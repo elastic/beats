@@ -97,13 +97,18 @@ datasources:
 #   install_path: "${path.data}/install"
 
 # process:
-#   # minimal port number for spawned processes
-#   min_port: 10000
-#   # maximum port number for spawned processes
-#   max_port: 30000
 #   # timeout for creating new processes. when process is not successfully created by this timeout
 #   # start operation is considered a failure
 #   spawn_timeout: 30s
+#   # timeout for stopping processes. when process is not stopped by this timeout then the process.
+#   # is force killed
+#   stop_timeout: 30s
+
+# grpc:
+#   # listen address for the GRPC server that spawned processes connect back to.
+#   address: localhost
+#   # port for the GRPC server that spawned processes connect back to.
+#   port: 6789
 
 # retry:
 #   # Enabled determines whether retry is possible. Default is false.

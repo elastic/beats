@@ -45,11 +45,10 @@ func (o *operationInstall) Name() string {
 	return "operation-install"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationInstall) Check() (bool, error) {
+// Check checks whether install needs to be ran.
+//
+// If the installation directory already exists then it will not be ran.
+func (o *operationInstall) Check(_ Application) (bool, error) {
 	installDir := o.program.Directory()
 	_, err := os.Stat(installDir)
 	return os.IsNotExist(err), nil

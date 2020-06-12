@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -18,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -48,6 +51,7 @@ type Managed struct {
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     *fleetGateway
+	srv         *server.Server
 }
 
 func newManaged(
@@ -114,6 +118,10 @@ func newManaged(
 	}
 
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
+	managedApplication.srv, err = server.NewFromConfig(log, rawConfig, &app.ApplicationStatusHandler{})
+	if err != nil {
+		return nil, errors.New(err, "initialize GRPC listener")
+	}
 
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
 	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
@@ -127,7 +135,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, client, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, managedApplication.srv, combinedReporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -204,6 +212,9 @@ func newManaged(
 // Start starts a managed elastic-agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
+	if err := m.srv.Start(); err != nil {
+		return err
+	}
 	m.gateway.Start()
 	return nil
 }
@@ -212,6 +223,7 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
+	m.srv.Stop()
 	return nil
 }
 

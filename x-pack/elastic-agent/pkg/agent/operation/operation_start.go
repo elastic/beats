@@ -7,6 +7,8 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -47,14 +49,16 @@ func (o *operationStart) Name() string {
 	return "operation-start"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationStart) Check() (bool, error) {
-	// TODO: get running processes and compare hashes
-
-	return true, nil
+// Check checks whether application needs to be started.
+//
+// Only starts the application when in stopped state, any other state
+// and the application is handled by the life cycle inside of the `Application`
+// implementation.
+func (o *operationStart) Check(application Application) (bool, error) {
+	if application.State().Status == state.Stopped {
+		return true, nil
+	}
+	return false, nil
 }
 
 // Run runs the operation

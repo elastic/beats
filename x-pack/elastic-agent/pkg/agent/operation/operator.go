@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -22,8 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 const (
@@ -43,6 +44,7 @@ type Operator struct {
 	config         *operatorCfg.Config
 	handlers       map[string]handleFunc
 	stateResolver  *stateresolver.StateResolver
+	srv            *server.Server
 	eventProcessor callbackHooks
 	monitor        monitoring.Monitor
 	isMonitoring   int
@@ -67,6 +69,7 @@ func NewOperator(
 	verifier download.Verifier,
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
+	srv *server.Server,
 	eventProcessor callbackHooks,
 	monitor monitoring.Monitor) (*Operator, error) {
 
@@ -92,6 +95,7 @@ func NewOperator(
 		verifier:       verifier,
 		installer:      installer,
 		stateResolver:  stateResolver,
+		srv:            srv,
 		apps:           make(map[string]Application),
 		eventProcessor: eventProcessor,
 		monitor:        monitor,
@@ -106,7 +110,7 @@ func NewOperator(
 }
 
 // State describes the current state of the system.
-// Reports all known beats and theirs states. Whether they are running
+// Reports all known applications and theirs states. Whether they are running
 // or not, and if they are information about process is also present.
 func (o *Operator) State() map[string]state.State {
 	result := make(map[string]state.State)
@@ -200,7 +204,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			return err
 		}
 
-		shouldRun, err := op.Check()
+		shouldRun, err := op.Check(app)
 		if err != nil {
 			return err
 		}
@@ -214,6 +218,11 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 		if err := op.Run(o.bgContext, app); err != nil {
 			return err
 		}
+	}
+
+	// when application is stopped remove from the operator
+	if app.State().Status == state.Stopped {
+		o.deleteApp(p)
 	}
 
 	return nil
@@ -230,8 +239,6 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return a, nil
 	}
 
-	factory := rconfig.NewConnFactory(o.config.RetryConfig.Delay, o.config.RetryConfig.MaxDelay)
-
 	specifier, ok := p.(app.Specifier)
 	if !ok {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
@@ -245,7 +252,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		o.pipelineID,
 		o.config.LoggingConfig.Level.String(),
 		specifier,
-		factory,
+		o.srv,
 		o.config,
 		o.logger,
 		o.eventProcessor.OnFailing,
@@ -257,6 +264,16 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	o.apps[id] = a
 	return a, nil
+}
+
+func (o *Operator) deleteApp(p Descriptor) {
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	id := p.ID()
+
+	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
+	delete(o.apps, id)
 }
 
 func isMonitorable(descriptor Descriptor) bool {
