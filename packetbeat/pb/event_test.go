@@ -41,7 +41,8 @@ func TestMarshalMapStr(t *testing.T) {
 	assert.Equal(t, common.MapStr{
 		"event": common.MapStr{
 			"kind":     "event",
-			"category": "network_traffic",
+			"category": []string{"network_traffic", "network"},
+			"type":     []string{"connection", "protocol"},
 		},
 		"source": common.MapStr{"ip": "127.0.0.1"},
 	}, m)
