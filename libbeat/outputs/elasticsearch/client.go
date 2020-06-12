@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"go.elastic.co/apm"
@@ -352,7 +353,7 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 			return "", errors.New("pipeline metadata is no string")
 		}
 
-		return pipeline, nil
+		return strings.ToLower(pipeline), nil
 	}
 
 	if pipelineSel != nil {
