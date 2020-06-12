@@ -934,9 +934,9 @@ def archiveTestOutput(Map args = [:]) {
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
-      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarbal")
+      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
       if (folder.trim()) {
-        def name = folder.replaceAll('/', '-').replaceAll('\\', '-').replaceAll('build', '')
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '')
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
