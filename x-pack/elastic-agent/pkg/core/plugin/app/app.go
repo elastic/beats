@@ -8,9 +8,12 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -19,8 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -44,11 +45,13 @@ type Application struct {
 	pipelineID      string
 	logLevel        string
 	spec            Specifier
-	state           state.State
-	grpcClient      remoteconfig.Client
-	clientFactory   remoteconfig.ConnectionCreator
+	srv             *server.Server
+	srvState        *server.ApplicationState
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
+	startContext    context.Context
+	tag             Taggable
+	state           state.State
 
 	uid int
 	gid int
@@ -73,7 +76,7 @@ func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
 	spec Specifier,
-	factory remoteconfig.ConnectionCreator,
+	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
 	failureReporter ReportFailureFunc,
@@ -93,7 +96,7 @@ func NewApplication(
 		pipelineID:      pipelineID,
 		logLevel:        logLevel,
 		spec:            spec,
-		clientFactory:   factory,
+		srv:             srv,
 		processConfig:   cfg.ProcessConfig,
 		downloadConfig:  cfg.DownloadConfig,
 		retryConfig:     cfg.RetryConfig,
@@ -111,6 +114,13 @@ func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
 }
 
+// State returns the application state.
+func (a *Application) State() state.State {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+	return a.state
+}
+
 // Name returns application name
 func (a *Application) Name() string {
 	return a.name
@@ -121,44 +131,38 @@ func (a *Application) Stop() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	if a.state.Status == state.Running && a.state.ProcessInfo != nil {
-		if closeClient, ok := a.grpcClient.(closer); ok {
-			closeClient.Close()
+	if a.state.Status == state.Stopped {
+		return
+	}
+
+	stopSig := os.Interrupt
+	if a.srvState != nil {
+		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+			// kill the process if stop through GRPC doesn't work
+			stopSig = os.Kill
 		}
-
-		process.Stop(a.logger, a.state.ProcessInfo.PID)
-
-		a.state.Status = state.Stopped
+		a.srvState = nil
+	}
+	if a.state.ProcessInfo != nil {
+		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
+			// no error on signal, so wait for it to stop
+			_, _ = a.state.ProcessInfo.Process.Wait()
+		}
 		a.state.ProcessInfo = nil
-		a.grpcClient = nil
-
-		// remove generated configuration if present
-		filename := fmt.Sprintf(configFileTempl, a.id)
-		filePath, err := filepath.Abs(filepath.Join(a.downloadConfig.InstallPath, filename))
-		if err == nil {
-			// ignoring error: not critical
-			os.Remove(filePath)
-		}
 
 		// cleanup drops
 		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
+	a.state.Status = state.Stopped
+	a.state.Message = "Stopped"
 }
 
-// State returns the state of the application [Running, Stopped].
-func (a *Application) State() state.State {
-	a.appLock.Lock()
-	defer a.appLock.Unlock()
-
-	return a.state
-}
-
-func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
 
 		select {
-		case ps := <-a.waitProc(proc):
+		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
 			a.Stop()
@@ -166,21 +170,23 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, c
 		}
 
 		a.appLock.Lock()
-		s := a.state.Status
-		a.state.Status = state.Stopped
 		a.state.ProcessInfo = nil
-		a.appLock.Unlock()
+		srvState := a.srvState
 
-		if procState.Success() {
+		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
+			a.appLock.Unlock()
 			return
 		}
 
-		if s == state.Running {
-			// it was a crash, report it async not to block
-			// process management with networking issues
-			go a.reportCrash(ctx)
-			a.Start(ctx, p, cfg)
-		}
+		msg := fmt.Sprintf("Exited with code: %d", procState.ExitCode())
+		a.state.Status = state.Crashed
+		a.state.Message = msg
+		a.appLock.Unlock()
+
+		// it was a crash, report it async not to block
+		// process management with networking issues
+		go a.reportCrash(ctx)
+		a.Start(ctx, p, cfg)
 	}()
 }
 

@@ -24,11 +24,10 @@ func (o *operationRemove) Name() string {
 	return "operation-remove"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationRemove) Check() (bool, error) {
+// Check checks whether remove needs to run.
+//
+// Always returns false.
+func (o *operationRemove) Check(_ Application) (bool, error) {
 	return false, nil
 }
 
