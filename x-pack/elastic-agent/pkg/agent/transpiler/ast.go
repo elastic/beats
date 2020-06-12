@@ -223,7 +223,7 @@ func (l *List) Find(idx string) (Node, bool) {
 	if l.value == nil {
 		return nil, false
 	}
-	if i > len(l.value) || i < 0 {
+	if i > len(l.value)-1 || i < 0 {
 		return nil, false
 	}
 
