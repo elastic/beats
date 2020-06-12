@@ -27,10 +27,9 @@ If no configuration file is specified, {agent} uses the default configuration,
 `elastic-agent.yml`, which is located in the same directory as {agent}. Specify
 the `-c` flag to use a different configuration file.
 
-For configuration options, see:
+For configuration options, see <<elastic-agent-configuration>>.
 
-* <<elastic-agent-configuration>>
-* <<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
+//<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
 
 [float]
 [[fleet-mode]]
@@ -39,8 +38,6 @@ For configuration options, see:
 With _fleet mode_, you manage {agent} remotely. The agent uses a trusted {kib}
 instance to retrieve configurations and report agent events. This trusted {kib}
 instance must have {ingest-manager} and {fleet} enabled.
-
-//TODO: Add links to topics about Ingest Manager.
 
 To create a trusted communication channel between {agent} and {kib}, enroll the
 agent to {fleet}.

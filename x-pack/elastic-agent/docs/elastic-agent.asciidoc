@@ -7,19 +7,12 @@ experimental[]
 collect data and send it to the {stack}. Behind the scenes, {agent} runs the
 {beats} shippers or Endpoint required for your configuration.
 
-//REVIEWERS: Maybe we shouldn't mention Endpoint yet ^^. WDYT?
-
-//REVIEWERS: Moved this up because I think it's important to highlight this up
-//front. It's covered in more detail later.
-
 To learn how to install, configure, and run your {agent}s, see:
 
 * <<elastic-agent-installation>>
 * <<run-elastic-agent>>
 * <<elastic-agent-cmd-options>>
 * <<elastic-agent-configuration>>
-
-//TODO: More these to the index.asciidoc for Ingest Management Guide?
 
 include::install-elastic-agent.asciidoc[leveloffset=+1]
 
@@ -29,4 +22,4 @@ include::elastic-agent-command-line.asciidoc[leveloffset=+1]
 
 include::elastic-agent-configuration.asciidoc[leveloffset=+1]
 
-include::elastic-agent-configuration-example.asciidoc[leveloffset=+1]
+//include::elastic-agent-configuration-example.asciidoc[leveloffset=+1]

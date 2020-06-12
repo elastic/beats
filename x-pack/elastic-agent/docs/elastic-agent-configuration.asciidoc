@@ -83,8 +83,6 @@ collected. If neither setting is specified, monitoring is disabled. Set
 [[elastic-agent-datasource-configuration]]
 == Datasource settings
 
-//TODO: provide more context here about what a data source is and how it's used.
-
 By default {agent} collects system metrics, such as cpu, memory, network, and
 filesystem metrics, and sends them to the default output. For example:
 
@@ -109,5 +107,5 @@ datasources:
 
 If `use_output` is not specified, the `default` output is used.
 
-For more examples, see
-<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>.
+//For more examples, see
+//<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>.
