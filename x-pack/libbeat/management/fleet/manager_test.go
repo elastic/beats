@@ -7,9 +7,13 @@ package fleet
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 )
 
 func TestConfigBlocks(t *testing.T) {
@@ -51,6 +55,16 @@ output:
 	if len(blocks) != 2 {
 		t.Fatalf("Expected 2 block have %d: %+v", len(blocks), blocks)
 	}
+}
+
+func TestStatusToProtoStatus(t *testing.T) {
+	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(management.Unknown))
+	assert.Equal(t, proto.StateObserved_STARTING, statusToProtoStatus(management.Starting))
+	assert.Equal(t, proto.StateObserved_CONFIGURING, statusToProtoStatus(management.Configuring))
+	assert.Equal(t, proto.StateObserved_HEALTHY, statusToProtoStatus(management.Running))
+	assert.Equal(t, proto.StateObserved_DEGRADED, statusToProtoStatus(management.Degraded))
+	assert.Equal(t, proto.StateObserved_FAILED, statusToProtoStatus(management.Failed))
+	assert.Equal(t, proto.StateObserved_STOPPING, statusToProtoStatus(management.Stopping))
 }
 
 type dummyReloadable struct{}
