@@ -93,7 +93,6 @@ type Handler interface {
 
 // Server is the GRPC server that the launched applications connect back to.
 type Server struct {
-	lock       sync.RWMutex
 	logger     *logger.Logger
 	ca         *authority.CertificateAuthority
 	listenAddr string
@@ -104,7 +103,7 @@ type Server struct {
 	watchdogDone chan bool
 	watchdogWG   sync.WaitGroup
 
-	apps map[string]*ApplicationState
+	apps sync.Map
 
 	// overridden in tests
 	watchdogCheckInterval time.Duration
@@ -122,7 +121,6 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 		ca:                    ca,
 		listenAddr:            listenAddr,
 		handler:               handler,
-		apps:                  make(map[string]*ApplicationState),
 		watchdogCheckInterval: WatchdogCheckLoop,
 		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
 	}, nil
@@ -176,14 +174,16 @@ func (s *Server) Stop() {
 
 // Get returns the application state from the server for the passed application.
 func (s *Server) Get(app interface{}) (*ApplicationState, bool) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-	for _, appState := range s.apps {
-		if appState.app == app {
-			return appState, true
+	var foundState *ApplicationState
+	s.apps.Range(func(_ interface{}, val interface{}) bool {
+		as := val.(*ApplicationState)
+		if as.app == app {
+			foundState = as
+			return false
 		}
-	}
-	return nil, false
+		return true
+	})
+	return foundState, foundState != nil
 }
 
 // Register registers a new application to connect to the server.
@@ -222,9 +222,7 @@ func (s *Server) Register(app interface{}, config string) (*ApplicationState, er
 		sentActions:       make(map[string]*sentAction),
 		actionsConn:       true,
 	}
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	s.apps[appState.token] = appState
+	s.apps.Store(appState.token, appState)
 	return appState, nil
 }
 
@@ -559,9 +557,7 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 func (as *ApplicationState) Destroy() {
 	as.destroyActionsStream()
 	as.destroyCheckinStream()
-	as.srv.lock.Lock()
-	delete(as.srv.apps, as.token)
-	as.srv.lock.Unlock()
+	as.srv.apps.Delete(as.token)
 }
 
 // UpdateConfig pushes an updated configuration to the connected application.
@@ -623,6 +619,49 @@ func (as *ApplicationState) PerformAction(name string, params map[string]interfa
 	}
 	res := <-resChan
 	return res.result, res.err
+}
+
+// App returns the registered app for the state.
+func (as *ApplicationState) App() interface{} {
+	return as.app
+}
+
+// Expected returns the expected state of the process.
+func (as *ApplicationState) Expected() proto.StateExpected_State {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.expected
+}
+
+// Config returns the expected config of the process.
+func (as *ApplicationState) Config() string {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.expectedConfig
+}
+
+// Status returns the current observed status.
+func (as *ApplicationState) Status() (proto.StateObserved_Status, string) {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.status, as.statusMessage
+}
+
+// SetStatus allows the status to be overwritten by the agent.
+//
+// This status will be overwritten by the client if it reconnects and updates it status.
+func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg string) {
+	as.checkinLock.RLock()
+	prevStatus := as.status
+	prevMessage := as.statusMessage
+	as.status = status
+	as.statusMessage = msg
+	as.checkinLock.RUnlock()
+
+	// alert the service handler that status has changed for the application
+	if prevStatus != status || prevMessage != msg {
+		as.srv.handler.OnStatusChange(as, status, msg)
+	}
 }
 
 // updateStatus updates the current observed status from the application, sends the expected state back to the
@@ -767,9 +806,9 @@ func (s *Server) watchdog() {
 		case <-time.After(s.watchdogCheckInterval):
 		}
 
-		s.lock.RLock()
 		now := time.Now().UTC()
-		for _, serverApp := range s.apps {
+		s.apps.Range(func(_ interface{}, val interface{}) bool {
+			serverApp := val.(*ApplicationState)
 			serverApp.checkinLock.RLock()
 			statusTime := serverApp.statusTime
 			serverApp.checkinLock.RUnlock()
@@ -798,27 +837,33 @@ func (s *Server) watchdog() {
 				}
 			}
 			serverApp.flushExpiredActions()
-		}
-		s.lock.RUnlock()
+			return true
+		})
 	}
 }
 
 // getByToken returns an application state by its token.
 func (s *Server) getByToken(token string) (*ApplicationState, bool) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-	a, ok := s.apps[token]
-	return a, ok
+	val, ok := s.apps.Load(token)
+	if ok {
+		return val.(*ApplicationState), true
+	}
+	return nil, false
 }
 
 // getCertificate returns the TLS certificate based on the clientHello or errors if not found.
 func (s *Server) getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-	for _, app := range s.apps {
-		if app.srvName == chi.ServerName {
-			return app.cert.Certificate, nil
+	var cert *tls.Certificate
+	s.apps.Range(func(_ interface{}, val interface{}) bool {
+		sa := val.(*ApplicationState)
+		if sa.srvName == chi.ServerName {
+			cert = sa.cert.Certificate
+			return false
 		}
+		return true
+	})
+	if cert != nil {
+		return cert, nil
 	}
 	return nil, errors.New("no supported TLS certificate", errors.TypeSecurity)
 }
