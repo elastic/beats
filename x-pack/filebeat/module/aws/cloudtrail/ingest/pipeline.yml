@@ -52,29 +52,29 @@ processors:
       formats:
         - ISO8601
   - rename:
-      field: "json.userIdentity.invokedBy"
-      target_field: "aws.cloudtrail.user_identity.invoked_by"
-      ignore_failure: true
-  - rename:
-      field: "json.userIdentity.sessionIssuer.type"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.type"
+      field: "json.userIdentity.sessionContext.sessionIssuer.type"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.type"
       ignore_failure: true
 # userIdentity.sessionIssuer.userName is only set with assumed roles.
   - rename:
-      field: "json.userIdentity.sessionIssuer.userName"
+      field: "json.userIdentity.sessionContext.sessionIssuer.userName"
       target_field: "user.name"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.principalId"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.principal_id"
+      field: "json.userIdentity.sessionContext.sessionIssuer.principalId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.principal_id"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.arn"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.arn"
+      field: "json.userIdentity.sessionContext.sessionIssuer.arn"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.arn"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.accountId"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.account_id"
+      field: "json.userIdentity.sessionContext.sessionIssuer.accountId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.invokedBy"
+      target_field: "aws.cloudtrail.user_identity.invoked_by"
       ignore_failure: true
   - rename:
       field: "json.eventSource"
@@ -102,6 +102,22 @@ processors:
       target_field: "source.geo"
       ignore_failure: true
       ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+        field: source.as.organization_name
+        target_field: source.as.organization.name
+        ignore_missing: true
   - user_agent:
       field: "json.userAgent"
       target_field: "user_agent"
@@ -210,20 +226,7 @@ processors:
           ctx.related.user.add(userName);
         }
 
-        ctx.event.type = 'info';
-        ctx.event.kind = 'event';
-        if (ctx.aws.cloudtrail.error_code != null || ctx.aws.cloudtrail.error_message != null) {
-            ctx.event.outcome = 'failure'
-        } else {
-            ctx.event.outcome = 'success'
-        }
 
-        if (ctx.json?.eventName == 'ConsoleLogin') {
-          ctx.event.category = 'authentication';
-          if (ctx.json?.responseElements.ConsoleLogin != null) {
-            ctx.event.outcome = Processors.lowercase(ctx.json.responseElements.ConsoleLogin);
-          }
-        }
 
         if (ctx.json?.requestParameters.userName != null) {
           addRelatedUser(ctx, ctx.json.requestParameters.userName);
@@ -262,6 +265,344 @@ processors:
           cl_map.put("additional_eventdata", aed_map);
           ctx.aws.cloudtrail.put("console_login", cl_map);
         }
+  - script:
+      lang: painless
+      ignore_failure: true
+      params:
+        AddUserToGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        AssumeRole:
+          category:
+            - authentication
+          type:
+            - info
+        AttachGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        AttachUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        ChangePassword:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        ConsoleLogin:
+          category:
+            - authentication
+          type:
+            - info
+        CreateAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        CreateBucket:
+          category:
+            - file
+          type:
+            - creation
+        CreateGroup:
+          category:
+            - iam
+          type:
+            - group
+            - creation
+        CreateKeyPair:
+          category:
+            - iam
+          type:
+            - admin
+            - creation
+        CreateUser:
+          category:
+            - iam
+          type:
+            - user
+            - creation
+        CreateVirtualMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeactivateMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteBucket:
+          category:
+            - file
+          type:
+            - deletion
+        DeleteGroup:
+          category:
+            - iam
+          type:
+            - group
+            - deletion
+        DeleteGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        DeleteSSHPublicKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteUser:
+          category:
+            - iam
+          type:
+            - user
+            - deletion
+        DeleteUserPermissionsBoundary:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteVirtualMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DetachGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        DetachUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        EnableMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        GetGroup:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        GetGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        GetUser:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        GetUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListAttachedGroupPolicies:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListAttachedUserPolicies:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListGroupsForUser:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListGroupPolicies:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListGroups:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListGroupsForUser:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUserPolicies:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUsers:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUserTags:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        PutGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        PutUserPermissionsBoundary:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        PutUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        RemoveUserFromGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        SetDefaultPolicyVersion:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        SetSecurityTokenServicePreferences:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        TagUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UntagUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateAccountPasswordPolicy:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        UpdateGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        UpdateLoginProfile:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateRole:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        UpdateSSHPublicKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+      source: >-
+        ctx.event.kind = 'event';
+        ctx.event.type = 'info';
+
+        if (ctx.aws.cloudtrail.error_code != null || ctx.aws.cloudtrail.error_message != null) {
+            ctx.event.outcome = 'failure'
+        } else {
+            ctx.event.outcome = 'success'
+        }
+
+        if (ctx?.event?.action == null) {
+            return;
+        }
+
+        if (ctx.event.action == 'ConsoleLogin' && ctx.json?.responseElements.ConsoleLogin != null) {
+            ctx.event.outcome = Processors.lowercase(ctx.json.responseElements.ConsoleLogin);
+        }
+        
+        def hm = new HashMap(params.get(ctx.event.action));
+        hm.forEach((k, v) -> ctx.event[k] = v);
 
   - remove:
       field:

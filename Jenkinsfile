@@ -23,6 +23,8 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -71,7 +73,7 @@ pipeline {
     stage('Lint'){
       options { skipDefaultCheckout() }
       steps {
-        makeTarget("Lint", "check")
+        makeTarget(context: "Lint", target: "check")
       }
     }
     stage('Build and Test'){
@@ -91,7 +93,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
+            mageTarget(context: "Elastic Agent x-pack Linux", directory: "x-pack/elastic-agent", target: "build test")
           }
         }
 
@@ -105,7 +107,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
+            mageTargetWin(context: "Elastic Agent x-pack Windows Unit test", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
         }
 
@@ -119,7 +121,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
+            mageTarget(context: "Elastic Agent x-pack Mac OS X", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
           post {
             always {
@@ -138,7 +140,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
+            makeTarget(context: "Filebeat oss Linux", target: "-C filebeat testsuite", withModule: true)
           }
         }
         stage('Filebeat x-pack'){
@@ -151,7 +153,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
+            mageTarget(context: "Filebeat x-pack Linux", directory: "x-pack/filebeat", target: "update build test", withModule: true)
           }
         }
         stage('Filebeat Mac OS X'){
@@ -164,7 +166,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
+            mageTarget(context: "Filebeat oss Mac OS X", directory: "filebeat", target: "build unitTest")
           }
           post {
             always {
@@ -182,7 +184,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+            mageTarget(context: "Filebeat x-pack Mac OS X", directory: "x-pack/filebeat", target: "build unitTest")
           }
           post {
             always {
@@ -200,7 +202,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+            mageTargetWin(context: "Filebeat oss Windows Unit test", directory: "filebeat", target: "build unitTest")
           }
         }
         stage('Filebeat x-pack Windows'){
@@ -213,7 +215,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
+            mageTargetWin(context: "Filebeat x-pack Windows", directory: "x-pack/filebeat", target: "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -228,7 +230,7 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
-                makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
+                makeTarget(context: "Heartbeat oss Linux", target: "-C heartbeat testsuite")
               }
             }
             stage('Heartbeat Mac OS X'){
@@ -241,7 +243,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
+                mageTarget(context: "Heartbeat oss Mac OS X", directory: "heartbeat", target: "build unitTest")
               }
               post {
                 always {
@@ -259,12 +261,12 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
+                mageTargetWin(context: "Heartbeat oss Windows Unit test", directory: "heartbeat", target: "build unitTest")
               }
             }
           }
         }
-        stage('Auditbeat oss'){
+        stage('Auditbeat oss Linux'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -273,48 +275,52 @@ pipeline {
               return env.BUILD_AUDITBEAT != "false"
             }
           }
-          stages {
-            stage('Auditbeat Linux'){
-              steps {
-                makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
-              }
+          steps {
+            makeTarget(context: "Auditbeat oss Linux", target: "-C auditbeat testsuite", withModule: true)
+          }
+        }
+        stage('Auditbeat crosscompile'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false"
             }
-            stage('Auditbeat crosscompile'){
-              steps {
-                makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
-              }
+          }
+          steps {
+            makeTarget(context: "Auditbeat oss crosscompile", target: "-C auditbeat crosscompile")
+          }
+        }
+        stage('Auditbeat oss Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.macosTest
             }
-            stage('Auditbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            mageTarget(context: "Auditbeat oss Mac OS X", directory: "auditbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Auditbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
-              }
+          }
+        }
+        stage('Auditbeat oss Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
+          }
+          steps {
+            mageTargetWin(context: "Auditbeat oss Windows Unit test", directory: "auditbeat", target: "build unitTest")
           }
         }
         stage('Auditbeat x-pack'){
@@ -327,7 +333,33 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+            mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true)
+          }
+        }
+        stage('Auditbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget(context: "Auditbeat x-pack Mac OS X", directory: "x-pack/auditbeat", target: "build unitTest")
+          }
+        }
+        stage('Auditbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin(context: "Auditbeat x-pack Windows", directory: "x-pack/auditbeat", target: "build unitTest")
           }
         }
         stage('Libbeat'){
@@ -342,17 +374,17 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
-                makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
+                makeTarget(context: "Libbeat oss Linux", target: "-C libbeat testsuite")
               }
             }
             stage('Libbeat crosscompile'){
               steps {
-                makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
+                makeTarget(context: "Libbeat oss crosscompile", target: "-C libbeat crosscompile")
               }
             }
             stage('Libbeat stress-tests'){
               steps {
-                makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
+                makeTarget(context: "Libbeat stress-tests", target: "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
               }
             }
           }
@@ -367,7 +399,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
+            makeTarget(context: "Libbeat x-pack Linux", target: "-C x-pack/libbeat testsuite")
           }
         }
         stage('Metricbeat OSS Unit tests'){
@@ -380,7 +412,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
+            mageTarget(context: "Metricbeat OSS linux/amd64 (unitTest)", directory: "metricbeat", target: "build unitTest")
           }
         }
         stage('Metricbeat OSS Integration tests'){
@@ -393,7 +425,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+            mageTarget(context: "Metricbeat OSS linux/amd64 (goIntegTest)", directory: "metricbeat", target: "goIntegTest", withModule: true)
           }
         }
         stage('Metricbeat Python integration tests'){
@@ -406,7 +438,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
+            mageTarget(context: "Metricbeat OSS linux/amd64 (pythonIntegTest)", directory: "metricbeat", target: "pythonIntegTest", withModule: true)
           }
         }
         stage('Metricbeat x-pack'){
@@ -433,7 +465,7 @@ pipeline {
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
-                  mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                  mageTarget(context: "Metricbeat x-pack Linux", directory: "x-pack/metricbeat", target: "build test", withModule: true)
                 }
               }
             }
@@ -454,7 +486,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
+            makeTarget(context: "Metricbeat OSS crosscompile", target: "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -467,7 +499,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
+            mageTarget(context: "Metricbeat OSS Mac OS X", directory: "metricbeat", target: "build unitTest")
           }
         }
         stage('Metricbeat x-pack Mac OS X'){
@@ -480,7 +512,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
+            mageTarget(context: "Metricbeat x-pack Mac OS X", directory: "x-pack/metricbeat", target: "build unitTest")
           }
           post {
             always {
@@ -498,7 +530,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+            mageTargetWin(context: "Metricbeat Windows Unit test", directory: "metricbeat", target: "build unitTest")
           }
         }
         stage('Metricbeat x-pack Windows'){
@@ -511,7 +543,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
+            mageTargetWin(context: "Metricbeat x-pack Windows", directory: "x-pack/metricbeat", target: "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -526,7 +558,7 @@ pipeline {
           stages {
             stage('Packetbeat oss'){
               steps {
-                makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
+                makeTarget(context: "Packetbeat oss Linux", target: "-C packetbeat testsuite")
               }
             }
           }
@@ -543,7 +575,7 @@ pipeline {
           stages {
             stage('Dockerlogbeat'){
               steps {
-                mageTarget("Elastic Docker Logging Driver Plugin unit tests", "x-pack/dockerlogbeat", "update build test")
+                mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "update build test")
               }
             }
           }
@@ -560,7 +592,7 @@ pipeline {
           stages {
             stage('Winlogbeat oss'){
               steps {
-                makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
+                makeTarget(context: "Winlogbeat oss crosscompile", target: "-C winlogbeat crosscompile")
               }
             }
             stage('Winlogbeat Windows'){
@@ -573,7 +605,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
+                mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "winlogbeat", target: "build unitTest")
               }
             }
           }
@@ -588,7 +620,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true)
           }
         }
         stage('Functionbeat'){
@@ -603,9 +635,9 @@ pipeline {
           stages {
             stage('Functionbeat x-pack'){
               steps {
-                mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
+                mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
                 withEnv(["GO_VERSION=1.13.1"]){
-                  makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
+                  makeTarget(context: "Functionbeat x-pack Linux", target: "-C x-pack/functionbeat test-gcp-functions")
                 }
               }
             }
@@ -619,7 +651,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
+                mageTarget(context: "Functionbeat x-pack Mac OS X", directory: "x-pack/functionbeat", target: "build unitTest")
               }
               post {
                 always {
@@ -637,7 +669,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+                mageTargetWin(context: "Functionbeat Windows Unit test", directory: "x-pack/functionbeat", target: "build unitTest")
               }
             }
           }
@@ -654,7 +686,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
+                makeTarget(context: "Journalbeat Linux", target: "-C journalbeat testsuite")
               }
             }
           }
@@ -673,8 +705,8 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
+                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
+                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
                 }
               }
             }
@@ -682,8 +714,8 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
+                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
+                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
                 }
               }
             }
@@ -699,7 +731,7 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+                  makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
                 }
               }
               post {
@@ -720,7 +752,7 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                  makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
                 }
               }
               post {
@@ -765,12 +797,19 @@ def delete() {
 }
 
 def fixPermissions(location) {
-  sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
+  sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+    source ./dev-tools/common.bash
+    docker_setup
+    script/fix_permissions.sh ${location}""", returnStatus: true)
 }
 
-def makeTarget(String context, String target, boolean clean = true) {
+def makeTarget(Map args = [:]) {
+  def context = args.context
+  def target = args.target
+  def clean = args.get('clean', true)
+  def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(true) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(target)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -783,9 +822,13 @@ def makeTarget(String context, String target, boolean clean = true) {
   }
 }
 
-def mageTarget(String context, String directory, String target) {
+def mageTarget(Map args = [:]) {
+  def context = args.context
+  def directory = args.directory
+  def target = args.target
+  def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(true) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(directory)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -799,9 +842,13 @@ def mageTarget(String context, String directory, String target) {
   }
 }
 
-def mageTargetWin(String context, String directory, String target) {
+def mageTargetWin(Map args = [:]) {
+  def context = args.context
+  def directory = args.directory
+  def target = args.target
+  def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin() {
+    withBeatsEnvWin(withModule: withModule, modulePattern: getModulePattern(directory)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -815,9 +862,26 @@ def mageTargetWin(String context, String directory, String target) {
   }
 }
 
-def withBeatsEnv(boolean archive, Closure body) {
+def getModulePattern(String toCompare) {
+  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
+  return (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
+}
+
+def withBeatsEnv(Map args = [:], Closure body) {
+  def archive = args.get('archive', true)
+  def withModule = args.get('withModule', false)
+  def modulePattern
+  if (withModule) {
+    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnv: modulePattern parameter is required.')
+  }
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+
+  // NOTE: This is required to run after the unstash
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -830,9 +894,8 @@ def withBeatsEnv(boolean archive, Closure body) {
     "PYTHON_ENV=${WORKSPACE}/python-env",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
+    "MODULE=${module}"
   ]) {
-    deleteDir()
-    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -880,10 +943,21 @@ def archiveTestOutput(Map args = [:]) {
   }
 }
 
-def withBeatsEnvWin(Closure body) {
+def withBeatsEnvWin(Map args = [:], Closure body) {
+  def withModule = args.get('withModule', false)
+  def modulePattern
+  if (withModule) {
+    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnvWin: modulePattern parameter is required.')
+  }
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
+
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+
+  // NOTE: This is required to run after the unstash
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -893,9 +967,8 @@ def withBeatsEnvWin(Closure body) {
     "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
+    "MODULE=${module}"
   ]){
-    deleteDir()
-    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -1006,11 +1079,11 @@ def k8sTest(versions){
     stage("k8s ${v}"){
       withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
-          withBeatsEnv(false) {
+          withBeatsEnv(archive: false, withModule: false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
             sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
-            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
@@ -1130,7 +1203,7 @@ def terraformApply(String directory) {
 //   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
 def startCloudTestEnv(String name, environments = []) {
   withCloudTestEnv() {
-    withBeatsEnv(false) {
+    withBeatsEnv(archive: false, withModule: false) {
       def runAll = params.runAllCloudTests
       try {
         for (environment in environments) {
@@ -1155,7 +1228,7 @@ def startCloudTestEnv(String name, environments = []) {
 def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
-      withBeatsEnv(false) {
+      withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${stashName}")
         retry(2) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
@@ -1238,11 +1311,21 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+}
 
-  // Run the ITs by running only if the changeset affects a specific module.
-  // For such, it's required to look for changes under the module folder and exclude anything else
-  // such as ascidoc and png files.
-  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+/**
+  This method gathers the module name, if required, in order to run the ITs only if 
+  the changeset affects a specific module.
+
+  For such, it's required to look for changes under the module folder and exclude anything else
+  such as ascidoc and png files.
+*/
+def getCommonModuleInTheChangeSet(String pattern) {
+  def module = ''
+  dir("${env.BASE_DIR}") {
+    module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+  }
+  return module
 }
 
 /**

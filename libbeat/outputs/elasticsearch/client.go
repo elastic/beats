@@ -19,10 +19,10 @@ package elasticsearch
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"go.elastic.co/apm"
@@ -84,7 +84,7 @@ func NewClient(
 		URL:              s.URL,
 		Username:         s.Username,
 		Password:         s.Password,
-		APIKey:           base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
+		APIKey:           s.APIKey,
 		Headers:          s.Headers,
 		TLS:              s.TLS,
 		Kerberos:         s.Kerberos,
@@ -353,7 +353,7 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 			return "", errors.New("pipeline metadata is no string")
 		}
 
-		return pipeline, nil
+		return strings.ToLower(pipeline), nil
 	}
 
 	if pipelineSel != nil {

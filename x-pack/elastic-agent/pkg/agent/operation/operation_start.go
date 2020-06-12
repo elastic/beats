@@ -7,18 +7,19 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 )
 
 // operationStart start installed process
 // skips if process is already running
 type operationStart struct {
-	program        app.Descriptor
 	logger         *logger.Logger
+	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
 	eventProcessor callbackHooks
@@ -28,6 +29,7 @@ type operationStart struct {
 
 func newOperationStart(
 	logger *logger.Logger,
+	program Descriptor,
 	operatorConfig *config.Config,
 	cfg map[string]interface{},
 	eventProcessor callbackHooks) *operationStart {
@@ -35,6 +37,7 @@ func newOperationStart(
 
 	return &operationStart{
 		logger:         logger,
+		program:        program,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
 		eventProcessor: eventProcessor,
@@ -46,14 +49,16 @@ func (o *operationStart) Name() string {
 	return "operation-start"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationStart) Check() (bool, error) {
-	// TODO: get running processes and compare hashes
-
-	return true, nil
+// Check checks whether application needs to be started.
+//
+// Only starts the application when in stopped state, any other state
+// and the application is handled by the life cycle inside of the `Application`
+// implementation.
+func (o *operationStart) Check(application Application) (bool, error) {
+	if application.State().Status == state.Stopped {
+		return true, nil
+	}
+	return false, nil
 }
 
 // Run runs the operation
@@ -72,5 +77,5 @@ func (o *operationStart) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	return application.Start(ctx, o.cfg)
+	return application.Start(ctx, o.program, o.cfg)
 }

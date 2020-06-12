@@ -45,21 +45,29 @@ processors:
     field: fortinet.firewall.tranip
     target_field: destination.nat.ip
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.dstport
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.tranport
     target_field: destination.nat.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.rcvdbyte
     target_field: destination.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.rcvdpkt
     target_field: destination.packets
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.dstcollectedemail
@@ -77,9 +85,11 @@ processors:
     field: fortinet.firewall.group
     target_field: source.user.group.name
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.sentbyte
     target_field: source.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.srcdomain
@@ -93,9 +103,11 @@ processors:
     field: fortinet.firewall.srcmac
     target_field: source.mac
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.srcport
     target_field: source.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.unauthuser
@@ -110,17 +122,21 @@ processors:
     field: fortinet.firewall.collectedemail
     target_field: source.user.email
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.sentpkt
     target_field: source.packets
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.transip
     target_field: source.nat.ip
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.transport
     target_field: source.nat.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.app
@@ -280,6 +296,17 @@ processors:
     field: related.user
     value: "{{destination.user.name}}"
     if: "ctx.destination?.user?.name != null"
+- remove:
+    field:
+    - fortinet.firewall.dstport
+    - fortinet.firewall.tranport
+    - fortinet.firewall.rcvdbyte
+    - fortinet.firewall.rcvdpkt
+    - fortinet.firewall.sentbyte
+    - fortinet.firewall.srcport
+    - fortinet.firewall.sentpkt
+    - fortinet.firewall.transport
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

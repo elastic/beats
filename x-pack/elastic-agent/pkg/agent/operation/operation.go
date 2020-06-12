@@ -7,6 +7,7 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
@@ -22,7 +23,7 @@ type operation interface {
 	// examples:
 	// - Start does not need to run if process is running
 	// - Fetch does not need to run if package is already present
-	Check() (bool, error)
+	Check(application Application) (bool, error)
 	// Run runs the operation
 	Run(ctx context.Context, application Application) error
 }
@@ -30,11 +31,11 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
-	Start(ctx context.Context, cfg map[string]interface{}) error
+	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
-	State() state.State
 	Monitor() monitoring.Monitor
+	State() state.State
 }
 
 // Descriptor defines a program which needs to be run.
@@ -44,5 +45,5 @@ type Descriptor interface {
 	Version() string
 	ID() string
 	Directory() string
-	IsGrpcConfigurable() bool
+	Tags() map[app.Tag]string
 }
