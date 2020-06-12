@@ -170,6 +170,11 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		}
 
 		a.appLock.Lock()
+		if a.state.ProcessInfo != proc {
+			// already another process started, another watcher is watching instead
+			a.appLock.Unlock()
+			return
+		}
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
 
@@ -178,15 +183,15 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 			return
 		}
 
-		msg := fmt.Sprintf("Exited with code: %d", procState.ExitCode())
+		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
 		a.state.Status = state.Crashed
 		a.state.Message = msg
-		a.appLock.Unlock()
 
 		// it was a crash, report it async not to block
 		// process management with networking issues
-		go a.reportCrash(ctx)
-		a.Start(ctx, p, cfg)
+		go a.reportCrash(ctx, msg)
+		a.start(ctx, p, cfg)
+		a.appLock.Unlock()
 	}()
 }
 
@@ -206,12 +211,13 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) reportCrash(ctx context.Context) {
+func (a *Application) reportCrash(ctx context.Context, reason string) {
 	a.monitor.Cleanup(a.name, a.pipelineID)
 
 	// TODO: reporting crash
 	if a.failureReporter != nil {
 		crashError := errors.New(
+			fmt.Errorf(reason),
 			fmt.Sprintf("application '%s' crashed", a.id),
 			errors.TypeApplicationCrash,
 			errors.M(errors.MetaKeyAppName, a.name),

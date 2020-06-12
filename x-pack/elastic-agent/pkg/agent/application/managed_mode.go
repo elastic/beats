@@ -116,7 +116,13 @@ func newManaged(
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
 	managedApplication.srv, err = server.NewFromConfig(log, rawConfig, &app.ApplicationStatusHandler{})
 	if err != nil {
-		return nil, errors.New(err, "initialize GRPC listener")
+		return nil, errors.New(err, "initialize GRPC listener", errors.TypeNetwork)
+	}
+	// must start before `Start` is called as Fleet will already try to start applications
+	// before `Start` is even called.
+	err = managedApplication.srv.Start()
+	if err != nil {
+		return nil, errors.New(err, "starting GRPC listener", errors.TypeNetwork)
 	}
 
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
@@ -208,9 +214,6 @@ func newManaged(
 // Start starts a managed elastic-agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
-	if err := m.srv.Start(); err != nil {
-		return err
-	}
 	m.gateway.Start()
 	return nil
 }

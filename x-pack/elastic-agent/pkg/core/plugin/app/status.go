@@ -53,7 +53,7 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 
 		// it was a crash, report it async not to block
 		// process management with networking issues
-		go app.reportCrash(context.Background())
+		go app.reportCrash(context.Background(), msg)
 
 		// kill the process
 		if app.state.ProcessInfo != nil {
@@ -62,13 +62,12 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 		}
 		ctx := app.startContext
 		tag := app.tag
-		app.appLock.Unlock()
 
 		// it was marshalled to pass into the state, so unmarshall will always succeed
 		var cfg map[string]interface{}
 		_ = yaml.Unmarshal([]byte(state.Config()), &cfg)
 
-		err := app.Start(ctx, tag, cfg)
+		err := app.start(ctx, tag, cfg)
 		if err != nil {
 			app.logger.Error(errors.New(
 				fmt.Sprintf("application '%s' failed to restart", app.id),
@@ -76,7 +75,6 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 				errors.M(errors.MetaKeyAppName, app.name),
 				errors.M(errors.MetaKeyAppName, app.id)))
 		}
-		return
 	}
 	app.appLock.Unlock()
 }
