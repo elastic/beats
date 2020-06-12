@@ -84,6 +84,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
 		go runner.Stop()
+		moduleStops.Add(1)
 	}
 
 	// Start new runners
@@ -101,7 +102,10 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
 		runner.Start()
+		moduleStarts.Add(1)
 	}
+
+	moduleRunning.Set(int64(len(r.runners)))
 
 	return errs.Err()
 }
