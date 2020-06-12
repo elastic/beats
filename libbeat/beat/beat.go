@@ -67,7 +67,7 @@ type Beat struct {
 
 	Fields []byte // Data from fields.yml
 
-	ConfigManager management.ConfigManager // config manager
+	Manager management.Manager // manager
 
 	Keystore keystore.Keystore
 }
