@@ -36,29 +36,39 @@ func newClientCacheWrap(client cfClient, ttl time.Duration, log *logp.Logger) *c
 	}
 }
 
+type cachedAppResponse struct {
+	app *cfclient.App
+	err error
+}
+
 // fetchApp uses the cfClient to retrieve an App entity and
 // stores it in the internal cache
 func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 	app, err := c.client.GetAppByGuid(guid)
-	if err != nil {
-		return nil, err
+	resp := cachedAppResponse{
+		app: &app,
+		err: err,
 	}
-	c.cache.Put(app.Guid, &app)
-	return &app, nil
+	if err != nil {
+		// Cache nil, because is what we want to return when there was an error
+		resp.app = nil
+	}
+	c.cache.Put(guid, &resp)
+	return resp.app, resp.err
 }
 
 // GetApp returns CF Application info, either from the cache or
 // using the CF client.
 func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
-	cachedApp := c.cache.Get(guid)
-	if cachedApp == nil {
+	cachedResp := c.cache.Get(guid)
+	if cachedResp == nil {
 		return c.fetchAppByGuid(guid)
 	}
-	app, ok := cachedApp.(*cfclient.App)
+	resp, ok := cachedResp.(*cachedAppResponse)
 	if !ok {
-		return nil, fmt.Errorf("error converting cached app")
+		return nil, fmt.Errorf("error converting cached app response (of type %T), this is likely a bug", cachedResp)
 	}
-	return app, nil
+	return resp.app, resp.err
 }
 
 // StartJanitor starts a goroutine that will periodically clean the applications cache.
