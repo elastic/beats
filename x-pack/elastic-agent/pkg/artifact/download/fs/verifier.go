@@ -53,7 +53,14 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 
 	fullPath := filepath.Join(v.config.TargetDirectory, filename)
 
-	return v.verifyHash(filename, fullPath)
+	isMatch, err := v.verifyHash(filename, fullPath)
+	if !isMatch || err != nil {
+		// remove bits so they can be redownloaded
+		os.Remove(fullPath)
+		os.Remove(fullPath + ".sha512")
+	}
+
+	return isMatch, err
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {

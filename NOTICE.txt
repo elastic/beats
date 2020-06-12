@@ -1912,6 +1912,15 @@ SOFTWARE
   to the Commercial Software.
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-concert
+Version: v0.0.2
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-concert/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit/v2
 Version: v2.0.0
 Revision: 92371bef3fb8
@@ -8135,11 +8144,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/lint
-Revision: fdd1cda4f05f
+Revision: 910be7a94367
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/lint/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: golang.org/x/mod
+Version: v0.1.1
+Revision: c90efee705ee
+License type (autodetected): BSD-3-Clause
+./vendor/golang.org/x/mod/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2009 The Go Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -8373,7 +8417,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 7b8e75db28f4
+Revision: b320d3a0f5a2
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
