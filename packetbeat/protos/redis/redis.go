@@ -327,7 +327,7 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 		fields["response"] = resp.message
 	}
 
-	pbf.Event.Action = "redis." + strings.ToLower(fields["method"].(string))
+	pbf.Event.Action = "redis." + strings.ToLower(string(requ.method))
 	if resp.isError {
 		pbf.Event.Outcome = "failure"
 	}

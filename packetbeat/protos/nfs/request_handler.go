@@ -198,5 +198,6 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 		} else {
 			nfs.pbf.Event.Outcome = "failure"
 		}
+		r.results(nfs.event)
 	}
 }
