@@ -28,9 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
-
-	// Register includes.
-	_ "github.com/elastic/beats/v7/auditbeat/include"
 )
 
 const (
