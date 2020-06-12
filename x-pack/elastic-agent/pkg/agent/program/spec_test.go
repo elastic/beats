@@ -43,6 +43,9 @@ func TestSerialization(t *testing.T) {
 				"log",
 			),
 		),
+		PostRules: transpiler.NewRuleList(
+			transpiler.Copy("filebeat", "inputs"),
+		),
 		PostInstallSteps: transpiler.NewStepList(
 			transpiler.DeleteFile("d-1", true),
 			transpiler.MoveFile("m-1", "m-2", false),
@@ -87,6 +90,10 @@ rules:
     key: type
     values:
     - log
+post_rules:
+- copy:
+    from: filebeat
+    to: inputs
 post_install:
 - delete_file:
     path: d-1
