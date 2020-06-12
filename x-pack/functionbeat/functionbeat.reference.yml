@@ -896,10 +896,7 @@ output.elasticsearch:
   # timing out. The default is 30s.
   #timeout: 30s
 
-
-
-
-# ------------------------------- Console Output -------------------------------
+#----------------------------- Console output ---------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -912,7 +909,7 @@ output.elasticsearch:
     # Configure escaping HTML symbols in strings.
     #escape_html: false
 
-# =================================== Paths ====================================
+#================================= Paths ======================================
 
 # The home path for the Functionbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
