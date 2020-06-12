@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -28,6 +29,8 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	log := logp.NewLogger("cloudfoundry")
+
 	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
@@ -44,9 +47,9 @@ func NewInput(
 
 	switch conf.Version {
 	case cloudfoundry.ConsumerVersionV1:
-		return newInputV1(conf, out, context)
+		return newInputV1(log, conf, out, context)
 	case cloudfoundry.ConsumerVersionV2:
-		return newInputV2(conf, out, context)
+		return newInputV2(log, conf, out, context)
 	default:
 		return nil, fmt.Errorf("not supported consumer version: %s", conf.Version)
 	}

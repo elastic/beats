@@ -26,9 +26,7 @@ type InputV1 struct {
 	outlet   channel.Outleter
 }
 
-func newInputV1(conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV1, error) {
-	log := logp.NewLogger("cloudfoundry")
-
+func newInputV1(log *logp.Logger, conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV1, error) {
 	hub := cloudfoundry.NewHub(&conf, "filebeat", log)
 	forwarder := harvester.NewForwarder(out)
 
