@@ -7843,8 +7843,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: go.elastic.co/ecszap
-Version: v0.1.1
-Revision: cdd95a104193
+Version: v0.2.0
 License type (autodetected): Apache-2.0
 ./vendor/go.elastic.co/ecszap/LICENSE:
 --------------------------------------------------------------------
