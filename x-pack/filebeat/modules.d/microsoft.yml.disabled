@@ -2,10 +2,26 @@
 # Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-microsoft.html
 
 - module: microsoft
-  # All logs
-  {fileset}:
+  # ATP configuration
+  atp:
     enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    # Alerts URL, should match the choosen interval
+    #var.url: "https://api.securitycenter.windows.com/api/alerts"
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+   
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+
+    # Common SSL options
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }

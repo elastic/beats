@@ -14,17 +14,15 @@ var:
   - name: http_headers
     default: |-
       {"Content-Type": "application/json"}
+  
   - name: oauth2
-    - name: provider
-      default: azure
-    - name: client.id
-      default: ""
-    - name: client.secret
-      default: ""
-    - name: token_url
-      default: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
-    - name: azure.resource
-      default: "https://api.securitycenter.windows.com/"
+    default: 
+      provider: azure
+      azure.resource: https://api.securitycenter.windows.com/
+
+  - name: ssl
+    default: |-
+      {}
 
 ingest_pipeline: ingest/pipeline.json
 input: config/atp.yml
