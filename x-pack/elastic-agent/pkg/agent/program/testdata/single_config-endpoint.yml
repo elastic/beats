@@ -1,0 +1,86 @@
+fleet:
+  kibana_url: https://kibana.mydomain.com:5601
+  ca_hash: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+  checkin_interval: 5m
+
+output:
+  elasticsearch:
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+
+type: endpoint
+enabled: true
+streams: []
+policy:
+  linux:
+    malware:
+      mode: prevent
+    advanced:
+      elasticsearch:
+        indices:
+          logging: logging-index
+          control: control-index
+          event: event-index
+        kernel:
+          process: true
+          connect: true
+    logging:
+      file: info
+      stdout: debug
+    events:
+      registry: true
+      process: true
+      security: true
+      file: true
+      dns: false
+      dll_and_driver_load: false
+      network: true
+  windows:
+    malware:
+      mode: prevent
+    advanced:
+      elasticsearch:
+        indices:
+          logging: logging-index
+          control: control-index
+          event: event-index
+        kernel:
+          process: true
+          connect: true
+    logging:
+      file: info
+      stdout: debug
+    events:
+      registry: true
+      process: true
+      security: true
+      file: true
+      dns: false
+      dll_and_driver_load: false
+      network: true
+  mac:
+    malware:
+      mode: prevent
+    advanced:
+      elasticsearch:
+        indices:
+          logging: logging-index
+          control: control-index
+          event: event-index
+        kernel:
+          process: true
+          connect: true
+    logging:
+      file: info
+      stdout: debug
+    events:
+      registry: true
+      process: true
+      security: true
+      file: true
+      dns: false
+      dll_and_driver_load: false
+      network: true

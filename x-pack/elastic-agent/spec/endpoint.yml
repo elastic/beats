@@ -1,0 +1,29 @@
+name: Endpoint
+rules:
+- fix_stream: {}
+
+- extract_list_items:
+    path: datasources
+    item: inputs
+    to: inputs
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - endpoint
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
+
+- overwrite:
+    from: inputs.0
+    to: ""
+    except:
+      - fleet
+      - output
+
+when: Equals(%{[type]}, 'endpoint') && HasAny('fleet') && HasNamespace('output', 'elasticsearch')

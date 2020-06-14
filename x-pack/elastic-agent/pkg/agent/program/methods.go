@@ -27,6 +27,8 @@ func methodsEnv(ast *transpiler.AST) *boolexp.MethodsReg {
 	var methods = boolexp.NewMethodsReg()
 	methods.MustRegister("HasItems", withEnv(env, hasItems))
 	methods.MustRegister("HasNamespace", withEnv(env, hasNamespace))
+	methods.MustRegister("HasAny", withEnv(env, hasAny))
+	methods.MustRegister("Equals", withEnv(env, equals))
 	return methods
 }
 
@@ -110,6 +112,52 @@ func hasNamespace(env *env, args []interface{}) (interface{}, error) {
 	}
 
 	return true, nil
+}
+
+// hasAny the methods take a list of possible keys where at least one of those keys must exist.
+func hasAny(env *env, args []interface{}) (interface{}, error) {
+	if len(args) < 1 {
+		return false, fmt.Errorf("expecting at least 1 argument received %d", len(args))
+	}
+
+	possibleKeys := make([]string, 0, len(args))
+
+	for _, v := range args {
+		sk, ok := v.(string)
+		if !ok {
+			return false, fmt.Errorf("invalid key %+v", v)
+		}
+		possibleKeys = append(possibleKeys, sk)
+	}
+
+	for _, key := range possibleKeys {
+		_, ok := transpiler.Lookup(env.ast, transpiler.Selector(key))
+		if ok {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// equals the value and ensures that it equals the value
+func equals(env *env, args []interface{}) (interface{}, error) {
+	if len(args) != 2 {
+		return false, fmt.Errorf("expecting exactly 2 arguments, received %d", len(args))
+	}
+
+	if args[0] == boolexp.Null {
+		return false, nil
+	}
+
+	v, ok := args[0].(transpiler.Node).Value().(*transpiler.StrVal)
+	if !ok {
+		return false, fmt.Errorf("expecting StrVal and received %T", args[0])
+	}
+	m, ok := args[1].(string)
+	if !ok {
+		return false, fmt.Errorf("expecting string and received %T", args[1])
+	}
+	return v.Value().(string) == m, nil
 }
 
 func withEnv(env *env, method envFunc) boolexp.CallFunc {
