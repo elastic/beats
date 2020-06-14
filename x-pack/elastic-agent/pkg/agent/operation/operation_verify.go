@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -18,7 +20,6 @@ import (
 // operationVerify verifies downloaded artifact for correct signature
 // skips if artifact is already installed
 type operationVerify struct {
-	eventProcessor callbackHooks
 	program        Descriptor
 	operatorConfig *config.Config
 	verifier       download.Verifier
@@ -27,12 +28,10 @@ type operationVerify struct {
 func newOperationVerify(
 	program Descriptor,
 	operatorConfig *config.Config,
-	verifier download.Verifier,
-	eventProcessor callbackHooks) *operationVerify {
+	verifier download.Verifier) *operationVerify {
 	return &operationVerify{
 		program:        program,
 		operatorConfig: operatorConfig,
-		eventProcessor: eventProcessor,
 		verifier:       verifier,
 	}
 }
@@ -64,11 +63,7 @@ func (o *operationVerify) Check(_ Application) (bool, error) {
 func (o *operationVerify) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 
