@@ -27,7 +27,6 @@ import (
 	"sync"
 	"time"
 
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
