@@ -49,7 +49,7 @@ func (b *messageBuffer) startNewMessage(msg reader.Message) {
 	b.load(msg)
 }
 
-// load loads the reader with the given message. It is recommend to either
+// load loads the reader with the given message. It is recommended to either
 // run clear or finalize before.
 func (b *messageBuffer) load(m reader.Message) {
 	b.addLine(m)

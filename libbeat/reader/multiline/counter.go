@@ -57,6 +57,11 @@ func (cr *counterReader) readFirst() (reader.Message, error) {
 		}
 
 		cr.msgBuffer.startNewMessage(message)
+		if cr.isEnoughLines() {
+			msg := cr.msgBuffer.finalize()
+			return msg, nil
+		}
+
 		cr.setState((*counterReader).readNext)
 		return cr.readNext()
 	}
@@ -93,16 +98,19 @@ func (cr *counterReader) readNext() (reader.Message, error) {
 			}
 		}
 
-		// if enough lines are aggregated, return multiline event
-		if !cr.msgBuffer.isEmptyMessage() && cr.msgBuffer.numLines == cr.msgBuffer.maxLines {
+		// add line to current multiline event
+		cr.msgBuffer.addLine(message)
+		if cr.isEnoughLines() {
 			msg := cr.msgBuffer.finalize()
-			cr.msgBuffer.load(message)
+			cr.setState((*counterReader).readFirst)
 			return msg, nil
 		}
 
-		// add line to current multiline event
-		cr.msgBuffer.addLine(message)
 	}
+}
+
+func (cr *counterReader) isEnoughLines() bool {
+	return cr.msgBuffer.numLines == cr.msgBuffer.maxLines
 }
 
 func (cr *counterReader) readFailed() (reader.Message, error) {

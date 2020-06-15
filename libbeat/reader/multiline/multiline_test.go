@@ -217,6 +217,16 @@ func TestMultilineCount(t *testing.T) {
 		"line1\n line1.1\nline2\n line2.1\n",
 		"line3\n line3.1\nline4\n line4.1\n",
 	)
+	maxLines = 1
+	testMultilineOK(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 1,
+		},
+		8,
+		"line1\n", "line1.1\n", "line2\n", "line2.1\n", "line3\n", "line3.1\n", "line4\n", "line4.1\n",
+	)
 }
 
 func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
