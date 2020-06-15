@@ -19,12 +19,14 @@ package beat
 
 // Config defines the structure for the Beat module configuration options
 type Config struct {
-	XPackEnabled bool `config:"xpack.enabled"`
+	XPackEnabled       bool `config:"xpack.enabled"`
+	XPackUseDataStream bool `config:"xpack.use_data_stream"`
 }
 
 // DefaultConfig returns the default configuration for the Beat module
 func DefaultConfig() Config {
 	return Config{
-		XPackEnabled: false,
+		XPackEnabled:       false,
+		XPackUseDataStream: false,
 	}
 }

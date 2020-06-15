@@ -176,7 +176,7 @@ var (
 	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -235,7 +235,9 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 			"source_node":  sourceNode,
 		}
 
-		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		if !useDataStream {
+			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		}
 		r.Event(event)
 	}
 	return errs.Err()

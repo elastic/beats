@@ -143,7 +143,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, useDataStream bool) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -202,7 +202,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 			event.RootFields["cluster_uuid"] = clusterUUID
 		}
 
-		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+		if !useDataStream {
+			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+		}
 		r.Event(event)
 	}
 

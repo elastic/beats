@@ -80,7 +80,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	err = eventMappingXPack(r, m, pipelinesContent, overrideClusterUUID)
+	err = eventMappingXPack(r, m, pipelinesContent, overrideClusterUUID, m.MetricSet.XPackUseDataStream)
 	if err != nil {
 		m.Logger().Error(err)
 	}

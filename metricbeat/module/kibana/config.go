@@ -19,12 +19,14 @@ package kibana
 
 // Config defines the structure for the Kibana module configuration options
 type Config struct {
-	XPackEnabled bool `config:"xpack.enabled"`
+	XPackEnabled       bool `config:"xpack.enabled"`
+	XPackUseDataStream bool `config:"xpack.use_data_stream"`
 }
 
 // DefaultConfig returns the default configuration for the Kibana module
 func DefaultConfig() Config {
 	return Config{
-		XPackEnabled: false,
+		XPackEnabled:       false,
+		XPackUseDataStream: false,
 	}
 }

@@ -59,7 +59,7 @@ var (
 	}
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -93,8 +93,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	event.RootFields.Put("interval_ms", m.Module().Config().Period/time.Millisecond)
 	event.RootFields.Put("type", "indices_stats")
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-
+	if !useDataStream {
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	}
 	r.Event(event)
 	return nil
 }

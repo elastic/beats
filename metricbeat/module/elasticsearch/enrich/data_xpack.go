@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -38,7 +38,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 
 	now := common.Time(time.Now())
 	intervalMS := m.Module().Config().Period / time.Millisecond
-	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+
+	var index string
+	if !useDataStream {
+		index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	}
 
 	indexExecutingPolicies(r, data, info, now, intervalMS, index)
 	indexCoordinatorStats(r, data, info, now, intervalMS, index)
@@ -55,7 +59,9 @@ func indexExecutingPolicies(r mb.ReporterV2, enrichData response, esInfo elastic
 			"type":                          "enrich_executing_policy_stats",
 			"enrich_executing_policy_stats": stat,
 		}
-		event.Index = indexName
+		if indexName != "" {
+			event.Index = indexName
+		}
 		r.Event(event)
 	}
 }
@@ -70,7 +76,9 @@ func indexCoordinatorStats(r mb.ReporterV2, enrichData response, esInfo elastics
 			"type":                     "enrich_coordinator_stats",
 			"enrich_coordinator_stats": stat,
 		}
-		event.Index = indexName
+		if indexName != "" {
+			event.Index = indexName
+		}
 		r.Event(event)
 	}
 }

@@ -26,7 +26,8 @@ import (
 type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
-	XPackEnabled bool
+	XPackEnabled       bool
+	XPackUseDataStream bool
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -46,6 +47,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		base,
 		http,
 		config.XPackEnabled,
+		config.XPackUseDataStream,
 	}
 
 	return ms, nil

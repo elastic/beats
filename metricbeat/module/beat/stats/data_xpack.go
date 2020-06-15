@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/beat"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte, useDataStream bool) error {
 	now := time.Now()
 	clusterUUID, err := m.getClusterUUID()
 	if err != nil {
@@ -67,7 +67,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []
 		"beats_stats":  fields,
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+	if !useDataStream {
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+	}
 
 	r.Event(event)
 	return nil

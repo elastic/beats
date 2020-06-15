@@ -164,7 +164,7 @@ func settingsDataParser(r mb.ReporterV2, data common.MapStr, now time.Time) (str
 	return "kibana_settings", clusterUUID, kibanaSettingsFields.(map[string]interface{}), nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser) error {
+func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, dataParserFunc dataParser, useDataStream bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -185,16 +185,18 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content
 		t:              fields,
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
+	if !useDataStream {
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
+	}
 
 	r.Event(event)
 	return nil
 }
 
-func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
-	return eventMappingXPack(r, intervalMs, now, content, statsDataParser)
+func eventMappingStatsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, useDataStream bool) error {
+	return eventMappingXPack(r, intervalMs, now, content, statsDataParser, useDataStream)
 }
 
-func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte) error {
-	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser)
+func eventMappingSettingsXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content []byte, useDataStream bool) error {
+	return eventMappingXPack(r, intervalMs, now, content, settingsDataParser, useDataStream)
 }

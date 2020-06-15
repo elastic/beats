@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -38,7 +38,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 
 	now := common.Time(time.Now())
 	intervalMS := m.Module().Config().Period / time.Millisecond
-	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+
+	var index string
+	if !useDataStream {
+		index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	}
 
 	indexCCRStats(r, data, info, now, intervalMS, index)
 	indexCCRAutoFollowStats(r, data, info, now, intervalMS, index)
@@ -57,7 +61,9 @@ func indexCCRStats(r mb.ReporterV2, ccrData response, esInfo elasticsearch.Info,
 				"ccr_stats":    followerShard,
 			}
 
-			event.Index = indexName
+			if indexName != "" {
+				event.Index = indexName
+			}
 			r.Event(event)
 		}
 	}
@@ -73,6 +79,8 @@ func indexCCRAutoFollowStats(r mb.ReporterV2, ccrData response, esInfo elasticse
 		"ccr_auto_follow_stats": ccrData.AutoFollowStats,
 	}
 
-	event.Index = indexName
+	if indexName != "" {
+		event.Index = indexName
+	}
 	r.Event(event)
 }

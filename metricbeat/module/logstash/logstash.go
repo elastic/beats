@@ -54,7 +54,8 @@ var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
-	XPack bool
+	XPack              bool
+	XPackUseDataStream bool
 }
 
 type graph struct {
@@ -84,9 +85,11 @@ type PipelineState struct {
 // within the Logstash module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	config := struct {
-		XPack bool `config:"xpack.enabled"`
+		XPack              bool `config:"xpack.enabled"`
+		XPackUseDataStream bool `config:"xpack.use_data_stream"`
 	}{
-		XPack: false,
+		XPack:              false,
+		XPackUseDataStream: false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -101,6 +104,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		base,
 		http,
 		config.XPack,
+		config.XPackUseDataStream,
 	}, nil
 }
 

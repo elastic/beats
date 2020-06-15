@@ -30,7 +30,7 @@ import (
 	b "github.com/elastic/beats/v7/metricbeat/module/beat"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byte, useDataStream bool) error {
 	now := time.Now()
 
 	// Massage info into beat
@@ -76,7 +76,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byt
 		"beats_state":  fields,
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+	if !useDataStream {
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+	}
 
 	r.Event(event)
 	return nil

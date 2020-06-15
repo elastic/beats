@@ -148,7 +148,7 @@ func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
 	return clusterSettings, nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -238,7 +238,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	if !useDataStream {
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	}
 	r.Event(event)
 
 	return nil

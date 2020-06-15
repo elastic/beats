@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState, overrideClusterUUID string) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState, overrideClusterUUID string, useDataStream bool) error {
 	pipelines = getUserDefinedPipelines(pipelines)
 	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
@@ -54,7 +54,9 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 			}
 
 			event.ID = pipeline.EphemeralID
-			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+			if !useDataStream {
+				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+			}
 			r.Event(event)
 		}
 	}

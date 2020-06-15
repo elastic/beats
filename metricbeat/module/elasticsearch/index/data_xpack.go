@@ -129,7 +129,7 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte, useDataStream bool) error {
 	clusterStateMetrics := []string{"metadata", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
@@ -160,7 +160,9 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 			"index_stats":  idx,
 		}
 
-		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		if !useDataStream {
+			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		}
 		r.Event(event)
 	}
 

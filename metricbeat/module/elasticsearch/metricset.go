@@ -42,7 +42,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	XPack bool
+	XPack              bool
+	XPackUseDataStream bool
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -54,9 +55,11 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack bool `config:"xpack.enabled"`
+		XPack              bool `config:"xpack.enabled"`
+		XPackUseDataStream bool `config:"xpack.use_data_stream"`
 	}{
-		XPack: false,
+		XPack:              false,
+		XPackUseDataStream: false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -67,6 +70,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.XPack,
+		config.XPackUseDataStream,
 	}
 
 	ms.SetServiceURI(servicePath)

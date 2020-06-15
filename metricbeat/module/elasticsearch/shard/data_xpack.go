@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, useDataStream bool) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
@@ -99,7 +99,9 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 					continue
 				}
 
-				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				if !useDataStream {
+					event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				}
 				r.Event(event)
 			}
 		}

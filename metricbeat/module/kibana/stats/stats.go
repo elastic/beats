@@ -180,7 +180,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 
 	if m.XPackEnabled {
 		intervalMs := m.calculateIntervalMs()
-		err = eventMappingStatsXPack(r, intervalMs, now, content)
+		err = eventMappingStatsXPack(r, intervalMs, now, content, m.MetricSet.XPackUseDataStream)
 		if err != nil {
 			// Since this is an x-pack code path, we log the error but don't
 			// return it. Otherwise it would get reported into `metricbeat-*`
@@ -203,7 +203,7 @@ func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 	}
 
 	intervalMs := m.calculateIntervalMs()
-	err = eventMappingSettingsXPack(r, intervalMs, now, content)
+	err = eventMappingSettingsXPack(r, intervalMs, now, content, m.MetricSet.XPackUseDataStream)
 	if err != nil {
 		m.Logger().Error(err)
 		return
