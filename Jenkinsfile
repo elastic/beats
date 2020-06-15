@@ -704,7 +704,7 @@ pipeline {
             stage('Generators Metricbeat Linux'){
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
                   makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
                   makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
                 }
@@ -713,7 +713,7 @@ pipeline {
             stage('Generators Beat Linux'){
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
                   makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
                   makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
                 }
@@ -730,7 +730,7 @@ pipeline {
               }
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
                   makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
                 }
               }
@@ -751,7 +751,7 @@ pipeline {
               }
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
                   makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
                 }
               }

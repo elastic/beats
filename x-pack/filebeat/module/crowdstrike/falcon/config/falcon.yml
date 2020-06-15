@@ -12,6 +12,9 @@ multiline.match: after
 multiline.max_lines: 5000
 multiline.timeout: 10
 
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
 processors:
 - script:
     lang: javascript
