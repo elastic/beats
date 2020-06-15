@@ -31,14 +31,14 @@
           property-strategies:
             # Builds for PRs won't be triggered automatically.
             # Only the master branch will be triggered automatically. 
-            - named-branches:
+            named-branches:
               - defaults:
                 - suppress-scm-triggering: true
               - exceptions:
                 - exception:
-                    branch-name: master
-                    properties:
-                      - suppress-scm-triggering: false
+                  branch-name: master
+                  properties:
+                    - suppress-scm-triggering: false
           clean:
             after: true
             before: true
