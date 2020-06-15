@@ -68,7 +68,8 @@
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ],
         "url.domain": "elastic.co",
         "url.path": "/config/"
@@ -142,7 +143,8 @@
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ],
         "url.domain": "elastic.co",
         "url.path": "/"
@@ -214,7 +216,8 @@
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ],
         "tls.client.server_name": "test.elastic.co",
         "url.domain": "elastic.co",
@@ -283,7 +286,8 @@
         "source.ip": "192.168.2.1",
         "source.port": 53430,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -353,7 +357,8 @@
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ],
         "url.domain": "elastic.no",
         "url.path": "/"
@@ -421,7 +426,8 @@
         "source.ip": "192.168.2.1",
         "source.port": 54438,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -480,7 +486,8 @@
         "source.ip": "192.168.2.1",
         "source.port": 54788,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -544,7 +551,8 @@
         "source.user.group.name": "elasticgroup2",
         "source.user.name": "elasticuser2",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -589,7 +597,8 @@
         "source.ip": "10.10.10.10",
         "source.user.name": "elasticouser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -652,7 +661,8 @@
         "source.ip": "8.8.8.8",
         "source.port": 500,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -719,7 +729,8 @@
         "source.ip": "9.9.9.9",
         "source.port": 500,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -763,7 +774,8 @@
         "rule.description": "System performance statistics",
         "service.type": "fortinet",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -809,7 +821,8 @@
         "source.ip": "10.10.10.10",
         "source.user.name": "elastiiiuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -874,7 +887,8 @@
         "source.ip": "7.6.3.4",
         "source.port": 500,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -902,7 +916,8 @@
         "rule.description": "FortiSandbox AV database updated",
         "service.type": "fortinet",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -942,7 +957,8 @@
         "service.type": "fortinet",
         "source.user.name": "elastico",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -990,7 +1006,8 @@
         "rule.description": "SSL VPN new connection",
         "service.type": "fortinet",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1044,7 +1061,8 @@
         "source.user.group.name": "somegroup",
         "source.user.name": "someuser",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1089,7 +1107,8 @@
         "source.ip": "192.168.1.1",
         "source.user.name": "elasticadmin",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1118,7 +1137,8 @@
         "rule.description": "FortiCloud server connected",
         "service.type": "fortinet",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1148,7 +1168,8 @@
         "rule.description": "FortiCloud server disconnected",
         "service.type": "fortinet",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1215,7 +1236,8 @@
         "source.ip": "192.168.1.6",
         "source.port": 53438,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1302,7 +1324,8 @@
         "source.packets": 723417,
         "source.port": 6000,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1377,7 +1400,8 @@
         "source.ip": "2001:4860:4860::8888",
         "source.packets": 4,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1452,7 +1476,8 @@
         "source.ip": "9.7.7.7",
         "source.packets": 0,
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1518,7 +1543,8 @@
         "source.port": 62493,
         "source.user.name": "elasticsuper",
         "tags": [
-            "fortinet-firewall"
+            "fortinet-firewall",
+            "forwarded"
         ]
     }
 ]
