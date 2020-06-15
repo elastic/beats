@@ -264,7 +264,9 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FUNCTIONBEAT_XPACK != "false"
+              return params.windowsTest
+              // NOTE: commented to run all the windows stages.
+              //return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
           stages {
