@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -38,8 +37,6 @@ import (
 type redisOut struct {
 	beat beat.Info
 }
-
-var debugf = logp.MakeDebug("redis")
 
 const (
 	defaultWaitRetry    = 1 * time.Second
@@ -95,12 +92,7 @@ func makeRedis(
 		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
 
-	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "key",
-		MultiKey:         "keys",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
+	key, err := buildKeySelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -176,4 +168,14 @@ func makeRedis(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildKeySelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
+	})
 }

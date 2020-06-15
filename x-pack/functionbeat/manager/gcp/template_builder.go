@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	runtime          = "go111"                            // Golang 1.11
+	runtime          = "go113"                            // Golang 1.13
 	archiveURL       = "gs://%s/%s"                       // path to the function archive
 	locationTemplate = "projects/%s/locations/%s"         // full name of the location
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions

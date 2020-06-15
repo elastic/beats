@@ -1,0 +1,90 @@
+description: Pipeline for normalizing Zeek kerberos.log
+processors:
+- set:
+    field: event.created
+    value: '{{_ingest.timestamp}}'
+- date:
+    field: zeek.kerberos.ts
+    formats:
+    - UNIX
+- remove:
+    field: zeek.kerberos.ts
+- script:
+    source: "ctx.zeek.kerberos.valid.days = Math.round( (ctx.zeek.kerberos.valid.until - ctx.zeek.kerberos.valid.from) / 86400 )"
+    if: "ctx.zeek.kerberos.valid?.from != null && ctx.zeek.kerberos.valid?.until != null"
+- date:
+    field: zeek.kerberos.valid.until
+    target_field: zeek.kerberos.valid.until
+    formats:
+    - UNIX
+    if: ctx.zeek.kerberos.valid?.until != null
+- date:
+    field: zeek.kerberos.valid.from
+    target_field: zeek.kerberos.valid.from
+    formats:
+    - UNIX
+    if: ctx.zeek.kerberos.valid?.from != null
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.zeek?.kerberos?.success == true"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.zeek?.kerberos?.success == false"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -4,14 +4,26 @@
         "destination.address": "192.168.10.10",
         "destination.ip": "192.168.10.10",
         "destination.port": 445,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.dpd",
         "event.id": "CRrT7S1ccw9H6hzCR",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info"
+        ],
         "fileset.name": "dpd",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:b+Szw+ia464igf5e+MwW1WUzw9Y=",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.10.31",
+            "192.168.10.10"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.10.31",
         "source.ip": "192.168.10.31",

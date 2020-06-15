@@ -31,6 +31,9 @@ import (
 )
 
 func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
+	// Test if flakey.
+	t.Skip("See https://github.com/elastic/beats/issues/17126")
+
 	conf := map[string]interface{}{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},

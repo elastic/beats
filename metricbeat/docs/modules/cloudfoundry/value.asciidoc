@@ -3,9 +3,9 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-cloudfoundry-value]]
-=== cloudfoundry value metricset
+=== Cloudfoundry value metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/cloudfoundry/value/_meta/docs.asciidoc[]
 

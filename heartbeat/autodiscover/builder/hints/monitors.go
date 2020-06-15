@@ -23,6 +23,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -60,7 +62,7 @@ func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create config based on input hints in the bus event
-func (hb *heartbeatHints) CreateConfig(event bus.Event) []*common.Config {
+func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var hints common.MapStr
 	hIface, ok := event["hints"]
 	if ok {

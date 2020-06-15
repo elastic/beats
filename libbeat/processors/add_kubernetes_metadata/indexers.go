@@ -19,7 +19,6 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
@@ -55,7 +54,6 @@ type MetadataIndex struct {
 }
 
 type Indexers struct {
-	sync.RWMutex
 	indexers []Indexer
 }
 
@@ -91,8 +89,6 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 // GetIndexes returns the composed index list from all registered indexers
 func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 	var indexes []string
-	i.RLock()
-	defer i.RUnlock()
 	for _, indexer := range i.indexers {
 		for _, i := range indexer.GetIndexes(pod) {
 			indexes = append(indexes, i)
@@ -104,8 +100,6 @@ func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
 // GetMetadata returns the composed metadata list from all registered indexers
 func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
-	i.RLock()
-	defer i.RUnlock()
 	for _, indexer := range i.indexers {
 		for _, m := range indexer.GetMetadata(pod) {
 			metadata = append(metadata, m)
@@ -116,8 +110,6 @@ func (i *Indexers) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 // Empty returns true if indexers list is empty
 func (i *Indexers) Empty() bool {
-	i.RLock()
-	defer i.RUnlock()
 	if len(i.indexers) == 0 {
 		return true
 	}

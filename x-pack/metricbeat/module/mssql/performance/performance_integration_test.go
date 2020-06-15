@@ -81,7 +81,7 @@ func TestFetch(t *testing.T) {
 		{key: "connections_reset_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "logouts_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "logins_per_sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "recompilations_per_sec", assertion: int64Assertion(int64EqualZero)},
+		{key: "recompilations_per_sec", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "compilations_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "batch_requests_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "buffer.cache_hit.pct", assertion: float64Assertion(float64HigherThanZero)},

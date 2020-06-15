@@ -1,0 +1,63 @@
+This is the remote_write metricset of the module prometheus. This metricset can receive metrics from a Prometheus server that
+has configured https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write[remote_write] setting accordingly, for instance:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+remote_write:
+  - url: "http://localhost:9201/write"
+------------------------------------------------------------------------------
+
+
+TIP: In order to assure the health of the whole queue, the following configuration
+ https://prometheus.io/docs/practices/remote_write/#parameters[parameters] should be considered:
+
+- `max_shards`: Sets the maximum number of parallelism with which Prometheus will try to send samples to Metricbeat.
+It is recommended that this setting should be equal to the number of cores of the machine where Metricbeat runs.
+Metricbeat can handle connections in parallel and hence setting `max_shards` to the number of parallelism that
+Metricbeat can actually achieve is the optimal queue configuration.
+- `max_samples_per_send`: Sets the number of samples to batch together for each send. Recommended values are
+between 100 (default) and 1000. Having a bigger batch can lead to improved throughput and in more efficient
+storage since Metricbeat groups metrics with the same labels into same event documents.
+However this will increase the memory usage of Metricbeat.
+- `capacity`: It is recommended to set capacity to 3-5 times `max_samples_per_send`.
+Capacity sets the number of samples that are queued in memory per shard, and hence capacity should be high enough so as to
+be able to cover `max_samples_per_send`.
+
+
+Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
+A basic configuration would look like:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+------------------------------------------------------------------------------
+
+
+
+Also consider using secure settings for the server, configuring the module with TLS/SSL as shown:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  ssl.certificate: "/etc/pki/server/cert.pem"
+  ssl.key: "/etc/pki/server/cert.key"
+  port: "9201"
+------------------------------------------------------------------------------
+
+and on Prometheus side:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+remote_write:
+  - url: "https://localhost:9201/write"
+    tls_config:
+        cert_file: "/etc/prometheus/my_key.pem"
+        key_file: "/etc/prometheus/my_key.key"
+        # Disable validation of the server certificate.
+        #insecure_skip_verify: true
+------------------------------------------------------------------------------

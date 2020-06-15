@@ -3,10 +3,16 @@
     "@timestamp": "2019-12-18T16:22:12.3425087Z",
     "event": {
       "action": "changed-computer-account",
+      "category": "iam",
       "code": 4742,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "admin"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
@@ -40,7 +46,7 @@
         "HomeDirectory": "-",
         "HomePath": "-",
         "LogonHours": "-",
-        "NewUacList": [
+        "NewUACList": [
           "ENCRYPTED_TEXT_PWD_ALLOWED"
         ],
         "NewUacValue": "0x84",

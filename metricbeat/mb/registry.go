@@ -68,6 +68,7 @@ type MetricSetRegistration struct {
 	IsDefault  bool
 	HostParser HostParser
 	Namespace  string
+	Replace    bool
 }
 
 // MetricSetOption sets an option for a MetricSetFactory that is being
@@ -96,6 +97,15 @@ func DefaultMetricSet() MetricSetOption {
 func WithNamespace(namespace string) MetricSetOption {
 	return func(r *MetricSetRegistration) {
 		r.Namespace = namespace
+	}
+}
+
+// MustReplace specifies that the MetricSetFactory must be replacing an existing
+// metricset with the same name. An error will happen if there is no metricset
+// defined with the same params.
+func MustReplace() MetricSetOption {
+	return func(r *MetricSetRegistration) {
+		r.Replace = true
 	}
 }
 
@@ -201,20 +211,26 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 	module = strings.ToLower(module)
 	name = strings.ToLower(name)
 
-	if metricsets, ok := r.metricSets[module]; !ok {
-		r.metricSets[module] = map[string]MetricSetRegistration{}
-	} else if _, exists := metricsets[name]; exists {
-		return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
-	}
-
-	if factory == nil {
-		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
-	}
-
 	// Set the options.
 	msInfo := MetricSetRegistration{Name: name, Factory: factory}
 	for _, opt := range options {
 		opt(&msInfo)
+	}
+
+	if metricsets, ok := r.metricSets[module]; !ok {
+		if msInfo.Replace {
+			return fmt.Errorf("metricset '%s/%s' should be replacing an existing metricset, none found", module, name)
+		}
+
+		r.metricSets[module] = map[string]MetricSetRegistration{}
+	} else if _, exists := metricsets[name]; exists {
+		if !msInfo.Replace {
+			return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
+		}
+	}
+
+	if factory == nil {
+		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}
 
 	r.metricSets[module][name] = msInfo

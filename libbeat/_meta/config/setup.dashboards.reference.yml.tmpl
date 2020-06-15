@@ -1,0 +1,44 @@
+{{header "Dashboards"}}
+
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards are disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The directory from where to read the dashboards. The default is the `kibana`
+# folder in the home path.
+#setup.dashboards.directory: ${path.home}/kibana
+
+# The URL from where to download the dashboards archive. It is used instead of
+# the directory if it has a value.
+#setup.dashboards.url:
+
+# The file archive (zip file) from where to read the dashboards. It is used instead
+# of the directory when it has a value.
+#setup.dashboards.file:
+
+# In case the archive contains the dashboards from multiple Beats, this lets you
+# select which one to load. You can load all the dashboards in the archive by
+# setting this to the empty string.
+#setup.dashboards.beat: {{.BeatName}}
+
+# The name of the Kibana index to use for setting the configuration. Default is ".kibana"
+#setup.dashboards.kibana_index: .kibana
+
+# The Elasticsearch index name. This overwrites the index name defined in the
+# dashboards and index pattern. Example: testbeat-*
+#setup.dashboards.index:
+
+# Always use the Kibana API for loading the dashboards instead of autodetecting
+# how to install the dashboards by first querying Elasticsearch.
+#setup.dashboards.always_kibana: false
+
+# If true and Kibana is not reachable at the time when dashboards are loaded,
+# it will retry to reconnect to Kibana instead of exiting with an error.
+#setup.dashboards.retry.enabled: false
+
+# Duration interval between Kibana connection retries.
+#setup.dashboards.retry.interval: 1s
+
+# Maximum number of retries before exiting with an error, 0 for unlimited retrying.
+#setup.dashboards.retry.maximum: 0

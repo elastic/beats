@@ -17,7 +17,7 @@ from .compose import ComposeMixin
 
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
-                        "agent.type", "agent.hostname", "agent.version"]
+                        "agent.type", "agent.name", "agent.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -147,11 +147,24 @@ class TestCase(unittest.TestCase, ComposeMixin):
         self.build_path = build_dir + "/system-tests/"
 
         # Start the containers needed to run these tests
-        self.compose_up()
+        self.compose_up_with_retries()
 
     @classmethod
     def tearDownClass(self):
         self.compose_down()
+
+    @classmethod
+    def compose_up_with_retries(self):
+        retries = 3
+        for i in range(retries):
+            try:
+                self.compose_up()
+                return
+            except Exception as e:
+                if i + 1 >= retries:
+                    raise e
+                print("Compose up failed, retrying: {}".format(e))
+                self.compose_down()
 
     def run_beat(self,
                  cmd=None,
@@ -560,6 +573,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
 
+                if field.get("type") == "object" and field.get("object_type") == "histogram":
+                    fields.append(newName + ".values")
+                    fields.append(newName + ".counts")
+
                 if field.get("type") == "alias":
                     aliases.append(newName)
 
@@ -569,7 +586,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
         # "fields.yml" you should run "make update" on metricbeat folder
-        with open(fields_doc, "r") as f:
+        with open(fields_doc, "r", encoding="utf_8") as f:
             path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")

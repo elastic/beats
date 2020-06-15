@@ -19,8 +19,10 @@ package hints
 
 import (
 	"fmt"
-
+	"strconv"
 	"strings"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
@@ -69,7 +71,7 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create configs based on hints passed from providers
-func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
+func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var config []*common.Config
 	host, _ := event["host"].(string)
 	if host == "" {
@@ -84,6 +86,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	}
 
 	modulesConfig := m.getModules(hints)
+	// here we handle raw configs if provided
 	if modulesConfig != nil {
 		configs := []*common.Config{}
 		for _, cfg := range modulesConfig {
@@ -93,7 +96,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, options...)
 
 	}
 
@@ -154,7 +157,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, config)
+	return template.ApplyConfigTemplate(event, config, options...)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -185,7 +188,7 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string,
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) ||
+		if strings.Contains(h, "data.port") || m.checkHostPort(h, port) ||
 			// Use the event that has no port config if there is a ${data.host}:9090 like input
 			(port == 0 && strings.Contains(h, "data.host")) {
 			result = append(result, h)
@@ -198,6 +201,27 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string,
 	}
 
 	return result, true
+}
+
+func (m *metricHints) checkHostPort(h string, p int) bool {
+	port := strconv.Itoa(p)
+
+	index := strings.LastIndex(h, ":"+port)
+	// Check if host contains :port. If not then return false
+	if index == -1 {
+		return false
+	}
+
+	// Check if the host ends with :port. Return true if yes
+	end := index + len(port) + 1
+	if end == len(h) {
+		return true
+	}
+
+	// Check if the character immediately after :port. If its not a number then return true.
+	// This is to avoid adding :80 as a valid host for an event that has port=8080
+	// Also ensure that port=3306 and hint="tcp(${data.host}:3306)/" is valid
+	return h[end] < '0' || h[end] > '9'
 }
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {

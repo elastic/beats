@@ -22,11 +22,11 @@
       description: >
         Time elapsed since the first bytes were read from the client
     - name: upstream.name
-      type: text
+      type: keyword
       description: >
         The name of the upstream.
     - name: upstream.alternative_name
-      type: text
+      type: keyword
       description: >
         The name of the alternative upstream.
     - name: upstream.response.length
@@ -44,7 +44,7 @@
       description: >
         The status code of the response obtained from the upstream server
     - name: http.request.id
-      type: text
+      type: keyword
       description: >
         The randomly generated ID of the request
     - name: upstream.ip

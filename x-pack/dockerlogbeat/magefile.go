@@ -14,46 +14,52 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-
-	"github.com/elastic/beats/v7/dev-tools/mage"
-
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/pkg/errors"
-
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
-var hubID = "elastic"
-var logDriverName = "elastic-logging-plugin"
-var dockerPluginName = filepath.Join(hubID, logDriverName)
-var packageStagingDir = "build/package/"
-var packageEndDir = "build/distributions/"
-var buildDir = filepath.Join(packageStagingDir, logDriverName)
-var dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
-var rootImageName = "rootfsimage"
+const (
+	hubID             = "elastic"
+	logDriverName     = "elastic-logging-plugin"
+	dockerPluginName  = hubID + "/" + logDriverName
+	packageStagingDir = "build/package/"
+	packageEndDir     = "build/distributions/"
+	rootImageName     = "rootfsimage"
+)
+
+var (
+	buildDir         = filepath.Join(packageStagingDir, logDriverName)
+	dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+)
 
 func init() {
 	devtools.BeatLicense = "Elastic License"
 	devtools.BeatDescription = "The Docker Logging Driver is a docker plugin for the Elastic Stack."
+	devtools.Platforms = devtools.Platforms.Filter("linux/amd64")
 }
 
-// getPluginName returns the fully qualified name:version string
+// getPluginName returns the fully qualified name:version string.
 func getPluginName() (string, error) {
-	version, err := mage.BeatQualifiedVersion()
+	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
 		return "", errors.Wrap(err, "error getting beats version")
 	}
@@ -74,7 +80,7 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
-		return errors.Wrap(err, "Error locating temp dir")
+		return errors.Wrap(err, "error locating temp dir")
 	}
 	defer sh.Rm(tmpDir)
 
@@ -119,16 +125,16 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 // * send this to the plugin create API endpoint
 func BuildContainer(ctx context.Context) error {
 	// setup
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
-	mage.CreateDir(packageStagingDir)
-	mage.CreateDir(packageEndDir)
+	devtools.CreateDir(packageStagingDir)
+	devtools.CreateDir(packageEndDir)
 	err = os.MkdirAll(filepath.Join(buildDir, "rootfs"), 0755)
 	if err != nil {
-		return errors.Wrap(err, "Error creating build dir")
+		return errors.Wrap(err, "error creating build dir")
 	}
 
 	err = createContainer(ctx, cli)
@@ -167,12 +173,12 @@ func BuildContainer(ctx context.Context) error {
 
 	_, err = io.Copy(file, exportReader)
 	if err != nil {
-		return errors.Wrap(err, "Error writing exported container")
+		return errors.Wrap(err, "error writing exported container")
 	}
 
 	//misc prepare operations
 
-	err = mage.Copy("config.json", filepath.Join(buildDir, "config.json"))
+	err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
 	if err != nil {
 		return errors.Wrap(err, "error copying config.json")
 	}
@@ -203,9 +209,9 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 
 // Uninstall removes working objects and containers
 func Uninstall(ctx context.Context) error {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	//check to see if we have a plugin we need to remove
@@ -249,9 +255,9 @@ func Install(ctx context.Context) error {
 		return err
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	archiveOpts := &archive.TarOptions{
@@ -278,12 +284,12 @@ func Install(ctx context.Context) error {
 
 // Export exports a "ready" root filesystem and config.json into a tarball
 func Export() error {
-	version, err := mage.BeatQualifiedVersion()
+	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
 		return errors.Wrap(err, "error getting beats version")
 	}
 
-	if mage.Snapshot {
+	if devtools.Snapshot {
 		version = version + "-SNAPSHOT"
 	}
 
@@ -308,7 +314,7 @@ func Export() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(devtools.ForPlatforms("linux/amd64"))
+	return devtools.CrossBuild()
 }
 
 // Build builds the base container used by the docker plugin
@@ -319,7 +325,6 @@ func Build() {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-
 	buildArgs := devtools.DefaultBuildArgs()
 	buildArgs.CGO = false
 	buildArgs.Static = true
@@ -329,6 +334,14 @@ func GolangCrossBuild() error {
 
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
+	start := time.Now()
+	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+
+	if _, enabled := devtools.Platforms.Get("linux/amd64"); !enabled {
+		fmt.Println(">> package: skipping because linux/amd64 is not enabled")
+		return
+	}
+
 	mg.SerialDeps(Build, Export)
 }
 
@@ -337,12 +350,16 @@ func BuildAndInstall() {
 	mg.SerialDeps(Build, Install)
 }
 
-// IntegTest is currently a dummy test for the `testsuite` target
-func IntegTest() {
-	fmt.Printf("There are no Integration tests for The Elastic Log Plugin\n")
-}
-
 // Update is currently a dummy test for the `testsuite` target
 func Update() {
-	fmt.Printf("There is no Update for The Elastic Log Plugin\n")
+	fmt.Println(">> update: There is no Update for The Elastic Log Plugin")
+}
+
+func newDockerClient(ctx context.Context) (*client.Client, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	cli.NegotiateAPIVersion(ctx)
+	return cli, nil
 }

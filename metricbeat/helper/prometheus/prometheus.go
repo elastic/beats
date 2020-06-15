@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+const acceptHeader = `application/openmetrics-text; version=0.0.1,text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
 	// GetFamilies requests metric families from prometheus endpoint and returns them
@@ -55,10 +57,11 @@ type httpfetcher interface {
 // NewPrometheusClient creates new prometheus helper
 func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	http, err := helper.NewHTTP(base)
-
 	if err != nil {
 		return nil, err
 	}
+
+	http.SetHeaderDefault("Accept", acceptHeader)
 	return &prometheus{http, base.Logger()}, nil
 }
 

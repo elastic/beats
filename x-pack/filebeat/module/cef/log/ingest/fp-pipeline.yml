@@ -24,4 +24,4 @@ processors:
   - set:
       field: cef.forcepoint.virus_id
       value: "{{cef.extensions.deviceCustomString4}}"
-      if: "ctx.cef?.extensions?.deviceCustomString4 != null"            
+      if: "ctx.cef?.extensions?.deviceCustomString4 != null"

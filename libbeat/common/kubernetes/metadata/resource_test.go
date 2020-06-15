@@ -25,6 +25,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
@@ -60,9 +62,9 @@ func TestResource_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 				"namespace": "default",
 			},
@@ -97,9 +99,9 @@ func TestResource_Generate(t *testing.T) {
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 				"namespace": "default",
 				"deployment": common.MapStr{
@@ -109,7 +111,8 @@ func TestResource_Generate(t *testing.T) {
 		},
 	}
 
-	cfg := defaultConfig()
+	var cfg Config
+	ucfg.New().Unpack(&cfg)
 	metagen := &Resource{
 		config: &cfg,
 	}

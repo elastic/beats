@@ -9,7 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 )
@@ -35,8 +34,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The oracle 'tablespace' metricset is beta.")
-
 	config := oracle.ConnectionDetails{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrap(err, "error parsing config file")

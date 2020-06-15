@@ -1,7 +1,9 @@
 [
     {
         "event.dataset": "icinga.startup",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "startup",
         "icinga.startup.facility": "cli",
         "input.type": "log",
@@ -12,7 +14,9 @@
     },
     {
         "event.dataset": "icinga.startup",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "startup",
         "icinga.startup.facility": "cli",
         "input.type": "log",

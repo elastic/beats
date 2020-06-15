@@ -20,7 +20,7 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/journalbeat/beater"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.

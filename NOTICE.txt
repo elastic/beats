@@ -347,6 +347,92 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/antlr/antlr4
+Revision: 225249fdaef5
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/antlr/antlr4/LICENSE.txt:
+--------------------------------------------------------------------
+[The "BSD 3-clause license"]
+Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. Neither the name of the copyright holder nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=====
+
+MIT License for codepointat.js from https://git.io/codepointat
+MIT License for fromcodepoint.js from https://git.io/vDW1m
+
+Copyright Mathias Bynens <https://mathiasbynens.be/>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/armon/go-radix
+Version: v1.0.0
+License type (autodetected): MIT
+./vendor/github.com/armon/go-radix/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2014 Armon Dadgar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/armon/go-socks5
 Revision: e75332964ef5
 License type (autodetected): MIT
@@ -459,7 +545,7 @@ License type (autodetected): MIT
 
 --------------------------------------------------------------------
 Dependency: github.com/Azure/azure-event-hubs-go/v3
-Version: v3.1.0
+Version: v3.1.2
 License type (autodetected): MIT
 ./vendor/github.com/Azure/azure-event-hubs-go/v3/LICENSE:
 --------------------------------------------------------------------
@@ -1072,7 +1158,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/denisenkom/go-mssqldb
-Revision: 4e0d7dc8888f
+Revision: bbfc9a55622e
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/denisenkom/go-mssqldb/LICENSE.txt:
 --------------------------------------------------------------------
@@ -1313,6 +1399,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/docker/spdystream
+Revision: 449fdfce4d96
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/spdystream/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/dop251/goja
 Overwrite: github.com/andrewkroh/goja
 Overwrite-Revision: dd2ac4456e20
@@ -1385,7 +1480,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/eapache/go-resiliency
-Version: v1.1.0
+Version: v1.2.0
 License type (autodetected): MIT
 ./vendor/github.com/eapache/go-resiliency/LICENSE:
 --------------------------------------------------------------------
@@ -1563,7 +1658,7 @@ Everyone is permitted to copy and distribute copies of this Agreement, but in or
 This Agreement is governed by the laws of the State of New York and the intellectual property laws of the United States of America. No party to this Agreement will bring a legal action under this Agreement more than one year after the cause of action arose. Each party waives its rights to a jury trial in any resulting litigation.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: v1.4.0
+Version: v1.5.0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -1586,10 +1681,251 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --------------------------------------------------------------------
-Dependency: github.com/elastic/go-libaudit
-Version: v0.4.0
+Dependency: github.com/elastic/elastic-agent-client/v7
+Version: v7.0.0
+Revision: d6a9eb4f6d07
+License type (autodetected): ELASTIC
+./vendor/github.com/elastic/elastic-agent-client/v7/LICENSE.txt:
+--------------------------------------------------------------------
+ELASTIC LICENSE AGREEMENT
+
+PLEASE READ CAREFULLY THIS ELASTIC LICENSE AGREEMENT (THIS "AGREEMENT"), WHICH
+CONSTITUTES A LEGALLY BINDING AGREEMENT AND GOVERNS ALL OF YOUR USE OF ALL OF
+THE ELASTIC SOFTWARE WITH WHICH THIS AGREEMENT IS INCLUDED ("ELASTIC SOFTWARE")
+THAT IS PROVIDED IN OBJECT CODE FORMAT, AND, IN ACCORDANCE WITH SECTION 2 BELOW,
+CERTAIN OF THE ELASTIC SOFTWARE THAT IS PROVIDED IN SOURCE CODE FORMAT. BY
+INSTALLING OR USING ANY OF THE ELASTIC SOFTWARE GOVERNED BY THIS AGREEMENT, YOU
+ARE ASSENTING TO THE TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE
+WITH SUCH TERMS AND CONDITIONS, YOU MAY NOT INSTALL OR USE THE ELASTIC SOFTWARE
+GOVERNED BY THIS AGREEMENT. IF YOU ARE INSTALLING OR USING THE SOFTWARE ON
+BEHALF OF A LEGAL ENTITY, YOU REPRESENT AND WARRANT THAT YOU HAVE THE ACTUAL
+AUTHORITY TO AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT ON BEHALF OF
+SUCH ENTITY.
+
+Posted Date: April 20, 2018
+
+This Agreement is entered into by and between Elasticsearch BV ("Elastic") and
+You, or the legal entity on behalf of whom You are acting (as applicable,
+"You").
+
+1. OBJECT CODE END USER LICENSES, RESTRICTIONS AND THIRD PARTY OPEN SOURCE
+SOFTWARE
+
+  1.1 Object Code End User License. Subject to the terms and conditions of
+  Section 1.2 of this Agreement, Elastic hereby grants to You, AT NO CHARGE and
+  for so long as you are not in breach of any provision of this Agreement, a
+  License to the Basic Features and Functions of the Elastic Software.
+
+  1.2 Reservation of Rights; Restrictions. As between Elastic and You, Elastic
+  and its licensors own all right, title and interest in and to the Elastic
+  Software, and except as expressly set forth in Sections 1.1, and 2.1 of this
+  Agreement, no other license to the Elastic Software is granted to You under
+  this Agreement, by implication, estoppel or otherwise. You agree not to: (i)
+  reverse engineer or decompile, decrypt, disassemble or otherwise reduce any
+  Elastic Software provided to You in Object Code, or any portion thereof, to
+  Source Code, except and only to the extent any such restriction is prohibited
+  by applicable law, (ii) except as expressly permitted in this Agreement,
+  prepare derivative works from, modify, copy or use the Elastic Software Object
+  Code or the Commercial Software Source Code in any manner; (iii) except as
+  expressly permitted in Section 1.1 above, transfer, sell, rent, lease,
+  distribute, sublicense, loan or otherwise transfer, Elastic Software Object
+  Code, in whole or in part, to any third party; (iv) use Elastic Software
+  Object Code for providing time-sharing services, any software-as-a-service,
+  service bureau services or as part of an application services provider or
+  other service offering (collectively, "SaaS Offering") where obtaining access
+  to the Elastic Software or the features and functions of the Elastic Software
+  is a primary reason or substantial motivation for users of the SaaS Offering
+  to access and/or use the SaaS Offering ("Prohibited SaaS Offering"); (v)
+  circumvent the limitations on use of Elastic Software provided to You in
+  Object Code format that are imposed or preserved by any License Key, or (vi)
+  alter or remove any Marks and Notices in the Elastic Software. If You have any
+  question as to whether a specific SaaS Offering constitutes a Prohibited SaaS
+  Offering, or are interested in obtaining Elastic's permission to engage in
+  commercial or non-commercial distribution of the Elastic Software, please
+  contact elastic_license@elastic.co.
+
+  1.3 Third Party Open Source Software. The Commercial Software may contain or
+  be provided with third party open source libraries, components, utilities and
+  other open source software (collectively, "Open Source Software"), which Open
+  Source Software may have applicable license terms as identified on a website
+  designated by Elastic. Notwithstanding anything to the contrary herein, use of
+  the Open Source Software shall be subject to the license terms and conditions
+  applicable to such Open Source Software, to the extent required by the
+  applicable licensor (which terms shall not restrict the license rights granted
+  to You hereunder, but may contain additional rights). To the extent any
+  condition of this Agreement conflicts with any license to the Open Source
+  Software, the Open Source Software license will govern with respect to such
+  Open Source Software only. Elastic may also separately provide you with
+  certain open source software that is licensed by Elastic. Your use of such
+  Elastic open source software will not be governed by this Agreement, but by
+  the applicable open source license terms.
+
+2. COMMERCIAL SOFTWARE SOURCE CODE
+
+  2.1 Limited License. Subject to the terms and conditions of Section 2.2 of
+  this Agreement, Elastic hereby grants to You, AT NO CHARGE and for so long as
+  you are not in breach of any provision of this Agreement, a limited,
+  non-exclusive, non-transferable, fully paid up royalty free right and license
+  to the Commercial Software in Source Code format, without the right to grant
+  or authorize sublicenses, to prepare Derivative Works of the Commercial
+  Software, provided You (i) do not hack the licensing mechanism, or otherwise
+  circumvent the intended limitations on the use of Elastic Software to enable
+  features other than Basic Features and Functions or those features You are
+  entitled to as part of a Subscription, and (ii) use the resulting object code
+  only for reasonable testing purposes.
+
+  2.2 Restrictions. Nothing in Section 2.1 grants You the right to (i) use the
+  Commercial Software Source Code other than in accordance with Section 2.1
+  above, (ii) use a Derivative Work of the Commercial Software outside of a
+  Non-production Environment, in any production capacity, on a temporary or
+  permanent basis, or (iii) transfer, sell, rent, lease, distribute, sublicense,
+  loan or otherwise make available the Commercial Software Source Code, in whole
+  or in part, to any third party. Notwithstanding the foregoing, You may
+  maintain a copy of the repository in which the Source Code of the Commercial
+  Software resides and that copy may be publicly accessible, provided that you
+  include this Agreement with Your copy of the repository.
+
+3. TERMINATION
+
+  3.1 Termination. This Agreement will automatically terminate, whether or not
+  You receive notice of such Termination from Elastic, if You breach any of its
+  provisions.
+
+  3.2 Post Termination. Upon any termination of this Agreement, for any reason,
+  You shall promptly cease the use of the Elastic Software in Object Code format
+  and cease use of the Commercial Software in Source Code format. For the
+  avoidance of doubt, termination of this Agreement will not affect Your right
+  to use Elastic Software, in either Object Code or Source Code formats, made
+  available under the Apache License Version 2.0.
+
+  3.3 Survival. Sections 1.2, 2.2. 3.3, 4 and 5 shall survive any termination or
+  expiration of this Agreement.
+
+4. DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY
+
+  4.1 Disclaimer of Warranties. TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE
+  LAW, THE ELASTIC SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+  AND ELASTIC AND ITS LICENSORS MAKE NO WARRANTIES WHETHER EXPRESSED, IMPLIED OR
+  STATUTORY REGARDING OR RELATING TO THE ELASTIC SOFTWARE. TO THE MAXIMUM EXTENT
+  PERMITTED UNDER APPLICABLE LAW, ELASTIC AND ITS LICENSORS SPECIFICALLY
+  DISCLAIM ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+  PURPOSE AND NON-INFRINGEMENT WITH RESPECT TO THE ELASTIC SOFTWARE, AND WITH
+  RESPECT TO THE USE OF THE FOREGOING. FURTHER, ELASTIC DOES NOT WARRANT RESULTS
+  OF USE OR THAT THE ELASTIC SOFTWARE WILL BE ERROR FREE OR THAT THE USE OF THE
+  ELASTIC SOFTWARE WILL BE UNINTERRUPTED.
+
+  4.2 Limitation of Liability. IN NO EVENT SHALL ELASTIC OR ITS LICENSORS BE
+  LIABLE TO YOU OR ANY THIRD PARTY FOR ANY DIRECT OR INDIRECT DAMAGES,
+  INCLUDING, WITHOUT LIMITATION, FOR ANY LOSS OF PROFITS, LOSS OF USE, BUSINESS
+  INTERRUPTION, LOSS OF DATA, COST OF SUBSTITUTE GOODS OR SERVICES, OR FOR ANY
+  SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES OF ANY KIND, IN CONNECTION WITH
+  OR ARISING OUT OF THE USE OR INABILITY TO USE THE ELASTIC SOFTWARE, OR THE
+  PERFORMANCE OF OR FAILURE TO PERFORM THIS AGREEMENT, WHETHER ALLEGED AS A
+  BREACH OF CONTRACT OR TORTIOUS CONDUCT, INCLUDING NEGLIGENCE, EVEN IF ELASTIC
+  HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+5. MISCELLANEOUS
+
+  This Agreement completely and exclusively states the entire agreement of the
+  parties regarding the subject matter herein, and it supersedes, and its terms
+  govern, all prior proposals, agreements, or other communications between the
+  parties, oral or written, regarding such subject matter. This Agreement may be
+  modified by Elastic from time to time, and any such modifications will be
+  effective upon the "Posted Date" set forth at the top of the modified
+  Agreement. If any provision hereof is held unenforceable, this Agreement will
+  continue without said provision and be interpreted to reflect the original
+  intent of the parties. This Agreement and any non-contractual obligation
+  arising out of or in connection with it, is governed exclusively by Dutch law.
+  This Agreement shall not be governed by the 1980 UN Convention on Contracts
+  for the International Sale of Goods. All disputes arising out of or in
+  connection with this Agreement, including its existence and validity, shall be
+  resolved by the courts with jurisdiction in Amsterdam, The Netherlands, except
+  where mandatory law provides for the courts at another location in The
+  Netherlands to have jurisdiction. The parties hereby irrevocably waive any and
+  all claims and defenses either might otherwise have in any such action or
+  proceeding in any of such courts based upon any alleged lack of personal
+  jurisdiction, improper venue, forum non conveniens or any similar claim or
+  defense. A breach or threatened breach, by You of Section 2 may cause
+  irreparable harm for which damages at law may not provide adequate relief, and
+  therefore Elastic shall be entitled to seek injunctive relief without being
+  required to post a bond. You may not assign this Agreement (including by
+  operation of law in connection with a merger or acquisition), in whole or in
+  part to any third party without the prior written consent of Elastic, which
+  may be withheld or granted by Elastic in its sole and absolute discretion.
+  Any assignment in violation of the preceding sentence is void. Notices to
+  Elastic may also be sent to legal@elastic.co.
+
+6. DEFINITIONS
+
+  The following terms have the meanings ascribed:
+
+  6.1 "Affiliate" means, with respect to a party, any entity that controls, is
+  controlled by, or which is under common control with, such party, where
+  "control" means ownership of at least fifty percent (50%) of the outstanding
+  voting shares of the entity, or the contractual right to establish policy for,
+  and manage the operations of, the entity.
+
+  6.2 "Basic Features and Functions" means those features and functions of the
+  Elastic Software that are eligible for use under a Basic license, as set forth
+  at https://www.elastic.co/subscriptions, as may be modified by Elastic from
+  time to time.
+
+  6.3 "Commercial Software" means the Elastic Software Source Code in any file
+  containing a header stating the contents are subject to the Elastic License or
+  which is contained in the repository folder labeled "x-pack", unless a LICENSE
+  file present in the directory subtree declares a different license.
+
+  6.4 "Derivative Work of the Commercial Software" means, for purposes of this
+  Agreement, any modification(s) or enhancement(s) to the Commercial Software,
+  which represent, as a whole, an original work of authorship.
+
+  6.5 "License" means a limited, non-exclusive, non-transferable, fully paid up,
+  royalty free, right and license, without the right to grant or authorize
+  sublicenses, solely for Your internal business operations to (i) install and
+  use the applicable Features and Functions of the Elastic Software in Object
+  Code, and (ii) permit Contractors and Your Affiliates to use the Elastic
+  software as set forth in (i) above, provided that such use by Contractors must
+  be solely for Your benefit and/or the benefit of Your Affiliates, and You
+  shall be responsible for all acts and omissions of such Contractors and
+  Affiliates in connection with their use of the Elastic software that are
+  contrary to the terms and conditions of this Agreement.
+
+  6.6 "License Key" means a sequence of bytes, including but not limited to a
+  JSON blob, that is used to enable certain features and functions of the
+  Elastic Software.
+
+  6.7 "Marks and Notices" means all Elastic trademarks, trade names, logos and
+  notices present on the Documentation as originally provided by Elastic.
+
+  6.8 "Non-production Environment" means an environment for development, testing
+  or quality assurance, where software is not used for production purposes.
+
+  6.9 "Object Code" means any form resulting from mechanical transformation or
+  translation of Source Code form, including but not limited to compiled object
+  code, generated documentation, and conversions to other media types.
+
+  6.10 "Source Code" means the preferred form of computer software for making
+  modifications, including but not limited to software source code,
+  documentation source, and configuration files.
+
+  6.11 "Subscription" means the right to receive Support Services and a License
+  to the Commercial Software.
+
+--------------------------------------------------------------------
+Dependency: github.com/elastic/go-concert
+Version: v0.0.2
 License type (autodetected): Apache-2.0
-./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
+./vendor/github.com/elastic/go-concert/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/elastic/go-libaudit/v2
+Version: v2.0.0
+Revision: 92371bef3fb8
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-libaudit/v2/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -1758,8 +2094,40 @@ separate copyright notices and license terms. Your use of these
 subcomponents is subject to the terms and conditions of the 
 subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
+Dependency: github.com/evanphx/json-patch
+Version: v4.2.0
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/evanphx/json-patch/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2014, Evan Phoenix
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the Evan Phoenix nor the names of its contributors 
+  may be used to endorse or promote products derived from this software 
+  without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/fatih/color
-Version: v1.9.0
+Version: v1.5.0
 License type (autodetected): MIT
 ./vendor/github.com/fatih/color/LICENSE.md:
 --------------------------------------------------------------------
@@ -2335,6 +2703,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/godbus/dbus
+Revision: ade71ed3457e
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/godbus/dbus/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/godbus/dbus/v5
 Version: v5.0.3
 License type (autodetected): BSD-2-Clause
@@ -2635,7 +3035,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gofrs/uuid
-Version: v3.2.0
+Version: v3.3.0
 License type (autodetected): MIT
 ./vendor/github.com/gofrs/uuid/LICENSE:
 --------------------------------------------------------------------
@@ -2703,6 +3103,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
+Dependency: github.com/golang-sql/civil
+Revision: cb61b32ac6fe
+License type (autodetected): Apache-2.0
+./vendor/github.com/golang-sql/civil/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/golang/groupcache
 Revision: 215e87163ea7
 License type (autodetected): Apache-2.0
@@ -2713,7 +3122,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Version: v1.3.4
+Version: v1.4.2
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
@@ -2928,7 +3337,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/google/gofuzz
-Version: v1.0.0
+Version: v1.1.0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/google/gofuzz/LICENSE:
 --------------------------------------------------------------------
@@ -2939,6 +3348,9 @@ Apache License 2.0
 Dependency: github.com/google/gopacket
 Version: v1.1.18
 Revision: 0ad7f2610e34
+Overwrite: github.com/adriansr/gopacket
+Overwrite-Version: v1.1.18
+Overwrite-Revision: dd62abfa8a41
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/google/gopacket/LICENSE:
 --------------------------------------------------------------------
@@ -3052,7 +3464,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/gorhill/cronexpr
-Revision: 88b0669f7d75
+Revision: d520615e531a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/gorhill/cronexpr/APLv2:
 --------------------------------------------------------------------
@@ -3089,98 +3501,163 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: github.com/hashicorp/go-cleanhttp
-Version: v0.5.1
+Dependency: github.com/grpc-ecosystem/grpc-gateway
+Version: v1.13.0
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/grpc-ecosystem/grpc-gateway/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2015, Gengo, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the name of Gengo, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/h2non/filetype
+Version: v1.0.12
+License type (autodetected): MIT
+./vendor/github.com/h2non/filetype/LICENSE:
+--------------------------------------------------------------------
+The MIT License
+
+Copyright (c) Tomas Aparicio
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/hashicorp/errwrap
+Version: v1.0.0
 License type (autodetected): MPL-2.0
-./vendor/github.com/hashicorp/go-cleanhttp/LICENSE:
+./vendor/github.com/hashicorp/errwrap/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License, version 2.0
 
 1. Definitions
 
-1.1. "Contributor"
+1.1. “Contributor”
 
      means each individual or legal entity that creates, contributes to the
      creation of, or owns Covered Software.
 
-1.2. "Contributor Version"
+1.2. “Contributor Version”
 
      means the combination of the Contributions of others (if any) used by a
-     Contributor and that particular Contributor's Contribution.
+     Contributor and that particular Contributor’s Contribution.
 
-1.3. "Contribution"
+1.3. “Contribution”
 
      means Covered Software of a particular Contributor.
 
-1.4. "Covered Software"
+1.4. “Covered Software”
 
      means Source Code Form to which the initial Contributor has attached the
      notice in Exhibit A, the Executable Form of such Source Code Form, and
      Modifications of such Source Code Form, in each case including portions
      thereof.
 
-1.5. "Incompatible With Secondary Licenses"
+1.5. “Incompatible With Secondary Licenses”
      means
 
      a. that the initial Contributor has attached the notice described in
         Exhibit B to the Covered Software; or
 
-     b. that the Covered Software was made available under the terms of
-        version 1.1 or earlier of the License, but not also under the terms of
-        a Secondary License.
+     b. that the Covered Software was made available under the terms of version
+        1.1 or earlier of the License, but not also under the terms of a
+        Secondary License.
 
-1.6. "Executable Form"
+1.6. “Executable Form”
 
      means any form of the work other than Source Code Form.
 
-1.7. "Larger Work"
+1.7. “Larger Work”
 
-     means a work that combines Covered Software with other material, in a
-     separate file or files, that is not Covered Software.
+     means a work that combines Covered Software with other material, in a separate
+     file or files, that is not Covered Software.
 
-1.8. "License"
+1.8. “License”
 
      means this document.
 
-1.9. "Licensable"
+1.9. “Licensable”
 
-     means having the right to grant, to the maximum extent possible, whether
-     at the time of the initial grant or subsequently, any and all of the
-     rights conveyed by this License.
+     means having the right to grant, to the maximum extent possible, whether at the
+     time of the initial grant or subsequently, any and all of the rights conveyed by
+     this License.
 
-1.10. "Modifications"
+1.10. “Modifications”
 
      means any of the following:
 
-     a. any file in Source Code Form that results from an addition to,
-        deletion from, or modification of the contents of Covered Software; or
+     a. any file in Source Code Form that results from an addition to, deletion
+        from, or modification of the contents of Covered Software; or
 
      b. any new file in Source Code Form that contains any Covered Software.
 
-1.11. "Patent Claims" of a Contributor
+1.11. “Patent Claims” of a Contributor
 
-      means any patent claim(s), including without limitation, method,
-      process, and apparatus claims, in any patent Licensable by such
-      Contributor that would be infringed, but for the grant of the License,
-      by the making, using, selling, offering for sale, having made, import,
-      or transfer of either its Contributions or its Contributor Version.
+      means any patent claim(s), including without limitation, method, process,
+      and apparatus claims, in any patent Licensable by such Contributor that
+      would be infringed, but for the grant of the License, by the making,
+      using, selling, offering for sale, having made, import, or transfer of
+      either its Contributions or its Contributor Version.
 
-1.12. "Secondary License"
+1.12. “Secondary License”
 
       means either the GNU General Public License, Version 2.0, the GNU Lesser
       General Public License, Version 2.1, the GNU Affero General Public
       License, Version 3.0, or any later versions of those licenses.
 
-1.13. "Source Code Form"
+1.13. “Source Code Form”
 
       means the form of the work preferred for making modifications.
 
-1.14. "You" (or "Your")
+1.14. “You” (or “Your”)
 
       means an individual or a legal entity exercising rights under this
-      License. For legal entities, "You" includes any entity that controls, is
+      License. For legal entities, “You” includes any entity that controls, is
       controlled by, or is under common control with You. For purposes of this
-      definition, "control" means (a) the power, direct or indirect, to cause
+      definition, “control” means (a) the power, direct or indirect, to cause
       the direction or management of such entity, whether by contract or
       otherwise, or (b) ownership of more than fifty percent (50%) of the
       outstanding shares or beneficial ownership of such entity.
@@ -3196,59 +3673,57 @@ Mozilla Public License, version 2.0
      a. under intellectual property rights (other than patent or trademark)
         Licensable by such Contributor to use, reproduce, make available,
         modify, display, perform, distribute, and otherwise exploit its
-        Contributions, either on an unmodified basis, with Modifications, or
-        as part of a Larger Work; and
+        Contributions, either on an unmodified basis, with Modifications, or as
+        part of a Larger Work; and
 
      b. under Patent Claims of such Contributor to make, use, sell, offer for
-        sale, have made, import, and otherwise transfer either its
-        Contributions or its Contributor Version.
+        sale, have made, import, and otherwise transfer either its Contributions
+        or its Contributor Version.
 
 2.2. Effective Date
 
-     The licenses granted in Section 2.1 with respect to any Contribution
-     become effective for each Contribution on the date the Contributor first
-     distributes such Contribution.
+     The licenses granted in Section 2.1 with respect to any Contribution become
+     effective for each Contribution on the date the Contributor first distributes
+     such Contribution.
 
 2.3. Limitations on Grant Scope
 
-     The licenses granted in this Section 2 are the only rights granted under
-     this License. No additional rights or licenses will be implied from the
-     distribution or licensing of Covered Software under this License.
-     Notwithstanding Section 2.1(b) above, no patent license is granted by a
-     Contributor:
+     The licenses granted in this Section 2 are the only rights granted under this
+     License. No additional rights or licenses will be implied from the distribution
+     or licensing of Covered Software under this License. Notwithstanding Section
+     2.1(b) above, no patent license is granted by a Contributor:
 
      a. for any code that a Contributor has removed from Covered Software; or
 
-     b. for infringements caused by: (i) Your and any other third party's
+     b. for infringements caused by: (i) Your and any other third party’s
         modifications of Covered Software, or (ii) the combination of its
         Contributions with other software (except as part of its Contributor
         Version); or
 
-     c. under Patent Claims infringed by Covered Software in the absence of
-        its Contributions.
+     c. under Patent Claims infringed by Covered Software in the absence of its
+        Contributions.
 
-     This License does not grant any rights in the trademarks, service marks,
-     or logos of any Contributor (except as may be necessary to comply with
-     the notice requirements in Section 3.4).
+     This License does not grant any rights in the trademarks, service marks, or
+     logos of any Contributor (except as may be necessary to comply with the
+     notice requirements in Section 3.4).
 
 2.4. Subsequent Licenses
 
      No Contributor makes additional grants as a result of Your choice to
-     distribute the Covered Software under a subsequent version of this
-     License (see Section 10.2) or under the terms of a Secondary License (if
-     permitted under the terms of Section 3.3).
+     distribute the Covered Software under a subsequent version of this License
+     (see Section 10.2) or under the terms of a Secondary License (if permitted
+     under the terms of Section 3.3).
 
 2.5. Representation
 
-     Each Contributor represents that the Contributor believes its
-     Contributions are its original creation(s) or it has sufficient rights to
-     grant the rights to its Contributions conveyed by this License.
+     Each Contributor represents that the Contributor believes its Contributions
+     are its original creation(s) or it has sufficient rights to grant the
+     rights to its Contributions conveyed by this License.
 
 2.6. Fair Use
 
-     This License is not intended to limit any rights You have under
-     applicable copyright doctrines of fair use, fair dealing, or other
-     equivalents.
+     This License is not intended to limit any rights You have under applicable
+     copyright doctrines of fair use, fair dealing, or other equivalents.
 
 2.7. Conditions
 
@@ -3261,12 +3736,11 @@ Mozilla Public License, version 2.0
 3.1. Distribution of Source Form
 
      All distribution of Covered Software in Source Code Form, including any
-     Modifications that You create or to which You contribute, must be under
-     the terms of this License. You must inform recipients that the Source
-     Code Form of the Covered Software is governed by the terms of this
-     License, and how they can obtain a copy of this License. You may not
-     attempt to alter or restrict the recipients' rights in the Source Code
-     Form.
+     Modifications that You create or to which You contribute, must be under the
+     terms of this License. You must inform recipients that the Source Code Form
+     of the Covered Software is governed by the terms of this License, and how
+     they can obtain a copy of this License. You may not attempt to alter or
+     restrict the recipients’ rights in the Source Code Form.
 
 3.2. Distribution of Executable Form
 
@@ -3278,40 +3752,39 @@ Mozilla Public License, version 2.0
         reasonable means in a timely manner, at a charge no more than the cost
         of distribution to the recipient; and
 
-     b. You may distribute such Executable Form under the terms of this
-        License, or sublicense it under different terms, provided that the
-        license for the Executable Form does not attempt to limit or alter the
-        recipients' rights in the Source Code Form under this License.
+     b. You may distribute such Executable Form under the terms of this License,
+        or sublicense it under different terms, provided that the license for
+        the Executable Form does not attempt to limit or alter the recipients’
+        rights in the Source Code Form under this License.
 
 3.3. Distribution of a Larger Work
 
      You may create and distribute a Larger Work under terms of Your choice,
-     provided that You also comply with the requirements of this License for
-     the Covered Software. If the Larger Work is a combination of Covered
-     Software with a work governed by one or more Secondary Licenses, and the
-     Covered Software is not Incompatible With Secondary Licenses, this
-     License permits You to additionally distribute such Covered Software
-     under the terms of such Secondary License(s), so that the recipient of
-     the Larger Work may, at their option, further distribute the Covered
-     Software under the terms of either this License or such Secondary
-     License(s).
+     provided that You also comply with the requirements of this License for the
+     Covered Software. If the Larger Work is a combination of Covered Software
+     with a work governed by one or more Secondary Licenses, and the Covered
+     Software is not Incompatible With Secondary Licenses, this License permits
+     You to additionally distribute such Covered Software under the terms of
+     such Secondary License(s), so that the recipient of the Larger Work may, at
+     their option, further distribute the Covered Software under the terms of
+     either this License or such Secondary License(s).
 
 3.4. Notices
 
-     You may not remove or alter the substance of any license notices
-     (including copyright notices, patent notices, disclaimers of warranty, or
-     limitations of liability) contained within the Source Code Form of the
-     Covered Software, except that You may alter any license notices to the
-     extent required to remedy known factual inaccuracies.
+     You may not remove or alter the substance of any license notices (including
+     copyright notices, patent notices, disclaimers of warranty, or limitations
+     of liability) contained within the Source Code Form of the Covered
+     Software, except that You may alter any license notices to the extent
+     required to remedy known factual inaccuracies.
 
 3.5. Application of Additional Terms
 
      You may choose to offer, and to charge a fee for, warranty, support,
      indemnity or liability obligations to one or more recipients of Covered
-     Software. However, You may do so only on Your own behalf, and not on
-     behalf of any Contributor. You must make it absolutely clear that any
-     such warranty, support, indemnity, or liability obligation is offered by
-     You alone, and You hereby agree to indemnify every Contributor for any
+     Software. However, You may do so only on Your own behalf, and not on behalf
+     of any Contributor. You must make it absolutely clear that any such
+     warranty, support, indemnity, or liability obligation is offered by You
+     alone, and You hereby agree to indemnify every Contributor for any
      liability incurred by such Contributor as a result of warranty, support,
      indemnity or liability terms You offer. You may include additional
      disclaimers of warranty and limitations of liability specific to any
@@ -3320,14 +3793,14 @@ Mozilla Public License, version 2.0
 4. Inability to Comply Due to Statute or Regulation
 
    If it is impossible for You to comply with any of the terms of this License
-   with respect to some or all of the Covered Software due to statute,
-   judicial order, or regulation then You must: (a) comply with the terms of
-   this License to the maximum extent possible; and (b) describe the
-   limitations and the code they affect. Such description must be placed in a
-   text file included with all distributions of the Covered Software under
-   this License. Except to the extent prohibited by statute or regulation,
-   such description must be sufficiently detailed for a recipient of ordinary
-   skill to be able to understand it.
+   with respect to some or all of the Covered Software due to statute, judicial
+   order, or regulation then You must: (a) comply with the terms of this License
+   to the maximum extent possible; and (b) describe the limitations and the code
+   they affect. Such description must be placed in a text file included with all
+   distributions of the Covered Software under this License. Except to the
+   extent prohibited by statute or regulation, such description must be
+   sufficiently detailed for a recipient of ordinary skill to be able to
+   understand it.
 
 5. Termination
 
@@ -3335,22 +3808,21 @@ Mozilla Public License, version 2.0
      fail to comply with any of its terms. However, if You become compliant,
      then the rights granted under this License from a particular Contributor
      are reinstated (a) provisionally, unless and until such Contributor
-     explicitly and finally terminates Your grants, and (b) on an ongoing
-     basis, if such Contributor fails to notify You of the non-compliance by
-     some reasonable means prior to 60 days after You have come back into
-     compliance. Moreover, Your grants from a particular Contributor are
-     reinstated on an ongoing basis if such Contributor notifies You of the
-     non-compliance by some reasonable means, this is the first time You have
-     received notice of non-compliance with this License from such
-     Contributor, and You become compliant prior to 30 days after Your receipt
-     of the notice.
+     explicitly and finally terminates Your grants, and (b) on an ongoing basis,
+     if such Contributor fails to notify You of the non-compliance by some
+     reasonable means prior to 60 days after You have come back into compliance.
+     Moreover, Your grants from a particular Contributor are reinstated on an
+     ongoing basis if such Contributor notifies You of the non-compliance by
+     some reasonable means, this is the first time You have received notice of
+     non-compliance with this License from such Contributor, and You become
+     compliant prior to 30 days after Your receipt of the notice.
 
 5.2. If You initiate litigation against any entity by asserting a patent
-     infringement claim (excluding declaratory judgment actions,
-     counter-claims, and cross-claims) alleging that a Contributor Version
-     directly or indirectly infringes any patent, then the rights granted to
-     You by any and all Contributors for the Covered Software under Section
-     2.1 of this License shall terminate.
+     infringement claim (excluding declaratory judgment actions, counter-claims,
+     and cross-claims) alleging that a Contributor Version directly or
+     indirectly infringes any patent, then the rights granted to You by any and
+     all Contributors for the Covered Software under Section 2.1 of this License
+     shall terminate.
 
 5.3. In the event of termination under Sections 5.1 or 5.2 above, all end user
      license agreements (excluding distributors and resellers) which have been
@@ -3359,16 +3831,16 @@ Mozilla Public License, version 2.0
 
 6. Disclaimer of Warranty
 
-   Covered Software is provided under this License on an "as is" basis,
-   without warranty of any kind, either expressed, implied, or statutory,
-   including, without limitation, warranties that the Covered Software is free
-   of defects, merchantable, fit for a particular purpose or non-infringing.
-   The entire risk as to the quality and performance of the Covered Software
-   is with You. Should any Covered Software prove defective in any respect,
-   You (not any Contributor) assume the cost of any necessary servicing,
-   repair, or correction. This disclaimer of warranty constitutes an essential
-   part of this License. No use of  any Covered Software is authorized under
-   this License except under this disclaimer.
+   Covered Software is provided under this License on an “as is” basis, without
+   warranty of any kind, either expressed, implied, or statutory, including,
+   without limitation, warranties that the Covered Software is free of defects,
+   merchantable, fit for a particular purpose or non-infringing. The entire
+   risk as to the quality and performance of the Covered Software is with You.
+   Should any Covered Software prove defective in any respect, You (not any
+   Contributor) assume the cost of any necessary servicing, repair, or
+   correction. This disclaimer of warranty constitutes an essential part of this
+   License. No use of  any Covered Software is authorized under this License
+   except under this disclaimer.
 
 7. Limitation of Liability
 
@@ -3380,29 +3852,27 @@ Mozilla Public License, version 2.0
    goodwill, work stoppage, computer failure or malfunction, or any and all
    other commercial damages or losses, even if such party shall have been
    informed of the possibility of such damages. This limitation of liability
-   shall not apply to liability for death or personal injury resulting from
-   such party's negligence to the extent applicable law prohibits such
-   limitation. Some jurisdictions do not allow the exclusion or limitation of
-   incidental or consequential damages, so this exclusion and limitation may
-   not apply to You.
+   shall not apply to liability for death or personal injury resulting from such
+   party’s negligence to the extent applicable law prohibits such limitation.
+   Some jurisdictions do not allow the exclusion or limitation of incidental or
+   consequential damages, so this exclusion and limitation may not apply to You.
 
 8. Litigation
 
-   Any litigation relating to this License may be brought only in the courts
-   of a jurisdiction where the defendant maintains its principal place of
-   business and such litigation shall be governed by laws of that
-   jurisdiction, without reference to its conflict-of-law provisions. Nothing
-   in this Section shall prevent a party's ability to bring cross-claims or
-   counter-claims.
+   Any litigation relating to this License may be brought only in the courts of
+   a jurisdiction where the defendant maintains its principal place of business
+   and such litigation shall be governed by laws of that jurisdiction, without
+   reference to its conflict-of-law provisions. Nothing in this Section shall
+   prevent a party’s ability to bring cross-claims or counter-claims.
 
 9. Miscellaneous
 
-   This License represents the complete agreement concerning the subject
-   matter hereof. If any provision of this License is held to be
-   unenforceable, such provision shall be reformed only to the extent
-   necessary to make it enforceable. Any law or regulation which provides that
-   the language of a contract shall be construed against the drafter shall not
-   be used to construe this License against a Contributor.
+   This License represents the complete agreement concerning the subject matter
+   hereof. If any provision of this License is held to be unenforceable, such
+   provision shall be reformed only to the extent necessary to make it
+   enforceable. Any law or regulation which provides that the language of a
+   contract shall be construed against the drafter shall not be used to construe
+   this License against a Contributor.
 
 
 10. Versions of the License
@@ -3416,24 +3886,23 @@ Mozilla Public License, version 2.0
 
 10.2. Effect of New Versions
 
-      You may distribute the Covered Software under the terms of the version
-      of the License under which You originally received the Covered Software,
-      or under the terms of any subsequent version published by the license
+      You may distribute the Covered Software under the terms of the version of
+      the License under which You originally received the Covered Software, or
+      under the terms of any subsequent version published by the license
       steward.
 
 10.3. Modified Versions
 
       If you create software not governed by this License, and you want to
-      create a new license for such software, you may create and use a
-      modified version of this License if you rename the license and remove
-      any references to the name of the license steward (except to note that
-      such modified license differs from this License).
+      create a new license for such software, you may create and use a modified
+      version of this License if you rename the license and remove any
+      references to the name of the license steward (except to note that such
+      modified license differs from this License).
 
-10.4. Distributing Source Code Form that is Incompatible With Secondary
-      Licenses If You choose to distribute Source Code Form that is
-      Incompatible With Secondary Licenses under the terms of this version of
-      the License, the notice described in Exhibit B of this License must be
-      attached.
+10.4. Distributing Source Code Form that is Incompatible With Secondary Licenses
+      If You choose to distribute Source Code Form that is Incompatible With
+      Secondary Licenses under the terms of this version of the License, the
+      notice described in Exhibit B of this License must be attached.
 
 Exhibit A - Source Code Form License Notice
 
@@ -3444,113 +3913,112 @@ Exhibit A - Source Code Form License Notice
       obtain one at
       http://mozilla.org/MPL/2.0/.
 
-If it is not possible or desirable to put the notice in a particular file,
-then You may include the notice in a location (such as a LICENSE file in a
-relevant directory) where a recipient would be likely to look for such a
-notice.
+If it is not possible or desirable to put the notice in a particular file, then
+You may include the notice in a location (such as a LICENSE file in a relevant
+directory) where a recipient would be likely to look for such a notice.
 
 You may add additional accurate notices of copyright ownership.
 
-Exhibit B - "Incompatible With Secondary Licenses" Notice
+Exhibit B - “Incompatible With Secondary Licenses” Notice
 
-      This Source Code Form is "Incompatible
-      With Secondary Licenses", as defined by
+      This Source Code Form is “Incompatible
+      With Secondary Licenses”, as defined by
       the Mozilla Public License, v. 2.0.
 
 
 --------------------------------------------------------------------
-Dependency: github.com/hashicorp/go-rootcerts
-Version: v1.0.2
+Dependency: github.com/hashicorp/go-multierror
+Version: v1.1.0
 License type (autodetected): MPL-2.0
-./vendor/github.com/hashicorp/go-rootcerts/LICENSE:
+./vendor/github.com/hashicorp/go-multierror/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License, version 2.0
 
 1. Definitions
 
-1.1. "Contributor"
+1.1. “Contributor”
 
      means each individual or legal entity that creates, contributes to the
      creation of, or owns Covered Software.
 
-1.2. "Contributor Version"
+1.2. “Contributor Version”
 
      means the combination of the Contributions of others (if any) used by a
-     Contributor and that particular Contributor's Contribution.
+     Contributor and that particular Contributor’s Contribution.
 
-1.3. "Contribution"
+1.3. “Contribution”
 
      means Covered Software of a particular Contributor.
 
-1.4. "Covered Software"
+1.4. “Covered Software”
 
      means Source Code Form to which the initial Contributor has attached the
      notice in Exhibit A, the Executable Form of such Source Code Form, and
      Modifications of such Source Code Form, in each case including portions
      thereof.
 
-1.5. "Incompatible With Secondary Licenses"
+1.5. “Incompatible With Secondary Licenses”
      means
 
      a. that the initial Contributor has attached the notice described in
         Exhibit B to the Covered Software; or
 
-     b. that the Covered Software was made available under the terms of
-        version 1.1 or earlier of the License, but not also under the terms of
-        a Secondary License.
+     b. that the Covered Software was made available under the terms of version
+        1.1 or earlier of the License, but not also under the terms of a
+        Secondary License.
 
-1.6. "Executable Form"
+1.6. “Executable Form”
 
      means any form of the work other than Source Code Form.
 
-1.7. "Larger Work"
+1.7. “Larger Work”
 
-     means a work that combines Covered Software with other material, in a
-     separate file or files, that is not Covered Software.
+     means a work that combines Covered Software with other material, in a separate
+     file or files, that is not Covered Software.
 
-1.8. "License"
+1.8. “License”
 
      means this document.
 
-1.9. "Licensable"
+1.9. “Licensable”
 
-     means having the right to grant, to the maximum extent possible, whether
-     at the time of the initial grant or subsequently, any and all of the
-     rights conveyed by this License.
+     means having the right to grant, to the maximum extent possible, whether at the
+     time of the initial grant or subsequently, any and all of the rights conveyed by
+     this License.
 
-1.10. "Modifications"
+1.10. “Modifications”
 
      means any of the following:
 
-     a. any file in Source Code Form that results from an addition to,
-        deletion from, or modification of the contents of Covered Software; or
+     a. any file in Source Code Form that results from an addition to, deletion
+        from, or modification of the contents of Covered Software; or
 
      b. any new file in Source Code Form that contains any Covered Software.
 
-1.11. "Patent Claims" of a Contributor
+1.11. “Patent Claims” of a Contributor
 
-      means any patent claim(s), including without limitation, method,
-      process, and apparatus claims, in any patent Licensable by such
-      Contributor that would be infringed, but for the grant of the License,
-      by the making, using, selling, offering for sale, having made, import,
-      or transfer of either its Contributions or its Contributor Version.
+      means any patent claim(s), including without limitation, method, process,
+      and apparatus claims, in any patent Licensable by such Contributor that
+      would be infringed, but for the grant of the License, by the making,
+      using, selling, offering for sale, having made, import, or transfer of
+      either its Contributions or its Contributor Version.
 
-1.12. "Secondary License"
+1.12. “Secondary License”
 
       means either the GNU General Public License, Version 2.0, the GNU Lesser
       General Public License, Version 2.1, the GNU Affero General Public
       License, Version 3.0, or any later versions of those licenses.
 
-1.13. "Source Code Form"
+1.13. “Source Code Form”
 
       means the form of the work preferred for making modifications.
 
-1.14. "You" (or "Your")
+1.14. “You” (or “Your”)
 
       means an individual or a legal entity exercising rights under this
-      License. For legal entities, "You" includes any entity that controls, is
+      License. For legal entities, “You” includes any entity that controls, is
       controlled by, or is under common control with You. For purposes of this
-      definition, "control" means (a) the power, direct or indirect, to cause
+      definition, “control” means (a) the power, direct or indirect, to cause
       the direction or management of such entity, whether by contract or
       otherwise, or (b) ownership of more than fifty percent (50%) of the
       outstanding shares or beneficial ownership of such entity.
@@ -3566,59 +4034,57 @@ Mozilla Public License, version 2.0
      a. under intellectual property rights (other than patent or trademark)
         Licensable by such Contributor to use, reproduce, make available,
         modify, display, perform, distribute, and otherwise exploit its
-        Contributions, either on an unmodified basis, with Modifications, or
-        as part of a Larger Work; and
+        Contributions, either on an unmodified basis, with Modifications, or as
+        part of a Larger Work; and
 
      b. under Patent Claims of such Contributor to make, use, sell, offer for
-        sale, have made, import, and otherwise transfer either its
-        Contributions or its Contributor Version.
+        sale, have made, import, and otherwise transfer either its Contributions
+        or its Contributor Version.
 
 2.2. Effective Date
 
-     The licenses granted in Section 2.1 with respect to any Contribution
-     become effective for each Contribution on the date the Contributor first
-     distributes such Contribution.
+     The licenses granted in Section 2.1 with respect to any Contribution become
+     effective for each Contribution on the date the Contributor first distributes
+     such Contribution.
 
 2.3. Limitations on Grant Scope
 
-     The licenses granted in this Section 2 are the only rights granted under
-     this License. No additional rights or licenses will be implied from the
-     distribution or licensing of Covered Software under this License.
-     Notwithstanding Section 2.1(b) above, no patent license is granted by a
-     Contributor:
+     The licenses granted in this Section 2 are the only rights granted under this
+     License. No additional rights or licenses will be implied from the distribution
+     or licensing of Covered Software under this License. Notwithstanding Section
+     2.1(b) above, no patent license is granted by a Contributor:
 
      a. for any code that a Contributor has removed from Covered Software; or
 
-     b. for infringements caused by: (i) Your and any other third party's
+     b. for infringements caused by: (i) Your and any other third party’s
         modifications of Covered Software, or (ii) the combination of its
         Contributions with other software (except as part of its Contributor
         Version); or
 
-     c. under Patent Claims infringed by Covered Software in the absence of
-        its Contributions.
+     c. under Patent Claims infringed by Covered Software in the absence of its
+        Contributions.
 
-     This License does not grant any rights in the trademarks, service marks,
-     or logos of any Contributor (except as may be necessary to comply with
-     the notice requirements in Section 3.4).
+     This License does not grant any rights in the trademarks, service marks, or
+     logos of any Contributor (except as may be necessary to comply with the
+     notice requirements in Section 3.4).
 
 2.4. Subsequent Licenses
 
      No Contributor makes additional grants as a result of Your choice to
-     distribute the Covered Software under a subsequent version of this
-     License (see Section 10.2) or under the terms of a Secondary License (if
-     permitted under the terms of Section 3.3).
+     distribute the Covered Software under a subsequent version of this License
+     (see Section 10.2) or under the terms of a Secondary License (if permitted
+     under the terms of Section 3.3).
 
 2.5. Representation
 
-     Each Contributor represents that the Contributor believes its
-     Contributions are its original creation(s) or it has sufficient rights to
-     grant the rights to its Contributions conveyed by this License.
+     Each Contributor represents that the Contributor believes its Contributions
+     are its original creation(s) or it has sufficient rights to grant the
+     rights to its Contributions conveyed by this License.
 
 2.6. Fair Use
 
-     This License is not intended to limit any rights You have under
-     applicable copyright doctrines of fair use, fair dealing, or other
-     equivalents.
+     This License is not intended to limit any rights You have under applicable
+     copyright doctrines of fair use, fair dealing, or other equivalents.
 
 2.7. Conditions
 
@@ -3631,12 +4097,11 @@ Mozilla Public License, version 2.0
 3.1. Distribution of Source Form
 
      All distribution of Covered Software in Source Code Form, including any
-     Modifications that You create or to which You contribute, must be under
-     the terms of this License. You must inform recipients that the Source
-     Code Form of the Covered Software is governed by the terms of this
-     License, and how they can obtain a copy of this License. You may not
-     attempt to alter or restrict the recipients' rights in the Source Code
-     Form.
+     Modifications that You create or to which You contribute, must be under the
+     terms of this License. You must inform recipients that the Source Code Form
+     of the Covered Software is governed by the terms of this License, and how
+     they can obtain a copy of this License. You may not attempt to alter or
+     restrict the recipients’ rights in the Source Code Form.
 
 3.2. Distribution of Executable Form
 
@@ -3648,40 +4113,39 @@ Mozilla Public License, version 2.0
         reasonable means in a timely manner, at a charge no more than the cost
         of distribution to the recipient; and
 
-     b. You may distribute such Executable Form under the terms of this
-        License, or sublicense it under different terms, provided that the
-        license for the Executable Form does not attempt to limit or alter the
-        recipients' rights in the Source Code Form under this License.
+     b. You may distribute such Executable Form under the terms of this License,
+        or sublicense it under different terms, provided that the license for
+        the Executable Form does not attempt to limit or alter the recipients’
+        rights in the Source Code Form under this License.
 
 3.3. Distribution of a Larger Work
 
      You may create and distribute a Larger Work under terms of Your choice,
-     provided that You also comply with the requirements of this License for
-     the Covered Software. If the Larger Work is a combination of Covered
-     Software with a work governed by one or more Secondary Licenses, and the
-     Covered Software is not Incompatible With Secondary Licenses, this
-     License permits You to additionally distribute such Covered Software
-     under the terms of such Secondary License(s), so that the recipient of
-     the Larger Work may, at their option, further distribute the Covered
-     Software under the terms of either this License or such Secondary
-     License(s).
+     provided that You also comply with the requirements of this License for the
+     Covered Software. If the Larger Work is a combination of Covered Software
+     with a work governed by one or more Secondary Licenses, and the Covered
+     Software is not Incompatible With Secondary Licenses, this License permits
+     You to additionally distribute such Covered Software under the terms of
+     such Secondary License(s), so that the recipient of the Larger Work may, at
+     their option, further distribute the Covered Software under the terms of
+     either this License or such Secondary License(s).
 
 3.4. Notices
 
-     You may not remove or alter the substance of any license notices
-     (including copyright notices, patent notices, disclaimers of warranty, or
-     limitations of liability) contained within the Source Code Form of the
-     Covered Software, except that You may alter any license notices to the
-     extent required to remedy known factual inaccuracies.
+     You may not remove or alter the substance of any license notices (including
+     copyright notices, patent notices, disclaimers of warranty, or limitations
+     of liability) contained within the Source Code Form of the Covered
+     Software, except that You may alter any license notices to the extent
+     required to remedy known factual inaccuracies.
 
 3.5. Application of Additional Terms
 
      You may choose to offer, and to charge a fee for, warranty, support,
      indemnity or liability obligations to one or more recipients of Covered
-     Software. However, You may do so only on Your own behalf, and not on
-     behalf of any Contributor. You must make it absolutely clear that any
-     such warranty, support, indemnity, or liability obligation is offered by
-     You alone, and You hereby agree to indemnify every Contributor for any
+     Software. However, You may do so only on Your own behalf, and not on behalf
+     of any Contributor. You must make it absolutely clear that any such
+     warranty, support, indemnity, or liability obligation is offered by You
+     alone, and You hereby agree to indemnify every Contributor for any
      liability incurred by such Contributor as a result of warranty, support,
      indemnity or liability terms You offer. You may include additional
      disclaimers of warranty and limitations of liability specific to any
@@ -3690,14 +4154,14 @@ Mozilla Public License, version 2.0
 4. Inability to Comply Due to Statute or Regulation
 
    If it is impossible for You to comply with any of the terms of this License
-   with respect to some or all of the Covered Software due to statute,
-   judicial order, or regulation then You must: (a) comply with the terms of
-   this License to the maximum extent possible; and (b) describe the
-   limitations and the code they affect. Such description must be placed in a
-   text file included with all distributions of the Covered Software under
-   this License. Except to the extent prohibited by statute or regulation,
-   such description must be sufficiently detailed for a recipient of ordinary
-   skill to be able to understand it.
+   with respect to some or all of the Covered Software due to statute, judicial
+   order, or regulation then You must: (a) comply with the terms of this License
+   to the maximum extent possible; and (b) describe the limitations and the code
+   they affect. Such description must be placed in a text file included with all
+   distributions of the Covered Software under this License. Except to the
+   extent prohibited by statute or regulation, such description must be
+   sufficiently detailed for a recipient of ordinary skill to be able to
+   understand it.
 
 5. Termination
 
@@ -3705,22 +4169,21 @@ Mozilla Public License, version 2.0
      fail to comply with any of its terms. However, if You become compliant,
      then the rights granted under this License from a particular Contributor
      are reinstated (a) provisionally, unless and until such Contributor
-     explicitly and finally terminates Your grants, and (b) on an ongoing
-     basis, if such Contributor fails to notify You of the non-compliance by
-     some reasonable means prior to 60 days after You have come back into
-     compliance. Moreover, Your grants from a particular Contributor are
-     reinstated on an ongoing basis if such Contributor notifies You of the
-     non-compliance by some reasonable means, this is the first time You have
-     received notice of non-compliance with this License from such
-     Contributor, and You become compliant prior to 30 days after Your receipt
-     of the notice.
+     explicitly and finally terminates Your grants, and (b) on an ongoing basis,
+     if such Contributor fails to notify You of the non-compliance by some
+     reasonable means prior to 60 days after You have come back into compliance.
+     Moreover, Your grants from a particular Contributor are reinstated on an
+     ongoing basis if such Contributor notifies You of the non-compliance by
+     some reasonable means, this is the first time You have received notice of
+     non-compliance with this License from such Contributor, and You become
+     compliant prior to 30 days after Your receipt of the notice.
 
 5.2. If You initiate litigation against any entity by asserting a patent
-     infringement claim (excluding declaratory judgment actions,
-     counter-claims, and cross-claims) alleging that a Contributor Version
-     directly or indirectly infringes any patent, then the rights granted to
-     You by any and all Contributors for the Covered Software under Section
-     2.1 of this License shall terminate.
+     infringement claim (excluding declaratory judgment actions, counter-claims,
+     and cross-claims) alleging that a Contributor Version directly or
+     indirectly infringes any patent, then the rights granted to You by any and
+     all Contributors for the Covered Software under Section 2.1 of this License
+     shall terminate.
 
 5.3. In the event of termination under Sections 5.1 or 5.2 above, all end user
      license agreements (excluding distributors and resellers) which have been
@@ -3729,16 +4192,16 @@ Mozilla Public License, version 2.0
 
 6. Disclaimer of Warranty
 
-   Covered Software is provided under this License on an "as is" basis,
-   without warranty of any kind, either expressed, implied, or statutory,
-   including, without limitation, warranties that the Covered Software is free
-   of defects, merchantable, fit for a particular purpose or non-infringing.
-   The entire risk as to the quality and performance of the Covered Software
-   is with You. Should any Covered Software prove defective in any respect,
-   You (not any Contributor) assume the cost of any necessary servicing,
-   repair, or correction. This disclaimer of warranty constitutes an essential
-   part of this License. No use of  any Covered Software is authorized under
-   this License except under this disclaimer.
+   Covered Software is provided under this License on an “as is” basis, without
+   warranty of any kind, either expressed, implied, or statutory, including,
+   without limitation, warranties that the Covered Software is free of defects,
+   merchantable, fit for a particular purpose or non-infringing. The entire
+   risk as to the quality and performance of the Covered Software is with You.
+   Should any Covered Software prove defective in any respect, You (not any
+   Contributor) assume the cost of any necessary servicing, repair, or
+   correction. This disclaimer of warranty constitutes an essential part of this
+   License. No use of  any Covered Software is authorized under this License
+   except under this disclaimer.
 
 7. Limitation of Liability
 
@@ -3750,29 +4213,27 @@ Mozilla Public License, version 2.0
    goodwill, work stoppage, computer failure or malfunction, or any and all
    other commercial damages or losses, even if such party shall have been
    informed of the possibility of such damages. This limitation of liability
-   shall not apply to liability for death or personal injury resulting from
-   such party's negligence to the extent applicable law prohibits such
-   limitation. Some jurisdictions do not allow the exclusion or limitation of
-   incidental or consequential damages, so this exclusion and limitation may
-   not apply to You.
+   shall not apply to liability for death or personal injury resulting from such
+   party’s negligence to the extent applicable law prohibits such limitation.
+   Some jurisdictions do not allow the exclusion or limitation of incidental or
+   consequential damages, so this exclusion and limitation may not apply to You.
 
 8. Litigation
 
-   Any litigation relating to this License may be brought only in the courts
-   of a jurisdiction where the defendant maintains its principal place of
-   business and such litigation shall be governed by laws of that
-   jurisdiction, without reference to its conflict-of-law provisions. Nothing
-   in this Section shall prevent a party's ability to bring cross-claims or
-   counter-claims.
+   Any litigation relating to this License may be brought only in the courts of
+   a jurisdiction where the defendant maintains its principal place of business
+   and such litigation shall be governed by laws of that jurisdiction, without
+   reference to its conflict-of-law provisions. Nothing in this Section shall
+   prevent a party’s ability to bring cross-claims or counter-claims.
 
 9. Miscellaneous
 
-   This License represents the complete agreement concerning the subject
-   matter hereof. If any provision of this License is held to be
-   unenforceable, such provision shall be reformed only to the extent
-   necessary to make it enforceable. Any law or regulation which provides that
-   the language of a contract shall be construed against the drafter shall not
-   be used to construe this License against a Contributor.
+   This License represents the complete agreement concerning the subject matter
+   hereof. If any provision of this License is held to be unenforceable, such
+   provision shall be reformed only to the extent necessary to make it
+   enforceable. Any law or regulation which provides that the language of a
+   contract shall be construed against the drafter shall not be used to construe
+   this License against a Contributor.
 
 
 10. Versions of the License
@@ -3786,24 +4247,23 @@ Mozilla Public License, version 2.0
 
 10.2. Effect of New Versions
 
-      You may distribute the Covered Software under the terms of the version
-      of the License under which You originally received the Covered Software,
-      or under the terms of any subsequent version published by the license
+      You may distribute the Covered Software under the terms of the version of
+      the License under which You originally received the Covered Software, or
+      under the terms of any subsequent version published by the license
       steward.
 
 10.3. Modified Versions
 
       If you create software not governed by this License, and you want to
-      create a new license for such software, you may create and use a
-      modified version of this License if you rename the license and remove
-      any references to the name of the license steward (except to note that
-      such modified license differs from this License).
+      create a new license for such software, you may create and use a modified
+      version of this License if you rename the license and remove any
+      references to the name of the license steward (except to note that such
+      modified license differs from this License).
 
-10.4. Distributing Source Code Form that is Incompatible With Secondary
-      Licenses If You choose to distribute Source Code Form that is
-      Incompatible With Secondary Licenses under the terms of this version of
-      the License, the notice described in Exhibit B of this License must be
-      attached.
+10.4. Distributing Source Code Form that is Incompatible With Secondary Licenses
+      If You choose to distribute Source Code Form that is Incompatible With
+      Secondary Licenses under the terms of this version of the License, the
+      notice described in Exhibit B of this License must be attached.
 
 Exhibit A - Source Code Form License Notice
 
@@ -3814,23 +4274,21 @@ Exhibit A - Source Code Form License Notice
       obtain one at
       http://mozilla.org/MPL/2.0/.
 
-If it is not possible or desirable to put the notice in a particular file,
-then You may include the notice in a location (such as a LICENSE file in a
-relevant directory) where a recipient would be likely to look for such a
-notice.
+If it is not possible or desirable to put the notice in a particular file, then
+You may include the notice in a location (such as a LICENSE file in a relevant
+directory) where a recipient would be likely to look for such a notice.
 
 You may add additional accurate notices of copyright ownership.
 
-Exhibit B - "Incompatible With Secondary Licenses" Notice
+Exhibit B - “Incompatible With Secondary Licenses” Notice
 
-      This Source Code Form is "Incompatible
-      With Secondary Licenses", as defined by
+      This Source Code Form is “Incompatible
+      With Secondary Licenses”, as defined by
       the Mozilla Public License, v. 2.0.
-
 
 --------------------------------------------------------------------
 Dependency: github.com/hashicorp/go-uuid
-Version: v1.0.1
+Version: v1.0.2
 License type (autodetected): MPL-2.0
 ./vendor/github.com/hashicorp/go-uuid/LICENSE:
 --------------------------------------------------------------------
@@ -4930,376 +5388,6 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
       the Mozilla Public License, v. 2.0.
 
 --------------------------------------------------------------------
-Dependency: github.com/hashicorp/nomad/api
-Revision: e31695b5bbe6
-License type (autodetected): MPL-2.0
-./vendor/github.com/hashicorp/nomad/api/LICENSE:
---------------------------------------------------------------------
-Mozilla Public License, version 2.0
-
-1. Definitions
-
-1.1. "Contributor"
-
-     means each individual or legal entity that creates, contributes to the
-     creation of, or owns Covered Software.
-
-1.2. "Contributor Version"
-
-     means the combination of the Contributions of others (if any) used by a
-     Contributor and that particular Contributor's Contribution.
-
-1.3. "Contribution"
-
-     means Covered Software of a particular Contributor.
-
-1.4. "Covered Software"
-
-     means Source Code Form to which the initial Contributor has attached the
-     notice in Exhibit A, the Executable Form of such Source Code Form, and
-     Modifications of such Source Code Form, in each case including portions
-     thereof.
-
-1.5. "Incompatible With Secondary Licenses"
-     means
-
-     a. that the initial Contributor has attached the notice described in
-        Exhibit B to the Covered Software; or
-
-     b. that the Covered Software was made available under the terms of
-        version 1.1 or earlier of the License, but not also under the terms of
-        a Secondary License.
-
-1.6. "Executable Form"
-
-     means any form of the work other than Source Code Form.
-
-1.7. "Larger Work"
-
-     means a work that combines Covered Software with other material, in a
-     separate file or files, that is not Covered Software.
-
-1.8. "License"
-
-     means this document.
-
-1.9. "Licensable"
-
-     means having the right to grant, to the maximum extent possible, whether
-     at the time of the initial grant or subsequently, any and all of the
-     rights conveyed by this License.
-
-1.10. "Modifications"
-
-     means any of the following:
-
-     a. any file in Source Code Form that results from an addition to,
-        deletion from, or modification of the contents of Covered Software; or
-
-     b. any new file in Source Code Form that contains any Covered Software.
-
-1.11. "Patent Claims" of a Contributor
-
-      means any patent claim(s), including without limitation, method,
-      process, and apparatus claims, in any patent Licensable by such
-      Contributor that would be infringed, but for the grant of the License,
-      by the making, using, selling, offering for sale, having made, import,
-      or transfer of either its Contributions or its Contributor Version.
-
-1.12. "Secondary License"
-
-      means either the GNU General Public License, Version 2.0, the GNU Lesser
-      General Public License, Version 2.1, the GNU Affero General Public
-      License, Version 3.0, or any later versions of those licenses.
-
-1.13. "Source Code Form"
-
-      means the form of the work preferred for making modifications.
-
-1.14. "You" (or "Your")
-
-      means an individual or a legal entity exercising rights under this
-      License. For legal entities, "You" includes any entity that controls, is
-      controlled by, or is under common control with You. For purposes of this
-      definition, "control" means (a) the power, direct or indirect, to cause
-      the direction or management of such entity, whether by contract or
-      otherwise, or (b) ownership of more than fifty percent (50%) of the
-      outstanding shares or beneficial ownership of such entity.
-
-
-2. License Grants and Conditions
-
-2.1. Grants
-
-     Each Contributor hereby grants You a world-wide, royalty-free,
-     non-exclusive license:
-
-     a. under intellectual property rights (other than patent or trademark)
-        Licensable by such Contributor to use, reproduce, make available,
-        modify, display, perform, distribute, and otherwise exploit its
-        Contributions, either on an unmodified basis, with Modifications, or
-        as part of a Larger Work; and
-
-     b. under Patent Claims of such Contributor to make, use, sell, offer for
-        sale, have made, import, and otherwise transfer either its
-        Contributions or its Contributor Version.
-
-2.2. Effective Date
-
-     The licenses granted in Section 2.1 with respect to any Contribution
-     become effective for each Contribution on the date the Contributor first
-     distributes such Contribution.
-
-2.3. Limitations on Grant Scope
-
-     The licenses granted in this Section 2 are the only rights granted under
-     this License. No additional rights or licenses will be implied from the
-     distribution or licensing of Covered Software under this License.
-     Notwithstanding Section 2.1(b) above, no patent license is granted by a
-     Contributor:
-
-     a. for any code that a Contributor has removed from Covered Software; or
-
-     b. for infringements caused by: (i) Your and any other third party's
-        modifications of Covered Software, or (ii) the combination of its
-        Contributions with other software (except as part of its Contributor
-        Version); or
-
-     c. under Patent Claims infringed by Covered Software in the absence of
-        its Contributions.
-
-     This License does not grant any rights in the trademarks, service marks,
-     or logos of any Contributor (except as may be necessary to comply with
-     the notice requirements in Section 3.4).
-
-2.4. Subsequent Licenses
-
-     No Contributor makes additional grants as a result of Your choice to
-     distribute the Covered Software under a subsequent version of this
-     License (see Section 10.2) or under the terms of a Secondary License (if
-     permitted under the terms of Section 3.3).
-
-2.5. Representation
-
-     Each Contributor represents that the Contributor believes its
-     Contributions are its original creation(s) or it has sufficient rights to
-     grant the rights to its Contributions conveyed by this License.
-
-2.6. Fair Use
-
-     This License is not intended to limit any rights You have under
-     applicable copyright doctrines of fair use, fair dealing, or other
-     equivalents.
-
-2.7. Conditions
-
-     Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted in
-     Section 2.1.
-
-
-3. Responsibilities
-
-3.1. Distribution of Source Form
-
-     All distribution of Covered Software in Source Code Form, including any
-     Modifications that You create or to which You contribute, must be under
-     the terms of this License. You must inform recipients that the Source
-     Code Form of the Covered Software is governed by the terms of this
-     License, and how they can obtain a copy of this License. You may not
-     attempt to alter or restrict the recipients' rights in the Source Code
-     Form.
-
-3.2. Distribution of Executable Form
-
-     If You distribute Covered Software in Executable Form then:
-
-     a. such Covered Software must also be made available in Source Code Form,
-        as described in Section 3.1, and You must inform recipients of the
-        Executable Form how they can obtain a copy of such Source Code Form by
-        reasonable means in a timely manner, at a charge no more than the cost
-        of distribution to the recipient; and
-
-     b. You may distribute such Executable Form under the terms of this
-        License, or sublicense it under different terms, provided that the
-        license for the Executable Form does not attempt to limit or alter the
-        recipients' rights in the Source Code Form under this License.
-
-3.3. Distribution of a Larger Work
-
-     You may create and distribute a Larger Work under terms of Your choice,
-     provided that You also comply with the requirements of this License for
-     the Covered Software. If the Larger Work is a combination of Covered
-     Software with a work governed by one or more Secondary Licenses, and the
-     Covered Software is not Incompatible With Secondary Licenses, this
-     License permits You to additionally distribute such Covered Software
-     under the terms of such Secondary License(s), so that the recipient of
-     the Larger Work may, at their option, further distribute the Covered
-     Software under the terms of either this License or such Secondary
-     License(s).
-
-3.4. Notices
-
-     You may not remove or alter the substance of any license notices
-     (including copyright notices, patent notices, disclaimers of warranty, or
-     limitations of liability) contained within the Source Code Form of the
-     Covered Software, except that You may alter any license notices to the
-     extent required to remedy known factual inaccuracies.
-
-3.5. Application of Additional Terms
-
-     You may choose to offer, and to charge a fee for, warranty, support,
-     indemnity or liability obligations to one or more recipients of Covered
-     Software. However, You may do so only on Your own behalf, and not on
-     behalf of any Contributor. You must make it absolutely clear that any
-     such warranty, support, indemnity, or liability obligation is offered by
-     You alone, and You hereby agree to indemnify every Contributor for any
-     liability incurred by such Contributor as a result of warranty, support,
-     indemnity or liability terms You offer. You may include additional
-     disclaimers of warranty and limitations of liability specific to any
-     jurisdiction.
-
-4. Inability to Comply Due to Statute or Regulation
-
-   If it is impossible for You to comply with any of the terms of this License
-   with respect to some or all of the Covered Software due to statute,
-   judicial order, or regulation then You must: (a) comply with the terms of
-   this License to the maximum extent possible; and (b) describe the
-   limitations and the code they affect. Such description must be placed in a
-   text file included with all distributions of the Covered Software under
-   this License. Except to the extent prohibited by statute or regulation,
-   such description must be sufficiently detailed for a recipient of ordinary
-   skill to be able to understand it.
-
-5. Termination
-
-5.1. The rights granted under this License will terminate automatically if You
-     fail to comply with any of its terms. However, if You become compliant,
-     then the rights granted under this License from a particular Contributor
-     are reinstated (a) provisionally, unless and until such Contributor
-     explicitly and finally terminates Your grants, and (b) on an ongoing
-     basis, if such Contributor fails to notify You of the non-compliance by
-     some reasonable means prior to 60 days after You have come back into
-     compliance. Moreover, Your grants from a particular Contributor are
-     reinstated on an ongoing basis if such Contributor notifies You of the
-     non-compliance by some reasonable means, this is the first time You have
-     received notice of non-compliance with this License from such
-     Contributor, and You become compliant prior to 30 days after Your receipt
-     of the notice.
-
-5.2. If You initiate litigation against any entity by asserting a patent
-     infringement claim (excluding declaratory judgment actions,
-     counter-claims, and cross-claims) alleging that a Contributor Version
-     directly or indirectly infringes any patent, then the rights granted to
-     You by any and all Contributors for the Covered Software under Section
-     2.1 of this License shall terminate.
-
-5.3. In the event of termination under Sections 5.1 or 5.2 above, all end user
-     license agreements (excluding distributors and resellers) which have been
-     validly granted by You or Your distributors under this License prior to
-     termination shall survive termination.
-
-6. Disclaimer of Warranty
-
-   Covered Software is provided under this License on an "as is" basis,
-   without warranty of any kind, either expressed, implied, or statutory,
-   including, without limitation, warranties that the Covered Software is free
-   of defects, merchantable, fit for a particular purpose or non-infringing.
-   The entire risk as to the quality and performance of the Covered Software
-   is with You. Should any Covered Software prove defective in any respect,
-   You (not any Contributor) assume the cost of any necessary servicing,
-   repair, or correction. This disclaimer of warranty constitutes an essential
-   part of this License. No use of  any Covered Software is authorized under
-   this License except under this disclaimer.
-
-7. Limitation of Liability
-
-   Under no circumstances and under no legal theory, whether tort (including
-   negligence), contract, or otherwise, shall any Contributor, or anyone who
-   distributes Covered Software as permitted above, be liable to You for any
-   direct, indirect, special, incidental, or consequential damages of any
-   character including, without limitation, damages for lost profits, loss of
-   goodwill, work stoppage, computer failure or malfunction, or any and all
-   other commercial damages or losses, even if such party shall have been
-   informed of the possibility of such damages. This limitation of liability
-   shall not apply to liability for death or personal injury resulting from
-   such party's negligence to the extent applicable law prohibits such
-   limitation. Some jurisdictions do not allow the exclusion or limitation of
-   incidental or consequential damages, so this exclusion and limitation may
-   not apply to You.
-
-8. Litigation
-
-   Any litigation relating to this License may be brought only in the courts
-   of a jurisdiction where the defendant maintains its principal place of
-   business and such litigation shall be governed by laws of that
-   jurisdiction, without reference to its conflict-of-law provisions. Nothing
-   in this Section shall prevent a party's ability to bring cross-claims or
-   counter-claims.
-
-9. Miscellaneous
-
-   This License represents the complete agreement concerning the subject
-   matter hereof. If any provision of this License is held to be
-   unenforceable, such provision shall be reformed only to the extent
-   necessary to make it enforceable. Any law or regulation which provides that
-   the language of a contract shall be construed against the drafter shall not
-   be used to construe this License against a Contributor.
-
-
-10. Versions of the License
-
-10.1. New Versions
-
-      Mozilla Foundation is the license steward. Except as provided in Section
-      10.3, no one other than the license steward has the right to modify or
-      publish new versions of this License. Each version will be given a
-      distinguishing version number.
-
-10.2. Effect of New Versions
-
-      You may distribute the Covered Software under the terms of the version
-      of the License under which You originally received the Covered Software,
-      or under the terms of any subsequent version published by the license
-      steward.
-
-10.3. Modified Versions
-
-      If you create software not governed by this License, and you want to
-      create a new license for such software, you may create and use a
-      modified version of this License if you rename the license and remove
-      any references to the name of the license steward (except to note that
-      such modified license differs from this License).
-
-10.4. Distributing Source Code Form that is Incompatible With Secondary
-      Licenses If You choose to distribute Source Code Form that is
-      Incompatible With Secondary Licenses under the terms of this version of
-      the License, the notice described in Exhibit B of this License must be
-      attached.
-
-Exhibit A - Source Code Form License Notice
-
-      This Source Code Form is subject to the
-      terms of the Mozilla Public License, v.
-      2.0. If a copy of the MPL was not
-      distributed with this file, You can
-      obtain one at
-      http://mozilla.org/MPL/2.0/.
-
-If it is not possible or desirable to put the notice in a particular file,
-then You may include the notice in a location (such as a LICENSE file in a
-relevant directory) where a recipient would be likely to look for such a
-notice.
-
-You may add additional accurate notices of copyright ownership.
-
-Exhibit B - "Incompatible With Secondary Licenses" Notice
-
-      This Source Code Form is "Incompatible
-      With Secondary Licenses", as defined by
-      the Mozilla Public License, v. 2.0.
-
-
---------------------------------------------------------------------
 Dependency: github.com/haya14busa/go-actions-toolkit
 Revision: ca0307860f01
 License type (autodetected): MIT
@@ -5420,33 +5508,6 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: github.com/jarcoal/httpmock
-Version: v1.0.4
-License type (autodetected): MIT
-./vendor/github.com/jarcoal/httpmock/LICENSE:
---------------------------------------------------------------------
-The MIT License (MIT)
-
-Copyright (c) 2014 Jared Morse
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/jcmturner/gofork
@@ -5608,7 +5669,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/json-iterator/go
-Version: v1.1.7
+Version: v1.1.8
 License type (autodetected): MIT
 ./vendor/github.com/json-iterator/go/LICENSE:
 --------------------------------------------------------------------
@@ -5663,8 +5724,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/compress
-Version: v1.9.3
-Revision: c099ac9f21dd
+Version: v1.9.8
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
@@ -5842,7 +5902,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mattn/go-colorable
-Version: v0.1.4
+Version: v0.0.8
 License type (autodetected): MIT
 ./vendor/github.com/mattn/go-colorable/LICENSE:
 --------------------------------------------------------------------
@@ -5900,7 +5960,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mattn/go-isatty
-Version: v0.0.12
+Version: v0.0.2
 License type (autodetected): MIT
 ./vendor/github.com/mattn/go-isatty/LICENSE:
 --------------------------------------------------------------------
@@ -6590,6 +6650,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/oklog/ulid
+Version: v1.3.1
+License type (autodetected): Apache-2.0
+./vendor/github.com/oklog/ulid/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Version: v1.0.0
 Revision: ac19fd6e7483
@@ -6638,7 +6707,7 @@ See also http://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
 Dependency: github.com/pierrec/lz4
-Version: v2.2.6
+Version: v2.4.1
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/pierrec/lz4/LICENSE:
 --------------------------------------------------------------------
@@ -6814,8 +6883,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/procfs
-Version: v0.0.9
-Revision: 42f6e295b56f
+Version: v0.0.11
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/procfs/LICENSE:
 --------------------------------------------------------------------
@@ -6831,8 +6899,105 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
+Dependency: github.com/prometheus/prometheus
+Version: v2.5.0
+License type (autodetected): Apache-2.0
+./vendor/github.com/prometheus/prometheus/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+The Prometheus systems and service monitoring server
+Copyright 2012-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+
+The following components are included in this product:
+
+Bootstrap
+http://getbootstrap.com
+Copyright 2011-2014 Twitter, Inc.
+Licensed under the MIT License
+
+bootstrap3-typeahead.js
+https://github.com/bassjobsen/Bootstrap-3-Typeahead
+Original written by @mdo and @fat
+Copyright 2014 Bass Jobsen @bassjobsen
+Licensed under the Apache License, Version 2.0
+
+fuzzy
+https://github.com/mattyork/fuzzy
+Original written by @mattyork
+Copyright 2012 Matt York
+Licensed under the MIT License
+
+bootstrap-datetimepicker.js
+https://github.com/Eonasdan/bootstrap-datetimepicker
+Copyright 2015 Jonathan Peterson (@Eonasdan)
+Licensed under the MIT License
+
+moment.js
+https://github.com/moment/moment/
+Copyright JS Foundation and other contributors
+Licensed under the MIT License
+
+Rickshaw
+https://github.com/shutterstock/rickshaw
+Copyright 2011-2014 by Shutterstock Images, LLC
+See https://github.com/shutterstock/rickshaw/blob/master/LICENSE for license details
+
+mustache.js
+https://github.com/janl/mustache.js
+Copyright 2009 Chris Wanstrath (Ruby)
+Copyright 2010-2014 Jan Lehnardt (JavaScript)
+Copyright 2010-2015 The mustache.js community
+Licensed under the MIT License
+
+jQuery
+https://jquery.org
+Copyright jQuery Foundation and other contributors
+Licensed under the MIT License
+
+Protocol Buffers for Go with Gadgets
+http://github.com/gogo/protobuf/
+Copyright (c) 2013, The GoGo Authors.
+See source code for license details.
+
+Go support for leveled logs, analogous to
+https://code.google.com/p/google-glog/
+Copyright 2013 Google Inc.
+Licensed under the Apache License, Version 2.0
+
+Support for streaming Protocol Buffer messages for the Go language (golang).
+https://github.com/matttproud/golang_protobuf_extensions
+Copyright 2013 Matt T. Proud
+Licensed under the Apache License, Version 2.0
+
+DNS library in Go
+http://miek.nl/posts/2014/Aug/16/go-dns-package/
+Copyright 2009 The Go Authors, 2011 Miek Gieben
+See https://github.com/miekg/dns/blob/master/LICENSE for license details.
+
+LevelDB key/value database in Go
+https://github.com/syndtr/goleveldb
+Copyright 2012 Suryandaru Triandana
+See https://github.com/syndtr/goleveldb/blob/master/LICENSE for license details.
+
+gosnappy - a fork of code.google.com/p/snappy-go
+https://github.com/syndtr/gosnappy
+Copyright 2011 The Snappy-Go Authors
+See https://github.com/syndtr/gosnappy/blob/master/LICENSE for license details.
+
+go-zookeeper - Native ZooKeeper client for Go
+https://github.com/samuel/go-zookeeper
+Copyright (c) 2013, Samuel Stauffer <samuel@descolada.com>
+See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for license details.
+
+--------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
-Revision: 3113b8401b8a
+Revision: cac0b30c2563
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
@@ -7060,6 +7225,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/santhosh-tekuri/jsonschema
+Version: v1.2.4
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/santhosh-tekuri/jsonschema/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2017 Santhosh Kumar Tekuri. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+--------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
 Version: v2.19.11
 License type (autodetected): BSD-3-Clause
@@ -7129,7 +7327,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
 Overwrite: github.com/elastic/sarama
-Overwrite-Revision: 355d120d0970
+Overwrite-Version: v1.24.1
+Overwrite-Revision: cbc80333a91e
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -7193,7 +7392,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/spf13/pflag
-Version: v1.0.3
+Version: v1.0.5
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/spf13/pflag/LICENSE:
 --------------------------------------------------------------------
@@ -7255,8 +7454,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/stretchr/objx
-Version: v0.1.2
-Revision: b8b73a35e983
+Version: v0.2.0
 License type (autodetected): MIT
 ./vendor/github.com/stretchr/objx/LICENSE:
 --------------------------------------------------------------------
@@ -7285,7 +7483,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/stretchr/testify
-Version: v1.4.0
+Version: v1.5.1
 License type (autodetected): MIT
 ./vendor/github.com/stretchr/testify/LICENSE:
 --------------------------------------------------------------------
@@ -7381,6 +7579,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/urso/diag
+Revision: 21b3cc8eb797
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/diag/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/diag-ecs
+Revision: ab085841dcb9
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/diag-ecs/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/ecslog
+Version: v0.0.1
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/ecslog/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/urso/go-bin
 Revision: 781c575c9f0e
 License type (autodetected): Apache-2.0
@@ -7391,9 +7616,18 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/urso/magetools
-Revision: 61080ed7b22b
+Revision: c2e338f92f3a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/urso/magetools/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/sderr
+Revision: c2a16f3d43ec
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/sderr/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -7496,6 +7730,237 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: go.elastic.co/apm
+Version: v1.7.2
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/apm/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Elastic APM Go Agent
+Copyright 2018-2019 Elasticsearch B.V.
+
+This product includes software developed at Elasticsearch, B.V. (https://www.elastic.co/).
+
+=========================================
+Third party code included by the Go Agent
+=========================================
+
+------------------------------------------------------------------------------------
+This project copies code from the Go standard library (https://github.com/golang/go)
+------------------------------------------------------------------------------------
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------
+This project copies code from Gorilla Mux (https://github.com/gorilla/mux)
+--------------------------------------------------------------------------
+
+Copyright (c) 2012-2018 The Gorilla Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+	 * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+	 * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+	 * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------------------------------------------------
+This project copies code from pq (https://github.com/lib/pq)
+------------------------------------------------------------
+
+Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: go.elastic.co/apm/module/apmelasticsearch
+Version: v1.7.2
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/apm/module/apmelasticsearch/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: go.elastic.co/apm/module/apmhttp
+Version: v1.7.2
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/apm/module/apmhttp/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: go.elastic.co/ecszap
+Version: v0.2.0
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/ecszap/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+ecszap
+Copyright 2020-2020 Elasticsearch B.V.
+
+==========================================================================
+Third party libraries used by the Elastic ecszap project:
+==========================================================================
+
+Dependency: github.com/stretchr/testify
+Version: v1.4.0
+License type: MIT
+https://github.com/stretchr/testify/blob/199de5f3a493a9bf2dcc7fa5bf841d7759c13d7d/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2012-2018 Mat Ryer and Tyler Bunnell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+--------------------------------------------------------------------
+
+
+Dependency: go.uber.org/zap
+Version: v1.14.0
+License type: MIT
+https://github.com/uber-go/zap/blob/0bd02a6308c1bac3a03b02dc385555297cb22f83/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016-2017 Uber Technologies, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+--------------------------------------------------------------------
+
+
+Dependency: github.com/magefile/mage
+Version: v1.9.0
+License type: Apache-2.0
+https://github.com/magefile/mage/blob/324c6690ed410efc1d9b597e477c46d42cbeb340/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/pkg/errors
+Version: v0.9.1
+License type (autodetected): BSD-2-Clause
+https://github.com/pkg/errors/blob/614d223910a179a466c1767a985424175c39b465/LICENSE
+--------------------------------------------------------------------
+Copyright (c) 2015, Dave Cheney <dave@cheney.net>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+Dependency: go.elastic.co/fastjson
+Version: v1.0.0
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/fastjson/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: go.opencensus.io
 Version: v0.22.2
 License type (autodetected): Apache-2.0
@@ -7506,7 +7971,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: go.uber.org/atomic
-Version: v1.3.1
+Version: v1.5.0
 License type (autodetected): MIT
 ./vendor/go.uber.org/atomic/LICENSE.txt:
 --------------------------------------------------------------------
@@ -7532,8 +7997,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: go.uber.org/multierr
-Version: v1.1.1
-Revision: fb7d312c2c04
+Version: v1.3.0
 License type (autodetected): MIT
 ./vendor/go.uber.org/multierr/LICENSE.txt:
 --------------------------------------------------------------------
@@ -7558,8 +8022,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: go.uber.org/tools
+Revision: 2cfd321de3ee
+License type (autodetected): MIT
+./vendor/go.uber.org/tools/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2017 Uber Technologies, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: go.uber.org/zap
-Version: v1.7.1
+Version: v1.14.0
 License type (autodetected): MIT
 ./vendor/go.uber.org/zap/LICENSE.txt:
 --------------------------------------------------------------------
@@ -7585,7 +8075,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: c9f3fb736b72
+Revision: 06a226fb4e37
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -7653,11 +8143,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/lint
-Revision: fdd1cda4f05f
+Revision: 910be7a94367
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/lint/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: golang.org/x/mod
+Version: v0.1.1
+Revision: c90efee705ee
+License type (autodetected): BSD-3-Clause
+./vendor/golang.org/x/mod/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2009 The Go Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -7789,7 +8314,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: 9fbb57f87de9
+Revision: b016eb3dc98e
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -7891,7 +8416,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 7b8e75db28f4
+Revision: b320d3a0f5a2
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
@@ -8044,7 +8569,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/grpc
-Version: v1.27.1
+Version: v1.29.1
 License type (autodetected): Apache-2.0
 ./vendor/google.golang.org/grpc/LICENSE:
 --------------------------------------------------------------------
@@ -8052,8 +8577,42 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: google.golang.org/protobuf
+Version: v1.23.0
+License type (autodetected): BSD-3-Clause
+./vendor/google.golang.org/protobuf/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2018 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
-Version: v0.9.0
+Version: v0.9.1
 License type (autodetected): BSD-3-Clause
 ./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
@@ -8105,8 +8664,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: gopkg.in/jcmturner/goidentity.v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/gopkg.in/jcmturner/goidentity.v3/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: gopkg.in/jcmturner/gokrb5.v7
-Version: v7.3.0
+Version: v7.5.0
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/jcmturner/gokrb5.v7/LICENSE:
 --------------------------------------------------------------------
@@ -8221,7 +8789,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.8
+Version: v2.3.0
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/yaml.v2/LICENSE:
 --------------------------------------------------------------------
@@ -8244,7 +8812,7 @@ limitations under the License.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.8
+Version: v2.3.0
 License type (autodetected): MIT
 ./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
 --------------------------------------------------------------------
@@ -8675,7 +9243,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: k8s.io/api
-Revision: b90922c02518
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/api/LICENSE:
 --------------------------------------------------------------------
@@ -8684,7 +9252,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/apimachinery
-Revision: bfcf53abc9f8
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/apimachinery/LICENSE:
 --------------------------------------------------------------------
@@ -8693,7 +9261,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/client-go
-Revision: 78d2af792bab
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/client-go/LICENSE:
 --------------------------------------------------------------------
@@ -8702,8 +9270,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/klog
-Version: v0.3.4
-Revision: 6a023d6d0e09
+Version: v1.0.0
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/klog/LICENSE:
 --------------------------------------------------------------------
@@ -8711,8 +9278,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: k8s.io/kube-openapi
+Revision: 61e04a5be9a6
+License type (autodetected): Apache-2.0
+./vendor/k8s.io/kube-openapi/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: k8s.io/utils
-Revision: 3dccf664f023
+Revision: a9aa75ae1b89
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/utils/LICENSE:
 --------------------------------------------------------------------
@@ -8720,9 +9296,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: sigs.k8s.io/structured-merge-diff/v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/sigs.k8s.io/structured-merge-diff/v3/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: sigs.k8s.io/yaml
-Version: v1.1.1
-Revision: 4cd0c284b15f
+Version: v1.2.0
 License type (autodetected): MIT
 ./vendor/sigs.k8s.io/yaml/LICENSE:
 --------------------------------------------------------------------

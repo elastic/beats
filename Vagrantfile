@@ -44,7 +44,7 @@ if (-Not (Test-Path $gopath_beats)) {
 if (-Not (Get-Command "gvm" -ErrorAction SilentlyContinue)) {
     echo "Installing gvm to manage go version"
     [Net.ServicePointManager]::SecurityProtocol = "tls12"
-    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
+    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
     C:\\Windows\\System32\\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
     go version
 
@@ -83,7 +83,7 @@ choco feature disable -n=showDownloadProgress
 
 if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
     echo "Installing python 3"
-    choco install python -y -r --version 3.8.1.20200110
+    choco install python -y -r --version 3.8.2
     refreshenv
     $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
 }
@@ -119,7 +119,7 @@ def linuxGvmProvision(arch="amd64")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-linux-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-linux-#{arch}
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
@@ -135,7 +135,7 @@ def linuxDebianProvision()
 #!/usr/bin/env bash
 set -eio pipefail
 apt-get update
-apt-get install -y make gcc python3 python3-pip python3-venv git
+apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev
 SCRIPT
 end
 
@@ -164,6 +164,11 @@ Vagrant.configure(2) do |config|
   config.vm.define "win2019", primary: true do |c|
     c.vm.box = "StefanScherer/windows_2019"
     c.vm.provision "shell", inline: $winPsProvision, privileged: false
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
   end
 
   # Solaris 11.2
@@ -223,6 +228,11 @@ Vagrant.configure(2) do |config|
   config.vm.define "ubuntu1804", primary: true do |c|
     c.vm.box = "ubuntu/bionic64"
     c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false

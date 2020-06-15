@@ -24,6 +24,6 @@ var (
 
 func init() {
 	mb.Registry.MustAddMetricSet("openmetrics", "collector",
-		collector.MetricSetBuilder("openmetrics"),
+		collector.MetricSetBuilder("openmetrics", collector.DefaultPromEventsGeneratorFactory),
 		mb.WithHostParser(hostParser))
 }

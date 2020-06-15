@@ -20,6 +20,8 @@
 package memory
 
 import (
+	"fmt"
+
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
@@ -70,6 +72,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	memoryStats := m.memoryService.getMemoryStatsList(stats, m.dedot)
+	if len(memoryStats) == 0 {
+		return fmt.Errorf("No memory stats data available")
+	}
 	eventsMapping(r, memoryStats)
 
 	return nil

@@ -11,8 +11,12 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"regexp"
+	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -35,14 +39,8 @@ func testSetup(t *testing.T) {
 	})
 }
 
-func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
-	testSetup(t)
-	// Create an http test server according to whether TLS is used
-	var newServer = httptest.NewServer
-	if isTLS {
-		newServer = httptest.NewTLSServer
-	}
-	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func createServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
+	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			req, err := ioutil.ReadAll(r.Body)
 			defer r.Body.Close()
@@ -71,6 +69,62 @@ func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input 
 			w.Write(b)
 		}
 	}))
+}
+
+func createCustomServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
+	var isRetry bool
+	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if !isRetry {
+			w.Header().Set("X-Rate-Limit-Limit", "0")
+			w.Header().Set("X-Rate-Limit-Remaining", "0")
+			w.Header().Set("X-Rate-Limit-Reset", strconv.FormatInt(time.Now().Unix(), 10))
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte{})
+			isRetry = true
+		} else {
+			message := map[string]interface{}{
+				"hello": "world",
+				"embedded": map[string]string{
+					"hello": "world",
+				},
+			}
+			b, _ := json.Marshal(message)
+			w.WriteHeader(http.StatusOK)
+			w.Write(b)
+		}
+	}))
+}
+
+func createCustomServerWithArrayResponse(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
+	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		message := map[string]interface{}{
+			"hello": []map[string]string{
+				{"foo": "bar"},
+				{"bar": "foo"},
+			},
+		}
+		b, _ := json.Marshal(message)
+		w.WriteHeader(http.StatusOK)
+		w.Write(b)
+	}))
+}
+
+func runTest(t *testing.T, isTLS bool, testRateLimitRetry bool, testArrayResponse bool, m map[string]interface{}, run func(input *HttpjsonInput, out *stubOutleter, t *testing.T)) {
+	testSetup(t)
+	// Create an http test server according to whether TLS is used
+	var newServer = httptest.NewServer
+	if isTLS {
+		newServer = httptest.NewTLSServer
+	}
+	ts := createServer(newServer)
+	if testRateLimitRetry {
+		ts = createCustomServer(newServer)
+	}
+	if testArrayResponse {
+		ts = createCustomServerWithArrayResponse(newServer)
+	}
 	defer ts.Close()
 	m["url"] = ts.URL
 	cfg := common.MustNewConfigFrom(m)
@@ -90,7 +144,7 @@ func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input 
 	if err != nil {
 		t.Fatal(err)
 	}
-	input := in.(*httpjsonInput)
+	input := in.(*HttpjsonInput)
 	defer input.Stop()
 
 	run(input, eventOutlet, t)
@@ -150,14 +204,163 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	return !o.done
 }
 
+func newOAuth2TestServer(t *testing.T) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != "POST" {
+			t.Errorf("expected POST request, got %v", r.Method)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			t.Errorf("no error expected, got %q", err)
+			return
+		}
+
+		if gt := r.FormValue("grant_type"); gt != "client_credentials" {
+			t.Errorf("expected grant_type was client_credentials, got %q", gt)
+			return
+		}
+
+		clientID := r.FormValue("client_id")
+		clientSecret := r.FormValue("client_secret")
+		if clientID == "" || clientSecret == "" {
+			clientID, clientSecret, _ = r.BasicAuth()
+		}
+		if clientID != "a_client_id" || clientSecret != "a_client_secret" {
+			t.Errorf("expected client credentials \"a_client_id:a_client_secret\", got \"%s:%s\"", clientID, clientSecret)
+		}
+
+		if s := r.FormValue("scope"); s != "scope1 scope2" {
+			t.Errorf("expected scope was scope1+scope2, got %q", s)
+			return
+		}
+
+		expectedParams := []string{"v1", "v2"}
+		if p := r.Form["param1"]; !reflect.DeepEqual(expectedParams, p) {
+			t.Errorf("expected params were %q, but got %q", expectedParams, p)
+			return
+		}
+
+		w.Header().Set("content-type", "application/json")
+		w.Write([]byte(`{"token_type":"Bearer","expires_in":"3599","access_token":"abcdef1234567890"}`))
+	}))
+}
+
 // --- Test Cases
+
+func TestGetNextLinkFromHeader(t *testing.T) {
+	header := make(http.Header)
+	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs>; rel=\"self\"")
+	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1>; rel=\"next\"")
+	re, _ := regexp.Compile("<([^>]+)>; *rel=\"next\"(?:,|$)")
+	url, err := getNextLinkFromHeader(header, "Link", re)
+	if url != "https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1" {
+		t.Fatal("Failed to test getNextLinkFromHeader. URL " + url + " is not expected")
+	}
+	if err != nil {
+		t.Fatal("Failed to test getNextLinkFromHeader with error:", err)
+	}
+}
+
+func TestCreateRequestInfoFromBody(t *testing.T) {
+	m := map[string]interface{}{
+		"id": 100,
+	}
+	extraBodyContent := common.MapStr{"extra_body": "abc"}
+	ri, err := createRequestInfoFromBody(common.MapStr(m), "id", "pagination_id", extraBodyContent, "https://test-123", &RequestInfo{
+		URL:        "",
+		ContentMap: common.MapStr{},
+		Headers:    common.MapStr{},
+	})
+	if ri.URL != "https://test-123" {
+		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
+	}
+	p, err := ri.ContentMap.GetValue("pagination_id")
+	if err != nil {
+		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
+	}
+	switch pt := p.(type) {
+	case int:
+		if pt != 100 {
+			t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %d should be 100.", pt)
+		}
+	default:
+		t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %T should be int.", pt)
+	}
+	b, err := ri.ContentMap.GetValue("extra_body")
+	if err != nil {
+		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
+	}
+	switch bt := b.(type) {
+	case string:
+		if bt != "abc" {
+			t.Fatalf("Failed to test createRequestInfoFromBody. extra_body value %s does not match \"abc\".", bt)
+		}
+	default:
+		t.Fatalf("Failed to test createRequestInfoFromBody. extra_body type %T should be string.", bt)
+	}
+}
+
+// Test getRateLimit function with a remaining quota, expect to receive 0, nil.
+func TestGetRateLimitCase1(t *testing.T) {
+	header := make(http.Header)
+	header.Add("X-Rate-Limit-Limit", "120")
+	header.Add("X-Rate-Limit-Remaining", "118")
+	header.Add("X-Rate-Limit-Reset", "1581658643")
+	rateLimit := &RateLimit{
+		Limit:     "X-Rate-Limit-Limit",
+		Reset:     "X-Rate-Limit-Reset",
+		Remaining: "X-Rate-Limit-Remaining",
+	}
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil || epoch != 0 {
+		t.Fatal("Failed to test getRateLimit.")
+	}
+}
+
+// Test getRateLimit function with a past time, expect to receive 0, nil.
+func TestGetRateLimitCase2(t *testing.T) {
+	header := make(http.Header)
+	header.Add("X-Rate-Limit-Limit", "10")
+	header.Add("X-Rate-Limit-Remaining", "0")
+	header.Add("X-Rate-Limit-Reset", "1581658643")
+	rateLimit := &RateLimit{
+		Limit:     "X-Rate-Limit-Limit",
+		Reset:     "X-Rate-Limit-Reset",
+		Remaining: "X-Rate-Limit-Remaining",
+	}
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil || epoch != 0 {
+		t.Fatal("Failed to test getRateLimit.")
+	}
+}
+
+// Test getRateLimit function with a time yet to come, expect to receive <reset-value>, nil.
+func TestGetRateLimitCase3(t *testing.T) {
+	epoch := time.Now().Unix() + 100
+	header := make(http.Header)
+	header.Add("X-Rate-Limit-Limit", "10")
+	header.Add("X-Rate-Limit-Remaining", "0")
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(epoch, 10))
+	rateLimit := &RateLimit{
+		Limit:     "X-Rate-Limit-Limit",
+		Reset:     "X-Rate-Limit-Reset",
+		Remaining: "X-Rate-Limit-Remaining",
+	}
+	epoch2, err := getRateLimit(header, rateLimit)
+	if err != nil || epoch2 != epoch {
+		t.Fatal("Failed to test getRateLimit.")
+	}
+}
 
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -179,7 +382,7 @@ func TestGetHTTPS(t *testing.T) {
 		"interval":              0,
 		"ssl.verification_mode": "none",
 	}
-	runTest(t, true, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, true, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -195,13 +398,56 @@ func TestGetHTTPS(t *testing.T) {
 	})
 }
 
+func TestRateLimitRetry(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method": "GET",
+		"interval":    0,
+	}
+	runTest(t, false, true, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestArrayResponse(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":        "GET",
+		"json_objects_array": "hello",
+		"interval":           0,
+	}
+	runTest(t, false, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
 func TestPOST(t *testing.T) {
 	m := map[string]interface{}{
 		"http_method":       "POST",
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -223,7 +469,7 @@ func TestRepeatedPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          10 ^ 9,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -244,10 +490,41 @@ func TestRunStop(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		input.Run()
 		input.Stop()
 		input.Run()
 		input.Stop()
+	})
+}
+
+func TestOAuth2(t *testing.T) {
+	ts := newOAuth2TestServer(t)
+	m := map[string]interface{}{
+		"http_method":          "GET",
+		"oauth2.client.id":     "a_client_id",
+		"oauth2.client.secret": "a_client_secret",
+		"oauth2.token_url":     ts.URL,
+		"oauth2.endpoint_params": map[string][]string{
+			"param1": {"v1", "v2"},
+		},
+		"oauth2.scopes": []string{"scope1", "scope2"},
+		"interval":      0,
+	}
+	defer ts.Close()
+
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
 	})
 }

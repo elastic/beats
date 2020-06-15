@@ -19,6 +19,7 @@ package mage
 
 import (
 	"fmt"
+	"go/build"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,6 +32,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
@@ -125,6 +127,12 @@ func CrossBuild(options ...CrossBuildOption) error {
 	if len(params.Platforms) == 0 {
 		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
 		return nil
+	}
+
+	if CrossBuildMountModcache {
+		// Make sure the module dependencies are downloaded on the host,
+		// as they will be mounted into the container read-only.
+		mg.Deps(func() error { return gotool.Mod.Download() })
 	}
 
 	// Build the magefile for Linux so we can run it inside the container.
@@ -250,11 +258,17 @@ func (b GolangCrossBuilder) Build() error {
 	if UseVendor {
 		args = append(args, "--env", "GOFLAGS=-mod=vendor")
 	}
+	if CrossBuildMountModcache {
+		// Mount $GOPATH/pkg/mod into the container, read-only.
+		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
+		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
+	}
 
 	args = append(args,
 		"--rm",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
+		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
@@ -282,7 +296,10 @@ func DockerChown(path string) {
 // chownPaths will chown the file and all of the dirs specified in the path.
 func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
-	defer log.Printf("chown took: %v", time.Now().Sub(start))
+	numFixed := 0
+	defer func() {
+		log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -301,10 +318,10 @@ func chownPaths(uid, gid int, path string) error {
 			return nil
 		}
 
-		log.Printf("chown file: %v", name)
 		if err := os.Chown(name, uid, gid); err != nil {
 			return errors.Wrapf(err, "failed to chown path=%v", name)
 		}
+		numFixed++
 		return nil
 	})
 }

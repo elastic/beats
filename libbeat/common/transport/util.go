@@ -24,6 +24,8 @@ import (
 	"strings"
 )
 
+const logSelector = "transport"
+
 func fullAddress(host string, defaultPort int) string {
 	if _, _, err := net.SplitHostPort(host); err == nil {
 		return host

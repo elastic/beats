@@ -1,5 +1,5 @@
 [id="{beatname_lc}-deduplication"]
-== Data deduplication
+== Deduplicate data
 
 The {beats} framework guarantees at-least-once delivery to ensure that no data
 is lost when events are sent to outputs that support acknowledgement, such as
@@ -73,11 +73,11 @@ from the JSON string and stores it in the `@metadata._id` field:
 [source,yaml]
 ----
 processors:
- - decode_json_fields:
-     document_id: "myid"
-     fields: ["message"]
-     max_depth: 1
-     target: ""
+  - decode_json_fields:
+      document_id: "myid"
+      fields: ["message"]
+      max_depth: 1
+      target: ""
 ----
 +
 The resulting document ID is `100`.

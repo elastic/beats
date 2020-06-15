@@ -26,7 +26,8 @@ output.redis:
 
 ==== Compatibility
 
-This output works with Redis 3.2.4.
+This output is expected to work with all Redis versions between 3.2.4 and 5.0.8. Other versions might work as well,
+but are not supported.
 
 ==== Configuration options
 

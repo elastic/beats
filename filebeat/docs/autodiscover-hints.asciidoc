@@ -155,6 +155,24 @@ annotations:
   co.elastic.logs.sidecar/exclude_lines: '^DBG'
 -----
 
+[float]
+===== Configuring Namespace Defaults
+
+Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
+The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
+enable Namespace defaults configure the `add_resource_metadata` for Namespace objects as follows:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      add_resource_metadata:
+        namespace:
+          enabled: true
+-------------------------------------------------------------------------------------
+
 
 
 [float]

@@ -26,7 +26,7 @@ var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
 		"pilot_xds":                                              prometheus.Metric("xds.count"),
 		"pilot_xds_pushes":                                       prometheus.Metric("xds.pushes"),
-		"pilot_xds_push_time":                                    prometheus.Metric("xds.push.time.sec"),
+		"pilot_xds_push_time":                                    prometheus.Metric("xds.push.time.ms", prometheus.OpMultiplyBuckets(1000)),
 		"pilot_xds_eds_instances":                                prometheus.Metric("xds.eds.instances"),
 		"pilot_xds_push_context_errors":                          prometheus.Metric("xds.push.context.errors"),
 		"pilot_total_xds_internal_errors":                        prometheus.Metric("xds.internal.errors"),

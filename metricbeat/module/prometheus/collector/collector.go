@@ -19,6 +19,7 @@ package collector
 
 import (
 	"regexp"
+	"sync"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -35,19 +36,42 @@ const (
 )
 
 var (
-	hostParser = parse.URLHostParserBuilder{
+	// HostParser parses a Prometheus endpoint URL
+	HostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 		PathConfigKey: "metrics_path",
 	}.Build()
+
+	upMetricName          = "up"
+	upMetricType          = dto.MetricType_GAUGE
+	upMetricInstanceLabel = "instance"
+	upMetricJobLabel      = "job"
+	upMetricJobValue      = "prometheus"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("prometheus", "collector", MetricSetBuilder("prometheus"),
-		mb.WithHostParser(hostParser),
+	mb.Registry.MustAddMetricSet("prometheus", "collector",
+		MetricSetBuilder("prometheus", DefaultPromEventsGeneratorFactory),
+		mb.WithHostParser(HostParser),
 		mb.DefaultMetricSet(),
 	)
 }
+
+// PromEventsGenerator converts a Prometheus metric family into a PromEvent list
+type PromEventsGenerator interface {
+	// Start must be called before using the generator
+	Start()
+
+	// converts a Prometheus metric family into a list of PromEvents
+	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
+
+	// Stop must be called when the generator won't be used anymore
+	Stop()
+}
+
+// PromEventsGeneratorFactory creates a PromEventsGenerator when instanciating a metricset
+type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, error)
 
 // MetricSet for fetching prometheus data
 type MetricSet struct {
@@ -56,10 +80,14 @@ type MetricSet struct {
 	includeMetrics []*regexp.Regexp
 	excludeMetrics []*regexp.Regexp
 	namespace      string
+	promEventsGen  PromEventsGenerator
+	once           sync.Once
+	host           string
 }
 
-// MetricSetBuilder returns a builder function for a new Prometheus metricset using the given namespace
-func MetricSetBuilder(namespace string) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+// MetricSetBuilder returns a builder function for a new Prometheus metricset using
+// the given namespace and event generator
+func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config := defaultConfig
 		if err := base.Module().UnpackConfig(&config); err != nil {
@@ -70,11 +98,19 @@ func MetricSetBuilder(namespace string) func(base mb.BaseMetricSet) (mb.MetricSe
 			return nil, err
 		}
 
+		promEventsGen, err := genFactory(base)
+		if err != nil {
+			return nil, err
+		}
+
 		ms := &MetricSet{
 			BaseMetricSet: base,
 			prometheus:    prometheus,
 			namespace:     namespace,
+			promEventsGen: promEventsGen,
 		}
+		// store host here to use it as a pointer when building `up` metric
+		ms.host = ms.Host()
 		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
@@ -90,54 +126,52 @@ func MetricSetBuilder(namespace string) func(base mb.BaseMetricSet) (mb.MetricSe
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	m.once.Do(m.promEventsGen.Start)
+
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
 	if err != nil {
-		m.addUpEvent(eventList, 0)
-		for _, evt := range eventList {
-			reporter.Event(mb.Event{
-				RootFields: common.MapStr{m.namespace: evt},
-			})
-		}
-		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
+		// send up event only
+		families = append(families, m.upMetricFamily(0.0))
+
+		// set the error to report it after sending the up event
+		err = errors.Wrap(err, "unable to decode response from prometheus endpoint")
+	} else {
+		// add up event to the list
+		families = append(families, m.upMetricFamily(1.0))
 	}
 
 	for _, family := range families {
 		if m.skipFamily(family) {
 			continue
 		}
-		promEvents := getPromEventsFromMetricFamily(family)
+		promEvents := m.promEventsGen.GeneratePromEvents(family)
 
 		for _, promEvent := range promEvents {
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = common.MapStr{
-					"metrics": common.MapStr{},
-				}
+				eventList[labelsHash] = common.MapStr{}
 
 				// Add default instance label if not already there
-				if exists, _ := promEvent.labels.HasKey("instance"); !exists {
-					promEvent.labels.Put("instance", m.Host())
+				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
+					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
 				}
 				// Add default job label if not already there
-				if exists, _ := promEvent.labels.HasKey("job"); !exists {
-					promEvent.labels.Put("job", m.Module().Name())
+				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
+					promEvent.Labels.Put("job", m.Module().Name())
 				}
 				// Add labels
-				if len(promEvent.labels) > 0 {
-					eventList[labelsHash]["labels"] = promEvent.labels
+				if len(promEvent.Labels) > 0 {
+					eventList[labelsHash]["labels"] = promEvent.Labels
 				}
 			}
 
-			// Not checking anything here because we create these maps some lines before
-			metrics := eventList[labelsHash]["metrics"].(common.MapStr)
-			metrics.Update(promEvent.data)
+			// Accumulate metrics in the event
+			eventList[labelsHash].DeepUpdate(promEvent.Data)
 		}
 	}
 
-	m.addUpEvent(eventList, 1)
-
-	// Converts hash list to slice
+	// Report events
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
 			RootFields: common.MapStr{m.namespace: e},
@@ -147,27 +181,36 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
+	return err
+}
+
+// Close stops the metricset
+func (m *MetricSet) Close() error {
+	m.promEventsGen.Stop()
 	return nil
 }
 
-func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
-	metricName := "up"
-	if m.skipFamilyName(metricName) {
-		return
+func (m *MetricSet) upMetricFamily(value float64) *dto.MetricFamily {
+	gauge := dto.Gauge{
+		Value: &value,
 	}
-	upPromEvent := PromEvent{
-		labels: common.MapStr{
-			"instance": m.Host(),
-			"job":      "prometheus",
-		},
+	label1 := dto.LabelPair{
+		Name:  &upMetricInstanceLabel,
+		Value: &m.host,
 	}
-	eventList[upPromEvent.LabelsHash()] = common.MapStr{
-		"metrics": common.MapStr{
-			"up": up,
-		},
-		"labels": upPromEvent.labels,
+	label2 := dto.LabelPair{
+		Name:  &upMetricJobLabel,
+		Value: &upMetricJobValue,
 	}
-
+	metric := dto.Metric{
+		Gauge: &gauge,
+		Label: []*dto.LabelPair{&label1, &label2},
+	}
+	return &dto.MetricFamily{
+		Name:   &upMetricName,
+		Type:   &upMetricType,
+		Metric: []*dto.Metric{&metric},
+	}
 }
 
 func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {

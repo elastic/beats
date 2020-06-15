@@ -159,12 +159,16 @@ def main():
         # add labels
         labels = ["backport"]
 
+        zube_teams = zube_team_labels(original_pr)
         if args.zube_team:
             resp = session.get(base + "/labels/Team:"+args.zube_team)
             if resp.status_code != 200:
                 print("Cannot find team label", resp.text)
                 sys.exit(1)
-            labels.append("Team:"+args.zube_team)
+            zube_teams = ["Team:" + args.zube_team]
+
+        if len(zube_teams) > 0:
+            labels += zube_teams
             labels.append("[zube]: In Review")
         else:
             labels.append("review")
@@ -193,6 +197,13 @@ def get_version(beats_dir):
             if match:
                 return match.group('version')
 
+def zube_team_labels(pr):
+    teams = []
+    for label in pr.get('labels', []):
+        name = label.get('name', '')
+        if name.startswith('Team:'):
+            teams.append(name)
+    return teams
 
 if __name__ == "__main__":
     sys.exit(main())

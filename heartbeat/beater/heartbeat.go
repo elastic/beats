@@ -86,7 +86,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.ConfigManager.Enabled() {
+	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 
@@ -156,14 +156,18 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	adapter := autodiscover.NewFactoryAdapter(bt.dynamicFactory)
-
-	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, adapter, bt.config.Autodiscover)
+	autodiscover, err := autodiscover.NewAutodiscover(
+		"heartbeat",
+		b.Publisher,
+		bt.dynamicFactory,
+		autodiscover.QueryConfig(),
+		bt.config.Autodiscover,
+		b.Keystore,
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	return ad, nil
+	return autodiscover, nil
 }
 
 // Stop stops the beat.

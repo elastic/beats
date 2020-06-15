@@ -12,5 +12,5 @@ var:
       - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
       - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/gc.yml

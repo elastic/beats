@@ -84,9 +84,9 @@ func RunTests(
 		return fmt.Errorf("loading pipeline failed: %+v", err)
 	}
 	defer func() {
-		logp.Info("Stop pipeline")
+		log.Info("Stop pipeline")
 		pipeline.Close()
-		logp.Info("pipeline closed")
+		log.Info("pipeline closed")
 	}()
 
 	cs := newCloseSignaler()
@@ -100,7 +100,7 @@ func RunTests(
 		withWG(&genWG, func() {
 			err := generate(cs, pipeline, config.Generate, i, errors)
 			if err != nil {
-				logp.Err("Generator failed with: %v", err)
+				log.Errorf("Generator failed with: %v", err)
 			}
 		})
 	}

@@ -162,6 +162,34 @@ func TestAuthentication(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
 }
 
+func TestSetHeader(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Headers = map[string]string{
+		"Override": "default",
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	require.NoError(t, err)
+
+	h.SetHeader("Override", "overridden")
+	v := h.headers.Get("override")
+	assert.Equal(t, "overridden", v)
+}
+
+func TestSetHeaderDefault(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Headers = map[string]string{
+		"Override": "default",
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	require.NoError(t, err)
+
+	h.SetHeaderDefault("Override", "overridden")
+	v := h.headers.Get("override")
+	assert.Equal(t, "default", v)
+}
+
 func TestOverUnixSocket(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skipf("unix domain socket aren't supported under Windows")

@@ -33,8 +33,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
-	// Add autodiscover builders / appenders
-	_ "github.com/elastic/beats/v7/metricbeat/autodiscover"
+	// include all metricbeat specific builders
+	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
+
+	// include all metricbeat specific appenders
+	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
 
 	// Add metricbeat default processors
 	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
@@ -131,7 +134,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.ConfigManager.Enabled()
+	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()
 	if !dynamicCfgEnabled && len(config.Modules) == 0 {
 		return nil, mb.ErrEmptyConfig
 	}
@@ -177,8 +180,13 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 
 	if config.Autodiscover != nil {
 		var err error
-		adapter := autodiscover.NewFactoryAdapter(factory)
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
+		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
+			"metricbeat",
+			b.Publisher,
+			factory, autodiscover.QueryConfig(),
+			config.Autodiscover,
+			b.Keystore,
+		)
 		if err != nil {
 			return nil, err
 		}

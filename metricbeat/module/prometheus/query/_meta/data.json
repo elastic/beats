@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "prometheus.query",
+        "duration": 115000,
+        "module": "prometheus"
+    },
+    "metricset": {
+        "name": "query",
+        "period": 10000
+    },
+    "prometheus": {
+        "labels": {
+            "__name__": "go_threads",
+            "instance": "localhost:9090",
+            "job": "prometheus"
+        },
+        "query": {
+            "go_threads": 18
+        }
+    },
+    "service": {
+        "address": "localhost:32769",
+        "type": "prometheus"
+    }
+}

@@ -1,8 +1,8 @@
 - key: azure
-  title: "azure"
+  title: "Azure"
   description: >
     azure module
-  release: beta
+  release: ga
   fields:
     - name: azure
       type: group

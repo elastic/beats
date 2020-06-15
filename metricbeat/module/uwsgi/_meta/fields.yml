@@ -1,5 +1,5 @@
 - key: uwsgi
-  title: "uwsgi"
+  title: "uWSGI"
   description: >
     uwsgi module
   release: ga

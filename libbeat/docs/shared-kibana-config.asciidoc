@@ -12,6 +12,10 @@
 [[setup-kibana-endpoint]]
 == Configure the Kibana endpoint
 
+++++
+<titleabbrev>Kibana endpoint</titleabbrev>
+++++
+
 Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
 via the Kibana API. This requires a Kibana endpoint configuration.
 

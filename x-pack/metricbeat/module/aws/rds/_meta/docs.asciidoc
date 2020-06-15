@@ -5,7 +5,8 @@ with Amazon RDS, users can monitor network throughput, I/O for read, write, and/
 metadata operations, client connections, and burst credit balances for their DB instances.
 Amazon RDS sends metrics and dimensions to Amazon CloudWatch every minute.
 Amazon Aurora provides a variety of Amazon CloudWatch metrics that users can
-use to monitor health and performance of their Aurora DB cluster.
+use to monitor health and performance of their Aurora DB cluster. This metricset
+by default collects all tags from AWS RDS.
 
 [float]
 === AWS Permissions
@@ -14,6 +15,7 @@ Some specific AWS permissions are required for IAM user to collect AWS RDS metri
 cloudwatch:GetMetricData
 ec2:DescribeRegions
 rds:DescribeDBInstances
+rds:ListTagsForResource
 sts:GetCallerIdentity
 iam:ListAccountAliases
 ----

@@ -24,10 +24,11 @@ import (
 // Config contains the configuration options for the logger. To create a Config
 // from a common.Config use logp/config.Build.
 type Config struct {
-	Beat      string   `config:",ignore"`   // Name of the Beat (for default file name).
-	JSON      bool     `config:"json"`      // Write logs as JSON.
-	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).
-	Selectors []string `config:"selectors"` // Selectors for debug level logging.
+	Beat       string   `config:",ignore"`   // Name of the Beat (for default file name).
+	JSON       bool     `config:"json"`      // Write logs as JSON.
+	Level      Level    `config:"level"`     // Logging level (error, warning, info, debug).
+	Selectors  []string `config:"selectors"` // Selectors for debug level logging.
+	ECSEnabled bool     `config:"ecs"`       // Adds minimal ECS information using ECS conformant keys to every log line
 
 	toObserver  bool
 	toIODiscard bool
@@ -38,6 +39,7 @@ type Config struct {
 
 	Files FileConfig `config:"files"`
 
+	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
 }
@@ -54,32 +56,13 @@ type FileConfig struct {
 	RedirectStderr  bool          `config:"redirect_stderr"`
 }
 
+const defaultLevel = InfoLevel
+
 // DefaultConfig returns the default config options for a given environment the
 // Beat is supposed to be run within.
 func DefaultConfig(environment Environment) Config {
-	switch environment {
-	case SystemdEnvironment, ContainerEnvironment:
-		return defaultToStderrConfig()
-
-	case MacOSServiceEnvironment, WindowsServiceEnvironment:
-		fallthrough
-	default:
-		return defaultToFileConfig()
-	}
-}
-
-func defaultToStderrConfig() Config {
 	return Config{
-		Level:     InfoLevel,
-		ToStderr:  true,
-		addCaller: true,
-	}
-}
-
-func defaultToFileConfig() Config {
-	return Config{
-		Level:   InfoLevel,
-		ToFiles: true,
+		Level: defaultLevel,
 		Files: FileConfig{
 			MaxSize:         10 * 1024 * 1024,
 			MaxBackups:      7,
@@ -87,6 +70,7 @@ func defaultToFileConfig() Config {
 			Interval:        0,
 			RotateOnStartup: true,
 		},
-		addCaller: true,
+		environment: environment,
+		addCaller:   true,
 	}
 }
