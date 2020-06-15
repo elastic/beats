@@ -428,7 +428,7 @@ type PtraceIoDesc struct {
 	Op   int32
 	Offs *byte
 	Addr *byte
-	Len  uint64
+	Len  uint
 }
 
 type Kevent_t struct {

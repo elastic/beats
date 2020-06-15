@@ -10,13 +10,9 @@ const cacheLineSize = 64
 
 func init() {
 	switch runtime.GOOS {
-	case "android", "darwin":
-		// Android and iOS don't seem to allow reading these registers.
-		// Fake the minimal features expected by
-		// TestARM64minimalFeatures.
-		ARM64.HasASIMD = true
-		ARM64.HasFP = true
-	case "linux":
+	case "darwin":
+		// iOS does not seem to allow reading these registers
+	case "android", "linux":
 		doinit()
 	default:
 		readARM64Registers()
