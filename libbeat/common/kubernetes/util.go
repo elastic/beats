@@ -26,7 +26,9 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -49,7 +51,7 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 		kubeconfig = getKubeConfigEnvironmentVariable()
 	}
 
-	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	cfg, err := buildConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
@@ -60,6 +62,23 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	}
 
 	return client, nil
+}
+
+// buildConfig is a helper function that builds configs from a kubeconfig filepath.
+// If kubeconfigPath is not passed in we fallback to inClusterConfig.
+// If inClusterConfig fails, we fallback to the default config.
+// This is a copy of `clientcmd.BuildConfigFromFlags` of `client-go` but without the annoying
+// klog messages that are not possible to be disabled.
+func buildConfig(kubeconfigPath string) (*restclient.Config, error) {
+	if kubeconfigPath == "" {
+		kubeconfig, err := restclient.InClusterConfig()
+		if err == nil {
+			return kubeconfig, nil
+		}
+	}
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
+		&clientcmd.ConfigOverrides{ClusterInfo: clientcmdapi.Cluster{Server: ""}}).ClientConfig()
 }
 
 // IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,

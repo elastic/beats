@@ -19,10 +19,7 @@ content_type:
 {{ end }}
 {{ end }}
 {{ if .api }}
-api:
-{{ range $k, $v := .api }}
- - {{ $k }}: {{ $v -}}
-{{ end }}
+api: {{.api | tojson }}
 {{ end }}
 
 {{ else if eq .input "file" }}
@@ -51,6 +48,7 @@ processors:
         - 2006-01-02T15:04:05
 {{ end }}
   - script:
+      when.has_fields: ['o365audit']
       lang: javascript
       id: o365audit_script
       file: ${path.home}/module/o365/audit/config/pipeline.js
