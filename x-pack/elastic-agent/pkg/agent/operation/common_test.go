@@ -6,7 +6,6 @@ package operation
 
 import (
 	"context"
-
 	"os"
 	"path/filepath"
 	"runtime"

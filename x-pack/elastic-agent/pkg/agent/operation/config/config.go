@@ -14,7 +14,7 @@ import (
 // Config is an operator configuration
 type Config struct {
 	ProcessConfig *process.Config `yaml:"process" config:"process"`
-	RetryConfig   *retry.Config    `yaml:"retry" config:"retry"`
+	RetryConfig   *retry.Config   `yaml:"retry" config:"retry"`
 
 	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
 	LoggingConfig  *logger.Config   `yaml:"logging,omitempty" config:"logging,omitempty"`
