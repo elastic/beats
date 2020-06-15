@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * PANW {pull}18223[18223]
 * Cisco {pull}18753[18753]
 * CrowdStrike {pull}19132[19132]
+* Fortinet {pull}19133[19133]
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 * Netflow {pull}19087[19087]
