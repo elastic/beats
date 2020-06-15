@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -73,7 +73,7 @@ func getProgramFromStepWithTags(step configrequest.Step, artifactConfig *artifac
 		version = fmt.Sprintf("%s-SNAPSHOT", version)
 	}
 
-	p := app.NewDescriptor(step.Process, version, artifactConfig, tags)
+	p := app.NewDescriptor(step.AppType, step.Process, version, artifactConfig, tags)
 	return p, config, nil
 }
 

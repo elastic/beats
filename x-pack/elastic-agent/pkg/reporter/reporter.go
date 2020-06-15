@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 
 	"github.com/hashicorp/go-multierror"
 

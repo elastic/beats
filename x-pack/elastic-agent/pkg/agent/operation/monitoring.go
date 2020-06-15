@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 )
 
 const (
@@ -131,6 +131,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		filebeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
+			AppType: "process",
 			Process: logsProcessName,
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
@@ -149,6 +150,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		metricbeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
+			AppType: "process",
 			Process: metricsProcessName,
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,

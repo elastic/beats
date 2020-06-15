@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"

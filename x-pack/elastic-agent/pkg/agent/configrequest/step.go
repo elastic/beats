@@ -20,6 +20,8 @@ type Step struct {
 	ID string
 	// Version is a version of a program
 	Version string
+	// AppType defines the type of application such as `subprocess`
+	AppType string
 	// Process defines a process such as `filebeat`
 	Process string
 	// Meta contains additional data such as version, configuration or tags.

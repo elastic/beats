@@ -7,11 +7,10 @@ package operation
 import (
 	"context"
 	"fmt"
+
 	"os"
 	"strings"
 	"sync"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -21,10 +20,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/endpoint"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 const (
@@ -245,18 +247,38 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	}
 
 	// TODO: (michal) join args into more compact options version
-	a, err := app.NewApplication(
-		o.bgContext,
-		p.ID(),
-		p.BinaryName(),
-		o.pipelineID,
-		o.config.LoggingConfig.Level.String(),
-		specifier,
-		o.srv,
-		o.config,
-		o.logger,
-		o.reporter,
-		o.monitor)
+	var a Application
+	var err error
+	switch p.AppType() {
+	case "process":
+		a, err = process.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	case "endpoint":
+		a, err = endpoint.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	default:
+		err = fmt.Errorf("unknown application type: %s", p.AppType())
+	}
 
 	if err != nil {
 		return nil, err

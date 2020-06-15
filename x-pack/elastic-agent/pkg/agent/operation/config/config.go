@@ -7,14 +7,14 @@ package config
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
+	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 )
 
 // Config is an operator configuration
 type Config struct {
-	ProcessConfig *process.Config `yaml:"process" config:"process"`
-	RetryConfig   *retry.Config   `yaml:"retry" config:"retry"`
+	ProcessConfig *process2.Config `yaml:"process" config:"process"`
+	RetryConfig   *retry.Config    `yaml:"retry" config:"retry"`
 
 	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
 	LoggingConfig  *logger.Config   `yaml:"logging,omitempty" config:"logging,omitempty"`
@@ -23,7 +23,7 @@ type Config struct {
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
 	return &Config{
-		ProcessConfig:  process.DefaultConfig(),
+		ProcessConfig:  process2.DefaultConfig(),
 		RetryConfig:    retry.DefaultConfig(),
 		DownloadConfig: artifact.DefaultConfig(),
 		LoggingConfig:  logger.DefaultLoggingConfig(),

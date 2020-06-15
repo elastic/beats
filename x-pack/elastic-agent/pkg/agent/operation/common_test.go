@@ -6,6 +6,7 @@ package operation
 
 import (
 	"context"
+	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -21,10 +22,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/noop"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
@@ -38,7 +37,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process.Config{},
+		ProcessConfig: &process2.Config{},
 		DownloadConfig: &artifact.Config{
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,

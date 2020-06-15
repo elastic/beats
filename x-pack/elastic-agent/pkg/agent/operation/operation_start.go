@@ -6,12 +6,12 @@ package operation
 
 import (
 	"context"
+	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 )
 
 // operationStart start installed process
@@ -22,7 +22,7 @@ type operationStart struct {
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
 
-	pi *process.Info
+	pi *process2.Info
 }
 
 func newOperationStart(

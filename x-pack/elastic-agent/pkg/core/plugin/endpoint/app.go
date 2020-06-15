@@ -2,56 +2,50 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package app
+package endpoint
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
 var (
-	// ErrAppNotRunning is returned when configuration is performed on not running application.
-	ErrAppNotRunning = errors.New("application is not running", errors.TypeApplication)
-	// ErrClientNotFound signals that client is not present in the vault.
-	ErrClientNotFound = errors.New("client not present", errors.TypeApplication)
-	// ErrClientNotConfigurable happens when stored client does not implement Config func
-	ErrClientNotConfigurable = errors.New("client does not provide configuration", errors.TypeApplication)
+	// ErrAppNotInstalled is returned when configuration is performed on not installed application.
+	ErrAppNotInstalled = errors.New("application is not installed", errors.TypeApplication)
 )
 
-// Application encapsulates a concrete application ran by elastic-agent e.g Beat.
+// Application encapsulates the Endpoint application that is ran by the system service manager.
 type Application struct {
 	bgContext    context.Context
 	id           string
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         Specifier
+	spec         app.Specifier
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
 	startContext context.Context
-	tag          Taggable
+	tag          app.Taggable
 	state        state.State
 	reporter     state.Reporter
-
-	uid int
-	gid int
 
 	monitor monitoring.Monitor
 
@@ -64,26 +58,17 @@ type Application struct {
 	appLock sync.Mutex
 }
 
-// ArgsDecorator decorates arguments before calling an application
-type ArgsDecorator func([]string) []string
-
 // NewApplication creates a new instance of an applications. It will not automatically start
 // the application.
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
-	spec Specifier,
+	spec app.Specifier,
 	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
-
-	s := spec.Spec()
-	uid, gid, err := getUserGroup(s)
-	if err != nil {
-		return nil, err
-	}
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
@@ -101,8 +86,6 @@ func NewApplication(
 		limiter:        b,
 		reporter:       reporter,
 		monitor:        monitor,
-		uid:            uid,
-		gid:            gid,
 	}, nil
 }
 
@@ -123,36 +106,6 @@ func (a *Application) Name() string {
 	return a.name
 }
 
-// Stop stops the current application.
-func (a *Application) Stop() {
-	a.appLock.Lock()
-	defer a.appLock.Unlock()
-
-	if a.state.Status == state.Stopped {
-		return
-	}
-
-	stopSig := os.Interrupt
-	if a.srvState != nil {
-		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
-			// kill the process if stop through GRPC doesn't work
-			stopSig = os.Kill
-		}
-		a.srvState = nil
-	}
-	if a.state.ProcessInfo != nil {
-		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
-			// no error on signal, so wait for it to stop
-			_, _ = a.state.ProcessInfo.Process.Wait()
-		}
-		a.state.ProcessInfo = nil
-
-		// cleanup drops
-		a.monitor.Cleanup(a.name, a.pipelineID)
-	}
-	a.setState(state.Stopped, "Stopped")
-}
-
 // SetState sets the status of the application.
 func (a *Application) SetState(status state.Status, msg string) {
 	a.appLock.Lock()
@@ -160,56 +113,98 @@ func (a *Application) SetState(status state.Status, msg string) {
 	a.setState(status, msg)
 }
 
-func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
-	go func() {
-		var procState *os.ProcessState
-
-		select {
-		case ps := <-a.waitProc(proc.Process):
-			procState = ps
-		case <-a.bgContext.Done():
-			a.Stop()
-			return
+// Start starts the application with a specified config.
+func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
+	defer func() {
+		if err != nil {
+			// inject App metadata
+			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
 		}
-
-		a.appLock.Lock()
-		if a.state.ProcessInfo != proc {
-			// already another process started, another watcher is watching instead
-			a.appLock.Unlock()
-			return
-		}
-		a.state.ProcessInfo = nil
-		srvState := a.srvState
-
-		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
-			a.appLock.Unlock()
-			return
-		}
-
-		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg)
-
-		// it was a crash, cleanup anything required
-		go a.cleanUp()
-		a.start(ctx, p, cfg)
-		a.appLock.Unlock()
 	}()
+
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	cfgStr, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+
+	// already started
+	if a.srvState != nil {
+		a.setState(state.Starting, "Starting")
+		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
+		a.srvState.UpdateConfig(string(cfgStr))
+	} else {
+		a.srvState, err = a.srv.Register(a, string(cfgStr))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
-	resChan := make(chan *os.ProcessState)
-
-	go func() {
-		procState, err := proc.Wait()
+// Configure configures the application with the passed configuration.
+func (a *Application) Configure(_ context.Context, config map[string]interface{}) (err error) {
+	defer func() {
 		if err != nil {
-			// process is not a child - some OSs requires process to be child
-			a.externalProcess(proc)
+			// inject App metadata
+			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
 		}
-
-		resChan <- procState
 	}()
 
-	return resChan
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	if a.state.Status == state.Stopped {
+		return errors.New(ErrAppNotInstalled)
+	}
+	if a.srvState == nil {
+		return errors.New(ErrAppNotInstalled)
+	}
+
+	cfgStr, err := yaml.Marshal(config)
+	if err != nil {
+		return errors.New(err, errors.TypeApplication)
+	}
+	err = a.srvState.UpdateConfig(string(cfgStr))
+	if err != nil {
+		return errors.New(err, errors.TypeApplication)
+	}
+	return nil
+}
+
+// Stop stops the current application.
+func (a *Application) Stop() {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	if a.srvState == nil {
+		return
+	}
+
+	if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error())
+	} else {
+		a.setState(state.Stopped, "Stopped")
+	}
+}
+
+// OnStatusChange is the handler called by the GRPC server code.
+//
+// It updates the status of the application and handles restarting the application is needed.
+func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+	a.appLock.Lock()
+
+	// If the application is stopped, do not update the state. Stopped is a final state
+	// and should not be overridden.
+	if a.state.Status == state.Stopped {
+		a.appLock.Unlock()
+		return
+	}
+
+	a.setStateFromProto(status, msg)
+	a.appLock.Unlock()
 }
 
 func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {

@@ -6,6 +6,7 @@ package operation
 
 import (
 	"context"
+	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"testing"
 	"time"
 
@@ -16,12 +17,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 func TestGenerateSteps(t *testing.T) {
@@ -103,7 +103,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process.Config{},
+		ProcessConfig: &process2.Config{},
 		DownloadConfig: &artifact.Config{
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
