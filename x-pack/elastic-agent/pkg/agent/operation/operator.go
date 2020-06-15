@@ -161,8 +161,12 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 // specific configuration of new process is passed
 func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 	flow := []operation{
-		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
-		newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
+		newRetryableOperations(
+			o.logger,
+			o.config.RetryConfig,
+			newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
+			newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
+		),
 		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
 		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
 		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
