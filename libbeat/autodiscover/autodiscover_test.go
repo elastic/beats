@@ -37,7 +37,6 @@ import (
 type mockRunner struct {
 	mutex            sync.Mutex
 	config           *common.Config
-	meta             *common.MapStrPointer
 	started, stopped bool
 }
 
@@ -56,7 +55,6 @@ func (m *mockRunner) Clone() *mockRunner {
 	defer m.mutex.Unlock()
 	return &mockRunner{
 		config:  m.config,
-		meta:    m.meta,
 		started: m.started,
 		stopped: m.stopped,
 	}
@@ -93,10 +91,9 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
-		meta:   meta,
 	}
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -191,7 +188,6 @@ func TestAutodiscover(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 1)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 
@@ -204,12 +200,10 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	wait(t, func() bool { return adapter.Runners()[0].meta.Get()["foo"] == "baz" })
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 1)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.Equal(t, runners[0].meta.Get()["foo"], "baz") // meta is updated
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 
@@ -236,7 +230,6 @@ func TestAutodiscover(t *testing.T) {
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
 	assert.True(t, runners[0].stopped)
-	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
 	assert.False(t, runners[1].stopped)
 
@@ -254,7 +247,6 @@ func TestAutodiscover(t *testing.T) {
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
-	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
 	assert.True(t, runners[1].stopped)
 }
@@ -318,10 +310,8 @@ func TestAutodiscoverHash(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
-	assert.Equal(t, runners[1].meta.Get()["foo"], "bar")
 	assert.True(t, runners[1].started)
 	assert.False(t, runners[1].stopped)
 }

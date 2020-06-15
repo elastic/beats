@@ -8,9 +8,12 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -19,8 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -33,22 +34,21 @@ var (
 	ErrClientNotConfigurable = errors.New("client does not provide configuration", errors.TypeApplication)
 )
 
-// ReportFailureFunc is a callback func used to report async failures due to crashes.
-type ReportFailureFunc func(context.Context, string, error)
-
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
 type Application struct {
-	bgContext       context.Context
-	id              string
-	name            string
-	pipelineID      string
-	logLevel        string
-	spec            Specifier
-	state           state.State
-	grpcClient      remoteconfig.Client
-	clientFactory   remoteconfig.ConnectionCreator
-	limiter         *tokenbucket.Bucket
-	failureReporter ReportFailureFunc
+	bgContext    context.Context
+	id           string
+	name         string
+	pipelineID   string
+	logLevel     string
+	spec         Specifier
+	srv          *server.Server
+	srvState     *server.ApplicationState
+	limiter      *tokenbucket.Bucket
+	startContext context.Context
+	tag          Taggable
+	state        state.State
+	reporter     state.Reporter
 
 	uid int
 	gid int
@@ -73,10 +73,10 @@ func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
 	spec Specifier,
-	factory remoteconfig.ConnectionCreator,
+	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
-	failureReporter ReportFailureFunc,
+	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
 
 	s := spec.Spec()
@@ -87,28 +87,35 @@ func NewApplication(
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
-		bgContext:       ctx,
-		id:              id,
-		name:            appName,
-		pipelineID:      pipelineID,
-		logLevel:        logLevel,
-		spec:            spec,
-		clientFactory:   factory,
-		processConfig:   cfg.ProcessConfig,
-		downloadConfig:  cfg.DownloadConfig,
-		retryConfig:     cfg.RetryConfig,
-		logger:          logger,
-		limiter:         b,
-		failureReporter: failureReporter,
-		monitor:         monitor,
-		uid:             uid,
-		gid:             gid,
+		bgContext:      ctx,
+		id:             id,
+		name:           appName,
+		pipelineID:     pipelineID,
+		logLevel:       logLevel,
+		spec:           spec,
+		srv:            srv,
+		processConfig:  cfg.ProcessConfig,
+		downloadConfig: cfg.DownloadConfig,
+		retryConfig:    cfg.RetryConfig,
+		logger:         logger,
+		limiter:        b,
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
 	}, nil
 }
 
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// State returns the application state.
+func (a *Application) State() state.State {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+	return a.state
 }
 
 // Name returns application name
@@ -121,44 +128,44 @@ func (a *Application) Stop() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	if a.state.Status == state.Running && a.state.ProcessInfo != nil {
-		if closeClient, ok := a.grpcClient.(closer); ok {
-			closeClient.Close()
+	if a.state.Status == state.Stopped {
+		return
+	}
+
+	stopSig := os.Interrupt
+	if a.srvState != nil {
+		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+			// kill the process if stop through GRPC doesn't work
+			stopSig = os.Kill
 		}
-
-		process.Stop(a.logger, a.state.ProcessInfo.PID)
-
-		a.state.Status = state.Stopped
+		a.srvState = nil
+	}
+	if a.state.ProcessInfo != nil {
+		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
+			// no error on signal, so wait for it to stop
+			_, _ = a.state.ProcessInfo.Process.Wait()
+		}
 		a.state.ProcessInfo = nil
-		a.grpcClient = nil
-
-		// remove generated configuration if present
-		filename := fmt.Sprintf(configFileTempl, a.id)
-		filePath, err := filepath.Abs(filepath.Join(a.downloadConfig.InstallPath, filename))
-		if err == nil {
-			// ignoring error: not critical
-			os.Remove(filePath)
-		}
 
 		// cleanup drops
 		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
+	a.setState(state.Stopped, "Stopped")
 }
 
-// State returns the state of the application [Running, Stopped].
-func (a *Application) State() state.State {
+// SetState sets the status of the application.
+func (a *Application) SetState(status state.Status, msg string) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-
-	return a.state
+	a.setState(status, msg)
 }
 
-func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
 
 		select {
-		case ps := <-a.waitProc(proc):
+		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
 			a.Stop()
@@ -166,21 +173,26 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, c
 		}
 
 		a.appLock.Lock()
-		s := a.state.Status
-		a.state.Status = state.Stopped
+		if a.state.ProcessInfo != proc {
+			// already another process started, another watcher is watching instead
+			a.appLock.Unlock()
+			return
+		}
 		a.state.ProcessInfo = nil
-		a.appLock.Unlock()
+		srvState := a.srvState
 
-		if procState.Success() {
+		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
+			a.appLock.Unlock()
 			return
 		}
 
-		if s == state.Running {
-			// it was a crash, report it async not to block
-			// process management with networking issues
-			go a.reportCrash(ctx)
-			a.Start(ctx, p, cfg)
-		}
+		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
+		a.setState(state.Crashed, msg)
+
+		// it was a crash, cleanup anything required
+		go a.cleanUp()
+		a.start(ctx, p, cfg)
+		a.appLock.Unlock()
 	}()
 }
 
@@ -200,16 +212,35 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) reportCrash(ctx context.Context) {
-	a.monitor.Cleanup(a.name, a.pipelineID)
-
-	// TODO: reporting crash
-	if a.failureReporter != nil {
-		crashError := errors.New(
-			fmt.Sprintf("application '%s' crashed", a.id),
-			errors.TypeApplicationCrash,
-			errors.M(errors.MetaKeyAppName, a.name),
-			errors.M(errors.MetaKeyAppName, a.id))
-		a.failureReporter(ctx, a.name, crashError)
+func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
+	var status state.Status
+	switch pstatus {
+	case proto.StateObserved_STARTING:
+		status = state.Starting
+	case proto.StateObserved_CONFIGURING:
+		status = state.Configuring
+	case proto.StateObserved_HEALTHY:
+		status = state.Running
+	case proto.StateObserved_DEGRADED:
+		status = state.Degraded
+	case proto.StateObserved_FAILED:
+		status = state.Failed
+	case proto.StateObserved_STOPPING:
+		status = state.Stopping
 	}
+	a.setState(status, msg)
+}
+
+func (a *Application) setState(status state.Status, msg string) {
+	if a.state.Status != status || a.state.Message != msg {
+		a.state.Status = status
+		a.state.Message = msg
+		if a.reporter != nil {
+			go a.reporter.OnStateChange(a.id, a.name, a.state)
+		}
+	}
+}
+
+func (a *Application) cleanUp() {
+	a.monitor.Cleanup(a.name, a.pipelineID)
 }
