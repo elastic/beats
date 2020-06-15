@@ -11,6 +11,9 @@ var:
 ingest_pipeline: ingest/pipeline.yml
 input: config/atp.yml
 
+tags: 
+  - forwarded
+
 requires.processors:
 - name: decode_json_fields
   fields: [message]
