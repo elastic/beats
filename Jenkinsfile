@@ -936,7 +936,7 @@ def archiveTestOutput(Map args = [:]) {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
       log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
       if (folder.trim()) {
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '') + goos()
+        def name = folder.replaceAll(File.separator, '-').replaceAll('build', '').replaceAll('^-', '') + '-' + goos()
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
