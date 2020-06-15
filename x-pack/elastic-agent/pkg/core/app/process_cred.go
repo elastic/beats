@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+// UserGroup returns the uid and gid for the process specification.
 func (spec ProcessSpec) UserGroup() (int, int, error) {
 	if spec.User.Uid == "" && spec.Group.Gid == "" {
 		// use own level
