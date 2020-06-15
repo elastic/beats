@@ -95,12 +95,12 @@ type beatConfig struct {
 	Seccomp  *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
-	HTTP            *common.Config `config:"http"`
-	Path            paths.Path     `config:"path"`
-	Logging         *common.Config `config:"logging"`
-	MetricLogging   *common.Config `config:"logging.metrics"`
-	Keystore        *common.Config `config:"keystore"`
-	Instrumentation *common.Config `config:"instrumentation"`
+	HTTP            *common.Config         `config:"http"`
+	Path            paths.Path             `config:"path"`
+	Logging         *common.Config         `config:"logging"`
+	MetricLogging   *common.Config         `config:"logging.metrics"`
+	Keystore        *common.Config         `config:"keystore"`
+	Instrumentation instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
 	Pipeline pipeline.Config `config:",inline"`
