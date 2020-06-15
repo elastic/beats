@@ -1,0 +1,108 @@
+description: Pipeline for parsing microsoft atp logs
+processors:
+- remove:
+    field:
+      - message
+      - json.evidence
+      - json.comments
+      - host
+    ignore_missing: true
+- set:
+    field: cloud.provider
+    value: azure
+- set:
+    field: event.kind
+    value: alert
+- set:
+    field: event.provider
+    value: defender_atp
+- set:
+    field: event.category
+    value: malware
+    if: ctx.json?.category == 'Malware'
+- set:
+    field: threat.framework
+    value: MITRE ATT&CK
+    if: ctx.json?.category != null
+- set:
+    field: '@timestamp'
+    value: '{{json.alertCreationTime}}'
+    if: ctx.json?.alertCreationTime != null
+- append:
+    field: event.type
+    value:
+      - creation
+      - start
+    if: ctx.json?.status == 'New'
+- append:
+    field: event.type
+    value:
+      - end
+    if: ctx.json?.status == 'Resolved'
+- remove:
+    field: json.alertCreationTime
+    ignore_missing: true
+- rename:
+    field: json.id
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: json.category
+    target_field: threat.technique.name
+    ignore_missing: true
+- rename:
+    field: json.aadTenantId
+    target_field: cloud.account.id
+    ignore_missing: true
+- rename:
+    field: json.machineId
+    target_field: cloud.instance.id
+    ignore_missing: true
+- rename:
+    field: json.title
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: json.description
+    target_field: rule.description
+    ignore_missing: true
+    if: (ctx.json?.description).length() < 1020
+- rename:
+    field: json.firstEventTime
+    target_field: event.start
+    ignore_missing: true
+- rename:
+    field: json.lastEventTime
+    target_field: event.end
+    ignore_missing: true
+- rename:
+    field: json.computerDnsName
+    target_field: host.hostname
+    ignore_missing: true
+- rename:
+    field: json.detectionSource
+    target_field: observer.name
+    ignore_missing: true
+- rename:
+    field: json.severity
+    target_field: event.severity
+    ignore_missing: true
+- rename:
+    field: json.relatedUser.userName
+    target_field: host.user.name
+    ignore_missing: true
+- rename:
+    field: json.relatedUser.domainName
+    target_field: host.user.domain
+    ignore_missing: true
+- rename:
+    field: json
+    target_field: atp
+    ignore_missing: true
+- remove:
+    field: atp.relatedUser
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

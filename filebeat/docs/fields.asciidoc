@@ -45,6 +45,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-microsoft>>
 * <<exported-fields-misp>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
@@ -25875,6 +25876,74 @@ type: alias
 alias to: event.duration
 
 --
+
+[[exported-fields-microsoft]]
+== Microsoft fields
+
+Microsoft Module
+
+
+
+[float]
+=== microsoft
+
+- name: defender_atp
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for ingesting Microsoft Defender ATP.
+  fields:
+    - name: lastUpdateTime
+      type: keyword
+      description: >
+        The date and time (in UTC) the alert was last updated.
+
+    - name: resolvedTime
+      type: keyword
+      description: >
+        The date and time in which the status of the alert was changed to 'Resolved'.
+
+    - name: incidentId
+      type: keyword
+      description: >
+        The Incident ID of the Alert.
+
+    - name: investigationId
+      type: keyword
+      description: >
+        The Investigation ID related to the Alert.
+
+    - name: investigationId
+      type: keyword
+      description: >
+        The current state of the Investigation.
+
+    - name: investigationId
+      type: keyword
+      description: >
+        Owner of the alert.
+
+    - name: status
+      type: keyword
+      description: >
+        Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+
+    - name: classification
+      type: keyword
+      description: >
+        Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+
+    - name: determination
+      type: keyword
+      description: >
+        Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
+
+    - name: threatFamilyName
+      type: keyword
+      description: >
+        Threat family.
+
 
 [[exported-fields-misp]]
 == MISP fields

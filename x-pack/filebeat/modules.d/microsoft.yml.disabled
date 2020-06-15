@@ -3,7 +3,7 @@
 
 - module: microsoft
   # ATP configuration
-  atp:
+  defender_atp:
     enabled: true
     # How often the API should be polled
     #var.interval: 5m
