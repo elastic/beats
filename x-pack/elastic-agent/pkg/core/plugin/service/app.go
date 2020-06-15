@@ -2,10 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package endpoint
+package service
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"net"
 	"sync"
 	"time"
 
@@ -31,7 +34,7 @@ var (
 	ErrAppNotInstalled = errors.New("application is not installed", errors.TypeApplication)
 )
 
-// Application encapsulates the Endpoint application that is ran by the system service manager.
+// Application encapsulates an application that is ran as a service by the system service manager.
 type Application struct {
 	bgContext    context.Context
 	id           string
@@ -47,6 +50,9 @@ type Application struct {
 	state        state.State
 	reporter     state.Reporter
 
+	uid int
+	gid int
+
 	monitor monitoring.Monitor
 
 	processConfig  *process.Config
@@ -55,20 +61,30 @@ type Application struct {
 
 	logger *logger.Logger
 
+	credsPort    int
+	credsWG      sync.WaitGroup
+	credsListener net.Listener
+
 	appLock sync.Mutex
 }
 
-// NewApplication creates a new instance of an applications. It will not automatically start
-// the application.
+// NewApplication creates a new instance of an applications.
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
+	credsPort int,
 	spec app.Specifier,
 	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
+
+	s := spec.Spec()
+	uid, gid, err := s.UserGroup()
+	if err != nil {
+		return nil, err
+	}
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
@@ -86,6 +102,9 @@ func NewApplication(
 		limiter:        b,
 		reporter:       reporter,
 		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
+		credsPort: 		credsPort,
 	}, nil
 }
 
@@ -141,6 +160,32 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 			return err
 		}
 	}
+
+	defer func() {
+		if err != nil {
+			if a.srvState != nil {
+				a.srvState.Destroy()
+				a.srvState = nil
+			}
+		}
+	}()
+
+	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
+		return err
+	}
+
+	if a.limiter != nil {
+		a.limiter.Add()
+	}
+
+	// start the credentials listener for the service
+	if err := a.startCredsListener(); err != nil {
+		return err
+	}
+
+	// allow the service manager to ensure that the application is started, currently this does not start/stop
+	// the actual service in the system service manager
+
 	return nil
 }
 
@@ -188,6 +233,10 @@ func (a *Application) Stop() {
 	} else {
 		a.setState(state.Stopped, "Stopped")
 	}
+	a.srvState = nil
+
+	a.cleanUp()
+	a.stopCredsListener()
 }
 
 // OnStatusChange is the handler called by the GRPC server code.
@@ -238,4 +287,46 @@ func (a *Application) setState(status state.Status, msg string) {
 
 func (a *Application) cleanUp() {
 	a.monitor.Cleanup(a.name, a.pipelineID)
+}
+
+func (a *Application) startCredsListener() error {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", a.credsPort))
+	if err != nil {
+		return errors.New(err, "failed to start connection credentials listener")
+	}
+	a.credsListener = lis
+	a.credsWG.Add(1)
+	go func() {
+		for {
+			conn, err := lis.Accept()
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				a.logger.Errorf("failed to accept connection on credentials listener: %s", err)
+			}
+			a.appLock.Lock()
+			srvState := a.srvState
+			a.appLock.Unlock()
+			if srvState == nil {
+				// application stopped
+				_ = conn.Close()
+				continue
+			}
+			if err := srvState.WriteConnInfo(conn); err != nil {
+				a.logger.Errorf("failed to write connection credentials: %s", err)
+				continue
+			}
+			_ = conn.Close()
+		}
+		a.credsWG.Done()
+	}()
+
+	return nil
+}
+
+func (a *Application) stopCredsListener() {
+	a.credsListener.Close()
+	a.credsWG.Wait()
+	a.credsListener = nil
 }

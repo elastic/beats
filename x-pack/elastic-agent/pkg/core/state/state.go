@@ -5,7 +5,7 @@
 package state
 
 import (
-	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 )
 
 // Status describes the current status of the application process.
@@ -34,7 +34,7 @@ const (
 
 // State wraps the process state and application status.
 type State struct {
-	ProcessInfo *process2.Info
+	ProcessInfo *process.Info
 	Status      Status
 	Message     string
 }

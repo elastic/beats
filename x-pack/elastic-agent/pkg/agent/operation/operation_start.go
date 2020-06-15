@@ -6,7 +6,6 @@ package operation
 
 import (
 	"context"
-	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 
@@ -21,8 +20,6 @@ type operationStart struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-
-	pi *process2.Info
 }
 
 func newOperationStart(

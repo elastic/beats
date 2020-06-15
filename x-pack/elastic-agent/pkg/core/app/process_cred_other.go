@@ -5,10 +5,8 @@
 // +build !linux
 // +build !darwin
 
-package process
+package app
 
-import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
-
-func getUserGroup(spec app.ProcessSpec) (int, int, error) {
+func (spec ProcessSpec) GetUserGroup() (int, int, error) {
 	return 0, 0, nil
 }

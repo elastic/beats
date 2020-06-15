@@ -22,20 +22,21 @@ type Descriptor struct {
 }
 
 // NewDescriptor creates a program which satisfies Program interface and can be used with Operator.
-func NewDescriptor(appType, binaryName, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
+func NewDescriptor(servicePort int, binaryName, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
 	binaryName = strings.ToLower(binaryName)
 	dir := directory(binaryName, version, config)
 
 	return &Descriptor{
 		directory:    dir,
-		executionCtx: NewExecutionContext(appType, binaryName, version, tags),
+		executionCtx: NewExecutionContext(servicePort, binaryName, version, tags),
 		spec:         spec(dir, binaryName),
 	}
 }
 
-// AppType is the type of application for running. (E.g subprocess)
-func (p *Descriptor) AppType() string {
-	return p.executionCtx.AppType
+// ServicePort is the port the service will connect to gather GRPC information. When this is not
+// 0 then the application is ran using the `service` application type, versus a `process` application.
+func (p *Descriptor) ServicePort() int {
+	return p.executionCtx.ServicePort
 }
 
 // BinaryName is the name of the binary. E.g filebeat.

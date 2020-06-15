@@ -7,23 +7,22 @@ package process
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -78,7 +77,7 @@ func NewApplication(
 	monitor monitoring.Monitor) (*Application, error) {
 
 	s := spec.Spec()
-	uid, gid, err := getUserGroup(s)
+	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +145,7 @@ func (a *Application) Stop() {
 		a.state.ProcessInfo = nil
 
 		// cleanup drops
-		a.monitor.Cleanup(a.name, a.pipelineID)
+		a.cleanUp()
 	}
 	a.setState(state.Stopped, "Stopped")
 }

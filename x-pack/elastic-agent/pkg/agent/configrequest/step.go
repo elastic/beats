@@ -20,8 +20,9 @@ type Step struct {
 	ID string
 	// Version is a version of a program
 	Version string
-	// AppType defines the type of application such as `subprocess`
-	AppType string
+	// ServicePort is the port the service will connect to gather GRPC information. When this is not
+	// 0 then the application is ran using the `service` application type, versus a `process` application.
+	ServicePort int
 	// Process defines a process such as `filebeat`
 	Process string
 	// Meta contains additional data such as version, configuration or tags.

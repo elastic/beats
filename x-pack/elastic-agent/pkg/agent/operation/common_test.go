@@ -6,12 +6,13 @@ package operation
 
 import (
 	"context"
-	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
+
+	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 

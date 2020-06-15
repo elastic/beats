@@ -15,7 +15,7 @@ const (
 
 // ExecutionContext describes runnable binary
 type ExecutionContext struct {
-	AppType    string
+	ServicePort int
 	BinaryName string
 	Version    string
 	Tags       map[Tag]string
@@ -23,7 +23,7 @@ type ExecutionContext struct {
 }
 
 // NewExecutionContext creates an execution context and generates an ID for this context
-func NewExecutionContext(appType string, binaryName, version string, tags map[Tag]string) ExecutionContext {
+func NewExecutionContext(servicePort int, binaryName, version string, tags map[Tag]string) ExecutionContext {
 	id := fmt.Sprintf("%s--%s", binaryName, version)
 	if len(tags) > 0 {
 		hash := fmt.Sprintf("%x", sha256.New().Sum([]byte(fmt.Sprint(tags))))
@@ -34,7 +34,7 @@ func NewExecutionContext(appType string, binaryName, version string, tags map[Ta
 	}
 
 	return ExecutionContext{
-		AppType:    appType,
+		ServicePort:    servicePort,
 		BinaryName: binaryName,
 		Version:    version,
 		Tags:       tags,

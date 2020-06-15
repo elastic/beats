@@ -47,7 +47,7 @@ type Application interface {
 // Descriptor defines a program which needs to be run.
 // Is passed around operator operations.
 type Descriptor interface {
-	AppType() string
+	ServicePort() int
 	BinaryName() string
 	Version() string
 	ID() string

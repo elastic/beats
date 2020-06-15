@@ -1,4 +1,5 @@
 name: Endpoint
+service: 6788
 rules:
 - fix_stream: {}
 

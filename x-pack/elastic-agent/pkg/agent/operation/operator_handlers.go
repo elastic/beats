@@ -73,7 +73,7 @@ func getProgramFromStepWithTags(step configrequest.Step, artifactConfig *artifac
 		version = fmt.Sprintf("%s-SNAPSHOT", version)
 	}
 
-	p := app.NewDescriptor(step.AppType, step.Process, version, artifactConfig, tags)
+	p := app.NewDescriptor(step.ServicePort, step.Process, version, artifactConfig, tags)
 	return p, config, nil
 }
 

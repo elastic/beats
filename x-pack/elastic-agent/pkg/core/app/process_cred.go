@@ -4,19 +4,17 @@
 
 // +build linux darwin
 
-package process
+package app
 
 import (
 	"os"
 	"os/user"
 	"strconv"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-func getUserGroup(spec app.ProcessSpec) (int, int, error) {
+func (spec ProcessSpec) UserGroup() (int, int, error) {
 	if spec.User.Uid == "" && spec.Group.Gid == "" {
 		// use own level
 		return os.Geteuid(), os.Getegid(), nil

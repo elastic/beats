@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/endpoint"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -249,8 +249,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	// TODO: (michal) join args into more compact options version
 	var a Application
 	var err error
-	switch p.AppType() {
-	case "process":
+	if p.ServicePort() == 0 {
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
@@ -263,21 +262,20 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.logger,
 			o.reporter,
 			o.monitor)
-	case "endpoint":
-		a, err = endpoint.NewApplication(
+	} else {
+		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
 			p.BinaryName(),
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
+			p.ServicePort(),
 			specifier,
 			o.srv,
 			o.config,
 			o.logger,
 			o.reporter,
 			o.monitor)
-	default:
-		err = fmt.Errorf("unknown application type: %s", p.AppType())
 	}
 
 	if err != nil {

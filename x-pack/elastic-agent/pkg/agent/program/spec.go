@@ -28,7 +28,7 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 // to register their spec in a secure way.
 type Spec struct {
 	Name             string               `yaml:"name"`
-	App              string               `yaml:"app,omitempty"`
+	ServicePort      int               	  `yaml:"service,omitempty"`
 	Cmd              string               `yaml:"cmd"`
 	Args             []string             `yaml:"args"`
 	Rules            *transpiler.RuleList `yaml:"rules"`
@@ -54,10 +54,6 @@ func ReadSpecs(path string) ([]Spec, error) {
 		if err := yaml.Unmarshal(b, &spec); err != nil {
 			return []Spec{}, errors.New(err, fmt.Sprintf("could not unmarshal YAML for file %s", f), errors.TypeConfig)
 		}
-		if spec.App == "" {
-			// process is the default app type
-			spec.App = "process"
-		}
 		specs = append(specs, spec)
 	}
 
@@ -69,10 +65,6 @@ func NewSpecFromBytes(b []byte) (Spec, error) {
 	spec := Spec{}
 	if err := yaml.Unmarshal(b, &spec); err != nil {
 		return Spec{}, errors.New(err, "could not unmarshal YAML", errors.TypeConfig)
-	}
-	if spec.App == "" {
-		// process is the default app type
-		spec.App = "process"
 	}
 	return spec, nil
 }
