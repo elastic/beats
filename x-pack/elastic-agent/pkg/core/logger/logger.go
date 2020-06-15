@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp/configure"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"gopkg.in/yaml.v2"
 )
 
 const agentName = "elastic-agent"
@@ -49,8 +50,18 @@ func NewFromConfig(cfg *config.Config) (*Logger, error) {
 }
 
 func new(cfg *Config) (*Logger, error) {
-	logpCfg := configToLogpConfig(cfg)
-	commonLogp, err := common.NewConfigFrom(logpCfg)
+	logpCfg, err := configToLogpConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// work around custom types and common config
+	yamlCfg, err := yaml.Marshal(logpCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	commonLogp, err := common.NewConfigFrom(string(yamlCfg))
 	if err != nil {
 		return nil, errors.New(err, errors.TypeConfig)
 	}
