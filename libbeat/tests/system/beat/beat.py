@@ -726,7 +726,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 expected_types = (bool,)
             elif doc_type in ['object', 'geo_point']:
                 expected_types = (dict, list, type(None))
-            elif doc_type in ['short', 'integer', 'long', 'double', 'float']:
+            elif doc_type in ['byte', 'short', 'integer', 'long', 'double', 'float', 'scaled_float']:
                 expected_types = (int, float, complex, list)
             else:
                 # everything else should be a string or array
