@@ -66,9 +66,7 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          // NOTE: commented to run faster the windows pipeline.
-          //       when required then it can be enabled.
-          // loadConfigEnvVars()
+          loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
