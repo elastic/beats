@@ -27,11 +27,11 @@ import (
 type multilineType uint8
 
 const (
-	patternStr = "pattern"
-	countStr   = "count"
-
 	patternMode multilineType = iota
 	countMode
+
+	patternStr = "pattern"
+	countStr   = "count"
 )
 
 var (

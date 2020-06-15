@@ -36,5 +36,5 @@ func New(
 	} else if config.Type == countMode {
 		return newMultilineCountReader(r, separator, maxBytes, config)
 	}
-	return nil, fmt.Errorf("unknown multiline type")
+	return nil, fmt.Errorf("unknown multiline type %d", config.Type)
 }
