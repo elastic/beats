@@ -23,7 +23,15 @@ import (
 )
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) error {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	return a.start(ctx, t, cfg)
+}
+
+// Start starts the application without grabbing the lock.
+func (a *Application) start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -31,44 +39,37 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		}
 	}()
 
+	// already started if not stopped or crashed
+	if a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed {
+		return nil
+	}
+
 	cfgStr, err := yaml.Marshal(cfg)
 	if err != nil {
 		return err
 	}
 
-	// because `Start` can be called by `ApplicationStatusHandler` to perform a restart on failure
-	// the locking needs to be handled in the correct order.
-	a.appLock.Lock()
 	a.startContext = ctx
 	a.tag = t
 	srvState := a.srvState
-	a.appLock.Unlock()
 
 	// Failed applications can be started again.
 	if srvState != nil {
-		srvState.SetStatus(proto.StateObserved_STARTING, "Starting")
+		a.setState(state.Starting, "Starting")
+		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
 		srvState.UpdateConfig(string(cfgStr))
 	} else {
-		a.appLock.Lock()
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
-		a.appLock.Unlock()
 	}
-
-	// now that `SetStatus` would call `ApplicationStatusHandler` has occurred the
-	// reset of `Start` can be held by the lock.
-	a.appLock.Lock()
-	defer a.appLock.Unlock()
 
 	if a.state.Status != state.Stopped {
 		// restarting as it was previously in a different state
-		a.state.Status = state.Restarting
-		a.state.Message = "Restarting"
+		a.setState(state.Restarting, "Restarting")
 	} else {
-		a.state.Status = state.Starting
-		a.state.Message = "Starting"
+		a.setState(state.Starting, "Starting")
 	}
 
 	defer func() {
