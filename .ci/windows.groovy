@@ -81,6 +81,7 @@ pipeline {
         // NOTE: commented to run the windows pipeline a bit faster.
         //       when required then it can be enabled.
         // makeTarget("Lint", "check")
+        echo 'SKIPPED'
       }
     }
     stage('Build and Test Windows'){
