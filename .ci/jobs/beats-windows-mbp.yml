@@ -13,7 +13,8 @@
           discover-pr-forks-trust: permission
           discover-pr-origin: merge-current          
           discover-tags: false
-          head-filter-regex: 'master'
+          # Run MBP for the master branch and PRs
+          head-filter-regex: '(master|PR-.*)'
           notification-context: 'beats-ci'
           repo: beats
           repo-owner: elastic
@@ -27,6 +28,17 @@
             - regular-branches: true
             - change-request:
                 ignore-target-only-changes: false
+          property-strategies:
+            # Builds for PRs won't be triggered automatically.
+            # Only the master branch will be triggered automatically. 
+            - named-branches:
+              - defaults:
+                - suppress-scm-triggering: true
+              - exceptions:
+                - exception:
+                    branch-name: master
+                    properties:
+                      - suppress-scm-triggering: false
           clean:
             after: true
             before: true
