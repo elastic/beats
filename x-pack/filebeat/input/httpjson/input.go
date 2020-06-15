@@ -71,11 +71,7 @@ func NewInput(
 		return nil, err
 	}
 	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +333,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					return err
 				}
 			} else {
-				v, err = common.MapStr(mm).GetValue(in.config.JSONObjects)
+				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
 					return err
 				}
@@ -397,29 +393,9 @@ func (in *HttpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	client, err := in.newHTTPClient(ctx)
 	if err != nil {
 		return err
-	}
-
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return err
-	}
-
-	// Make transport client
-	var client *http.Client
-	client = &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			TLSClientConfig:   tlsConfig.ToConfig(),
-			DisableKeepAlives: true,
-		},
-		Timeout: in.config.HTTPClientTimeout,
 	}
 
 	ri := &RequestInfo{
@@ -460,6 +436,38 @@ func (in *HttpjsonInput) Stop() {
 // Wait is an alias for Stop.
 func (in *HttpjsonInput) Wait() {
 	in.Stop()
+}
+
+func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make transport client
+	client := &http.Client{
+		Transport: &http.Transport{
+			Dial:              dialer.Dial,
+			DialTLS:           tlsDialer.Dial,
+			TLSClientConfig:   tlsConfig.ToConfig(),
+			DisableKeepAlives: true,
+		},
+		Timeout: in.config.HTTPClientTimeout,
+	}
+
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client)
+	}
+
+	return client, nil
 }
 
 func makeEvent(body string) beat.Event {
