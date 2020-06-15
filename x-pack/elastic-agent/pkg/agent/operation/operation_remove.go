@@ -7,16 +7,15 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operationRemove uninstall and removes all the bits related to the artifact
 type operationRemove struct {
-	eventProcessor callbackHooks
 }
 
-func newOperationRemove(eventProcessor callbackHooks) *operationRemove {
-	return &operationRemove{eventProcessor: eventProcessor}
+func newOperationRemove() *operationRemove {
+	return &operationRemove{}
 }
 
 // Name is human readable name identifying an operation
@@ -35,11 +34,7 @@ func (o *operationRemove) Check(_ Application) (bool, error) {
 func (o *operationRemove) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 
