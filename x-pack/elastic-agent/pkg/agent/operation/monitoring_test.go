@@ -9,9 +9,7 @@ import (
 	"testing"
 	"time"
 
-	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -21,7 +19,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
@@ -104,7 +104,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process2.Config{},
+		ProcessConfig: &process.Config{},
 		DownloadConfig: &artifact.Config{
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
@@ -126,7 +126,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &app.ApplicationStatusHandler{})
+	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,6 +157,8 @@ func (*testMonitorableApp) Configure(_ context.Context, config map[string]interf
 func (*testMonitorableApp) State() state.State                { return state.State{} }
 func (*testMonitorableApp) SetState(_ state.Status, _ string) {}
 func (a *testMonitorableApp) Monitor() monitoring.Monitor     { return a.monitor }
+func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string) {
+}
 
 type testMonitor struct {
 	monitorLogs    bool

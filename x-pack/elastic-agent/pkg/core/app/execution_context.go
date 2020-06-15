@@ -16,10 +16,10 @@ const (
 // ExecutionContext describes runnable binary
 type ExecutionContext struct {
 	ServicePort int
-	BinaryName string
-	Version    string
-	Tags       map[Tag]string
-	ID         string
+	BinaryName  string
+	Version     string
+	Tags        map[Tag]string
+	ID          string
 }
 
 // NewExecutionContext creates an execution context and generates an ID for this context
@@ -34,10 +34,10 @@ func NewExecutionContext(servicePort int, binaryName, version string, tags map[T
 	}
 
 	return ExecutionContext{
-		ServicePort:    servicePort,
-		BinaryName: binaryName,
-		Version:    version,
-		Tags:       tags,
-		ID:         id,
+		ServicePort: servicePort,
+		BinaryName:  binaryName,
+		Version:     version,
+		Tags:        tags,
+		ID:          id,
 	}
 }

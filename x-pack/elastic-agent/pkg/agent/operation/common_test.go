@@ -6,15 +6,12 @@ package operation
 
 import (
 	"context"
+
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
-
-	process2 "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -22,9 +19,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
@@ -38,7 +38,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			Delay:        3 * time.Second,
 			MaxDelay:     10 * time.Second,
 		},
-		ProcessConfig: &process2.Config{},
+		ProcessConfig: &process.Config{},
 		DownloadConfig: &artifact.Config{
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,
@@ -60,7 +60,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &app.ApplicationStatusHandler{})
+	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func getProgram(binary, version string) *app.Descriptor {
 		OperatingSystem: "darwin",
 		Architecture:    "32",
 	}
-	return app.NewDescriptor(binary, version, downloadCfg, nil)
+	return app.NewDescriptor(0, binary, version, downloadCfg, nil)
 }
 
 func getAbsPath(path string) string {

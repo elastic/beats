@@ -38,4 +38,3 @@ func injectFleet(cfg *config.Config) func(*logger.Logger, *transpiler.AST) error
 		return nil
 	}
 }
-

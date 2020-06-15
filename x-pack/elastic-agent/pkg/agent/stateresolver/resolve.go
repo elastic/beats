@@ -108,10 +108,10 @@ func converge(s state, cfg cfgReq) (state, []configrequest.Step) {
 
 		if !found {
 			steps = append(steps, configrequest.Step{
-				ID:      configrequest.StepRemove,
+				ID:          configrequest.StepRemove,
 				ServicePort: active.Program.Spec.ServicePort,
-				Process: active.Program.Cmd(),
-				Version: release.Version(),
+				Process:     active.Program.Cmd(),
+				Version:     release.Version(),
 			})
 		}
 	}
@@ -128,10 +128,10 @@ func converge(s state, cfg cfgReq) (state, []configrequest.Step) {
 			}
 
 			steps = append(steps, configrequest.Step{
-				ID:      configrequest.StepRun,
+				ID:          configrequest.StepRun,
 				ServicePort: p.Spec.ServicePort,
-				Process: p.Cmd(),
-				Version: release.Version(),
+				Process:     p.Cmd(),
+				Version:     release.Version(),
 				Meta: map[string]interface{}{
 					configrequest.MetaConfigKey: p.Configuration(),
 				},

@@ -61,8 +61,8 @@ type Application struct {
 
 	logger *logger.Logger
 
-	credsPort    int
-	credsWG      sync.WaitGroup
+	credsPort     int
+	credsWG       sync.WaitGroup
 	credsListener net.Listener
 
 	appLock sync.Mutex
@@ -104,7 +104,7 @@ func NewApplication(
 		monitor:        monitor,
 		uid:            uid,
 		gid:            gid,
-		credsPort: 		credsPort,
+		credsPort:      credsPort,
 	}, nil
 }
 

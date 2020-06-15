@@ -265,7 +265,6 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 		return nil
 	}
 
-
 	targetList, ok := targetListNode.Value().(*List)
 	if !ok {
 		return nil
