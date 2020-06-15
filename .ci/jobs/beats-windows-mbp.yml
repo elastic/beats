@@ -32,9 +32,9 @@
             # Builds for PRs won't be triggered automatically.
             # Only the master branch will be triggered automatically. 
             named-branches:
-              - defaults:
+              defaults:
                 - suppress-scm-triggering: true
-              - exceptions:
+              exceptions:
                 - exception:
                   branch-name: master
                   properties:
