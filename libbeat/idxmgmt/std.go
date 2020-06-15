@@ -20,6 +20,7 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -197,6 +198,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		MultiKey:         "indices",
 		EnableSingleOnly: true,
 		FailEmpty:        mode != ilm.ModeEnabled,
+		Case:             outil.SelectorLowerCase,
 	}
 
 	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
@@ -354,7 +356,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 
 	if tmp := evt.Meta["alias"]; tmp != nil {
 		if alias, ok := tmp.(string); ok {
-			return alias
+			return strings.ToLower(alias)
 		}
 	}
 
@@ -362,7 +364,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 		if idx, ok := tmp.(string); ok {
 			ts := evt.Timestamp.UTC()
 			return fmt.Sprintf("%s-%d.%02d.%02d",
-				idx, ts.Year(), ts.Month(), ts.Day())
+				strings.ToLower(idx), ts.Year(), ts.Month(), ts.Day())
 		}
 	}
 
@@ -372,7 +374,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	// which are then expanded by a processor to the "raw_index" field.
 	if tmp := evt.Meta["raw_index"]; tmp != nil {
 		if idx, ok := tmp.(string); ok {
-			return idx
+			return strings.ToLower(idx)
 		}
 	}
 
