@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -128,6 +129,67 @@ func TestBackoffFunc(t *testing.T) {
 				prevBackoff = backoff
 			}
 
+		})
+	}
+}
+
+func TestTopicSelection(t *testing.T) {
+	cases := map[string]struct {
+		cfg   map[string]interface{}
+		event beat.Event
+		want  string
+	}{
+		"topic configured": {
+			cfg:  map[string]interface{}{"topic": "test"},
+			want: "test",
+		},
+		"topic must keep case": {
+			cfg:  map[string]interface{}{"topic": "Test"},
+			want: "Test",
+		},
+		"topics setting": {
+			cfg: map[string]interface{}{
+				"topics": []map[string]interface{}{{"topic": "test"}},
+			},
+			want: "test",
+		},
+		"topics setting must keep case": {
+			cfg: map[string]interface{}{
+				"topics": []map[string]interface{}{{"topic": "Test"}},
+			},
+			want: "Test",
+		},
+		"use event field": {
+			cfg: map[string]interface{}{"topic": "test-%{[field]}"},
+			event: beat.Event{
+				Fields: common.MapStr{"field": "from-event"},
+			},
+			want: "test-from-event",
+		},
+		"use event field must keep case": {
+			cfg: map[string]interface{}{"topic": "Test-%{[field]}"},
+			event: beat.Event{
+				Fields: common.MapStr{"field": "From-Event"},
+			},
+			want: "Test-From-Event",
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			selector, err := buildTopicSelector(common.MustNewConfigFrom(test.cfg))
+			if err != nil {
+				t.Fatalf("Failed to parse configuration: %v", err)
+			}
+
+			got, err := selector.Select(&test.event)
+			if err != nil {
+				t.Fatalf("Failed to create topic name: %v", err)
+			}
+
+			if test.want != got {
+				t.Errorf("Pipeline name missmatch (want: %v, got: %v)", test.want, got)
+			}
 		})
 	}
 }

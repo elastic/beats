@@ -17,7 +17,10 @@
 
 package pipetool
 
-import "github.com/elastic/beats/v7/libbeat/beat"
+import (
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+)
 
 // connectEditPipeline modifies the client configuration using edit before calling
 // edit.
@@ -88,4 +91,20 @@ func WithDefaultGuarantees(pipeline beat.PipelineConnector, mode beat.PublishMod
 // wrap the client to provide additional functionality.
 func WithClientWrapper(pipeline beat.PipelineConnector, wrap ClientWrapper) beat.PipelineConnector {
 	return &wrapClientPipeline{parent: pipeline, wrapper: wrap}
+}
+
+// WithDynamicFields ensures that dynamicFields from autodiscovery are setup
+// when connecting to the publisher pipeline.
+// Processing.DynamicFields will only be overwritten if not is not already set.
+func WithDynamicFields(pipeline beat.PipelineConnector, dynamicFields *common.MapStrPointer) beat.PipelineConnector {
+	if dynamicFields == nil {
+		return pipeline
+	}
+
+	return WithClientConfigEdit(pipeline, func(cfg beat.ClientConfig) (beat.ClientConfig, error) {
+		if cfg.Processing.DynamicFields == nil {
+			cfg.Processing.DynamicFields = dynamicFields
+		}
+		return cfg, nil
+	})
 }
