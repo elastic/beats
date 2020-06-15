@@ -7,85 +7,35 @@ package application
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-const (
-	monitoringName            = "FLEET_MONITORING"
-	programsKey               = "programs"
-	monitoringKey             = "settings.monitoring"
-	monitoringUseOutputKey    = "settings.monitoring.use_output"
-	monitoringOutputFormatKey = "outputs.%s"
-	outputKey                 = "output"
-
-	enabledKey        = "settings.monitoring.enabled"
-	logsKey           = "settings.monitoring.logs"
-	metricsKey        = "settings.monitoring.metrics"
-	outputsKey        = "outputs"
-	elasticsearchKey  = "elasticsearch"
-	typeKey           = "type"
-	defaultOutputName = "default"
-)
-
-func injectFleet(cfg *FleetAgentConfig) func(string, *transpiler.AST, []program.Program) ([]program.Program, error) {
-	return func(outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
-		var err error
-		monitoringProgram := program.Program{
-			Spec: program.Spec{
-				Name: monitoringName,
-				Cmd:  monitoringName,
-			},
-		}
-
-		config := make(map[string]interface{})
-		// if monitoring is not specified use default one where everything is enabled
-		if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
-			monitoringNode := transpiler.NewDict([]transpiler.Node{
-				transpiler.NewKey("enabled", transpiler.NewBoolVal(true)),
-				transpiler.NewKey("logs", transpiler.NewBoolVal(true)),
-				transpiler.NewKey("metrics", transpiler.NewBoolVal(true)),
-				transpiler.NewKey("use_output", transpiler.NewStrVal("default")),
-			})
-
-			transpiler.Insert(rootAst, transpiler.NewKey("monitoring", monitoringNode), "settings")
-		}
-
-		// get monitoring output name to be used
-		monitoringOutputName := defaultOutputName
-		useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
-		if found {
-			monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
-			if !ok {
-				return programsToRun, nil
-			}
-
-			monitoringOutputName = monitoringOutputNameKey.String()
-		}
-
-		ast := rootAst.Clone()
-		if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
-			return programsToRun, err
-		}
-
-		config, err = ast.Map()
+func injectFleet(cfg *config.Config) func(*logger.Logger, *transpiler.AST) error {
+	return func(logger *logger.Logger, rootAst *transpiler.AST) error {
+		config, err := cfg.ToMapStr()
 		if err != nil {
-			return programsToRun, err
+			return err
 		}
-
-		programList := make([]string, 0, len(programsToRun))
-		for _, p := range programsToRun {
-			programList = append(programList, p.Spec.Cmd)
-		}
-		// making program list part of the config
-		// so it will get regenerated with every change
-		config[programsKey] = programList
-
-		monitoringProgram.Config, err = transpiler.NewAST(config)
+		ast, err := transpiler.NewAST(config)
 		if err != nil {
-			return programsToRun, err
+			return err
 		}
-
-		return append(programsToRun, monitoringProgram), nil
+		api, ok := transpiler.Lookup(ast, "api")
+		if !ok {
+			return fmt.Errorf("failed to get api from fleet config")
+		}
+		agentInfo, ok := transpiler.Lookup(ast, "agent_info")
+		if !ok {
+			return fmt.Errorf("failed to get agent_info from fleet config")
+		}
+		fleet := transpiler.NewDict([]transpiler.Node{agentInfo, api})
+		err = transpiler.Insert(rootAst, fleet, "fleet")
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 }
+

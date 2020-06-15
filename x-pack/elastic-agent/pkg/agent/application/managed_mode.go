@@ -146,8 +146,8 @@ func newManaged(
 		log,
 		router,
 		&configModifiers{
-			Decorators: []decoratorFunc{injectFleet(cfg), injectMonitoring},
-			Filters:    []filterFunc{filters.ConstraintFilter},
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{injectFleet(config), filters.ConstraintFilter},
 		},
 		monitor,
 	)
