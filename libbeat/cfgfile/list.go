@@ -105,6 +105,10 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		moduleStarts.Add(1)
 	}
 
+	// NOTE: This metric tracks the number of modules in the list. The true
+	// number of modules in the running state may differ because modules can
+	// stop on their own (i.e. on errors) and also when this stops a module
+	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
 	return errs.Err()
