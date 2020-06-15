@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 var (
@@ -25,19 +26,16 @@ type operationConfig struct {
 	logger         *logger.Logger
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-	eventProcessor callbackHooks
 }
 
 func newOperationConfig(
 	logger *logger.Logger,
 	operatorConfig *config.Config,
-	cfg map[string]interface{},
-	eventProcessor callbackHooks) *operationConfig {
+	cfg map[string]interface{}) *operationConfig {
 	return &operationConfig{
 		logger:         logger,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -55,11 +53,7 @@ func (o *operationConfig) Check(_ Application) (bool, error) { return true, nil 
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 	return application.Configure(ctx, o.cfg)

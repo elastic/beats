@@ -36,6 +36,7 @@ type Application interface {
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
 	State() state.State
+	SetState(status state.Status, msg string)
 }
 
 // Descriptor defines a program which needs to be run.
