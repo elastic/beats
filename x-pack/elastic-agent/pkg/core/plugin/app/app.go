@@ -34,24 +34,21 @@ var (
 	ErrClientNotConfigurable = errors.New("client does not provide configuration", errors.TypeApplication)
 )
 
-// ReportFailureFunc is a callback func used to report async failures due to crashes.
-type ReportFailureFunc func(context.Context, string, error)
-
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
 type Application struct {
-	bgContext       context.Context
-	id              string
-	name            string
-	pipelineID      string
-	logLevel        string
-	spec            Specifier
-	srv             *server.Server
-	srvState        *server.ApplicationState
-	limiter         *tokenbucket.Bucket
-	failureReporter ReportFailureFunc
-	startContext    context.Context
-	tag             Taggable
-	state           state.State
+	bgContext    context.Context
+	id           string
+	name         string
+	pipelineID   string
+	logLevel     string
+	spec         Specifier
+	srv          *server.Server
+	srvState     *server.ApplicationState
+	limiter      *tokenbucket.Bucket
+	startContext context.Context
+	tag          Taggable
+	state        state.State
+	reporter     state.Reporter
 
 	uid int
 	gid int
@@ -79,7 +76,7 @@ func NewApplication(
 	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
-	failureReporter ReportFailureFunc,
+	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
 
 	s := spec.Spec()
@@ -90,22 +87,22 @@ func NewApplication(
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
-		bgContext:       ctx,
-		id:              id,
-		name:            appName,
-		pipelineID:      pipelineID,
-		logLevel:        logLevel,
-		spec:            spec,
-		srv:             srv,
-		processConfig:   cfg.ProcessConfig,
-		downloadConfig:  cfg.DownloadConfig,
-		retryConfig:     cfg.RetryConfig,
-		logger:          logger,
-		limiter:         b,
-		failureReporter: failureReporter,
-		monitor:         monitor,
-		uid:             uid,
-		gid:             gid,
+		bgContext:      ctx,
+		id:             id,
+		name:           appName,
+		pipelineID:     pipelineID,
+		logLevel:       logLevel,
+		spec:           spec,
+		srv:            srv,
+		processConfig:  cfg.ProcessConfig,
+		downloadConfig: cfg.DownloadConfig,
+		retryConfig:    cfg.RetryConfig,
+		logger:         logger,
+		limiter:        b,
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
 	}, nil
 }
 
@@ -153,8 +150,14 @@ func (a *Application) Stop() {
 		// cleanup drops
 		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
-	a.state.Status = state.Stopped
-	a.state.Message = "Stopped"
+	a.setState(state.Stopped, "Stopped")
+}
+
+// SetState sets the status of the application.
+func (a *Application) SetState(status state.Status, msg string) {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+	a.setState(status, msg)
 }
 
 func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -170,6 +173,11 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		}
 
 		a.appLock.Lock()
+		if a.state.ProcessInfo != proc {
+			// already another process started, another watcher is watching instead
+			a.appLock.Unlock()
+			return
+		}
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
 
@@ -178,15 +186,13 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 			return
 		}
 
-		msg := fmt.Sprintf("Exited with code: %d", procState.ExitCode())
-		a.state.Status = state.Crashed
-		a.state.Message = msg
-		a.appLock.Unlock()
+		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
+		a.setState(state.Crashed, msg)
 
-		// it was a crash, report it async not to block
-		// process management with networking issues
-		go a.reportCrash(ctx)
-		a.Start(ctx, p, cfg)
+		// it was a crash, cleanup anything required
+		go a.cleanUp()
+		a.start(ctx, p, cfg)
+		a.appLock.Unlock()
 	}()
 }
 
@@ -206,16 +212,35 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) reportCrash(ctx context.Context) {
-	a.monitor.Cleanup(a.name, a.pipelineID)
-
-	// TODO: reporting crash
-	if a.failureReporter != nil {
-		crashError := errors.New(
-			fmt.Sprintf("application '%s' crashed", a.id),
-			errors.TypeApplicationCrash,
-			errors.M(errors.MetaKeyAppName, a.name),
-			errors.M(errors.MetaKeyAppName, a.id))
-		a.failureReporter(ctx, a.name, crashError)
+func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
+	var status state.Status
+	switch pstatus {
+	case proto.StateObserved_STARTING:
+		status = state.Starting
+	case proto.StateObserved_CONFIGURING:
+		status = state.Configuring
+	case proto.StateObserved_HEALTHY:
+		status = state.Running
+	case proto.StateObserved_DEGRADED:
+		status = state.Degraded
+	case proto.StateObserved_FAILED:
+		status = state.Failed
+	case proto.StateObserved_STOPPING:
+		status = state.Stopping
 	}
+	a.setState(status, msg)
+}
+
+func (a *Application) setState(status state.Status, msg string) {
+	if a.state.Status != status || a.state.Message != msg {
+		a.state.Status = status
+		a.state.Message = msg
+		if a.reporter != nil {
+			go a.reporter.OnStateChange(a.id, a.name, a.state)
+		}
+	}
+}
+
+func (a *Application) cleanUp() {
+	a.monitor.Cleanup(a.name, a.pipelineID)
 }
