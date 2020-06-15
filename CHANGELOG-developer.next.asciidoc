@@ -46,6 +46,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
   Your magefile.go will require a change to adapt the devtool API. See the pull request for
   more details. {pull}18148[18148]
 - The Elasticsearch client settings expect the API key to be raw (not base64-encoded). {issue}18939[18939] {pull}18945[18945]
+- `management.ConfigManager` has been renamed to `management.Manager`. {pull}19114[19114]
+- `UpdateStatus` has been added to the `management.Manager` interface. {pull}19114[19114]
 
 ==== Bugfixes
 

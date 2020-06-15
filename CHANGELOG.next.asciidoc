@@ -39,10 +39,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * CEF {pull}18223[18223]
 * PANW {pull}18223[18223]
 * Cisco {pull}18753[18753]
+* CrowdStrike {pull}19132[19132]
+* Fortinet {pull}19133[19133]
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 * Netflow {pull}19087[19087]
+* Zeek {pull}19113[19113] (`forwarded` tag is not included by default)
 * Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
+* CoreDNS {pull}19134[19134] (`forwarded` tag is not included by default)
+* Envoy Proxy {pull}19134[19134] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
@@ -183,6 +188,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
+- Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
@@ -242,6 +248,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
+- Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 
 *Packetbeat*
 

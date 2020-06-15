@@ -51,15 +51,25 @@ func NewDownloaderWithClient(config *artifact.Config, client http.Client) *Downl
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(ctx context.Context, programName, version string) (string, error) {
+func (e *Downloader) Download(ctx context.Context, programName, version string) (_ string, err error) {
+	downloadedFiles := make([]string, 0, 2)
+	defer func() {
+		if err != nil {
+			for _, path := range downloadedFiles {
+				os.Remove(path)
+			}
+		}
+	}()
+
 	// download from source to dest
 	path, err := e.download(ctx, e.config.OS(), programName, version)
+	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
-		os.Remove(path)
 		return "", err
 	}
 
-	_, err = e.downloadHash(ctx, e.config.OS(), programName, version)
+	hashPath, err := e.downloadHash(ctx, e.config.OS(), programName, version)
+	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
 

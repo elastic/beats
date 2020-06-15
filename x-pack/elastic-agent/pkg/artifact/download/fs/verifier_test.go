@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
@@ -26,6 +28,101 @@ const (
 type testCase struct {
 	system string
 	arch   string
+}
+
+func TestFetchVerify(t *testing.T) {
+	timeout := 15 * time.Second
+	dropPath := filepath.Join("testdata", "drop")
+	installPath := filepath.Join("testdata", "install")
+	targetPath := filepath.Join("testdata", "download")
+	ctx := context.Background()
+	programName := "beat"
+	version := "8.0.0"
+
+	targetFilePath := filepath.Join(targetPath, "beat-8.0.0-darwin-x86_64.tar.gz")
+	hashTargetFilePath := filepath.Join(targetPath, "beat-8.0.0-darwin-x86_64.tar.gz.sha512")
+
+	// cleanup
+	defer os.RemoveAll(targetPath)
+
+	config := &artifact.Config{
+		TargetDirectory: targetPath,
+		DropPath:        dropPath,
+		InstallPath:     installPath,
+		Timeout:         timeout,
+		OperatingSystem: "darwin",
+		Architecture:    "32",
+	}
+
+	err := prepareFetchVerifyTests(dropPath, targetPath, targetFilePath, hashTargetFilePath)
+	assert.NoError(t, err)
+
+	downloader := NewDownloader(config)
+	verifier, err := NewVerifier(config)
+	assert.NoError(t, err)
+
+	// first download verify should fail:
+	// download skipped, as invalid package is prepared upfront
+	// verify fails and cleans download
+	matches, err := verifier.Verify(programName, version)
+	assert.NoError(t, err)
+	assert.Equal(t, false, matches)
+
+	_, err = os.Stat(targetFilePath)
+	assert.True(t, os.IsNotExist(err))
+
+	_, err = os.Stat(hashTargetFilePath)
+	assert.True(t, os.IsNotExist(err))
+
+	// second one should pass
+	// download not skipped: package missing
+	// verify passes because hash is not correct
+	_, err = downloader.Download(ctx, programName, version)
+	assert.NoError(t, err)
+
+	// file downloaded ok
+	_, err = os.Stat(targetFilePath)
+	assert.NoError(t, err)
+
+	_, err = os.Stat(hashTargetFilePath)
+	assert.NoError(t, err)
+
+	matches, err = verifier.Verify(programName, version)
+	assert.NoError(t, err)
+	assert.Equal(t, true, matches)
+}
+
+func prepareFetchVerifyTests(dropPath, targetDir, targetFilePath, hashTargetFilePath string) error {
+	sourceFilePath := filepath.Join(dropPath, "beat-8.0.0-darwin-x86_64.tar.gz")
+	hashSourceFilePath := filepath.Join(dropPath, "beat-8.0.0-darwin-x86_64.tar.gz.sha512")
+
+	// clean targets
+	os.Remove(targetFilePath)
+	os.Remove(hashTargetFilePath)
+
+	if err := os.MkdirAll(targetDir, 0775); err != nil {
+		return err
+	}
+
+	sourceFile, err := os.Open(sourceFilePath)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	targretFile, err := os.OpenFile(targetFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer targretFile.Close()
+
+	hashContent, err := ioutil.ReadFile(hashSourceFilePath)
+	if err != nil {
+		return err
+	}
+
+	corruptedHash := append([]byte{1, 2, 3, 4, 5, 6}, hashContent[6:]...)
+	return ioutil.WriteFile(hashTargetFilePath, corruptedHash, 0666)
 }
 
 func TestVerify(t *testing.T) {
