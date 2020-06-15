@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed ingestion of some Cisco ASA and FTD messages when a hostname was used instead of an IP for NAT fields. {issue}14034[14034] {pull}18376[18376]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
+- Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 
 *Heartbeat*
 
