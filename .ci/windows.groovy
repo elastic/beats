@@ -85,10 +85,6 @@ pipeline {
       }
     }
     stage('Build and Test Windows'){
-      when {
-        beforeAgent true
-        expression { return env.ONLY_DOCS == "false" }
-      }
       failFast false
       parallel {
         stage('Elastic Agent x-pack Windows'){
