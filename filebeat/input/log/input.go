@@ -18,6 +18,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,7 +27,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -173,7 +173,7 @@ func (p *Input) loadStates(states []file.State) error {
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
 			if !state.Finished {
-				return &common.ErrInputNotFinished{State: state.String()}
+				return fmt.Errorf("Can only start an input when all related states are finished: %+v", state)
 			}
 
 			// Update input states and send new states to registry

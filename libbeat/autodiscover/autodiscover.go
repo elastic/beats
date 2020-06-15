@@ -204,9 +204,11 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			continue
 		}
 
-		err = a.checkConfig(config)
+		err = a.factory.CheckConfig(config)
 		if err != nil {
-			continue
+			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+				"Auto discover config check failed for config '%s', won't start runner",
+				common.DebugString(config, true))))
 		}
 
 		// Update meta no matter what
@@ -225,38 +227,6 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	}
 
 	return updated
-}
-
-// checkConfig verifies an input config by calling CheckConfig of various factories with a retry in order to
-// ensure that a config is not in conflict with an older config which is "stopping" state yet.
-func (a *Autodiscover) checkConfig(config *common.Config) error {
-	checkConfigAttempts := 0
-	maxCheckConfigAttempts := 5
-	for {
-		err := a.factory.CheckConfig(config)
-		if err == nil {
-			return nil
-		} else {
-			if err, ok := err.(*common.ErrInputNotFinished); !ok {
-				// error not related to stopping input, raise it now
-				a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-					"Auto discover config check failed for config '%s' after max attempts, won't start runner",
-					common.DebugString(config, true))))
-				return err
-			}
-			a.logger.Debug(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s'[attempt %v], won't start runner",
-				common.DebugString(config, true), checkConfigAttempts+1)))
-		}
-		if checkConfigAttempts > maxCheckConfigAttempts {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s' after max attempts, won't start runner",
-				common.DebugString(config, true))))
-			return err
-		}
-		time.Sleep(3 * time.Second)
-		checkConfigAttempts += 1
-	}
 }
 
 func (a *Autodiscover) handleStop(event bus.Event) bool {
