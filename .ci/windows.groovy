@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/7z-fallback') _
 
 import groovy.transform.Field
 
@@ -353,12 +353,25 @@ def mageTargetWin(String context, String directory, String target) {
   }
 }
 
+def compressToolsDetails() {
+  bat(label: "isTarInstalled", script: 'tar --version >NULL', returnStatus: true)
+  withEnv(["PATH+SYSTEM=C:\\Windows\\System32"]) {
+    bat(label: 'isTarInstalled withEnv', script: 'tar --version >NULL', returnStatus: true)
+  }
+  bat(label: 'is7zInstalled', script: '7z >NULL', returnStatus: true)
+  withEnv(["PATH+CHOCO=C:\\ProgramData\\chocolatey\\bin"]) {
+    bat(label: 'is7zInstalled withEnv', script: '7z >NULL', returnStatus: true)
+  }
+}
+
 def mageTargetWin(String context, String directory, String target, String label) {
   return {
     log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
     def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
     node("${immutable} && ${label}"){
       withBeatsEnvWin() {
+        // Only for the time being
+        compressToolsDetails()
         whenTrue(params.debug) {
           dumpFilteredEnvironment()
           dumpMageWin()
