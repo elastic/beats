@@ -228,7 +228,7 @@ func TestClientWithHeaders(t *testing.T) {
 				"X-Test": "testing value",
 			},
 		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}, nil)
 	assert.NoError(t, err)
 

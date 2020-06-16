@@ -1,78 +1,25 @@
-Agent's notes
+[[elastic-agent-installation-configuration]]
+= Manage your {agent}s
 
+experimental[]
 
-[[requirements]]
-Requirements
+{agent} is a single, unified agent that you can deploy to hosts or containers to
+collect data and send it to the {stack}. Behind the scenes, {agent} runs the
+{beats} shippers or Endpoint required for your configuration.
 
-The remote Kibana version of the Agent must be equal or higher than the Agent version, if this is not met
-Kibana will refuse the connection.
+To learn how to install, configure, and run your {agent}s, see:
 
+* <<elastic-agent-installation>>
+* <<run-elastic-agent>>
+* <<elastic-agent-cmd-options>>
+* <<elastic-agent-configuration>>
 
-[[Supported Actions by the Agent]]
+include::install-elastic-agent.asciidoc[leveloffset=+1]
 
-The Elastic Agent supports the following actions received by Fleet.
+include::run-elastic-agent.asciidoc[leveloffset=+1]
 
-Implemented:
+include::elastic-agent-command-line.asciidoc[leveloffset=+1]
 
-[[Configuration change]]
+include::elastic-agent-configuration.asciidoc[leveloffset=+1]
 
-The Elastic Agent receives a configuration encoded as a JSON object.
-
-[source,json]
-------------------------------------------------------------------------------
-	{
-		"type": "CONFIG_CHANGE",
-		"id": "id1",
-		"data": {
-			"config": {
-				"id": "policy-id",
-				"outputs": {
-					"default": {
-						"hosts": "https://localhost:9200"
-					}
-				},
-				"datasources": [{
-					"id": "string",
-					"enabled": true,
-					"use_output": "default",
-					"inputs": [{
-						"type": "logs",
-						"streams": [{
-							"paths": ["/var/log/hello.log"]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-------------------------------------------------------------------------------
-
-[[Planned but not implemented]]
-
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "UPGRADE",
-  "id": "id1",
-  "target_version": "7.2.1"
-}
-------------------------------------------------------------------------------
-
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "DOWNGRADE",
-  "id": "id1",
-  "target_version": "7.2.1"
-}
-------------------------------------------------------------------------------
-
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "RELAY",
-  "id": "id1",
-  "destination": {"name":"endpoint"}
-  "data": {}
-}
-------------------------------------------------------------------------------
+//include::elastic-agent-configuration-example.asciidoc[leveloffset=+1]
