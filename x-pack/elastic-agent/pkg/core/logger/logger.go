@@ -7,12 +7,13 @@ package logger
 import (
 	"fmt"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/logp/configure"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"gopkg.in/yaml.v2"
 )
 
 const agentName = "elastic-agent"
