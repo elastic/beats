@@ -6,7 +6,6 @@ package state
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
 // Status describes the current status of the application process.
@@ -40,20 +39,8 @@ type State struct {
 	Message     string
 }
 
-// UpdateFromProto updates the status from the status from the GRPC protocol.
-func (s *State) UpdateFromProto(status proto.StateObserved_Status) {
-	switch status {
-	case proto.StateObserved_STARTING:
-		s.Status = Starting
-	case proto.StateObserved_CONFIGURING:
-		s.Status = Configuring
-	case proto.StateObserved_HEALTHY:
-		s.Status = Running
-	case proto.StateObserved_DEGRADED:
-		s.Status = Degraded
-	case proto.StateObserved_FAILED:
-		s.Status = Failed
-	case proto.StateObserved_STOPPING:
-		s.Status = Stopping
-	}
+// Reporter is interface that is called when a state is changed.
+type Reporter interface {
+	// OnStateChange is called when state changes.
+	OnStateChange(id string, name string, state State)
 }

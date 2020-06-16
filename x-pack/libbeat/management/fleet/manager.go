@@ -161,16 +161,15 @@ func (cm *Manager) OnConfig(s string) {
 
 	blocks, err := cm.toConfigBlocks(configMap)
 	if err != nil {
-		err = errors.Wrap(err, "could not apply the configuration")
+		err = errors.Wrap(err, "failed to parse configuration")
 		cm.logger.Error(err)
 		cm.UpdateStatus(management.Failed, err.Error())
 		return
 	}
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
-		err = errors.Wrap(err, "could not apply the configuration")
-		cm.logger.Error(err)
-		cm.UpdateStatus(management.Failed, err.Error())
+		// `cm.apply` already logs the errors; currently allow beat to run degraded
+		cm.UpdateStatus(management.Degraded, errs.Error())
 		return
 	}
 

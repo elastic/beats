@@ -5,7 +5,6 @@
 package app
 
 import (
-	"context"
 	"fmt"
 
 	"gopkg.in/yaml.v2"
@@ -13,7 +12,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	pstate "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
@@ -27,8 +26,8 @@ type ApplicationStatusHandler struct{}
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application is needed.
-func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, status proto.StateObserved_Status, msg string) {
-	app, ok := state.App().(*Application)
+func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+	app, ok := s.App().(*Application)
 	if !ok {
 		panic(errors.New("only *Application can be registered when using the ApplicationStatusHandler", errors.TypeUnexpected))
 	}
@@ -37,23 +36,21 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 
 	// If the application is stopped, do not update the state. Stopped is a final state
 	// and should not be overridden.
-	if app.state.Status == pstate.Stopped {
+	if app.state.Status == state.Stopped {
 		app.appLock.Unlock()
 		return
 	}
 
-	app.state.UpdateFromProto(status)
-	app.state.Message = msg
+	app.setStateFromProto(status, msg)
 	if status == proto.StateObserved_FAILED {
 		// ignore when expected state is stopping
-		if state.Expected() == proto.StateExpected_STOPPING {
+		if s.Expected() == proto.StateExpected_STOPPING {
 			app.appLock.Unlock()
 			return
 		}
 
-		// it was a crash, report it async not to block
-		// process management with networking issues
-		go app.reportCrash(context.Background())
+		// it was a crash, cleanup anything required
+		go app.cleanUp()
 
 		// kill the process
 		if app.state.ProcessInfo != nil {
@@ -62,21 +59,15 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 		}
 		ctx := app.startContext
 		tag := app.tag
-		app.appLock.Unlock()
 
 		// it was marshalled to pass into the state, so unmarshall will always succeed
 		var cfg map[string]interface{}
-		_ = yaml.Unmarshal([]byte(state.Config()), &cfg)
+		_ = yaml.Unmarshal([]byte(s.Config()), &cfg)
 
-		err := app.Start(ctx, tag, cfg)
+		err := app.start(ctx, tag, cfg)
 		if err != nil {
-			app.logger.Error(errors.New(
-				fmt.Sprintf("application '%s' failed to restart", app.id),
-				errors.TypeApplicationCrash,
-				errors.M(errors.MetaKeyAppName, app.name),
-				errors.M(errors.MetaKeyAppName, app.id)))
+			app.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err))
 		}
-		return
 	}
 	app.appLock.Unlock()
 }

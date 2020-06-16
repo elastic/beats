@@ -83,9 +83,6 @@ func newInput(
 
 	var out channel.Outleter
 	out, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
 		ACKLastEvent: func(private interface{}) {
 			// Errors don't have a cursor.
 			if cursor, ok := private.(cursor); ok {

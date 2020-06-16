@@ -137,9 +137,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
 				if s3Context, ok := private.(*s3Context); ok {
