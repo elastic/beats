@@ -93,7 +93,7 @@ func (l *Loader) Configure(cfg *common.Config) (Input, error) {
 
 	p, exists := l.registry[name]
 	if !exists {
-		return nil, &LoadError{Name: name, Reason: ErrUnknown}
+		return nil, &LoadError{Name: name, Reason: ErrUnknownInput}
 	}
 
 	log := l.log.With("input", name, "stability", p.Stability, "deprecated", p.Deprecated)

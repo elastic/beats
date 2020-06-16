@@ -42,10 +42,10 @@ type SetupError struct {
 	Fails []error
 }
 
-// ErrUnknown indicates that the plugin type does not exist. Either
+// ErrUnknownInput indicates that the plugin type does not exist. Either
 // because the 'type' setting name does not match the loaders expectations,
 // or because the type is unknown.
-var ErrUnknown = errors.New("unknown input type")
+var ErrUnknownInput = errors.New("unknown input type")
 
 // ErrNoInputConfigured indicates that the 'type' setting is missing.
 var ErrNoInputConfigured = errors.New("no input type configured")
@@ -56,7 +56,7 @@ var ErrPluginWithoutName = errors.New("the plugin has no name")
 
 // IsUnknownInputError checks if an error value indicates an input load
 // error because there is no existing plugin that can create the input.
-func IsUnknownInputError(err error) bool { return errors.Is(err, ErrUnknown) }
+func IsUnknownInputError(err error) bool { return errors.Is(err, ErrUnknownInput) }
 
 func failedInputName(err error) string {
 	switch e := err.(type) {
