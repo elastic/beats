@@ -295,6 +295,11 @@ github.com/cavaliercoder/go-rpm/version
 github.com/cespare/xxhash/v2
 # github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
 github.com/cloudfoundry-community/go-cfclient
+# github.com/cloudfoundry/noaa v2.1.0+incompatible
+github.com/cloudfoundry/noaa
+github.com/cloudfoundry/noaa/consumer
+github.com/cloudfoundry/noaa/consumer/internal
+github.com/cloudfoundry/noaa/errors
 # github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
 github.com/cloudfoundry/sonde-go/events
 # github.com/containerd/containerd v1.3.3
