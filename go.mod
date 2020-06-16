@@ -8,8 +8,7 @@ require (
 	cloud.google.com/go/pubsub v1.0.1
 	cloud.google.com/go/storage v1.0.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
-	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
-	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
+	code.cloudfoundry.org/go-loggregator/v8 v8.0.1
 	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
 	github.com/Azure/azure-sdk-for-go v37.1.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
@@ -26,7 +25,6 @@ require (
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/antlr/antlr4 v0.0.0-20200225173536-225249fdaef5
-	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
@@ -125,7 +123,6 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0

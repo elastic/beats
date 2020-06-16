@@ -8,9 +8,9 @@ import (
 	"context"
 	"sync"
 
-	loggregator "code.cloudfoundry.org/go-loggregator"
-	"code.cloudfoundry.org/go-loggregator/conversion"
-	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	loggregator "code.cloudfoundry.org/go-loggregator/v8"
+	"code.cloudfoundry.org/go-loggregator/v8/conversion"
+	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

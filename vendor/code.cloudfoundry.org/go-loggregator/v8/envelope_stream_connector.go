@@ -8,7 +8,7 @@ import (
 	"time"
 
 	gendiodes "code.cloudfoundry.org/go-diodes"
-	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

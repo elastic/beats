@@ -1,0 +1,12 @@
+---
+language: go
+
+go:
+- "1.x"
+- "master"
+
+install: true
+
+script:
+- env GO111MODULE=on go build ./...
+- env GO111MODULE=on go test ./...
