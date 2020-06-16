@@ -19,6 +19,7 @@ type synthproxyReq struct {
 	Name string `json:"name"`
 	Browser string `json:"browser"`
 	Script string `json:"script"`
+	ApiKey string `json:"api_key"`
 }
 
 func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {
@@ -28,7 +29,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	}
 
 	for _, browser := range config.Browsers {
-		sr := synthproxyReq{"TODO", browser, config.Script}
+		sr := synthproxyReq{"TODO", browser, config.Script, config.ApiKey}
 		srJson, err := json.Marshal(sr)
 		if err != nil {
 			return nil, 0, err

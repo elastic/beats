@@ -24,7 +24,8 @@ heartbeat.monitors:
     j.step("unreachable step", async (page) => {
         await page.click('css=a#missing-id-that-is-not-real');
     });
-  runner_url: "http://localhost:5678"
+  api_key: "changeme"
+  runner_url: "https://us-central1-elastic-observability.cloudfunctions.net/synthproxy-test2"
   browsers: ["chromium", "webkit", "firefox"]
   schedule: "@every 10m"
 
