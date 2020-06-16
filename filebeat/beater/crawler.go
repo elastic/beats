@@ -138,7 +138,7 @@ func (c *crawler) startInput(
 
 	c.inputs[id] = runner
 
-	c.log.Info("Starting input (ID: %d)", id)
+	c.log.Infof("Starting input (ID: %d)", id)
 	runner.Start()
 
 	return nil
