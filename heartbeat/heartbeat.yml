@@ -18,6 +18,12 @@ heartbeat.monitors:
     j.step("click uptime", async (page) => {
         await page.click('css=a[href="/uptime-monitoring"]');
     });
+    j.step("broken step", async (page) => {
+        await page.click('css=a#missing-id-that-is-not-real');
+    });
+    j.step("unreachable step", async (page) => {
+        await page.click('css=a#missing-id-that-is-not-real');
+    });
   runner_url: "http://localhost:5678"
   browsers: ["chromium", "webkit", "firefox"]
   schedule: "@every 10m"
