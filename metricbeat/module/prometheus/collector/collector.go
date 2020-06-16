@@ -20,7 +20,6 @@ package collector
 import (
 	"regexp"
 	"sync"
-	"time"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -85,7 +84,6 @@ type MetricSet struct {
 	once            sync.Once
 	host            string
 	eventGenStarted bool
-	period          time.Duration
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -112,7 +110,6 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			namespace:       namespace,
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
-			period:          config.Period,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
@@ -194,17 +191,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops the metricset
 func (m *MetricSet) Close() error {
-	attempts := 0
-	for !m.eventGenStarted {
-		time.Sleep(m.period)
-		// waiting 2 periods so as the first Fetch to start the generator, otherwise return since
-		// Fetch is not called at all
-		if attempts > 2 {
-			return nil
-		}
-		attempts++
+	if m.eventGenStarted {
+		m.promEventsGen.Stop()
 	}
-	m.promEventsGen.Stop()
 	return nil
 }
 
