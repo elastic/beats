@@ -28,7 +28,6 @@ go install -mod=vendor github.com/magefile/mage
 mage -version
 where mage
 
-
 if not exist C:\Python38\python.exe (
     REM Install python 3.8.
     choco install python -y -r --no-progress --version 3.8.2 || echo ERROR && exit /b
