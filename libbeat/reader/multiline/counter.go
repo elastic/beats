@@ -64,7 +64,7 @@ func (cr *counterReader) readFirst() (reader.Message, error) {
 		}
 
 		cr.msgBuffer.startNewMessage(message)
-		if cr.msgBuffer.numLines == cr.linesCount {
+		if cr.msgBuffer.processedLines == cr.linesCount {
 			msg := cr.msgBuffer.finalize()
 			return msg, nil
 		}
@@ -107,7 +107,7 @@ func (cr *counterReader) readNext() (reader.Message, error) {
 
 		// add line to current multiline event
 		cr.msgBuffer.addLine(message)
-		if cr.msgBuffer.numLines == cr.linesCount {
+		if cr.msgBuffer.processedLines == cr.linesCount {
 			msg := cr.msgBuffer.finalize()
 			cr.setState((*counterReader).readFirst)
 			return msg, nil

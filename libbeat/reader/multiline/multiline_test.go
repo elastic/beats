@@ -227,6 +227,18 @@ func TestMultilineCount(t *testing.T) {
 		8,
 		"line1\n", "line1.1\n", "line2\n", "line2.1\n", "line3\n", "line3.1\n", "line4\n", "line4.1\n",
 	)
+	maxLines = 2
+	testMultilineTruncated(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 3,
+		},
+		4,
+		true,
+		[]string{"line1\n line1.1\n line1.2\n", "line2\n line2.1\n line2.2\n", "line3\n line3.1\n line3.2\n", "line4\n line4.1\n line4.3\n"},
+		[]string{"line1\n", "line2\n", "line3\n", "line4\n"},
+	)
 }
 
 func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {

@@ -22,15 +22,16 @@ import (
 )
 
 type messageBuffer struct {
-	maxBytes    int // bytes stored in content
-	maxLines    int
-	separator   []byte
-	skipNewline bool
-	last        []byte
-	numLines    int
-	truncated   int
-	err         error // last seen error
-	message     reader.Message
+	maxBytes       int // bytes stored in content
+	maxLines       int
+	separator      []byte
+	skipNewline    bool
+	last           []byte
+	numLines       int
+	processedLines int
+	truncated      int
+	err            error // last seen error
+	message        reader.Message
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -63,6 +64,7 @@ func (b *messageBuffer) clear() {
 	b.message = reader.Message{}
 	b.last = nil
 	b.numLines = 0
+	b.processedLines = 0
 	b.truncated = 0
 	b.err = nil
 }
@@ -108,6 +110,7 @@ func (b *messageBuffer) addLine(m reader.Message) {
 		b.truncated += len(m.Content)
 
 	}
+	b.processedLines++
 
 	b.last = m.Content
 	b.message.Bytes += m.Bytes
