@@ -752,5 +752,4 @@ class TestCase(unittest.TestCase, ComposeMixin):
             if not is_ecs_version_set(cfg_path):
                 errors.append("{}".format(cfg_path))
         if len(errors) > 0:
-                raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))
-
+            raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))
