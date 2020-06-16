@@ -8,6 +8,9 @@
 package cloudfoundry
 
 import (
+	"context"
+	"crypto/tls"
+	"net/http"
 	"testing"
 	"time"
 
@@ -17,11 +20,34 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
 func TestInput(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("cloudfoundry"))
+
+	t.Run("v1", func(t *testing.T) {
+		testInput(t, "v1")
+	})
+
+	t.Run("v2", func(t *testing.T) {
+		testInput(t, "v2")
+	})
+}
+
+func testInput(t *testing.T, version string) {
 	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
+	config.SetString("version", -1, version)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	apiAddress, err := config.String("api_address", -1)
+	require.NoError(t, err)
+
+	// Ensure that there is something happening in the firehose
+	go makeApiRequests(t, ctx, apiAddress)
 
 	events := make(chan beat.Event)
 	connector := channel.ConnectorFunc(func(*common.Config, beat.ClientConfig) (channel.Outleter, error) {
@@ -71,5 +97,29 @@ func (o *outleter) OnEvent(e beat.Event) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func makeApiRequests(t *testing.T, ctx context.Context, address string) {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	for {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, address, nil)
+		require.NoError(t, err)
+		resp, err := client.Do(req)
+		require.NoError(t, err)
+		resp.Body.Close()
+
+		select {
+		case <-time.After(1 * time.Second):
+		case <-ctx.Done():
+			return
+		}
 	}
 }
