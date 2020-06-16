@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/7z-fallback') _
 
 import groovy.transform.Field
 
