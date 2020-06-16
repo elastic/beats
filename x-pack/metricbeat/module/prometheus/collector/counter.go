@@ -45,7 +45,6 @@ func NewCounterCache(timeout time.Duration) CounterCache {
 		ints:    common.NewCache(timeout, 0),
 		floats:  common.NewCache(timeout, 0),
 		timeout: timeout,
-		started: false,
 	}
 }
 
