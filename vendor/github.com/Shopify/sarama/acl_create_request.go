@@ -47,10 +47,6 @@ func (c *CreateAclsRequest) version() int16 {
 	return c.Version
 }
 
-func (c *CreateAclsRequest) headerVersion() int16 {
-	return 1
-}
-
 func (c *CreateAclsRequest) requiredVersion() KafkaVersion {
 	switch c.Version {
 	case 1:

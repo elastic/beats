@@ -170,10 +170,6 @@ func (r *OffsetCommitRequest) version() int16 {
 	return r.Version
 }
 
-func (r *OffsetCommitRequest) headerVersion() int16 {
-	return 1
-}
-
 func (r *OffsetCommitRequest) requiredVersion() KafkaVersion {
 	switch r.Version {
 	case 1:

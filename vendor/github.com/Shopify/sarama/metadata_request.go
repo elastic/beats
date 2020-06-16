@@ -65,10 +65,6 @@ func (r *MetadataRequest) version() int16 {
 	return r.Version
 }
 
-func (r *MetadataRequest) headerVersion() int16 {
-	return 1
-}
-
 func (r *MetadataRequest) requiredVersion() KafkaVersion {
 	switch r.Version {
 	case 1:

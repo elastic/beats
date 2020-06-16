@@ -58,7 +58,7 @@ func newOffsetManagerFromClient(group, memberID string, generation int32, client
 		client: client,
 		conf:   conf,
 		group:  group,
-		ticker: time.NewTicker(conf.Consumer.Offsets.AutoCommit.Interval),
+		ticker: time.NewTicker(conf.Consumer.Offsets.CommitInterval),
 		poms:   make(map[string]map[int32]*partitionOffsetManager),
 
 		memberID:   memberID,
@@ -233,12 +233,7 @@ func (om *offsetManager) mainLoop() {
 	}
 }
 
-// flushToBroker is ignored if auto-commit offsets is disabled
 func (om *offsetManager) flushToBroker() {
-	if !om.conf.Consumer.Offsets.AutoCommit.Enable {
-		return
-	}
-
 	req := om.constructRequest()
 	if req == nil {
 		return
@@ -280,6 +275,7 @@ func (om *offsetManager) constructRequest() *OffsetCommitRequest {
 			ConsumerID:              om.memberID,
 			ConsumerGroupGeneration: om.generation,
 		}
+
 	}
 
 	om.pomsLock.RLock()

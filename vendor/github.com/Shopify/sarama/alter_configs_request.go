@@ -117,10 +117,6 @@ func (a *AlterConfigsRequest) version() int16 {
 	return 0
 }
 
-func (a *AlterConfigsRequest) headerVersion() int16 {
-	return 1
-}
-
 func (a *AlterConfigsRequest) requiredVersion() KafkaVersion {
 	return V0_11_0_0
 }

@@ -11,7 +11,6 @@ type protocolBody interface {
 	versionedDecoder
 	key() int16
 	version() int16
-	headerVersion() int16
 	requiredVersion() KafkaVersion
 }
 
@@ -27,19 +26,12 @@ func (r *request) encode(pe packetEncoder) error {
 	pe.putInt16(r.body.version())
 	pe.putInt32(r.correlationID)
 
-	if r.body.headerVersion() >= 1 {
-		err := pe.putString(r.clientID)
-		if err != nil {
-			return err
-		}
+	err := pe.putString(r.clientID)
+	if err != nil {
+		return err
 	}
 
-	if r.body.headerVersion() >= 2 {
-		// we don't use tag headers at the moment so we just put an array length of 0
-		pe.putUVarint(0)
-	}
-
-	err := r.body.encode(pe)
+	err = r.body.encode(pe)
 	if err != nil {
 		return err
 	}
@@ -71,14 +63,6 @@ func (r *request) decode(pd packetDecoder) (err error) {
 	r.body = allocateBody(key, version)
 	if r.body == nil {
 		return PacketDecodingError{fmt.Sprintf("unknown request key (%d)", key)}
-	}
-
-	if r.body.headerVersion() >= 2 {
-		// tagged field
-		_, err = pd.getUVarint()
-		if err != nil {
-			return err
-		}
 	}
 
 	return r.body.decode(pd, version)
@@ -121,7 +105,7 @@ func allocateBody(key, version int16) protocolBody {
 	case 0:
 		return &ProduceRequest{}
 	case 1:
-		return &FetchRequest{Version: version}
+		return &FetchRequest{}
 	case 2:
 		return &OffsetRequest{Version: version}
 	case 3:
@@ -182,10 +166,6 @@ func allocateBody(key, version int16) protocolBody {
 		return &CreatePartitionsRequest{}
 	case 42:
 		return &DeleteGroupsRequest{}
-	case 45:
-		return &AlterPartitionReassignmentsRequest{}
-	case 46:
-		return &ListPartitionReassignmentsRequest{}
 	}
 	return nil
 }

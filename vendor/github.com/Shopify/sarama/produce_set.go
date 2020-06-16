@@ -13,22 +13,17 @@ type partitionSet struct {
 }
 
 type produceSet struct {
-	parent        *asyncProducer
-	msgs          map[string]map[int32]*partitionSet
-	producerID    int64
-	producerEpoch int16
+	parent *asyncProducer
+	msgs   map[string]map[int32]*partitionSet
 
 	bufferBytes int
 	bufferCount int
 }
 
 func newProduceSet(parent *asyncProducer) *produceSet {
-	pid, epoch := parent.txnmgr.getProducerID()
 	return &produceSet{
-		msgs:          make(map[string]map[int32]*partitionSet),
-		parent:        parent,
-		producerID:    pid,
-		producerEpoch: epoch,
+		msgs:   make(map[string]map[int32]*partitionSet),
+		parent: parent,
 	}
 }
 
@@ -49,10 +44,9 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 	}
 
 	timestamp := msg.Timestamp
-	if timestamp.IsZero() {
+	if msg.Timestamp.IsZero() {
 		timestamp = time.Now()
 	}
-	timestamp = timestamp.Truncate(time.Millisecond)
 
 	partitions := ps.msgs[msg.Topic]
 	if partitions == nil {
@@ -70,8 +64,8 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 				Version:          2,
 				Codec:            ps.parent.conf.Producer.Compression,
 				CompressionLevel: ps.parent.conf.Producer.CompressionLevel,
-				ProducerID:       ps.producerID,
-				ProducerEpoch:    ps.producerEpoch,
+				ProducerID:       ps.parent.txnmgr.producerID,
+				ProducerEpoch:    ps.parent.txnmgr.producerEpoch,
 			}
 			if ps.parent.conf.Producer.Idempotent {
 				batch.FirstSequence = msg.sequenceNumber
@@ -83,17 +77,12 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 		}
 		partitions[msg.Partition] = set
 	}
+	set.msgs = append(set.msgs, msg)
 
 	if ps.parent.conf.Version.IsAtLeast(V0_11_0_0) {
 		if ps.parent.conf.Producer.Idempotent && msg.sequenceNumber < set.recordsToSend.RecordBatch.FirstSequence {
 			return errors.New("assertion failed: message out of sequence added to a batch")
 		}
-	}
-
-	// Past this point we can't return an error, because we've already added the message to the set.
-	set.msgs = append(set.msgs, msg)
-
-	if ps.parent.conf.Version.IsAtLeast(V0_11_0_0) {
 		// We are being conservative here to avoid having to prep encode the record
 		size += maximumRecordOverhead
 		rec := &Record{
@@ -137,10 +126,6 @@ func (ps *produceSet) buildRequest() *ProduceRequest {
 	}
 	if ps.parent.conf.Version.IsAtLeast(V0_11_0_0) {
 		req.Version = 3
-	}
-
-	if ps.parent.conf.Producer.Compression == CompressionZSTD && ps.parent.conf.Version.IsAtLeast(V2_1_0_0) {
-		req.Version = 7
 	}
 
 	for topic, partitionSets := range ps.msgs {

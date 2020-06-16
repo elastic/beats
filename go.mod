@@ -106,6 +106,7 @@ require (
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1
+	github.com/klauspost/cpuid v1.3.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
 	github.com/magefile/mage v1.9.0
@@ -177,7 +178,7 @@ require (
 
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic.0.20200519143807-cbc80333a91e
+	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20

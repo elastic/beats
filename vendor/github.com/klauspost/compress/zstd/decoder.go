@@ -124,9 +124,7 @@ func (d *Decoder) Read(p []byte) (int, error) {
 			if d.current.err != nil {
 				break
 			}
-			if !d.nextBlock(n == 0) {
-				return n, nil
-			}
+			d.nextBlock()
 		}
 	}
 	if len(d.current.b) > 0 {
@@ -254,7 +252,7 @@ func (d *Decoder) WriteTo(w io.Writer) (int64, error) {
 		if d.current.err != nil {
 			break
 		}
-		d.nextBlock(true)
+		d.nextBlock()
 	}
 	err := d.current.err
 	if err != nil {
@@ -331,10 +329,7 @@ func (d *Decoder) DecodeAll(input, dst []byte) ([]byte, error) {
 
 // nextBlock returns the next block.
 // If an error occurs d.err will be set.
-// Optionally the function can block for new output.
-// If non-blocking mode is used the returned boolean will be false
-// if no data was available without blocking.
-func (d *Decoder) nextBlock(blocking bool) (ok bool) {
+func (d *Decoder) nextBlock() {
 	if d.current.d != nil {
 		if debug {
 			printf("re-adding current decoder %p", d.current.d)
@@ -344,22 +339,12 @@ func (d *Decoder) nextBlock(blocking bool) (ok bool) {
 	}
 	if d.current.err != nil {
 		// Keep error state.
-		return blocking
+		return
 	}
-
-	if blocking {
-		d.current.decodeOutput = <-d.current.output
-	} else {
-		select {
-		case d.current.decodeOutput = <-d.current.output:
-		default:
-			return false
-		}
-	}
+	d.current.decodeOutput = <-d.current.output
 	if debug {
 		println("got", len(d.current.b), "bytes, error:", d.current.err)
 	}
-	return true
 }
 
 // Close will release all resources.
@@ -386,35 +371,6 @@ func (d *Decoder) Close() {
 		d.current.d = nil
 	}
 	d.current.err = ErrDecoderClosed
-}
-
-// IOReadCloser returns the decoder as an io.ReadCloser for convenience.
-// Any changes to the decoder will be reflected, so the returned ReadCloser
-// can be reused along with the decoder.
-// io.WriterTo is also supported by the returned ReadCloser.
-func (d *Decoder) IOReadCloser() io.ReadCloser {
-	return closeWrapper{d: d}
-}
-
-// closeWrapper wraps a function call as a closer.
-type closeWrapper struct {
-	d *Decoder
-}
-
-// WriteTo forwards WriteTo calls to the decoder.
-func (c closeWrapper) WriteTo(w io.Writer) (n int64, err error) {
-	return c.d.WriteTo(w)
-}
-
-// Read forwards read calls to the decoder.
-func (c closeWrapper) Read(p []byte) (n int, err error) {
-	return c.d.Read(p)
-}
-
-// Close closes the decoder.
-func (c closeWrapper) Close() error {
-	c.d.Close()
-	return nil
 }
 
 type decodeOutput struct {

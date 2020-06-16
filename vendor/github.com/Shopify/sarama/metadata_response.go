@@ -255,10 +255,6 @@ func (r *MetadataResponse) version() int16 {
 	return r.Version
 }
 
-func (r *MetadataResponse) headerVersion() int16 {
-	return 0
-}
-
 func (r *MetadataResponse) requiredVersion() KafkaVersion {
 	switch r.Version {
 	case 1:
@@ -322,4 +318,5 @@ foundPartition:
 	pmatch.Isr = isr
 	pmatch.OfflineReplicas = offline
 	pmatch.Err = err
+
 }

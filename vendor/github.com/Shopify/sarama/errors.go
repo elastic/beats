@@ -94,14 +94,6 @@ func (mErr MultiError) Error() string {
 	return errString
 }
 
-func (mErr MultiError) PrettyError() string {
-	var errString = ""
-	for _, err := range *mErr.Errors {
-		errString += err.Error() + "\n"
-	}
-	return errString
-}
-
 // ErrDeleteRecords is the type of error returned when fail to delete the required records
 type ErrDeleteRecords struct {
 	MultiError
@@ -109,14 +101,6 @@ type ErrDeleteRecords struct {
 
 func (err ErrDeleteRecords) Error() string {
 	return "kafka server: failed to delete records " + err.MultiError.Error()
-}
-
-type ErrReassignPartitions struct {
-	MultiError
-}
-
-func (err ErrReassignPartitions) Error() string {
-	return fmt.Sprintf("failed to reassign partitions for topic: \n%s", err.MultiError.PrettyError())
 }
 
 // Numeric error codes returned by the Kafka server.

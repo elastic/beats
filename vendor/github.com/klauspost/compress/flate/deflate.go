@@ -50,6 +50,8 @@ const (
 	skipNever = math.MaxInt32
 )
 
+var useSSE42 bool
+
 type compressionLevel struct {
 	good, lazy, nice, chain, fastSkipHashing, level int
 }
@@ -95,8 +97,9 @@ type advancedState struct {
 	hashOffset int
 
 	// input window: unprocessed data is window[index:windowEnd]
-	index     int
-	hashMatch [maxMatchLength + minMatchLength]uint32
+	index      int
+	bulkHasher func([]byte, []uint32)
+	hashMatch  [maxMatchLength + minMatchLength]uint32
 }
 
 type compressor struct {
@@ -117,7 +120,7 @@ type compressor struct {
 
 	// queued output tokens
 	tokens tokens
-	fast   fastEnc
+	snap   fastEnc
 	state  *advancedState
 }
 
@@ -161,14 +164,14 @@ func (d *compressor) fillDeflate(b []byte) int {
 	return n
 }
 
-func (d *compressor) writeBlock(tok *tokens, index int, eof bool) error {
+func (d *compressor) writeBlock(tok tokens, index int, eof bool) error {
 	if index > 0 || eof {
 		var window []byte
 		if d.blockStart <= index {
 			window = d.window[d.blockStart:index]
 		}
 		d.blockStart = index
-		d.w.writeBlock(tok, eof, window)
+		d.w.writeBlock(tok.tokens[:tok.n], eof, window)
 		return d.w.err
 	}
 	return nil
@@ -177,20 +180,20 @@ func (d *compressor) writeBlock(tok *tokens, index int, eof bool) error {
 // writeBlockSkip writes the current block and uses the number of tokens
 // to determine if the block should be stored on no matches, or
 // only huffman encoded.
-func (d *compressor) writeBlockSkip(tok *tokens, index int, eof bool) error {
+func (d *compressor) writeBlockSkip(tok tokens, index int, eof bool) error {
 	if index > 0 || eof {
 		if d.blockStart <= index {
 			window := d.window[d.blockStart:index]
 			// If we removed less than a 64th of all literals
 			// we huffman compress the block.
 			if int(tok.n) > len(window)-int(tok.n>>6) {
-				d.w.writeBlockHuff(eof, window, d.sync)
+				d.w.writeBlockHuff(eof, window)
 			} else {
 				// Write a dynamic huffman block.
-				d.w.writeBlockDynamic(tok, eof, window, d.sync)
+				d.w.writeBlockDynamic(tok.tokens[:tok.n], eof, window)
 			}
 		} else {
-			d.w.writeBlock(tok, eof, nil)
+			d.w.writeBlock(tok.tokens[:tok.n], eof, nil)
 		}
 		d.blockStart = index
 		return d.w.err
@@ -205,16 +208,8 @@ func (d *compressor) writeBlockSkip(tok *tokens, index int, eof bool) error {
 func (d *compressor) fillWindow(b []byte) {
 	// Do not fill window if we are in store-only mode,
 	// use constant or Snappy compression.
-	if d.level == 0 {
-		return
-	}
-	if d.fast != nil {
-		// encode the last data, but discard the result
-		if len(b) > maxMatchOffset {
-			b = b[len(b)-maxMatchOffset:]
-		}
-		d.fast.Encode(&d.tokens, b)
-		d.tokens.Reset()
+	switch d.compressionLevel.level {
+	case 0, 1, 2:
 		return
 	}
 	s := d.state
@@ -241,7 +236,7 @@ func (d *compressor) fillWindow(b []byte) {
 		}
 
 		dst := s.hashMatch[:dstSize]
-		bulkHash4(tocheck, dst)
+		s.bulkHasher(tocheck, dst)
 		var newH uint32
 		for i, val := range dst {
 			di := i + startindex
@@ -289,7 +284,62 @@ func (d *compressor) findMatch(pos int, prevHead int, prevLength int, lookahead 
 
 	for i := prevHead; tries > 0; tries-- {
 		if wEnd == win[i+length] {
-			n := matchLen(win[i:i+minMatchLook], wPos)
+			n := matchLen(win[i:], wPos, minMatchLook)
+
+			if n > length && (n > minMatchLength || pos-i <= 4096) {
+				length = n
+				offset = pos - i
+				ok = true
+				if n >= nice {
+					// The match is good enough that we don't try to find a better one.
+					break
+				}
+				wEnd = win[pos+n]
+			}
+		}
+		if i == minIndex {
+			// hashPrev[i & windowMask] has already been overwritten, so stop now.
+			break
+		}
+		i = int(d.state.hashPrev[i&windowMask]) - d.state.hashOffset
+		if i < minIndex || i < 0 {
+			break
+		}
+	}
+	return
+}
+
+// Try to find a match starting at index whose length is greater than prevSize.
+// We only look at chainCount possibilities before giving up.
+// pos = s.index, prevHead = s.chainHead-s.hashOffset, prevLength=minMatchLength-1, lookahead
+func (d *compressor) findMatchSSE(pos int, prevHead int, prevLength int, lookahead int) (length, offset int, ok bool) {
+	minMatchLook := maxMatchLength
+	if lookahead < minMatchLook {
+		minMatchLook = lookahead
+	}
+
+	win := d.window[0 : pos+minMatchLook]
+
+	// We quit when we get a match that's at least nice long
+	nice := len(win) - pos
+	if d.nice < nice {
+		nice = d.nice
+	}
+
+	// If we've got a match that's good enough, only look in 1/4 the chain.
+	tries := d.chain
+	length = prevLength
+	if length >= d.good {
+		tries >>= 2
+	}
+
+	wEnd := win[pos+length]
+	wPos := win[pos:]
+	minIndex := pos - windowSize
+
+	for i := prevHead; tries > 0; tries-- {
+		if wEnd == win[i+length] {
+			n := matchLenSSE4(win[i:], wPos, minMatchLook)
 
 			if n > length && (n > minMatchLength || pos-i <= 4096) {
 				length = n
@@ -322,27 +372,42 @@ func (d *compressor) writeStoredBlock(buf []byte) error {
 	return d.w.err
 }
 
+const hashmul = 0x1e35a7bd
+
 // hash4 returns a hash representation of the first 4 bytes
 // of the supplied slice.
 // The caller must ensure that len(b) >= 4.
 func hash4(b []byte) uint32 {
-	b = b[:4]
-	return hash4u(uint32(b[3])|uint32(b[2])<<8|uint32(b[1])<<16|uint32(b[0])<<24, hashBits)
+	return ((uint32(b[3]) | uint32(b[2])<<8 | uint32(b[1])<<16 | uint32(b[0])<<24) * hashmul) >> (32 - hashBits)
 }
 
 // bulkHash4 will compute hashes using the same
 // algorithm as hash4
 func bulkHash4(b []byte, dst []uint32) {
-	if len(b) < 4 {
+	if len(b) < minMatchLength {
 		return
 	}
 	hb := uint32(b[3]) | uint32(b[2])<<8 | uint32(b[1])<<16 | uint32(b[0])<<24
-	dst[0] = hash4u(hb, hashBits)
-	end := len(b) - 4 + 1
+	dst[0] = (hb * hashmul) >> (32 - hashBits)
+	end := len(b) - minMatchLength + 1
 	for i := 1; i < end; i++ {
 		hb = (hb << 8) | uint32(b[i+3])
-		dst[i] = hash4u(hb, hashBits)
+		dst[i] = (hb * hashmul) >> (32 - hashBits)
 	}
+}
+
+// matchLen returns the number of matching bytes in a and b
+// up to length 'max'. Both slices must be at least 'max'
+// bytes in size.
+func matchLen(a, b []byte, max int) int {
+	a = a[:max]
+	b = b[:len(a)]
+	for i, av := range a {
+		if b[i] != av {
+			return i
+		}
+	}
+	return max
 }
 
 func (d *compressor) initDeflate() {
@@ -359,6 +424,149 @@ func (d *compressor) initDeflate() {
 	s.offset = 0
 	s.hash = 0
 	s.chainHead = -1
+	s.bulkHasher = bulkHash4
+	if useSSE42 {
+		s.bulkHasher = crc32sseAll
+	}
+}
+
+// Assumes that d.fastSkipHashing != skipNever,
+// otherwise use deflateLazy
+func (d *compressor) deflate() {
+	s := d.state
+	// Sanity enables additional runtime tests.
+	// It's intended to be used during development
+	// to supplement the currently ad-hoc unit tests.
+	const sanity = false
+
+	if d.windowEnd-s.index < minMatchLength+maxMatchLength && !d.sync {
+		return
+	}
+
+	s.maxInsertIndex = d.windowEnd - (minMatchLength - 1)
+	if s.index < s.maxInsertIndex {
+		s.hash = hash4(d.window[s.index : s.index+minMatchLength])
+	}
+
+	for {
+		if sanity && s.index > d.windowEnd {
+			panic("index > windowEnd")
+		}
+		lookahead := d.windowEnd - s.index
+		if lookahead < minMatchLength+maxMatchLength {
+			if !d.sync {
+				return
+			}
+			if sanity && s.index > d.windowEnd {
+				panic("index > windowEnd")
+			}
+			if lookahead == 0 {
+				if d.tokens.n > 0 {
+					if d.err = d.writeBlockSkip(d.tokens, s.index, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+				return
+			}
+		}
+		if s.index < s.maxInsertIndex {
+			// Update the hash
+			s.hash = hash4(d.window[s.index : s.index+minMatchLength])
+			ch := s.hashHead[s.hash&hashMask]
+			s.chainHead = int(ch)
+			s.hashPrev[s.index&windowMask] = ch
+			s.hashHead[s.hash&hashMask] = uint32(s.index + s.hashOffset)
+		}
+		s.length = minMatchLength - 1
+		s.offset = 0
+		minIndex := s.index - windowSize
+		if minIndex < 0 {
+			minIndex = 0
+		}
+
+		if s.chainHead-s.hashOffset >= minIndex && lookahead > minMatchLength-1 {
+			if newLength, newOffset, ok := d.findMatch(s.index, s.chainHead-s.hashOffset, minMatchLength-1, lookahead); ok {
+				s.length = newLength
+				s.offset = newOffset
+			}
+		}
+		if s.length >= minMatchLength {
+			s.ii = 0
+			// There was a match at the previous step, and the current match is
+			// not better. Output the previous match.
+			// "s.length-3" should NOT be "s.length-minMatchLength", since the format always assume 3
+			d.tokens.tokens[d.tokens.n] = matchToken(uint32(s.length-3), uint32(s.offset-minOffsetSize))
+			d.tokens.n++
+			// Insert in the hash table all strings up to the end of the match.
+			// index and index-1 are already inserted. If there is not enough
+			// lookahead, the last two strings are not inserted into the hash
+			// table.
+			if s.length <= d.fastSkipHashing {
+				var newIndex int
+				newIndex = s.index + s.length
+				// Calculate missing hashes
+				end := newIndex
+				if end > s.maxInsertIndex {
+					end = s.maxInsertIndex
+				}
+				end += minMatchLength - 1
+				startindex := s.index + 1
+				if startindex > s.maxInsertIndex {
+					startindex = s.maxInsertIndex
+				}
+				tocheck := d.window[startindex:end]
+				dstSize := len(tocheck) - minMatchLength + 1
+				if dstSize > 0 {
+					dst := s.hashMatch[:dstSize]
+					bulkHash4(tocheck, dst)
+					var newH uint32
+					for i, val := range dst {
+						di := i + startindex
+						newH = val & hashMask
+						// Get previous value with the same hash.
+						// Our chain should point to the previous value.
+						s.hashPrev[di&windowMask] = s.hashHead[newH]
+						// Set the head of the hash chain to us.
+						s.hashHead[newH] = uint32(di + s.hashOffset)
+					}
+					s.hash = newH
+				}
+				s.index = newIndex
+			} else {
+				// For matches this long, we don't bother inserting each individual
+				// item into the table.
+				s.index += s.length
+				if s.index < s.maxInsertIndex {
+					s.hash = hash4(d.window[s.index : s.index+minMatchLength])
+				}
+			}
+			if d.tokens.n == maxFlateBlockTokens {
+				// The block includes the current character
+				if d.err = d.writeBlockSkip(d.tokens, s.index, false); d.err != nil {
+					return
+				}
+				d.tokens.n = 0
+			}
+		} else {
+			s.ii++
+			end := s.index + int(s.ii>>uint(d.fastSkipHashing)) + 1
+			if end > d.windowEnd {
+				end = d.windowEnd
+			}
+			for i := s.index; i < end; i++ {
+				d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[i]))
+				d.tokens.n++
+				if d.tokens.n == maxFlateBlockTokens {
+					if d.err = d.writeBlockSkip(d.tokens, i+1, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+			}
+			s.index = end
+		}
+	}
 }
 
 // deflateLazy is the same as deflate, but with d.fastSkipHashing == skipNever,
@@ -395,14 +603,15 @@ func (d *compressor) deflateLazy() {
 				// Flush current output block if any.
 				if d.byteAvailable {
 					// There is still one pending token that needs to be flushed
-					d.tokens.AddLiteral(d.window[s.index-1])
+					d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+					d.tokens.n++
 					d.byteAvailable = false
 				}
 				if d.tokens.n > 0 {
-					if d.err = d.writeBlock(&d.tokens, s.index, false); d.err != nil {
+					if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
 						return
 					}
-					d.tokens.Reset()
+					d.tokens.n = 0
 				}
 				return
 			}
@@ -433,7 +642,8 @@ func (d *compressor) deflateLazy() {
 		if prevLength >= minMatchLength && s.length <= prevLength {
 			// There was a match at the previous step, and the current match is
 			// not better. Output the previous match.
-			d.tokens.AddMatch(uint32(prevLength-3), uint32(prevOffset-minOffsetSize))
+			d.tokens.tokens[d.tokens.n] = matchToken(uint32(prevLength-3), uint32(prevOffset-minOffsetSize))
+			d.tokens.n++
 
 			// Insert in the hash table all strings up to the end of the match.
 			// index and index-1 are already inserted. If there is not enough
@@ -474,10 +684,10 @@ func (d *compressor) deflateLazy() {
 			s.length = minMatchLength - 1
 			if d.tokens.n == maxFlateBlockTokens {
 				// The block includes the current character
-				if d.err = d.writeBlock(&d.tokens, s.index, false); d.err != nil {
+				if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
 					return
 				}
-				d.tokens.Reset()
+				d.tokens.n = 0
 			}
 		} else {
 			// Reset, if we got a match this run.
@@ -487,12 +697,13 @@ func (d *compressor) deflateLazy() {
 			// We have a byte waiting. Emit it.
 			if d.byteAvailable {
 				s.ii++
-				d.tokens.AddLiteral(d.window[s.index-1])
+				d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+				d.tokens.n++
 				if d.tokens.n == maxFlateBlockTokens {
-					if d.err = d.writeBlock(&d.tokens, s.index, false); d.err != nil {
+					if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
 						return
 					}
-					d.tokens.Reset()
+					d.tokens.n = 0
 				}
 				s.index++
 
@@ -505,24 +716,343 @@ func (d *compressor) deflateLazy() {
 							break
 						}
 
-						d.tokens.AddLiteral(d.window[s.index-1])
+						d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+						d.tokens.n++
 						if d.tokens.n == maxFlateBlockTokens {
-							if d.err = d.writeBlock(&d.tokens, s.index, false); d.err != nil {
+							if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
 								return
 							}
-							d.tokens.Reset()
+							d.tokens.n = 0
 						}
 						s.index++
 					}
 					// Flush last byte
-					d.tokens.AddLiteral(d.window[s.index-1])
+					d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+					d.tokens.n++
 					d.byteAvailable = false
 					// s.length = minMatchLength - 1 // not needed, since s.ii is reset above, so it should never be > minMatchLength
 					if d.tokens.n == maxFlateBlockTokens {
-						if d.err = d.writeBlock(&d.tokens, s.index, false); d.err != nil {
+						if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
 							return
 						}
-						d.tokens.Reset()
+						d.tokens.n = 0
+					}
+				}
+			} else {
+				s.index++
+				d.byteAvailable = true
+			}
+		}
+	}
+}
+
+// Assumes that d.fastSkipHashing != skipNever,
+// otherwise use deflateLazySSE
+func (d *compressor) deflateSSE() {
+	s := d.state
+	// Sanity enables additional runtime tests.
+	// It's intended to be used during development
+	// to supplement the currently ad-hoc unit tests.
+	const sanity = false
+
+	if d.windowEnd-s.index < minMatchLength+maxMatchLength && !d.sync {
+		return
+	}
+
+	s.maxInsertIndex = d.windowEnd - (minMatchLength - 1)
+	if s.index < s.maxInsertIndex {
+		s.hash = crc32sse(d.window[s.index:s.index+minMatchLength]) & hashMask
+	}
+
+	for {
+		if sanity && s.index > d.windowEnd {
+			panic("index > windowEnd")
+		}
+		lookahead := d.windowEnd - s.index
+		if lookahead < minMatchLength+maxMatchLength {
+			if !d.sync {
+				return
+			}
+			if sanity && s.index > d.windowEnd {
+				panic("index > windowEnd")
+			}
+			if lookahead == 0 {
+				if d.tokens.n > 0 {
+					if d.err = d.writeBlockSkip(d.tokens, s.index, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+				return
+			}
+		}
+		if s.index < s.maxInsertIndex {
+			// Update the hash
+			s.hash = crc32sse(d.window[s.index:s.index+minMatchLength]) & hashMask
+			ch := s.hashHead[s.hash]
+			s.chainHead = int(ch)
+			s.hashPrev[s.index&windowMask] = ch
+			s.hashHead[s.hash] = uint32(s.index + s.hashOffset)
+		}
+		s.length = minMatchLength - 1
+		s.offset = 0
+		minIndex := s.index - windowSize
+		if minIndex < 0 {
+			minIndex = 0
+		}
+
+		if s.chainHead-s.hashOffset >= minIndex && lookahead > minMatchLength-1 {
+			if newLength, newOffset, ok := d.findMatchSSE(s.index, s.chainHead-s.hashOffset, minMatchLength-1, lookahead); ok {
+				s.length = newLength
+				s.offset = newOffset
+			}
+		}
+		if s.length >= minMatchLength {
+			s.ii = 0
+			// There was a match at the previous step, and the current match is
+			// not better. Output the previous match.
+			// "s.length-3" should NOT be "s.length-minMatchLength", since the format always assume 3
+			d.tokens.tokens[d.tokens.n] = matchToken(uint32(s.length-3), uint32(s.offset-minOffsetSize))
+			d.tokens.n++
+			// Insert in the hash table all strings up to the end of the match.
+			// index and index-1 are already inserted. If there is not enough
+			// lookahead, the last two strings are not inserted into the hash
+			// table.
+			if s.length <= d.fastSkipHashing {
+				var newIndex int
+				newIndex = s.index + s.length
+				// Calculate missing hashes
+				end := newIndex
+				if end > s.maxInsertIndex {
+					end = s.maxInsertIndex
+				}
+				end += minMatchLength - 1
+				startindex := s.index + 1
+				if startindex > s.maxInsertIndex {
+					startindex = s.maxInsertIndex
+				}
+				tocheck := d.window[startindex:end]
+				dstSize := len(tocheck) - minMatchLength + 1
+				if dstSize > 0 {
+					dst := s.hashMatch[:dstSize]
+
+					crc32sseAll(tocheck, dst)
+					var newH uint32
+					for i, val := range dst {
+						di := i + startindex
+						newH = val & hashMask
+						// Get previous value with the same hash.
+						// Our chain should point to the previous value.
+						s.hashPrev[di&windowMask] = s.hashHead[newH]
+						// Set the head of the hash chain to us.
+						s.hashHead[newH] = uint32(di + s.hashOffset)
+					}
+					s.hash = newH
+				}
+				s.index = newIndex
+			} else {
+				// For matches this long, we don't bother inserting each individual
+				// item into the table.
+				s.index += s.length
+				if s.index < s.maxInsertIndex {
+					s.hash = crc32sse(d.window[s.index:s.index+minMatchLength]) & hashMask
+				}
+			}
+			if d.tokens.n == maxFlateBlockTokens {
+				// The block includes the current character
+				if d.err = d.writeBlockSkip(d.tokens, s.index, false); d.err != nil {
+					return
+				}
+				d.tokens.n = 0
+			}
+		} else {
+			s.ii++
+			end := s.index + int(s.ii>>5) + 1
+			if end > d.windowEnd {
+				end = d.windowEnd
+			}
+			for i := s.index; i < end; i++ {
+				d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[i]))
+				d.tokens.n++
+				if d.tokens.n == maxFlateBlockTokens {
+					if d.err = d.writeBlockSkip(d.tokens, i+1, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+			}
+			s.index = end
+		}
+	}
+}
+
+// deflateLazy is the same as deflate, but with d.fastSkipHashing == skipNever,
+// meaning it always has lazy matching on.
+func (d *compressor) deflateLazySSE() {
+	s := d.state
+	// Sanity enables additional runtime tests.
+	// It's intended to be used during development
+	// to supplement the currently ad-hoc unit tests.
+	const sanity = false
+
+	if d.windowEnd-s.index < minMatchLength+maxMatchLength && !d.sync {
+		return
+	}
+
+	s.maxInsertIndex = d.windowEnd - (minMatchLength - 1)
+	if s.index < s.maxInsertIndex {
+		s.hash = crc32sse(d.window[s.index:s.index+minMatchLength]) & hashMask
+	}
+
+	for {
+		if sanity && s.index > d.windowEnd {
+			panic("index > windowEnd")
+		}
+		lookahead := d.windowEnd - s.index
+		if lookahead < minMatchLength+maxMatchLength {
+			if !d.sync {
+				return
+			}
+			if sanity && s.index > d.windowEnd {
+				panic("index > windowEnd")
+			}
+			if lookahead == 0 {
+				// Flush current output block if any.
+				if d.byteAvailable {
+					// There is still one pending token that needs to be flushed
+					d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+					d.tokens.n++
+					d.byteAvailable = false
+				}
+				if d.tokens.n > 0 {
+					if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+				return
+			}
+		}
+		if s.index < s.maxInsertIndex {
+			// Update the hash
+			s.hash = crc32sse(d.window[s.index:s.index+minMatchLength]) & hashMask
+			ch := s.hashHead[s.hash]
+			s.chainHead = int(ch)
+			s.hashPrev[s.index&windowMask] = ch
+			s.hashHead[s.hash] = uint32(s.index + s.hashOffset)
+		}
+		prevLength := s.length
+		prevOffset := s.offset
+		s.length = minMatchLength - 1
+		s.offset = 0
+		minIndex := s.index - windowSize
+		if minIndex < 0 {
+			minIndex = 0
+		}
+
+		if s.chainHead-s.hashOffset >= minIndex && lookahead > prevLength && prevLength < d.lazy {
+			if newLength, newOffset, ok := d.findMatchSSE(s.index, s.chainHead-s.hashOffset, minMatchLength-1, lookahead); ok {
+				s.length = newLength
+				s.offset = newOffset
+			}
+		}
+		if prevLength >= minMatchLength && s.length <= prevLength {
+			// There was a match at the previous step, and the current match is
+			// not better. Output the previous match.
+			d.tokens.tokens[d.tokens.n] = matchToken(uint32(prevLength-3), uint32(prevOffset-minOffsetSize))
+			d.tokens.n++
+
+			// Insert in the hash table all strings up to the end of the match.
+			// index and index-1 are already inserted. If there is not enough
+			// lookahead, the last two strings are not inserted into the hash
+			// table.
+			var newIndex int
+			newIndex = s.index + prevLength - 1
+			// Calculate missing hashes
+			end := newIndex
+			if end > s.maxInsertIndex {
+				end = s.maxInsertIndex
+			}
+			end += minMatchLength - 1
+			startindex := s.index + 1
+			if startindex > s.maxInsertIndex {
+				startindex = s.maxInsertIndex
+			}
+			tocheck := d.window[startindex:end]
+			dstSize := len(tocheck) - minMatchLength + 1
+			if dstSize > 0 {
+				dst := s.hashMatch[:dstSize]
+				crc32sseAll(tocheck, dst)
+				var newH uint32
+				for i, val := range dst {
+					di := i + startindex
+					newH = val & hashMask
+					// Get previous value with the same hash.
+					// Our chain should point to the previous value.
+					s.hashPrev[di&windowMask] = s.hashHead[newH]
+					// Set the head of the hash chain to us.
+					s.hashHead[newH] = uint32(di + s.hashOffset)
+				}
+				s.hash = newH
+			}
+
+			s.index = newIndex
+			d.byteAvailable = false
+			s.length = minMatchLength - 1
+			if d.tokens.n == maxFlateBlockTokens {
+				// The block includes the current character
+				if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
+					return
+				}
+				d.tokens.n = 0
+			}
+		} else {
+			// Reset, if we got a match this run.
+			if s.length >= minMatchLength {
+				s.ii = 0
+			}
+			// We have a byte waiting. Emit it.
+			if d.byteAvailable {
+				s.ii++
+				d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+				d.tokens.n++
+				if d.tokens.n == maxFlateBlockTokens {
+					if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
+						return
+					}
+					d.tokens.n = 0
+				}
+				s.index++
+
+				// If we have a long run of no matches, skip additional bytes
+				// Resets when s.ii overflows after 64KB.
+				if s.ii > 31 {
+					n := int(s.ii >> 6)
+					for j := 0; j < n; j++ {
+						if s.index >= d.windowEnd-1 {
+							break
+						}
+
+						d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+						d.tokens.n++
+						if d.tokens.n == maxFlateBlockTokens {
+							if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
+								return
+							}
+							d.tokens.n = 0
+						}
+						s.index++
+					}
+					// Flush last byte
+					d.tokens.tokens[d.tokens.n] = literalToken(uint32(d.window[s.index-1]))
+					d.tokens.n++
+					d.byteAvailable = false
+					// s.length = minMatchLength - 1 // not needed, since s.ii is reset above, so it should never be > minMatchLength
+					if d.tokens.n == maxFlateBlockTokens {
+						if d.err = d.writeBlock(d.tokens, s.index, false); d.err != nil {
+							return
+						}
+						d.tokens.n = 0
 					}
 				}
 			} else {
@@ -555,17 +1085,17 @@ func (d *compressor) storeHuff() {
 	if d.windowEnd < len(d.window) && !d.sync || d.windowEnd == 0 {
 		return
 	}
-	d.w.writeBlockHuff(false, d.window[:d.windowEnd], d.sync)
+	d.w.writeBlockHuff(false, d.window[:d.windowEnd])
 	d.err = d.w.err
 	d.windowEnd = 0
 }
 
-// storeFast will compress and store the currently added data,
+// storeHuff will compress and store the currently added data,
 // if enough has been accumulated or we at the end of the stream.
 // Any error that occurred will be in d.err
-func (d *compressor) storeFast() {
+func (d *compressor) storeSnappy() {
 	// We only compress if we have maxStoreBlockSize.
-	if d.windowEnd < len(d.window) {
+	if d.windowEnd < maxStoreBlockSize {
 		if !d.sync {
 			return
 		}
@@ -576,30 +1106,32 @@ func (d *compressor) storeFast() {
 			}
 			if d.windowEnd <= 32 {
 				d.err = d.writeStoredBlock(d.window[:d.windowEnd])
+				d.tokens.n = 0
+				d.windowEnd = 0
 			} else {
-				d.w.writeBlockHuff(false, d.window[:d.windowEnd], true)
+				d.w.writeBlockHuff(false, d.window[:d.windowEnd])
 				d.err = d.w.err
 			}
-			d.tokens.Reset()
+			d.tokens.n = 0
 			d.windowEnd = 0
-			d.fast.Reset()
+			d.snap.Reset()
 			return
 		}
 	}
 
-	d.fast.Encode(&d.tokens, d.window[:d.windowEnd])
+	d.snap.Encode(&d.tokens, d.window[:d.windowEnd])
 	// If we made zero matches, store the block as is.
-	if d.tokens.n == 0 {
+	if int(d.tokens.n) == d.windowEnd {
 		d.err = d.writeStoredBlock(d.window[:d.windowEnd])
 		// If we removed less than 1/16th, huffman compress the block.
 	} else if int(d.tokens.n) > d.windowEnd-(d.windowEnd>>4) {
-		d.w.writeBlockHuff(false, d.window[:d.windowEnd], d.sync)
+		d.w.writeBlockHuff(false, d.window[:d.windowEnd])
 		d.err = d.w.err
 	} else {
-		d.w.writeBlockDynamic(&d.tokens, false, d.window[:d.windowEnd], d.sync)
+		d.w.writeBlockDynamic(d.tokens.tokens[:d.tokens.n], false, d.window[:d.windowEnd])
 		d.err = d.w.err
 	}
-	d.tokens.Reset()
+	d.tokens.n = 0
 	d.windowEnd = 0
 }
 
@@ -644,26 +1176,36 @@ func (d *compressor) init(w io.Writer, level int) (err error) {
 		d.fill = (*compressor).fillBlock
 		d.step = (*compressor).store
 	case level == ConstantCompression:
-		d.w.logNewTablePenalty = 4
 		d.window = make([]byte, maxStoreBlockSize)
 		d.fill = (*compressor).fillBlock
 		d.step = (*compressor).storeHuff
+	case level >= 1 && level <= 4:
+		d.snap = newFastEnc(level)
+		d.window = make([]byte, maxStoreBlockSize)
+		d.fill = (*compressor).fillBlock
+		d.step = (*compressor).storeSnappy
 	case level == DefaultCompression:
 		level = 5
 		fallthrough
-	case level >= 1 && level <= 6:
-		d.w.logNewTablePenalty = 6
-		d.fast = newFastEnc(level)
-		d.window = make([]byte, maxStoreBlockSize)
-		d.fill = (*compressor).fillBlock
-		d.step = (*compressor).storeFast
-	case 7 <= level && level <= 9:
-		d.w.logNewTablePenalty = 10
+	case 5 <= level && level <= 9:
 		d.state = &advancedState{}
 		d.compressionLevel = levels[level]
 		d.initDeflate()
 		d.fill = (*compressor).fillDeflate
-		d.step = (*compressor).deflateLazy
+		if d.fastSkipHashing == skipNever {
+			if useSSE42 {
+				d.step = (*compressor).deflateLazySSE
+			} else {
+				d.step = (*compressor).deflateLazy
+			}
+		} else {
+			if useSSE42 {
+				d.step = (*compressor).deflateSSE
+			} else {
+				d.step = (*compressor).deflate
+
+			}
+		}
 	default:
 		return fmt.Errorf("flate: invalid compression level %d: want value in range [-2, 9]", level)
 	}
@@ -676,10 +1218,10 @@ func (d *compressor) reset(w io.Writer) {
 	d.sync = false
 	d.err = nil
 	// We only need to reset a few things for Snappy.
-	if d.fast != nil {
-		d.fast.Reset()
+	if d.snap != nil {
+		d.snap.Reset()
 		d.windowEnd = 0
-		d.tokens.Reset()
+		d.tokens.n = 0
 		return
 	}
 	switch d.compressionLevel.chain {
@@ -698,7 +1240,7 @@ func (d *compressor) reset(w io.Writer) {
 		s.hashOffset = 1
 		s.index, d.windowEnd = 0, 0
 		d.blockStart, d.byteAvailable = 0, false
-		d.tokens.Reset()
+		d.tokens.n = 0
 		s.length = minMatchLength - 1
 		s.offset = 0
 		s.hash = 0

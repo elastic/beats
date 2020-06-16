@@ -26,7 +26,9 @@ func (slice int32Slice) Swap(i, j int) {
 
 func dupInt32Slice(input []int32) []int32 {
 	ret := make([]int32, 0, len(input))
-	ret = append(ret, input...)
+	for _, val := range input {
+		ret = append(ret, val)
+	}
 	return ret
 }
 
@@ -159,8 +161,6 @@ var (
 	V2_1_0_0  = newKafkaVersion(2, 1, 0, 0)
 	V2_2_0_0  = newKafkaVersion(2, 2, 0, 0)
 	V2_3_0_0  = newKafkaVersion(2, 3, 0, 0)
-	V2_4_0_0  = newKafkaVersion(2, 4, 0, 0)
-	V2_5_0_0  = newKafkaVersion(2, 5, 0, 0)
 
 	SupportedVersions = []KafkaVersion{
 		V0_8_2_0,
@@ -185,11 +185,9 @@ var (
 		V2_1_0_0,
 		V2_2_0_0,
 		V2_3_0_0,
-		V2_4_0_0,
-		V2_5_0_0,
 	}
 	MinVersion = V0_8_2_0
-	MaxVersion = V2_5_0_0
+	MaxVersion = V2_3_0_0
 )
 
 //ParseKafkaVersion parses and returns kafka version or error from a string

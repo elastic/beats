@@ -155,10 +155,6 @@ func (r *OffsetFetchResponse) version() int16 {
 	return r.Version
 }
 
-func (r *OffsetFetchResponse) headerVersion() int16 {
-	return 0
-}
-
 func (r *OffsetFetchResponse) requiredVersion() KafkaVersion {
 	switch r.Version {
 	case 1:

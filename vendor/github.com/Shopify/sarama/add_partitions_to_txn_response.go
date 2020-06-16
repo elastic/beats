@@ -79,10 +79,6 @@ func (a *AddPartitionsToTxnResponse) version() int16 {
 	return 0
 }
 
-func (a *AddPartitionsToTxnResponse) headerVersion() int16 {
-	return 0
-}
-
 func (a *AddPartitionsToTxnResponse) requiredVersion() KafkaVersion {
 	return V0_11_0_0
 }
