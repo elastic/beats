@@ -33,7 +33,7 @@ type Registry struct {
 
 // Store helper for writing tests.
 // The store needs a reference to the Registry with the current test context.
-// The Store provides additional helpers for reopning the store, MustX methods
+// The Store provides additional helpers for reopening the store, MustX methods
 // that will fail the test if an error has occured.
 type Store struct {
 	backend.Store
@@ -87,8 +87,8 @@ func (s *Store) Reopen() {
 	s.Store = store
 }
 
-// MustHas fails the test if an error occured in a call to Has.
-func (s *Store) MustHas(key string) bool {
+// MustHave fails the test if an error occured in a call to Has.
+func (s *Store) MustHave(key string) bool {
 	b, err := s.Has(key)
 	must(s.Registry.T, err, "unexpected error on store/has call")
 	return b

@@ -80,7 +80,7 @@ func TestBackendCompliance(t *testing.T, factory BackendFactory) {
 
 func testSetGet(t *testing.T, factory BackendFactory) {
 	t.Run("unknown key", WithStore(factory, func(t *testing.T, store *Store) {
-		has := store.MustHas("key")
+		has := store.MustHave("key")
 		assert.False(t, has)
 	}))
 
@@ -91,7 +91,7 @@ func testSetGet(t *testing.T, factory BackendFactory) {
 
 			store.ReopenIf(reopen)
 
-			has := store.MustHas("key")
+			has := store.MustHave("key")
 			assert.True(t, has)
 		}))
 
@@ -123,7 +123,7 @@ func testRemove(t *testing.T, factory BackendFactory) {
 			store.ReopenIf(reopen)
 			store.MustRemove(key)
 			store.ReopenIf(reopen)
-			has := store.MustHas(key)
+			has := store.MustHave(key)
 			assert.False(t, has)
 		}))
 	})
