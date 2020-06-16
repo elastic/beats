@@ -7,9 +7,19 @@ IF ERRORLEVEL 1 (
  choco install curl -y --no-progress --skipdownloadcache
 )
 mkdir %WORKSPACE%\bin
+
+REM If 32 bits then install the GVM accordingly
+IF NOT EXIST "%PROGRAMFILES(X86)%" (
+    curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+)
+
 where /q gvm
 IF ERRORLEVEL 1 (
- curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
+    IF EXIST "%PROGRAMFILES(X86)%" (
+        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
+    ) ELSE (
+        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+    )
 )
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
@@ -17,6 +27,7 @@ go env
 go install -mod=vendor github.com/magefile/mage
 mage -version
 where mage
+
 
 if not exist C:\Python38\python.exe (
     REM Install python 3.8.
