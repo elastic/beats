@@ -112,7 +112,9 @@ func (m *loggingLevel) String() string {
 type loggingOutput uint8
 
 const (
+	// ConsoleOutput outputs logs to console, stderr.
 	ConsoleOutput loggingOutput = iota
+	// FileOutput outputs logs to predefined set of files.
 	FileOutput
 )
 
