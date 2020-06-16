@@ -130,11 +130,11 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	}
 
 	for _, step := range steps {
-		if strings.ToLower(step.Process) != strings.ToLower(monitoringName) {
-			if _, isSupported := program.SupportedMap[strings.ToLower(step.Process)]; !isSupported {
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.Process),
+		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
+			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
+				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
 					errors.TypeApplication,
-					errors.M(errors.MetaKeyAppName, step.Process))
+					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
 		}
 

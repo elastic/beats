@@ -22,13 +22,13 @@ type Descriptor struct {
 }
 
 // NewDescriptor creates a program which satisfies Program interface and can be used with Operator.
-func NewDescriptor(servicePort int, binaryName, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
-	binaryName = strings.ToLower(binaryName)
+func NewDescriptor(pSpec program.Spec, version string, config *artifact.Config, tags map[Tag]string) *Descriptor {
+	binaryName := strings.ToLower(pSpec.Cmd)
 	dir := directory(binaryName, version, config)
 
 	return &Descriptor{
 		directory:    dir,
-		executionCtx: NewExecutionContext(servicePort, binaryName, version, tags),
+		executionCtx: NewExecutionContext(pSpec.ServicePort, binaryName, version, tags),
 		spec:         spec(dir, binaryName),
 	}
 }

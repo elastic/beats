@@ -4,6 +4,8 @@
 
 package configrequest
 
+import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 const (
 	// StepRun is a name of Start program event
 	StepRun = "sc-run"
@@ -20,15 +22,12 @@ type Step struct {
 	ID string
 	// Version is a version of a program
 	Version string
-	// ServicePort is the port the service will connect to gather GRPC information. When this is not
-	// 0 then the application is ran using the `service` application type, versus a `process` application.
-	ServicePort int
-	// Process defines a process such as `filebeat`
-	Process string
+	// Spec for the program
+	ProgramSpec program.Spec
 	// Meta contains additional data such as version, configuration or tags.
 	Meta map[string]interface{}
 }
 
 func (s *Step) String() string {
-	return "[ID:" + s.ID + ", PROCESS: " + s.Process + " VERSION:" + s.Version + "]"
+	return "[ID:" + s.ID + ", PROCESS: " + s.ProgramSpec.Cmd + " VERSION:" + s.Version + "]"
 }
