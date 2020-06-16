@@ -1,8 +1,6 @@
 [[load-ingest-pipelines]]
 == Load ingest pipelines
 
-// REVIEWERS: This content originally lived in modules-getting-started.asciidoc
-
 The ingest pipelines used to parse log lines are set up automatically the first
 time you run {beatname_uc}, assuming the {es} output is enabled. If you're sending
 events to {ls}, or plan to use

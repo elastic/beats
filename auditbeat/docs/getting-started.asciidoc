@@ -97,9 +97,9 @@ visualizing your data. To load these assets:
 include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 --
 +
-`-e` is optional and sends output to standard error instead of syslog.
+`-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended index template for writing to {es}
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
 [TIP]
@@ -127,10 +127,6 @@ include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
-
-//REVIEWERS: Removing cURL test because I think users will see a better view of
-//the data simply by going to the Discover app in Kibana. Showing the cURL
-//command is not ideal for cloud users.
 
 [float]
 [[view-data]]

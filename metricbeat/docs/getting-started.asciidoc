@@ -114,9 +114,9 @@ visualizing your data. To load these assets:
 include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 --
 +
-`-e` is optional and sends output to standard error instead of syslog.
+`-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended index template for writing to {es}
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
 [TIP]

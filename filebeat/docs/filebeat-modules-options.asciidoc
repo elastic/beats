@@ -7,8 +7,6 @@
 <titleabbrev>Modules</titleabbrev>
 ++++
 
-// REVIEWERS: I've changed the focus of this topic to back to configuration.
-
 NOTE: Using {beatname_uc} modules is optional. You may decide to
 <<configuration-{beatname_lc}-options,configure inputs manually>> if you're using
 a log type that isn't supported, or you want to use a different setup.
@@ -53,10 +51,6 @@ along with any modules that are enabled in the configuration file or `modules.d`
 directory. If there's a conflict, the configuration specified at the command
 line is used.
 
-// REVIEWERS: I've removed the detail about using the --modules flag because
-// it seems like an extra detail. Users can look at the command reference to
-// learn how to specify the flag.
-
 [float]
 [[configure-modules-config-file]]
 === Configure modules in the +{beatname_lc}.yml+ file
@@ -85,9 +79,6 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 - module: system
 ----
 
-// REVIEWERS: Deleting the section about configuring variable settings because
-// it doesn't really add much value to users who are looking at the module
-// config docs. It's just an extra hop.
 
 [[advanced-settings]]
 === Override input settings

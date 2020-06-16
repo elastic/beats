@@ -54,6 +54,3 @@ endif::[]
 |Analyze security events
 |===
 --
-
-//REVIEWERS: We should decide which of the Beats shippers to highlight in this topic.
-//Right now, a few are missing from the list.

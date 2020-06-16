@@ -32,8 +32,6 @@ include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 [[installation]]
 === Step 1: Install {beatname_uc}
 
-//REVIEWERS: We don't currently say anything about licensing here. Should we?
-
 Install {beatname_uc} on all the servers you want to monitor.
 
 To download and install {beatname_uc}, use the commands that work with your
@@ -60,9 +58,6 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 [float]
 [[enable-modules]]
 === Step 3: Enable and configure data collection modules
-
-// REVIEWERS: I'm intentionally focusing on the module config steps because I
-// feel it represents the fastest getting started experience. Any objections?
 
 {beatname_uc} uses modules to collect and parse log data.
 
@@ -120,9 +115,9 @@ visualizing your data. To load these assets:
 include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 --
 +
-`-e` is optional and sends output to standard error instead of syslog.
+`-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended index template for writing to {es}
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
 This step does not load the ingest pipelines used to parse log lines. By
