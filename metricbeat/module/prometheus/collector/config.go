@@ -17,8 +17,13 @@
 
 package collector
 
+import (
+	"time"
+)
+
 type metricsetConfig struct {
 	MetricsFilters MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
+	Period         time.Duration `config:"period" yaml:"period"`
 }
 
 type MetricFilters struct {

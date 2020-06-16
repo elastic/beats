@@ -20,6 +20,7 @@ package collector
 import (
 	"regexp"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -76,13 +77,15 @@ type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, 
 // MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus     p.Prometheus
-	includeMetrics []*regexp.Regexp
-	excludeMetrics []*regexp.Regexp
-	namespace      string
-	promEventsGen  PromEventsGenerator
-	once           sync.Once
-	host           string
+	prometheus      p.Prometheus
+	includeMetrics  []*regexp.Regexp
+	excludeMetrics  []*regexp.Regexp
+	namespace       string
+	promEventsGen   PromEventsGenerator
+	once            sync.Once
+	host            string
+	eventGenStarted bool
+	period          time.Duration
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -104,10 +107,12 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		}
 
 		ms := &MetricSet{
-			BaseMetricSet: base,
-			prometheus:    prometheus,
-			namespace:     namespace,
-			promEventsGen: promEventsGen,
+			BaseMetricSet:   base,
+			prometheus:      prometheus,
+			namespace:       namespace,
+			promEventsGen:   promEventsGen,
+			eventGenStarted: false,
+			period:          config.Period,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
@@ -126,7 +131,10 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.once.Do(m.promEventsGen.Start)
+	m.once.Do(func() {
+		m.promEventsGen.Start()
+		m.eventGenStarted = true
+	})
 
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
@@ -186,6 +194,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops the metricset
 func (m *MetricSet) Close() error {
+	attempts := 0
+	for !m.eventGenStarted {
+		time.Sleep(m.period)
+		// waiting 2 periods so as the first Fetch to start the generator, otherwise return since
+		// Fetch is not called at all
+		if attempts > 2 {
+			return nil
+		}
+		attempts++
+	}
 	m.promEventsGen.Stop()
 	return nil
 }
