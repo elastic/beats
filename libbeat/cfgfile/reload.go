@@ -73,7 +73,7 @@ type Reload struct {
 // of new Runners
 type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
-	Create(p beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.PipelineConnector, config *common.Config) (Runner, error)
 
 	// CheckConfig tests if a confiugation can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must

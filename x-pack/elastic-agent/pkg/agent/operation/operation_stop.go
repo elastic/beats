@@ -7,11 +7,9 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operationStop stops the running process
@@ -19,17 +17,14 @@ import (
 type operationStop struct {
 	logger         *logger.Logger
 	operatorConfig *config.Config
-	eventProcessor callbackHooks
 }
 
 func newOperationStop(
 	logger *logger.Logger,
-	operatorConfig *config.Config,
-	eventProcessor callbackHooks) *operationStop {
+	operatorConfig *config.Config) *operationStop {
 	return &operationStop{
 		logger:         logger,
 		operatorConfig: operatorConfig,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -50,19 +45,6 @@ func (o *operationStop) Check(application Application) (bool, error) {
 
 // Run runs the operation
 func (o *operationStop) Run(ctx context.Context, application Application) (err error) {
-	o.eventProcessor.OnStopping(ctx, application.Name())
-	defer func() {
-		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
-		} else {
-			o.eventProcessor.OnStopped(ctx, application.Name())
-		}
-	}()
-
 	application.Stop()
 	return nil
 }

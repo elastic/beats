@@ -99,3 +99,5 @@ include::inputs/input-syslog.asciidoc[]
 include::inputs/input-tcp.asciidoc[]
 
 include::inputs/input-udp.asciidoc[]
+
+include::inputs/input-unix.asciidoc[]
