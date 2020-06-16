@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+- Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
 
