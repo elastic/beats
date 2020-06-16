@@ -1149,22 +1149,13 @@ type: date
 
 --
 
-*`aws.cloudtrail.user_identity.invoked_by`*::
-+
---
-The name of the AWS service that made the request, such as Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
-
-type: keyword
-
---
-
 [float]
 === session_issuer
 
 If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
 
 
-*`aws.cloudtrail.user_identity.session_issuer.type`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.type`*::
 +
 --
 The source of the temporary security credentials, such as Root, IAMUser, or Role.
@@ -1173,7 +1164,7 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.principal_id`*::
 +
 --
 The internal ID of the entity that was used to get credentials.
@@ -1182,7 +1173,7 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.arn`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.arn`*::
 +
 --
 The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
@@ -1191,10 +1182,19 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.account_id`*::
 +
 --
 The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.invoked_by`*::
++
+--
+The name of the AWS service that made the request, such as Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
 
 type: keyword
 
