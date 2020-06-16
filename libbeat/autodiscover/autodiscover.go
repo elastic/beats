@@ -209,6 +209,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
 				"Auto discover config check failed for config '%s', won't start runner",
 				common.DebugString(config, true))))
+			continue
 		}
 
 		// Update meta no matter what
