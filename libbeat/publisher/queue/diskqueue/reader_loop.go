@@ -17,6 +17,8 @@
 
 package diskqueue
 
+import "os"
+
 func (dq *diskQueue) readerLoop() {
 	curFrameID := frameID(0)
 	for {
@@ -83,28 +85,56 @@ func (dq *diskQueue) writerLoop() {
 	}
 }
 
+func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
+	var err error
+	dq.segments.Lock()
+	defer dq.segments.Unlock()
+
+	id := dq.segments.nextID
+	defer func() {
+		// If we were successful, update nextID
+		if err == nil {
+			dq.segments.nextID++
+		}
+	}()
+
+	segment := &queueSegment{id: id}
+
+	path := dq.settings.segmentPath(id)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	return &segmentWriter{
+		segment: segment,
+		file:    file,
+	}, nil
+}
+
 // This is only called from the writer loop.
 func (dq *diskQueue) writeFrameData(bytes []byte) error {
-	frameSize := len(bytes) + frameMetadataSize
+	frameSize := uint64(len(bytes) + frameMetadataSize)
 
-	// We can check segment size without holding a lock because the writer
-	// loop (i.e. the current thread) is the only place that modifies it
-	// after segmentFile creation.
-	if dq.writingSegment == nil ||
-		dq.writingSegment.size + frameSize > dq.settings.MaxSegmentSize {
-		// There is no writing segment, or the incoming data frame doesn't
-		// fit in the current one, so we need to create a new one.
+	dq.segments.Lock()
+	defer dq.segments.Unlock()
+	if dq.segments.writer != nil &&
+		dq.segments.writer.position+frameSize > dq.settings.MaxSegmentSize {
+		// There is a writing segment, but the incoming data frame doesn't
+		// fit, so we need to finalize it and create a new one.
+		//dq.segments.writer =
+		//dq.segments.writing
 	}
-	
-	.capacity() < frameSize {
 
-	} != nil && dq.writingSegment.
+	/*.capacity() < frameSize {
+
+	} != nil && dq.writingSegment.*/
 
 	// while (free bytes) < frameSize {
 	// block
 	// }
 
-	if dq.writingSegment == nil {
+	if dq.segments.writing == nil {
 		// There is no current output segment, create a new one.
 
 	}

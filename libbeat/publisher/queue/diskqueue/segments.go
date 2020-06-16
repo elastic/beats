@@ -38,17 +38,15 @@ import (
 type frameID uint64
 
 // The metadata for a single segment file.
-type segmentFile struct {
-	logger *logp.Logger
-
-	lock sync.Mutex
+type queueSegment struct {
+	sync.Mutex
 
 	id segmentID
 
 	// The length in bytes of the segment file on disk. This is updated when
 	// the segment is written to, and should always correspond to the end of
 	// a complete data frame.
-	size int64
+	size uint64
 
 	// The number of frames read from this segment, or zero if it has not
 	// yet been completely read.
@@ -61,7 +59,7 @@ type segmentFile struct {
 // metadata for decoding segment files.
 type segmentReader struct {
 	// The segment this reader was generated from.
-	segment *segmentFile
+	segment *queueSegment
 
 	// The underlying data reader.
 	raw io.Reader
@@ -79,8 +77,9 @@ type segmentReader struct {
 }
 
 type segmentWriter struct {
-	*os.File
-	curPosition int64
+	segment  *queueSegment
+	file     *os.File
+	position int64
 }
 
 type checksumType int
@@ -97,21 +96,21 @@ const frameMetadataSize = 12
 const segmentHeaderSize = 8
 
 // Sort order: we store loaded segments in ascending order by their id.
-type bySegmentID []*segmentFile
+type bySegmentID []*queueSegment
 
 func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
 
-func segmentFilesForPath(
+func queueSegmentsForPath(
 	path string, logger *logp.Logger,
-) ([]*segmentFile, error) {
+) ([]*queueSegment, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", path, err)
 	}
 
-	segments := []*segmentFile{}
+	segments := []*queueSegment{}
 	for _, file := range files {
 		if file.Size() <= segmentHeaderSize {
 			// Ignore segments that don't have at least some data beyond the
@@ -125,10 +124,9 @@ func segmentFilesForPath(
 			// don't match the "[uint64].seg" pattern.
 			if id, err := strconv.ParseUint(components[0], 10, 64); err == nil {
 				segments = append(segments,
-					&segmentFile{
-						logger: logger,
-						id:     segmentID(id),
-						size:   file.Size(),
+					&queueSegment{
+						id:   segmentID(id),
+						size: uint64(file.Size()),
 					})
 			}
 		}

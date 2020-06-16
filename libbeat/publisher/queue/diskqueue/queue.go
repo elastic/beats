@@ -82,7 +82,7 @@ type diskQueueOutput struct {
 	data []byte
 
 	// The segment file this data was read from.
-	segment *segmentFile
+	segment *queueSegment
 
 	// The index of this data's frame (the sequential read order
 	// of all frames during this execution).
@@ -97,29 +97,8 @@ type diskQueue struct {
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
 
-	// segmentLock must be held to read or write segmentFile, readingSegments
-	// and completedSegments.
-	segmentLock sync.Mutex
-
-	// The segment that is currently being written.
-	writingSegment *segmentFile
-
-	// A list of the segments that have been completely written but have
-	// not yet been processed by the reader loop, sorted by increasing
-	// segment ID. Segments are always read in order. When a segment has
-	// been read completely, it is removed from the front of this list and
-	// appended to completedSegments.
-	readingSegments []*segmentFile
-
-	// A list of the segments that have been read but have not yet been
-	// completely acknowledged, sorted by increasing segment ID. When the
-	// first entry of this list is completely acknowledged, it is removed
-	// from this list and the underlying file is deleted.
-	completedSegments []*segmentFile
-
-	// The next sequential unused segment ID. This is what will be assigned
-	// to the next segmentFile we create.
-	nextSegmentID segmentID
+	// Metadata related to the segment files.
+	segments diskQueueSegments
 
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
@@ -191,6 +170,35 @@ type diskQueue struct {
 	done chan struct{}
 }
 
+// diskQueueSegments encapsulates segment-related queue metadata.
+type diskQueueSegments struct {
+	// The lock should be held to read or write any of the fields below.
+	sync.Mutex
+
+	// The segment that is currently being written.
+	writing *queueSegment
+
+	writer *segmentWriter
+	reader *segmentReader
+
+	// A list of the segments that have been completely written but have
+	// not yet been processed by the reader loop, sorted by increasing
+	// segment ID. Segments are always read in order. When a segment has
+	// been read completely, it is removed from the front of this list and
+	// appended to completedSegments.
+	reading []*queueSegment
+
+	// A list of the segments that have been read but have not yet been
+	// completely acknowledged, sorted by increasing segment ID. When the
+	// first entry of this list is completely acknowledged, it is removed
+	// from this list and the underlying file is deleted.
+	completed []*queueSegment
+
+	// The next sequential unused segment ID. This is what will be assigned
+	// to the next queueSegment we create.
+	nextID segmentID
+}
+
 func init() {
 	queue.RegisterQueueType(
 		"disk",
@@ -241,52 +249,56 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	segments, err := segmentFilesForPath(
+	segments, err := queueSegmentsForPath(
 		settings.directoryPath(), settings.Logger)
 	if err != nil {
 		return nil, err
 	}
 
 	return &diskQueue{
-		settings:        settings,
-		readingSegments: segments,
-		closed:          atomic.MakeBool(false),
-		done:            make(chan struct{}),
+		settings: settings,
+		segments: diskQueueSegments{
+			reading: segments,
+		},
+		closed: atomic.MakeBool(false),
+		done:   make(chan struct{}),
 	}, nil
 }
 
 // This is only called by readerLoop.
 func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
-	// TODO: make sure we hold the right locks to mess with segments here.
+	dq.segments.Lock()
+	defer dq.segments.Unlock()
+
 	errors := []error{}
-	for len(dq.readingSegments) > 0 {
-		segment := dq.readingSegments[0]
-		segmentPath := dq.settings.segmentFilePath(segment.id)
+	for len(dq.segments.reading) > 0 {
+		segment := dq.segments.reading[0]
+		segmentPath := dq.settings.segmentPath(segment.id)
 		reader, err := tryLoad(segment, segmentPath)
 		if err != nil {
 			// TODO: Handle this: depending on the type of error, either delete
 			// the segment or log an error and leave it alone, then skip to the
 			// next one.
 			errors = append(errors, err)
-			dq.readingSegments = dq.readingSegments[1:]
+			dq.segments.reading = dq.segments.reading[1:]
 			continue
 		}
 		// Remove the segment from the active list and move it to
 		// completedSegments until all its data has been acknowledged.
-		dq.readingSegments = dq.readingSegments[1:]
-		dq.completedSegments = append(dq.completedSegments, segment)
+		dq.segments.reading = dq.segments.reading[1:]
+		dq.segments.completed = append(dq.segments.completed, segment)
 		return reader, errors
 	}
-	// TODO: if readingSegments is empty we may still be able to
-	// read partial data from writingSegment which is still being
+	// TODO: if segments.reading is empty we may still be able to
+	// read partial data from segments.writing which is still being
 	// written.
 	return nil, errors
 }
 
-func tryLoad(segment *segmentFile, path string) (*segmentReader, error) {
+func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 	// this is a strangely fine-grained lock maybe?
-	segment.lock.Lock()
-	defer segment.lock.Unlock()
+	segment.Lock()
+	defer segment.Unlock()
 
 	// dataSize is guaranteed to be positive because we don't add
 	// anything to the segments list unless it is.
@@ -308,7 +320,7 @@ func tryLoad(segment *segmentFile, path string) (*segmentReader, error) {
 	return &segmentReader{
 		raw:          reader,
 		curPosition:  0,
-		endPosition:  dataSize,
+		endPosition:  int64(dataSize),
 		checksumType: header.checksumType,
 	}, nil
 }
@@ -359,7 +371,7 @@ func (settings Settings) stateFilePath() string {
 	return filepath.Join(settings.directoryPath(), "state.dat")
 }
 
-func (settings Settings) segmentFilePath(segmentID segmentID) string {
+func (settings Settings) segmentPath(segmentID segmentID) string {
 	return filepath.Join(
 		settings.directoryPath(),
 		fmt.Sprintf("%v.seg", segmentID))
