@@ -21,9 +21,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 func TestStore_Close(t *testing.T) {
