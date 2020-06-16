@@ -6,8 +6,13 @@ package operation
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -22,9 +27,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 )
 
-var installPath = "tests/scripts"
+var downloadPath = getAbsPath("tests/downloads")
+var installPath = getAbsPath("tests/scripts")
 
-func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.Config) {
+func getTestOperator(t *testing.T, downloadPath string, installPath string, p *app.Descriptor) (*Operator, *operatorCfg.Config) {
 	operatorConfig := &operatorCfg.Config{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
@@ -34,7 +40,8 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		},
 		ProcessConfig: &process.Config{},
 		DownloadConfig: &artifact.Config{
-			InstallPath: installPath,
+			TargetDirectory: downloadPath,
+			InstallPath:     installPath,
 		},
 	}
 
@@ -53,8 +60,16 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 	if err != nil {
 		t.Fatal(err)
 	}
+	srv, err := server.New(l, ":0", &app.ApplicationStatusHandler{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = srv.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,11 +77,24 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 	operator.config.DownloadConfig.OperatingSystem = "darwin"
 	operator.config.DownloadConfig.Architecture = "32"
 
+	// make the download path so the `operation_verify` can ensure the path exists
+	downloadConfig := operator.config.DownloadConfig
+	fullPath, err := artifact.GetArtifactPath(p.BinaryName(), p.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	if err != nil {
+		t.Fatal(err)
+	}
+	createFile(t, fullPath)
+
 	return operator, operatorConfig
 }
 
 func getLogger() *logger.Logger {
-	l, _ := logger.New()
+	cfg, _ := config.NewConfigFrom(map[string]interface{}{
+		"logging": map[string]interface{}{
+			"level": "error",
+		},
+	})
+	l, _ := logger.NewFromConfig(cfg)
 	return l
 }
 
@@ -74,12 +102,39 @@ func getProgram(binary, version string) *app.Descriptor {
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
+		Architecture:    "32",
 	}
 	return app.NewDescriptor(binary, version, downloadCfg, nil)
 }
 
-type TestConfig struct {
-	TestFile string
+func getAbsPath(path string) string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(filename), path)
+}
+
+func createFile(t *testing.T, path string) {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		file, err := os.Create(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer file.Close()
+	}
+}
+
+func waitFor(t *testing.T, check func() error) {
+	started := time.Now()
+	for {
+		err := check()
+		if err == nil {
+			return
+		}
+		if time.Now().Sub(started) >= 15*time.Second {
+			t.Fatalf("check timed out after 15 second: %s", err)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 }
 
 type DummyDownloader struct{}

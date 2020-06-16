@@ -114,10 +114,7 @@ func (s *stateStorage) Load(key stream) (cursor, error) {
 	}
 	cur, err := s.persister.Load(key)
 	if err != nil {
-		if err != errStateNotFound {
-			return cur, err
-		}
-		cur = newCursor(key, time.Time{})
+		return newCursor(key, time.Time{}), err
 	}
 	return cur, s.saveUnsafe(cur)
 }

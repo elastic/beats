@@ -6,14 +6,24 @@ package cloudfoundry
 
 import (
 	"crypto/tls"
+	"fmt"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-
 	"github.com/gofrs/uuid"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+)
+
+const (
+	ConsumerVersionV1 = "v1"
+	ConsumerVersionV2 = "v2"
 )
 
 type Config struct {
+	// Version of the consumer to use, it can be v1 or v2, defaults to v1
+	Version string `config:"version"`
+
 	// CloudFoundry credentials for retrieving OAuth tokens
 	ClientID     string `config:"client_id" validate:"required"`
 	ClientSecret string `config:"client_secret" validate:"required"`
@@ -45,6 +55,15 @@ func (c *Config) InitDefaults() {
 	}
 	c.ShardID = uuid.String()
 	c.CacheDuration = 120 * time.Second
+	c.Version = ConsumerVersionV1
+}
+
+func (c *Config) Validate() error {
+	supportedVersions := []string{ConsumerVersionV1, ConsumerVersionV2}
+	if !anyOf(supportedVersions, c.Version) {
+		return fmt.Errorf("not supported version %v, expected one of %s", c.Version, strings.Join(supportedVersions, ", "))
+	}
+	return nil
 }
 
 // TLSConfig returns the TLS configuration.
@@ -54,4 +73,13 @@ func (c *Config) TLSConfig() (*tls.Config, error) {
 		return nil, err
 	}
 	return tls.ToConfig(), nil
+}
+
+func anyOf(elems []string, s string) bool {
+	for _, elem := range elems {
+		if s == elem {
+			return true
+		}
+	}
+	return false
 }

@@ -290,6 +290,45 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
+		{
+			message: "Module, namespace, host hint shouldn't return when port isn't the same has hint",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 80,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:8080",
+					},
+				},
+			},
+			len: 0,
+		},
+		{
+			message: "Non http URLs with valid host port combination should return a valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 3306,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "tcp(${data.host}:3306)/",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"namespace":  "test",
+				"metricsets": []string{"default"},
+				"hosts":      []interface{}{"tcp(1.2.3.4:3306)/"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+			},
+		},
 	}
 	for _, test := range tests {
 		mockRegister := mb.NewRegister()

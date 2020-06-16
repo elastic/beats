@@ -14,6 +14,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "CreateVirtualMFADevice",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-351c-472a-b089-EXAMPLE",
         "event.kind": "event",
@@ -21,13 +24,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"false\",\"creationDate\":\"2019-11-27T15:07:22Z\"}}},\"eventTime\":\"2019-11-27T15:10:15Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"CreateVirtualMFADevice\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"console.amazonaws.com\",\"requestParameters\":{\"virtualMFADeviceName\":\"Alice\",\"path\":\"/\"},\"responseElements\":{\"virtualMFADevice\":{\"serialNumber\":\"arn:aws:iam::0123456789012:mfa/Alice\"}},\"requestID\":\"EXAMPLE-303b-4b0e-a8c7-EXAMPLE\",\"eventID\":\"EXAMPLE-351c-472a-b089-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

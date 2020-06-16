@@ -11,6 +11,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "UpdateGroup",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-c3aa-487b-b05e-EXAMPLE",
         "event.kind": "event",
@@ -18,13 +21,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"0123456789012\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\"},\"eventTime\":\"2020-01-09T02:23:11Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"UpdateGroup\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"aws-cli/1.16.310 Python/3.8.1 Darwin/18.7.0 botocore/1.13.46\",\"requestParameters\":{\"newGroupName\":\"TEST-GROUP2\",\"groupName\":\"TEST-GROUP\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-c22d-4fca-b40a-EXAMPLE\",\"eventID\":\"EXAMPLE-c3aa-487b-b05e-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "0123456789012",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",
@@ -46,6 +55,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "UpdateGroup",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-6a0b-475c-b5db-EXAMPLE",
         "event.kind": "event",
@@ -53,13 +65,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"0123456789012\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\"},\"eventTime\":\"2020-01-09T02:24:35Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"UpdateGroup\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"aws-cli/1.16.310 Python/3.8.1 Darwin/18.7.0 botocore/1.13.46\",\"errorCode\":\"EntityAlreadyExistsException\",\"errorMessage\":\"Group with name TEST-GROUP already exists.\",\"requestParameters\":{\"newGroupName\":\"TEST-GROUP\",\"groupName\":\"TEST-GROUP2\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-f673-4ce7-8529-EXAMPLE\",\"eventID\":\"EXAMPLE-6a0b-475c-b5db-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "failure",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 683,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "0123456789012",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",

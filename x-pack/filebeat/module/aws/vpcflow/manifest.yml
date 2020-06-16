@@ -13,6 +13,8 @@ var:
   - name: secret_access_key
   - name: session_token
   - name: role_arn
+  - name: tags
+    default: [forwarded]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
