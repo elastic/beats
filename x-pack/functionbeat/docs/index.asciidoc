@@ -20,8 +20,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_kafka_output:
 :no_redis_output:
 :no_file_output:
-:no_console_output:
-:no_codec:
 :requires_xpack:
 :serverless:
 :mac_os:

@@ -20,7 +20,7 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		ExtraVars: map[string]interface{}{
-			"ExcludeConsole":             true,
+			"ExcludeConsole":             false,
 			"ExcludeFileOutput":          true,
 			"ExcludeKafka":               true,
 			"ExcludeRedis":               true,
