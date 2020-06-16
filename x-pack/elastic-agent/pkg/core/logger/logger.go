@@ -21,21 +21,21 @@ const agentName = "elastic-agent"
 type Logger = logp.Logger
 
 // New returns a configured ECS Logger
-func New() (*Logger, error) {
-	return new(DefaultLoggingConfig())
+func New(name string) (*Logger, error) {
+	return new(name, DefaultLoggingConfig())
 }
 
 // NewWithLogpLevel returns a configured logp Logger with specified level.
-func NewWithLogpLevel(level logp.Level) (*Logger, error) {
+func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
 	dc := DefaultLoggingConfig()
 	dc.Level = loggingLevel(level)
 
-	return new(dc)
+	return new(name, dc)
 }
 
 //NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
-func NewFromConfig(cfg *config.Config) (*Logger, error) {
+func NewFromConfig(name string, cfg *config.Config) (*Logger, error) {
 	wrappedConfig := &struct {
 		Logging *Config `config:"logging"`
 	}{
@@ -46,16 +46,19 @@ func NewFromConfig(cfg *config.Config) (*Logger, error) {
 		return nil, err
 	}
 
-	return new(wrappedConfig.Logging)
+	return new(name, wrappedConfig.Logging)
 }
 
-func new(cfg *Config) (*Logger, error) {
+func new(name string, cfg *Config) (*Logger, error) {
 	logpCfg, err := configToLogpConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	// work around custom types and common config
+	// when custom type is transformed to common.Config
+	// value is determined based on reflect value which is incorrect
+	// enum vs human readable form
 	yamlCfg, err := yaml.Marshal(logpCfg)
 	if err != nil {
 		return nil, err
@@ -70,5 +73,5 @@ func new(cfg *Config) (*Logger, error) {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 
-	return logp.NewLogger(""), nil
+	return logp.NewLogger(name), nil
 }

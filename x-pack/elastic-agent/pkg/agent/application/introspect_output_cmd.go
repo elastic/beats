@@ -198,5 +198,5 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel(logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }

@@ -94,7 +94,7 @@ func getLogger() *logger.Logger {
 			"level": "error",
 		},
 	})
-	l, _ := logger.NewFromConfig(cfg)
+	l, _ := logger.NewFromConfig("", cfg)
 	return l
 }
 
