@@ -205,7 +205,7 @@ func (w *watcher) process(ctx context.Context) bool {
 		}
 		if !exists {
 			if entry.state == delete {
-				w.logger.Errorf("Object was not found in the store, deleting anyway!")
+				w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
 				// delete anyway in order to clean states
 				w.handler.OnDelete(entry.objectRaw)
 			}

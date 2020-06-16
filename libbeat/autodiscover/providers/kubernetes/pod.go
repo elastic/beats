@@ -135,15 +135,14 @@ func (p *pod) OnUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 
 	p.logger.Debugf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
-	if pod.Status.Phase == kubernetes.PodPending {
-		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
-		return
-	}
 	// If Pod is in a phase where all containers in the have terminated emit a stop event
 	if pod.Status.Phase == kubernetes.PodSucceeded || pod.Status.Phase == kubernetes.PodFailed {
 		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
 
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+		return
+	} else if pod.Status.Phase == kubernetes.PodPending {
+		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
 		return
 	}
 
