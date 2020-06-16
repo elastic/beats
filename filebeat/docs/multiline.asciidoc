@@ -81,6 +81,8 @@ lines are discarded. The default is 500.
 
 *`multiline.count_lines`*:: The number of lines to aggregate into a single event.
 
+*`multiline.skip_newline`*:: When set, multiline events are concatenated without a line separator.
+
 
 ==== Examples of multiline configuration
 
