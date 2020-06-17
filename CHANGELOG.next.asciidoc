@@ -141,6 +141,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Add better handling for Kubernetes Update and Delete watcher events. {pull}18882[18882]
 - Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
