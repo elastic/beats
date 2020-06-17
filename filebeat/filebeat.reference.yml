@@ -531,6 +531,15 @@ filebeat.inputs:
   # Default is 5s.
   #multiline.timeout: 5s
 
+  # To aggregate constant number of lines into a single event use the count mode of multiline.
+  #multiline.type: count
+
+  # The number of lines to aggregate into a single event.
+  #multiline.count_lines: 3
+
+  # Do not add new line character when concatenating lines.
+  #multiline.skip_newline: false
+
   # Setting tail_files to true means filebeat starts reading new files at the end
   # instead of the beginning. If this is used in combination with log rotation
   # this can mean that the first entries of a new file are skipped.
@@ -2194,6 +2203,41 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the filebeat.
+#instrumentation:
+    # Set to true to enable instrumentation of filebeat.
+    #enabled: false
+
+    # Environment in which filebeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
 
 # ================================= Migration ==================================
 
