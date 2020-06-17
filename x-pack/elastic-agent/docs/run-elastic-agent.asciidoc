@@ -5,7 +5,7 @@
 experimental[]
 
 {agent} runs in two modes: standalone or fleet. The two modes differ in how you
-configure and manage the agent.
+configure and manage the Agent.
 
 [float]
 [[fleet-mode]]
@@ -20,12 +20,12 @@ agent to {fleet}.
 
 To enroll an {agent} to {fleet}:
 
-. Stop the agent, if it's already running.
+. Stop the Agent, if it's already running.
 
 . Go the **{fleet}** tab in {ingest-manager}, and click **Enroll new agent** to
 generate a token. See <<ingest-management-getting-started>> for detailed steps.
 
-. Enroll the agent:
+. Enroll the Agent:
 +
 [source,shell]
 ----
@@ -44,7 +44,7 @@ To start {agent}, run:
 [[standalone-mode]]
 == Run in standalone mode (default)
 
-With _standalone mode_, you manually configure and manage the agent locally.
+With _standalone mode_, you manually configure and manage the Agent locally.
 Each agent is configured to be in standalone mode by default after installation.
 
 If {agent} is installed as an auto-starting service, it will run automatically

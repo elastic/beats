@@ -4,7 +4,7 @@
 
 experimental[]
 
-Download and install the agent on each system you want to monitor.
+Download and install the Agent on each system you want to monitor.
 
 //TODO: Replace with tabbed panel when the code is stable. 
 
