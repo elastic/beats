@@ -155,6 +155,7 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
 		a.srvState.UpdateConfig(string(cfgStr))
 	} else {
+		a.setState(state.Starting, "Starting")
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
@@ -201,9 +202,6 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	if a.state.Status == state.Stopped {
-		return errors.New(ErrAppNotInstalled)
-	}
 	if a.srvState == nil {
 		return errors.New(ErrAppNotInstalled)
 	}
@@ -300,10 +298,7 @@ func (a *Application) startCredsListener() error {
 		for {
 			conn, err := lis.Accept()
 			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				a.logger.Errorf("failed to accept connection on credentials listener: %s", err)
+				break
 			}
 			a.appLock.Lock()
 			srvState := a.srvState
@@ -314,7 +309,10 @@ func (a *Application) startCredsListener() error {
 				continue
 			}
 			if err := srvState.WriteConnInfo(conn); err != nil {
-				a.logger.Errorf("failed to write connection credentials: %s", err)
+				_ = conn.Close()
+				if err != io.EOF {
+					a.logger.Errorf("failed to write connection credentials: %s", err)
+				}
 				continue
 			}
 			_ = conn.Close()
