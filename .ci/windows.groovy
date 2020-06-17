@@ -419,7 +419,9 @@ def withBeatsEnv(boolean archive, Closure body) {
 def withBeatsEnvWin(Closure body) {
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
+  // NOTE: to support Windows 7 32 bits the arch in the go context path is required In order to support
+  def arch = is32bit() ? '386' : 'amd64'
+  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${arch}"
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -458,6 +460,11 @@ def installTools() {
   } else {
     retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
+}
+
+def is32bit(){
+  def labels = env.NODE_LABELS
+  return labels.contains('i386')
 }
 
 def goos(){
