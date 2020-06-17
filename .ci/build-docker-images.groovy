@@ -14,7 +14,8 @@ pipeline {
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     NOTIFY_TO = credentials('notify-to')
     PATH = "${env.GOPATH}/bin:${env.PATH}"
-    PIPELINE_LOG_LEVEL='INFO'
+    PIPELINE_LOG_LEVEL = 'INFO'
+    JOB_GIT_CREDENTIALS = "f6c7695a-671e-4f4f-a331-acdce44ff9ba"
   }
   options {
     timeout(time: 1, unit: 'HOURS')
