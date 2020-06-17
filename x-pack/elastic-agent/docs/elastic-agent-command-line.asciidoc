@@ -3,6 +3,9 @@
 
 experimental[]
 
+//REVIEWERS: There are a couple of options missing here: strict.perms and
+// path.config. Did we leave them out intentionally? 
+
 The `elastic-agent run` command provides flags that alter the behavior of an
 agent:
 
