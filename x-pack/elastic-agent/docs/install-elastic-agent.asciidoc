@@ -1,16 +1,17 @@
-:release-state: released
-
 [[elastic-agent-installation]]
+[role="xpack"]
 = Install {agent}
 
 experimental[]
 
-Download and install the agent on each system you want to monitor.
+Download and install the Agent on each system you want to monitor.
+
+//TODO: Replace with tabbed panel when the code is stable. 
+
+// tag::install-elastic-agent[]
 
 To download and install {elastic-agent}, use the commands that work with your
 system:
-
-//TODO: Replace with tabbed panels when the code is stable (might be after 7.8).
 
 *mac:*
 
@@ -79,3 +80,6 @@ PS C:\Program Files\Elastic-Agent> .\install-service-elastic-agent.ps1
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
 
 endif::[]
+
+// end::install-elastic-agent[]
+
