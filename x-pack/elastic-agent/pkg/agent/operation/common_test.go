@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -103,7 +105,10 @@ func getProgram(binary, version string) *app.Descriptor {
 		OperatingSystem: "darwin",
 		Architecture:    "32",
 	}
-	return app.NewDescriptor(0, binary, version, downloadCfg, nil)
+	return app.NewDescriptor(program.Spec{
+		Name: binary,
+		Cmd:  binary,
+	}, version, downloadCfg, nil)
 }
 
 func getAbsPath(path string) string {
