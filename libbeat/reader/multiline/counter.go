@@ -34,9 +34,9 @@ func newMultilineCountReader(
 	maxBytes int,
 	config *Config,
 ) (reader.Reader, error) {
-	maxLines := *config.MaxLines
-	if maxLines == 0 {
-		maxLines = config.LinesCount
+	maxLines := config.LinesCount
+	if l := config.MaxLines; l != nil && 0 < *l {
+		maxLines = *l
 	}
 
 	return &counterReader{
