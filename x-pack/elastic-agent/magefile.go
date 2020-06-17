@@ -234,9 +234,9 @@ func (Test) All() {
 // Unit runs all the unit tests.
 func (Test) Unit() error {
 	mg.Deps(Prepare.Env, Build.TestBinaries)
-	raceFlag = ""
+	raceFlag := ""
 	if os.Getenv("DEV_ARCH") == "amd64" {
-		args = "-race"
+		raceFlag = "-race"
 	}
 	return RunGo("test", raceFlag, "-v", "-coverprofile", filepath.Join(buildDir, "coverage.out"), "./...")
 }
