@@ -7613,24 +7613,6 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
-Dependency: github.com/urso/diag-ecs
-Revision: ab085841dcb9
-License type (autodetected): Apache-2.0
-./vendor/github.com/urso/diag-ecs/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: github.com/urso/ecslog
-Version: v0.0.1
-License type (autodetected): Apache-2.0
-./vendor/github.com/urso/ecslog/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/urso/go-bin
 Revision: 781c575c9f0e
 License type (autodetected): Apache-2.0
