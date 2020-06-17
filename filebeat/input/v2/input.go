@@ -85,7 +85,7 @@ type Context struct {
 	// The input ID.
 	ID string
 
-	// Agent procides additional Beat info like instance ID or beat name.
+	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shutdown.
@@ -99,7 +99,7 @@ type TestContext struct {
 	// with labels that will identify logs for the input.
 	Logger *logp.Logger
 
-	// Agent procides additional Beat info like instance ID or beat name.
+	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shutdown.
