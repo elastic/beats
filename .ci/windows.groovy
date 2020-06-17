@@ -426,6 +426,7 @@ def withBeatsEnvWin(Closure body) {
   withEnv([
     "HOME=${env.WORKSPACE}",
     "DEV_ARCH=${arch}",
+    "DEV_OS=windows",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
     "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}",
