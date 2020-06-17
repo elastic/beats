@@ -58,6 +58,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The port to listen for syslog traffic. Defaults to 9004.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[fortinet-firewall, forwarded]`.
+
 [float]
 ==== Fortinet ECS fields
 

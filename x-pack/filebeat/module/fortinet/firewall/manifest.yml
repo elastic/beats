@@ -4,7 +4,7 @@ var:
   - name: syslog_host
     default: localhost
   - name: tags
-    default: [fortinet-firewall]
+    default: [fortinet-firewall, forwarded]
   - name: syslog_port
     default: 9004
   - name: input

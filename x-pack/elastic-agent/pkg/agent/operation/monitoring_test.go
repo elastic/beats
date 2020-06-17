@@ -153,8 +153,9 @@ func (*testMonitorableApp) Stop() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) State() state.State            { return state.State{} }
-func (a *testMonitorableApp) Monitor() monitoring.Monitor { return a.monitor }
+func (*testMonitorableApp) State() state.State                { return state.State{} }
+func (*testMonitorableApp) SetState(_ state.Status, _ string) {}
+func (a *testMonitorableApp) Monitor() monitoring.Monitor     { return a.monitor }
 
 type testMonitor struct {
 	monitorLogs    bool

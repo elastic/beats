@@ -11,8 +11,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -24,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
@@ -38,16 +37,16 @@ const (
 // Enables running sidecars for processes.
 // TODO: implement retry strategies
 type Operator struct {
-	bgContext      context.Context
-	pipelineID     string
-	logger         *logger.Logger
-	config         *operatorCfg.Config
-	handlers       map[string]handleFunc
-	stateResolver  *stateresolver.StateResolver
-	srv            *server.Server
-	eventProcessor callbackHooks
-	monitor        monitoring.Monitor
-	isMonitoring   int
+	bgContext     context.Context
+	pipelineID    string
+	logger        *logger.Logger
+	config        *operatorCfg.Config
+	handlers      map[string]handleFunc
+	stateResolver *stateresolver.StateResolver
+	srv           *server.Server
+	reporter      state.Reporter
+	monitor       monitoring.Monitor
+	isMonitoring  int
 
 	apps     map[string]Application
 	appsLock sync.Mutex
@@ -70,7 +69,7 @@ func NewOperator(
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
 	srv *server.Server,
-	eventProcessor callbackHooks,
+	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Operator, error) {
 
 	operatorConfig := operatorCfg.DefaultConfig()
@@ -82,23 +81,19 @@ func NewOperator(
 		return nil, fmt.Errorf("artifacts configuration not provided")
 	}
 
-	if eventProcessor == nil {
-		eventProcessor = &noopCallbackHooks{}
-	}
-
 	operator := &Operator{
-		bgContext:      ctx,
-		config:         operatorConfig,
-		pipelineID:     pipelineID,
-		logger:         logger,
-		downloader:     fetcher,
-		verifier:       verifier,
-		installer:      installer,
-		stateResolver:  stateResolver,
-		srv:            srv,
-		apps:           make(map[string]Application),
-		eventProcessor: eventProcessor,
-		monitor:        monitor,
+		bgContext:     ctx,
+		config:        operatorConfig,
+		pipelineID:    pipelineID,
+		logger:        logger,
+		downloader:    fetcher,
+		verifier:      verifier,
+		installer:     installer,
+		stateResolver: stateResolver,
+		srv:           srv,
+		apps:          make(map[string]Application),
+		reporter:      reporter,
+		monitor:       monitor,
 	}
 
 	operator.initHandlerMap()
@@ -164,12 +159,12 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 		newRetryableOperations(
 			o.logger,
 			o.config.RetryConfig,
-			newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
-			newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
+			newOperationFetch(o.logger, p, o.config, o.downloader),
+			newOperationVerify(p, o.config, o.verifier),
 		),
-		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
-		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
-		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
+		newOperationInstall(o.logger, p, o.config, o.installer),
+		newOperationStart(o.logger, p, o.config, cfg),
+		newOperationConfig(o.logger, o.config, cfg),
 	}
 	return o.runFlow(p, flow)
 }
@@ -177,7 +172,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 // Stop stops the running process, if process is already stopped it does not return an error
 func (o *Operator) stop(p Descriptor) (err error) {
 	flow := []operation{
-		newOperationStop(o.logger, o.config, o.eventProcessor),
+		newOperationStop(o.logger, o.config),
 	}
 
 	return o.runFlow(p, flow)
@@ -186,7 +181,7 @@ func (o *Operator) stop(p Descriptor) (err error) {
 // PushConfig tries to push config to a running process
 func (o *Operator) pushConfig(p Descriptor, cfg map[string]interface{}) error {
 	flow := []operation{
-		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
+		newOperationConfig(o.logger, o.config, cfg),
 	}
 
 	return o.runFlow(p, flow)
@@ -259,7 +254,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		o.srv,
 		o.config,
 		o.logger,
-		o.eventProcessor.OnFailing,
+		o.reporter,
 		o.monitor)
 
 	if err != nil {
