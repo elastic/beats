@@ -197,7 +197,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					}
 				}
 
-				// By default, replace dot "." using under bar "_" for tag keys.
+				// By default, replace dot "." using underscore "_" for tag keys.
 				// Note: tag values are not dedotted.
 				for _, tag := range tags {
 					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)

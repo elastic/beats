@@ -207,7 +207,7 @@ func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, m
 		}
 
 		for _, tag := range outputListTags.TagList {
-			// By default, replace dot "." using under bar "_" for tag keys.
+			// By default, replace dot "." using underscore "_" for tag keys.
 			// Note: tag values are not dedotted.
 			dbDetails.tags = append(dbDetails.tags,
 				aws.Tag{
