@@ -90,8 +90,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
             }
@@ -276,7 +275,9 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.windowsTest
+                  return false
+                  // NOTE: commented to run all the windows stages.
+                  // return params.windowsTest
                 }
               }
               steps {
