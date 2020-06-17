@@ -19,6 +19,7 @@ package collector
 
 import (
 	"regexp"
+
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
