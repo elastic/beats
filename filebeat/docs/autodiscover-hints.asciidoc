@@ -168,7 +168,7 @@ annotations:
   co.elastic.logs/1.processors.dissect.tokenizer: "%{key2} %{key1}"
 -------------------------------------------------------------------------------------
 
-The above configuration would help ensure that the first input handles only debug logs and passes it through a dissect
+The above configuration would generate two input configurations. The first input handles only debug logs and passes it through a dissect
 tokenizer. The second input handles everything but debug logs.
 
 [float]
