@@ -472,6 +472,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
+- Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 
 *Heartbeat*
 
