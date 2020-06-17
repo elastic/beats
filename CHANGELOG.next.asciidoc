@@ -251,6 +251,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
+- Stop counterCache only when already started {pull}19103[19103]
 
 *Packetbeat*
 
