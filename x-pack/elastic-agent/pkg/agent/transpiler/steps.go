@@ -7,6 +7,7 @@ package transpiler
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -53,6 +54,8 @@ func (r *StepList) MarshalYAML() (interface{}, error) {
 			name = "delete_file"
 		case *MoveFileStep:
 			name = "move_file"
+		case *ExecFileStep:
+			name = "exec_file"
 
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", step)
@@ -105,6 +108,8 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			s = &DeleteFileStep{}
 		case "move_file":
 			s = &MoveFileStep{}
+		case "exec_file":
+			s = &ExecFileStep{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -209,6 +214,46 @@ func MoveFile(path, target string, failOnMissing bool) *MoveFileStep {
 		Path:          path,
 		Target:        target,
 		FailOnMissing: failOnMissing,
+	}
+}
+
+// ExecFileStep executes a file.
+type ExecFileStep struct {
+	Path string
+	Args []string
+}
+
+// Execute executes file with provided arguments.
+func (r *ExecFileStep) Execute(rootDir string) error {
+	path, isSubpath, err := joinPaths(rootDir, r.Path)
+	if err != nil {
+		return err
+	}
+
+	if !isSubpath {
+		return fmt.Errorf("invalid path value for operation 'Exec': %s", path)
+	}
+
+	args := []string{path}
+	args = append(args, r.Args...)
+	cmd := &exec.Cmd{
+		Path: path,
+		Args: args,
+		Env:  nil,
+		Dir:  rootDir,
+	}
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("operation 'Exec' failed: %s", string(output))
+	}
+	return nil
+}
+
+// ExecFile creates a ExecFileStep
+func ExecFile(path string, args ...string) *ExecFileStep {
+	return &ExecFileStep{
+		Path: path,
+		Args: args,
 	}
 }
 

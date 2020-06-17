@@ -6,7 +6,6 @@ package operation
 
 import (
 	"context"
-	"os"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
@@ -20,14 +19,14 @@ type operationInstall struct {
 	logger         *logger.Logger
 	program        Descriptor
 	operatorConfig *config.Config
-	installer      install.Installer
+	installer      install.InstallerChecker
 }
 
 func newOperationInstall(
 	logger *logger.Logger,
 	program Descriptor,
 	operatorConfig *config.Config,
-	installer install.Installer) *operationInstall {
+	installer install.InstallerChecker) *operationInstall {
 
 	return &operationInstall{
 		logger:         logger,
@@ -46,9 +45,11 @@ func (o *operationInstall) Name() string {
 //
 // If the installation directory already exists then it will not be ran.
 func (o *operationInstall) Check(_ Application) (bool, error) {
-	installDir := o.program.Directory()
-	_, err := os.Stat(installDir)
-	return os.IsNotExist(err), nil
+	err := o.installer.Check(o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // Run runs the operation

@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -53,9 +55,10 @@ type Operator struct {
 	apps     map[string]Application
 	appsLock sync.Mutex
 
-	downloader download.Downloader
-	verifier   download.Verifier
-	installer  install.Installer
+	downloader  download.Downloader
+	verifier    download.Verifier
+	installer   install.InstallerChecker
+	uninstaller uninstall.Uninstaller
 }
 
 // NewOperator creates a new operator, this operator holds
@@ -68,7 +71,8 @@ func NewOperator(
 	config *config.Config,
 	fetcher download.Downloader,
 	verifier download.Verifier,
-	installer install.Installer,
+	installer install.InstallerChecker,
+	uninstaller uninstall.Uninstaller,
 	stateResolver *stateresolver.StateResolver,
 	srv *server.Server,
 	reporter state.Reporter,
@@ -91,6 +95,7 @@ func NewOperator(
 		downloader:    fetcher,
 		verifier:      verifier,
 		installer:     installer,
+		uninstaller:   uninstaller,
 		stateResolver: stateResolver,
 		srv:           srv,
 		apps:          make(map[string]Application),
@@ -175,6 +180,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 func (o *Operator) stop(p Descriptor) (err error) {
 	flow := []operation{
 		newOperationStop(o.logger, o.config),
+		newOperationUninstall(o.logger, p, o.uninstaller),
 	}
 
 	return o.runFlow(p, flow)

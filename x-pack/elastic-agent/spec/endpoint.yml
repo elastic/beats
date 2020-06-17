@@ -1,6 +1,24 @@
 name: Endpoint
 cmd: endpoint
 service: 6788
+install_checks:
+- exec_file:
+    path: "endpoint"
+    args:
+    - "verify"
+post_install:
+- exec_file:
+    path: "endpoint"
+    args:
+    - "install"
+    - "--upgrade"
+    - "--resource"
+    - "endpoint-resource.zip"
+pre_uninstall:
+- exec_file:
+    path: "endpoint"
+    args:
+      - "uninstall"
 rules:
 - fix_stream: {}
 
