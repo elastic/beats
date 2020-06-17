@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -55,7 +57,8 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
-	installer := &DummyInstaller{}
+	installer := &DummyInstallerChecker{}
+	uninstaller := &DummyUninstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
 	if err != nil {
@@ -70,7 +73,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,10 +160,22 @@ func (*DummyVerifier) Verify(p, v string) (bool, error) {
 
 var _ download.Verifier = &DummyVerifier{}
 
-type DummyInstaller struct{}
+type DummyInstallerChecker struct{}
 
-func (*DummyInstaller) Install(p, v, _ string) error {
+func (*DummyInstallerChecker) Check(p, v, _ string) error {
 	return nil
 }
 
-var _ install.Installer = &DummyInstaller{}
+func (*DummyInstallerChecker) Install(p, v, _ string) error {
+	return nil
+}
+
+var _ install.InstallerChecker = &DummyInstallerChecker{}
+
+type DummyUninstaller struct{}
+
+func (*DummyUninstaller) Uninstall(p, v, _ string) error {
+	return nil
+}
+
+var _ uninstall.Uninstaller = &DummyUninstaller{}
