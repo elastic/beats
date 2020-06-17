@@ -33,8 +33,6 @@ import (
 	"strings"
 	"time"
 
-	"go.elastic.co/apm"
-
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -51,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -96,11 +95,12 @@ type beatConfig struct {
 	Seccomp  *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
-	HTTP          *common.Config `config:"http"`
-	Path          paths.Path     `config:"path"`
-	Logging       *common.Config `config:"logging"`
-	MetricLogging *common.Config `config:"logging.metrics"`
-	Keystore      *common.Config `config:"keystore"`
+	HTTP            *common.Config         `config:"http"`
+	Path            paths.Path             `config:"path"`
+	Logging         *common.Config         `config:"logging"`
+	MetricLogging   *common.Config         `config:"logging.metrics"`
+	Keystore        *common.Config         `config:"keystore"`
+	Instrumentation instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
 	Pipeline pipeline.Config `config:",inline"`
@@ -123,7 +123,6 @@ var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
-	preventDefaultTracing()
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -141,16 +140,6 @@ func initRand() {
 		seed = n.Int64()
 	}
 	rand.Seed(seed)
-}
-
-func preventDefaultTracing() {
-	// By default, the APM tracer is active. We switch behaviour to not require users to have
-	// an APM Server running, making it opt-in
-	if os.Getenv("ELASTIC_APM_ACTIVE") == "" {
-		os.Setenv("ELASTIC_APM_ACTIVE", "false")
-	}
-	// we need to close the default tracer to prevent the beat sending events to localhost:8200
-	apm.DefaultTracer.Close()
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -343,18 +332,12 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			return nil, errors.New(msg)
 		}
 	}
-
-	tracer, err := apm.NewTracer(b.Info.Beat, b.Info.Version)
-	if err != nil {
-		return nil, err
-	}
-
 	pipeline, err := pipeline.Load(b.Info,
 		pipeline.Monitors{
 			Metrics:   reg,
 			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
 			Logger:    logp.L().Named("publisher"),
-			Tracer:    tracer,
+			Tracer:    b.Instrumentation.Tracer(),
 		},
 		b.Config.Pipeline,
 		b.processing,
@@ -452,7 +435,11 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	svc.HandleSignals(beater.Stop, cancel)
+	var stopBeat = func() {
+		b.Instrumentation.Tracer().Close()
+		beater.Stop()
+	}
+	svc.HandleSignals(stopBeat, cancel)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -607,6 +594,12 @@ func (b *Beat) configure(settings Settings) error {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		common.OverwriteConfigOpts(configOpts(store))
 	}
+
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	if err != nil {
+		return err
+	}
+	b.Beat.Instrumentation = instrumentation
 
 	b.keystore = store
 	b.Beat.Keystore = store
