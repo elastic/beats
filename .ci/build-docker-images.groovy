@@ -9,11 +9,8 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKER_REGISTRY = 'docker.elastic.co'
     DOCKER_REGISTRY_SECRET = 'secret/observability-team/ci/docker-registry/prod'
-    GOPATH = "${env.WORKSPACE}"
     HOME = "${env.WORKSPACE}"
-    JOB_GCS_BUCKET = credentials('gcs-bucket')
     NOTIFY_TO = credentials('notify-to')
-    PATH = "${env.GOPATH}/bin:${env.PATH}"
     PIPELINE_LOG_LEVEL = 'INFO'
     JOB_GIT_CREDENTIALS = "f6c7695a-671e-4f4f-a331-acdce44ff9ba"
   }
