@@ -122,9 +122,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
-// OnAdd ensures processing of service objects that are newly added
+// OnAdd ensures processing of pod objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
-	p.logger.Debugf("Watcher Node add: %+v", obj)
+	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
@@ -134,11 +134,15 @@ func (p *pod) OnAdd(obj interface{}) {
 func (p *pod) OnUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 
-	// If Pod is in a phase where all containers in the have terminated emit a stop event
-	if pod.Status.Phase == kubernetes.PodSucceeded || pod.Status.Phase == kubernetes.PodFailed {
+	p.logger.Debugf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
+	switch pod.Status.Phase {
+	case kubernetes.PodSucceeded, kubernetes.PodFailed:
+		// If Pod is in a phase where all containers in the have terminated emit a stop event
 		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
-
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+		return
+	case kubernetes.PodPending:
+		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
 		return
 	}
 
@@ -147,12 +151,13 @@ func (p *pod) OnUpdate(obj interface{}) {
 	p.emit(pod, "start")
 }
 
-// GenerateHints creates hints needed for hints builder
+// OnDelete stops pod objects that are deleted
 func (p *pod) OnDelete(obj interface{}) {
-	p.logger.Debugf("Watcher Node delete: %+v", obj)
+	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 
+// GenerateHints creates hints needed for hints builder
 func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
