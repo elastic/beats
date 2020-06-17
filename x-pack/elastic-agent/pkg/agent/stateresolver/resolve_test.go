@@ -5,8 +5,11 @@
 package stateresolver
 
 import (
+	"regexp"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
@@ -59,16 +62,16 @@ func TestResolver(t *testing.T) {
 			},
 			steps: []configrequest.Step{
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: fb1.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(fb1),
+					ID:          configrequest.StepRun,
+					ProgramSpec: fb1.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(fb1),
 				},
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: mb1.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(mb1),
+					ID:          configrequest.StepRun,
+					ProgramSpec: mb1.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(mb1),
 				},
 			},
 		},
@@ -112,10 +115,10 @@ func TestResolver(t *testing.T) {
 			},
 			steps: []configrequest.Step{
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: mb1.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(mb1),
+					ID:          configrequest.StepRun,
+					ProgramSpec: mb1.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(mb1),
 				},
 			},
 		},
@@ -159,16 +162,16 @@ func TestResolver(t *testing.T) {
 			},
 			steps: []configrequest.Step{
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: fb2.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(fb2),
+					ID:          configrequest.StepRun,
+					ProgramSpec: fb2.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(fb2),
 				},
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: mb1.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(mb1),
+					ID:          configrequest.StepRun,
+					ProgramSpec: mb1.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(mb1),
 				},
 			},
 		},
@@ -206,15 +209,15 @@ func TestResolver(t *testing.T) {
 			},
 			steps: []configrequest.Step{
 				configrequest.Step{
-					ID:      configrequest.StepRemove,
-					Process: fb1.Cmd(),
-					Version: release.Version(),
+					ID:          configrequest.StepRemove,
+					ProgramSpec: fb1.Spec,
+					Version:     release.Version(),
 				},
 				configrequest.Step{
-					ID:      configrequest.StepRun,
-					Process: mb1.Cmd(),
-					Version: release.Version(),
-					Meta:    withMeta(mb1),
+					ID:          configrequest.StepRun,
+					ProgramSpec: mb1.Spec,
+					Version:     release.Version(),
+					Meta:        withMeta(mb1),
 				},
 			},
 		},
@@ -249,14 +252,14 @@ func TestResolver(t *testing.T) {
 			},
 			steps: []configrequest.Step{
 				configrequest.Step{
-					ID:      configrequest.StepRemove,
-					Process: fb1.Cmd(),
-					Version: release.Version(),
+					ID:          configrequest.StepRemove,
+					ProgramSpec: fb1.Spec,
+					Version:     release.Version(),
 				},
 				configrequest.Step{
-					ID:      configrequest.StepRemove,
-					Process: mb1.Cmd(),
-					Version: release.Version(),
+					ID:          configrequest.StepRemove,
+					ProgramSpec: mb1.Spec,
+					Version:     release.Version(),
 				},
 			},
 		},
@@ -326,7 +329,7 @@ func TestResolver(t *testing.T) {
 				require.Equal(t, a.Program.Checksum(), compare.Program.Checksum())
 			}
 
-			if diff := cmp.Diff(test.steps, steps); diff != "" {
+			if diff := cmp.Diff(test.steps, steps, cmpopts.IgnoreUnexported(regexp.Regexp{})); diff != "" {
 				t.Errorf("converge() mismatch (-want +got):\n%s", diff)
 			}
 		})

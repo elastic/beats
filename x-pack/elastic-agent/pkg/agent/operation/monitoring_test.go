@@ -55,13 +55,13 @@ func TestGenerateSteps(t *testing.T) {
 			var fbFound, mbFound bool
 			for _, s := range steps {
 				// Filebeat step check
-				if s.Process == "filebeat" {
+				if s.ProgramSpec.Cmd == "filebeat" {
 					fbFound = true
 					checkStep(t, "filebeat", sampleOutput, s)
 				}
 
 				// Metricbeat step check
-				if s.Process == "metricbeat" {
+				if s.ProgramSpec.Cmd == "metricbeat" {
 					mbFound = true
 					checkStep(t, "metricbeat", sampleOutput, s)
 				}
