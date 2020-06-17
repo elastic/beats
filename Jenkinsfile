@@ -929,9 +929,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
   }
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-  // NOTE: to support Windows 7 32 bits the arch in the go context path is required
-  def arch = is32bit() ? '386' : 'amd64'
-  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${arch}"
+  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
 
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
@@ -975,11 +973,6 @@ def installTools() {
   } else {
     retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
-}
-
-def is32bit(){
-  def labels = env.NODE_LABELS
-  return labels.contains('i386')
 }
 
 def goos(){
