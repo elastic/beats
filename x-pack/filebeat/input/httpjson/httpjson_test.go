@@ -38,7 +38,6 @@ const (
 
 var (
 	once sync.Once
-	url  string
 )
 
 func testSetup(t *testing.T) {
@@ -90,6 +89,10 @@ func createServer(newServer func(handler http.Handler) *httptest.Server) *httpte
 				"hello": "world",
 				"embedded": map[string]string{
 					"hello": "world",
+				},
+				"list": []map[string]interface{}{
+					{"foo": "bar"},
+					{"hello": "world"},
 				},
 			}
 			b, _ := json.Marshal(message)
@@ -157,8 +160,14 @@ func createCustomServerWithArrayResponse(newServer func(handler http.Handler) *h
 	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		message := map[string]interface{}{
-			"hello": []map[string]string{
-				{"foo": "bar"},
+			"hello": []map[string]interface{}{
+				{
+					"foo": "bar",
+					"list": []map[string]interface{}{
+						{"foo": "bar"},
+						{"hello": "world"},
+					},
+				},
 				{"bar": "foo"},
 			},
 		}
@@ -596,6 +605,73 @@ func TestOAuth2(t *testing.T) {
 		events, ok := out.waitForEvents(1)
 		if !ok {
 			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestSplitResponseWithKey(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":     "GET",
+		"split_events_by": "list",
+		"interval":        0,
+	}
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestSplitResponseWithoutKey(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":     "GET",
+		"split_events_by": "not_found",
+		"interval":        0,
+	}
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestArrayWithSplitResponse(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":        "GET",
+		"json_objects_array": "hello",
+		"split_events_by":    "list",
+		"interval":           0,
+	}
+	runTest(t, false, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(3)
+		if !ok {
+			t.Fatalf("Expected 3 events, but got %d.", len(events))
 		}
 		input.Stop()
 
