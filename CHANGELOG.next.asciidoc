@@ -39,11 +39,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * CEF {pull}18223[18223]
 * PANW {pull}18223[18223]
 * Cisco {pull}18753[18753]
+* CrowdStrike {pull}19132[19132]
+* Fortinet {pull}19133[19133]
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
+* Netflow {pull}19087[19087]
+* Zeek {pull}19113[19113] (`forwarded` tag is not included by default)
+* Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
+* CoreDNS {pull}19134[19134] (`forwarded` tag is not included by default)
+* Envoy Proxy {pull}19134[19134] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
+- Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 
 *Heartbeat*
 
@@ -58,6 +66,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
+- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 
 *Packetbeat*
 
@@ -119,8 +128,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Add better handling for Kubernetes Update and Delete watcher events. {pull}18882[18882]
+- Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+- Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 
 *Auditbeat*
 
@@ -128,6 +142,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
+- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
+- system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 
 *Filebeat*
 
@@ -174,6 +190,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
+- Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
+- Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
 
@@ -232,6 +250,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
+- Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
+- Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
+- Stop counterCache only when already started {pull}19103[19103]
 
 *Packetbeat*
 
@@ -250,6 +271,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
@@ -383,6 +405,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
+- Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
+- Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
+- Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 
 *Heartbeat*
 

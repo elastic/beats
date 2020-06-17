@@ -92,9 +92,6 @@ func NewInput(
 
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
 		ACKEvents: func(privates []interface{}) {
 			for _, priv := range privates {
 				if msg, ok := priv.(*pubsub.Message); ok {

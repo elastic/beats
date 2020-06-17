@@ -4,7 +4,9 @@
 
 package state
 
-import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+)
 
 // Status describes the current status of the application process.
 type Status int
@@ -12,9 +14,21 @@ type Status int
 const (
 	// Stopped is status describing not running application.
 	Stopped Status = iota
-	// Running signals that application is currently running.
+	// Starting is status describing application is starting.
+	Starting
+	// Configuring is status describing application is configuring.
+	Configuring
+	// Running is status describing application is running.
 	Running
-	// Restarting means process crashed and is being started again.
+	// Degraded is status describing application is degraded.
+	Degraded
+	// Failed is status describing application is failed.
+	Failed
+	// Stopping is status describing application is stopping.
+	Stopping
+	// Crashed is status describing application is crashed.
+	Crashed
+	// Restarting is status describing application is restarting.
 	Restarting
 )
 
@@ -22,4 +36,11 @@ const (
 type State struct {
 	ProcessInfo *process.Info
 	Status      Status
+	Message     string
+}
+
+// Reporter is interface that is called when a state is changed.
+type Reporter interface {
+	// OnStateChange is called when state changes.
+	OnStateChange(id string, name string, state State)
 }

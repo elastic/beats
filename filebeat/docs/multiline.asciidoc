@@ -29,6 +29,7 @@ The following example shows how to configure {beatname_uc} to handle a multiline
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^\['
 multiline.negate: true
 multiline.match: after
@@ -46,6 +47,8 @@ multiline.match: after
     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
 -------------------------------------------------------------------------------------
 
+*`multiline.type`*:: Defines which aggregation method to use. The default is `pattern`. The other option
+is `count` which lets you aggregate constant number of lines.
 
 *`multiline.pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by {beatname_uc}
 differ somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
@@ -76,6 +79,10 @@ lines are discarded. The default is 500.
 
 *`multiline.timeout`*:: After the specified timeout, {beatname_uc} sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
+*`multiline.count_lines`*:: The number of lines to aggregate into a single event.
+
+*`multiline.skip_newline`*:: When set, multiline events are concatenated without a line separator.
+
 
 ==== Examples of multiline configuration
 
@@ -103,6 +110,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^[[:space:]]'
 multiline.negate: false
 multiline.match: after
@@ -127,6 +135,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
 multiline.negate: false
 multiline.match: after
@@ -153,6 +162,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '\\$'
 multiline.negate: false
 multiline.match: before
@@ -176,6 +186,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
 multiline.negate: true
 multiline.match: after
@@ -200,6 +211,7 @@ To consolidate this as a single event in {beatname_uc}, use the following multil
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: 'Start new event'
 multiline.negate: true
 multiline.match: after
