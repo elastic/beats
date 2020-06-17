@@ -245,7 +245,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            mageTargetWin("Winlogbeat x-pack Windows", "x-pack/winlogbeat", "build unitTest")
           }
         }
         stage('Functionbeat'){
