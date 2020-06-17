@@ -144,6 +144,15 @@ filebeat.inputs:
   # Default is 5s.
   #multiline.timeout: 5s
 
+  # To aggregate constant number of lines into a single event use the count mode of multiline.
+  #multiline.type: count
+
+  # The number of lines to aggregate into a single event.
+  #multiline.count_lines: 3
+
+  # Do not add new line character when concatenating lines.
+  #multiline.skip_newline: false
+
   # Setting tail_files to true means filebeat starts reading new files at the end
   # instead of the beginning. If this is used in combination with log rotation
   # this can mean that the first entries of a new file are skipped.
