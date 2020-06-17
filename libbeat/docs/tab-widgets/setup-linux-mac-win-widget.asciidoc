@@ -1,8 +1,8 @@
 ++++
-<div class="tabs">
+<div class="tabs" data-tab-group="os">
   <div role="tablist" aria-label="Set up">
     <button role="tab"
-            aria-selected="false"
+            aria-selected="true"
             aria-controls="mac-tab-setup"
             id="mac-setup">
       MacOS

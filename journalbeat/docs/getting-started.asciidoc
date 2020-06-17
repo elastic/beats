@@ -107,7 +107,7 @@ visualizing your data. To load these assets:
 . From the installation directory, run:
 +
 --
-include::{libbeat-dir}/tab-widgets/setup-linux-mac-win-widget.asciidoc[]
+include::{libbeat-dir}/tab-widgets/setup-deb-rpm-linux-widget.asciidoc[]
 --
 +
 `-e` is optional and sends output to standard error instead of the configured log output.

@@ -1,5 +1,5 @@
 ++++
-<div class="tabs">
+<div class="tabs" data-tab-group="os">
   <div role="tablist" aria-label="Install libpcap">
     <button role="tab"
             aria-selected="true"
@@ -13,6 +13,27 @@
             id="rpm-install-libpcap"
             tabindex="-1">
       RPM
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="mac-tab-install-libpcap"
+            id="mac-install-libpcap"
+            tabindex="-1">
+      MacOS
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="brew-tab-install-libpcap"
+            id="brew-install-libpcap"
+            tabindex="-1">
+      Brew
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="linux-tab-install-libpcap"
+            id="linux-install-libpcap"
+            tabindex="-1">
+      Linux
     </button>
     <button role="tab"
             aria-selected="false"
@@ -40,6 +61,39 @@ include::install-libpcap.asciidoc[tag=deb]
 ++++
 
 include::install-libpcap.asciidoc[tag=rpm]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="mac-tab-install-libpcap"
+       aria-labelledby="mac-install-libpcap"
+       hidden="">
+++++
+
+include::install-libpcap.asciidoc[tag=mac]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="brew-tab-install-libpcap"
+       aria-labelledby="brew-install-libpcap"
+       hidden="">
+++++
+
+include::install-libpcap.asciidoc[tag=brew]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-install-libpcap"
+       aria-labelledby="linux-install-libpcap"
+       hidden="">
+++++
+
+include::install-libpcap.asciidoc[tag=linux]
 
 ++++
   </div>

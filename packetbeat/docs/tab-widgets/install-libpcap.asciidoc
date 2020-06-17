@@ -1,3 +1,5 @@
+:no-libpcap: 
+
 // tag::deb[]
 ["source","sh",subs="attributes"]
 ------------------------------------------------
@@ -11,6 +13,18 @@ sudo apt-get install libpcap{libpcap}
 sudo yum install libpcap
 ------------------------------------------------
 // end::rpm[]
+
+// tag::mac[]
+You probably do not need to install libpcap.
+// end::mac[]
+
+// tag::brew[]
+You probably do not need to install libpcap.
+// end::brew[]
+
+// tag::linux[]
+You probably do not need to install libpcap.
+// end::linux[]
 
 // tag::win[]
 Download and install a packet sniffing library,

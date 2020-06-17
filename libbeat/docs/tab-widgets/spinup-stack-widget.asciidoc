@@ -1,5 +1,5 @@
 ++++
-<div class="tabs">
+<div class="tabs" data-tab-group="host">
   <div role="tablist" aria-label="Spin up">
     <button role="tab"
             aria-selected="true"

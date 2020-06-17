@@ -1,56 +1,56 @@
 ++++
 <div class="tabs" data-tab-group="os">
-  <div role="tablist" aria-label="Install">
+  <div role="tablist" aria-label="Set up">
     <button role="tab"
             aria-selected="true"
-            aria-controls="deb-tab-install"
-            id="deb-install">
-      DEB
+            aria-controls="deb-tab-setup"
+            id="deb-setup">
+      Deb
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="rpm-tab-install"
-            id="rpm-install"
+            aria-controls="rpm-tab-setup"
+            id="rpm-setup"
             tabindex="-1">
       RPM
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="linux-tab-install"
-            id="linux-install"
+            aria-controls="linux-tab-setup"
+            id="linux-setup"
             tabindex="-1">
       Linux
     </button>
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="deb-tab-install"
-       aria-labelledby="deb-install">
+       id="deb-tab-setup"
+       aria-labelledby="deb-setup">
 ++++
 
-include::install.asciidoc[tag=deb]
-
-++++
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="rpm-tab-install"
-       aria-labelledby="rpm-install"
-       hidden="">
-++++
-
-include::install.asciidoc[tag=rpm]
+include::setup.asciidoc[tag=mac]
 
 ++++
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="linux-tab-install"
-       aria-labelledby="linux-install"
+       id="rpm-tab-setup"
+       aria-labelledby="rpm-setup"
        hidden="">
 ++++
 
-include::install.asciidoc[tag=linux]
+include::setup.asciidoc[tag=linux]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-setup"
+       aria-labelledby="linux-setup"
+       hidden="">
+++++
+
+include::setup.asciidoc[tag=win]
 
 ++++
   </div>

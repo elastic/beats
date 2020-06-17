@@ -4,12 +4,10 @@
 .tabs {
   width: 100%;
 }
-
 [role="tablist"] {
   margin: 0 0 -0.1em;
   overflow: visible;
 }
-
 [role="tab"] {
   position: relative;
   padding: 0.3em 0.5em 0.4em;
@@ -20,7 +18,6 @@
   font-size: inherit;
   background: hsl(220, 20%, 94%);
 }
-
 [role="tab"]:hover::before,
 [role="tab"]:focus::before,
 [role="tab"][aria-selected="true"]::before {
@@ -32,17 +29,14 @@
   border-top: 3px solid hsl(219, 1%, 72%);
   content: '';
 }
-
 [role="tab"][aria-selected="true"] {
   border-radius: 0;
   background: hsl(220, 43%, 99%);
   outline: 0;
 }
-
 [role="tab"][aria-selected="true"]:not(:focus):not(:hover)::before {
   border-top: 5px solid hsl(218, 96%, 48%);
 }
-
 [role="tab"][aria-selected="true"]::after {
   position: absolute;
   z-index: 3;
@@ -54,7 +48,6 @@
   box-shadow: none;
   content: '';
 }
-
 [role="tab"]:hover,
 [role="tab"]:focus,
 [role="tab"]:active {
@@ -62,12 +55,10 @@
   border-radius: 0;
   color: inherit;
 }
-
 [role="tab"]:hover::before,
 [role="tab"]:focus::before {
   border-color: hsl(218, 96%, 48%);
 }
-
 [role="tabpanel"] {
   position: relative;
   z-index: 2;
@@ -78,11 +69,9 @@
   background: hsl(220, 43%, 99%);
   margin-bottom: 1em;
 }
-
 [role="tabpanel"] p {
   margin: 0;
 }
-
 [role="tabpanel"] * + p {
   margin-top: 1em;
 }
@@ -92,15 +81,12 @@
 window.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll('[role="tab"]');
   const tabList = document.querySelector('[role="tablist"]');
-
   // Add a click event handler to each tab
   tabs.forEach(tab => {
     tab.addEventListener("click", changeTabs);
   });
-
   // Enable arrow navigation between tabs in the tab list
   let tabFocus = 0;
-
   tabList.addEventListener("keydown", e => {
     // Move right
     if (e.keyCode === 39 || e.keyCode === 37) {
@@ -119,35 +105,62 @@ window.addEventListener("DOMContentLoaded", () => {
           tabFocus = tabs.length - 1;
         }
       }
-
       tabs[tabFocus].setAttribute("tabindex", 0);
       tabs[tabFocus].focus();
     }
   });
 });
 
-function changeTabs(e) {
-  const target = e.target;
+function setActiveTab(target) {
   const parent = target.parentNode;
   const grandparent = parent.parentNode;
-
+  // console.log(grandparent);
   // Remove all current selected tabs
   parent
     .querySelectorAll('[aria-selected="true"]')
     .forEach(t => t.setAttribute("aria-selected", false));
-
   // Set this tab as selected
   target.setAttribute("aria-selected", true);
-
   // Hide all tab panels
   grandparent
     .querySelectorAll('[role="tabpanel"]')
     .forEach(p => p.setAttribute("hidden", true));
-
   // Show the selected panel
   grandparent.parentNode
     .querySelector(`#${target.getAttribute("aria-controls")}`)
     .removeAttribute("hidden");
+}
+
+function changeTabs(e) {
+  // get the containing list of the tab that was just clicked
+  const tabList = e.target.parentNode;
+  
+  // get all of the sibling tabs
+  const buttons = Array.apply(null, tabList.querySelectorAll('button'));
+  
+  // loop over the siblings to discover which index thje clicked one was
+  const { index } = buttons.reduce(({ found, index }, button) => {
+    if (!found && buttons[index] === e.target) {
+      return { found: true, index };
+    } else if (!found) {
+      return { found, index: index + 1 };
+    } else {
+      return { found, index };
+    }
+  }, { found: false, index: 0 });
+  
+  // get the tab container
+  const container = tabList.parentNode;
+  // read the data-tab-group value from the container, e.g. "os"
+  const { tabGroup } = container.dataset;
+  // get a list of all the tab groups that match this value on the page
+  const groups = document.querySelectorAll('[data-tab-group=' + tabGroup + ']');
+  
+  // for each of the found tab groups, find the tab button at the previously discovered index and select it for each group
+  groups.forEach((group) => {
+    const target = group.querySelectorAll('button')[index];
+    setActiveTab(target);
+  });
 }
 </script>
 ++++
