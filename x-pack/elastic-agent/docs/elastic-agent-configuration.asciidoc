@@ -1,11 +1,12 @@
 [[elastic-agent-configuration]]
+[role="xpack"]
 = Configuration settings
 
 experimental[]
 
 By default {agent} runs in standalone mode to ingest system data and send it to
 a local {es} instance running on port 9200. It uses the demo credentials of the
-`elastic` user. It's also configured to monitor all {beats} managed by the agent
+`elastic` user. It's also configured to monitor all {beats} managed by the Agent
 and send the {beats} logs and metrics to the same {es) instance.
 
 To alter this behavior, configure the output and other configuration settings:
