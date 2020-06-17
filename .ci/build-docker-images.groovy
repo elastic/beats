@@ -31,17 +31,18 @@ pipeline {
   }
   parameters {
     booleanParam(name: "RELEASE_TEST_IMAGES", defaultValue: "true", description: "If it's needed to build & push Beats' test images")
+    string(name: 'BRANCH_REFERENCE', defaultValue: "master", description: "Git branch/tag to use")
   }
   stages {
     stage('Checkout') {
       steps {
+        gitCheckout(basedir: "${BASE_DIR}",
+          branch: "${params.BRANCH_REFERENCE}",
+          repo: "https://github.com/elastic/${REPO}.git",
+          credentialsId: "${JOB_GIT_CREDENTIALS}"
+        )
         dir("${BASE_DIR}"){
-          git("https://github.com/elastic/${REPO}.git")
-        }
-        script {
-          dir("${BASE_DIR}"){
-            env.GO_VERSION = readFile(".go-version").trim()
-          }
+          setEnvVar("GO_VERSION", readFile(".go-version").trim())
         }
       }
     }
