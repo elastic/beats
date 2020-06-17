@@ -6,11 +6,9 @@ package awscloudwatch
 
 import (
 	"context"
-	"strconv"
+	"fmt"
 	"sync"
 	"time"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
@@ -40,15 +38,16 @@ func init() {
 
 // awsCloudWatchInput is a input for AWS CloudWatch logs
 type awsCloudWatchInput struct {
-	outlet     channel.Outleter // Output of received awscloudwatch logs.
-	config     config
-	awsConfig  awssdk.Config
-	logger     *logp.Logger
-	close      chan struct{}
-	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
-	context    *channelContext
-	workerWg   sync.WaitGroup // Waits on awscloudwatch worker goroutine.
-	stopOnce   sync.Once
+	outlet          channel.Outleter // Output of received awscloudwatch logs.
+	config          config
+	awsConfig       awssdk.Config
+	logger          *logp.Logger
+	close           chan struct{}
+	workerOnce      sync.Once // Guarantees that the worker goroutine is only started once.
+	context         *channelContext
+	workerWg        sync.WaitGroup // Waits on awscloudwatch worker goroutine.
+	stopOnce        sync.Once
+	prevCurrentTime time.Time
 }
 
 type cwContext struct {
@@ -85,7 +84,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 
-	logger.Info("awscloudwatch input config = ", config)
+	logger.Debug("awscloudwatch input config = ", config)
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
@@ -124,81 +123,143 @@ func (p *awsCloudWatchInput) Run() {
 	awsConfig := p.awsConfig.Copy()
 	awsConfig.Region = p.config.RegionName
 
-	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "cloudwatchlogs", p.config.RegionName, awsConfig)
-	p.run(cwConfig)
-
-	for {
-		select {
-		case <-p.close:
-			p.logger.Info("awscloudwatch input stopped")
-			return
-		case <-time.After(p.config.ScanFrequency):
-			p.logger.Info("start awscloudwatch input")
-			p.run(cwConfig)
-		}
-	}
+	p.workerOnce.Do(func() {
+		p.workerWg.Add(1)
+		cwConfig := awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "cloudwatchlogs", p.config.RegionName, awsConfig)
+		p.run(cwConfig)
+		p.workerWg.Done()
+	})
 }
 
 func (p *awsCloudWatchInput) run(cwConfig awssdk.Config) {
 	defer p.logger.Infof("awscloudwatch input worker for log group '%v' has stopped.", p.config.LogGroup)
-
-	p.logger.Infof("awscloudwatch input worker has started. with log group: %v", p.config.LogGroup)
+	p.logger.Infof("awscloudwatch input worker for log group: '%v' has started", p.config.LogGroup)
 
 	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
 	defer cancelFn()
 
-	startTime, endTime := aws.GetStartTimeEndTime(p.config.ScanFrequency)
-	p.logger.Info("startTime = ", startTime)
-	p.logger.Info("endTime = ", endTime)
-	startTimeMS := int64(startTime.Nanosecond()) / int64(time.Millisecond)
-	endTimeMS := int64(endTime.Nanosecond()) / int64(time.Millisecond)
-
 	svc := cloudwatchlogs.New(cwConfig)
+	prevEndTime := int64(0)
 	for p.context.Err() == nil {
-		getLogEventsInput := &cloudwatchlogs.GetLogEventsInput{
-			LogGroupName:  awssdk.String(p.config.LogGroup),
-			LogStreamName: awssdk.String(p.config.LogStream),
-			StartTime:     &startTimeMS,
-			EndTime:       &endTimeMS,
-			Limit:         awssdk.Int64(int64(p.config.Limit)),
-		}
+		i := 0
+		nextToken := ""
+		currentTime := time.Now()
+		startTime, endTime := getStartPosition(p.config.StartPosition, currentTime, prevEndTime)
+		prevEndTime = endTime
 
-		req := svc.GetLogEventsRequest(getLogEventsInput)
-		resp, err := req.Send(ctx)
-		if err != nil {
-			p.logger.Error("GetLogEventsRequest failed", err)
-			continue
-		}
+		p.logger.Debugf("start_position = %s and startTime = %v", p.config.StartPosition, startTime)
 
-		events := resp.Events
-		p.logger.Debugf("Processing #%v events", len(events))
-		for i, event := range events {
-			f := common.MapStr{
-				"message": *event.Message,
-				"log": common.MapStr{
-					"file.path": p.config.LogGroup + "/" + p.config.LogStream,
-				},
-				"aws": common.MapStr{
-					"log_group":  p.config.LogGroup,
-					"log_stream": p.config.LogStream,
-				},
-				"cloud": common.MapStr{
-					"provider": "aws",
-					"region":   p.config.RegionName,
-				},
+		for nextToken != "" || i == 0 {
+			fmt.Println("====== i = ", i)
+			fmt.Println("====== nextToken = ", nextToken)
+
+			filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
+				LogGroupName: awssdk.String(p.config.LogGroup),
+				StartTime:    awssdk.Int64(startTime),
+				EndTime:      awssdk.Int64(endTime),
+				Limit:        awssdk.Int64(p.config.Limit),
 			}
-			beatEvent := beat.Event{
-				Timestamp: time.Now(),
-				Fields:    f,
-				Meta:      common.MapStr{"id": strconv.Itoa(int(*event.Timestamp)) + "-" + strconv.Itoa(int(*event.IngestionTime)) + "-" + strconv.Itoa(i)},
+			if i != 0 {
+				filterLogEventsInput.NextToken = awssdk.String(nextToken)
 			}
-			err = p.forwardEvent(beatEvent)
+
+			req := svc.FilterLogEventsRequest(filterLogEventsInput)
+			resp, err := req.Send(ctx)
 			if err != nil {
-				p.logger.Error("forwardEvent failed", err)
+				p.logger.Error("FilterLogEventsRequest failed", err)
 				continue
 			}
+
+			if resp.NextToken != nil {
+				nextToken = *resp.NextToken
+			} else {
+				nextToken = ""
+			}
+
+			logEvents := resp.Events
+			fmt.Println("# events = ", len(logEvents))
+			p.logger.Debugf("Processing #%v events", len(logEvents))
+
+			errC := make(chan error)
+			err = p.processLogEvents(logEvents, errC)
+			if err != nil {
+				err = errors.Wrap(err, "handleS3Objects failed")
+				p.logger.Error(err)
+				continue
+			}
+
+			// increase counter after making FilterLogEventsRequest API call
+			i++
+			time.Sleep(time.Duration(200) * time.Millisecond)
+		}
+
+		p.logger.Infof("sleeping for %v before checking new logs", p.config.WaitTime)
+		time.Sleep(time.Duration(p.config.WaitTime) * time.Second)
+		p.logger.Info("done sleeping")
+	}
+}
+
+func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64) (startTime int64, endTime int64) {
+	switch startPosition {
+	case "beginning":
+		if prevEndTime != 0 {
+			return prevEndTime, int64(currentTime.Nanosecond()) / int64(time.Millisecond)
+		}
+		return 0, int64(currentTime.Nanosecond()) / int64(time.Millisecond)
+	case "end":
+		if prevEndTime != 0 {
+			return prevEndTime, 0
+		}
+		return int64(currentTime.Nanosecond()) / int64(time.Millisecond), 0
+	}
+	return
+}
+
+func (p *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, errC chan error) error {
+	cwCtx := &cwContext{
+		refs: 1,
+		errC: errC,
+	}
+	defer cwCtx.done()
+
+	for _, logEvent := range logEvents {
+		event := createEvent(logEvent, p.config.LogGroup, p.config.RegionName, cwCtx)
+		err := p.forwardEvent(event)
+		if err != nil {
+			err = errors.Wrap(err, "forwardEvent failed")
+			p.logger.Error(err)
+			cwCtx.setError(err)
 		}
 	}
+	return nil
+}
+func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string, cwCtx *cwContext) beat.Event {
+	cwCtx.Inc()
+
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": *logEvent.Message,
+			"log": common.MapStr{
+				"file.path": logGroup + "/" + *logEvent.LogStreamName,
+			},
+			"aws": common.MapStr{
+				"log_group":      logGroup,
+				"log_stream":     *logEvent.LogStreamName,
+				"ingestion_time": *logEvent.IngestionTime,
+				"timestamp":      *logEvent.Timestamp,
+				"event_id":       *logEvent.EventId,
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   regionName,
+			},
+		},
+		Private: cwCtx,
+	}
+	event.SetID(*logEvent.EventId)
+
+	return event
 }
 
 func (p *awsCloudWatchInput) forwardEvent(event beat.Event) error {
