@@ -19,7 +19,7 @@ To alter this behavior, configure the output and other configuration settings:
 == Output settings
 
 Specify one or more outputs. Specifying multiple outputs allows you to pair
-each data source with a different output. 
+each data source with a different output.
 
 IMPORTANT: {agent} currently works with the {es} output only.
 
@@ -54,7 +54,7 @@ A default output configuration is required.
 [[elastic-agent-monitoring-configuration]]
 == {beats} monitoring settings
 
-{agent} monitors {beats} by default. To disable or change monitoring 
+{agent} monitors {beats} by default. To disable or change monitoring
 settings, set options under `settings.monitoring`:
 
 [source,yaml]
@@ -89,20 +89,19 @@ filesystem metrics, and sends them to the default output. For example:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-datasources:
-  - namespace: default
+inputs:
+  - type: system/metrics
+    dataset.namespace: default
     use_output: default
-    inputs:
-      - type: system/metrics
-        streams:
-          - metricset: cpu
-            dataset: system.cpu
-          - metricset: memory
-            dataset: system.memory
-          - metricset: network
-            dataset: system.network
-          - metricset: filesystem
-            dataset: system.filesystem
+    streams:
+      - metricset: cpu
+        dataset.name: system.cpu
+      - metricset: memory
+        dataset.name: system.memory
+      - metricset: network
+        dataset.name: system.network
+      - metricset: filesystem
+        dataset.name: system.filesystem
 -------------------------------------------------------------------------------------
 
 If `use_output` is not specified, the `default` output is used.

@@ -19,37 +19,49 @@ outputs:
     hosts: ["monitoring:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
-datasources:
-  - use_output: default
-    inputs:
-    - type: docker/metrics
-      streams:
-        - metricset: status
-          dataset: docker.status
-        - metricset: info
-          dataset: ""
-      hosts: ["http://127.0.0.1:8080"]
-    - type: logs
-      streams:
-        - paths:
-          - /var/log/hello1.log
-          - /var/log/hello2.log
-      vars:
-        var: value
-  - namespace: testing
+inputs:
+  - type: docker/metrics
     use_output: default
-    inputs:
-      - type: apache/metrics
-        processors:
-          - add_fields:
-              fields:
-                should_be: first
-        streams:
-          - enabled: true
-            metricset: info
-            hosts: ["http://apache.remote"]
-        hosts: ["http://apache.local"]
-        id: apache-metrics-id
+    streams:
+      - metricset: status
+        dataset:
+          name: docker.status
+      - metricset: info
+        dataset:
+          name: ""
+    hosts: ["http://127.0.0.1:8080"]
+  - type: logs
+    use_output: default
+    streams:
+      - paths:
+        - /var/log/hello1.log
+        - /var/log/hello2.log
+    vars:
+      var: value
+  - type: logs
+    dataset:
+      type: testtype
+    use_output: default
+    streams:
+      - paths:
+        - /var/log/hello3.log
+        - /var/log/hello4.log
+    vars:
+      var: value
+  - type: apache/metrics
+    dataset:
+      namespace: testing
+    use_output: default
+    processors:
+      - add_fields:
+          fields:
+            should_be: first
+    streams:
+      - enabled: true
+        metricset: info
+        hosts: ["http://apache.remote"]
+    hosts: ["http://apache.local"]
+    id: apache-metrics-id
 
 settings.monitoring:
   use_output: monitoring
