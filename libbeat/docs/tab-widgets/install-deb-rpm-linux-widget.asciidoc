@@ -56,5 +56,3 @@ include::install.asciidoc[tag=linux]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

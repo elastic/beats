@@ -38,5 +38,3 @@ include::set-connection.asciidoc[tag=self-managed]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

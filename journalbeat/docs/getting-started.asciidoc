@@ -173,3 +173,6 @@ xpack.infra:
      logAlias: "filebeat-*,journalbeat-*"
 ----
 ====
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

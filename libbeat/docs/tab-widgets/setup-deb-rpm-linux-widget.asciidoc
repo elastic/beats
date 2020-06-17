@@ -56,5 +56,3 @@ include::setup.asciidoc[tag=win]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

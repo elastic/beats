@@ -110,5 +110,3 @@ include::enable-modules.asciidoc[tag=win]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

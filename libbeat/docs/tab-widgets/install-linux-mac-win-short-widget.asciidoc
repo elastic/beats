@@ -56,5 +56,3 @@ include::install.asciidoc[tag=win-short]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

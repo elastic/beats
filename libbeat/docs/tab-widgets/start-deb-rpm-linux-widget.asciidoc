@@ -56,5 +56,3 @@ include::start.asciidoc[tag=linux]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

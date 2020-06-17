@@ -110,5 +110,3 @@ include::install.asciidoc[tag=win]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

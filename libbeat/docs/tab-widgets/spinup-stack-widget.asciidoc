@@ -38,5 +38,3 @@ include::spinup-stack.asciidoc[tag=self-managed]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]

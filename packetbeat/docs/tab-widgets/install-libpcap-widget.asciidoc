@@ -110,5 +110,3 @@ include::install-libpcap.asciidoc[tag=win]
   </div>
 </div>
 ++++
-
-include::{libbeat-dir}/tab-widgets/stuff.asciidoc[]

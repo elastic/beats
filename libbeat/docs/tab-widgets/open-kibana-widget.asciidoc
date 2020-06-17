@@ -38,5 +38,3 @@ include::open-kibana.asciidoc[tag=self-managed]
   </div>
 </div>
 ++++
-
-include::stuff.asciidoc[]
