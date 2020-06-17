@@ -270,7 +270,6 @@ pipeline {
           }
           stages {
             stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
