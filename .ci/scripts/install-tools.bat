@@ -35,3 +35,9 @@ if not exist C:\Python38\python.exe (
 python --version
 where python
 
+if not exist C:\tools\mingw64\bin\gcc.exe (
+    REM Install mingw 5.3.0
+    choco install mingw -y -r --no-progress --version 5.3.0 || echo ERROR && exit /b
+)
+
+where gcc --version
