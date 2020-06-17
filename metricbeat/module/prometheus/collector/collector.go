@@ -19,8 +19,6 @@ package collector
 
 import (
 	"regexp"
-	"sync"
-
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
@@ -81,7 +79,6 @@ type MetricSet struct {
 	excludeMetrics  []*regexp.Regexp
 	namespace       string
 	promEventsGen   PromEventsGenerator
-	once            sync.Once
 	host            string
 	eventGenStarted bool
 }
@@ -128,10 +125,10 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.once.Do(func() {
+	if !m.eventGenStarted {
 		m.promEventsGen.Start()
 		m.eventGenStarted = true
-	})
+	}
 
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
