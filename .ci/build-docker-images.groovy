@@ -66,7 +66,7 @@ pipeline {
           dir("${BASE_DIR}/metricbeat"){
             retryWithSleep(retries: 3, seconds: 5, backoff: true){
               sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "compose:pushSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
             }
           }
         }
@@ -85,7 +85,7 @@ pipeline {
           dir("${BASE_DIR}/x-pack/metricbeat"){
             retryWithSleep(retries: 3, seconds: 5, backoff: true){
               sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "compose:pushSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
             }
           }
         }
@@ -104,7 +104,7 @@ pipeline {
           dir("${BASE_DIR}/x-pack/filebeat"){
             retryWithSleep(retries: 3, seconds: 5, backoff: true){
               sh(label: 'Build', script: "mage compose:buildSupportedVersions");
-              sh(label: 'Push', script: "compose:pushSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
             }
           }
         }
