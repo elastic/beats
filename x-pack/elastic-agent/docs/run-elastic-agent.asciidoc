@@ -11,12 +11,12 @@ configure and manage the Agent.
 [[fleet-mode]]
 == Run in {fleet} mode
 
-With _fleet mode_, you manage {agent} remotely. The agent uses a trusted {kib}
-instance to retrieve configurations and report agent events. This trusted {kib}
+With _fleet mode_, you manage {agent} remotely. The Agent uses a trusted {kib}
+instance to retrieve configurations and report Agent events. This trusted {kib}
 instance must have {ingest-manager} and {fleet} enabled.
 
 To create a trusted communication channel between {agent} and {kib}, enroll the
-agent to {fleet}.
+Agent to {fleet}.
 
 To enroll an {agent} to {fleet}:
 
@@ -45,7 +45,7 @@ To start {agent}, run:
 == Run in standalone mode (default)
 
 With _standalone mode_, you manually configure and manage the Agent locally.
-Each agent is configured to be in standalone mode by default after installation.
+Each Agent is configured to be in standalone mode by default after installation.
 
 If {agent} is installed as an auto-starting service, it will run automatically
 when you restart your system.
