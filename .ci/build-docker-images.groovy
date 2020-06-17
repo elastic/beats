@@ -34,6 +34,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
+        deleteDir()
         gitCheckout(basedir: "${BASE_DIR}",
           branch: "${params.BRANCH_REFERENCE}",
           repo: "https://github.com/elastic/${REPO}.git",
