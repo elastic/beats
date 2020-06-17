@@ -418,7 +418,7 @@ def withBeatsEnvWin(Closure body) {
     "DEV_OS=windows",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}",
+    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw64\\bin;${env.PATH}",
     "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",

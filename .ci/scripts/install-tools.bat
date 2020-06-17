@@ -1,6 +1,6 @@
 set GOPATH=%WORKSPACE%
 set MAGEFILE_CACHE=%WORKSPACE%\.magefile
-set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;%PATH%
+set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw64\bin;%PATH%
 
 where /q curl
 IF ERRORLEVEL 1 (
