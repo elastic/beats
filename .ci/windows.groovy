@@ -105,8 +105,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_FILEBEAT != "false" && params.windowsTest
             }
@@ -120,8 +119,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
             }
@@ -135,8 +133,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_HEARTBEAT != "false"
             }
@@ -147,8 +144,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return false
-                  // return params.windowsTest
+                  return params.windowsTest
                 }
               }
               steps {
@@ -162,8 +158,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
@@ -177,8 +172,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
             }
@@ -192,8 +186,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_METRICBEAT != "false" && params.windowsTest
             }
@@ -207,8 +200,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
             }
@@ -222,8 +214,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return env.BUILD_WINLOGBEAT != "false"
             }
@@ -234,8 +225,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return false
-                  // return params.windowsTest
+                  return params.windowsTest
                 }
               }
               steps {
@@ -249,8 +239,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return false
-              // return params.windowsTest
+              return params.windowsTest
               // NOTE: commented to run all the windows stages.
               //return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
             }
