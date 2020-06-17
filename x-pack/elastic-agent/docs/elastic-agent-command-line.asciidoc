@@ -1,4 +1,5 @@
 [[elastic-agent-cmd-options]]
+[role="xpack"]
 = Command line options
 
 experimental[]

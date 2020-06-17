@@ -1,4 +1,6 @@
 [[elastic-agent-installation-configuration]]
+[role="xpack"]
+
 = Manage your {agent}s
 
 experimental[]

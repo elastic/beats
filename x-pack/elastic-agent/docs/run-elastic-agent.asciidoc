@@ -1,4 +1,5 @@
 [[run-elastic-agent]]
+[role="xpack"]
 = Run {agent}
 
 experimental[]

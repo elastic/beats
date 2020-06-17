@@ -1,4 +1,5 @@
 [[elastic-agent-installation]]
+[role="xpack"]
 = Install {agent}
 
 experimental[]

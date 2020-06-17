@@ -1,4 +1,5 @@
 [[elastic-agent-configuration]]
+[role="xpack"]
 = Configuration settings
 
 experimental[]
