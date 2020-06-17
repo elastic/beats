@@ -12,7 +12,7 @@ post_install:
     args:
     - "install"
     - "--upgrade"
-    - "--resource"
+    - "--resources"
     - "endpoint-resource.zip"
 pre_uninstall:
 - exec_file:

@@ -40,6 +40,12 @@ func (i *Installer) Install(programName, version, installDir string) error {
 		return err
 	}
 
+	// cleanup install directory before unzip
+	_, err = os.Stat(installDir)
+	if err == nil || os.IsExist(err) {
+		os.RemoveAll(installDir)
+	}
+
 	if err := i.unzip(artifactPath, programName, version); err != nil {
 		return err
 	}
@@ -57,7 +63,7 @@ func (i *Installer) Install(programName, version, installDir string) error {
 		}
 	}
 
-	return i.runInstall(programName, version, installDir)
+	return nil
 }
 
 func (i *Installer) unzip(artifactPath, programName, version string) error {
@@ -67,13 +73,6 @@ func (i *Installer) unzip(artifactPath, programName, version string) error {
 
 	powershellArg := fmt.Sprintf("Expand-Archive -LiteralPath \"%s\" -DestinationPath \"%s\"", artifactPath, i.config.InstallPath)
 	installCmd := exec.Command("powershell", "-command", powershellArg)
-	return installCmd.Run()
-}
-
-func (i *Installer) runInstall(programName, version, installPath string) error {
-	powershellCmd := fmt.Sprintf(powershellCmdTemplate, installPath, programName)
-	installCmd := exec.Command("powershell", "-command", powershellCmd)
-
 	return installCmd.Run()
 }
 

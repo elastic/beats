@@ -244,6 +244,10 @@ func (r *ExecFileStep) Execute(rootDir string) error {
 	}
 	output, err := cmd.Output()
 	if err != nil {
+		exitErr, ok := err.(*exec.ExitError)
+		if ok && exitErr.Stderr != nil && len(exitErr.Stderr) > 0 {
+			return fmt.Errorf("operation 'Exec' failed: %s", string(exitErr.Stderr))
+		}
 		return fmt.Errorf("operation 'Exec' failed: %s", string(output))
 	}
 	return nil

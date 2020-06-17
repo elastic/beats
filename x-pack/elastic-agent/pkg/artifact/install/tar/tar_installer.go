@@ -31,7 +31,7 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, _ string) error {
+func (i *Installer) Install(programName, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
@@ -43,7 +43,13 @@ func (i *Installer) Install(programName, version, _ string) error {
 	}
 	defer f.Close()
 
-	return unpack(f, i.config.InstallPath)
+	// cleanup install directory before unpack
+	_, err = os.Stat(installDir)
+	if err == nil || os.IsExist(err) {
+		os.RemoveAll(installDir)
+	}
+
+	return unpack(f, installDir)
 
 }
 

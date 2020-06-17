@@ -47,9 +47,10 @@ func (o *operationInstall) Name() string {
 func (o *operationInstall) Check(_ Application) (bool, error) {
 	err := o.installer.Check(o.program.BinaryName(), o.program.Version(), o.program.Directory())
 	if err != nil {
-		return false, err
+		// don't return err, just state if Run should be called
+		return true, nil
 	}
-	return true, nil
+	return false, nil
 }
 
 // Run runs the operation
