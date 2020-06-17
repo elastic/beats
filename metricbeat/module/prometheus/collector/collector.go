@@ -19,7 +19,6 @@ package collector
 
 import (
 	"regexp"
-	"sync"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -76,13 +75,13 @@ type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, 
 // MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus     p.Prometheus
-	includeMetrics []*regexp.Regexp
-	excludeMetrics []*regexp.Regexp
-	namespace      string
-	promEventsGen  PromEventsGenerator
-	once           sync.Once
-	host           string
+	prometheus      p.Prometheus
+	includeMetrics  []*regexp.Regexp
+	excludeMetrics  []*regexp.Regexp
+	namespace       string
+	promEventsGen   PromEventsGenerator
+	host            string
+	eventGenStarted bool
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -104,10 +103,11 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		}
 
 		ms := &MetricSet{
-			BaseMetricSet: base,
-			prometheus:    prometheus,
-			namespace:     namespace,
-			promEventsGen: promEventsGen,
+			BaseMetricSet:   base,
+			prometheus:      prometheus,
+			namespace:       namespace,
+			promEventsGen:   promEventsGen,
+			eventGenStarted: false,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
@@ -126,7 +126,10 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.once.Do(m.promEventsGen.Start)
+	if !m.eventGenStarted {
+		m.promEventsGen.Start()
+		m.eventGenStarted = true
+	}
 
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
@@ -186,7 +189,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops the metricset
 func (m *MetricSet) Close() error {
-	m.promEventsGen.Stop()
+	if m.eventGenStarted {
+		m.promEventsGen.Stop()
+	}
 	return nil
 }
 

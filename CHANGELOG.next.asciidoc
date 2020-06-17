@@ -128,11 +128,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Add better handling for Kubernetes Update and Delete watcher events. {pull}18882[18882]
 - Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 - Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 
 *Auditbeat*
 
@@ -250,6 +252,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+- Stop counterCache only when already started {pull}19103[19103]
 
 *Packetbeat*
 
@@ -268,6 +271,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
@@ -402,6 +406,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
+- Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
+- Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 
 *Heartbeat*
 

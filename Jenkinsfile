@@ -703,20 +703,14 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
-                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
-                }
+                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
+                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
-                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
-                }
+                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
+                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
               }
             }
             stage('Generators Metricbeat Mac OS X'){
@@ -729,10 +723,7 @@ pipeline {
                 }
               }
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
-                }
+                makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
               }
               post {
                 always {
@@ -750,10 +741,7 @@ pipeline {
                 }
               }
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
-                }
+                makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
               }
               post {
                 always {
