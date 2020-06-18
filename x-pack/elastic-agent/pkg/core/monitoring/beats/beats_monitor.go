@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 const httpPlusPrefix = "http+"
