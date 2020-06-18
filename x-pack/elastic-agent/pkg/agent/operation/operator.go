@@ -255,6 +255,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	var a Application
 	var err error
 	if p.ServicePort() == 0 {
+		// Applications without service ports defined are ran as through the process application type.
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
@@ -268,6 +269,8 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.reporter,
 			o.monitor)
 	} else {
+		// Service port is defined application is ran with service application type, with it fetching
+		// the connection credentials through the defined service port.
 		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
