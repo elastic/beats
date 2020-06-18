@@ -27,11 +27,12 @@ type ModuleV2 struct {
 	containerReporter mb.PushReporterV2
 }
 
-func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (*ModuleV2, error) {
-	// Early check that listener can be created
+func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (mb.Module, error) {
+	// early check that listener can be created
 	_, err := hub.RlpListener(cfcommon.RlpListenerCallbacks{})
 	if err != nil {
 		return nil, err
+
 	}
 
 	return &ModuleV2{
@@ -42,31 +43,42 @@ func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (*Modu
 }
 
 func (m *ModuleV2) RunCounterReporter(reporter mb.PushReporterV2) {
+	m.listenerLock.Lock()
 	m.runReporters(reporter, m.valueReporter, m.containerReporter)
-	defer m.runReporters(nil, m.valueReporter, m.containerReporter)
+	m.listenerLock.Unlock()
 
 	<-reporter.Done()
+
+	m.listenerLock.Lock()
+	m.runReporters(nil, m.valueReporter, m.containerReporter)
+	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) RunValueReporter(reporter mb.PushReporterV2) {
+	m.listenerLock.Lock()
 	m.runReporters(m.counterReporter, reporter, m.containerReporter)
-	defer m.runReporters(m.counterReporter, nil, m.containerReporter)
+	m.listenerLock.Unlock()
 
 	<-reporter.Done()
 
+	m.listenerLock.Lock()
+	m.runReporters(m.counterReporter, nil, m.containerReporter)
+	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) RunContainerReporter(reporter mb.PushReporterV2) {
+	m.listenerLock.Lock()
 	m.runReporters(m.counterReporter, m.valueReporter, reporter)
-	defer m.runReporters(m.counterReporter, m.valueReporter, nil)
+	m.listenerLock.Unlock()
 
 	<-reporter.Done()
+
+	m.listenerLock.Lock()
+	m.runReporters(m.counterReporter, m.valueReporter, nil)
+	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) runReporters(counterReporter, valueReporter, containerReporter mb.PushReporterV2) {
-	m.listenerLock.Lock()
-	defer m.listenerLock.Unlock()
-
 	if m.listener != nil {
 		m.listener.Stop()
 		m.listener = nil
