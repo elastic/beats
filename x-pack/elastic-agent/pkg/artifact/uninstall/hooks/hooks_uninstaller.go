@@ -48,9 +48,5 @@ func (i *Uninstaller) Uninstall(programName, version, installDir string) error {
 		break
 	}
 
-	if err := i.uninstaller.Uninstall(programName, version, installDir); err != nil {
-		return err
-	}
-
-	return nil
+	return i.uninstaller.Uninstall(programName, version, installDir)
 }
