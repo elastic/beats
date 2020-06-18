@@ -447,7 +447,7 @@ func TestSelector(t *testing.T) {
 			},
 		},
 		"indexed key access when it doesn't exist": {
-			selector: "inputs.paths.1",
+			selector: "inputs.paths.2",
 			hashmap: map[string]interface{}{
 				"inputs": map[string]interface{}{
 					"type":         "log/docker",
