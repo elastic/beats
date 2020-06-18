@@ -77,8 +77,6 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "remove_key"
 		case *FixStreamRule:
 			name = "fix_stream"
-		case *OverwriteRule:
-			name = "overwrite"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -158,8 +156,6 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &RemoveKeyRule{}
 		case "fix_stream":
 			r = &FixStreamRule{}
-		case "overwrite":
-			r = &OverwriteRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -349,59 +345,6 @@ func CopyAllToList(to, onMerge string, except ...string) *CopyAllToListRule {
 		To:         to,
 		Except:     except,
 		OnConflict: onMerge,
-	}
-}
-
-// OverwriteRule is a rule which overwrites the entire to destination, except for
-// the specified keys if the to destination is a dictionary.
-type OverwriteRule struct {
-	From   Selector
-	To     Selector
-	Except []string
-}
-
-// Apply overwrites the destination, except for
-// the specified keys if the to destination is a dictionary.
-func (r *OverwriteRule) Apply(ast *AST) error {
-	from, ok := Lookup(ast, r.From)
-	// skip when the `from` node is not found.
-	if !ok {
-		return nil
-	}
-	to, ok := Lookup(ast, r.To)
-	// skip when the `to` node is not found.
-	if !ok {
-		return nil
-	}
-
-	keep := make([]Node, 0, len(r.Except))
-	switch src := from.(type) {
-	case *Dict:
-		switch dest := to.(type) {
-		case *Dict:
-			for _, v := range dest.value {
-				if inArray(v.(*Key).name, r.Except) {
-					keep = append(keep, v)
-				}
-			}
-			dest.value = src.value
-			for _, v := range keep {
-				dest.value = append(dest.value, v)
-			}
-			dest.sort()
-			return nil
-		}
-	}
-
-	return fmt.Errorf("can only overwrite a dict with another dict, from: %T to: %T", from, to)
-}
-
-// Overwrite creates a OverwriteRule
-func Overwrite(from Selector, to Selector, except ...string) *OverwriteRule {
-	return &OverwriteRule{
-		From:   from,
-		To:     to,
-		Except: except,
 	}
 }
 
@@ -1233,15 +1176,6 @@ func keys(m map[string]interface{}) []string {
 		keys = append(keys, k)
 	}
 	return keys
-}
-
-func inArray(key string, keys []string) bool {
-	for _, k := range keys {
-		if key == k {
-			return true
-		}
-	}
-	return false
 }
 
 func datasetNamespaceFromInputNode(inputNode Node) string {
