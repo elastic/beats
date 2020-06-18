@@ -43,9 +43,15 @@ func TestSerialization(t *testing.T) {
 				"log",
 			),
 		),
+		CheckInstallSteps: transpiler.NewStepList(
+			transpiler.ExecFile("app", "verify", "--installed"),
+		),
 		PostInstallSteps: transpiler.NewStepList(
 			transpiler.DeleteFile("d-1", true),
 			transpiler.MoveFile("m-1", "m-2", false),
+		),
+		PreUninstallSteps: transpiler.NewStepList(
+			transpiler.ExecFile("app", "uninstall", "--force"),
 		),
 		When: "1 == 1",
 	}
@@ -87,6 +93,12 @@ rules:
     key: type
     values:
     - log
+check_install:
+- exec_file:
+    path: app
+    args:
+    - verify
+    - --installed
 post_install:
 - delete_file:
     path: d-1
@@ -95,6 +107,12 @@ post_install:
     path: m-1
     target: m-2
     fail_on_missing: false
+pre_uninstall:
+- exec_file:
+    path: app
+    args:
+    - uninstall
+    - --force
 when: 1 == 1
 `
 	t.Run("serialization", func(t *testing.T) {
