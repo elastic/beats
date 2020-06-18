@@ -22,6 +22,7 @@ const agentName = "elastic-agent"
 // Logger alias ecslog.Logger with Logger.
 type Logger = logp.Logger
 
+// Config is a logging config.
 type Config = logp.Config
 
 // New returns a configured ECS Logger
@@ -93,6 +94,7 @@ func defaultConfig() (*common.Config, error) {
 	return commonLogp, nil
 }
 
+// DefaultLoggingConfig returns default configuration for agent logging.
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
