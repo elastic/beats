@@ -115,6 +115,13 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// sort sorts the keys in the dictionary
+func (d *Dict) sort() {
+	sort.Slice(d.value, func(i, j int) bool {
+		return d.value[i].(*Key).name < d.value[j].(*Key).name
+	})
+}
+
 // Key represents a Key / value pair in the dictionary.
 type Key struct {
 	name  string
@@ -213,7 +220,10 @@ func (l *List) Find(idx string) (Node, bool) {
 	if err != nil {
 		return nil, false
 	}
-	if i > len(l.value) || i < len(l.value) {
+	if l.value == nil {
+		return nil, false
+	}
+	if i > len(l.value)-1 || i < 0 {
 		return nil, false
 	}
 
@@ -548,6 +558,9 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 }
 
 func splitPath(s Selector) []string {
+	if s == "" {
+		return nil
+	}
 	return strings.Split(s, selectorSep)
 }
 
@@ -694,7 +707,6 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 		if !ok {
 			return nil, false
 		}
-
 		current = n
 	}
 
@@ -713,9 +725,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
 
-				sort.Slice(t.value, func(i, j int) bool {
-					return t.value[i].(*Key).name < t.value[j].(*Key).name
-				})
+				t.sort()
 
 				current = newNode
 				continue
