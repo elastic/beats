@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -267,6 +268,21 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Module with data.host defined and a zero port should not return a config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 0,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+					},
+				},
+			},
+			len: 0,
+		},
+		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -290,6 +306,45 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
+		{
+			message: "Module, namespace, host hint shouldn't return when port isn't the same has hint",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 80,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:8080",
+					},
+				},
+			},
+			len: 0,
+		},
+		{
+			message: "Non http URLs with valid host port combination should return a valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 3306,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "tcp(${data.host}:3306)/",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"namespace":  "test",
+				"metricsets": []string{"default"},
+				"hosts":      []interface{}{"tcp(1.2.3.4:3306)/"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+			},
+		},
 	}
 	for _, test := range tests {
 		mockRegister := mb.NewRegister()
@@ -301,6 +356,7 @@ func TestGenerateHints(t *testing.T) {
 		m := metricHints{
 			Key:      defaultConfig().Key,
 			Registry: mockRegister,
+			logger:   logp.NewLogger("hints.builder"),
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
@@ -374,6 +430,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 		m := metricHints{
 			Key:      defaultConfig().Key,
 			Registry: mockRegister,
+			logger:   logp.NewLogger("hints.builder"),
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)

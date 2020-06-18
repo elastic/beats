@@ -128,6 +128,11 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 
 // Start starts the GRPC endpoint and accepts new connections.
 func (s *Server) Start() error {
+	if s.server != nil {
+		// already started
+		return nil
+	}
+
 	lis, err := net.Listen("tcp", s.listenAddr)
 	if err != nil {
 		return err
@@ -652,16 +657,9 @@ func (as *ApplicationState) Status() (proto.StateObserved_Status, string) {
 // This status will be overwritten by the client if it reconnects and updates it status.
 func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg string) {
 	as.checkinLock.RLock()
-	prevStatus := as.status
-	prevMessage := as.statusMessage
 	as.status = status
 	as.statusMessage = msg
 	as.checkinLock.RUnlock()
-
-	// alert the service handler that status has changed for the application
-	if prevStatus != status || prevMessage != msg {
-		as.srv.handler.OnStatusChange(as, status, msg)
-	}
 }
 
 // updateStatus updates the current observed status from the application, sends the expected state back to the

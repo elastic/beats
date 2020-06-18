@@ -1,0 +1,22 @@
+[[elastic-agent-cmd-options]]
+[role="xpack"]
+= Command line options
+
+experimental[]
+
+The `elastic-agent run` command provides flags that alter the behavior of an
+agent:
+
+`-path.home`::
+The home directory of the {agent}. `path.home` determines the location of the
+configuration files and data directory.
+
+`-c`::
+The configuration file to load. If not specified, {agent} uses
+`{path.home}/elastic-agent.yml`.
+
+`-path.data`::
+The data directory used by {agent} to store downloaded artifacts. Also stores
+logs for any {beats} started and managed by {agent}.
++
+If not specified, {agent} uses `{path.home}/data`.

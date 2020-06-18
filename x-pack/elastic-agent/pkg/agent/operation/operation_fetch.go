@@ -8,11 +8,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operationFetch fetches artifact from preconfigured source
@@ -22,22 +22,19 @@ type operationFetch struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	downloader     download.Downloader
-	eventProcessor callbackHooks
 }
 
 func newOperationFetch(
 	logger *logger.Logger,
 	program Descriptor,
 	operatorConfig *config.Config,
-	downloader download.Downloader,
-	eventProcessor callbackHooks) *operationFetch {
+	downloader download.Downloader) *operationFetch {
 
 	return &operationFetch{
 		logger:         logger,
 		program:        program,
 		operatorConfig: operatorConfig,
 		downloader:     downloader,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -69,11 +66,7 @@ func (o *operationFetch) Check(_ Application) (bool, error) {
 func (o *operationFetch) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 

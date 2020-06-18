@@ -59,11 +59,7 @@ func NewInput(
 ) (input.Input, error) {
 	cfgwarn.Beta("Unix socket support is beta.")
 
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

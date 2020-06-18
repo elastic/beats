@@ -3,7 +3,6 @@
 set -eo pipefail
 
 # Environment variables used
-# FLEET_CONFIG_ID - config related to new token [defaul]
 # FLEET_ENROLLMENT_TOKEN - existing enrollment token to be used for enroll
 # FLEET_ENROLL - if set to 1 enroll will be performed
 # FLEET_SETUP - if  set to 1 fleet setup will be performed
@@ -49,8 +48,9 @@ function enroll(){
       if [ $exitCode -ne 0 ]; then
         exit $exitCode
       fi
+
+      apikey=$(echo $enrollResp | jq -r '.item.api_key')
     fi
-    apikey=$(echo $enrollResp | jq -r '.item.api_key')
     echo $apikey
 
     ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
