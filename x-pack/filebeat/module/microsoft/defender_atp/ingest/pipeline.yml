@@ -84,10 +84,6 @@ processors:
     target_field: observer.name
     ignore_missing: true
 - rename:
-    field: json.severity
-    target_field: event.severity
-    ignore_missing: true
-- rename:
     field: json.relatedUser.userName
     target_field: host.user.name
     ignore_missing: true
@@ -97,7 +93,7 @@ processors:
     ignore_missing: true
 - rename:
     field: json
-    target_field: atp
+    target_field: microsoft.defender_atp
     ignore_missing: true
 - remove:
     field: atp.relatedUser

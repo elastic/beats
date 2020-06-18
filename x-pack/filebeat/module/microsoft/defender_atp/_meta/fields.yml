@@ -25,15 +25,20 @@
       description: >
         The Investigation ID related to the Alert.
 
-    - name: investigationId
+    - name: investigationState
       type: keyword
       description: >
         The current state of the Investigation.
 
-    - name: investigationId
+    - name: assignedTo
       type: keyword
       description: >
         Owner of the alert.
+
+    - name: severity
+      type: keyword
+      description: >
+        Severity of the alert. Possible values are: 'UnSpecified', 'Informational', 'Low', 'Medium' and 'High'.
 
     - name: status
       type: keyword
