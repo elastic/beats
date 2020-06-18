@@ -12,3 +12,6 @@ configure, and set up the {beatname_uc} environment.
 To start {beatname_uc}, run:
 
 include::{docdir}/getting-started.asciidoc[tag=start-step]
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]
