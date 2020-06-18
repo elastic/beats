@@ -70,6 +70,24 @@ func TestToEvent(t *testing.T) {
 				},
 			},
 		},
+		// 'syslog.priority' field with junk
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_PRIORITY: "123456, ",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"priority": int64(123456),
+				},
+				"log": common.MapStr{
+					"syslog": common.MapStr{
+						"priority": int64(123456),
+					},
+				},
+			},
+		},
 		// 'syslog.pid' field with user append
 		ToEventTestCase{
 			entry: sdjournal.JournalEntry{
