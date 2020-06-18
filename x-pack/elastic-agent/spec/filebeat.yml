@@ -10,13 +10,8 @@ rules:
     on_conflict: insert_after
     type: logs
 
-- extract_list_items:
-    path: datasources
-    item: inputs
-    to: inputsstreams
-
 - map:
-    path: inputsstreams
+    path: inputs
     rules:
     - copy_all_to_list:
         to: streams
@@ -27,6 +22,9 @@ rules:
         to: streams
         on_conflict: insert_before
 
+- rename:
+    from: inputs
+    to: inputsstreams
 
 - extract_list_items:
     path: inputsstreams
@@ -47,7 +45,14 @@ rules:
           log/docker: docker
           log/redis_slowlog: redis
           log/syslog: syslog
-
+    - remove_key:
+        key: use_output
+    - remove_key:
+        key: dataset
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
+        key: dataset.name
 
 - filter_values:
     selector: inputs

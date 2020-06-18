@@ -1,13 +1,6 @@
 name: Endpoint
-cmd: endpoint
-service: 6788
 rules:
 - fix_stream: {}
-
-- extract_list_items:
-    path: datasources
-    item: inputs
-    to: inputs
 
 - filter_values:
     selector: inputs
@@ -21,11 +14,10 @@ rules:
     values:
     - true
 
-- overwrite:
-    from: inputs.0
-    to: ""
-    except:
-      - fleet
-      - output
+- filter:
+    selectors:
+    - fleet
+    - inputs
+    - output
 
-when: Equals(%{[type]}, 'endpoint') && HasAny('fleet') && HasNamespace('output', 'elasticsearch')
+when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')

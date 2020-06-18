@@ -616,9 +616,10 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 	for _, v := range subIdentifiers {
 		tags := resourceTagMap[v]
 		if len(tags) != 0 {
-			// By default, replace dot "." using underscore "_" for tag keys and values
+			// By default, replace dot "." using underscore "_" for tag keys.
+			// Note: tag values are not dedotted.
 			for _, tag := range tags {
-				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
 			}
 			continue
 		}
