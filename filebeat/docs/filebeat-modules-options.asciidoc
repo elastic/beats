@@ -79,6 +79,8 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 - module: system
 ----
 
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]
 
 [[advanced-settings]]
 === Override input settings
@@ -120,6 +122,3 @@ You can also enable `close_eof` for all inputs created by any of the modules:
 ----------------------------------------------------------------------
 
 :modulename!:
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]
