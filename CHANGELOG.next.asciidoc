@@ -488,6 +488,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 - Added an `id` config option to inputs to allow running multiple inputs on the
   same journal. {pull}18467{18467}
+- Add basic ECS categorization and `log.syslog` fields. {pull}19176[19176]
 
 *Metricbeat*
 
