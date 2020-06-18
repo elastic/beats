@@ -577,6 +577,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Packetbeat*
 
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 
 *Functionbeat*
 
