@@ -258,7 +258,6 @@ func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
 	modules := builder.GetHintsAsList(hints, l.config.Key)
 	var output []common.MapStr
 
-	fmt.Println(hints, modules)
 	for _, mod := range modules {
 		output = append(output, common.MapStr{
 			l.config.Key: mod,
