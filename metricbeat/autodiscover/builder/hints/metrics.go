@@ -56,6 +56,8 @@ const (
 type metricHints struct {
 	Key      string
 	Registry *mb.Register
+
+	logger *logp.Logger
 }
 
 // NewMetricHints builds a new metrics builder based on hints
@@ -67,18 +69,24 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &metricHints{config.Key, config.Registry}, nil
+	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
 }
 
 // Create configs based on hints passed from providers
 func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
-	var config []*common.Config
+	var (
+		config []*common.Config
+		noPort bool
+	)
 	host, _ := event["host"].(string)
 	if host == "" {
 		return config
 	}
 
-	port, _ := common.TryToInt(event["port"])
+	port, ok := common.TryToInt(event["port"])
+	if !ok {
+		noPort = true
+	}
 
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
@@ -105,7 +113,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		return config
 	}
 
-	hosts, ok := m.getHostsWithPort(hints, port)
+	hosts, ok := m.getHostsWithPort(hints, port, noPort)
 	if !ok {
 		return config
 	}
@@ -144,14 +152,14 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		moduleConfig["password"] = password
 	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+	m.logger.Debug("generated config: %v", moduleConfig)
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
-		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		logp.Debug("", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
+	m.logger.Debug("generated config: %+v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
@@ -181,22 +189,22 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string, bool) {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort bool) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || m.checkHostPort(h, port) ||
+		if strings.Contains(h, "data.port") && port != 0 && !noPort || m.checkHostPort(h, port) ||
 			// Use the event that has no port config if there is a ${data.host}:9090 like input
-			(port == 0 && strings.Contains(h, "data.host")) {
+			(noPort && strings.Contains(h, "data.host")) {
 			result = append(result, h)
 		}
 	}
 
 	if len(thosts) > 0 && len(result) == 0 {
-		logp.Debug("hints.builder", "no hosts selected for port %d with hints: %+v", port, thosts)
+		m.logger.Debug("no hosts selected for port %d with hints: %+v", port, thosts)
 		return nil, false
 	}
 
