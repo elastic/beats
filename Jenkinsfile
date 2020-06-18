@@ -42,7 +42,7 @@ pipeline {
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
-    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
 
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
     booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
@@ -1295,7 +1295,7 @@ def loadConfigEnvVars(){
 }
 
 /**
-  This method gathers the module name, if required, in order to run the ITs only if 
+  This method gathers the module name, if required, in order to run the ITs only if
   the changeset affects a specific module.
 
   For such, it's required to look for changes under the module folder and exclude anything else
