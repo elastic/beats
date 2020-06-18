@@ -22,36 +22,6 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
-		"overwrite": {
-			givenYAML: `
-fleet:
-  kibana_url: contents
-output:
-  elasticsearch:
-    hosts: []
-datasources:
-  - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
-`,
-			expectedYAML: `
-type: file
-streams:
-  - paths: /var/log/mysql/error.log
-fleet:
-  kibana_url: contents
-output:
-  elasticsearch:
-    hosts: []
-`,
-			rule: &RuleList{
-				Rules: []Rule{
-					Overwrite("datasources.0.inputs.0", "", "fleet", "output"),
-				},
-			},
-		},
 		"fix streams": {
 			givenYAML: `
 inputs:
@@ -672,7 +642,6 @@ func TestSerialization(t *testing.T) {
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
-		Overwrite("t1", "t2", "a", "b"),
 	)
 
 	y := `- rename:
@@ -733,12 +702,6 @@ func TestSerialization(t *testing.T) {
     - b
     on_conflict: insert_before
 - fix_stream: {}
-- overwrite:
-    from: t1
-    to: t2
-    except:
-    - a
-    - b
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

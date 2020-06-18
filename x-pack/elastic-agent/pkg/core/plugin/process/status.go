@@ -20,11 +20,11 @@ import (
 // It updates the status of the application and handles restarting the application is needed.
 func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
 	a.appLock.Lock()
+	defer a.appLock.Unlock()
 
 	// If the application is stopped, do not update the state. Stopped is a final state
 	// and should not be overridden.
 	if a.state.Status == state.Stopped {
-		a.appLock.Unlock()
 		return
 	}
 
@@ -32,7 +32,6 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 	if status == proto.StateObserved_FAILED {
 		// ignore when expected state is stopping
 		if s.Expected() == proto.StateExpected_STOPPING {
-			a.appLock.Unlock()
 			return
 		}
 
@@ -56,5 +55,4 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 			a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err))
 		}
 	}
-	a.appLock.Unlock()
 }
