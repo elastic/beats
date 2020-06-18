@@ -23,25 +23,6 @@ include::../include/gs-link.asciidoc[]
 
 This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Dashboards
-
-The best way to view Crowdstrike events and alert data is in the SIEM. 
-
-[role="screenshot"]
-image::./images/siem-alerts-cs.jpg[]
-
-[float]
-For alerts, go to Detections -> External alerts.
-
-[role="screenshot"]
-image::./images/siem-events-cs.jpg[]
-
-[float]
-And for all over event Crowdstrike Falcon event types, go to Host -> Events.
-
 include::../include/configuring-intro.asciidoc[]
 
 :fileset_ex: falcon_endpoint
