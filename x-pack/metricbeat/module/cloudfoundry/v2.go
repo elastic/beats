@@ -43,42 +43,31 @@ func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (mb.Mo
 }
 
 func (m *ModuleV2) RunCounterReporter(reporter mb.PushReporterV2) {
-	m.listenerLock.Lock()
 	m.runReporters(reporter, m.valueReporter, m.containerReporter)
-	m.listenerLock.Unlock()
+	defer m.runReporters(nil, m.valueReporter, m.containerReporter)
 
 	<-reporter.Done()
-
-	m.listenerLock.Lock()
-	m.runReporters(nil, m.valueReporter, m.containerReporter)
-	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) RunValueReporter(reporter mb.PushReporterV2) {
-	m.listenerLock.Lock()
 	m.runReporters(m.counterReporter, reporter, m.containerReporter)
-	m.listenerLock.Unlock()
+	defer m.runReporters(m.counterReporter, nil, m.containerReporter)
 
 	<-reporter.Done()
 
-	m.listenerLock.Lock()
-	m.runReporters(m.counterReporter, nil, m.containerReporter)
-	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) RunContainerReporter(reporter mb.PushReporterV2) {
-	m.listenerLock.Lock()
 	m.runReporters(m.counterReporter, m.valueReporter, reporter)
-	m.listenerLock.Unlock()
+	defer m.runReporters(m.counterReporter, m.valueReporter, nil)
 
 	<-reporter.Done()
-
-	m.listenerLock.Lock()
-	m.runReporters(m.counterReporter, m.valueReporter, nil)
-	m.listenerLock.Unlock()
 }
 
 func (m *ModuleV2) runReporters(counterReporter, valueReporter, containerReporter mb.PushReporterV2) {
+	m.listenerLock.Lock()
+	defer m.listenerLock.Unlock()
+
 	if m.listener != nil {
 		m.listener.Stop()
 		m.listener = nil
