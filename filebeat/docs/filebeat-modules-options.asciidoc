@@ -1,3 +1,6 @@
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]
+
 :modulename: system nginx mysql
 
 [id="configuration-{beatname_lc}-modules"]
