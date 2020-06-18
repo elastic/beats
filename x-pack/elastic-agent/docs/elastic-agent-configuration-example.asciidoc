@@ -1,4 +1,5 @@
 [[elastic-agent-configuration-example]]
+[role="xpack"]
 = Configuration example
 
 experimental[]
