@@ -10,10 +10,10 @@ import groovy.transform.Field
 @Field def stashedTestReports = [:]
 
 pipeline {
-  agent { label 'ubuntu && immutable' }
+  agent { label 'ubuntu-1404-i386' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
-    GOX_FLAGS = "-arch amd64"
+    GOX_FLAGS = "-arch i386"
     DOCKER_COMPOSE_VERSION = "1.21.0"
     TERRAFORM_VERSION = "0.12.24"
     PIPELINE_LOG_LEVEL = "INFO"
@@ -84,7 +84,7 @@ pipeline {
       failFast false
       parallel {
         stage('Elastic Agent x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -131,7 +131,7 @@ pipeline {
         }
 
         stage('Filebeat oss'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -144,7 +144,7 @@ pipeline {
           }
         }
         stage('Filebeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -219,7 +219,7 @@ pipeline {
           }
         }
         stage('Heartbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -267,7 +267,7 @@ pipeline {
           }
         }
         stage('Auditbeat oss Linux'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -280,7 +280,7 @@ pipeline {
           }
         }
         stage('Auditbeat crosscompile'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -324,7 +324,7 @@ pipeline {
           }
         }
         stage('Auditbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -363,7 +363,7 @@ pipeline {
           }
         }
         stage('Libbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -390,7 +390,7 @@ pipeline {
           }
         }
         stage('Libbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -403,7 +403,7 @@ pipeline {
           }
         }
         stage('Metricbeat OSS Unit tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -416,7 +416,7 @@ pipeline {
           }
         }
         stage('Metricbeat OSS Integration tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -429,7 +429,7 @@ pipeline {
           }
         }
         stage('Metricbeat Python integration tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -442,7 +442,7 @@ pipeline {
           }
         }
         stage('Metricbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -452,7 +452,7 @@ pipeline {
           }
           stages {
             stage('Prepare cloud integration tests environments'){
-              agent { label 'ubuntu && immutable' }
+              agent { label 'ubuntu-1404-i386' }
               options { skipDefaultCheckout() }
               steps {
                 startCloudTestEnv('x-pack-metricbeat', [
@@ -461,7 +461,7 @@ pipeline {
               }
             }
             stage('Metricbeat x-pack'){
-              agent { label 'ubuntu && immutable' }
+              agent { label 'ubuntu-1404-i386' }
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
@@ -477,7 +477,7 @@ pipeline {
           }
         }
         stage('Metricbeat crosscompile'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -547,7 +547,7 @@ pipeline {
           }
         }
         stage('Packetbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -564,7 +564,7 @@ pipeline {
           }
         }
         stage('dockerlogbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -581,7 +581,7 @@ pipeline {
           }
         }
         stage('Winlogbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -624,7 +624,7 @@ pipeline {
           }
         }
         stage('Functionbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -675,7 +675,7 @@ pipeline {
           }
         }
         stage('Journalbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -692,7 +692,7 @@ pipeline {
           }
         }
         stage('Generators'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -752,7 +752,7 @@ pipeline {
           }
         }
         stage('Kubernetes'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-1404-i386' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
