@@ -74,3 +74,24 @@ func TestIsEmptyValue(t *testing.T) {
 	assert.False(t, isEmptyValue(reflect.ValueOf(time.Duration(0))))
 	assert.True(t, isEmptyValue(reflect.ValueOf(time.Duration(-1))))
 }
+
+func TestSkipFields(t *testing.T) {
+	m := common.MapStr{}
+	if err := MarshalStruct(m, "test", &struct {
+		Field1 string `ecs:"field1"`
+		Field2 string
+		Field3 string `ecs:"field3"`
+	}{
+		Field1: "field1",
+		Field2: "field2",
+		Field3: "field3",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, common.MapStr{
+		"test": common.MapStr{
+			"field1": "field1",
+			"field3": "field3",
+		},
+	}, m)
+}

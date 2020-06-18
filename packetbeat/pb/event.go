@@ -337,7 +337,7 @@ func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
 		structField := typ.Field(i)
 		tag := getTag(structField)
 		if tag == "" {
-			break
+			continue
 		}
 
 		inline := false
