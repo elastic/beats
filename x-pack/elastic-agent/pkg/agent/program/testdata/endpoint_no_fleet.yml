@@ -1,13 +1,4 @@
-name: Production Website DB Servers
-fleet:
-  agent:
-    id: fleet-agent-id
-  api:
-    access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-    kibana:
-      protocol: https
-      host: localhost:5601
-      timeout: 30s
+name: Endpoint Host
 
 outputs:
   default:
@@ -18,55 +9,7 @@ outputs:
     api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
     ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
 
-  monitoring:
-    type: elasticsearch
-    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-    hosts: ["monitoring:9200"]
-    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
-
 inputs:
-- type: docker/metrics
-  use_output: default
-  streams:
-    - metricset: status
-      dataset:
-        name: docker.status
-    - metricset: info
-      dataset:
-        name: ""
-  hosts: ["http://127.0.0.1:8080"]
-- type: logs
-  use_output: default
-  streams:
-    - paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
-  vars:
-    var: value
-- type: logs
-  dataset:
-    type: testtype
-  use_output: default
-  streams:
-    - paths:
-      - /var/log/hello3.log
-      - /var/log/hello4.log
-  vars:
-    var: value
-- id: apache-metrics-id
-  type: apache/metrics
-  dataset:
-    namespace: testing
-  use_output: default
-  processors:
-    - add_fields:
-        fields:
-          should_be: first
-  streams:
-    - enabled: true
-      metricset: info
-      hosts: ["http://apache.remote"]
-  hosts: ["http://apache.local"]
 - id: endpoint-id
   name: endpoint-1
   enabled: true
@@ -156,12 +99,3 @@ inputs:
         process: true
         file: true
         network: true
-
-settings.monitoring:
-  use_output: monitoring
-
-management:
-  host: "localhost"
-
-config:
-  reload: 123

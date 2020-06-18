@@ -2,16 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package app
+package process
 
 import (
 	"context"
 	"io"
 	"path/filepath"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 
 	"gopkg.in/yaml.v2"
 
@@ -19,11 +15,14 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) error {
+func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) error {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
@@ -31,7 +30,7 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 }
 
 // Start starts the application without grabbing the lock.
-func (a *Application) start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
+func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -97,7 +96,7 @@ func (a *Application) start(ctx context.Context, t Taggable, cfg map[string]inte
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 
 	// use separate file
-	isSidecar := IsSidecar(t)
+	isSidecar := app.IsSidecar(t)
 	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args, isSidecar)
 
 	// specify beat name to avoid data lock conflicts
