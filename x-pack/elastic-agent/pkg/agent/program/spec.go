@@ -32,7 +32,7 @@ type Spec struct {
 	Cmd               string               `yaml:"cmd"`
 	Args              []string             `yaml:"args"`
 	Rules             *transpiler.RuleList `yaml:"rules"`
-	InstallCheckSteps *transpiler.StepList `yaml:"install_checks"`
+	CheckInstallSteps *transpiler.StepList `yaml:"check_install"`
 	PostInstallSteps  *transpiler.StepList `yaml:"post_install"`
 	PreUninstallSteps *transpiler.StepList `yaml:"pre_uninstall"`
 	When              string               `yaml:"when"`

@@ -83,8 +83,8 @@ func (i *InstallerChecker) Check(programName, version, installDir string) error 
 			continue
 		}
 
-		if spec.InstallCheckSteps != nil {
-			return spec.InstallCheckSteps.Execute(installDir)
+		if spec.CheckInstallSteps != nil {
+			return spec.CheckInstallSteps.Execute(installDir)
 		}
 
 		// only one spec for type
