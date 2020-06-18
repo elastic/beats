@@ -12,15 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"

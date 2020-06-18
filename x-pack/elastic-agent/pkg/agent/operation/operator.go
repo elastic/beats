@@ -11,8 +11,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -20,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
