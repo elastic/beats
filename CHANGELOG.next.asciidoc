@@ -505,6 +505,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
+
 *Functionbeat*
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 
