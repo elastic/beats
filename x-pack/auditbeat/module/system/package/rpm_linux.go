@@ -207,11 +207,13 @@ func (lib *librpm) close() error {
 func openLibrpm() (*librpm, error) {
 	var librpmNames = []string{
 		"librpm.so",   // with rpm-devel installed
-		"librpm.so.8", // Fedora 29
+		"librpm.so.9", // Fedora 31/32
+		"librpm.so.8", // Fedora 29/30
 		"librpm.so.3", // CentOS 7
 		"librpm.so.1", // CentOS 6
 
 		// Following for completeness, but not explicitly tested
+		"librpm.so.10",
 		"librpm.so.7",
 		"librpm.so.6",
 		"librpm.so.5",

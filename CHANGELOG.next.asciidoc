@@ -157,6 +157,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
 
 *Filebeat*
 
