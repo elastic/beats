@@ -1,4 +1,3 @@
-from filebeat import BaseTest
 import jinja2
 import requests
 import sys
@@ -7,6 +6,8 @@ import json
 from requests.auth import HTTPBasicAuth
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../filebeat/tests/system'))
+
+from filebeat import BaseTest
 
 
 class Test(BaseTest):
