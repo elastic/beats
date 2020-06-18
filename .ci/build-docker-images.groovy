@@ -45,14 +45,6 @@ pipeline {
         }
       }
     }
-    // stage('Install dependencies') {
-    //   when {
-    //     expression { return params.RELEASE_TEST_IMAGES }
-    //   }
-    //   steps {
-    //     sh(label: 'Install virtualenv', script: 'pip install --user virtualenv')
-    //   }
-    // }
     stage('Metricbeat Test Docker images'){
       options {
         warnError('Metricbeat Test Docker images failed')
