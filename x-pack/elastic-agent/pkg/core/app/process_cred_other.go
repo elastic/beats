@@ -7,6 +7,7 @@
 
 package app
 
-func getUserGroup(spec ProcessSpec) (int, int, error) {
+// UserGroup returns the uid and gid for the process specification.
+func (spec ProcessSpec) UserGroup() (int, int, error) {
 	return 0, 0, nil
 }
