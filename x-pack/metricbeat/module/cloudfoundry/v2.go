@@ -27,12 +27,11 @@ type ModuleV2 struct {
 	containerReporter mb.PushReporterV2
 }
 
-func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (mb.Module, error) {
-	// early check that listener can be created
+func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (*ModuleV2, error) {
+	// Early check that listener can be created
 	_, err := hub.RlpListener(cfcommon.RlpListenerCallbacks{})
 	if err != nil {
 		return nil, err
-
 	}
 
 	return &ModuleV2{

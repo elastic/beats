@@ -37,8 +37,8 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 	hub := cfcommon.NewHub(&cfg, "metricbeat", log)
 
 	switch cfg.Version {
-	//case cfcommon.ConsumerVersionV1:
-	//	return newModuleV1(base, hub, log)
+	case cfcommon.ConsumerVersionV1:
+		return newModuleV1(base, hub, log)
 	case cfcommon.ConsumerVersionV2:
 		return newModuleV2(base, hub, log)
 	default:
