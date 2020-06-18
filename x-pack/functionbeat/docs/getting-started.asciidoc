@@ -213,7 +213,7 @@ If deployment fails, see <<faq>> for help troubleshooting.
 
 [float]
 [[view-data]]
-=== Step 5: View your data in {kib}
+=== Step 6: View your data in {kib}
 
 There are currently no example dashboards available for {beatname_uc}.
 
