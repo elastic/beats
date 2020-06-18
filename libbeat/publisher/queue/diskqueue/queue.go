@@ -70,12 +70,12 @@ type Settings struct {
 
 type segmentID uint64
 
-type bufferPosition struct {
-	// The index of this position's segment within the overall buffer.
+type queuePosition struct {
+	// The index of this position's segment within the queue.
 	segment segmentID
 
 	// The byte offset of this position within its segment.
-	byteIndex uint64
+	byteIndex segmentPos
 }
 
 type diskQueueOutput struct {
@@ -313,14 +313,10 @@ func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
 	}
-	if header.version != 0 {
-		return nil, fmt.Errorf("Segment %d: unrecognized schema version %d",
-			segment.id, header.version)
-	}
 	return &segmentReader{
 		raw:          reader,
 		curPosition:  0,
-		endPosition:  int64(dataSize),
+		endPosition:  segmentPos(dataSize),
 		checksumType: header.checksumType,
 	}, nil
 }
@@ -331,7 +327,12 @@ type segmentHeader struct {
 }
 
 func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
-	return nil, nil
+	header := segmentHeader{}
+	if header.version != 0 {
+		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
+	}
+	panic("TODO: not implemented")
+	//return nil, nil
 }
 
 // readNextFrame reads the next pending data frame in the queue

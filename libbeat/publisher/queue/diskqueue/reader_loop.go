@@ -17,7 +17,12 @@
 
 package diskqueue
 
-import "os"
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+)
 
 func (dq *diskQueue) readerLoop() {
 	curFrameID := frameID(0)
@@ -118,13 +123,13 @@ func (dq *diskQueue) writeFrameData(bytes []byte) error {
 
 	dq.segments.Lock()
 	defer dq.segments.Unlock()
-	if dq.segments.writer != nil &&
+	/*if dq.segments.writer != nil &&
 		dq.segments.writer.position+frameSize > dq.settings.MaxSegmentSize {
 		// There is a writing segment, but the incoming data frame doesn't
 		// fit, so we need to finalize it and create a new one.
 		//dq.segments.writer =
 		//dq.segments.writing
-	}
+	}*/
 
 	/*.capacity() < frameSize {
 
@@ -140,4 +145,52 @@ func (dq *diskQueue) writeFrameData(bytes []byte) error {
 	}
 
 	return nil
+}
+
+func readSegment(
+	reader io.Reader, checksumType checksumType,
+	start segmentPos, stop segmentPos,
+	output chan diskQueueOutput, cancel chan struct{},
+) (int, error) {
+	return 0, nil
+}
+
+func (dq *diskQueue) nextSegmentForReading() *queueSegment {
+	dq.segments.Lock()
+	defer dq.segments.Unlock()
+	if len(dq.segments.reading) > 0 {
+		return dq.segments.reading[0]
+	}
+	if dq.segments.writing != nil {
+		return dq.segments.writing
+	}
+	return nil
+}
+
+func (dq *diskQueue) altReaderLoop() {
+	curFrameID := frameID(0)
+	for {
+		segment := dq.nextSegmentForReading()
+		if segment == nil {
+			// TODO: wait
+			continue
+		}
+		// this is a strangely fine-grained lock maybe?
+		segment.Lock()
+		defer segment.Unlock()
+
+		// dataSize is guaranteed to be positive because we don't add
+		// anything to the segments list unless it is.
+		dataSize := segment.size - segmentHeaderSize
+		file, err := os.Open(path)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Couldn't open segment %d: %w", segment.id, err)
+		}
+		reader := bufio.NewReader(file)
+		header, err := readSegmentHeader(reader)
+		if err != nil {
+			return nil, fmt.Errorf("Couldn't read segment header: %w", err)
+		}
+	}
 }

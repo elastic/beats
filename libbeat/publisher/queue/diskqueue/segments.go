@@ -37,6 +37,9 @@ import (
 // acknowledged.
 type frameID uint64
 
+// segmentPos is a byte index into the segment's data region.
+type segmentPos uint64
+
 // The metadata for a single segment file.
 type queueSegment struct {
 	sync.Mutex
@@ -65,12 +68,12 @@ type segmentReader struct {
 	raw io.Reader
 
 	// The current byte offset of the reader within the file.
-	curPosition int64
+	curPosition segmentPos
 
 	// The position at which this reader should stop reading. This is often
 	// the end of the file, but it may be earlier when the queue is reading
 	// and writing to the same segment.
-	endPosition int64
+	endPosition segmentPos
 
 	// The checksumType field from this segment file's header.
 	checksumType checksumType
@@ -233,21 +236,3 @@ func (dq *diskQueue) segmentReaderForPosition(
 ) (*segmentReader, error) {
 	panic("TODO: not implemented")
 }
-
-/*
-func (sm *segmentManager) segmentReaderForPosition(pos bufferPosition) (*segmentReader, error) {
-	segment = getSegment(pos.segment)
-
-	dataSize := segment.size - segmentHeaderSize
-	file, err := os.Open(pathForSegmentId(pos.segment))
-	// ...read segment header...
-	checksumType := checksumTypeNone
-	file.Seek(segmentHeaderSize+pos.byteIndex, 0)
-	reader := bufio.NewReader(file)
-	return &segmentReader{
-		raw:       reader,
-		curPosition:  pos.byteIndex,
-		endPosition:  dataSize,
-		checksumType: checksumType,
-	}, nil
-}*/
