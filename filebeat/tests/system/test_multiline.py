@@ -17,6 +17,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after"
@@ -48,6 +49,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="\\\\$",
             match="before"
         )
@@ -78,6 +80,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^=[A-Z]+",
             match="after",
             negate="true",
@@ -122,6 +125,7 @@ connection <0.23893.109>, channel 3 - soft error:
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after",
@@ -160,6 +164,7 @@ connection <0.23893.109>, channel 3 - soft error:
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after",
@@ -204,6 +209,7 @@ connection <0.23893.109>, channel 3 - soft error:
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after",
@@ -240,6 +246,7 @@ connection <0.23893.109>, channel 3 - soft error:
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after",
@@ -295,6 +302,7 @@ connection <0.23893.109>, channel 3 - soft error:
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
+            multiline_type="pattern",
             pattern="^\[",
             negate="true",
             match="after",
@@ -340,11 +348,12 @@ SetAdCodeMiddleware.default_ad_code route """.encode("utf-8")
         self.render_config_template(
             path=os.path.abspath(self.working_dir + "/log/") + "*",
             multiline=True,
+            multiline_type="pattern",
             match="after",
         )
 
         proc = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("missing required field accessing") == 1)
+        self.wait_until(lambda: self.log_contains("multiline.pattern cannot be empty") == 1)
 
         proc.check_kill_and_wait(exit_code=1)

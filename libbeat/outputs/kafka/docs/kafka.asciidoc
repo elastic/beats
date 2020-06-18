@@ -5,6 +5,14 @@
 <titleabbrev>Kafka</titleabbrev>
 ++++
 
+[IMPORTANT]
+.Known problem in version 7.8.0
+====
+The Kafka output fails to connect when using multiple TLS brokers. We advise
+not to upgrade to {beatname_uc} 7.8.0 if you're using the Kafka output in this
+configuration.
+====
+
 The Kafka output sends events to Apache Kafka.
 
 To use this output, edit the {beatname_uc} configuration file to disable the {es}

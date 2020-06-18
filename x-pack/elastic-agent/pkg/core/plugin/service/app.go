@@ -242,16 +242,15 @@ func (a *Application) Stop() {
 // It updates the status of the application and handles restarting the application is needed.
 func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
 	a.appLock.Lock()
+	defer a.appLock.Unlock()
 
 	// If the application is stopped, do not update the state. Stopped is a final state
 	// and should not be overridden.
 	if a.state.Status == state.Stopped {
-		a.appLock.Unlock()
 		return
 	}
 
 	a.setStateFromProto(status, msg)
-	a.appLock.Unlock()
 }
 
 func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
