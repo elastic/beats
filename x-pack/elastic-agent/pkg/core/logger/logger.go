@@ -84,7 +84,7 @@ func defaultConfig() (*common.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(yamlCfg))
+
 	commonLogp, err := common.NewConfigFrom(string(yamlCfg))
 	if err != nil {
 		return nil, errors.New(err, errors.TypeConfig)
