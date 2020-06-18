@@ -17,40 +17,42 @@
 
 package pb
 
-import "time"
+import (
+	"github.com/elastic/ecs/code/go/ecs"
+)
+
+// Fixes for non-array datatypes
+// =============================
+//
+// Code at github.com/elastic/ecs/code/go/ecs has some fields as string
+// when they should be []string.
+//
+// Once the code generator is fixed, this code will no longer compile
+// which reminds us to strip out the overrides below
+var (
+	compileTimeUpgradeCheckEvent = ecs.Event{
+		Type: "remove this when we upgrade ECS",
+	}
+	compileTimeUpgradeCheckRelated = ecs.Related{
+		User: "remove this when we upgrade ECS",
+	}
+)
 
 type ecsEvent struct {
-	ID   string `ecs:"id"`
-	Code string `ecs:"code"`
-	Kind string `ecs:"kind"`
+	ecs.Event `ecs:",inline"`
 	// overridden because this needs to be an array
 	Category []string `ecs:"category"`
-	Action   string   `ecs:"action"`
-	Outcome  string   `ecs:"outcome"`
 	// overridden because this needs to be an array
-	Type          []string      `ecs:"type"`
-	Module        string        `ecs:"module"`
-	Dataset       string        `ecs:"dataset"`
-	Provider      string        `ecs:"provider"`
-	Severity      int64         `ecs:"severity"`
-	Original      string        `ecs:"original"`
-	Hash          string        `ecs:"hash"`
-	Duration      time.Duration `ecs:"duration"`
-	Sequence      int64         `ecs:"sequence"`
-	Timezone      string        `ecs:"timezone"`
-	Created       time.Time     `ecs:"created"`
-	Start         time.Time     `ecs:"start"`
-	End           time.Time     `ecs:"end"`
-	RiskScore     float64       `ecs:"risk_score"`
-	RiskScoreNorm float64       `ecs:"risk_score_norm"`
-	Ingested      time.Time     `ecs:"ingested"`
-	Reference     string        `ecs:"reference"`
-	Url           string        `ecs:"url"`
+	Type []string `ecs:"type"`
 }
 
 type ecsRelated struct {
-	IP   []string `ecs:"ip"`
+	ecs.Related `ecs:",inline"`
+	// overridden because this needs to be an array
+	IP []string `ecs:"ip"`
+	// overridden because this needs to be an array
 	User []string `ecs:"user"`
+	// overridden because this needs to be an array
 	Hash []string `ecs:"hash"`
 
 	// for de-dup

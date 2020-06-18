@@ -18,8 +18,10 @@
 package pb
 
 import (
+	"fmt"
 	"net"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -74,8 +76,10 @@ type Fields struct {
 func NewFields() *Fields {
 	return &Fields{
 		Event: ecsEvent{
-			Duration: -1,
-			Kind:     "event",
+			Event: ecs.Event{
+				Duration: -1,
+				Kind:     "event",
+			},
 			Type:     []string{"connection", "protocol"},
 			Category: []string{"network_traffic", "network"},
 		},
@@ -336,13 +340,33 @@ func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
 			break
 		}
 
+		inline := false
+		tags := strings.Split(tag, ",")
+		if len(tags) > 1 {
+			for _, flag := range tags[1:] {
+				switch flag {
+				case "inline":
+					inline = true
+				default:
+					return fmt.Errorf("Unsupported flag %q in tag %q of type %s", flag, tag, typ)
+				}
+			}
+			tag = tags[0]
+		}
+
 		fieldValue := val.Field(i)
 		if !fieldValue.IsValid() || isEmptyValue(fieldValue) {
 			continue
 		}
 
-		if _, err := m.Put(key+"."+tag, fieldValue.Interface()); err != nil {
-			return err
+		if inline {
+			if err := marshalStruct(m, key, fieldValue); err != nil {
+				return err
+			}
+		} else {
+			if _, err := m.Put(key+"."+tag, fieldValue.Interface()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
