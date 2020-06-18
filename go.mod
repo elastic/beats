@@ -178,7 +178,7 @@ require (
 
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic
+	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic.0.20200610201946-1a2a3be32d82
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
