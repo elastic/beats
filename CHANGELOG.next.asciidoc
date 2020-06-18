@@ -580,6 +580,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 - Add monitoring info about triggered functions. {pull}14876[14876]
 - Add Google Cloud Platform support. {pull}13598[13598]
+- Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 
 *Winlogbeat*
 
