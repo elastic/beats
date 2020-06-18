@@ -7,12 +7,10 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 )
 
 // operationStart start installed process
@@ -22,17 +20,13 @@ type operationStart struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-	eventProcessor callbackHooks
-
-	pi *process.Info
 }
 
 func newOperationStart(
 	logger *logger.Logger,
 	program Descriptor,
 	operatorConfig *config.Config,
-	cfg map[string]interface{},
-	eventProcessor callbackHooks) *operationStart {
+	cfg map[string]interface{}) *operationStart {
 	// TODO: make configurable
 
 	return &operationStart{
@@ -40,7 +34,6 @@ func newOperationStart(
 		program:        program,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -63,17 +56,9 @@ func (o *operationStart) Check(application Application) (bool, error) {
 
 // Run runs the operation
 func (o *operationStart) Run(ctx context.Context, application Application) (err error) {
-	o.eventProcessor.OnStarting(ctx, application.Name())
 	defer func() {
 		if err != nil {
-			// kill the process if something failed
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
-		} else {
-			o.eventProcessor.OnRunning(ctx, application.Name())
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 

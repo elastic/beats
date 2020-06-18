@@ -1,0 +1,12 @@
+[[elastic-agent-configuration-example]]
+[role="xpack"]
+= Configuration example
+
+experimental[]
+
+The following example shows a full list of configuration options:
+
+[source,yaml]
+----
+include::elastic-agent_configuration_example.yml[]
+----
