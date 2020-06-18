@@ -21,6 +21,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -167,6 +169,16 @@ func createCustomServerWithArrayResponse(newServer func(handler http.Handler) *h
 						{"foo": "bar"},
 						{"hello": "world"},
 					},
+				},
+				{
+					"foo": "bar",
+					"list": []map[string]interface{}{
+						{"foo": "bar"},
+					},
+				},
+				{
+					"bar":  "foo",
+					"list": []map[string]interface{}{},
 				},
 				{"bar": "foo"},
 			},
@@ -665,18 +677,50 @@ func TestArrayWithSplitResponse(t *testing.T) {
 		"split_events_by":    "list",
 		"interval":           0,
 	}
+
+	expectedFields := []string{
+		`{
+			"foo": "bar",
+			"list": {
+				"foo": "bar"
+			}
+		}`,
+		`{
+			"foo": "bar",
+			"list": {
+				"hello": "world"
+			}
+		}`,
+		`{
+			"foo": "bar",
+			"list": {
+				"foo": "bar"
+			}
+		}`,
+		`{
+			"bar":  "foo",
+			"list": []
+		}`,
+		`{"bar": "foo"}`,
+	}
+
 	runTest(t, false, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
-		events, ok := out.waitForEvents(3)
+		events, ok := out.waitForEvents(5)
 		if !ok {
-			t.Fatalf("Expected 3 events, but got %d.", len(events))
+			t.Fatalf("Expected 5 events, but got %d.", len(events))
 		}
 		input.Stop()
 
 		if err := group.Wait(); err != nil {
 			t.Fatal(err)
+		}
+
+		for i, e := range events {
+			message, _ := e.GetValue("message")
+			assert.JSONEq(t, expectedFields[i], message.(string))
 		}
 	})
 }

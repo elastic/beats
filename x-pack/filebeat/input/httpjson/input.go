@@ -181,10 +181,12 @@ func (in *HttpjsonInput) createHTTPRequest(ctx context.Context, ri *RequestInfo)
 
 // processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
 func (in *HttpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
+	var last map[string]interface{}
 	for _, t := range events {
 		switch v := t.(type) {
 		case map[string]interface{}:
 			for _, e := range in.splitEvent(v) {
+				last = e
 				d, err := json.Marshal(e)
 				if err != nil {
 					return nil, errors.Wrapf(err, "failed to marshal %+v", e)
@@ -198,7 +200,7 @@ func (in *HttpjsonInput) processEventArray(events []interface{}) (map[string]int
 			return nil, errors.Errorf("expected only JSON objects in the array but got a %T", v)
 		}
 	}
-	return nil, nil
+	return last, nil
 }
 
 func (in *HttpjsonInput) splitEvent(event map[string]interface{}) []map[string]interface{} {
@@ -211,8 +213,8 @@ func (in *HttpjsonInput) splitEvent(event map[string]interface{}) []map[string]i
 
 	splitOnIfc, _ := m.GetValue(in.config.SplitEventsBy)
 	splitOn, ok := splitOnIfc.([]interface{})
-	// if not an array, we do nothing
-	if !ok {
+	// if not an array or is empty, we do nothing
+	if !ok || len(splitOn) == 0 {
 		return []map[string]interface{}{event}
 	}
 
