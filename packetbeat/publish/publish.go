@@ -46,7 +46,7 @@ var debugf = logp.MakeDebug("publish")
 
 func NewTransactionPublisher(
 	name string,
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	ignoreOutgoing bool,
 	canDrop bool,
 ) (*TransactionPublisher, error) {
@@ -112,6 +112,7 @@ func (p *TransactionPublisher) CreateReporter(
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 
 	// start worker, so post-processing and processor-pipeline
 	// can work concurrently to sniffer acquiring new events

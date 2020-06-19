@@ -108,7 +108,7 @@ type reporterFactory interface {
 	CreateReporter(*common.Config) (func(beat.Event), error)
 }
 
-func (s ProtocolsStruct) Init(
+func (s *ProtocolsStruct) Init(
 	testMode bool,
 	pub reporterFactory,
 	configs map[string]*common.Config,
@@ -144,7 +144,7 @@ func (s ProtocolsStruct) Init(
 	return nil
 }
 
-func (s ProtocolsStruct) configureProtocol(
+func (s *ProtocolsStruct) configureProtocol(
 	testMode bool,
 	pub reporterFactory,
 	name string,
@@ -269,11 +269,14 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	return filter
 }
 
-func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
+func (s *ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
 	if _, exists := s.all[proto]; exists {
 		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
 	}
 
+	if s.all == nil {
+		s.all = map[Protocol]protocolInstance{}
+	}
 	s.all[proto] = protocolInstance{
 		client: client,
 		plugin: plugin,
@@ -281,10 +284,16 @@ func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plu
 
 	success := false
 	if tcp, ok := plugin.(TCPPlugin); ok {
+		if s.tcp == nil {
+			s.tcp = map[Protocol]TCPPlugin{}
+		}
 		s.tcp[proto] = tcp
 		success = true
 	}
 	if udp, ok := plugin.(UDPPlugin); ok {
+		if s.udp == nil {
+			s.udp = map[Protocol]UDPPlugin{}
+		}
 		s.udp[proto] = udp
 		success = true
 	}

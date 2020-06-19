@@ -108,6 +108,16 @@ func Lookup(name string) Protocol {
 	return UnknownProtocol
 }
 
+func LookupPlugin(name string) (ProtocolPlugin, bool) {
+	p := Lookup(name)
+	if p == UnknownProtocol {
+		return nil, false
+	}
+
+	plugin, ok := protocolPlugins[p]
+	return plugin, ok
+}
+
 func Register(name string, plugin ProtocolPlugin) {
 	proto := Protocol(len(protocolNames))
 	if p, exists := protocolSyms[name]; exists {
