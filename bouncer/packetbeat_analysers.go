@@ -32,15 +32,15 @@ type packetbeatRegistry struct{}
 type packetbeatManager struct{}
 
 type packetbeatInput struct {
-	config     packetbeatConfig
-	sniffer    *sniffer.Sniffer
-	analyzers  []packetbeatAnalyzer
-	icmpConfig *common.Config
+	config    packetbeatConfig
+	sniffer   *sniffer.Sniffer
+	analyzers []*common.Config
 
 	// internal setup created during run (fields required to pass configured collection to createWorker)
-	transPub  *publish.TransactionPublisher
-	flows     *flows.Flows
-	protocols protos.ProtocolsStruct
+	transPub   *publish.TransactionPublisher
+	flows      *flows.Flows
+	icmpConfig *common.Config
+	protocols  protos.ProtocolsStruct
 }
 
 type packetbeatAnalyzer struct {
@@ -97,8 +97,9 @@ func (p *packetbeatManager) Create(cfg *common.Config) (v2.Input, error) {
 		return nil, err
 	}
 
-	analyzers := make([]packetbeatAnalyzer, len(pbcfg.Protocols))
-	for i, config := range pbcfg.Protocols {
+	var icmpConfig *common.Config
+	var analyzers []*common.Config
+	for _, config := range pbcfg.Protocols {
 		if !config.Enabled() {
 			continue
 		}
@@ -111,24 +112,15 @@ func (p *packetbeatManager) Create(cfg *common.Config) (v2.Input, error) {
 		}
 
 		proto := protos.Lookup(module.Type)
-		plugin, exists := protos.LookupPlugin(module.Type)
-		if !exists {
+		if proto == protos.UnknownProtocol {
 			return nil, fmt.Errorf("unkown protocol %v", module.Type)
 		}
 
-		analyzers[i] = packetbeatAnalyzer{
-			protocol:   module.Type,
-			protocolID: proto,
-			plugin:     plugin,
-			config:     config,
+		if module.Type == "icmp" {
+			icmpConfig = config
 		}
-	}
 
-	var icmpConfig *common.Config
-	for _, analyzer := range analyzers {
-		if analyzer.protocol == "icmp" {
-			icmpConfig = analyzer.config
-		}
+		analyzers = append(analyzers, config)
 	}
 
 	withVlans := pbcfg.Interface.WithVlans
@@ -174,12 +166,7 @@ func (p *packetbeatInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) e
 	}
 	defer p.transPub.Stop()
 
-	protocolsConfigs := make([]*common.Config, len(p.analyzers))
-	for i, analyzer := range p.analyzers {
-		protocolsConfigs[i] = analyzer.config
-	}
-
-	err = p.protocols.Init(false, p.transPub, nil, protocolsConfigs)
+	err = p.protocols.Init(false, p.transPub, nil, p.analyzers)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -222,6 +209,7 @@ func (p *packetbeatInput) createWorker(linkType layers.LinkType) (sniffer.Worker
 		icmp6 = icmp
 	}
 
+	// NOTE: tcp and udp start background processes that might not be cleaned up correctly
 	tcp, err := tcp.NewTCP(&p.protocols)
 	if err != nil {
 		return nil, err
