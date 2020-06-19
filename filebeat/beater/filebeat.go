@@ -289,11 +289,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	inputsLogger := logp.NewLogger("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
-	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
+	v2Inputs, err := v2.PluginRegistry(fb.pluginFactory(b.Info, inputsLogger, stateStore))
 	if err != nil {
 		panic(err) // loader detected invalid state.
 	}
+	v2InputLoader := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 
 	var inputTaskGroup unison.TaskGroup
 	defer inputTaskGroup.Stop()

@@ -31,27 +31,52 @@ import (
 // when a configuration is passed to Configure.
 type Loader struct {
 	log         *logp.Logger
-	registry    map[string]Plugin
+	registry    Registry
 	typeField   string
 	defaultType string
+}
+
+type Registry interface {
+	Init(unison.Group, Mode) error
+	Find(name string) (Plugin, bool)
+}
+
+type tableRegistry map[string]Plugin
+
+func PluginRegistry(plugins []Plugin) (Registry, error) {
+	if errs := validatePlugins(plugins); len(errs) > 0 {
+		return nil, &SetupError{errs}
+	}
+
+	registry := make(tableRegistry, len(plugins))
+	for _, p := range plugins {
+		registry[p.Name] = p
+	}
+
+	return registry, nil
+}
+
+func (t tableRegistry) Init(group unison.Group, mode Mode) error {
+	for _, p := range t {
+		if err := p.Manager.Init(group, mode); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableRegistry) Find(name string) (Plugin, bool) {
+	p, ok := t[name]
+	return p, ok
 }
 
 // NewLoader creates a new Loader for configuring inputs from a slice if plugins.
 // NewLoader returns a SetupError if invalid plugin configurations or duplicates in the slice are detected.
 // The Loader will read the plugin name from the configuration object as is
 // configured by typeField. If typeField is empty, it defaults to "type".
-func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string) (*Loader, error) {
+func NewLoader(log *logp.Logger, registry Registry, typeField, defaultType string) *Loader {
 	if typeField == "" {
 		typeField = "type"
-	}
-
-	if errs := validatePlugins(plugins); len(errs) > 0 {
-		return nil, &SetupError{errs}
-	}
-
-	registry := make(map[string]Plugin, len(plugins))
-	for _, p := range plugins {
-		registry[p.Name] = p
 	}
 
 	return &Loader{
@@ -59,17 +84,12 @@ func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string
 		registry:    registry,
 		typeField:   typeField,
 		defaultType: defaultType,
-	}, nil
+	}
 }
 
 // Init runs Init on all InputManagers for all plugins known to the loader.
 func (l *Loader) Init(group unison.Group, mode Mode) error {
-	for _, p := range l.registry {
-		if err := p.Manager.Init(group, mode); err != nil {
-			return err
-		}
-	}
-	return nil
+	return l.registry.Init(group, mode)
 }
 
 // Configure creates a new input from a Config object.
@@ -91,7 +111,7 @@ func (l *Loader) Configure(cfg *common.Config) (Input, error) {
 		name = l.defaultType
 	}
 
-	p, exists := l.registry[name]
+	p, exists := l.registry.Find(name)
 	if !exists {
 		return nil, &LoadError{Name: name, Reason: ErrUnknownInput}
 	}
