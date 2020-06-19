@@ -15,7 +15,7 @@ the Loggregator API.
 
 This repository should be imported as:
 
-`import loggregator "code.cloudfoundry.org/go-loggregator"`
+`import loggregator "code.cloudfoundry.org/go-loggregator/v8"`
 
 ## Examples
 
