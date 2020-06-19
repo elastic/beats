@@ -165,17 +165,30 @@ func (p *Provider) String() string {
 	return "kubernetes"
 }
 
-func (p *Provider) publish(event bus.Event) {
-	// Try to match a config
-	if config := p.templates.GetConfig(event); config != nil {
-		event["config"] = config
-	} else {
-		// If there isn't a default template then attempt to use builders
-		e := p.eventManager.GenerateHints(event)
-		if config := p.builders.GetConfig(e); config != nil {
-			event["config"] = config
+func (p *Provider) publish(events []bus.Event) {
+	if len(events) == 0 {
+		return
+	}
+
+	configs := make([]*common.Config, 0)
+	for _, event := range events {
+		// Try to match a config
+		if config := p.templates.GetConfig(event); config != nil {
+			configs = append(configs, config...)
+		} else {
+			// If there isn't a default template then attempt to use builders
+			e := p.eventManager.GenerateHints(event)
+			if config := p.builders.GetConfig(e); config != nil {
+				configs = append(configs, config...)
+			}
 		}
 	}
+
+	// Since all the events belong to the same event ID pick on and add in all the configs
+	event := bus.Event(common.MapStr(events[0]).Clone())
+	// Remove the port to avoid ambiguity during debugging
+	delete(event, "port")
+	event["config"] = configs
 
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
@@ -213,7 +226,7 @@ func NewEventerManager(
 	c *common.Config,
 	cfg *Config,
 	client k8s.Interface,
-	publish func(event bus.Event),
+	publish func(event []bus.Event),
 ) (EventManager, error) {
 	var err error
 	em := &eventerManager{}
