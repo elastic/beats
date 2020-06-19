@@ -21,7 +21,7 @@ type config struct {
 	StartPosition             string              `config:"start_position" default:"beginning"`
 	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
 	Limit                     int64               `config:"limit" validate:"min=0,max=10000,nonzero"`
-	WaitTime                  time.Duration       `config:"wait_time" validate:"min=0,nonzero"`
+	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -32,7 +32,7 @@ func defaultConfig() config {
 		},
 		StartPosition: "beginning",
 		APITimeout:    120 * time.Second,
-		WaitTime:      1 * time.Minute,
+		ScanFrequency: 1 * time.Minute,
 		Limit:         10000,
 	}
 }

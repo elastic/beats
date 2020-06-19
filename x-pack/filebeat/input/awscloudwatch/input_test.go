@@ -27,6 +27,34 @@ func TestGetStartPosition(t *testing.T) {
 			int64(0),
 			int64(1590969600000),
 		},
+		{
+			"startPosition=end",
+			"end",
+			int64(0),
+			int64(1590969600000),
+			int64(0),
+		},
+		{
+			"startPosition=typo",
+			"typo",
+			int64(0),
+			int64(0),
+			int64(0),
+		},
+		{
+			"startPosition=beginning with prevEndTime",
+			"beginning",
+			int64(1590000000000),
+			int64(1590000000000),
+			int64(1590969600000),
+		},
+		{
+			"startPosition=end with prevEndTime",
+			"end",
+			int64(1590000000000),
+			int64(1590000000000),
+			int64(0),
+		},
 	}
 
 	for _, c := range cases {

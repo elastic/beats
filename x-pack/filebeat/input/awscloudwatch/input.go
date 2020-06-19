@@ -12,6 +12,7 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -39,18 +40,14 @@ type awsCloudWatchInput struct {
 
 	logger   *logp.Logger
 	outlet   channel.Outleter // Output of received awscloudwatch logs.
-	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
+	inputCtx *channelContext
 
-	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc // Used to signal that the worker should stop.
-	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup     // Waits on awscloudwatch worker goroutine.
+	workerOnce sync.Once      // Guarantees that the worker goroutine is only started once.
+	workerWg   sync.WaitGroup // Waits on awscloudwatch worker goroutine.
+	stopOnce   sync.Once
+	close      chan struct{}
 
-	stopOnce sync.Once
-	close    chan struct{}
-	context  *channelContext
-
-	prevCurrentTime time.Time
+	prevEndTime int64 // track previous endTime for each iteration.
 }
 
 type cwContext struct {
@@ -89,7 +86,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	}
 
 	logger.Debug("awscloudwatch input config = ", config)
-
 	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
@@ -99,11 +95,12 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	closeChannel := make(chan struct{})
 
 	in := &awsCloudWatchInput{
-		config:    config,
-		awsConfig: awsConfig,
-		logger:    logger,
-		close:     closeChannel,
-		context:   &channelContext{closeChannel},
+		config:      config,
+		awsConfig:   awsConfig,
+		logger:      logger,
+		close:       closeChannel,
+		inputCtx:    &channelContext{closeChannel},
+		prevEndTime: int64(0),
 	}
 
 	// Build outlet for events.
@@ -135,24 +132,29 @@ func (in *awsCloudWatchInput) Run() {
 			in.logger.Infof("awscloudwatch input worker for log group: '%v' has started", in.config.LogGroup)
 			defer in.logger.Infof("awscloudwatch input worker for log group '%v' has stopped.", in.config.LogGroup)
 			defer in.workerWg.Done()
-			defer in.workerCancel()
-
-			cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
-			if err := in.run(cwConfig); err != nil {
-				in.logger.Error(err)
-				return
-			}
+			in.run()
 		}()
 	})
 }
 
-func (in *awsCloudWatchInput) run(cwConfig awssdk.Config) error {
-	ctx, cancelFn := context.WithTimeout(in.context, in.config.APITimeout)
-	defer cancelFn()
-
+func (in *awsCloudWatchInput) run() {
+	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
-	prevEndTime := int64(0)
+	for in.inputCtx.Err() == nil {
+		fmt.Println("*************** start ***************")
+		err := in.getLogEventsFromCloudWatch(svc)
+		fmt.Println("err from getLogEventsFromCloudWatch = ", err)
+		if err != nil {
+			in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
+			continue
+		}
+		in.logger.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
+		time.Sleep(in.config.ScanFrequency)
+		in.logger.Debug("done sleeping")
+	}
+}
 
+func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
 	errC := make(chan error)
 	cwCtx := &cwContext{
 		refs: 1,
@@ -160,11 +162,16 @@ func (in *awsCloudWatchInput) run(cwConfig awssdk.Config) error {
 	}
 	defer cwCtx.done()
 
+	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
+	defer cancelFn()
+
 	i := 0
 	nextToken := ""
 	currentTime := time.Now()
-	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, prevEndTime)
-	prevEndTime = endTime
+	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime)
+	fmt.Println("***** startTime = ", startTime)
+	fmt.Println("***** endTime = ", endTime)
+	in.prevEndTime = endTime
 
 	in.logger.Debugf("start_position = %s and startTime = %v", in.config.StartPosition, startTime)
 
@@ -209,12 +216,8 @@ func (in *awsCloudWatchInput) run(cwConfig awssdk.Config) error {
 
 		// increase counter after making FilterLogEventsRequest API call
 		i++
-		time.Sleep(time.Duration(200) * time.Millisecond)
 	}
-
-	in.logger.Infof("sleeping for %v before checking new logs", in.config.WaitTime)
-	time.Sleep(time.Duration(in.config.WaitTime) * time.Second)
-	in.logger.Info("done sleeping")
+	fmt.Println("return from getLogEventsFromCloudWatch................")
 	return nil
 }
 
@@ -229,7 +232,7 @@ func getStartPosition(startPosition string, currentTime time.Time, prevEndTime i
 		if prevEndTime != int64(0) {
 			return prevEndTime, 0
 		}
-		return int64(currentTime.UnixNano()) / int64(time.Millisecond), 0
+		return currentTime.UnixNano() / int64(time.Millisecond), 0
 	}
 	return
 }
@@ -312,6 +315,7 @@ func (c *cwContext) done() {
 	defer c.mux.Unlock()
 	c.refs--
 	if c.refs == 0 {
+		fmt.Println("c.ref = ", c.refs)
 		c.errC <- c.err
 		close(c.errC)
 	}

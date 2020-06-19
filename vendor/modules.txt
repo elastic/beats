@@ -156,6 +156,7 @@ github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface
 github.com/aws/aws-sdk-go-v2/service/cloudwatch
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface
 github.com/aws/aws-sdk-go-v2/service/ec2
 github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2
