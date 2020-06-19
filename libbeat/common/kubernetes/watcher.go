@@ -69,6 +69,8 @@ type WatchOptions struct {
 	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
 	// vs what does not.
 	IsUpdated func(old, new interface{}) bool
+	// HonorReSyncs allows resync events to be requeued on the worker
+	HonorReSyncs bool
 }
 
 type item struct {
@@ -137,6 +139,8 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		UpdateFunc: func(o, n interface{}) {
 			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
+			} else if opts.HonorReSyncs {
+				w.enqueue(n, add)
 			}
 		},
 	})

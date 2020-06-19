@@ -39,7 +39,7 @@ type pod struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func(bus.Event)
+	publish          func([]bus.Event)
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
@@ -47,7 +47,7 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
+func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
 	config := defaultConfig()
@@ -67,9 +67,10 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		Namespace:   config.Namespace,
+		SyncTimeout:  config.SyncPeriod,
+		Node:         config.Node,
+		Namespace:    config.Namespace,
+		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
@@ -351,6 +352,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			kubemeta["namespace_annotations"] = nsAnn
 		}
 
+		var events []bus.Event
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			// Set a zero port on the event to signify that the event is from a container
@@ -383,6 +385,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			}
 			events = append(events, event)
 		}
+		p.publish(events)
 	}
 
 	// Publish a pod level event so that hints that have no exposed ports can get processed.
@@ -412,11 +415,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": meta,
 			},
 		}
-		p.publish(event)
-	}
-
-	// Publish the container level hints finally.
-	for _, event := range events {
-		p.publish(event)
+		p.publish([]bus.Event{event})
 	}
 }
