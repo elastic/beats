@@ -304,7 +304,8 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	var (
 		annotations = common.MapStr{}
 		nsAnn       = common.MapStr{}
-		events      = make([]bus.Event, 0)
+		podPorts    = common.MapStr{}
+		eventList   = make([][]bus.Event, 0)
 	)
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
@@ -320,7 +321,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 	}
 
-	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -385,7 +385,9 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			}
 			events = append(events, event)
 		}
-		p.publish(events)
+		if len(events) != 0 {
+			eventList = append(eventList, events)
+		}
 	}
 
 	// Publish a pod level event so that hints that have no exposed ports can get processed.
@@ -393,7 +395,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
 	// no unnecessary pod level events emitted prematurely.
 	// We publish the pod level hint first so that it doesn't override a valid container level event.
-	if len(events) != 0 {
+	if len(eventList) != 0 {
 		meta := p.metagen.Generate(pod)
 
 		// Information that can be used in discovering a workload
@@ -416,5 +418,10 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			},
 		}
 		p.publish([]bus.Event{event})
+	}
+
+	// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+	for _, events := range eventList {
+		p.publish(events)
 	}
 }

@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -1005,10 +1006,11 @@ func TestEmitEvent(t *testing.T) {
 				logger:    logp.NewLogger("kubernetes"),
 			}
 
+			pub := &publisher{b: p.bus}
 			pod := &pod{
 				metagen: metaGen,
 				config:  defaultConfig(),
-				publish: p.publish,
+				publish: pub.publish,
 				uuid:    UUID,
 				logger:  logp.NewLogger("kubernetes.pod"),
 			}
@@ -1022,6 +1024,7 @@ func TestEmitEvent(t *testing.T) {
 			for i := 0; i < len(test.Expected); i++ {
 				select {
 				case event := <-listener.Events():
+					fmt.Println(i, event)
 					assert.Equal(t, test.Expected[i], event, test.Message)
 				case <-time.After(2 * time.Second):
 					if test.Expected != nil {
@@ -1031,6 +1034,20 @@ func TestEmitEvent(t *testing.T) {
 			}
 
 		})
+	}
+}
+
+type publisher struct {
+	b bus.Bus
+}
+
+func (p *publisher) publish(events []bus.Event) {
+	if len(events) == 0 {
+		return
+	}
+	for _, event := range events {
+		event["config"] = []*common.Config{}
+		p.b.Publish(event)
 	}
 }
 

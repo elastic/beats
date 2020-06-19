@@ -65,9 +65,9 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		IsUpdated:   isUpdated,
+		SyncTimeout:  config.SyncPeriod,
+		Node:         config.Node,
+		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
 	}, nil)
 
