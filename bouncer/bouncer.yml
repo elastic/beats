@@ -1,0 +1,57 @@
+inputs:
+
+# collect linux system and services logs
+- type:  logs/journald
+  enabled: false
+  # include_matches:
+  # - syslog.identifier=test
+
+# collect system metrics
+- type: metrics/system
+  enabled: false
+  period: 60
+
+- type: audit/file_integrity
+  enabled: false
+  paths:
+  - /bin
+  # - /sbin
+  # - /usr/bin
+  # - /usr/sbin
+  # - /usr/local/bin
+  # - /usr/local/sbin
+
+# monitor local NAS
+- type: monitor/icmp
+  enabled: true
+  hosts: ["festplatte"]
+  schedule: "@every 5s"
+
+# monitor and analyzer DNS, HTTP and HTTPS traffic
+- type: net/sniffer
+  enabled: true
+  interface.device: any
+  protocols:
+  - type: dns
+    ports: [53]
+  - type: http
+    ports: [80]
+  - type: tls # https
+    ports: [443]
+
+# collect network flows
+- type: net/sniffer
+  enabled: true
+  interface.device: any
+  flows:
+    timeout: 30s
+    period: 10s
+
+limits:
+  # configure uptime monitors, concurrent network operations limits
+  monitors: 20
+
+logging.level: info
+logging.selectors: ['*']
+
+output.console.pretty: true
