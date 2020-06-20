@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
-	inputs "github.com/elastic/beats/v7/filebeat/features/input/default-inputs"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -166,22 +165,14 @@ func (app *app) configure() error {
 	}
 	app.scheduler = scheduler.NewWithLocation(app.Settings.Limits.Monitors, nil, location)
 
-	// initialize input loader with available input types
-	inputLogger := app.log.Named("input")
-	v2Inputs, err := v2.PluginRegistry(inputs.Init(app.info, inputLogger, store))
-	if err != nil {
-		panic(err)
-	}
-	v2Inputs = withTypePrefix("logs", v2Inputs)
-
 	inputsCollection := registryList{
-		v2Inputs,
+		withTypePrefix("logs", makeFilebeatRegistry(app.info, app.log, app.statestore)),
 		withTypePrefix("monitor", makeHeartbeatRegistry(app.scheduler)),
 		withTypePrefix("metrics", makeMetricbeatRegistry(app.info, nil)),
 		withTypePrefix("audit", makeAuditbeatRegistry(app.info, nil)),
 		withTypePrefix("net", makePacketbeatRegistry()),
 	}
-	app.inputLoader = v2.NewLoader(inputLogger, inputsCollection, "type", "")
+	app.inputLoader = v2.NewLoader(app.log, inputsCollection, "type", "")
 
 	// Let's configure inputs. Inputs won't do any processing, yet.
 	var inputs []v2.Input
