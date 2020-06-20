@@ -6,11 +6,11 @@ package awscloudwatch
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/pkg/errors"
@@ -53,7 +53,7 @@ type awsCloudWatchInput struct {
 type cwContext struct {
 	mux  sync.Mutex
 	refs int
-	err  error // first error witnessed or multi error
+	err  error
 	errC chan error
 }
 
@@ -141,13 +141,15 @@ func (in *awsCloudWatchInput) run() {
 	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
 	for in.inputCtx.Err() == nil {
-		fmt.Println("*************** start ***************")
 		err := in.getLogEventsFromCloudWatch(svc)
-		fmt.Println("err from getLogEventsFromCloudWatch = ", err)
 		if err != nil {
+			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+				continue
+			}
 			in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
 			continue
 		}
+
 		in.logger.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
 		time.Sleep(in.config.ScanFrequency)
 		in.logger.Debug("done sleeping")
@@ -155,7 +157,7 @@ func (in *awsCloudWatchInput) run() {
 }
 
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
-	errC := make(chan error)
+	errC := make(chan error, 1)
 	cwCtx := &cwContext{
 		refs: 1,
 		errC: errC,
@@ -169,24 +171,14 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	nextToken := ""
 	currentTime := time.Now()
 	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime)
-	fmt.Println("***** startTime = ", startTime)
-	fmt.Println("***** endTime = ", endTime)
-	in.prevEndTime = endTime
-
 	in.logger.Debugf("start_position = %s and startTime = %v", in.config.StartPosition, startTime)
 
+	// overwrite prevEndTime using new endTime
+	in.prevEndTime = endTime
+
 	for nextToken != "" || i == 0 {
-		fmt.Println("====== i = ", i)
 		// construct FilterLogEventsInput
-		filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-			LogGroupName: awssdk.String(in.config.LogGroup),
-			StartTime:    awssdk.Int64(startTime),
-			EndTime:      awssdk.Int64(endTime),
-			Limit:        awssdk.Int64(in.config.Limit),
-		}
-		if i != 0 {
-			filterLogEventsInput.NextToken = awssdk.String(nextToken)
-		}
+		filterLogEventsInput := constructFilterLogEventsInput(in.config.LogGroup, startTime, endTime, in.config.Limit, i, nextToken)
 
 		// make API request
 		req := svc.FilterLogEventsRequest(filterLogEventsInput)
@@ -197,14 +189,12 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 		}
 
 		// get token for next API call
+		nextToken = ""
 		if resp.NextToken != nil {
 			nextToken = *resp.NextToken
-		} else {
-			nextToken = ""
 		}
 
 		logEvents := resp.Events
-		fmt.Println("# events = ", len(logEvents))
 		in.logger.Debugf("Processing #%v events", len(logEvents))
 
 		err = in.processLogEvents(logEvents, cwCtx)
@@ -217,8 +207,20 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 		// increase counter after making FilterLogEventsRequest API call
 		i++
 	}
-	fmt.Println("return from getLogEventsFromCloudWatch................")
 	return nil
+}
+
+func constructFilterLogEventsInput(logGroup string, startTime int64, endTime int64, limit int64, i int, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
+	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
+		LogGroupName: awssdk.String(logGroup),
+		StartTime:    awssdk.Int64(startTime),
+		EndTime:      awssdk.Int64(endTime),
+		Limit:        awssdk.Int64(limit),
+	}
+	if i != 0 {
+		filterLogEventsInput.NextToken = awssdk.String(nextToken)
+	}
+	return filterLogEventsInput
 }
 
 func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64) (startTime int64, endTime int64) {
@@ -315,7 +317,6 @@ func (c *cwContext) done() {
 	defer c.mux.Unlock()
 	c.refs--
 	if c.refs == 0 {
-		fmt.Println("c.ref = ", c.refs)
 		c.errC <- c.err
 		close(c.errC)
 	}
