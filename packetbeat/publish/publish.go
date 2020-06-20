@@ -112,7 +112,6 @@ func (p *TransactionPublisher) CreateReporter(
 	if err != nil {
 		return nil, err
 	}
-	defer client.Close()
 
 	// start worker, so post-processing and processor-pipeline
 	// can work concurrently to sniffer acquiring new events
@@ -128,6 +127,8 @@ func (p *TransactionPublisher) CreateReporter(
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
+	defer client.Close()
+
 	for {
 		select {
 		case <-p.done:

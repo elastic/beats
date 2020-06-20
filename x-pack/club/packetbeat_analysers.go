@@ -2,8 +2,10 @@ package main
 
 import (
 	// import protocol modules
+	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -21,44 +23,55 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 	"github.com/tsg/gopacket/layers"
 
 	pbconfig "github.com/elastic/beats/v7/packetbeat/config"
 )
 
-type packetbeatRegistry struct{}
-
-type packetbeatManager struct{}
-
 type packetbeatInput struct {
-	config    packetbeatConfig
-	sniffer   *sniffer.Sniffer
-	analyzers []*common.Config
-
-	// internal setup created during run (fields required to pass configured collection to createWorker)
-	transPub   *publish.TransactionPublisher
-	flows      *flows.Flows
-	icmpConfig *common.Config
-	protocols  protos.ProtocolsStruct
+	sniffers []*snifferInput
 }
 
-type packetbeatAnalyzer struct {
-	protocol   string
-	protocolID protos.Protocol
-	plugin     protos.ProtocolPlugin
-	config     *common.Config
+type snifferInput struct {
+	// sniffer *sniffer.Sniffer
+
+	// configuration
+	device         string
+	ifc            interfaceConfig
+	ignoreOutgoing bool
+	analyzers      []*common.Config
+	flowsConfig    *pbconfig.Flows
+	icmpConfig     *common.Config
+
+	// run state
+	transPub  *publish.TransactionPublisher
+	flows     *flows.Flows
+	protocols protos.ProtocolsStruct
 }
 
 type packetbeatConfig struct {
-	Interface      pbconfig.InterfacesConfig
+	Interface      devicesConfig
 	Flows          *pbconfig.Flows
 	Protocols      []*common.Config `config:"protocols"`
 	IgnoreOutgoing bool             `config:"ignore_outgoing"`
 }
 
+type devicesConfig struct {
+	Devices   []string        `config:"device"`
+	Interface interfaceConfig `config:",inline"`
+}
+
+type interfaceConfig struct {
+	Type                  string `config:"type"`
+	WithVlans             bool   `config:"with_vlans"`
+	BpfFilter             string `config:"bpf_filter"`
+	Snaplen               int    `config:"snaplen"`
+	BufferSizeMb          int    `config:"buffer_size_mb"`
+	EnableAutoPromiscMode bool   `config:"auto_promisc_mode"`
+}
+
 func (cfg *packetbeatConfig) Validate() error {
-	if cfg.Interface.Device == "" {
+	if len(cfg.Interface.Devices) == 0 {
 		return errors.New("no device configured")
 	}
 	if !cfg.Flows.IsEnabled() && len(cfg.Protocols) == 0 {
@@ -69,29 +82,17 @@ func (cfg *packetbeatConfig) Validate() error {
 }
 
 func makePacketbeatRegistry() v2.Registry {
-	return &packetbeatRegistry{}
+	reg, _ := v2.PluginRegistry([]v2.Plugin{
+		{
+			Name:      "sniffer",
+			Stability: feature.Experimental,
+			Manager:   v2.ConfigureWith(configurePacketbeatInput),
+		},
+	})
+	return reg
 }
 
-func (p *packetbeatRegistry) Init(_ unison.Group, _ v2.Mode) error {
-	return nil
-}
-
-func (p *packetbeatRegistry) Find(name string) (v2.Plugin, bool) {
-	if name != "sniffer" {
-		return v2.Plugin{}, false
-	}
-	return v2.Plugin{
-		Name:      "sniffer",
-		Stability: feature.Experimental,
-		Manager:   &packetbeatManager{},
-	}, true
-}
-
-func (p *packetbeatManager) Init(grp unison.Group, mode v2.Mode) error {
-	return nil
-}
-
-func (p *packetbeatManager) Create(cfg *common.Config) (v2.Input, error) {
+func configurePacketbeatInput(cfg *common.Config) (v2.Input, error) {
 	var pbcfg packetbeatConfig
 	if err := cfg.Unpack(&pbcfg); err != nil {
 		return nil, err
@@ -111,56 +112,62 @@ func (p *packetbeatManager) Create(cfg *common.Config) (v2.Input, error) {
 			return nil, err
 		}
 
+		if module.Type == "icmp" {
+			icmpConfig = config
+			continue
+		}
+
 		proto := protos.Lookup(module.Type)
 		if proto == protos.UnknownProtocol {
 			return nil, fmt.Errorf("unkown protocol %v", module.Type)
 		}
 
-		if module.Type == "icmp" {
-			icmpConfig = config
-		}
-
 		analyzers = append(analyzers, config)
 	}
 
-	withVlans := pbcfg.Interface.WithVlans
-	withICMP := icmpConfig.Enabled()
+	var inputs []*snifferInput
+	for _, deviceName := range pbcfg.Interface.Devices {
+		snifferInput := &snifferInput{
+			device: deviceName,
+			ifc:    pbcfg.Interface.Interface,
 
-	filter := pbcfg.Interface.BpfFilter
-	if filter == "" && !pbcfg.Flows.IsEnabled() {
-		filter = protos.Protos.BpfFilter(withVlans, withICMP)
+			ignoreOutgoing: pbcfg.IgnoreOutgoing,
+			analyzers:      analyzers,
+			flowsConfig:    pbcfg.Flows,
+			icmpConfig:     icmpConfig,
+		}
+
+		inputs = append(inputs, snifferInput)
 	}
 
-	var err error
-	input := &packetbeatInput{
-		config:     pbcfg,
-		analyzers:  analyzers,
-		icmpConfig: icmpConfig,
-	}
-	input.sniffer, err = sniffer.New(false, filter, input.createWorker, pbcfg.Interface)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize sniffer: %w", err)
-	}
-
-	return input, nil
+	return &packetbeatInput{sniffers: inputs}, nil
 }
 
 func (p *packetbeatInput) Name() string                { return "sniffer" }
 func (p *packetbeatInput) Test(_ v2.TestContext) error { return nil }
 func (p *packetbeatInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) error {
-	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
-		p.sniffer.Stop()
-	})
-	defer cancel()
+	var wg sync.WaitGroup
+	for _, sniffer := range p.sniffers {
+		sniffer := sniffer
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx.Logger = ctx.Logger.With("device", sniffer.device)
+			err := sniffer.Run(ctx, pipeline)
+			if err != nil && err != context.Canceled {
+				ctx.Logger.Error("Sniffer failed with: %v", err)
+			}
+		}()
+	}
 
+	wg.Wait()
+	return nil
+}
+
+func (p *snifferInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) error {
 	// setup protocol transaction analyzers and publishing
 	var err error
-	p.transPub, err = publish.NewTransactionPublisher(
-		ctx.Agent.Name,
-		pipeline,
-		p.config.IgnoreOutgoing,
-		p.config.Interface.File == "",
-	)
+	p.transPub, err = publish.NewTransactionPublisher(ctx.Agent.Name, pipeline, p.ignoreOutgoing, true)
 	if err != nil {
 		return err
 	}
@@ -171,8 +178,31 @@ func (p *packetbeatInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) e
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
 
+	filter := p.ifc.BpfFilter
+	if filter == "" && !p.flowsConfig.IsEnabled() {
+		filter = p.protocols.BpfFilter(p.ifc.WithVlans, p.icmpConfig.Enabled())
+	}
+
+	interfaceConfig := pbconfig.InterfacesConfig{
+		Device:                p.device,
+		Type:                  p.ifc.Type,
+		WithVlans:             p.ifc.WithVlans,
+		BpfFilter:             filter,
+		Snaplen:               p.ifc.Snaplen,
+		BufferSizeMb:          p.ifc.BufferSizeMb,
+		EnableAutoPromiscMode: p.ifc.EnableAutoPromiscMode,
+	}
+	sniffer, err := sniffer.New(false, filter, p.createWorker, interfaceConfig)
+	if err != nil {
+		return err
+	}
+	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+		sniffer.Stop()
+	})
+	defer cancel()
+
 	// setup flows and flow data publishing
-	flows, flowsClient, err := setupFlows(pipeline, p.config)
+	flows, flowsClient, err := setupFlows(pipeline, p.flowsConfig)
 	if err != nil {
 		return err
 	}
@@ -188,10 +218,10 @@ func (p *packetbeatInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) e
 
 	ctx.Logger.Info("Start sniffer")
 	defer ctx.Logger.Info("Stop sniffer")
-	return p.sniffer.Run()
+	return sniffer.Run()
 }
 
-func (p *packetbeatInput) createWorker(linkType layers.LinkType) (sniffer.Worker, error) {
+func (p *snifferInput) createWorker(linkType layers.LinkType) (sniffer.Worker, error) {
 	var icmp4 icmp.ICMPv4Processor
 	var icmp6 icmp.ICMPv6Processor
 	if p.icmpConfig.Enabled() {
@@ -227,21 +257,21 @@ func (p *packetbeatInput) createWorker(linkType layers.LinkType) (sniffer.Worker
 	return worker, nil
 }
 
-func setupFlows(pipeline beat.PipelineConnector, config packetbeatConfig) (*flows.Flows, beat.Client, error) {
-	if !config.Flows.IsEnabled() {
+func setupFlows(pipeline beat.PipelineConnector, config *pbconfig.Flows) (*flows.Flows, beat.Client, error) {
+	if !config.IsEnabled() {
 		return nil, nil, nil
 	}
 
-	processors, err := processors.New(config.Flows.Processors)
+	processors, err := processors.New(config.Processors)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
-			EventMetadata: config.Flows.EventMetadata,
+			EventMetadata: config.EventMetadata,
 			Processor:     processors,
-			KeepNull:      config.Flows.KeepNull,
+			KeepNull:      config.KeepNull,
 		},
 	})
 	if err != nil {
@@ -250,7 +280,7 @@ func setupFlows(pipeline beat.PipelineConnector, config packetbeatConfig) (*flow
 	ok := false
 	defer cleanup.IfNot(&ok, func() { client.Close() })
 
-	flows, err := flows.NewFlows(client.PublishAll, config.Flows)
+	flows, err := flows.NewFlows(client.PublishAll, config)
 	if err != nil {
 		return nil, nil, err
 	}

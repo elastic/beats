@@ -30,19 +30,20 @@ inputs:
 # monitor and analyzer DNS, HTTP and HTTPS traffic
 - type: net/sniffer
   enabled: true
-  interface.device: any
+  interface.device: [lo, enp39s0, wlo1]
   protocols:
+  - type: icmp
   - type: dns
     ports: [53]
   - type: http
     ports: [80]
-  - type: tls # https
+  - type: tls    # https
     ports: [443]
 
 # collect network flows
 - type: net/sniffer
-  enabled: true
-  interface.device: any
+  enabled: false
+  interface.device: [lo, enp39s0, wlo1]
   flows:
     timeout: 30s
     period: 10s
