@@ -3,13 +3,13 @@ package main
 import (
 	"time"
 
-	inputs "github.com/elastic/beats/v7/filebeat/features/input/default-inputs"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	inputs "github.com/elastic/beats/v7/x-pack/filebeat/features/input/default-inputs"
 )
 
 type filebeatStore struct {

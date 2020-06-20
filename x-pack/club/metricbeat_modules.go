@@ -7,10 +7,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
-	_ "github.com/elastic/beats/v7/metricbeat/include"
-	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
-
-	_ "github.com/elastic/beats/v7/auditbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 )
 
 type metricbeatRegistry struct {
