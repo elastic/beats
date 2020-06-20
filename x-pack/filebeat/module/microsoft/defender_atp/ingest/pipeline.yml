@@ -3,52 +3,22 @@ processors:
 - remove:
     field:
       - message
-      - json.evidence
       - json.comments
       - host
     ignore_missing: true
+
+#########################
+## ECS General Mapping ##
+#########################
 - set:
     field: cloud.provider
     value: azure
 - set:
-    field: event.kind
-    value: alert
-- set:
-    field: event.provider
-    value: defender_atp
-- set:
-    field: event.category
-    value: malware
-    if: ctx.json?.category == 'Malware'
-- set:
-    field: threat.framework
-    value: MITRE ATT&CK
-    if: ctx.json?.category != null
-- set:
     field: '@timestamp'
     value: '{{json.alertCreationTime}}'
     if: ctx.json?.alertCreationTime != null
-- append:
-    field: event.type
-    value:
-      - creation
-      - start
-    if: ctx.json?.status == 'New'
-- append:
-    field: event.type
-    value:
-      - end
-    if: ctx.json?.status == 'Resolved'
 - remove:
     field: json.alertCreationTime
-    ignore_missing: true
-- rename:
-    field: json.id
-    target_field: event.id
-    ignore_missing: true
-- rename:
-    field: json.category
-    target_field: threat.technique.name
     ignore_missing: true
 - rename:
     field: json.aadTenantId
@@ -62,11 +32,34 @@ processors:
     field: json.title
     target_field: message
     ignore_missing: true
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: alert
+- set:
+    field: event.provider
+    value: defender_atp
+- set:
+    field: event.category
+    value: malware
+    if: ctx.json?.category == 'Malware'
+- append:
+    field: event.type
+    value:
+      - creation
+      - start
+    if: ctx.json?.status == 'New'
+- append:
+    field: event.type
+    value:
+      - end
+    if: ctx.json?.status == 'Resolved'
 - rename:
-    field: json.description
-    target_field: rule.description
+    field: json.id
+    target_field: event.id
     ignore_missing: true
-    if: (ctx.json?.description).length() < 1020
 - rename:
     field: json.firstEventTime
     target_field: event.start
@@ -75,6 +68,67 @@ processors:
     field: json.lastEventTime
     target_field: event.end
     ignore_missing: true
+########################
+## ECS Threat Mapping ##
+########################
+- set:
+    field: threat.framework
+    value: MITRE ATT&CK
+    if: ctx.json?.category != null
+- rename:
+    field: json.category
+    target_field: threat.technique.name
+    ignore_missing: true
+- rename:
+    field: json.description
+    target_field: rule.description
+    ignore_missing: true
+    if: (ctx.json?.description).length() < 1020
+######################
+## ECS File Mapping ##
+######################
+- rename:
+    field: json.evidence.fileName
+    target_field: file.name
+    ignore_missing: true
+- rename:
+    field: json.evidence.sha256
+    target_field: file.hash.sha256
+    ignore_missing: true
+- rename:
+    field: json.evidence.sha1
+    target_field: file.hash.sha1
+    ignore_missing: true
+- rename:
+    field: json.evidence.filePath
+    target_field: file.path
+    ignore_missing: true
+######################
+## ECS Process Mapping ##
+######################
+- rename:
+    field: json.evidence.processId
+    target_field: process.pid
+    ignore_missing: true
+- rename:
+    field: json.evidence.processCommandLine
+    target_field: process.command_line
+    ignore_missing: true
+- rename:
+    field: json.evidence.processCreationTime
+    target_field: process.start
+    ignore_missing: true
+- rename:
+    field: json.evidence.parentProcessId
+    target_field: process.parent.pid
+    ignore_missing: true
+- rename:
+    field: json.evidence.parentProcessCreationTime
+    target_field: process.parent.start
+    ignore_missing: true
+####################################
+## ECS Host/User/Observer Mapping ##
+####################################
 - rename:
     field: json.computerDnsName
     target_field: host.hostname
@@ -92,13 +146,39 @@ processors:
     target_field: host.user.domain
     ignore_missing: true
 - rename:
-    field: json
-    target_field: microsoft.defender_atp
+    field: json.evidence.userSid
+    target_field: host.user.id
     ignore_missing: true
 - remove:
-    field: atp.relatedUser
+    field: json.relatedUser
+    ignore_missing: true
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.ip
+    value: '{{json.evidence.ipAddress}}'
+    if: ctx.json?.evidence?.ipAddress != null
+- append:
+    field: related.user
+    value: '{{host.user.name}}'
+    if: ctx.host?.user?.name != null
+- append:
+    field: related.hash
+    value: '{{file.hash.sha1}}'
+    if: ctx.file?.hash?.sha1 != null
+- append:
+    field: related.hash
+    value: '{{file.hash.sha256}}'
+    if: ctx.file?.hash?.sha256 != null
+#############
+## Cleanup ##
+#############
+- rename:
+    field: json
+    target_field: microsoft.defender_atp
     ignore_missing: true
 on_failure:
 - set:
     field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+    value: '{{_ingest.on_failure_message}}'

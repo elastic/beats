@@ -5,6 +5,7 @@ http_method: GET
 http_headers: {"Content-Type": "application/json"}
 interval: {{ .interval }}
 json_objects_array: value
+split_events_by: evidence
 url: {{ .url }}
 
 oauth2: {{ .oauth2 | tojson }}
