@@ -71,6 +71,8 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 		if err != nil {
 			return nil, err
 		}
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to access directory: %v", err)
 	} else if !fi.Mode().IsDir() {
 		return nil, fmt.Errorf("'%v' is not a directory", home)
 	} else {
