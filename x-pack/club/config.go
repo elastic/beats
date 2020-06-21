@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // flagsConfig is used for parsing all available CLI flags
@@ -26,9 +25,8 @@ type settings struct {
 	Logging  logp.Config
 	Registry registrySettings // XXX: copied from filebeat
 	Limits   limitsSettings
-	Location string                 // time zone info
-	Output   common.ConfigNamespace `config:"output"`
-	Pipeline pipeline.Config        `config:",inline"`
+	Location string       // time zone info
+	Output   outputConfig `config:",inline"`
 }
 
 type registrySettings struct {

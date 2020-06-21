@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,11 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 type app struct {
@@ -40,7 +37,12 @@ type app struct {
 }
 
 func main() {
-	rc := run()
+	// setup shutdown signaling based on OS signal handling
+	// We shutdown early if a signal is received during setup.
+	osSig, cancel := osSignalContext(os.Interrupt)
+	defer cancel()
+
+	rc := run(osSig)
 	if rc != 0 {
 		fmt.Fprintf(os.Stderr, "Exit with error code %v\n", rc)
 	} else {
@@ -50,11 +52,14 @@ func main() {
 	os.Exit(rc)
 }
 
-func run() (retcode int) {
+func run(osSig context.Context) (retcode int) {
 	var flags flagsConfig
 	if err := flags.parseArgs(os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to read arguments:\n%v\n", err)
 		return 2
+	}
+	if osSig.Err() != nil {
+		return 0
 	}
 
 	app, err := newApp(filepath.Base(os.Args[0]), flags)
@@ -63,8 +68,11 @@ func run() (retcode int) {
 		return 1
 	}
 	defer app.Cleanup()
+	if osSig.Err() != nil {
+		return 0
+	}
 
-	if err := app.Run(); err != nil {
+	if err := app.Run(osSig); err != nil {
 		fmt.Fprintf(os.Stderr, "Run failed with: %v\n", err)
 		return 1
 	}
@@ -193,39 +201,21 @@ func (app *app) configure() error {
 	return nil
 }
 
-func (app *app) Run() error {
+func (app *app) Run(sigContext context.Context) error {
 	app.log.Infof("Starting... %v", app.Name)
 
 	var autoCancel ctxtool.AutoCancel
 	defer autoCancel.Cancel()
 
-	// XXX: A little overkill to init all index management, but makes output setup easier for now
-	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, app.info, app.rawConfig)
-	if err != nil {
-		return err
-	}
-
-	pipeline, err := pipeline.Load(app.info,
-		pipeline.Monitors{
-			Metrics:   nil,
-			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-			Logger:    app.log.Named("publisher"),
-			Tracer:    nil,
-		},
-		app.Settings.Pipeline,
-		nil,
-		makeOutputFactory(app.info, indexManagement, app.Settings.Output),
-	)
-	if err != nil {
-		return err
-	}
-	defer pipeline.Close()
-
-	// setup shutdown signal on OS signal
-	sigContext := autoCancel.With(osSignalContext(os.Interrupt))
 	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
 		app.log.Info("Shutdown signal received")
 	}))
+
+	pipeline, pipelineClose, err := configurePublishingPipeline(app.log, app.info, app.Settings.Output, app.rawConfig)
+	if err != nil {
+		return err
+	}
+	defer pipelineClose()
 
 	// setup input lifetime management and shutdown signaling
 	inputTaskGroup := unison.TaskGroup{}
@@ -292,27 +282,4 @@ func (app *app) Cleanup() {
 	defer app.log.Info("Finished shutting down internal subsystems")
 
 	app.statestore.Close()
-}
-
-func makeOutputFactory(
-	info beat.Info,
-	indexManagement idxmgmt.Supporter,
-	cfg common.ConfigNamespace,
-) func(outputs.Observer) (string, outputs.Group, error) {
-	return func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := createOutput(info, indexManagement, outStats, cfg)
-		return cfg.Name(), out, err
-	}
-}
-
-func createOutput(
-	info beat.Info,
-	indexManagement idxmgmt.Supporter,
-	stats outputs.Observer,
-	cfg common.ConfigNamespace,
-) (outputs.Group, error) {
-	if !cfg.IsSet() {
-		return outputs.Group{}, nil
-	}
-	return outputs.Load(indexManagement, info, stats, cfg.Name(), cfg.Config())
 }
