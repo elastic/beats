@@ -32,20 +32,13 @@ import (
 	"github.com/mitchellh/hashstructure"
 )
 
-var (
-	moduleList = monitoring.NewUniqueList()
-)
-
-func init() {
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
-}
-
 // Factory for modules
 type Factory struct {
 	beatInfo              beat.Info
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
 	pipelineCallbackID    uuid.UUID
+	telemetry             *monitoring.UniqueList
 	inputFactory          cfgfile.RunnerFactory
 }
 
@@ -57,12 +50,14 @@ type inputsRunner struct {
 	pipelineLoaderFactory PipelineLoaderFactory
 	pipelineCallbackID    uuid.UUID
 	overwritePipelines    bool
+	moduleList            *monitoring.UniqueList
 }
 
 // NewFactory instantiates a new Factory
 func NewFactory(
 	inputFactory cfgfile.RunnerFactory,
 	beatInfo beat.Info,
+	telemetry *monitoring.UniqueList,
 	pipelineLoaderFactory PipelineLoaderFactory,
 	overwritePipelines bool,
 ) *Factory {
@@ -112,6 +107,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
+		moduleList:            f.telemetry,
 	}, nil
 }
 
@@ -155,8 +151,10 @@ func (p *inputsRunner) Start() {
 	}
 
 	// Loop through and add modules, only 1 normally
-	for m := range p.moduleRegistry.registry {
-		moduleList.Add(m)
+	if p.moduleList != nil {
+		for m := range p.moduleRegistry.registry {
+			p.moduleList.Add(m)
+		}
 	}
 }
 
@@ -170,8 +168,10 @@ func (p *inputsRunner) Stop() {
 	}
 
 	// Loop through and remove modules, only 1 normally
-	for m := range p.moduleRegistry.registry {
-		moduleList.Remove(m)
+	if p.moduleList != nil {
+		for m := range p.moduleRegistry.registry {
+			p.moduleList.Remove(m)
+		}
 	}
 }
 

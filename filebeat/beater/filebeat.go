@@ -302,11 +302,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	moduleList := monitoring.NewUniqueList()
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
 	))
-	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, moduleList, pipelineLoaderFactory, config.OverwritePipelines)
 
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
 	if err != nil {
