@@ -26,7 +26,7 @@ type metricbeatInput struct {
 }
 
 func makeMetricbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
-	factory := module.NewFactory(info, opts...)
+	factory := module.NewFactory(info, nil, opts...)
 	return &runnerFactoryRegistry{
 		typeField: "module",
 		factory:   factory,
@@ -46,7 +46,7 @@ func makeMetricbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
 }
 
 func makeAuditbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
-	factory := module.NewFactory(info, opts...)
+	factory := module.NewFactory(info, nil, opts...)
 	return &runnerFactoryRegistry{
 		typeField: "module",
 		factory:   factory,

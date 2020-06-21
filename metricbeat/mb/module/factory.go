@@ -21,21 +21,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Factory creates new Runner instances from configuration objects.
 // It is used to register and reload modules.
 type Factory struct {
-	beatInfo beat.Info
-	options  []Option
+	beatInfo  beat.Info
+	telemetry *monitoring.UniqueList
+	options   []Option
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, telemetry *monitoring.UniqueList, options ...Option) *Factory {
 	return &Factory{
-		beatInfo: beatInfo,
-		options:  options,
+		beatInfo:  beatInfo,
+		telemetry: telemetry,
+		options:   options,
 	}
 }
 
@@ -67,7 +70,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 		if err != nil {
 			return nil, err
 		}
-		runners = append(runners, NewRunner(client, wrapper))
+		runners = append(runners, NewRunner(client, r.telemetry, wrapper))
 	}
 
 	return newRunnerGroup(runners), nil

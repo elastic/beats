@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -45,10 +46,11 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}   // Channel used to initiate shutdown.
-	runners      []module.Runner // Active list of module runners.
-	config       Config
-	autodiscover *autodiscover.Autodiscover
+	done             chan struct{}   // Channel used to initiate shutdown.
+	runners          []module.Runner // Active list of module runners.
+	config           Config
+	autodiscover     *autodiscover.Autodiscover
+	modulesTelemetry *monitoring.UniqueList
 
 	// Options
 	moduleOptions []module.Option
@@ -140,8 +142,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	}
 
 	metricbeat := &Metricbeat{
-		done:   make(chan struct{}),
-		config: config,
+		done:             make(chan struct{}),
+		config:           config,
+		modulesTelemetry: monitoring.NewUniqueList(),
 	}
 	for _, applyOption := range options {
 		applyOption(metricbeat)
@@ -155,11 +158,13 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		return metricbeat, nil
 	}
 
+	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", metricbeat.modulesTelemetry.Report, monitoring.Report)
+
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, moduleOptions...)
+	factory := module.NewFactory(b.Info, metricbeat.modulesTelemetry, moduleOptions...)
 
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
@@ -217,7 +222,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(b.Info, bt.moduleOptions...)
+	factory := module.NewFactory(b.Info, bt.modulesTelemetry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
 	wg.Add(1)
