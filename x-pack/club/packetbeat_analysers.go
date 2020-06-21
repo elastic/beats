@@ -33,8 +33,6 @@ type packetbeatInput struct {
 }
 
 type snifferInput struct {
-	// sniffer *sniffer.Sniffer
-
 	// configuration
 	device         string
 	ifc            interfaceConfig
