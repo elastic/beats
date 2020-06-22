@@ -45,7 +45,7 @@ processors:
 - dns:
     type: reverse
     action: append
-    dot: false
+    transport: tls
     fields:
       server.ip: server.hostname
       client.ip: client.hostname
