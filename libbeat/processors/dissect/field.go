@@ -19,11 +19,8 @@ package dissect
 
 import (
 	"fmt"
-	"net"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type field interface {
@@ -122,60 +119,8 @@ type normalField struct {
 	baseField
 }
 
-// strToInt is a helper to interpret a string as either base 10 or base 16.
-func strToInt(s string, bitSize int) (int64, error) {
-	base := 10
-	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
-		// strconv.ParseInt will accept the '0x' or '0X` prefix only when base is 0.
-		base = 0
-	}
-	return strconv.ParseInt(s, base, bitSize)
-}
-
-func transformType(typ dataType, value string) (interface{}, error) {
-	value = strings.TrimRight(value, " ")
-	switch typ {
-	case String:
-		return value, nil
-	case Long:
-		return strToInt(value, 64)
-	case Integer:
-		i, err := strToInt(value, 32)
-		return int32(i), err
-	case Float:
-		f, err := strconv.ParseFloat(value, 32)
-		return float32(f), err
-	case Double:
-		d, err := strconv.ParseFloat(value, 64)
-		return float64(d), err
-	case Boolean:
-		return strconv.ParseBool(value)
-	case IP:
-		if net.ParseIP(value) != nil {
-			return value, nil
-		}
-		return "", errors.New("value is not a valid IP address")
-	default:
-		return value, nil
-	}
-}
-
-func convertData(typ string, b string) interface{} {
-	if len(typ) == 0 {
-		return b
-	} else {
-		if dt, ok := dataTypeNames[typ]; ok {
-			value, err := transformType(dt, b)
-			if err == nil {
-				return value
-			}
-		}
-	}
-	return nil
-}
-
 func (f normalField) Apply(b string, m Map) {
-	m[f.Key()] = convertData(f.dataType, b)
+	m[f.Key()] = b
 }
 
 // skipField is an skip field without a name like this: `%{}`, this is often used to
@@ -245,9 +190,7 @@ type indirectField struct {
 func (f indirectField) Apply(b string, m Map) {
 	v, ok := m[f.Key()]
 	if ok {
-		if v, ok := v.(string); ok {
-			m[v] = convertData(f.dataType, b)
-		}
+		m[v] = b
 		return
 	}
 }
@@ -272,9 +215,7 @@ type appendField struct {
 func (f appendField) Apply(b string, m Map) {
 	v, ok := m[f.Key()]
 	if ok {
-		if val, ok := v.(string); ok {
-			m[f.Key()] = val + f.JoinString() + b
-		}
+		m[f.Key()] = v + f.JoinString() + b
 		return
 	}
 	m[f.Key()] = b

@@ -68,10 +68,10 @@ func TestDissectConversion(t *testing.T) {
 		{
 			Name: "Convert 1 indirect field value",
 			Tok:  "%{?k1}=%{&k1|integer} msg=\"%{message}\"",
-			Msg:  "id=7736 msg=\"Single value OK\"}",
+			Msg:  "id=8268 msg=\"Single value indirect field\"}",
 			Expected: map[string]interface{}{
-				"id":      int32(7736),
-				"message": "Single value OK",
+				"id":      int32(8268),
+				"message": "Single value indirect field",
 			},
 			Fail: false,
 		},
@@ -97,12 +97,12 @@ func TestDissectConversion(t *testing.T) {
 			}
 
 			if test.Fail {
-				_, err := d.Dissect(test.Msg)
+				_, err := d.DissectConvert(test.Msg)
 				assert.Error(t, err)
 				return
 			}
 
-			r, err := d.Dissect(test.Msg)
+			r, err := d.DissectConvert(test.Msg)
 			if !assert.NoError(t, err) {
 				return
 			}
