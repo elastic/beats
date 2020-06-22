@@ -45,6 +45,7 @@ processors:
     formats:
     - yyyy-MM-dd HH:mm:ss
     - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
     - ISO8601
     timezone: "{{fortinet.firewall.tz}}"
     if: "ctx.fortinet?.firewall?.tz != null"
@@ -54,12 +55,14 @@ processors:
     formats:
     - yyyy-MM-dd HH:mm:ss
     - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
     - ISO8601
     if: "ctx.fortinet?.firewall?.tz == null"
 - gsub:
     field: fortinet.firewall.eventtime
     pattern: "\\d{6}$"
     replacement: ""
+    if: "(ctx.fortinet?.firewall?.eventtime).length() > 18"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
