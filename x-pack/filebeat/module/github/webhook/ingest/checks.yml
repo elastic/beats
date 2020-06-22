@@ -20,9 +20,6 @@ processors:
     value: check_suite-{{github.action}}
     if: ctx.github?.check_suite != null
 - append:
-    field: event.category
-    value: web
-- append:
     field: event.type
     value: info
 - append:
@@ -52,57 +49,46 @@ processors:
     field: github.check_suite.html_url
     target_field: event.url
     ignore_missing: true
-- rename:
-    field: github.sender.login
-    target_field: source.user.name
+    if: ctx.event?.url == null
+- append:
+    field: github.related.app
+    value: "{{github.check_run.app.name}}"
     ignore_missing: true
-- rename:
-    field: github.sender.id
-    target_field: source.user.id
-    ignore_missing: true
-- rename:
-    field: github.check_run.app.name
-    target_field: github.related.app
-    ignore_missing: true
-- rename:
-    field: github.check_suite.app.name
-    target_field: github.related.app
+- append:
+    field: github.related.app
+    value: "{{github.check_suite.app.name}}"
     ignore_missing: true
 - rename:
     field: github.check_run.status
-    target_field: github.status
+    target_field: github.run.status
     ignore_missing: true
 - rename:
     field: github.check_suite.status
-    target_field: github.status
+    target_field: github.suite.status
     ignore_missing: true
 - rename:
     field: github.check_run.conclusion
-    target_field: github.conclusion
+    target_field: github.run.conclusion
     ignore_missing: true
 - rename:
     field: github.check_suite.conclusion
-    target_field: github.conclusion
+    target_field: github.suite.conclusion
     ignore_missing: true
 - rename:
     field: github.check_run.name
-    target_field: github.check_name
+    target_field: github.check.name
     ignore_missing: true
 - rename:
     field: github.check_run.id
-    target_field: github.check_id
+    target_field: github.check.id
     ignore_missing: true
-- rename:
-    field: github.check_run.check_suite.name
-    target_field: github.related.suite
+- append:
+    field: github.related.suite.name
+    value: "{{github.check_run.check_suite.name}}"
     ignore_missing: true
 - rename:
     field: github.check_suite.name
-    target_field: github.check_name
-    ignore_missing: true
-- rename:
-    field: github.repository.full_name
-    target_field: github.related.repository
+    target_field: github.suite.name
     ignore_missing: true
 # Since PR's is in arrays of objects we want to create an array of strings with the relevant info
 # to prevent nested datatypes
@@ -110,22 +96,37 @@ processors:
     field: github.check_run.pull_requests
     processor:
       append:
-        field: github.related.pull_requests
+        field: github.related.pull_request.sha
         value: "{{_ingest._value.head.sha}}"
+    if: ctx.github?.check_run?.pull_requests != null
 - foreach:
     field: github.check_suite.pull_requests
     processor:
       append:
-        field: github.related.pull_requests
+        field: github.related.pull_request.sha
         value: "{{_ingest._value.head.sha}}"
+    if: ctx.github?.check_suite?.pull_requests != null
+- foreach:
+    field: github.check_run.pull_requests
+    processor:
+      append:
+        field: github.related.pull_request.name
+        value: "{{_ingest._value.head.repo.name}}"
+    if: ctx.github?.check_run?.pull_requests != null
+- foreach:
+    field: github.check_suite.pull_requests
+    processor:
+      append:
+        field: github.related.pull_request.name
+        value: "{{_ingest._value.head.repo.name}}"
     if: ctx.github?.check_suite?.pull_requests != null
 - script:
     lang: painless
-    source: ctx.github.related.pull_requests_count = (ctx.github.check_run.pull_requests).length
+    source: ctx.github.related.pull_request.count = (ctx.github.check_run.pull_requests).length()
     if: ctx.github?.check_run?.pull_requests != null
 - script:
     lang: painless
-    source: ctx.github.related.pull_requests_count = (ctx.github.check_suite.pull_requests).length
+    source: ctx.github.related.pull_request.count = (ctx.github.check_suite.pull_requests).length()
     if: ctx.github?.check_suite?.pull_requests != null
 - remove:
     field:

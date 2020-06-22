@@ -1,11 +1,20 @@
 description: Pipeline to parse commit_comment, issue_comment and pull_request_review_comment github wehhooks
 processors:
-- append:
-    field: event.category
-    value: web
 - rename:
     field: github.comment.commit_id
-    target_field: github.related.commits
+    target_field: github.related.commit.id
+    ignore_missing: true
+- rename:
+    field: github.issue.id
+    target_field: github.related.issue.id
+    ignore_missing: true
+- rename:
+    field: github.comment.id
+    target_field: github.related.comment.id
+    ignore_missing: true
+- rename:
+    field: github.comment.html_url
+    target_field: github.related.comment.url
     ignore_missing: true
 - append:
     field: event.type
@@ -21,35 +30,20 @@ processors:
 - set:
     field: event.action
     value: commit_comment-{{github.action}}
-    if: ctx.github.issue == null && ctx.github.pull_request == null
+    if: ctx.github?.issue == null && ctx.github?.pull_request == null && ctx.github?.comment != null
 - set:
     field: event.action
     value: issue_comment-{{github.action}}
-    if: ctx.github.issue != null && ctx.github.pull_request == null
+    if: ctx.github?.issue != null && ctx.github?.pull_request == null
 - set:
     field: event.action
-    value: pull_request_review_comment-{{github.action}}
-    if: ctx.github.issue != null && ctx.github.pull_request == null
-- rename:
-    field: github.comment.id
-    target_field: event.id
-    ignore_missing: true
-- rename:
-    field: github.comment.html_url
-    target_field: event.url
-    ignore_missing: true
-- rename:
-    field: github.sender.login
-    target_field: source.user.name
-    ignore_missing: true
-- rename:
-    field: github.sender.id
-    target_field: source.user.id
-    ignore_missing: true
+    value: review_comment-{{github.action}}
+    if: ctx.github?.issue != null && ctx.github?.pull_request != null
 - remove:
     field:
     - github.comment
     - github.repository
+    - github.issue
     - github.organization
     - github.installation
     - github.sender

@@ -1,28 +1,10 @@
 description: Pipeline to parse deployment github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.deployment.creator.login}}'
-    if: ctx.github?.deployment?.creator?.type == 'User' && !(ctx.related.user).contains(ctx.github.deployment.creator.login)
 - append:
     field: event.type
     value:
     - info
     - creation
-    - start
 - set:
     field: event.kind
     value: event
@@ -31,19 +13,27 @@ processors:
     value: deployment-{{github.action}}
 - rename:
     field: github.deployment.id
-    target_field: event.id
+    target_field: github.related.deployment.id
     ignore_missing: true
 - rename:
     field: github.deployment.url
-    target_field: event.url
+    target_field: github.related.deployment.url
     ignore_missing: true
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: github.deployment.sha
+    target_field: github.related.deployment.sha
     ignore_missing: true
 - rename:
-    field: github.sender.id
-    target_field: source.user.id
+    field: github.deployment.task
+    target_field: github.related.deployment.task
+    ignore_missing: true
+- remove:
+    field:
+    - github.deployment
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
     ignore_missing: true
 on_failure:
 - set:

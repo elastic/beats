@@ -9,6 +9,9 @@ processors:
 - set:
     field: observer.vendor
     value: Github
+- append:
+    field: event.category
+    value: web
 - rename:
     field: github.organization.login
     target_field: github.related.organization
@@ -17,6 +20,26 @@ processors:
     field: related.user
     value: "{{github.sender.login}}"
     if: ctx.github?.sender?.type == 'User'
+- rename:
+    field: github.repository.full_name
+    target_field: github.related.repository.name
+    ignore_missing: true
+- rename:
+    field: github.repository.id
+    target_field: github.related.repository.id
+    ignore_missing: true
+- rename:
+    field: github.repository.html_url
+    target_field: github.related.repository.url
+    ignore_missing: true
+- rename:
+    field: github.sender.login
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: github.sender.id
+    target_field: source.user.id
+    ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "checks" >}'
     if: ctx.github?.checks_run != null || ctx.github?.checks_suite != null
