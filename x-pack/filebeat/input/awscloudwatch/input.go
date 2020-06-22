@@ -75,7 +75,7 @@ func (c *channelContext) Err() error {
 func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new awscloudwatch input
-func NewInput(cfg *common.Config, connector channel.Connector, inputContext input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Beta("awsclouwatch input type is used")
 	logger := logp.NewLogger(inputName)
 
@@ -106,7 +106,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, inputContext inpu
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
+			DynamicFields: context.DynamicFields,
 		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
@@ -178,7 +178,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 
 	for nextToken != "" || i == 0 {
 		// construct FilterLogEventsInput
-		filterLogEventsInput := constructFilterLogEventsInput(in.config.LogGroup, startTime, endTime, in.config.Limit, i, nextToken)
+		filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime, i, nextToken)
 
 		// make API request
 		req := svc.FilterLogEventsRequest(filterLogEventsInput)
@@ -210,13 +210,21 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	return nil
 }
 
-func constructFilterLogEventsInput(logGroup string, startTime int64, endTime int64, limit int64, i int, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
+func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64, i int, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(logGroup),
+		LogGroupName: awssdk.String(in.config.LogGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
-		Limit:        awssdk.Int64(limit),
 	}
+
+	if len(in.config.LogStreams) > 0 {
+		filterLogEventsInput.LogStreamNames = in.config.LogStreams
+	}
+
+	if in.config.LogStreamPrefix != "" {
+		filterLogEventsInput.LogStreamNamePrefix = awssdk.String(in.config.LogStreamPrefix)
+	}
+
 	if i != 0 {
 		filterLogEventsInput.NextToken = awssdk.String(nextToken)
 	}
@@ -252,6 +260,7 @@ func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.Filter
 	}
 	return nil
 }
+
 func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string, cwCtx *cwContext) beat.Event {
 	cwCtx.Inc()
 

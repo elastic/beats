@@ -1,0 +1,99 @@
+[role="xpack"]
+
+:libbeat-xpack-dir: ../../../../x-pack/libbeat
+
+:type: awscloudwatch
+
+[id="{beatname_lc}-input-{type}"]
+=== awscloudwatch input
+
+++++
+<titleabbrev>awscloudwatch</titleabbrev>
+++++
+
+beta[]
+
+`awscloudwatch` input can be used to retrieve all logs from all log streams in a
+specific log group. `filterLogEvents` AWS API is used to list log events from
+the specified log group. Amazon CloudWatch Logs can be used to store log files
+from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
+
+A log group is a group of log streams that share the same retention, monitoring,
+and access control settings. You can define log groups and specify which streams
+to put into each group. There is no limit on the number of log streams that can
+belong to one log group.
+
+A log stream is a sequence of log events that share the same source. Each
+separate source of logs in CloudWatch Logs makes up a separate log stream.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: awscloudwatch
+  log_group: test
+  region: us-east-1
+  scan_frequency: 1m
+  credential_profile_name: elastic-beats
+  expand_event_list_from_field: Records
+----
+
+The `awscloudwatch` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `log_group`
+Name of the log group to collect logs from. Required.
+
+[float]
+==== `region`
+AWS Region name that the log group belongs to. Required.
+
+[float]
+==== `log_streams`
+A list of strings to filters the results to only logs from the log streams in
+this list.
+
+[float]
+==== `log_stream_prefix`
+A list of strings to filters the results to include only events from log streams
+that have names starting with this prefix.
+
+[float]
+==== `start_position`
+`start_position` allows user to specify if this input should read log files from
+the `beginning` or from the `end`.
+
+* `beginning`: reads from the beginning of the log group (default)
+* `end`: read only new messages from now going forward
+
+[float]
+==== `scan_frequency`
+This config parameter sets how often Filebeat checks for new log events from the
+specified log group. Default `scan_frequency` is 1 minute, which means Filebeat
+will sleep for 1 minute before querying for new logs again.
+
+[float]
+==== `api_timeout`
+The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+will be interrupted. The default AWS API timeout for a message is 120 seconds.
+The minimum is 0 seconds. The maximum is half of the visibility timeout value.
+
+[float]
+==== `aws credentials`
+In order to make AWS API calls, `awscloudwatch` input requires AWS credentials.
+Please see <<aws-credentials-config,AWS credentials options>> for more details.
+
+[float]
+=== AWS Permissions
+Specific AWS permissions are required for IAM user to access SQS and awscloudwatch:
+----
+logs:FilterLogEvents
+----
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
+:type!:

@@ -12,16 +12,15 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-// TODO: add LogStreamPrefix and LogGroupPrefix config parameters
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	RegionName                string              `config:"region" validate:"nonzero,required"`
 	LogGroup                  string              `config:"log_group" validate:"nonzero,required"`
-	LogStream                 string              `config:"log_stream"`
+	LogStreams                []string            `config:"log_streams"`
+	LogStreamPrefix           string              `config:"log_stream_prefix"`
 	StartPosition             string              `config:"start_position" default:"beginning"`
-	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
-	Limit                     int64               `config:"limit" validate:"min=0,max=10000,nonzero"`
 	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
+	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -33,7 +32,6 @@ func defaultConfig() config {
 		StartPosition: "beginning",
 		APITimeout:    120 * time.Second,
 		ScanFrequency: 1 * time.Minute,
-		Limit:         10000,
 	}
 }
 
