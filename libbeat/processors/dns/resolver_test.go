@@ -38,7 +38,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	defer stop()
 
 	reg := monitoring.NewRegistry()
-	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, addr)
+	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
 	if err != nil {
 		t.Fatal(err)
 	}

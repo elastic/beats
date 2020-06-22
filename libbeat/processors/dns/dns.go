@@ -65,7 +65,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	)
 
 	log.Debugf("DNS processor config: %+v", c)
-	resolver, err := NewMiekgResolver(metrics, c.Timeout, c.Nameservers...)
+	resolver, err := NewMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
