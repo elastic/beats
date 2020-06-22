@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-rabbitmq]]
+[role="xpack"]
+
 :modulename: rabbitmq
 :has-dashboards: false
 
