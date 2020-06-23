@@ -359,6 +359,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
+- Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
 *Auditbeat*
 
