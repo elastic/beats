@@ -1,3 +1,8 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-gsuite]]
 [role="xpack"]
 
 :modulename: gsuite
@@ -81,3 +86,11 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 :fileset_ex!:
 
 :modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-gsuite,exported fields>> section.
+
