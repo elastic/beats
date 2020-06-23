@@ -122,7 +122,7 @@ Now create a directory under $GOPATH for your repository and change to the new d
 mkdir ${GOPATH}/src/github.com/{user}
 --------------------
 
-Run the mage script to generate the custom beat:
+Run the mage script from the Beats directory to generate the custom beat:
 
 
 [source,shell]
