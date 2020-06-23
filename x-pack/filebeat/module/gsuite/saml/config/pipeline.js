@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-function GSuiteSAML() {
+var saml = (function () {
     var processor = require("processor");
 
     var categorizeEvent = function(evt) {
@@ -22,19 +22,22 @@ function GSuiteSAML() {
     };
 
     var processParams = function(evt) {
-        var params = evt.Get("events.parameters");
+        var params = evt.Get("json.events.parameters");
         if (!params || !Array.isArray(params)) {
             return;
         }
+
+        var prefixRegex = /^(saml_)/;
 
         params.forEach(function(p){
             // all saml event parameters are strings.
             // for this reason we know for sure they are in the 'value' field.
             // https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml
-            evt.Set(p.name, p.value);
+            p.name = p.name.replace(prefixRegex, "");
+            evt.Put("gsuite.saml."+p.name, p.value);
         });
 
-        evt.Delete("events.parameters");
+        evt.Delete("json.events.parameters");
     };
 
     var pipeline = new processor.Chain()
@@ -46,14 +49,8 @@ function GSuiteSAML() {
     return {
         process: pipeline.Run,
     };
-}
-
-var gsuite;
-
-function register() {
-    gsuite = new GSuiteSAML();
-}
+}());
 
 function process(evt) {
-    return gsuite.process(evt);
+    return saml.process(evt);
 }

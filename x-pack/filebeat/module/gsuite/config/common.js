@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-function GSuite(keep_original_message) {
+var gsuite = (function () {
     var processor = require("processor");
 
     var decodeJson = new processor.DecodeJSONFields({
@@ -28,9 +28,11 @@ function GSuite(keep_original_message) {
             { from: "json.actor.profileId", to: "client.user.id" },
             { from: "json.ipAddress", to: "client.ip" },
             { from: "json.kind", to: "gsuite.kind" },
+            { from: "json.id.customerId", to: "gsuite.customer.id" },
             { from: "json.actor.callerType", to: "gsuite.actor.type" },
             { from: "json.actor.key", to: "gsuite.actor.key" },
             { from: "json.ownerDomain", to: "gsuite.owner.domain" },
+            { from: "json.events.type", to: "gsuite.event.type" },
         ],
         mode: "rename",
         ignore_missing: true,
@@ -45,26 +47,22 @@ function GSuite(keep_original_message) {
         fail_on_error: false,
     });
 
+    var cleanup = function(evt) {
+        evt.Delete("json.id.time");
+    };
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
         .Add(convertFields)
         .Add(copyFields)
-        .Delete("json")
+        .Add(cleanup)
         .Build();
 
     return {
         process: pipeline.Run,
     };
-}
-
-var gsuite;
-
-// Register params from configuration.
-function register(params) {
-    gsuite = new GSuite();
-}
+}());
 
 function process(evt) {
     return gsuite.process(evt);

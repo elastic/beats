@@ -1,8 +1,5 @@
 description: Pipeline for parsing gsuite logs
 processors:
-  - set:
-      field: ecs.version
-      value: 1.5.0
   - geoip:
       field: client.ip
       target_field: client.geo

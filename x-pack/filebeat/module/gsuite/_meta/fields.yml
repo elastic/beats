@@ -4,6 +4,7 @@
     gsuite Module
   fields:
     - name: gsuite
+      default_field: false
       type: group
       description: >
         Gsuite specific fields.
@@ -23,6 +24,11 @@
               *USER*: Another user in the same domain.
               *EXTERNAL_USER*: A user outside the domain.
               *KEY*: A non-human actor.
+        - name: event.type
+          type: keyword
+          description: >
+            The type of event.
+          example: audit#activity
         - name: kind
           type: keyword
           description: >
@@ -32,3 +38,34 @@
           type: keyword
           description: >
               The domain that is affected by the report's event.
+        - name: customer.id
+          type: keyword
+          description: >
+              The unique identifier for a G Suite account.
+        - name: saml
+          type: group
+          fields:
+            - name: application_name
+              type: keyword
+              description: >
+                Saml SP application name.
+            - name: failure_type
+              type: keyword
+              description: >
+                Login failure type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml.
+            - name: initiated_by
+              type: keyword
+              description: >
+                Requester of SAML authentication.
+            - name: orgunit_path
+              type: keyword
+              description: >
+                  User orgunit.
+            - name: status_code
+              type: keyword
+              description: >
+                SAML status code.
+            - name: second_level_status_code
+              type: keyword
+              description: >
+                SAML second level status code.
