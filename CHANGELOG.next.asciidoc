@@ -194,6 +194,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
 
 *Heartbeat*
 
