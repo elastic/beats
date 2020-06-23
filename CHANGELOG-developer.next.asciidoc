@@ -42,6 +42,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
   Your magefile.go will require a change to adapt the devtool API. See the pull request for
   more details. {pull}18148[18148]
 - Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
+- The Elasticsearch client settings expect the API key to be raw (not base64-encoded). {issue}18939[18939] {pull}18945[18945]
 
 ==== Bugfixes
 
