@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 var result Event

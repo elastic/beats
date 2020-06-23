@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 - Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 
 *Auditbeat*
@@ -144,6 +145,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
 
 *Filebeat*
 
@@ -251,6 +253,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
+- Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Stop counterCache only when already started {pull}19103[19103]
 
 *Packetbeat*
@@ -407,6 +410,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
+- Add automatic retries and exponential backoff to httpjson input. {pull}18956[18956]
 
 *Heartbeat*
 
@@ -418,6 +422,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Added an `id` config option to inputs to allow running multiple inputs on the
   same journal. {pull}18467{18467}
+- Add basic ECS categorization and `log.syslog` fields. {pull}19176[19176]
 
 *Metricbeat*
 
@@ -502,8 +507,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-*Functionbeat*
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 
+*Functionbeat*
+- Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 
 *Winlogbeat*
 

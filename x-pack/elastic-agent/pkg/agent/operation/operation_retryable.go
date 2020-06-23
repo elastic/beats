@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 )
 
 // retryableOperations consists of multiple operations which are

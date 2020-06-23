@@ -5,3 +5,4 @@
 :python: 3.7
 :docker: 1.12
 :docker-compose: 1.11
+:libpcap: 0.8

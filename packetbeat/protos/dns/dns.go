@@ -391,7 +391,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if t.response.data.Rcode == 0 {
@@ -414,7 +414,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.request.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.request.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if dns.sendRequest {
@@ -430,7 +430,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
 			fields["resource"] = t.response.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 		if dns.sendResponse {
 			fields["response"] = dnsToString(t.response.data)
@@ -448,7 +448,7 @@ func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
 }
 
 // Adds the DNS message data to the supplied MapStr.
-func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional bool) {
+func addDNSToMapStr(m common.MapStr, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool) {
 	m["id"] = dns.Id
 	m["op_code"] = dnsOpCodeToString(dns.Opcode)
 
@@ -533,6 +533,7 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true)
 		if len(resolvedIPs) > 0 {
 			m["resolved_ip"] = resolvedIPs
+			pbf.AddIP(resolvedIPs...)
 		}
 	}
 
