@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-gsuite-saml-Dashboard
+  file: Filebeat-gsuite-saml.json

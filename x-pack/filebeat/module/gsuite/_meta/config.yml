@@ -1,0 +1,4 @@
+- module: gsuite
+  # All logs
+  saml:
+    enabled: true

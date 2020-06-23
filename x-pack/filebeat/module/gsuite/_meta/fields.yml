@@ -1,0 +1,34 @@
+- key: gsuite
+  title: "gsuite"
+  description: >
+    gsuite Module
+  fields:
+    - name: gsuite
+      type: group
+      description: >
+        Gsuite specific fields.
+
+        More information about specific fields can be found at https://developers.google.com/admin-sdk/reports/v1/reference/activities/list
+      fields:
+        - name: actor.key
+          type: keyword
+          description: >
+            Only present when callerType is KEY. Can be the consumer_key of the requestor for OAuth 2LO API requests or an identifier for robot accounts.
+        - name: actor.type
+          type: keyword
+          description: >
+            The type of actor.
+
+            Values can be:
+              *USER*: Another user in the same domain.
+              *EXTERNAL_USER*: A user outside the domain.
+              *KEY*: A non-human actor.
+        - name: kind
+          type: keyword
+          description: >
+            The type of API resource.
+          example: audit#activity
+        - name: owner.domain
+          type: keyword
+          description: >
+              The domain that is affected by the report's event.
