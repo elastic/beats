@@ -15,6 +15,7 @@ class Test(BaseTest):
         assert len(objs) == 3
 
         assert objs[0]["method"] == "exchange.declare"
+        assert objs[0]["event.action"] == "amqp.exchange.declare"
         assert objs[0]["status"] == "OK"
         assert objs[0]["amqp.exchange"] == "titres"
         assert objs[0]["amqp.durable"] == True
@@ -23,6 +24,7 @@ class Test(BaseTest):
         assert objs[0]["amqp.no-wait"] == True
 
         assert objs[1]["method"] == "queue.declare"
+        assert objs[1]["event.action"] == "amqp.queue.declare"
         assert objs[1]["status"] == "OK"
         assert objs[1]["amqp.queue"] == "my_queue"
         assert objs[1]["amqp.exclusive"] == True
@@ -32,6 +34,7 @@ class Test(BaseTest):
         assert objs[1]["amqp.passive"] == False
 
         assert objs[2]["method"] == "channel.close"
+        assert objs[2]["event.action"] == "amqp.channel.close"
         assert objs[2]["status"] == "Error"
         assert objs[2]["amqp.reply-code"] == 404
         assert objs[2]["amqp.reply-text"] == "NOT_FOUND - no exchange 'plop' in vhost '/'"

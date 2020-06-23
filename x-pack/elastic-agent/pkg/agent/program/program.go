@@ -115,7 +115,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 	const (
 		outputsKey = "outputs"
 		outputKey  = "output"
-		streamsKey = "datasources"
+		inputsKey  = "inputs"
 		typeKey    = "type"
 	)
 
@@ -168,12 +168,12 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 		clone := cloneMap(normMap)
 		delete(clone, outputsKey)
 		clone[outputKey] = map[string]interface{}{n: v}
-		clone[streamsKey] = make([]map[string]interface{}, 0)
+		clone[inputsKey] = make([]map[string]interface{}, 0)
 
 		grouped[k] = clone
 	}
 
-	s, ok := normMap[streamsKey]
+	s, ok := normMap[inputsKey]
 	if !ok {
 		s = make([]interface{}, 0)
 	}
@@ -199,17 +199,17 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 			return nil, fmt.Errorf("unknown configuration output with name %s", targetName)
 		}
 
-		streams := config[streamsKey].([]map[string]interface{})
+		streams := config[inputsKey].([]map[string]interface{})
 		streams = append(streams, stream)
 
-		config[streamsKey] = streams
+		config[inputsKey] = streams
 		grouped[targetName] = config
 	}
 
 	transpiled := make(map[string]*transpiler.AST)
 
 	for name, group := range grouped {
-		if len(group[streamsKey].([]map[string]interface{})) == 0 {
+		if len(group[inputsKey].([]map[string]interface{})) == 0 {
 			continue
 		}
 

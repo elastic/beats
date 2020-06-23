@@ -7,10 +7,10 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operationStart start installed process
@@ -20,8 +20,6 @@ type operationStart struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-
-	pi *process.Info
 }
 
 func newOperationStart(

@@ -19,11 +19,11 @@ import (
 
 // Default Configuration for the Fleet Gateway.
 var defaultGatewaySettings = &fleetGatewaySettings{
-	Duration: 30 * time.Second,
-	Jitter:   5 * time.Second,
-	Backoff: backoffSettings{
-		Init: 1 * time.Second,
-		Max:  10 * time.Second,
+	Duration: 1 * time.Second,        // time between successful calls
+	Jitter:   500 * time.Millisecond, // used as a jitter for duration
+	Backoff: backoffSettings{ // time after a failed call
+		Init: 5 * time.Second,
+		Max:  60 * time.Second,
 	},
 }
 
