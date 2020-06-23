@@ -9,18 +9,13 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/api/iterator"
-
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3"
-
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
-
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
-
 	"google.golang.org/genproto/googleapis/api/metric"
+	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
