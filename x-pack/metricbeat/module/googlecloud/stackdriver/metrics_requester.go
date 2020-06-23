@@ -76,9 +76,10 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, sdc stackDriv
 	results := make([]timeSeriesWithAligner, 0)
 
 	aligner := sdc.Aligner
-	for mt, metricMeta := range metricsMeta {
+	for mt, meta := range metricsMeta {
 		wg.Add(1)
 
+		metricMeta := meta
 		go func(mt string) {
 			defer wg.Done()
 
