@@ -142,3 +142,10 @@ func TestCreateEvent(t *testing.T) {
 	event := createEvent(logEvent, "logGroup1", "us-east-1", &cwCtx)
 	assert.Equal(t, expectedEventFields, event.Fields)
 }
+
+func TestParseARN(t *testing.T) {
+	logGroup, regionName, err := parseARN("arn:aws:logs:us-east-1:428152502467:log-group:test:*")
+	assert.Equal(t, "test", logGroup)
+	assert.Equal(t, "us-east-1", regionName)
+	assert.NoError(t, err)
+}

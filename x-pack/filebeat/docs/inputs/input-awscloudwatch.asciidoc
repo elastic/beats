@@ -30,32 +30,26 @@ separate source of logs in CloudWatch Logs makes up a separate log stream.
 ----
 {beatname_lc}.inputs:
 - type: awscloudwatch
-  log_group: test
-  region: us-east-1
+  log_group_arn: arn:aws:logs:us-east-1:428152502467:log-group:test:*
   scan_frequency: 1m
   credential_profile_name: elastic-beats
-  expand_event_list_from_field: Records
+  start_position: beginning
 ----
 
 The `awscloudwatch` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-==== `log_group`
-Name of the log group to collect logs from. Required.
-
-[float]
-==== `region`
-AWS Region name that the log group belongs to. Required.
+==== `log_group_arn`
+ARN of the log group to collect logs from. Required.
 
 [float]
 ==== `log_streams`
-A list of strings to filters the results to only logs from the log streams in
-this list.
+A list of strings of log streams names that Filebeat collect log events from.
 
 [float]
 ==== `log_stream_prefix`
-A list of strings to filters the results to include only events from log streams
+A string to filter the results to include only log events from log streams
 that have names starting with this prefix.
 
 [float]
@@ -85,7 +79,7 @@ Please see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
 === AWS Permissions
-Specific AWS permissions are required for IAM user to access SQS and awscloudwatch:
+Specific AWS permissions are required for IAM user to access awscloudwatch:
 ----
 logs:FilterLogEvents
 ----

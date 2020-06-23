@@ -14,14 +14,15 @@ import (
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	RegionName                string              `config:"region" validate:"nonzero,required"`
-	LogGroup                  string              `config:"log_group" validate:"nonzero,required"`
+	LogGroupARN               string              `config:"log_group_arn" validate:"nonzero,required"`
 	LogStreams                []string            `config:"log_streams"`
 	LogStreamPrefix           string              `config:"log_stream_prefix"`
 	StartPosition             string              `config:"start_position" default:"beginning"`
 	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
 	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
+	LogGroup                  string
+	RegionName                string
 }
 
 func defaultConfig() config {

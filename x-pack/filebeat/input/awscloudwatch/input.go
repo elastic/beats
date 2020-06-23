@@ -6,8 +6,11 @@ package awscloudwatch
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
@@ -86,14 +89,21 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	logger.Debug("awscloudwatch input config = ", config)
+	logGroupName, regionName, err := parseARN(config.LogGroupARN)
+	if err != nil {
+		return nil, errors.Wrap(err, "parse log group ARN failed")
+	}
+
+	config.LogGroup = logGroupName
+	config.RegionName = regionName
+
 	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
-	awsConfig.Region = config.RegionName
+	awsConfig.Region = regionName
 
 	closeChannel := make(chan struct{})
-
 	in := &awsCloudWatchInput{
 		config:      config,
 		awsConfig:   awsConfig,
@@ -105,9 +115,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
 				if cwContext, ok := private.(*cwContext); ok {
@@ -154,6 +161,21 @@ func (in *awsCloudWatchInput) run() {
 		time.Sleep(in.config.ScanFrequency)
 		in.logger.Debug("done sleeping")
 	}
+}
+
+func parseARN(logGroupARN string) (string, string, error) {
+	arnParsed, err := arn.Parse(logGroupARN)
+	if err != nil {
+		return "", "", errors.Errorf("error Parse arn %s: %v", logGroupARN, err)
+	}
+
+	if strings.Contains(arnParsed.Resource, ":") {
+		resourceARNSplit := strings.Split(arnParsed.Resource, ":")
+		if len(resourceARNSplit) >= 2 && resourceARNSplit[0] == "log-group" {
+			return resourceARNSplit[1], arnParsed.Region, nil
+		}
+	}
+	return "", "", errors.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
