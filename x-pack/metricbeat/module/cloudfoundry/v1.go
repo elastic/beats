@@ -92,6 +92,8 @@ func (m *ModuleV1) run() {
 	dispatcher := newEventDispatcher(m.log)
 
 	for {
+		// Handle subscriptions and events dispatching on the same
+		// goroutine so locking is not needed.
 		select {
 		case e := <-m.events:
 			dispatcher.dispatch(e)
@@ -111,6 +113,8 @@ type subscription struct {
 	unsubscribe bool
 }
 
+// eventDispatcher keeps track on the reporters that are subscribed to each event type
+// and dispatches events to them when received.
 type eventDispatcher struct {
 	log       *logp.Logger
 	reporters map[cfcommon.EventType]mb.PushReporterV2
@@ -128,7 +132,7 @@ func (d *eventDispatcher) handleSubscription(s subscription) {
 	if s.unsubscribe {
 		if !subscribed || current != s.reporter {
 			// This can happen if same metricset is used twice
-			d.log.Warnf("unsubscribing not subscribed reporter for %s", s.eventType)
+			d.log.Warnf("Ignoring unsubscription of not subscribed reporter for %s", s.eventType)
 			return
 		}
 		delete(d.reporters, s.eventType)
@@ -136,7 +140,7 @@ func (d *eventDispatcher) handleSubscription(s subscription) {
 		if subscribed {
 			if s.reporter != current {
 				// This can happen if same metricset is used twice
-				d.log.Warnf("subscribing multiple reporters for %s", s.eventType)
+				d.log.Warnf("Ignoring subscription of multiple reporters for %s", s.eventType)
 			}
 			return
 		}
