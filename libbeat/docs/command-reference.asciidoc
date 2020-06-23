@@ -89,7 +89,7 @@ endif::[]
 
 Some of the features described here require an Elastic license. For
 more information, see https://www.elastic.co/subscriptions and
-{stack-ov}/license-management.html[License Management].
+{kibana-ref}/managing-licenses.html[License Management].
 
 
 [options="header"]
