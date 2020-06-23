@@ -29,3 +29,8 @@ rules:
   - nodes/stats
   verbs:
   - get
+# Comment out if apiserver metricset is enabled
+#- nonResourceURLs:
+#  - "/metrics"
+#  verbs:
+#  - get
