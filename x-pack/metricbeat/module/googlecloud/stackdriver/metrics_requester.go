@@ -70,29 +70,27 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, metricType str
 	return
 }
 
-func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, stackDriverConfigs []stackDriverConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, sdc stackDriverConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
 
-	for _, sdc := range stackDriverConfigs {
-		aligner := sdc.Aligner
-		for _, mt := range sdc.MetricTypes {
-			metricType := mt
-			wg.Add(1)
+	aligner := sdc.Aligner
+	serviceName := sdc.ServiceName
+	for _, mt := range sdc.MetricTypes {
+		wg.Add(1)
 
-			go func(metricType string) {
-				defer wg.Done()
+		go func(mt string) {
+			defer wg.Done()
 
-				metricMeta := metricsMeta[metricType]
-				interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-				ts := r.Metric(ctx, metricType, interval, aligner)
-
-				lock.Lock()
-				defer lock.Unlock()
-				results = append(results, ts)
-			}(metricType)
-		}
+			metricMeta := metricsMeta[mt]
+			r.logger.Debugf("For metricType %s, metricMeta = %s", mt, metricMeta)
+			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
+			ts := r.Metric(ctx, serviceName+".googleapis.com/"+mt, interval, aligner)
+			lock.Lock()
+			defer lock.Unlock()
+			results = append(results, ts)
+		}(mt)
 	}
 
 	wg.Wait()
@@ -139,6 +137,7 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
 		}
 	}
+	r.logger.Debugf("ListTimeSeries API filter = %s", f)
 	return
 }
 
