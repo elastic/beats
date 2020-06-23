@@ -287,7 +287,9 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 	evt, pbf := pb.NewBeatEvent(trans.ts)
 	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}
 	pbf.Destination = &ecs.Destination{IP: trans.tuple.dstIP.String()}
+	pbf.AddIP(trans.tuple.srcIP.String(), trans.tuple.dstIP.String())
 	pbf.Event.Dataset = "icmp"
+	pbf.Event.Type = []string{"connection"}
 	pbf.Error.Message = trans.notes
 
 	// common fields - group "event"

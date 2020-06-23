@@ -9,7 +9,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 )
 
 const (
@@ -37,7 +38,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, step.Process),
+				errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd),
 				"operator.handleStartSidecar failed to create program")
 		}
 
@@ -46,13 +47,13 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 			if err := o.stop(p); err != nil {
 				result = multierror.Append(err, err)
 			} else {
-				o.markStopMonitoring(step.Process)
+				o.markStopMonitoring(step.ProgramSpec.Cmd)
 			}
 		} else {
 			if err := o.start(p, cfg); err != nil {
 				result = multierror.Append(err, err)
 			} else {
-				o.markStartMonitoring(step.Process)
+				o.markStartMonitoring(step.ProgramSpec.Cmd)
 			}
 		}
 	}
@@ -66,7 +67,7 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, step.Process),
+				errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd),
 				"operator.handleStopSidecar failed to create program")
 		}
 
@@ -74,7 +75,7 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
 		} else {
-			o.markStopMonitoring(step.Process)
+			o.markStopMonitoring(step.ProgramSpec.Cmd)
 		}
 	}
 
@@ -97,7 +98,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 
 	outputIface, found := config[outputKey]
 	if !found {
-		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar of type %s", step.Process)
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar of type %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
@@ -109,7 +110,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 
 	output, found := outputMap["elasticsearch"]
 	if !found {
-		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.Process)
+		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
@@ -131,7 +132,10 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		filebeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: logsProcessName,
+			ProgramSpec: program.Spec{
+				Name: logsProcessName,
+				Cmd:  logsProcessName,
+			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
 			},
@@ -149,7 +153,10 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		metricbeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: metricsProcessName,
+			ProgramSpec: program.Spec{
+				Name: metricsProcessName,
+				Cmd:  metricsProcessName,
+			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
 			},
