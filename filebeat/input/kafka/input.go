@@ -69,9 +69,6 @@ func NewInput(
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
 		ACKEvents: func(events []interface{}) {
 			for _, event := range events {
 				if meta, ok := event.(eventMeta); ok {

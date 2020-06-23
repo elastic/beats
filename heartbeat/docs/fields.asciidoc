@@ -7283,6 +7283,18 @@ type: keyword
 
 --
 
+*`http.response.headers.*`*::
++
+--
+The canonical headers of the monitored HTTP response.
+
+
+type: object
+
+Object is not enabled.
+
+--
+
 [float]
 === rtt
 
