@@ -973,7 +973,7 @@
         "fortinet.firewall.disklograte": "0",
         "fortinet.firewall.fazlograte": "0",
         "fortinet.firewall.freediskstorage": "331",
-        "fortinet.firewall.mem": "10",
+        "fortinet.firewall.mem": 10,
         "fortinet.firewall.setuprate": "0",
         "fortinet.firewall.subtype": "system",
         "fortinet.firewall.sysuptime": "25170",
