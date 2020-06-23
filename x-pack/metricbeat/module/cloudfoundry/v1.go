@@ -84,10 +84,10 @@ func (m *ModuleV1) run() {
 	if !m.running.CAS(false, true) {
 		return
 	}
+	defer func() { m.running.Store(false) }()
 
 	m.consumer.Run()
 	defer m.consumer.Stop()
-	defer func() { m.running.Store(false) }()
 
 	dispatcher := newEventDispatcher(m.log)
 
