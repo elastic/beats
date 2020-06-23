@@ -110,9 +110,10 @@ var (
 
 	constCRLF = []byte("\r\n")
 
-	constClose       = []byte("close")
-	constKeepAlive   = []byte("keep-alive")
-	constHTTPVersion = []byte("HTTP/")
+	constClose          = []byte("close")
+	constKeepAlive      = []byte("keep-alive")
+	constHTTPVersion    = []byte("HTTP/")
+	continueStatePhrase = []byte("Continue")
 
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
