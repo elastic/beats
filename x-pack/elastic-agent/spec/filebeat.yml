@@ -1,7 +1,6 @@
 name: Filebeat
 cmd: filebeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
-configurable: grpc
 rules:
 - fix_stream: {}
 - inject_index:
@@ -11,13 +10,8 @@ rules:
     on_conflict: insert_after
     type: logs
 
-- extract_list_items:
-    path: datasources
-    item: inputs
-    to: inputsstreams
-
 - map:
-    path: inputsstreams
+    path: inputs
     rules:
     - copy_all_to_list:
         to: streams
@@ -28,6 +22,9 @@ rules:
         to: streams
         on_conflict: insert_before
 
+- rename:
+    from: inputs
+    to: inputsstreams
 
 - extract_list_items:
     path: inputsstreams
@@ -41,6 +38,7 @@ rules:
         path: type
         mapper:
           logs: log
+          logfile: log
           event/file: log
           event/stdin: stdin
           event/tcp: tcp
@@ -48,7 +46,14 @@ rules:
           log/docker: docker
           log/redis_slowlog: redis
           log/syslog: syslog
-
+    - remove_key:
+        key: use_output
+    - remove_key:
+        key: dataset
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
+        key: dataset.name
 
 - filter_values:
     selector: inputs

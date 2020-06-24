@@ -102,10 +102,6 @@ func (t *configuredJob) Start() {
 	var err error
 
 	fields := common.MapStr{"event": common.MapStr{"dataset": "uptime"}}
-	if t.monitor.factoryMetadata != nil {
-		fields.DeepUpdate(t.monitor.factoryMetadata.Get())
-	}
-
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			EventMetadata: t.config.EventMetadata,

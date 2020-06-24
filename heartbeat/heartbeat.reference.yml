@@ -1632,6 +1632,41 @@ logging.files:
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
 
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the heartbeat.
+#instrumentation:
+    # Set to true to enable instrumentation of heartbeat.
+    #enabled: false
+
+    # Environment in which heartbeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
+
 # ================================= Migration ==================================
 
 # This allows to enable 6.7 migration aliases

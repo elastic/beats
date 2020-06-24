@@ -64,6 +64,11 @@ type Dict struct {
 	value []Node
 }
 
+// NewDict creates a new dict with provided nodes.
+func NewDict(nodes []Node) *Dict {
+	return &Dict{nodes}
+}
+
 // Find takes a string which is a key and try to find the elements in the associated K/V.
 func (d *Dict) Find(key string) (Node, bool) {
 	for _, i := range d.value {
@@ -110,10 +115,22 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// sort sorts the keys in the dictionary
+func (d *Dict) sort() {
+	sort.Slice(d.value, func(i, j int) bool {
+		return d.value[i].(*Key).name < d.value[j].(*Key).name
+	})
+}
+
 // Key represents a Key / value pair in the dictionary.
 type Key struct {
 	name  string
 	value Node
+}
+
+// NewKey creates a new key with provided name node pair.
+func NewKey(name string, val Node) *Key {
+	return &Key{name, val}
 }
 
 func (k *Key) String() string {
@@ -203,7 +220,10 @@ func (l *List) Find(idx string) (Node, bool) {
 	if err != nil {
 		return nil, false
 	}
-	if i > len(l.value) || i < len(l.value) {
+	if l.value == nil {
+		return nil, false
+	}
+	if i > len(l.value)-1 || i < 0 {
 		return nil, false
 	}
 
@@ -227,6 +247,11 @@ func (l *List) Clone() Node {
 // StrVal represents a string.
 type StrVal struct {
 	value string
+}
+
+// NewStrVal creates a new string value node with provided value.
+func NewStrVal(val string) *StrVal {
+	return &StrVal{val}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -259,6 +284,11 @@ type IntVal struct {
 	value int
 }
 
+// NewIntVal creates a new int value node with provided value.
+func NewIntVal(val int) *IntVal {
+	return &IntVal{val}
+}
+
 // Find receive a key and return false since the node is not a List or Dict.
 func (s *IntVal) Find(key string) (Node, bool) {
 	return nil, false
@@ -287,6 +317,11 @@ func (s *IntVal) Hash() []byte {
 // UIntVal represents an int.
 type UIntVal struct {
 	value uint64
+}
+
+// NewUIntVal creates a new uint value node with provided value.
+func NewUIntVal(val uint64) *UIntVal {
+	return &UIntVal{val}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -320,6 +355,11 @@ type FloatVal struct {
 	value float64
 }
 
+// NewFloatVal creates a new float value node with provided value.
+func NewFloatVal(val float64) *FloatVal {
+	return &FloatVal{val}
+}
+
 // Find receive a key and return false since the node is not a List or Dict.
 func (s *FloatVal) Find(key string) (Node, bool) {
 	return nil, false
@@ -348,6 +388,11 @@ func (s *FloatVal) Hash() []byte {
 // BoolVal represents a boolean in our Tree.
 type BoolVal struct {
 	value bool
+}
+
+// NewBoolVal creates a new bool value node with provided value.
+func NewBoolVal(val bool) *BoolVal {
+	return &BoolVal{val}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -513,6 +558,9 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 }
 
 func splitPath(s Selector) []string {
+	if s == "" {
+		return nil
+	}
 	return strings.Split(s, selectorSep)
 }
 
@@ -659,7 +707,6 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 		if !ok {
 			return nil, false
 		}
-
 		current = n
 	}
 
@@ -678,9 +725,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
 
-				sort.Slice(t.value, func(i, j int) bool {
-					return t.value[i].(*Key).name < t.value[j].(*Key).name
-				})
+				t.sort()
 
 				current = newNode
 				continue
@@ -700,6 +745,8 @@ func Insert(a *AST, node Node, to Selector) error {
 	}
 
 	switch node.(type) {
+	case *Dict:
+		d.value = node
 	case *List:
 		d.value = node
 	default:

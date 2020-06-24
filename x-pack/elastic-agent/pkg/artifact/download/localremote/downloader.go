@@ -10,10 +10,27 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/composed"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/fs"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/http"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/snapshot"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // NewDownloader creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewDownloader(config *artifact.Config, downloaders ...download.Downloader) download.Downloader {
-	return composed.NewDownloader(fs.NewDownloader(config), http.NewDownloader(config))
+func NewDownloader(log *logger.Logger, config *artifact.Config) download.Downloader {
+	downloaders := make([]download.Downloader, 0, 3)
+	downloaders = append(downloaders, fs.NewDownloader(config))
+
+	// try snapshot repo before official
+	if release.Snapshot() {
+		snapDownloader, err := snapshot.NewDownloader(config)
+		if err != nil {
+			log.Error(err)
+		} else {
+			downloaders = append(downloaders, snapDownloader)
+		}
+	}
+
+	downloaders = append(downloaders, http.NewDownloader(config))
+	return composed.NewDownloader(downloaders...)
 }

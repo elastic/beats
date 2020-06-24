@@ -372,6 +372,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  version: v1
 
 #----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
@@ -530,15 +531,14 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  stackdriver:
-    service: compute
-    metrics:
-      - aligner: ALIGN_NONE
-        metric_types:
-          - "compute.googleapis.com/instance/cpu/reserved_cores"
-          - "compute.googleapis.com/instance/cpu/usage_time"
-          - "compute.googleapis.com/instance/cpu/utilization"
-          - "compute.googleapis.com/instance/uptime"
+  metrics:
+    - aligner: ALIGN_NONE
+      service: compute
+      metric_types:
+        - "instance/cpu/reserved_cores"
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+        - "instance/uptime"
 
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
@@ -2679,6 +2679,41 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the metricbeat.
+#instrumentation:
+    # Set to true to enable instrumentation of metricbeat.
+    #enabled: false
+
+    # Environment in which metricbeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
 
 # ================================= Migration ==================================
 

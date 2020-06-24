@@ -7,13 +7,7 @@
 <titleabbrev>Configure</titleabbrev>
 ++++
 
-Before modifying configuration settings, make sure you've completed the
-<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
-This section describes some common use cases for changing configuration options.
-
-include::{libbeat-dir}/shared-configuring.asciidoc[]
-
-The following topics describe how to configure {beatname_uc}:
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-{beatname_lc}-options>>
 * <<configuration-general-options>>
