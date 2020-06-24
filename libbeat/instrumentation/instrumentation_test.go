@@ -80,3 +80,15 @@ func TestAPMTracerDisabledByDefault(t *testing.T) {
 	require.NotNil(t, tracer)
 	assert.False(t, tracer.Active())
 }
+
+func TestInstrumentationDisabled(t *testing.T) {
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"instrumentation": map[string]interface{}{
+			"enabled": "false",
+		},
+	})
+	instrumentation, err := New(cfg, "filebeat", version.GetDefaultVersion())
+	require.NoError(t, err)
+	require.NotNil(t, instrumentation)
+
+}
