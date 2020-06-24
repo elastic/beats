@@ -38,6 +38,7 @@ rules:
         path: type
         mapper:
           logs: log
+          logfile: log
           event/file: log
           event/stdin: stdin
           event/tcp: tcp
