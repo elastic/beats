@@ -22,7 +22,7 @@ ifeval::["{beatname_lc}"!="heartbeat"]
 |{heartbeat-ref}/heartbeat-installation-configuration.html[{heartbeat}]
 |Uptime information
 endif::[]
-|{apm-get-started-ref}/index.html[APM]
+|{apm-overview-ref-v}/index.html[APM]
 |Application performance metrics
 ifeval::["{beatname_lc}"!="auditbeat"]
 |{auditbeat-ref}/auditbeat-installation-configuration.html[{auditbeat}]
