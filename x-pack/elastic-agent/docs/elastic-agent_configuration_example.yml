@@ -35,7 +35,7 @@ settings.monitoring:
 #logging.level: trace
 
 inputs:
-  - type: logs
+  - type: logfile
     name: epm/nginx
     version: 1.7.0
     dataset.namespace: prod
