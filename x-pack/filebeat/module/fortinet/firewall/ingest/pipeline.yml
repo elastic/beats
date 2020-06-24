@@ -37,7 +37,7 @@ processors:
     if: "ctx.fortinet?.firewall?.tz != null"
 - set:
     field: _temp.time
-    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}}Z"
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}}"
     if: "ctx.fortinet?.firewall?.tz == null"
 - date:
     field: _temp.time
@@ -69,6 +69,13 @@ processors:
     formats:
     - UNIX_MS
     timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX_MS
+    if: "ctx.fortinet?.firewall?.tz == null"
 - rename:
     field: fortinet.firewall.devname
     target_field: observer.name
