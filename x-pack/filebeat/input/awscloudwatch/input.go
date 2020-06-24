@@ -192,8 +192,8 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	i := 0
 	nextToken := ""
 	currentTime := time.Now()
-	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime)
-	in.logger.Debugf("start_position = %s and startTime = %v", in.config.StartPosition, startTime)
+	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency)
+	in.logger.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
 
 	// overwrite prevEndTime using new endTime
 	in.prevEndTime = endTime
@@ -253,7 +253,7 @@ func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, end
 	return filterLogEventsInput
 }
 
-func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64) (startTime int64, endTime int64) {
+func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64, scanFrequency time.Duration) (startTime int64, endTime int64) {
 	switch startPosition {
 	case "beginning":
 		if prevEndTime != int64(0) {
@@ -262,9 +262,9 @@ func getStartPosition(startPosition string, currentTime time.Time, prevEndTime i
 		return 0, currentTime.UnixNano() / int64(time.Millisecond)
 	case "end":
 		if prevEndTime != int64(0) {
-			return prevEndTime, 0
+			return prevEndTime, currentTime.UnixNano() / int64(time.Millisecond)
 		}
-		return currentTime.UnixNano() / int64(time.Millisecond), 0
+		return currentTime.Add(-scanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
 	}
 	return
 }

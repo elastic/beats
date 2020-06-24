@@ -24,6 +24,7 @@ func TestGetStartPosition(t *testing.T) {
 		title             string
 		startPosition     string
 		prevEndTime       int64
+		scanFrequency     time.Duration
 		expectedStartTime int64
 		expectedEndTime   int64
 	}{
@@ -31,6 +32,7 @@ func TestGetStartPosition(t *testing.T) {
 			"startPosition=beginning",
 			"beginning",
 			int64(0),
+			30 * time.Second,
 			int64(0),
 			int64(1590969600000),
 		},
@@ -38,13 +40,15 @@ func TestGetStartPosition(t *testing.T) {
 			"startPosition=end",
 			"end",
 			int64(0),
+			30 * time.Second,
+			int64(1590969570000),
 			int64(1590969600000),
-			int64(0),
 		},
 		{
 			"startPosition=typo",
 			"typo",
 			int64(0),
+			30 * time.Second,
 			int64(0),
 			int64(0),
 		},
@@ -52,6 +56,7 @@ func TestGetStartPosition(t *testing.T) {
 			"startPosition=beginning with prevEndTime",
 			"beginning",
 			int64(1590000000000),
+			30 * time.Second,
 			int64(1590000000000),
 			int64(1590969600000),
 		},
@@ -59,14 +64,15 @@ func TestGetStartPosition(t *testing.T) {
 			"startPosition=end with prevEndTime",
 			"end",
 			int64(1590000000000),
+			30 * time.Second,
 			int64(1590000000000),
-			int64(0),
+			int64(1590969600000),
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			startTime, endTime := getStartPosition(c.startPosition, currentTime, c.prevEndTime)
+			startTime, endTime := getStartPosition(c.startPosition, currentTime, c.prevEndTime, c.scanFrequency)
 			assert.Equal(t, c.expectedStartTime, startTime)
 			assert.Equal(t, c.expectedEndTime, endTime)
 		})
