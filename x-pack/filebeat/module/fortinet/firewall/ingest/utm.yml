@@ -230,6 +230,10 @@ processors:
     field: fortinet.firewall.ipaddr
     target_field: dns.resolved_ip
     ignore_missing: true
+- split:
+    field: dns.resolved_ip
+    separator: ', '
+    ignore_missing: true
 - rename:
     field: fortinet.firewall.level
     target_field: log.level
