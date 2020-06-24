@@ -57,8 +57,19 @@ that have names starting with this prefix.
 `start_position` allows user to specify if this input should read log files from
 the `beginning` or from the `end`.
 
-* `beginning`: reads from the beginning of the log group (default)
-* `end`: read only new messages from now going forward
+* `beginning`: reads from the beginning of the log group (default).
+* `end`: read only new messages from current time minus `scan_frequency` going forward
+
+For example, with `scan_frequency` equals to `30s` and current timestamp is
+`2020-06-24 12:00:00`:
+
+* with `start_position = beginning`:
+** first iteration: startTime=0, endTime=2020-06-24 12:00:00
+** second iteration: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
+
+* with `start_position = end`:
+** first iteration: startTime=2020-06-24 11:59:30, endTime=2020-06-24 12:00:00
+** second iteration: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
 
 [float]
 ==== `scan_frequency`
