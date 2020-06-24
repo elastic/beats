@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	datasourcesKey          = "datasources"
+	inputsKey               = "inputs"
 	constraintsKey          = "constraints"
 	validateVersionFuncName = "validate_version"
 )
@@ -30,26 +30,26 @@ var (
 // ConstraintFilter filters ast based on included constraints.
 func ConstraintFilter(log *logger.Logger, ast *transpiler.AST) error {
 	// get datasources
-	dsNode, found := transpiler.Lookup(ast, datasourcesKey)
+	inputsNode, found := transpiler.Lookup(ast, inputsKey)
 	if !found {
 		return nil
 	}
 
-	dsListNode, ok := dsNode.Value().(*transpiler.List)
+	inputsListNode, ok := inputsNode.Value().(*transpiler.List)
 	if !ok {
 		return nil
 	}
 
-	dsList, ok := dsListNode.Value().([]transpiler.Node)
+	inputsList, ok := inputsListNode.Value().([]transpiler.Node)
 	if !ok {
 		return nil
 	}
 
 	// for each datasource
 	i := 0
-	originalLen := len(dsList)
-	for i < len(dsList) {
-		constraintMatch, err := evaluateConstraints(log, dsList[i])
+	originalLen := len(inputsList)
+	for i < len(inputsList) {
+		constraintMatch, err := evaluateConstraints(log, inputsList[i])
 		if err != nil {
 			return err
 		}
@@ -58,20 +58,20 @@ func ConstraintFilter(log *logger.Logger, ast *transpiler.AST) error {
 			i++
 			continue
 		}
-		dsList = append(dsList[:i], dsList[i+1:]...)
+		inputsList = append(inputsList[:i], inputsList[i+1:]...)
 	}
 
-	if len(dsList) == originalLen {
+	if len(inputsList) == originalLen {
 		return nil
 	}
 
 	// Replace datasources with limited set
-	if err := transpiler.RemoveKey(datasourcesKey).Apply(ast); err != nil {
+	if err := transpiler.RemoveKey(inputsKey).Apply(ast); err != nil {
 		return err
 	}
 
-	newList := transpiler.NewList(dsList)
-	return transpiler.Insert(ast, newList, datasourcesKey)
+	newList := transpiler.NewList(inputsList)
+	return transpiler.Insert(ast, newList, inputsKey)
 }
 
 func evaluateConstraints(log *logger.Logger, datasourceNode transpiler.Node) (bool, error) {

@@ -26,6 +26,7 @@ require (
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/antlr/antlr4 v0.0.0-20200225173536-225249fdaef5
+	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
@@ -36,6 +37,7 @@ require (
 	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
 	github.com/cespare/xxhash/v2 v2.1.1
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
+	github.com/cloudfoundry/noaa v2.1.0+incompatible
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
@@ -97,6 +99,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/h2non/filetype v1.0.12
 	github.com/hashicorp/go-multierror v1.1.0
+	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
@@ -123,6 +126,7 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
+	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0

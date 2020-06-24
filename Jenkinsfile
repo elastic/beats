@@ -4,6 +4,19 @@
 
 import groovy.transform.Field
 
+
+/**
+  NOTE: Important note regarding the agents and labels.
+  agent labels are defined in the gobld service, that's managed by infra. The required format
+  is:
+   - '<os-family> && immutable' for linux OS.
+   - 'macosx' for the MacOS.
+   - 'windows-immutable && windows-<version>' for Windows. NOTE: version might differ in some cases
+
+  The above labels will help to set what OS family and specific version of the agent is
+  required to used in the stage.
+*/
+
 /**
  This is required to store the stashed id with the test results to be digested with runbld
 */
@@ -703,20 +716,14 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
-                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
-                }
+                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
+                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
-                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
-                }
+                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
+                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
               }
             }
             stage('Generators Metricbeat Mac OS X'){
@@ -729,10 +736,7 @@ pipeline {
                 }
               }
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
-                }
+                makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
               }
               post {
                 always {
@@ -750,10 +754,7 @@ pipeline {
                 }
               }
               steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporarily', stageResult: 'UNSTABLE') {
-                  makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
-                }
+                makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
               }
               post {
                 always {
