@@ -197,8 +197,6 @@ processors:
        - intrusion_detection
        - network
      if: 'ctx?._temp_?.message_type == "THREAT"'
- - drop:
-     if: 'ctx?.event?.category == null'
  - append:
      field: event.type
      value: allowed
