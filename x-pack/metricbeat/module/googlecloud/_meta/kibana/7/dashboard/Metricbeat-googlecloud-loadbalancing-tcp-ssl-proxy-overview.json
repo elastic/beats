@@ -32,7 +32,7 @@
             "panelIndex": "02422b42-6d8c-4924-acc1-0d7f4fb9a1b1",
             "panelRefName": "panel_0",
             "title": "Filters",
-            "version": "7.7.0"
+            "version": "7.6.2"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "da16e443-8524-47ea-83e1-6a16250ed61c",
             "panelRefName": "panel_1",
             "title": "Open Connections",
-            "version": "7.7.0"
+            "version": "7.6.2"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "305f8fc3-e763-4b2c-8998-9e0e057ce713",
             "panelRefName": "panel_2",
             "title": "Closed Connections",
-            "version": "7.7.0"
+            "version": "7.6.2"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "e4fe30c7-906a-4878-bec7-7a78a06d98d0",
             "panelRefName": "panel_3",
             "title": "New Connections",
-            "version": "7.7.0"
+            "version": "7.6.2"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "c2bec6ee-96e8-440c-bfa4-6e0def7b0095",
             "panelRefName": "panel_4",
             "title": "Egress Bytes",
-            "version": "7.7.0"
+            "version": "7.6.2"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "fbaeaa8f-262d-41b1-a621-d6dbff52ff59",
             "panelRefName": "panel_5",
             "title": "Ingress Bytes",
-            "version": "7.7.0"
+            "version": "7.6.2"
           }
         ],
         "timeRestore": false,
@@ -234,7 +234,7 @@
       },
       "id": "6958ed10-a6ad-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [
         {
@@ -332,7 +332,7 @@
       },
       "id": "f86c26f0-a6aa-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [],
       "type": "visualization",
@@ -414,7 +414,7 @@
       },
       "id": "c4e1e090-a6aa-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [],
       "type": "visualization",
@@ -496,7 +496,7 @@
       },
       "id": "eed05d80-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [],
       "type": "visualization",
@@ -578,7 +578,7 @@
       },
       "id": "afeb98a0-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [],
       "type": "visualization",
@@ -660,7 +660,7 @@
       },
       "id": "be27b340-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.7.0"
+        "visualization": "7.6.2"
       },
       "references": [],
       "type": "visualization",
@@ -668,5 +668,5 @@
       "version": "WzM1ODcsNV0="
     }
   ],
-  "version": "7.7.0"
+  "version": "7.6.2"
 }
