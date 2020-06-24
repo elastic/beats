@@ -306,6 +306,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
+- Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
 *Auditbeat*
 
