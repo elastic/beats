@@ -567,6 +567,7 @@ github.com/golang/snappy
 github.com/google/flatbuffers/go
 # github.com/google/go-cmp v0.4.0
 github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/cmpopts
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
@@ -631,7 +632,7 @@ github.com/insomniacslk/dhcp/iana
 # github.com/jcmturner/gofork v1.0.0
 github.com/jcmturner/gofork/encoding/asn1
 github.com/jcmturner/gofork/x/crypto/pbkdf2
-# github.com/jmespath/go-jmespath v0.3.0
+# github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 github.com/jmespath/go-jmespath
 # github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 github.com/jmoiron/sqlx
