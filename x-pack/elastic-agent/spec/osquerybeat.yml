@@ -1,0 +1,18 @@
+name: OSQuerybeat
+cmd: osquerybeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+rules:
+- fix_stream: {}
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - osquery
+
+- filter:
+    selectors:
+    - inputs
+    - output
+
+when: HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')
