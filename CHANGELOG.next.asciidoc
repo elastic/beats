@@ -503,6 +503,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add awscloudwatch input. {pull}19025[19025]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
+- Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 
 *Heartbeat*
 
