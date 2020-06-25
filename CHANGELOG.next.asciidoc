@@ -512,6 +512,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add an example to packetbeat.yml of using the `forwarded` tag to disable
+  `host` metadata fields when processing network data from network tap or mirror
+  port. {pull}19209[19209]
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 
 *Functionbeat*
