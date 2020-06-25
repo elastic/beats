@@ -24,7 +24,7 @@ function enroll(){
     local apiKey
 
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]]; then
-      apikey = "${FLEET_ENROLLMENT_TOKEN}"
+      apikey="${FLEET_ENROLLMENT_TOKEN}"
     else
       enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \

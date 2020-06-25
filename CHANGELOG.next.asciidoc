@@ -194,6 +194,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
 
 *Heartbeat*
 
@@ -306,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
+- Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
 *Auditbeat*
 
@@ -411,6 +413,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 - Add automatic retries and exponential backoff to httpjson input. {pull}18956[18956]
+- Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
+- Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 
 *Heartbeat*
 
@@ -505,6 +509,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Accept prefix as metric_types config parameter in googlecloud stackdriver metricset. {pull}19345[19345]
+- Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
 *Packetbeat*
 
