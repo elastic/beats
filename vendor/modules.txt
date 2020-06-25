@@ -459,7 +459,7 @@ github.com/elastic/go-perf
 # github.com/elastic/go-seccomp-bpf v1.1.0
 github.com/elastic/go-seccomp-bpf
 github.com/elastic/go-seccomp-bpf/arch
-# github.com/elastic/go-structform v0.0.6
+# github.com/elastic/go-structform v0.0.7
 github.com/elastic/go-structform
 github.com/elastic/go-structform/cborl
 github.com/elastic/go-structform/gotype
