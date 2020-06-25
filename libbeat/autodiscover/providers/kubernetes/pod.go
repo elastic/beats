@@ -191,6 +191,9 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
+	if port_name, ok := event["port_name"]; ok {
+		e["port_name"] = port_name
+	}
 
 	if rawCont, ok := kubeMeta["container"]; ok {
 		container = rawCont.(common.MapStr)
@@ -356,6 +359,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				flag:         true,
 				"host":       host,
 				"port":       port.ContainerPort,
+				"port_name":   port.Name,
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,

@@ -88,6 +88,11 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		noPort = true
 	}
 
+	portName, _ := event["port_name"].(string)
+	if portName == "" {
+		portName = ""
+	}
+
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
 		return configs
@@ -115,7 +120,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 			continue
 		}
 
-		hosts, ok := m.getHostsWithPort(hint, port, noPort)
+		hosts, ok := m.getHostsWithPort(hint, port, noPort, portName)
 		if !ok {
 			continue
 		}
@@ -192,13 +197,22 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort bool) ([]string, bool) {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort bool, portName string) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
+		if strings.Contains(h, "data.ports.") && port != 0 && !noPort && portName != "" {
+			hintPortName := m.getPortName(h)
+			if hintPortName == portName && hintPortName != ""{
+				host := strings.Replace(h, "${data.ports."+hintPortName+"}", fmt.Sprintf("%v", port), -1)
+				result = append(result, host)
+			}
+			// move on to the next host
+			continue
+		}
 		if strings.Contains(h, "data.port") && port != 0 && !noPort || m.checkHostPort(h, port) ||
 			// Use the event that has no port config if there is a ${data.host}:9090 like input
 			(noPort && strings.Contains(h, "data.host")) {
@@ -212,6 +226,16 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 	}
 
 	return result, true
+}
+
+// getPortName returns the port name defined in a host hint ie: for ${data.host}:%{data.ports.web} returns web
+func (m *metricHints) getPortName(h string) string {
+	firstIndex := strings.Index(h, "data.ports.")
+	if firstIndex == -1 {
+		return ""
+	}
+	firstIndex = firstIndex + len("data.ports.")
+	return h[firstIndex:len(h)-1]
 }
 
 func (m *metricHints) checkHostPort(h string, p int) bool {
