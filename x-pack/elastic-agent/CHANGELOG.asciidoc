@@ -71,3 +71,4 @@
 - Agent verifies packages before using them {pull}18876[18876]
 - Change stream.* to dataset.* fields {pull}18967[18967]
 - Agent now runs the GRPC server and spawned application connect by to Agent {pull}18973[18973]
+- Rename input.type logs to logfile {pull}19360[19360]
