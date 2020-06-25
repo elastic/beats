@@ -632,7 +632,8 @@ func TestSplitResponseWithKey(t *testing.T) {
 		"split_events_by": "list",
 		"interval":        0,
 	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	ts := createTestServer(HTTPTestServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -654,7 +655,8 @@ func TestSplitResponseWithoutKey(t *testing.T) {
 		"split_events_by": "not_found",
 		"interval":        0,
 	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	ts := createTestServer(HTTPTestServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -704,7 +706,8 @@ func TestArrayWithSplitResponse(t *testing.T) {
 		`{"bar": "foo"}`,
 	}
 
-	runTest(t, false, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	ts := createTestServer(ArrayResponseServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
