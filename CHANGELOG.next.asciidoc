@@ -508,6 +508,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
 *Packetbeat*
