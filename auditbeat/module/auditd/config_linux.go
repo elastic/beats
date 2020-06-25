@@ -35,12 +35,6 @@ import (
 	"github.com/elastic/go-libaudit/v2/rule/flags"
 )
 
-const (
-	moduleName         = "auditd"
-	metricsetName      = "auditd"
-	recursiveGlobDepth = 8
-)
-
 // Config defines the kernel metricset's possible configuration options.
 type Config struct {
 	ResolveIDs   bool     `config:"resolve_ids"`         // Resolve UID/GIDs to names.
