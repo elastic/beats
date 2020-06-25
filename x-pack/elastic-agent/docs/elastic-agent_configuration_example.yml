@@ -106,7 +106,7 @@ logging.to_stderr: true
 
 
 inputs:
-  - type: logs
+  - type: logfile
     name: epm/nginx
     version: 1.7.0
     dataset.namespace: prod

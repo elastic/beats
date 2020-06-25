@@ -11,12 +11,6 @@ metricbeat:
           type: metrics
           name: docker.status
           namespace: default
-    - add_fields:
-        target: "stream"
-        fields:
-          type: metrics
-          dataset: docker.status
-          namespace: default
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
@@ -27,12 +21,6 @@ metricbeat:
         fields:
           type: metrics
           name: generic
-          namespace: default
-    - add_fields:
-        target: "stream"
-        fields:
-          type: metrics
-          dataset: generic
           namespace: default
   - module: apache
     metricsets: [info]
@@ -47,12 +35,6 @@ metricbeat:
           fields:
             type: metrics
             name: generic
-            namespace: testing
-      - add_fields:
-          target: "stream"
-          fields:
-            type: metrics
-            dataset: generic
             namespace: testing
 
 output:

@@ -75,12 +75,12 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 // Create configs based on hints passed from providers
 func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var (
-		config []*common.Config
-		noPort bool
+		configs []*common.Config
+		noPort  bool
 	)
 	host, _ := event["host"].(string)
 	if host == "" {
-		return config
+		return configs
 	}
 
 	port, ok := common.TryToInt(event["port"])
@@ -90,10 +90,10 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
-		return config
+		return configs
 	}
 
-	modulesConfig := m.getModules(hints)
+	modulesConfig := m.getModuleConfigs(hints)
 	// here we handle raw configs if provided
 	if modulesConfig != nil {
 		configs := []*common.Config{}
@@ -108,64 +108,67 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 
 	}
 
-	mod := m.getModule(hints)
-	if mod == "" {
-		return config
-	}
+	modules := m.getModules(hints)
+	for _, hint := range modules {
+		mod := m.getModule(hint)
+		if mod == "" {
+			continue
+		}
 
-	hosts, ok := m.getHostsWithPort(hints, port, noPort)
-	if !ok {
-		return config
-	}
+		hosts, ok := m.getHostsWithPort(hint, port, noPort)
+		if !ok {
+			continue
+		}
 
-	ns := m.getNamespace(hints)
-	msets := m.getMetricSets(hints, mod)
-	tout := m.getTimeout(hints)
-	ival := m.getPeriod(hints)
-	sslConf := m.getSSLConfig(hints)
-	procs := m.getProcessors(hints)
-	metricspath := m.getMetricPath(hints)
-	username := m.getUsername(hints)
-	password := m.getPassword(hints)
+		ns := m.getNamespace(hint)
+		msets := m.getMetricSets(hint, mod)
+		tout := m.getTimeout(hint)
+		ival := m.getPeriod(hint)
+		sslConf := m.getSSLConfig(hint)
+		procs := m.getProcessors(hint)
+		metricspath := m.getMetricPath(hint)
+		username := m.getUsername(hint)
+		password := m.getPassword(hint)
 
-	moduleConfig := common.MapStr{
-		"module":     mod,
-		"metricsets": msets,
-		"hosts":      hosts,
-		"timeout":    tout,
-		"period":     ival,
-		"enabled":    true,
-		"ssl":        sslConf,
-		"processors": procs,
-	}
+		moduleConfig := common.MapStr{
+			"module":     mod,
+			"metricsets": msets,
+			"hosts":      hosts,
+			"timeout":    tout,
+			"period":     ival,
+			"enabled":    true,
+			"ssl":        sslConf,
+			"processors": procs,
+		}
 
-	if ns != "" {
-		moduleConfig["namespace"] = ns
-	}
-	if metricspath != "" {
-		moduleConfig["metrics_path"] = metricspath
-	}
-	if username != "" {
-		moduleConfig["username"] = username
-	}
-	if password != "" {
-		moduleConfig["password"] = password
-	}
+		if ns != "" {
+			moduleConfig["namespace"] = ns
+		}
+		if metricspath != "" {
+			moduleConfig["metrics_path"] = metricspath
+		}
+		if username != "" {
+			moduleConfig["username"] = username
+		}
+		if password != "" {
+			moduleConfig["password"] = password
+		}
 
-	m.logger.Debug("generated config: %v", moduleConfig)
+		logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
-	// Create config object
-	cfg, err := common.NewConfigFrom(moduleConfig)
-	if err != nil {
-		logp.Debug("", "config merge failed with error: %v", err)
+		// Create config object
+		cfg, err := common.NewConfigFrom(moduleConfig)
+		if err != nil {
+			logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		}
+		logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
+		configs = append(configs, cfg)
 	}
-	m.logger.Debug("generated config: %+v", common.DebugString(cfg, true))
-	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, config, options...)
+	return template.ApplyConfigTemplate(event, configs, options...)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -267,11 +270,24 @@ func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
 }
 
-func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+func (m *metricHints) getModuleConfigs(hints common.MapStr) []common.MapStr {
 	return builder.GetHintAsConfigs(hints, m.Key)
 }
 
 func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, m.Key)
 
+}
+
+func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+	modules := builder.GetHintsAsList(hints, m.Key)
+	var output []common.MapStr
+
+	for _, mod := range modules {
+		output = append(output, common.MapStr{
+			m.Key: mod,
+		})
+	}
+
+	return output
 }

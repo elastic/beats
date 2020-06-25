@@ -7,14 +7,25 @@
         "destination.domain": "example.net",
         "destination.ip": "93.184.216.34",
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network_traffic",
+            "network"
+        ],
         "event.dataset": "tls",
         "event.duration": 364625000,
         "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "network.community_id": "1:fx1jENdlg6r3LIvBRG3wEboWbPY=",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.1.35",
+            "93.184.216.34"
+        ],
         "server.domain": "example.net",
         "server.ip": "93.184.216.34",
         "server.port": 443,
@@ -115,6 +126,7 @@
         ],
         "tls.detailed.server_certificate.issuer.common_name": "DigiCert SHA2 Secure Server CA",
         "tls.detailed.server_certificate.issuer.country": "US",
+        "tls.detailed.server_certificate.issuer.distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
         "tls.detailed.server_certificate.issuer.organization": "DigiCert Inc",
         "tls.detailed.server_certificate.not_after": "2020-12-02T12:00:00.000Z",
         "tls.detailed.server_certificate.not_before": "2018-11-28T00:00:00.000Z",
@@ -124,16 +136,20 @@
         "tls.detailed.server_certificate.signature_algorithm": "SHA256-RSA",
         "tls.detailed.server_certificate.subject.common_name": "www.example.org",
         "tls.detailed.server_certificate.subject.country": "US",
+        "tls.detailed.server_certificate.subject.distinguished_name": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
         "tls.detailed.server_certificate.subject.locality": "Los Angeles",
         "tls.detailed.server_certificate.subject.organization": "Internet Corporation for Assigned Names and Numbers",
         "tls.detailed.server_certificate.subject.organizational_unit": "Technology",
         "tls.detailed.server_certificate.subject.province": "California",
+        "tls.detailed.server_certificate.subject.state_or_province": "California",
         "tls.detailed.server_certificate.version": 3,
+        "tls.detailed.server_certificate.version_number": 3,
         "tls.detailed.server_certificate_chain": [
             {
                 "issuer": {
                     "common_name": "DigiCert Global Root CA",
                     "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
                     "organization": "DigiCert Inc",
                     "organizational_unit": "www.digicert.com"
                 },
@@ -146,14 +162,17 @@
                 "subject": {
                     "common_name": "DigiCert SHA2 Secure Server CA",
                     "country": "US",
+                    "distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
                     "organization": "DigiCert Inc"
                 },
-                "version": 3
+                "version": 3,
+                "version_number": 3
             },
             {
                 "issuer": {
                     "common_name": "DigiCert Global Root CA",
                     "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
                     "organization": "DigiCert Inc",
                     "organizational_unit": "www.digicert.com"
                 },
@@ -166,10 +185,12 @@
                 "subject": {
                     "common_name": "DigiCert Global Root CA",
                     "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
                     "organization": "DigiCert Inc",
                     "organizational_unit": "www.digicert.com"
                 },
-                "version": 3
+                "version": 3,
+                "version_number": 3
             }
         ],
         "tls.detailed.server_hello.extensions._unparsed_": [
@@ -196,6 +217,36 @@
         "tls.server.not_after": "2020-12-02T12:00:00.000Z",
         "tls.server.not_before": "2018-11-28T00:00:00.000Z",
         "tls.server.subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+        "tls.server.x509.alternative_names": [
+            "www.example.org",
+            "example.com",
+            "example.edu",
+            "example.net",
+            "example.org",
+            "www.example.com",
+            "www.example.edu",
+            "www.example.net"
+        ],
+        "tls.server.x509.issuer.common_name": "DigiCert SHA2 Secure Server CA",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+        "tls.server.x509.issuer.organization": "DigiCert Inc",
+        "tls.server.x509.not_after": "2020-12-02T12:00:00.000Z",
+        "tls.server.x509.not_before": "2018-11-28T00:00:00.000Z",
+        "tls.server.x509.public_key_algorithm": "RSA",
+        "tls.server.x509.public_key_size": 2048,
+        "tls.server.x509.serial_number": "21020869104500376438182461249190639870",
+        "tls.server.x509.signature_algorithm": "SHA256-RSA",
+        "tls.server.x509.subject.common_name": "www.example.org",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.distinguished_name": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+        "tls.server.x509.subject.locality": "Los Angeles",
+        "tls.server.x509.subject.organization": "Internet Corporation for Assigned Names and Numbers",
+        "tls.server.x509.subject.organizational_unit": "Technology",
+        "tls.server.x509.subject.province": "California",
+        "tls.server.x509.subject.state_or_province": "California",
+        "tls.server.x509.version": 3,
+        "tls.server.x509.version_number": 3,
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
         "type": "tls"

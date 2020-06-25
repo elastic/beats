@@ -9,12 +9,10 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKER_REGISTRY = 'docker.elastic.co'
     DOCKER_REGISTRY_SECRET = 'secret/observability-team/ci/docker-registry/prod'
-    GOPATH = "${env.WORKSPACE}"
     HOME = "${env.WORKSPACE}"
-    JOB_GCS_BUCKET = credentials('gcs-bucket')
     NOTIFY_TO = credentials('notify-to')
-    PATH = "${env.GOPATH}/bin:${env.PATH}"
-    PIPELINE_LOG_LEVEL='INFO'
+    PIPELINE_LOG_LEVEL = 'INFO'
+    JOB_GIT_CREDENTIALS = "f6c7695a-671e-4f4f-a331-acdce44ff9ba"
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -36,22 +34,15 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
+        deleteDir()
         gitCheckout(basedir: "${BASE_DIR}",
           branch: "${params.BRANCH_REFERENCE}",
           repo: "https://github.com/elastic/${REPO}.git",
           credentialsId: "${JOB_GIT_CREDENTIALS}"
         )
         dir("${BASE_DIR}"){
-          setEnvVar("GO_VERSION", readFile(".go-version").trim())
+          setEnvVar("GO_VERSION", readFile(file: ".go-version")?.trim())
         }
-      }
-    }
-    stage('Install dependencies') {
-      when {
-        expression { return params.RELEASE_TEST_IMAGES }
-      }
-      steps {
-        sh(label: 'Install virtualenv', script: 'pip install --user virtualenv')
       }
     }
     stage('Metricbeat Test Docker images'){
@@ -63,9 +54,12 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${HOME}/${BASE_DIR}"){
-          retry(3){
-            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/metricbeat'")
+        withMageEnv(){
+          dir("${BASE_DIR}/metricbeat"){
+            retryWithSleep(retries: 3, seconds: 5, backoff: true){
+              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
+            }
           }
         }
       }
@@ -79,9 +73,12 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${HOME}/${BASE_DIR}"){
-          retry(3){
-            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/metricbeat'")
+        withMageEnv(){
+          dir("${BASE_DIR}/x-pack/metricbeat"){
+            retryWithSleep(retries: 3, seconds: 5, backoff: true){
+              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
+            }
           }
         }
       }
@@ -95,9 +92,12 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${HOME}/${BASE_DIR}"){
-          retry(3){
-            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/filebeat'")
+        withMageEnv(){
+          dir("${BASE_DIR}/x-pack/filebeat"){
+            retryWithSleep(retries: 3, seconds: 5, backoff: true){
+              sh(label: 'Build', script: "mage compose:buildSupportedVersions");
+              sh(label: 'Push', script: "mage compose:pushSupportedVersions");
+            }
           }
         }
       }

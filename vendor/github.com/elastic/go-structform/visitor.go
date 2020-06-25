@@ -17,13 +17,17 @@
 
 package structform
 
-// Visitor interface for iterating some structured input
+// Visitor interface for accepting events. The Vistor defined the common Data
+// Model all serializers should accept and all deserializers must implement.
 type Visitor interface {
 	ObjectVisitor
 	ArrayVisitor
 	ValueVisitor
 }
 
+// ExtVisitor interface defines the Extended Data Model. Usage and
+// implementation of the Extended Data Model is optional, but can speed up
+// operations.
 type ExtVisitor interface {
 	Visitor
 	ArrayValueVisitor
@@ -54,21 +58,36 @@ const (
 	Float64Type
 )
 
-// ObjectVisitor iterates all fields in a dictionary like structure
+// ObjectVisitor iterates all fields in a dictionary like structure.
 type ObjectVisitor interface {
+	// OnObjectStart is called when a new object (key-value pairs) is going to be reported.
+	// A call to OnKey or OnObjectFinished must follow directly.
 	OnObjectStart(len int, baseType BaseType) error
+
+	// OnArrayFinished indicates that there are no more key value pairs to report.
 	OnObjectFinished() error
+
+	// OnKey adds a new key to the object. A value must directly follow a call to OnKey.
 	OnKey(s string) error
 }
 
-// ArrayVisitor iterates all entries in a list/array like structure
+// ArrayVisitor defines the support for arrays/slices in the Data Model.
 type ArrayVisitor interface {
+	// OnArrayStart is called whan a new array is going to be reported.
+	//
+	// The `len` argument should report the length if known. `len` MUST BE -1 if
+	// the length of the array is not known.  The BaseType should indicate the
+	// element type of the array. If the element type is unknown or can be any
+	// type (e.g. interface{}), AnyType must be used.
 	OnArrayStart(len int, baseType BaseType) error
+
+	// OnArrayFinished indicates that there are no more elements in the array.
 	OnArrayFinished() error
 }
 
-// ValueVisitor reports actual values in a structure being iterated
+// ValueVisitor defines the set of supported primitive types in the Data Model.
 type ValueVisitor interface {
+	// untyped nil value
 	OnNil() error
 
 	OnBool(b bool) error
@@ -150,7 +169,7 @@ type ObjectValueVisitor interface {
 
 // StringRefVisitor handles strings by reference into a byte string.
 // The reference must be processed immediately, as the string passed
-// might get overwritten after the callback returns.
+// might get modified after the callback returns.
 type StringRefVisitor interface {
 	OnStringRef(s []byte) error
 	OnKeyRef(s []byte) error
@@ -163,6 +182,10 @@ type extVisitor struct {
 	StringRefVisitor
 }
 
+// EnsureExtVisitor converts a Visitor into an ExtVisitor.  If v already
+// implements ExtVisitor, it is directly implemented. If v only implements a
+// subset of ExtVisitor, then conversions for the missing interfaces will be
+// created.
 func EnsureExtVisitor(v Visitor) ExtVisitor {
 	if ev, ok := v.(ExtVisitor); ok {
 		return ev
