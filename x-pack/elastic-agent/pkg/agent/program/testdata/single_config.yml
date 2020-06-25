@@ -30,7 +30,7 @@ inputs:
         dataset:
           name: ""
     hosts: ["http://127.0.0.1:8080"]
-  - type: logs
+  - type: logfile
     use_output: default
     streams:
       - paths:
@@ -38,7 +38,7 @@ inputs:
         - /var/log/hello2.log
     vars:
       var: value
-  - type: logs
+  - type: logfile
     dataset:
       type: testtype
     use_output: default
