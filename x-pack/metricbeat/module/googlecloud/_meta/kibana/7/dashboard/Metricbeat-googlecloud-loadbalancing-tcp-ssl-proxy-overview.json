@@ -121,7 +121,7 @@
       },
       "id": "6041d970-a6ae-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "dashboard": "7.4.2"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -234,7 +234,7 @@
       },
       "id": "6958ed10-a6ad-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [
         {
@@ -332,7 +332,7 @@
       },
       "id": "f86c26f0-a6aa-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [],
       "type": "visualization",
@@ -414,7 +414,7 @@
       },
       "id": "c4e1e090-a6aa-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [],
       "type": "visualization",
@@ -496,7 +496,7 @@
       },
       "id": "eed05d80-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [],
       "type": "visualization",
@@ -578,7 +578,7 @@
       },
       "id": "afeb98a0-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [],
       "type": "visualization",
@@ -660,7 +660,7 @@
       },
       "id": "be27b340-a6ac-11ea-950e-d57608e3aa51",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.6.0"
       },
       "references": [],
       "type": "visualization",
