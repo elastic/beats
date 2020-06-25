@@ -603,20 +603,6 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 
 			addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
-
-			// add this for backwards compatibility remove later
-			streamProcessorMap := &Dict{value: make([]Node, 0)}
-			streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "target", value: &StrVal{value: "stream"}})
-			streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
-				&Key{name: "type", value: &StrVal{value: datasetType}},
-				&Key{name: "namespace", value: &StrVal{value: namespace}},
-				&Key{name: "dataset", value: &StrVal{value: dataset}},
-			}}})
-
-			streamAddFieldsMap := &Dict{value: []Node{&Key{"add_fields", streamProcessorMap}}}
-
-			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, streamAddFieldsMap)
-			// end of backward compatibility section
 		}
 	}
 
