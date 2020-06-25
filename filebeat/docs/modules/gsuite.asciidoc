@@ -23,37 +23,6 @@ It is compatible with a subset of applications under the https://developers.goog
 
 include::../include/configuring-intro.asciidoc[]
 
-:fileset_ex: saml
-
-include::../include/config-option-intro.asciidoc[]
-
-To allow the filebeat module to ingest data from the Google Reports API, you would need to create a application credentials following the instructions from https://developers.google.com/admin-sdk/reports/v1/guides/authorizing[Google authorization guide] and https://developers.google.com/identity/protocols/oauth2/service-account[Google OAuth2 guide for services].
-
-This module will make use of the following `oauth2 scopes`:
-
-- `https://www.googleapis.com/auth/admin.reports.audit.readonly`
-
-This module supports different ways to provide `oauth2` credentials to it:
-
-- `credentials_file`
-- `credentials_json`
-- `jwt_file`
-
-They are equivalent, and which one to use will depend on how you set up the authorization and your preference.
-
-[float]
-==== `saml` fileset settings
-
-[source,yaml]
-----
-- module: gsuite
-  saml:
-    enabled: true
-    var.credentials_file: "./credentials_file.json"
-----
-
-include::../include/var-paths.asciidoc[]
-
 [float]
 ==== GSuite Reports ECS fields
 
@@ -73,6 +42,66 @@ This is a list of GSuite Reports fields that are mapped to ECS.
 
 These are the common ECS mappings, depending on the fileset, others can be added.
 
+include::../include/config-option-intro.asciidoc[]
+
+To allow the filebeat module to ingest data from the Google Reports API, you would need to create application credentials following the instructions from https://developers.google.com/admin-sdk/reports/v1/guides/authorizing[Google authorization guide], https://developers.google.com/identity/protocols/oauth2/service-account[Google OAuth2 guide for services] and https://cloud.google.com/docs/authentication/production[Google Authentication for Server to Server Applications]
+
+This module will make use of the following `oauth2 scopes`:
+
+- `https://www.googleapis.com/auth/admin.reports.audit.readonly`
+
+This module supports different ways to provide `oauth2` credentials to it:
+
+- `credentials_file`
+- `credentials_json`
+- `jwt_file`
+
+They are equivalent, and which one to use will depend on how you set up the authorization and your preference.
+
+If none of them is provided, the module will fallback to authorize using the Application Default Credentials (ADC) mechanism.
+
+[float]
+===== Configuration options
+
+[source,yaml]
+----
+- module: gsuite
+  saml:
+    enabled: true
+    var.credentials_file: "./credentials_file.json"
+----
+
+Every fileset has the following configuration options:
+
+*`var.credentials_file`*::
+
+Specifies the path to the credentials file.
+
+*`var.jwt_file`*::
+
+Specifies the path to the JWT credentials file.
+
+*`var.credentials_json`*::
+
+Raw JSON containing the credentials. It can be either the content of `var.credentials_file` or `var.jwt_file`.
+
+
+*`var.http_client_timeout`*::
+
+Duration of the time limit on HTTP requests made by the module. Defaults to
+`60s`.
+
+*`var.interval`*::
+
+Duration between requests to the API. Defaults to `60s`.
+
+*`var.user_key`*::
+
+Specifies the user key to fetch reports from. Defaults to `all`.
+
+:fileset_ex: saml
+:fileset_ex!:
+
 [float]
 === Example dashboard
 
@@ -82,8 +111,6 @@ TODO: include an image of a sample dashboard. If you do not include a dashboard,
 remove this section and set `:has-dashboards: false` at the top of this file.
 
 :has-dashboards!:
-
-:fileset_ex!:
 
 :modulename!:
 
