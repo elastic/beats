@@ -18,27 +18,6 @@ It is compatible with a subset of applications under the https://developers.goog
 
 include::../include/configuring-intro.asciidoc[]
 
-[float]
-==== GSuite Reports ECS fields
-
-This is a list of GSuite Reports fields that are mapped to ECS.
-
-[options="header"]
-|==============================================================
-| GSuite Reports             | ECS Fields                     |
-| items[].id.time            | @timestamp                     |
-| items[].id.uniqueQualifier | event.id                       |
-| items[].id.applicationName | event.provider                 |
-| items[].events[].name      | event.action                   |
-| items[].ipAddress          | client.ip                      |
-| items[].actor.email        | client.user.email              |
-| items[].actor.profileId    | client.user.id                 |
-|==============================================================
-
-These are the common ECS mappings, depending on the fileset, others can be added.
-
-include::../include/config-option-intro.asciidoc[]
-
 To allow the filebeat module to ingest data from the Google Reports API, you would need to create application credentials following the instructions from https://developers.google.com/admin-sdk/reports/v1/guides/authorizing[Google authorization guide], https://developers.google.com/identity/protocols/oauth2/service-account[Google OAuth2 guide for services] and https://cloud.google.com/docs/authentication/production[Google Authentication for Server to Server Applications]
 
 This module will make use of the following `oauth2 scopes`:
@@ -94,8 +73,25 @@ Duration between requests to the API. Defaults to `60s`.
 
 Specifies the user key to fetch reports from. Defaults to `all`.
 
-:fileset_ex: saml
-:fileset_ex!:
+[float]
+==== GSuite Reports ECS fields
+
+This is a list of GSuite Reports fields that are mapped to ECS.
+
+[options="header"]
+|==============================================================
+| GSuite Reports             | ECS Fields                     |
+| items[].id.time            | @timestamp                     |
+| items[].id.uniqueQualifier | event.id                       |
+| items[].id.applicationName | event.provider                 |
+| items[].events[].name      | event.action                   |
+| items[].ipAddress          | client.ip, related.ip,
+                               client.as.*, client.geo.*      |
+| items[].actor.email        | client.user.email              |
+| items[].actor.profileId    | client.user.id                 |
+|==============================================================
+
+These are the common ones to all filesets.
 
 [float]
 === Example dashboard

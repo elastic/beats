@@ -15,7 +15,7 @@ var:
   - name: tags
     default: [forwarded]
 
-input: config/saml.yml
+input: config/config.yml
 ingest_pipeline: ../ingest/common.yml
 
 requires.processors:
