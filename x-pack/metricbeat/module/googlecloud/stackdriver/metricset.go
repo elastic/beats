@@ -50,10 +50,9 @@ type MetricSet struct {
 
 //stackDriverConfig holds a configuration specific for stackdriver metricset.
 type stackDriverConfig struct {
-	ServiceName      string   `config:"service"  validate:"required"`
-	MetricTypes      []string `config:"metric_types"`
-	MetricTypePrefix string   `config:"metric_type_prefix"`
-	Aligner          string   `config:"aligner"`
+	ServiceName string   `config:"service"  validate:"required"`
+	MetricTypes []string `config:"metric_types" validate:"required"`
+	Aligner     string   `config:"aligner"`
 }
 
 type metricMeta struct {
@@ -209,10 +208,6 @@ func (mc *stackDriverConfig) Validate() error {
 			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
 		}
 	}
-
-	if len(mc.MetricTypes) == 0 && mc.MetricTypePrefix == "" {
-		return errors.New("metric_types and metric_type_prefix cannot be both empty")
-	}
 	return nil
 }
 
@@ -225,14 +220,14 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 	}
 
 	for _, sdc := range m.stackDriverConfig {
-		if sdc.MetricTypePrefix != "" {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+sdc.MetricTypePrefix)
+		for _, mt := range sdc.MetricTypes {
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
 			it := client.ListMetricDescriptors(ctx, req)
 
 			for {
 				out, err := it.Next()
 				if err != nil && err != iterator.Done {
-					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type prefix %s: %v", sdc.MetricTypePrefix, err)
+					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
@@ -245,19 +240,6 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 					break
 				}
 			}
-		}
-
-		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = "%s"`, sdc.ServiceName+".googleapis.com/"+mt)
-			it := client.ListMetricDescriptors(ctx, req)
-			out, err := it.Next()
-			if err != nil {
-				err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
-				m.Logger().Error(err)
-				return metricsWithMeta, err
-			}
-
-			metricsWithMeta = m.getMetadata(out, metricsWithMeta)
 		}
 	}
 

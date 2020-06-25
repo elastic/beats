@@ -16,14 +16,11 @@ call.
 [float]
 == Metricset config and parameters
 
-* *metric_types*: A list of metric type strings. Each call of the
+* *metric_types*: Required, a list of metric type strings, or a list of metric
+type prefixes. For example, `instance/cpu` is the prefix for metric type
+`instance/cpu/usage_time`, `instance/cpu/utilization` etc Each call of the
 `ListTimeSeries` API can return any number of time series from a single metric
 type. Metric type is to used for identifying a specific time series.
-
-* *metric_type_prefix*: A single string of metric type prefix. For example,
-`instance/cpu` is the prefix for metric type `instance/cpu/usage_time`,
-`instance/cpu/utilization` etc. Note: `metric_types` and `metric_type_prefix`
-cannot be both empty.
 
 * *aligner*: A single string with which aggregation operation need to be applied
 onto time series data for ListTimeSeries API. If it's not given, default aligner
@@ -124,5 +121,6 @@ every minute with no aggregation. The metric types in `compute` service with
   metrics:
     - aligner: ALIGN_NONE
       service: compute
-      metric_type_prefix: "instance/cpu"
+      metric_types:
+        - "instance/cpu"
 ----
