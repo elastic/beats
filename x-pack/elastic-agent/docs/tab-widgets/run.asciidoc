@@ -1,0 +1,55 @@
+// tag::mac[]
+[source,shell]
+----
+./elastic-agent run
+----
+// end::mac[]
+
+// tag::mac-standalone[]
+[source,shell]
+----
+./elastic-agent -c elastic-agent-standalone.yml run
+----
+// end::mac-standalone[]
+
+// tag::linux[]
+[source,shell]
+----
+./elastic-agent run
+----
+// end::linux[]
+
+// tag::linux-standalone[]
+[source,shell]
+----
+./elastic-agent -c elastic-agent-standalone.yml run
+----
+// end::linux-standalone[]
+
+// tag::win[]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
+
+From the PowerShell prompt, change to the directory where you installed {agent},
+and run:
+
+[source,shell]
+----
+.\elastic-agent.exe run
+----
+// end::win[]
+
+// tag::win-standalone[]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
+
+From the PowerShell prompt, change to the directory where you installed {agent},
+and run:
+
+[source,shell]
+----
+.\elastic-agent.exe -c elastic-agent-standalone.yml run
+----
+// end::win-standalone[]
+
+

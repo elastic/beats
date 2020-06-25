@@ -1,0 +1,36 @@
+// tag::mac[]
+[source,shell]
+----
+./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+----
+
+// tag::where[]
+Where `KIBANA_URL` is the {kib} URL where {fleet} is running, and
+`ENROLLMENT_KEY` is the enrollment token acquired from {fleet}.
+// end::where[]
+
+// end::mac[]
+
+// tag::linux[]
+[source,shell]
+----
+./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+----
+
+include::enroll.asciidoc[tag=where]
+// end::linux[]
+
+// tag::win[]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
+
+From the PowerShell prompt, change to the directory where you installed {agent},
+and run:
+
+[source,shell]
+----
+.\elastic-agent.exe enroll KIBANA_URL ENROLLMENT_KEY
+----
+
+include::enroll.asciidoc[tag=where]
+// end::win[]

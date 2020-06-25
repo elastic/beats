@@ -27,18 +27,15 @@ generate a token. See <<ingest-management-getting-started>> for detailed steps.
 
 . Enroll the Agent:
 +
-[source,shell]
-----
-./elastic-agent enroll http://localhost:5601 $token
-----
-+
-Where `$token` is an enrollment token acquired from {fleet}.
+--
+include::tab-widgets/enroll-linux-mac-win-widget.asciidoc[]
+--
 
-To start {agent}, run:
-[source,shell]
-----
-./elastic-agent run
-----
+. Start {agent}:
++
+--
+include::tab-widgets/run-linux-mac-win-widget.asciidoc[]
+--
 
 [float]
 [[standalone-mode]]
@@ -52,16 +49,15 @@ when you restart your system.
 
 To start {agent} manually, run:
 
-[source,shell]
-----
-./elastic-agent run
-----
+include::tab-widgets/run-standalone-linux-mac-win-widget.asciidoc[]
 
-If no configuration file is specified, {agent} uses the default configuration,
-`elastic-agent.yml`, which is located in the same directory as {agent}. Specify
-the `-c` flag to use a different configuration file.
+Use the `-c` flag to specify the configuration file. If no configuration file is
+specified, {agent} uses the default configuration, `elastic-agent.yml`, which is
+located in the same directory as {agent}.
 
 For configuration options, see <<elastic-agent-configuration>>.
 
 //<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
 
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]
