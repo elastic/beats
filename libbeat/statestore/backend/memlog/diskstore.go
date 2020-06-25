@@ -141,7 +141,7 @@ func (s *diskstore) tryOpenLog() error {
 	flags := os.O_RDWR | os.O_CREATE
 	if s.logNeedsTruncate {
 		flags |= os.O_TRUNC
-}
+	}
 
 	f, err := os.OpenFile(s.logFilePath, flags, s.fileMode)
 	if err != nil {
@@ -191,7 +191,7 @@ func (s *diskstore) Close() error {
 		err := s.logBuf.Flush()
 		if err == nil {
 			err = syncFile(s.logFile)
-}
+		}
 		s.logFile.Close()
 		s.logFile = nil
 		s.logBuf = nil
@@ -206,7 +206,7 @@ func (s *diskstore) Close() error {
 func (s *diskstore) LogOperation(op op) error {
 	if s.logInvalid {
 		return errLogInvalid
-}
+	}
 
 	if s.logFile == nil {
 		// We continue in case we have errors accessing the log file, but mark the
@@ -222,7 +222,6 @@ func (s *diskstore) LogOperation(op op) error {
 
 	writer := s.logBuf
 	counting := &countWriter{w: writer}
-	enc := newJSONEncoder(counting)
 	defer func() {
 		s.logFileSize += counting.n
 	}()
@@ -232,10 +231,8 @@ func (s *diskstore) LogOperation(op op) error {
 		s.logInvalid = true
 	})
 
-	if err := enc.Encode(logAction{
-		Op: op.name(),
-		ID: s.txid + 1,
-	}); err != nil {
+	enc := newJSONEncoder(counting)
+	if err := enc.Encode(logAction{Op: op.name(), ID: s.txid + 1}); err != nil {
 		return err
 	}
 	writer.WriteByte('\n')
