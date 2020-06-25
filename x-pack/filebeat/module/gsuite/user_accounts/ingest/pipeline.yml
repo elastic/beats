@@ -1,0 +1,9 @@
+description: Pipeline for parsing gsuite user_accounts
+processors:
+  - set:
+      field: event.category
+      value: authentication
+  - set:
+      field: event.type
+      value: change
+

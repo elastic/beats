@@ -5,3 +5,5 @@
   # All logs
   saml:
     enabled: true
+  user_accounts:
+    enabled: true

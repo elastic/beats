@@ -1,0 +1,40 @@
+{{ if eq .input "httpjson" }}
+type: httpjson
+
+url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/user_accounts
+json_objects_array: items
+
+interval: {{ .interval }}
+
+{{ if .http_client_timeout }}
+http_client_timeout: {{ .http_client_timeout }}
+{{ end }}
+
+oauth2.provider: google
+oauth2.google.credentials_file: {{ .credentials_file }}
+oauth2.google.credentials_json: {{ .credentials_json }}
+oauth2.google.jwt_file: {{ .jwt_file }}
+oauth2.scopes:
+  - https://www.googleapis.com/auth/admin.reports.audit.readonly
+
+{{ else if eq .input "file" }}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0
+  - script:
+      lang: javascript
+      id: gsuite-common
+      file: ${path.home}/module/gsuite/config/common.js
