@@ -35,7 +35,7 @@ func isRetryErr(err error) bool {
 	return err == syscall.EINTR || err == syscall.EAGAIN
 }
 
-// trySync provides a best-effort fsync on path (directory). The fsync is required by some
+// trySyncPath provides a best-effort fsync on path (directory). The fsync is required by some
 // filesystems, so to update the parents directory metadata to actually
 // contain the new file being rotated in.
 func trySyncPath(path string) {

@@ -37,7 +37,7 @@ type diskstore struct {
 
 	// on disk file tracking information
 	home        string         // home path of the store
-	logFileName string         // current log file
+	logFilePath string         // current log file
 	dataFiles   []dataFileInfo // set of data files found
 
 	// txid is the sequential counter that tracks
@@ -92,7 +92,7 @@ const (
 	keyField = "_key"
 )
 
-// newDiskStorek initializes the disk store stucture only. The store must have
+// newDiskStore initializes the disk store stucture only. The store must have
 // been opened already.  It tries to open the update log file for append
 // operations. If opening the update log file fails, it is marked as
 // 'corrupted', triggering a checkpoint operation on the first update to the store.
@@ -110,7 +110,7 @@ func newDiskStore(
 	s := &diskstore{
 		log:              log.With("path", home),
 		home:             home,
-		logFileName:      filepath.Join(home, logFileName),
+		logFilePath:      filepath.Join(home, logFileName),
 		dataFiles:        dataFiles,
 		txid:             txid,
 		fileMode:         mode,
@@ -156,9 +156,9 @@ func (s *diskstore) LogOperation(op op) error {
 // WriteCheckpoint serializes all state into a json file. The file contains an
 // array with all states known to the memory storage.
 // WriteCheckpoint first serializes all state to a temporary file, and finally
-// replaces move the temporary data file into the correct location. No files
+// moves the temporary data file into the correct location. No files
 // are overwritten or replaced. Instead the change sequence number is used for
-// the filename, and older data files will be deleleted after success.
+// the filename, and older data files will be deleted after success.
 //
 // The active marker file is overwritten after all updates did succeed. The
 // marker file contains the filename of the current valid data-file.

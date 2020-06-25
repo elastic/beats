@@ -59,10 +59,12 @@
 // supposed to be valid. Older data files will continiously tried to be cleaned up
 // on checkpoint operations.
 // The data files filenames do include the change sequence number. Which allows
-// us to sort them by name. The checkpoint operation of memlog, writes the full state
-// into a new data file, that consists of an JSON array with all known key-value pairs.
-// All fields of an entry are store top-level in the object. The `_key` field
-// is used to store the entries key.
+// us to sort them by name. The checkpoint operation of memlog, writes the full
+// state into a new data file, that consists of an JSON array with all known
+// key-value pairs.  Each JSON object in the array consists of the value
+// object, with memlog private fields added. Private fields start with `_`. At
+// the moment the only private field is `_key`, which is used to identify the
+// key-value pair.
 // NOTE: Creating a new file guarantees that Beats can progress when creating a
 //       new checkpoint file.  Some filesystems tend to block the
 //       delete/replace operation when the file is accessed by another process
