@@ -1,8 +1,13 @@
-name:	Production Website DB Servers
+name: Production Website DB Servers
 fleet:
-    kibana_url: https://kibana.mydomain.com:5601
-    ca_hash: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
-    checkin_interval: 5m
+  agent:
+    id: fleet-agent-id
+  api:
+    access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    kibana:
+      protocol: https
+      host: localhost:5601
+      timeout: 30s
 
 outputs:
   default:
@@ -19,35 +24,138 @@ outputs:
     hosts: ["monitoring:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
-datasources:
-  - use_output: default
-    inputs:
-    - type: docker/metrics
-      streams:
-        - metricset: status
-          dataset: docker.status
-      hosts: ["http://127.0.0.1:8080"]
-    - type: logs
-      streams:
-        - paths:
-          - /var/log/hello1.log
-          - /var/log/hello2.log
-      vars:
-        var: value
-  - namespace: testing
-    use_output: default
-    inputs:
-      - type: apache/metrics
-        processors:
-          - add_fields:
-              fields:
-                should_be: first
-        streams:
-          - enabled: true
-            metricset: info
-            hosts: ["http://apache.remote"]
-        hosts: ["http://apache.local"]
-        id: apache-metrics-id
+inputs:
+- type: docker/metrics
+  use_output: default
+  streams:
+    - metricset: status
+      dataset:
+        name: docker.status
+    - metricset: info
+      dataset:
+        name: ""
+  hosts: ["http://127.0.0.1:8080"]
+- type: logfile
+  use_output: default
+  streams:
+    - paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+  vars:
+    var: value
+- type: logfile
+  dataset:
+    type: testtype
+  use_output: default
+  streams:
+    - paths:
+      - /var/log/hello3.log
+      - /var/log/hello4.log
+  vars:
+    var: value
+- id: apache-metrics-id
+  type: apache/metrics
+  dataset:
+    namespace: testing
+  use_output: default
+  processors:
+    - add_fields:
+        fields:
+          should_be: first
+  streams:
+    - enabled: true
+      metricset: info
+      hosts: ["http://apache.remote"]
+  hosts: ["http://apache.local"]
+- id: endpoint-id
+  name: endpoint-1
+  enabled: true
+  package:
+    name: endpoint
+    version: 0.3.0
+  dataset:
+    namespace: default
+  artifact_manifest:
+    schema_version: v22
+    manifest_version: v21
+    artifacts:
+      - endpoint-allowlist-windows:
+          sha256: 1234
+          size: 2
+          url: /relative/path/to/endpoint-allowlist-windows
+      - endpoint-allowlist-macos:
+          sha256: 1234
+          size: 2
+          url: /relative/path/to/endpoint-allowlist-macos
+      - endpoint-allowlist-linux:
+          sha256: 1234
+          size: 2
+          url: /relative/path/to/endpoint-allowlist-linux
+  policy:
+    linux:
+      advanced:
+        free-form: free-form-value
+      indices:
+        network: logs-endpoint.events.network-default
+        file: logs-endpoint.events.file-default
+        process: logs-endpoint.events.process-default
+        metadata: metrics-endpoint.metadata-default
+        policy: metrics-endpoint.policy-default
+        telemetry: metrics-endpoint.telemetry-default
+      logging:
+        file: info
+        stdout: debug
+      events:
+        process: true
+        file: true
+        network: true
+    windows:
+      malware:
+        mode: prevent
+      advanced:
+        free-form: free-form-value
+      indices:
+        network: logs-endpoint.events.network-default
+        file: logs-endpoint.events.file-default
+        registry: logs-endpoint.events.registry-default
+        process: logs-endpoint.events.process-default
+        driver: logs-endpoint.events.driver-default
+        library: logs-endpoint.events.library-default
+        alerts: logs-endpoint.alerts-default
+        metadata: metrics-endpoint.metadata-default
+        policy: metrics-endpoint.policy-default
+        telemetry: metrics-endpoint.telemetry-default
+      logging:
+        file: info
+        stdout: debug
+      events:
+        registry: true
+        process: true
+        security: true
+        file: true
+        dns: false
+        dll_and_driver_load: false
+        network: true
+    mac:
+      malware:
+        mode: prevent
+      advanced:
+        free-form: free-form-value
+      indices:
+        network: logs-endpoint.events.network-default
+        file: logs-endpoint.events.file-default
+        process: logs-endpoint.events.process-default
+        alerts: logs-endpoint.alerts-default
+        metadata: metrics-endpoint.metadata-default
+        policy: metrics-endpoint.policy-default
+        telemetry: metrics-endpoint.telemetry-default
+      logging:
+        file: info
+        stdout: debug
+      events:
+        process: true
+        file: true
+        network: true
 
 settings.monitoring:
   use_output: monitoring

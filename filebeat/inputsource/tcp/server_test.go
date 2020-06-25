@@ -213,7 +213,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": ":0"})
+	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": "127.0.0.1:0"})
 	if !assert.NoError(t, err) {
 		return
 	}

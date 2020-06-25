@@ -10,6 +10,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"os"
 	"testing"
 	"time"
 
@@ -54,7 +55,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
 		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
-		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 0, GID: 20, EUID: 501, EGID: 20},
 		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
 		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
@@ -119,7 +120,12 @@ func TestTCPConnWithProcess(t *testing.T) {
 		"network.type":        "ipv4",
 		"process.pid":         1234,
 		"process.name":        "curl",
-		"user.id":             "501",
+		"user.id":             "0",
+		"user.name":           "root",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
+		"related.ip":          []string{localIP, remoteIP},
+		"related.user":        []string{"root"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -129,16 +135,24 @@ func TestTCPConnWithProcess(t *testing.T) {
 
 func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	const (
-		localIP            = "192.168.33.10"
-		remoteIP           = "172.19.12.13"
-		localPort          = 38842
-		remotePort         = 443
-		sock       uintptr = 0xff1234
+		localIP               = "192.168.33.10"
+		remoteIP              = "172.19.12.13"
+		localPort             = 38842
+		remotePort            = 443
+		sock          uintptr = 0xff1234
+		flowTimeout           = time.Hour
+		socketTimeout         = time.Minute * 3
+		closeTimeout          = time.Minute
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), flowTimeout, socketTimeout, closeTimeout, time.Second)
+	now := time.Now()
+	st.clock = func() time.Time {
+		return now
+	}
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
+
 		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
 		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -169,7 +183,18 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		t.Fatal(err)
 	}
 	st.ExpireOlder()
+	// Nothing expired just yet.
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Empty(t, flows)
+
 	evs = []event{
+		&clockSyncCall{
+			Meta: meta(uint32(os.Getpid()), 1235, 0),
+			Ts:   uint64(now.UnixNano()),
+		},
 		&inetReleaseCall{Meta: meta(0, 0, 15), Sock: sock},
 		&tcpV4DoRcv{
 			Meta:  meta(0, 0, 17),
@@ -180,17 +205,31 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 			RAddr: rAddr,
 			RPort: rPort,
 		},
-		&doExit{Meta: meta(1234, 1234, 18)},
+
+		&inetCreate{Meta: meta(1234, 1235, 18), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 19), Sock: sock + 1},
+		&tcpIPv4ConnectCall{Meta: meta(1234, 1235, 20), Sock: sock + 1, RAddr: rAddr, RPort: rPort},
+		&tcpV4DoRcv{
+			Meta:  meta(0, 0, 21),
+			Sock:  sock + 1,
+			Size:  12,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
 	}
 	if err := feedEvents(evs, st, t); err != nil {
 		t.Fatal(err)
 	}
+	// Expire the first socket
+	now = now.Add(closeTimeout + 1)
 	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err = getFlows(st.DoneFlows(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Len(t, flows, 2)
+	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow 0", flow)
 	for field, expected := range map[string]interface{}{
@@ -202,8 +241,8 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"client.port":         localPort,
 		"destination.ip":      remoteIP,
 		"destination.port":    remotePort,
-		"destination.packets": uint64(1),
-		"destination.bytes":   uint64(12),
+		"destination.packets": uint64(2),
+		"destination.bytes":   uint64(19),
 		"server.ip":           remoteIP,
 		"server.port":         remotePort,
 		"network.direction":   "outbound",
@@ -212,15 +251,35 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"process.pid":         1234,
 		"process.name":        "curl",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
 		}
 	}
+	// Wait until sock+1 expires due to inactivity. It won't be available
+	// just yet.
+	now = now.Add(socketTimeout + 1)
+	st.ExpireOlder()
+	flows, err = getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Empty(t, flows)
+
+	// Wait until the sock is closed completely.
+	now = now.Add(closeTimeout + 1)
+	st.ExpireOlder()
+	flows, err = getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
+	flow = flows[0]
 
 	// we have a truncated flow with no directionality,
 	// so just report what we can
-	flow = flows[1]
 	t.Log("read flow 1", flow)
 	for field, expected := range map[string]interface{}{
 		"source.ip":         localIP,
@@ -234,6 +293,8 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"network.direction": "unknown",
 		"network.transport": "tcp",
 		"network.type":      "ipv4",
+		"event.type":        []string{"info", "connection"},
+		"event.category":    []string{"network", "network_traffic"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -300,6 +361,8 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		"process.pid":         1234,
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -370,6 +433,8 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		"process.pid":         1234,
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -693,5 +758,55 @@ func TestUDPSendMsgAltLogic(t *testing.T) {
 		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
 		assert.Equal(t, expectedIPv6, ev.String())
 	})
+}
 
+func TestSocketReuse(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Hour, time.Hour, 0, time.Hour)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		&clockSyncCall{
+			Meta: meta(uint32(os.Getpid()), 1235, 5),
+			Ts:   uint64(time.Now().UnixNano()),
+		},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+		// Asume inetRelease lost.
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
 }

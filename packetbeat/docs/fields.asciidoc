@@ -452,9 +452,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
-type: keyword
+
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -491,7 +494,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -10342,6 +10345,550 @@ Detailed TLS-specific event fields.
 
 
 
+
+*`tls.client.x509.version`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`tls.client.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`tls.client.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`tls.client.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.client.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.client.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.digicert.com
+
+--
+
+*`tls.client.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: DigiCert Inc
+
+--
+
+*`tls.client.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`tls.client.x509.issuer.province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
+*`tls.client.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.client.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.client.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. Recommend using names found in Go Lang Crypto library (See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353).
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`tls.client.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25
+
+--
+
+*`tls.client.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39
+
+--
+
+*`tls.client.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
+
+--
+
+*`tls.client.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: r2.shared.global.fastly.net
+
+--
+
+*`tls.client.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`tls.client.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Fastly, Inc.
+
+--
+
+*`tls.client.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`tls.client.x509.subject.province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
+*`tls.client.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.client.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.client.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`tls.client.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`tls.client.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+
+
+*`tls.server.x509.version`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`tls.server.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`tls.server.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`tls.server.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.digicert.com
+
+--
+
+*`tls.server.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: DigiCert Inc
+
+--
+
+*`tls.server.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`tls.server.x509.issuer.province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
+*`tls.server.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.server.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.server.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. Recommend using names found in Go Lang Crypto library (See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353).
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`tls.server.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25
+
+--
+
+*`tls.server.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39
+
+--
+
+*`tls.server.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
+
+--
+
+*`tls.server.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: r2.shared.global.fastly.net
+
+--
+
+*`tls.server.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`tls.server.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Fastly, Inc.
+
+--
+
+*`tls.server.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`tls.server.x509.subject.province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
+*`tls.server.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`tls.server.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`tls.server.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`tls.server.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`tls.server.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+
 *`tls.detailed.version`*::
 +
 --
@@ -10591,6 +11138,17 @@ type: long
 
 --
 
+*`tls.detailed.client_certificate.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
 *`tls.detailed.client_certificate.serial_number`*::
 +
 --
@@ -10716,6 +11274,17 @@ type: keyword
 
 --
 
+*`tls.detailed.client_certificate.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
+
+--
+
 [float]
 === issuer
 
@@ -10776,6 +11345,17 @@ type: keyword
 
 --
 
+*`tls.detailed.client_certificate.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate issuer entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
+
+--
+
 [float]
 === server_certificate
 
@@ -10788,6 +11368,17 @@ Certificate provided by the server for authentication.
 X509 format version.
 
 type: long
+
+--
+
+*`tls.detailed.server_certificate.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -10898,6 +11489,15 @@ type: keyword
 
 --
 
+*`tls.detailed.server_certificate.subject.state_or_province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
 *`tls.detailed.server_certificate.subject.common_name`*::
 +
 --
@@ -10913,6 +11513,17 @@ type: keyword
 Locality.
 
 type: keyword
+
+--
+
+*`tls.detailed.server_certificate.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
 
 --
 
@@ -10958,6 +11569,15 @@ type: keyword
 
 --
 
+*`tls.detailed.server_certificate.issuer.state_or_province`*::
++
+--
+Province or region within country.
+
+type: keyword
+
+--
+
 *`tls.detailed.server_certificate.issuer.common_name`*::
 +
 --
@@ -10973,6 +11593,17 @@ type: keyword
 Locality.
 
 type: keyword
+
+--
+
+*`tls.detailed.server_certificate.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate issuer entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
 
 --
 

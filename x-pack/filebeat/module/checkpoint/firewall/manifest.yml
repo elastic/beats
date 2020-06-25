@@ -4,14 +4,12 @@ var:
   - name: syslog_host
     default: localhost
   - name: tags
-    default: [checkpoint-firewall]
+    default: [checkpoint-firewall, forwarded]
   - name: syslog_port
     default: 9001
   - name: input
     default: syslog
-  - name: log_level
-    default: 7
 
-ingest_pipeline: 
-  - ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.yml
 input: config/firewall.yml

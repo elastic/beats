@@ -67,6 +67,11 @@ func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	})
 }
 
+// NotifyTermination tells the OS that the service is stopped.
+func NotifyTermination() {
+	notifyWindowsServiceStopped()
+}
+
 // cmdline flags
 var memprofile, cpuprofile, httpprof *string
 var cpuOut *os.File

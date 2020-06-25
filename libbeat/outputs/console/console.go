@@ -19,6 +19,7 @@ package console
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"runtime"
@@ -102,7 +103,7 @@ func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*co
 }
 
 func (c *console) Close() error { return nil }
-func (c *console) Publish(batch publisher.Batch) error {
+func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))

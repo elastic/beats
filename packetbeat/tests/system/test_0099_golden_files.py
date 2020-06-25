@@ -64,8 +64,8 @@ def clean_keys(obj):
     keys = [
         "@metadata.version",
         "agent.ephemeral_id",
-        "agent.hostname",
         "agent.id",
+        "agent.name",
         "agent.type",
         "agent.version",
         "ecs.version",

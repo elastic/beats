@@ -1,3 +1,4 @@
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/)
 [![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)

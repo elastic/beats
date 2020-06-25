@@ -1,0 +1,23 @@
+name: Endpoint
+rules:
+- fix_stream: {}
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - endpoint
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
+
+- filter:
+    selectors:
+    - fleet
+    - inputs
+    - output
+
+when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')

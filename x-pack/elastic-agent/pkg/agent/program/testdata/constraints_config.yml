@@ -15,23 +15,19 @@ outputs:
     hosts: ["monitoring:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
-datasources:
-  - use_output: default
-    inputs:
-    - type: logs
-      streams:
-      - paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
-  - namespace: testing
-    use_output: default
+inputs:
+  - type: logfile
+    streams:
+    - paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+  - type: apache/metrics
     constraints:
       - "validate_version(%{[agent.version]}, '1.0.0 - 7.0.0')"
-    inputs:
-      - type: apache/metrics
-        streams:
-          - enabled: true
-            metricset: info
+    dataset.namespace: testing
+    streams:
+      - enabled: true
+        metricset: info
 
 settings.monitoring:
   use_output: monitoring

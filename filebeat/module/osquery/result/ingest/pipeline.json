@@ -42,6 +42,164 @@
             "target_field": "osquery.result.calendar_time",
             "ignore_missing": true
         }
+    },
+    {
+        "set": {
+            "field": "event.kind",
+            "value": "event"
+        }
+    },
+    {
+        "set": {
+            "field": "event.type",
+            "value": "info"
+        }
+    },
+    {
+        "set": {
+            "field": "event.action",
+            "value": "{{osquery.result.action}}",
+            "if": "ctx?.osquery?.result?.action != null"
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.atime",
+            "target_field": "file.accessed",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.atime != null"
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.ctime",
+            "target_field": "file.created",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.ctime != null"
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.mtime",
+            "target_field": "file.mtime",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.mtime != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.directory",
+            "value": "{{osquery.result.columns.directory}}",
+            "if": "ctx?.osquery?.result?.columns?.directory != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.name",
+            "value": "{{osquery.result.columns.filename}}",
+            "if": "ctx?.osquery?.result?.columns?.filename != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.gid",
+            "value": "{{osquery.result.columns.gid}}",
+            "if": "ctx?.osquery?.result?.columns?.gid != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.inode",
+            "value": "{{osquery.result.columns.inode}}",
+            "if": "ctx?.osquery?.result?.columns?.inode != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.mode",
+            "value": "{{osquery.result.columns.mode}}",
+            "if": "ctx?.osquery?.result?.columns?.mode != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.path",
+            "value": "{{osquery.result.columns.path}}",
+            "if": "ctx?.osquery?.result?.columns?.path != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.size",
+            "value": "{{osquery.result.columns.size}}",
+            "if": "ctx?.osquery?.result?.columns?.size != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.type",
+            "value": "{{osquery.result.columns.type}}",
+            "if": "ctx?.osquery?.result?.columns?.type != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.uid",
+            "value": "{{osquery.result.columns.uid}}",
+            "if": "ctx?.osquery?.result?.columns?.uid != null"
+        }
+    },
+    {
+        "set": {
+            "field": "user.name",
+            "value": "{{osquery.result.decorations.username}}",
+            "if": "ctx?.osquery?.result?.decorations?.username != null"
+        }
+    },
+    {
+        "append": {
+            "field": "related.user",
+            "value": "{{user.name}}",
+            "if": "ctx?.user?.name != null"
+        }
+    },
+    {
+        "set": {
+            "field": "host.hostname",
+            "value": "{{osquery.result.host_identifier}}",
+            "if": "ctx?.osquery?.result?.host_identifier != null"
+        }
+    },
+    {
+        "set": {
+            "field": "host.id",
+            "value": "{{osquery.result.decorations.host_uuid}}",
+            "if": "ctx?.osquery?.result?.decorations?.host_uuid != null"
+        }
+    },
+    {
+        "set": {
+            "field": "process.name",
+            "value": "{{osquery.result.columns.process}}",
+            "if": "ctx?.osquery?.result?.columns?.process != null"
+        }
+    },
+    {
+        "set": {
+            "field": "url.full",
+            "value": "{{osquery.result.columns.source_url}}",
+            "if": "ctx?.osquery?.result?.columns?.source_url != null && ctx.osquery.result.columns.source_url != 'null'"
+        }
+    },
+    {
+        "set": {
+            "field": "rule.name",
+            "value": "{{osquery.result.name}}",
+            "if": "ctx?.osquery?.result?.name != null"
+        }
     }
   ],
   "on_failure" : [{

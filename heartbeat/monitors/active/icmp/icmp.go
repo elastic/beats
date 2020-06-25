@@ -32,46 +32,71 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+var debugf = logp.MakeDebug("icmp")
+
 func init() {
 	monitors.RegisterActive("icmp", create)
 }
 
-var debugf = logp.MakeDebug("icmp")
-
 func create(
 	name string,
-	cfg *common.Config,
+	commonConfig *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
+	loop, err := getStdLoop()
+	if err != nil {
+		logp.Warn("Failed to initialize ICMP loop %v", err)
+		return nil, 0, err
+	}
+
 	config := DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	if err := commonConfig.Unpack(&config); err != nil {
 		return nil, 0, err
 	}
 
-	ipVersion := config.Mode.Network()
-	if len(config.Hosts) > 0 && ipVersion == "" {
+	jf, err := newJobFactory(config, monitors.NewStdResolver(), loop)
+	if err != nil {
+		return nil, 0, err
+	}
+	return jf.makeJobs()
+
+}
+
+type jobFactory struct {
+	config    Config
+	resolver  monitors.Resolver
+	loop      ICMPLoop
+	ipVersion string
+}
+
+func newJobFactory(config Config, resolver monitors.Resolver, loop ICMPLoop) (*jobFactory, error) {
+	jf := &jobFactory{config: config, resolver: resolver, loop: loop}
+	err := jf.checkConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return jf, nil
+}
+
+func (jf *jobFactory) checkConfig() error {
+	jf.ipVersion = jf.config.Mode.Network()
+	if len(jf.config.Hosts) > 0 && jf.ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
+		return err
+	}
+
+	return nil
+}
+
+func (jf *jobFactory) makeJobs() (j []jobs.Job, endpoints int, err error) {
+	if err := jf.loop.checkNetworkMode(jf.ipVersion); err != nil {
 		return nil, 0, err
 	}
 
-	var loopErr error
-	loopInit.Do(func() {
-		debugf("initializing ICMP loop")
-		loop, loopErr = newICMPLoop()
-	})
-	if loopErr != nil {
-		logp.Warn("Failed to initialize ICMP loop %v", loopErr)
-		return nil, 0, loopErr
-	}
-	debugf("ICMP loop successfully initialized")
+	pingFactory := jf.pingIPFactory(&jf.config)
 
-	if err := loop.checkNetworkMode(ipVersion); err != nil {
-		return nil, 0, err
-	}
-
-	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
-
-	for _, host := range config.Hosts {
-		job, err := monitors.MakeByHostJob(host, config.Mode, monitors.NewStdResolver(), pingFactory)
+	for _, host := range jf.config.Hosts {
+		job, err := monitors.MakeByHostJob(host, jf.config.Mode, monitors.NewStdResolver(), pingFactory)
 
 		if err != nil {
 			return nil, 0, err
@@ -82,15 +107,15 @@ func create(
 			return nil, 0, err
 		}
 
-		jobs = append(jobs, wrappers.WithURLField(u, job))
+		j = append(j, wrappers.WithURLField(u, job))
 	}
 
-	return jobs, len(config.Hosts), nil
+	return j, len(jf.config.Hosts), nil
 }
 
-func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
-	return func(event *beat.Event, ip *net.IPAddr) error {
-		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {
+	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
+		rtt, n, err := jf.loop.ping(ip, config.Timeout, config.Wait)
 		if err != nil {
 			return err
 		}
@@ -98,9 +123,9 @@ func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
 		icmpFields := common.MapStr{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
-			eventext.MergeEventFields(event, icmpFields)
+			eventext.MergeEventFields(event, common.MapStr{"icmp": icmpFields})
 		}
 
 		return nil
-	}
+	})
 }

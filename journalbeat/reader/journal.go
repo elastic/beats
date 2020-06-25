@@ -118,8 +118,10 @@ func setupMatches(j *sdjournal.Journal, matches []string) error {
 
 		var p string
 		for journalKey, eventField := range journaldEventFields {
-			if elems[0] == eventField.name {
-				p = journalKey + "=" + elems[1]
+			for _, name := range eventField.names {
+				if elems[0] == name {
+					p = journalKey + "=" + elems[1]
+				}
 			}
 		}
 
@@ -240,7 +242,11 @@ func (r *Reader) checkForNewEvents() (bool, error) {
 
 // toEvent creates a beat.Event from journal entries.
 func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
-	fields := common.MapStr{}
+	fields := common.MapStr{
+		"event": common.MapStr{
+			"kind": "event",
+		},
+	}
 	custom := common.MapStr{}
 
 	for entryKey, v := range entry.Fields {
@@ -249,7 +255,9 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 			custom.Put(normalized, v)
 		} else if !fieldConversionInfo.dropped {
 			value := r.convertNamedField(fieldConversionInfo, v)
-			fields.Put(fieldConversionInfo.name, value)
+			for _, name := range fieldConversionInfo.names {
+				fields.Put(name, value)
+			}
 		}
 	}
 
@@ -267,7 +275,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	}
 
 	state := checkpoint.JournalState{
-		Path:               r.config.Path,
+		Path:               r.config.CheckpointID,
 		Cursor:             entry.Cursor,
 		RealtimeTimestamp:  entry.RealtimeTimestamp,
 		MonotonicTimestamp: entry.MonotonicTimestamp,
@@ -295,7 +303,7 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 			s := strings.Split(value, ",")
 			v, err = strconv.ParseInt(s[0], 10, 64)
 			if err != nil {
-				r.logger.Debugf("Failed to convert field: %s \"%v\" to int: %v", fc.name, value, err)
+				r.logger.Debugf("Failed to convert field: %v \"%v\" to int: %v", fc.names, value, err)
 				return value
 			}
 		}

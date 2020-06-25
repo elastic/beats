@@ -2,7 +2,7 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability"
+            "id": "elastic-apm"
         },
         "provider": "googlecloud"
     },
@@ -14,18 +14,18 @@
     "googlecloud": {
         "labels": {
             "metrics": {
-                "storage_class": "REGIONAL"
+                "storage_class": "MULTI_REGIONAL"
             },
             "resource": {
-                "bucket_name": "elastic-vsphere-images",
-                "location": "us-east1"
+                "bucket_name": "artifacts.elastic-apm.appspot.com",
+                "location": "us"
             }
         },
         "storage": {
             "storage": {
-                "object_count": 3,
-                "total_byte_seconds": 58816542441472,
-                "total_bytes": 680747019
+                "object_count": {
+                    "value": 15
+                }
             }
         }
     },

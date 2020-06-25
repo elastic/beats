@@ -124,7 +124,7 @@ func (f *Field) Validate() error {
 
 func (f *Field) validateType() error {
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword":
+	case "text", "keyword", "wildcard":
 		return stringType.validate(f.Format)
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
 		return numberType.validate(f.Format)

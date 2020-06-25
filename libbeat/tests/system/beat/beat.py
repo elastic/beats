@@ -11,13 +11,14 @@ import time
 import yaml
 import hashlib
 import re
+import glob
 from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
 
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
-                        "agent.type", "agent.hostname", "agent.version"]
+                        "agent.type", "agent.name", "agent.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -586,7 +587,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
         # "fields.yml" you should run "make update" on metricbeat folder
-        with open(fields_doc, "r") as f:
+        with open(fields_doc, "r", encoding="utf_8") as f:
             path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
@@ -722,3 +723,33 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc.wait()
 
         return self.get_log_lines(logfile="version")[0].split()[2]
+
+    def assert_explicit_ecs_version_set(self, module, fileset):
+        """
+        Assert that the module explicitly sets the ECS version field.
+        """
+        def get_config_paths(modules_path, module, fileset):
+            pathname = os.path.abspath(modules_path +
+                                       "/" +
+                                       module +
+                                       "/" +
+                                       fileset +
+                                       "/" +
+                                       "config/*.yml")
+            return glob.glob(pathname)
+
+        def is_ecs_version_set(path):
+            # parsing the yml file would be better but go templates in
+            # the file make that difficult
+            with open(path) as fhandle:
+                for line in fhandle:
+                    if re.search("ecs\.version", line):
+                        return True
+            return False
+
+        errors = []
+        for cfg_path in get_config_paths(self.modules_path, module, fileset):
+            if not is_ecs_version_set(cfg_path):
+                errors.append("{}".format(cfg_path))
+        if len(errors) > 0:
+            raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))

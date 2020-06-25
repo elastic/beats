@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -22,10 +23,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 )
 
 const (
@@ -41,6 +44,7 @@ func init() {
 	}
 }
 
+// HttpjsonInput struct has the HttpJsonInput configuration and other userful info.
 type HttpjsonInput struct {
 	config
 	log      *logp.Logger
@@ -53,10 +57,25 @@ type HttpjsonInput struct {
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
 }
 
+// RequestInfo struct has the information for generating an HTTP request
 type RequestInfo struct {
 	URL        string
 	ContentMap common.MapStr
 	Headers    common.MapStr
+}
+
+type retryLogger struct {
+	log *logp.Logger
+}
+
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+	}
+}
+
+func (l *retryLogger) Printf(s string, args ...interface{}) {
+	l.log.Debugf(s, args...)
 }
 
 // NewInput creates a new httpjson input
@@ -71,11 +90,7 @@ func NewInput(
 		return nil, err
 	}
 	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +216,10 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 	return "", nil
 }
 
-// getRateLimit get the rate limit value if specified in the HTTP Header of the response
+// getRateLimit get the rate limit value if specified in the HTTP Header of the response,
+// and returns an init64 value in seconds since unix epoch for rate limit reset time.
+// When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
+// returns 0 for the epoch value.
 func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 	if rateLimit != nil {
 		if rateLimit.Remaining != "" {
@@ -222,6 +240,9 @@ func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 				if err != nil {
 					return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
 				}
+				if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+					return 0, nil
+				}
 				return epoch, nil
 			}
 		}
@@ -235,12 +256,14 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 	if err != nil {
 		return err
 	}
-	if epoch == 0 {
+	t := time.Unix(epoch, 0)
+	w := time.Until(t)
+	if epoch == 0 || w <= 0 {
+		in.log.Debugf("Rate Limit: No need to apply rate limit.")
 		return nil
 	}
-	t := time.Unix(epoch, 0)
 	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
-	ticker := time.NewTicker(time.Until(t))
+	ticker := time.NewTicker(w)
 	defer ticker.Stop()
 	select {
 	case <-ctx.Done():
@@ -329,7 +352,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					return err
 				}
 			} else {
-				v, err = common.MapStr(mm).GetValue(in.config.JSONObjects)
+				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
 					return err
 				}
@@ -389,29 +412,9 @@ func (in *HttpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	client, err := in.newHTTPClient(ctx)
 	if err != nil {
 		return err
-	}
-
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return err
-	}
-
-	// Make transport client
-	var client *http.Client
-	client = &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			TLSClientConfig:   tlsConfig.ToConfig(),
-			DisableKeepAlives: true,
-		},
-		Timeout: in.config.HTTPClientTimeout,
 	}
 
 	ri := &RequestInfo{
@@ -452,6 +455,39 @@ func (in *HttpjsonInput) Stop() {
 // Wait is an alias for Stop.
 func (in *HttpjsonInput) Wait() {
 	in.Stop()
+}
+
+func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make retryable HTTP client
+	var client *retryablehttp.Client = &retryablehttp.Client{
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: in.config.HTTPClientTimeout,
+				}).DialContext,
+				TLSClientConfig:   tlsConfig.ToConfig(),
+				DisableKeepAlives: true,
+			},
+			Timeout: in.config.HTTPClientTimeout,
+		},
+		Logger:       newRetryLogger(),
+		RetryWaitMin: in.config.RetryWaitMin,
+		RetryWaitMax: in.config.RetryWaitMax,
+		RetryMax:     in.config.RetryMax,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client.StandardClient())
+	}
+
+	return client.StandardClient(), nil
 }
 
 func makeEvent(body string) beat.Event {

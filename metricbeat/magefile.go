@@ -31,6 +31,9 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
+	// register kubernetes runner
+	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
+
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	// mage:import
@@ -46,14 +49,14 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
-	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
-	common.RegisterCheckDeps(update.Update)
-	test.RegisterDeps(GoIntegTest, PythonIntegTest)
+	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 	unittest.RegisterGoTestDeps(Fields)
 	unittest.RegisterPythonTestDeps(Fields)
 
@@ -75,8 +78,9 @@ func Package() {
 
 	devtools.UseElasticBeatOSSPackaging()
 	metricbeat.CustomizePackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
-	mg.Deps(update.Update, metricbeat.PrepareModulePackagingOSS)
+	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -100,12 +104,6 @@ func Dashboards() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
-}
-
-// Imports generates an include/list_{suffix}.go file containing
-// a import statement for each module and dataset.
-func Imports() error {
-	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
 }
 
 func configYML() error {
@@ -133,9 +131,25 @@ func MockedTests(ctx context.Context) error {
 	return devtools.GoTest(ctx, params)
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a fields.yml and fields.go for each module.
+func Fields() {
+	mg.Deps(fieldsYML, moduleFieldsGo)
+}
+
+func fieldsYML() error {
 	return devtools.GenerateFieldsYAML("module")
+}
+
+func moduleFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo("module")
+}
+
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(
+		Fields, Dashboards, Config, CollectAll,
+		metricbeat.PrepareModulePackagingOSS,
+		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
@@ -168,7 +182,9 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(Fields)
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
@@ -181,8 +197,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	}, devtools.ListMatchingEnvVars("NOSE_")...)
+	})
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -38,7 +39,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_elb autodiscover is experimental")
 
 	config := awsauto.DefaultConfig()
@@ -85,13 +86,13 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			config.AWSConfig.Endpoint, "elasticloadbalancing", region, awsCfg)))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates)
+func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, err
 	}

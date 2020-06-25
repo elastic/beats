@@ -19,8 +19,10 @@ package hints
 
 import (
 	"fmt"
-
+	"strconv"
 	"strings"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
@@ -54,6 +56,8 @@ const (
 type metricHints struct {
 	Key      string
 	Registry *mb.Register
+
+	logger *logp.Logger
 }
 
 // NewMetricHints builds a new metrics builder based on hints
@@ -65,25 +69,32 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &metricHints{config.Key, config.Registry}, nil
+	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
 }
 
 // Create configs based on hints passed from providers
-func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
-	var config []*common.Config
+func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
+	var (
+		configs []*common.Config
+		noPort  bool
+	)
 	host, _ := event["host"].(string)
 	if host == "" {
-		return config
+		return configs
 	}
 
-	port, _ := common.TryToInt(event["port"])
+	port, ok := common.TryToInt(event["port"])
+	if !ok {
+		noPort = true
+	}
 
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
-		return config
+		return configs
 	}
 
-	modulesConfig := m.getModules(hints)
+	modulesConfig := m.getModuleConfigs(hints)
+	// here we handle raw configs if provided
 	if modulesConfig != nil {
 		configs := []*common.Config{}
 		for _, cfg := range modulesConfig {
@@ -93,68 +104,71 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, options...)
 
 	}
 
-	mod := m.getModule(hints)
-	if mod == "" {
-		return config
-	}
+	modules := m.getModules(hints)
+	for _, hint := range modules {
+		mod := m.getModule(hint)
+		if mod == "" {
+			continue
+		}
 
-	hosts, ok := m.getHostsWithPort(hints, port)
-	if !ok {
-		return config
-	}
+		hosts, ok := m.getHostsWithPort(hint, port, noPort)
+		if !ok {
+			continue
+		}
 
-	ns := m.getNamespace(hints)
-	msets := m.getMetricSets(hints, mod)
-	tout := m.getTimeout(hints)
-	ival := m.getPeriod(hints)
-	sslConf := m.getSSLConfig(hints)
-	procs := m.getProcessors(hints)
-	metricspath := m.getMetricPath(hints)
-	username := m.getUsername(hints)
-	password := m.getPassword(hints)
+		ns := m.getNamespace(hint)
+		msets := m.getMetricSets(hint, mod)
+		tout := m.getTimeout(hint)
+		ival := m.getPeriod(hint)
+		sslConf := m.getSSLConfig(hint)
+		procs := m.getProcessors(hint)
+		metricspath := m.getMetricPath(hint)
+		username := m.getUsername(hint)
+		password := m.getPassword(hint)
 
-	moduleConfig := common.MapStr{
-		"module":     mod,
-		"metricsets": msets,
-		"hosts":      hosts,
-		"timeout":    tout,
-		"period":     ival,
-		"enabled":    true,
-		"ssl":        sslConf,
-		"processors": procs,
-	}
+		moduleConfig := common.MapStr{
+			"module":     mod,
+			"metricsets": msets,
+			"hosts":      hosts,
+			"timeout":    tout,
+			"period":     ival,
+			"enabled":    true,
+			"ssl":        sslConf,
+			"processors": procs,
+		}
 
-	if ns != "" {
-		moduleConfig["namespace"] = ns
-	}
-	if metricspath != "" {
-		moduleConfig["metrics_path"] = metricspath
-	}
-	if username != "" {
-		moduleConfig["username"] = username
-	}
-	if password != "" {
-		moduleConfig["password"] = password
-	}
+		if ns != "" {
+			moduleConfig["namespace"] = ns
+		}
+		if metricspath != "" {
+			moduleConfig["metrics_path"] = metricspath
+		}
+		if username != "" {
+			moduleConfig["username"] = username
+		}
+		if password != "" {
+			moduleConfig["password"] = password
+		}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+		logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
-	// Create config object
-	cfg, err := common.NewConfigFrom(moduleConfig)
-	if err != nil {
-		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		// Create config object
+		cfg, err := common.NewConfigFrom(moduleConfig)
+		if err != nil {
+			logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		}
+		logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
+		configs = append(configs, cfg)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
-	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, config)
+	return template.ApplyConfigTemplate(event, configs, options...)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -178,26 +192,47 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string, bool) {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort bool) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) ||
+		if strings.Contains(h, "data.port") && port != 0 && !noPort || m.checkHostPort(h, port) ||
 			// Use the event that has no port config if there is a ${data.host}:9090 like input
-			(port == 0 && strings.Contains(h, "data.host")) {
+			(noPort && strings.Contains(h, "data.host")) {
 			result = append(result, h)
 		}
 	}
 
 	if len(thosts) > 0 && len(result) == 0 {
-		logp.Debug("hints.builder", "no hosts selected for port %d with hints: %+v", port, thosts)
+		m.logger.Debug("no hosts selected for port %d with hints: %+v", port, thosts)
 		return nil, false
 	}
 
 	return result, true
+}
+
+func (m *metricHints) checkHostPort(h string, p int) bool {
+	port := strconv.Itoa(p)
+
+	index := strings.LastIndex(h, ":"+port)
+	// Check if host contains :port. If not then return false
+	if index == -1 {
+		return false
+	}
+
+	// Check if the host ends with :port. Return true if yes
+	end := index + len(port) + 1
+	if end == len(h) {
+		return true
+	}
+
+	// Check if the character immediately after :port. If its not a number then return true.
+	// This is to avoid adding :80 as a valid host for an event that has port=8080
+	// Also ensure that port=3306 and hint="tcp(${data.host}:3306)/" is valid
+	return h[end] < '0' || h[end] > '9'
 }
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {
@@ -235,11 +270,24 @@ func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
 }
 
-func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+func (m *metricHints) getModuleConfigs(hints common.MapStr) []common.MapStr {
 	return builder.GetHintAsConfigs(hints, m.Key)
 }
 
 func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, m.Key)
 
+}
+
+func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+	modules := builder.GetHintsAsList(hints, m.Key)
+	var output []common.MapStr
+
+	for _, mod := range modules {
+		output = append(output, common.MapStr{
+			m.Key: mod,
+		})
+	}
+
+	return output
 }

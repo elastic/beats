@@ -4,8 +4,9 @@
 
 FROM {{ .from }}
 
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum clean all
+# Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
+RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y && yum install --setopt=tsflags=nodocs -y epel-release &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+RUN for iter in {1..10}; do yum update -y && yum install -y jq &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \

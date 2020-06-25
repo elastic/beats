@@ -28,6 +28,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -62,6 +64,9 @@ var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
 var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+
+// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
+var BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -106,6 +111,14 @@ type License struct {
 type licenseWrapper struct {
 	License License `json:"license"`
 }
+
+var BulkStatsDict = c.Dict("bulk", s.Schema{
+	"total_operations":     c.Int("total_operations"),
+	"total_time_in_millis": c.Int("total_time_in_millis"),
+	"total_size_in_bytes":  c.Int("total_size_in_bytes"),
+	"avg_time_in_millis":   c.Int("avg_time_in_millis"),
+	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
+}, c.DictOptional)
 
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
@@ -248,18 +261,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	}
 
 	// License not found in cache, fetch it from Elasticsearch
-	info, err := GetInfo(http, resetURI)
-	if err != nil {
-		return nil, err
-	}
-	var licensePath string
-	if info.Version.Number.Major < 7 {
-		licensePath = "_xpack/license"
-	} else {
-		licensePath = "_license"
-	}
-
-	content, err := fetchPath(http, resetURI, licensePath, "")
+	content, err := fetchPath(http, resetURI, "_license", "")
 	if err != nil {
 		return nil, err
 	}

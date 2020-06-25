@@ -14,6 +14,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "DeleteVirtualMFADevice",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-f8e6-4d5f-8525-EXAMPLE",
         "event.kind": "event",
@@ -21,13 +24,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-09T16:36:17Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-10T00:34:02Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteVirtualMFADevice\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"serialNumber\":\"arn:aws:iam::0123456789012:mfa/Alice\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-af91-4d1a-aaf2-EXAMPLE\",\"eventID\":\"EXAMPLE-f8e6-4d5f-8525-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

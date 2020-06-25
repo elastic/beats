@@ -14,6 +14,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
@@ -84,7 +85,7 @@ type EnrollRequest struct {
 
 // Metadata is a all the metadata send or received from the elastic-agent.
 type Metadata struct {
-	Local        map[string]interface{} `json:"local"`
+	Local        *info.ECSMeta          `json:"local"`
 	UserProvided map[string]interface{} `json:"user_provided"`
 }
 

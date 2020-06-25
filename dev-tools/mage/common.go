@@ -115,7 +115,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 		return args[0]
 	}
 
-	var out map[string]interface{}
+	out := map[string]interface{}{}
 	for _, m := range args {
 		for k, v := range m {
 			out[k] = v
@@ -220,7 +220,19 @@ func dockerInfo() (*DockerInfo, error) {
 // PATH.
 func HaveDockerCompose() error {
 	_, err := exec.LookPath("docker-compose")
-	return errors.Wrap(err, "docker-compose was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("docker-compose is not available")
+	}
+	return nil
+}
+
+// HaveKubectl returns an error if kind is not found on the PATH.
+func HaveKubectl() error {
+	_, err := exec.LookPath("kubectl")
+	if err != nil {
+		return fmt.Errorf("kubectl is not available")
+	}
+	return nil
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the
@@ -818,6 +830,31 @@ func ListMatchingEnvVars(prefixes ...string) []string {
 				break
 			}
 		}
+	}
+	return vars
+}
+
+// IntegrationTestEnvVars returns the names of environment variables needed to configure
+// connections to integration test environments.
+func IntegrationTestEnvVars() []string {
+	// Environment variables that can be configured with paths to files
+	// with authentication information.
+	vars := []string{
+		"AWS_SHARED_CREDENTIAL_FILE",
+		"AZURE_AUTH_LOCATION",
+		"GOOGLE_APPLICATION_CREDENTIALS",
+	}
+	// Environment variables with authentication information.
+	prefixes := []string{
+		"AWS_",
+		"AZURE_",
+
+		// Accepted by terraform, but not by many clients, including Beats
+		"GOOGLE_",
+		"GCLOUD_",
+	}
+	for _, prefix := range prefixes {
+		vars = append(vars, ListMatchingEnvVars(prefix)...)
 	}
 	return vars
 }

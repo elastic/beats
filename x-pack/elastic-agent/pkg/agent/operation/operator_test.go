@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build linux darwin
-
 package operation
 
 import (
@@ -11,257 +9,68 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
-	"time"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 func TestMain(m *testing.M) {
 	// init supported with test cases
-	shortSpec := program.Spec{
-		Name:         "short",
-		Cmd:          "/bin/echo",
-		Configurable: "file",
-		Args:         []string{"123"},
-	}
-	longSpec := program.Spec{
-		Name:         "long",
-		Cmd:          "/bin/sh",
-		Configurable: "file",
-		Args:         []string{"-c", "echo 123; sleep 100"},
-	}
 	configurableSpec := program.Spec{
-		Name:         "configurable",
-		Cmd:          "configurable",
-		Configurable: "file",
-		Args:         []string{},
-	}
-	configByFileSpec := program.Spec{
-		Name:         "configurablebyfile",
-		Cmd:          "configurablebyfile",
-		Configurable: "file",
-		Args:         []string{},
+		Name: "configurable",
+		Cmd:  "configurable",
+		Args: []string{},
 	}
 
-	program.Supported = append(program.Supported, shortSpec, longSpec, configurableSpec, configByFileSpec)
+	program.Supported = append(program.Supported, configurableSpec)
+
+	p := getProgram("configurable", "1.0")
+	spec := p.Spec()
+	path := spec.BinaryPath
+	if runtime.GOOS == "windows" {
+		path += ".exe"
+	}
+	if s, err := os.Stat(path); err != nil || s == nil {
+		panic(fmt.Errorf("binary not available %s", spec.BinaryPath))
+	}
+
+	os.Exit(m.Run())
 }
 
 func TestNotSupported(t *testing.T) {
 	p := getProgram("notsupported", "1.0")
 
-	operator, _ := getTestOperator(t, "tests/scripts")
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	err := operator.start(p, nil)
 	if err == nil {
 		t.Fatal("was expecting error but got none")
 	}
 }
 
-func TestShortRun(t *testing.T) {
-	p := getProgram("short", "1.0")
-
-	operator, _ := getTestOperator(t, "tests/scripts")
-	if err := operator.start(p, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	if len(items) == 1 && items[p.ID()].Status == state.Running {
-		t.Fatalf("Process reattach info not stopped %#v, %+v", items, items[p.ID()].Status)
-	}
-
-	os.Remove(filepath.Join(operator.config.DownloadConfig.InstallPath, "short--1.0.yml"))
-}
-
-func TestShortRunInvalid(t *testing.T) {
-	p := getProgram("bumblebee", "")
-	operator, _ := getTestOperator(t, "/bin")
-	if err := operator.start(p, nil); err == nil {
-		t.Fatal(err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	if len(items) == 1 && items[p.ID()].Status == state.Running {
-		t.Fatalf("Process reattach info not stopped %#v, %+v", items, items[p.ID()].Status)
-	}
-}
-
-func TestLongRunWithStop(t *testing.T) {
-	p := getProgram("long", "1.0")
-
-	operator, _ := getTestOperator(t, "tests/scripts")
-	if err := operator.start(p, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	pid := item0.ProcessInfo.PID
-
-	// stop the process
-	if err := operator.stop(p); err != nil {
-		t.Fatalf("Failed to stop process with PID %d: %v", pid, err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	// check state updated
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status == state.Running {
-		t.Fatalf("Process state says running after Stop %#v", items)
-	}
-
-	// check process stopped
-	proc, err := os.FindProcess(pid)
-	if err != nil && proc != nil {
-		t.Fatal("Process found")
-	}
-}
-
-func TestLongRunWithCrash(t *testing.T) {
-	p := getProgram("long", "1.0")
-
-	operator, _ := getTestOperator(t, "tests/scripts")
-	if err := operator.start(p, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	// crash the process
-	pid := item0.ProcessInfo.PID
-	proc, err := os.FindProcess(pid)
-	if err != nil {
-		t.Fatalf("Failed to get process with PID %d: %v", pid, err)
-	}
-	if err := proc.Kill(); err != nil {
-		t.Fatalf("Failed to kill process with PID %d: %v", pid, err)
-	}
-
-	// let the watcher kick in
-	<-time.After(3 * time.Second)
-
-	// check process restarted
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status != state.Running {
-		t.Fatalf("Process not present after restart %#v", items)
-	}
-
-	newPid := item1.ProcessInfo.PID
-	if pid == newPid {
-		t.Fatalf("Process not restarted, still with the same PID %d", pid)
-	}
-
-	// stop restarted process
-	if err := operator.stop(p); err != nil {
-		t.Fatalf("Failed to stop restarted process %d: %v", newPid, err)
-	}
-}
-
-func TestTwoProcesses(t *testing.T) {
-	p := getProgram("long", "1.0")
-
-	operator, _ := getTestOperator(t, "tests/scripts")
-	if err := operator.start(p, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	// start the same process again
-	if err := operator.start(p, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	if item0.ProcessInfo.PID != item1.ProcessInfo.PID {
-		t.Fatal("Process got updated, expected the same")
-	}
-
-	// check process restarted
-	operator.stop(p)
-}
-
 func TestConfigurableRun(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
-
-	operator, _ := getTestOperator(t, installPath)
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
 	}
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
 
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	pid := item0.ProcessInfo.PID
-
-	// check it is still running
-	<-time.After(2 * time.Second)
-
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status != state.Running {
-		t.Fatalf("Process stopped running %#v", items)
-	}
-
-	newPID := item1.ProcessInfo.PID
-	if pid != newPID {
-		t.Fatalf("Process crashed in between first pid: '%v' second pid: '%v'", pid, newPID)
-	}
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to running")
+		}
+		return nil
+	})
 
 	// try to configure
 	cfg := make(map[string]interface{})
@@ -271,23 +80,132 @@ func TestConfigurableRun(t *testing.T) {
 		t.Fatalf("failed to config: %v", err)
 	}
 
-	if s, err := os.Stat(tstFilePath); err != nil || s == nil {
-		t.Fatalf("failed to create a file using Config call %s", tstFilePath)
+	waitFor(t, func() error {
+		if s, err := os.Stat(tstFilePath); err != nil || s == nil {
+			return fmt.Errorf("failed to create a file using Config call %s", tstFilePath)
+		}
+		return nil
+	})
+
+	items := operator.State()
+	item0, ok := items[p.ID()]
+	if !ok || item0.Status != state.Running {
+		t.Fatalf("Process no longer running after config %#v", items)
 	}
+	pid := item0.ProcessInfo.PID
 
 	// stop the process
 	if err := operator.stop(p); err != nil {
 		t.Fatalf("Failed to stop process with PID %d: %v", pid, err)
 	}
 
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
+	waitFor(t, func() error {
+		items := operator.State()
+		_, ok := items[p.ID()]
+		if ok {
+			return fmt.Errorf("state for process, should be removed")
+		}
+		return nil
+	})
 
-	// check reattach collection cleaned up
-	items = operator.State()
-	item2, ok := items[p.ID()]
-	if !ok || item2.Status == state.Running {
-		t.Fatalf("Process still running after stop %#v", items)
+	// check process stopped
+	proc, err := os.FindProcess(pid)
+	if err != nil && proc != nil {
+		t.Fatal("Process found")
+	}
+}
+
+func TestConfigurableFailed(t *testing.T) {
+	p := getProgram("configurable", "1.0")
+
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	if err := operator.start(p, nil); err != nil {
+		t.Fatal(err)
+	}
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
+
+	var pid int
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to running")
+		}
+		pid = item.ProcessInfo.PID
+		return nil
+	})
+
+	// try to configure (with failed status)
+	cfg := make(map[string]interface{})
+	tstFilePath := filepath.Join(os.TempDir(), fmt.Sprintf("tmp%d", rand.Uint32()))
+	cfg["TestFile"] = tstFilePath
+	cfg["Status"] = proto.StateObserved_FAILED
+	if err := operator.pushConfig(p, cfg); err != nil {
+		t.Fatalf("failed to config: %v", err)
+	}
+
+	// should still create the file
+	waitFor(t, func() error {
+		if s, err := os.Stat(tstFilePath); err != nil || s == nil {
+			return fmt.Errorf("failed to create a file using Config call %s", tstFilePath)
+		}
+		return nil
+	})
+
+	// wait for not running status
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status == state.Running {
+			return fmt.Errorf("process never left running")
+		}
+		return nil
+	})
+
+	// don't send status anymore
+	delete(cfg, "Status")
+	if err := operator.pushConfig(p, cfg); err != nil {
+		t.Fatalf("failed to config: %v", err)
+	}
+
+	// check that it restarted (has a new PID)
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.ProcessInfo == nil {
+			return fmt.Errorf("in restart loop")
+		}
+		if pid == item.ProcessInfo.PID {
+			return fmt.Errorf("process never restarted")
+		}
+		pid = item.ProcessInfo.PID
+		return nil
+	})
+
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to back to running")
+		}
+		return nil
+	})
+
+	// stop the process
+	if err := operator.stop(p); err != nil {
+		t.Fatalf("Failed to stop process with PID %d: %v", pid, err)
 	}
 
 	// check process stopped
@@ -297,68 +215,143 @@ func TestConfigurableRun(t *testing.T) {
 	}
 }
 
-func TestConfigurableByFileRun(t *testing.T) {
-	cfg := make(map[string]interface{})
-	cfg["TestFile"] = "tstFilePath"
-	downloadCfg := &artifact.Config{
-		InstallPath:     installPath,
-		OperatingSystem: "darwin",
-	}
+func TestConfigurableCrash(t *testing.T) {
+	p := getProgram("configurable", "1.0")
 
-	p := app.NewDescriptor("configurablebyfile", "1.0", downloadCfg, nil)
-	installPath := "tests/scripts"
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
-
-	operator, _ := getTestOperator(t, installPath)
-	if err := operator.start(p, cfg); err != nil {
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
 	}
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
 
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
+	var pid int
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to running")
+		}
+		pid = item.ProcessInfo.PID
+		return nil
+	})
 
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
+	// try to configure (with failed status)
+	cfg := make(map[string]interface{})
+	tstFilePath := filepath.Join(os.TempDir(), fmt.Sprintf("tmp%d", rand.Uint32()))
+	cfg["TestFile"] = tstFilePath
+	cfg["Crash"] = true
+	if err := operator.pushConfig(p, cfg); err != nil {
+		t.Fatalf("failed to config: %v", err)
 	}
 
-	// check it is still running
-	<-time.After(2 * time.Second)
+	// should still create the file
+	waitFor(t, func() error {
+		if s, err := os.Stat(tstFilePath); err != nil || s == nil {
+			return fmt.Errorf("failed to create a file using Config call %s", tstFilePath)
+		}
+		return nil
+	})
 
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status != state.Running {
-		t.Fatalf("Process not running anymore %#v", items)
+	// wait for not running status
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status == state.Running {
+			return fmt.Errorf("process never left running")
+		}
+		return nil
+	})
+
+	// don't send crash anymore
+	delete(cfg, "Crash")
+	if err := operator.pushConfig(p, cfg); err != nil {
+		t.Fatalf("failed to config: %v", err)
 	}
 
-	if item0.ProcessInfo.PID != item1.ProcessInfo.PID {
-		t.Fatalf("Process crashed in between first pid: '%v' second pid: '%v'", item0.ProcessInfo.PID, item1.ProcessInfo.PID)
-	}
+	// check that it restarted (has a new PID)
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.ProcessInfo == nil {
+			return fmt.Errorf("in restart loop")
+		}
+		if pid == item.ProcessInfo.PID {
+			return fmt.Errorf("process never restarted")
+		}
+		pid = item.ProcessInfo.PID
+		return nil
+	})
+
+	// let the process get back to ready
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to back to running")
+		}
+		return nil
+	})
 
 	// stop the process
 	if err := operator.stop(p); err != nil {
-		t.Fatalf("Failed to stop process with PID %d: %v", item1.ProcessInfo.PID, err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	// check reattach collection cleaned up
-	items = operator.State()
-	item2, ok := items[p.ID()]
-	if !ok || item2.Status == state.Running {
-		t.Fatalf("Process still running after stop %#v", items)
+		t.Fatalf("Failed to stop process with PID %d: %v", pid, err)
 	}
 
 	// check process stopped
-	proc, err := os.FindProcess(item1.ProcessInfo.PID)
+	proc, err := os.FindProcess(pid)
 	if err != nil && proc != nil {
 		t.Fatal("Process found")
+	}
+}
+
+func TestConfigurableStartStop(t *testing.T) {
+	p := getProgram("configurable", "1.0")
+
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
+
+	// start and stop it 3 times
+	for i := 0; i < 3; i++ {
+		if err := operator.start(p, nil); err != nil {
+			t.Fatal(err)
+		}
+
+		waitFor(t, func() error {
+			items := operator.State()
+			item, ok := items[p.ID()]
+			if !ok {
+				return fmt.Errorf("no state for process")
+			}
+			if item.Status != state.Running {
+				return fmt.Errorf("process never went to running")
+			}
+			return nil
+		})
+
+		// stop the process
+		if err := operator.stop(p); err != nil {
+			t.Fatalf("Failed to stop process: %v", err)
+		}
+
+		waitFor(t, func() error {
+			items := operator.State()
+			_, ok := items[p.ID()]
+			if ok {
+				return fmt.Errorf("state for process, should be removed")
+			}
+			return nil
+		})
 	}
 }

@@ -14,6 +14,9 @@
         "cloud.account.id": "123456789012",
         "cloud.region": "us-east-1",
         "event.action": "DeleteUser",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "b89eb34b-8fcb-4cba-8439-d4EXAMPLE",
         "event.kind": "event",
@@ -21,7 +24,10 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EX_PRINCIPAL_ID\",\"arn\":\"arn:aws:iam::123456789012:user/Alice\",\"accountId\":\"123456789012\",\"accessKeyId\":\"EXAMPLE_KEY_ID\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-03T15:26:38Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-03T15:50:52Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteUser\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"userName\":\"Bob\"},\"responseElements\":null,\"requestID\":\"0e794d53-cdb5-4f7d-b7db-5EXAMPLE\",\"eventID\":\"b89eb34b-8fcb-4cba-8439-d4EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "deletion"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
@@ -31,6 +37,9 @@
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

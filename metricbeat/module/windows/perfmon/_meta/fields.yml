@@ -1,6 +1,6 @@
 - name: perfmon
   type: group
-  release: beta
+  release: ga
   description: >
     perfmon
   fields:

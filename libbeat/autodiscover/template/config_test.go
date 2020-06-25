@@ -18,12 +18,16 @@
 package template
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 func TestConfigsMapping(t *testing.T) {
@@ -83,7 +87,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings)
+		mapper, err := NewConfigMapper(mappings, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -91,6 +95,132 @@ func TestConfigsMapping(t *testing.T) {
 		res := mapper.GetConfig(test.event)
 		assert.Equal(t, test.expected, res)
 	}
+}
+
+func TestConfigsMappingKeystore(t *testing.T) {
+	secret := "mapping_secret"
+	//expected config
+	config, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct":  "config",
+		"password": secret,
+	})
+
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, secret)
+
+	tests := []struct {
+		mapping  string
+		event    bus.Event
+		expected []*common.Config
+	}{
+		// Match config
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    password: "${PASSWORD}"`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
+	}
+
+	for _, test := range tests {
+		var mappings MapperSettings
+		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if err := config.Unpack(&mappings); err != nil {
+			t.Fatal(err)
+		}
+
+		mapper, err := NewConfigMapper(mappings, keystore, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res := mapper.GetConfig(test.event)
+		assert.Equal(t, test.expected, res)
+	}
+}
+
+func TestConfigsMappingKeystoreProvider(t *testing.T) {
+	secret := "mapping_provider_secret"
+	//expected config
+	config, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct":  "config",
+		"password": secret,
+	})
+
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, secret)
+
+	tests := []struct {
+		mapping  string
+		event    bus.Event
+		expected []*common.Config
+	}{
+		// Match config
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    password: "${PASSWORD}"`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
+	}
+
+	keystoreProvider := newMockKeystoreProvider(secret)
+	for _, test := range tests {
+		var mappings MapperSettings
+		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if err := config.Unpack(&mappings); err != nil {
+			t.Fatal(err)
+		}
+
+		mapper, err := NewConfigMapper(mappings, keystore, keystoreProvider)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res := mapper.GetConfig(test.event)
+		assert.Equal(t, test.expected, res)
+	}
+}
+
+type mockKeystore struct {
+	secret string
+}
+
+func newMockKeystoreProvider(secret string) keystore.Provider {
+	return &mockKeystore{secret}
+}
+
+// GetKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
+func (kr *mockKeystore) GetKeystore(event bus.Event) keystore.Keystore {
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, kr.secret)
+	return keystore
 }
 
 func TestNilConditionConfig(t *testing.T) {
@@ -107,7 +237,35 @@ func TestNilConditionConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = NewConfigMapper(mappings)
+	_, err = NewConfigMapper(mappings, nil, nil)
 	assert.NoError(t, err)
 	assert.Nil(t, mappings[0].ConditionConfig)
+}
+
+// create a keystore with an existing key
+/// `PASSWORD` with the value of `secret` variable.
+func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+	keyStore, err := keystore.NewFileKeystore(path)
+	// Fail fast in the test suite
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore.Store("PASSWORD", []byte(secret))
+	writableKeystore.Save()
+	return keyStore
+}
+
+// create a temporary file on disk to save the keystore.
+func getTemporaryKeystoreFile() string {
+	path, err := ioutils.TempDir("", "testing")
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(path, "keystore")
 }

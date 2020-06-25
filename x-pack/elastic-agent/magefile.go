@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -108,8 +109,7 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
 	return devtools.GolangCrossBuild(params)
 }
 
@@ -117,9 +117,9 @@ func GolangCrossBuildOSS() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
 	params.OutputDir = "build/golang-crossbuild"
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
+
 	if err := devtools.GolangCrossBuild(params); err != nil {
 		return err
 	}
@@ -138,35 +138,23 @@ func BuildGoDaemon() error {
 // BinaryOSS build the fleet artifact.
 func (Build) BinaryOSS() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent-oss"),
-		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.Name = "elastic-agent-oss"
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Binary build the fleet artifact.
 func (Build) Binary() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
-	)
-}
 
-// Dev make a special build with the Dev tags.
-func (Build) Dev() error {
-	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-tags", "dev",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Clean up dev environment.
@@ -178,9 +166,12 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
+	binaryName := "configurable"
+	if runtime.GOOS == "windows" {
+		binaryName += ".exe"
+	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86", "main.go")),
-		RunGo("build", "-o", filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "configurablebyfile"), filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -330,22 +321,6 @@ func commitID() string {
 	return commitID
 }
 
-func flags() string {
-	return strings.Join(flagsSet(), " ")
-}
-
-func flagsSet() []string {
-	ts := time.Now().Format(time.RFC3339)
-	commitID := commitID()
-	isSnapshot, _ := os.LookupEnv(snapshotEnv)
-
-	return []string{
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.buildTime=%s"`, ts),
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.commit=%s"`, commitID),
-		fmt.Sprintf(` -X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot=%s"`, isSnapshot),
-	}
-}
-
 // Update is an alias for executing fields, dashboards, config, includes.
 func Update() {
 	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
@@ -383,19 +358,12 @@ func configYML() error {
 
 // ConfigFileParams returns the parameters for generating OSS config.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.XPackBeatDir("_meta/common.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.p2.yml"),
-		},
-		ReferenceParts: []string{
-			devtools.XPackBeatDir("_meta/common.reference.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.reference.p2.yml"),
-		},
-		DockerParts: []string{
-			devtools.XPackBeatDir("_meta/elastic-agent.docker.yml"),
-		},
-	}
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	p.Short.Template = "_meta/config/elastic-agent.yml.tmpl"
+	p.Reference.Template = "_meta/config/elastic-agent.reference.yml.tmpl"
+	p.Docker.Template = "_meta/config/elastic-agent.docker.yml.tmpl"
+	return p
 }
 
 // fieldDocs generates docs/fields.asciidoc containing all fields
@@ -455,7 +423,14 @@ func (Demo) NoEnroll() error {
 }
 
 func runAgent(env map[string]string) error {
-	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+	prevPlatforms := os.Getenv("PLATFORMS")
+	defer os.Setenv("PLATFORMS", prevPlatforms)
+
+	// setting this improves build time
+	os.Setenv("PLATFORMS", "+all linux/amd64")
+	devtools.Platforms = devtools.NewPlatformList("+all linux/amd64")
+
+	supportedEnvs := map[string]int{"FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
 	dockerImageOut, err := sh.Output("docker", "image", "ls")
@@ -467,7 +442,6 @@ func runAgent(env map[string]string) error {
 	if !strings.Contains(dockerImageOut, tag) {
 		// produce docker package
 		packageAgent([]string{
-			"linux-x86.tar.gz",
 			"linux-x86_64.tar.gz",
 		}, devtools.UseElasticAgentDemoPackaging)
 
@@ -483,7 +457,11 @@ func runAgent(env map[string]string) error {
 	}
 
 	// prepare env variables
-	var envs []string
+	envs := []string{
+		// providing default kibana to be fixed for os-es if not provided
+		"KIBANA_HOST=http://localhost:5601",
+	}
+
 	envs = append(envs, os.Environ()...)
 	for k, v := range env {
 		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
@@ -496,6 +474,9 @@ func runAgent(env map[string]string) error {
 		if _, isSupported := supportedEnvs[parts[0]]; !isSupported {
 			continue
 		}
+
+		// fix value
+		e = fmt.Sprintf("%s=%s", parts[0], fixOsEnv(parts[0], parts[1]))
 
 		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
 	}
@@ -551,4 +532,31 @@ func dockerTag() string {
 	}
 
 	return tagBase
+}
+
+func fixOsEnv(k, v string) string {
+	switch k {
+	case "KIBANA_HOST":
+		// network host works in a weird way here
+		if runtime.GOOS == "darwin" || runtime.GOOS == "windows" {
+			return strings.Replace(strings.ToLower(v), "localhost", "host.docker.internal", 1)
+		}
+	}
+
+	return v
+}
+
+func buildVars() map[string]string {
+	vars := make(map[string]string)
+
+	isSnapshot, _ := os.LookupEnv(snapshotEnv)
+	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	return vars
+}
+
+func injectBuildVars(m map[string]string) {
+	for k, v := range buildVars() {
+		m[k] = v
+	}
 }

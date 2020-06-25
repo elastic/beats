@@ -18,16 +18,20 @@
 package pipeline
 
 import (
+	"fmt"
 	"math"
+	"strings"
 	"sync"
 	"testing"
 	"testing/quick"
 	"time"
 
+	"go.elastic.co/apm/apmtest"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
@@ -40,14 +44,16 @@ func TestMakeClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 300 + (i % 100) // between 300 and 399
 				numEvents := atomic.MakeUint(0)
 
+				logger := makeBufLogger(t)
+
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
 				var published atomic.Uint
@@ -58,7 +64,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				client := ctor(publishFn)
 
-				worker := makeClientWorker(nilObserver, wqu, client)
+				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
@@ -71,9 +77,14 @@ func TestMakeClientWorker(t *testing.T) {
 				timeout := 20 * time.Second
 
 				// Make sure that all events have eventually been published
-				return waitUntilTrue(timeout, func() bool {
+				success := waitUntilTrue(timeout, func() bool {
 					return numEvents == published
 				})
+				if !success {
+					logger.Flush()
+					t.Logf("numBatches = %v, numEvents = %v, published = %v", numBatches, numEvents, published)
+				}
+				return success
 			}, nil)
 
 			if err != nil {
@@ -94,13 +105,15 @@ func TestReplaceClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 1000 + (i % 100) // between 1000 and 1099
 
+				logger := makeBufLogger(t)
+
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
 				var batches []publisher.Batch
@@ -137,7 +150,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(nilObserver, wqu, client)
+				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -162,19 +175,126 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(nilObserver, wqu, client)
+				makeClientWorker(nilObserver, wqu, client, logger, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
 				timeout = 20 * time.Second
-				return waitUntilTrue(timeout, func() bool {
+				success := waitUntilTrue(timeout, func() bool {
 					return numEvents == int(publishedFirst.Load()+publishedLater.Load())
 				})
+				if !success {
+					logger.Flush()
+					t.Logf("numBatches = %v, numEvents = %v, publishedFirst = %v, publishedLater = %v",
+						numBatches, numEvents, publishedFirst.Load(), publishedLater.Load())
+				}
+				return success
 			}, &quick.Config{MaxCount: 25})
 
 			if err != nil {
 				t.Error(err)
 			}
 		})
+	}
+}
+
+func TestMakeClientTracer(t *testing.T) {
+	testutil.SeedPRNG(t)
+
+	numBatches := 10
+	numEvents := atomic.MakeUint(0)
+
+	logger := makeBufLogger(t)
+
+	wqu := makeWorkQueue()
+	retryer := newRetryer(logger, nilObserver, wqu, nil)
+	defer retryer.close()
+
+	var published atomic.Uint
+	publishFn := func(batch publisher.Batch) error {
+		published.Add(uint(len(batch.Events())))
+		return nil
+	}
+
+	client := newMockNetworkClient(publishFn)
+
+	recorder := apmtest.NewRecordingTracer()
+	defer recorder.Close()
+
+	worker := makeClientWorker(nilObserver, wqu, client, logger, recorder.Tracer)
+	defer worker.Close()
+
+	for i := 0; i < numBatches; i++ {
+		batch := randomBatch(10, 15).withRetryer(retryer)
+		numEvents.Add(uint(len(batch.Events())))
+		wqu <- batch
+	}
+
+	// Give some time for events to be published
+	timeout := 10 * time.Second
+
+	// Make sure that all events have eventually been published
+	matches := waitUntilTrue(timeout, func() bool {
+		return numEvents == published
+	})
+	if !matches {
+		t.Errorf("expected %d events, got %d", numEvents, published)
+	}
+	recorder.Flush(nil)
+
+	apmEvents := recorder.Payloads()
+	transactions := apmEvents.Transactions
+	if len(transactions) != numBatches {
+		logger.Flush()
+		t.Errorf("expected %d traces, got %d", numBatches, len(transactions))
+	}
+}
+
+// bufLogger is a buffered logger. It does not immediately print out log lines; instead it
+// buffers them. To print them out, one must explicitly call it's Flush() method. This is
+// useful when you want to see the logs only when tests fail but not when they pass.
+type bufLogger struct {
+	t     *testing.T
+	lines []string
+	mu    sync.RWMutex
+}
+
+func (l *bufLogger) Debug(vs ...interface{})              { l.report("DEBUG", vs) }
+func (l *bufLogger) Debugf(fmt string, vs ...interface{}) { l.reportf("DEBUG ", fmt, vs) }
+
+func (l *bufLogger) Info(vs ...interface{})              { l.report("INFO", vs) }
+func (l *bufLogger) Infof(fmt string, vs ...interface{}) { l.reportf("INFO", fmt, vs) }
+
+func (l *bufLogger) Error(vs ...interface{})              { l.report("ERROR", vs) }
+func (l *bufLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("ERROR", fmt, vs) }
+
+func (l *bufLogger) report(level string, vs []interface{}) {
+	str := strings.TrimRight(strings.Repeat("%v ", len(vs)), " ")
+	l.reportf(level, str, vs)
+}
+func (l *bufLogger) reportf(level, str string, vs []interface{}) {
+	str = level + ": " + str
+	line := fmt.Sprintf(str, vs...)
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.lines = append(l.lines, line)
+}
+
+func (l *bufLogger) Flush() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	for _, line := range l.lines {
+		l.t.Log(line)
+	}
+
+	l.lines = make([]string, 0)
+}
+
+func makeBufLogger(t *testing.T) *bufLogger {
+	return &bufLogger{
+		t:     t,
+		lines: make([]string, 0),
 	}
 }

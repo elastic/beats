@@ -1,0 +1,59 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "instance": {
+            "id": "7692260917184259934",
+            "name": "instance-test-ks"
+        },
+        "machine": {
+            "type": "e2-standard-2"
+        },
+        "provider": "googlecloud"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "event": {
+        "dataset": "googlecloud.compute",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "compute": {
+            "instance": {
+                "disk": {
+                    "read_bytes_count": {
+                        "value": 0
+                    },
+                    "read_ops_count": {
+                        "value": 0
+                    },
+                    "write_bytes_count": {
+                        "value": 158506
+                    },
+                    "write_ops_count": {
+                        "value": 25
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "device_name": "instance-test-ks",
+                "device_type": "permanent",
+                "storage_type": "pd-standard"
+            },
+            "user": {
+                "created-by": "ks"
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

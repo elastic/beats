@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/test"
@@ -33,7 +34,8 @@ func Test_internalBuilder(t *testing.T) {
 	}
 
 	uuid, _ := uuid.NewV4()
-	provider, err := internalBuilder(uuid, pBus, cfg, fetcher)
+	k, _ := keystore.NewFileKeystore("test")
+	provider, err := internalBuilder(uuid, pBus, cfg, fetcher, k)
 	require.NoError(t, err)
 
 	startListener := pBus.Subscribe("start")
