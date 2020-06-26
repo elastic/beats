@@ -2083,7 +2083,7 @@ Size of user data within buckets of the specified state that are resident in RAM
 *`couchbase.bucket.disk.fetches`*::
 +
 --
-type: long
+type: double
 
 Number of disk fetches.
 
@@ -2141,7 +2141,7 @@ Percentage of RAM used (for active objects) against the configured bucket size (
 *`couchbase.bucket.ops_per_sec`*::
 +
 --
-type: long
+type: double
 
 Number of operations per second.
 
@@ -2238,7 +2238,7 @@ Max bucket count setting.
 *`couchbase.cluster.quota.index_memory.mb`*::
 +
 --
-type: long
+type: double
 
 Memory quota setting for the Index service (Mbyte).
 
@@ -2248,7 +2248,7 @@ Memory quota setting for the Index service (Mbyte).
 *`couchbase.cluster.quota.memory.mb`*::
 +
 --
-type: long
+type: double
 
 Memory quota setting for the cluster (Mbyte).
 
@@ -2349,7 +2349,7 @@ Couchbase node metrics.
 *`couchbase.node.cmd_get`*::
 +
 --
-type: long
+type: double
 
 Number of get commands
 
