@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * Cisco {pull}18753[18753]
 * Checkpoint {pull}18754[18754]
 * Netflow {pull}19087[19087]
+* Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 will no longer send the `host` field that contains information about the host Filebeat is
