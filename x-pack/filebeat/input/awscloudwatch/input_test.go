@@ -126,7 +126,6 @@ func TestCreateEvent(t *testing.T) {
 		Message:       awssdk.String("test-message-1"),
 		Timestamp:     awssdk.Int64(1600000000000),
 	}
-	cwCtx := cwContext{}
 
 	expectedEventFields := common.MapStr{
 		"message": "test-message-1",
@@ -145,7 +144,7 @@ func TestCreateEvent(t *testing.T) {
 			"region":   "us-east-1",
 		},
 	}
-	event := createEvent(logEvent, "logGroup1", "us-east-1", &cwCtx)
+	event := createEvent(logEvent, "logGroup1", "us-east-1")
 	assert.Equal(t, expectedEventFields, event.Fields)
 }
 
