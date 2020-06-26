@@ -181,6 +181,7 @@ func PythonNoseTestForModule(params PythonTestArgs) error {
 			fmt.Sprintf("module/%s/test_*.py", module),
 			fmt.Sprintf("module/%s/*/test_*.py", module),
 		}
+		params.TestName += "-" + module
 	}
 	return PythonNoseTest(params)
 }
