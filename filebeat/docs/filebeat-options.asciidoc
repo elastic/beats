@@ -7,9 +7,7 @@
 
 TIP: <<{beatname_lc}-modules-overview,{beatname_uc} modules>> provide the
 fastest getting started experience for common log formats. See
-<<{beatname_lc}-modules-quickstart>> to learn how to get started with modules.
-Also see <<configuration-{beatname_lc}-modules>> for information about enabling
-and configuring modules.
+<<{beatname_lc}-installation-configuration>> to learn how to get started.
 
 To configure {beatname_uc} manually (instead of using
 <<{beatname_lc}-modules-overview,modules>>), you specify a list of inputs in the
@@ -35,6 +33,28 @@ input type more than once. For example:
   fields_under_root: true
 ----
 
+For the most basic configuration, define a single input with a single path. For
+example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/*.log
+-------------------------------------------------------------------------------------
+
+The input in this example harvests all files in the path `/var/log/*.log`, which
+means that {beatname_uc} will harvest all files in the directory `/var/log/`
+that end with `.log`. All patterns supported by
+https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also supported here.
+
+To fetch all files from a predefined level of subdirectories, use this pattern:
+`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of
+`/var/log`. It does not fetch log files from the `/var/log` folder itself.
+Currently it is not possible to recursively fetch all files in all
+subdirectories of a directory.
 
 [float]
 [id="{beatname_lc}-input-types"]

@@ -4,6 +4,19 @@
 
 import groovy.transform.Field
 
+
+/**
+  NOTE: Important note regarding the agents and labels.
+  agent labels are defined in the gobld service, that's managed by infra. The required format
+  is:
+   - '<os-family> && immutable' for linux OS.
+   - 'macosx' for the MacOS.
+   - 'windows-immutable && windows-<version>' for Windows. NOTE: version might differ in some cases
+
+  The above labels will help to set what OS family and specific version of the agent is
+  required to used in the stage.
+*/
+
 /**
  This is required to store the stashed id with the test results to be digested with runbld
 */
