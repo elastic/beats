@@ -300,6 +300,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Stop counterCache only when already started {pull}19103[19103]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 
 *Packetbeat*
 
@@ -588,6 +589,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
 *Packetbeat*
