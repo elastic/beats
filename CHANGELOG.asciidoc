@@ -3,6 +3,36 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.8.1]]
+=== Beats version 7.8.1
+https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+
+*Auditbeat*
+
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
+
+*Filebeat*
+
+- Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
+- Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
+
+*Metricbeat*
+
+- Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+
 [[release-notes-7.8.0]]
 === Beats version 7.8.0
 https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
