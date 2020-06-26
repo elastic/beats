@@ -84,6 +84,7 @@ processors:
       field: "event.action"
       value: "{{json.eventName}}"
       ignore_failure: true
+      ignore_empty_value: true
   - rename:
       field: "json.awsRegion"
       target_field: "cloud.region"

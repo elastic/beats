@@ -8,20 +8,19 @@ outputs:
     username: elastic
     password: changeme
 
-datasources:
-  - namespace: default
+inputs:
+  - type: system/metrics
+    dataset.namespace: default
     use_output: default
-    inputs:
-      - type: system/metrics
-        streams:
-          - metricset: cpu
-            dataset: system.cpu
-          - metricset: memory
-            dataset: system.memory
-          - metricset: network
-            dataset: system.network
-          - metricset: filesystem
-            dataset: system.filesystem
+    streams:
+      - metricset: cpu
+        dataset.name: system.cpu
+      - metricset: memory
+        dataset.name: system.memory
+      - metricset: network
+        dataset.name: system.network
+      - metricset: filesystem
+        dataset.name: system.filesystem
 
 # settings.monitoring:
 #   # enabled turns on monitoring of running processes

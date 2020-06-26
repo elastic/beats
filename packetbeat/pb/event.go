@@ -18,8 +18,10 @@
 package pb
 
 import (
+	"fmt"
 	"net"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -54,8 +56,9 @@ type Fields struct {
 	Destination *ecs.Destination `ecs:"destination"`
 	Client      *ecs.Client      `ecs:"client"`
 	Server      *ecs.Server      `ecs:"server"`
+	Related     *ecsRelated      `ecs:"related"`
 	Network     ecs.Network      `ecs:"network"`
-	Event       ecs.Event        `ecs:"event"`
+	Event       ecsEvent         `ecs:"event"`
 
 	SourceProcess      *ecs.Process `ecs:"source.process"`
 	DestinationProcess *ecs.Process `ecs:"destination.process"`
@@ -72,10 +75,13 @@ type Fields struct {
 // NewFields returns a new Fields value.
 func NewFields() *Fields {
 	return &Fields{
-		Event: ecs.Event{
-			Duration: -1,
-			Kind:     "event",
-			Category: "network_traffic",
+		Event: ecsEvent{
+			Event: ecs.Event{
+				Duration: -1,
+				Kind:     "event",
+			},
+			Type:     []string{"connection", "protocol"},
+			Category: []string{"network_traffic", "network"},
 		},
 	}
 }
@@ -112,6 +118,7 @@ func (f *Fields) SetSource(endpoint *common.Endpoint) {
 	if f.Source == nil {
 		f.Source = &ecs.Source{}
 	}
+	f.AddIP(endpoint.IP)
 	f.Source.IP = endpoint.IP
 	f.Source.Port = int64(endpoint.Port)
 	f.Source.Domain = endpoint.Domain
@@ -126,12 +133,28 @@ func (f *Fields) SetDestination(endpoint *common.Endpoint) {
 	if f.Destination == nil {
 		f.Destination = &ecs.Destination{}
 	}
+	f.AddIP(endpoint.IP)
 	f.Destination.IP = endpoint.IP
 	f.Destination.Port = int64(endpoint.Port)
 	f.Destination.Domain = endpoint.Domain
 
 	if endpoint.PID > 0 {
 		f.DestinationProcess = makeProcess(&endpoint.Process)
+	}
+}
+
+// AddIP adds the given ip addresses to the related ECS IP field
+func (f *Fields) AddIP(ip ...string) {
+	if f.Related == nil {
+		f.Related = &ecsRelated{
+			ipSet: make(map[string]struct{}),
+		}
+	}
+	for _, ipAddress := range ip {
+		if _, ok := f.Related.ipSet[ipAddress]; !ok {
+			f.Related.ipSet[ipAddress] = struct{}{}
+			f.Related.IP = append(f.Related.IP, ipAddress)
+		}
 	}
 }
 
@@ -314,7 +337,21 @@ func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
 		structField := typ.Field(i)
 		tag := getTag(structField)
 		if tag == "" {
-			break
+			continue
+		}
+
+		inline := false
+		tags := strings.Split(tag, ",")
+		if len(tags) > 1 {
+			for _, flag := range tags[1:] {
+				switch flag {
+				case "inline":
+					inline = true
+				default:
+					return fmt.Errorf("Unsupported flag %q in tag %q of type %s", flag, tag, typ)
+				}
+			}
+			tag = tags[0]
 		}
 
 		fieldValue := val.Field(i)
@@ -322,8 +359,14 @@ func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
 			continue
 		}
 
-		if _, err := m.Put(key+"."+tag, fieldValue.Interface()); err != nil {
-			return err
+		if inline {
+			if err := marshalStruct(m, key, fieldValue); err != nil {
+				return err
+			}
+		} else {
+			if _, err := m.Put(key+"."+tag, fieldValue.Interface()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
