@@ -147,7 +147,8 @@ type testMonitorableApp struct {
 	monitor monitoring.Monitor
 }
 
-func (*testMonitorableApp) Name() string { return "" }
+func (*testMonitorableApp) Name() string  { return "" }
+func (*testMonitorableApp) Started() bool { return false }
 func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
 	return nil
 }

@@ -48,10 +48,10 @@ func (o *operationStart) Name() string {
 // and the application is handled by the life cycle inside of the `Application`
 // implementation.
 func (o *operationStart) Check(_ context.Context, application Application) (bool, error) {
-	if application.State().Status == state.Stopped {
-		return true, nil
+	if application.Started() {
+		return false, nil
 	}
-	return false, nil
+	return true, nil
 }
 
 // Run runs the operation

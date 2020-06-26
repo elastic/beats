@@ -35,6 +35,7 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
+	Started() bool
 	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
