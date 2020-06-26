@@ -52,13 +52,6 @@ type awsCloudWatchInput struct {
 	prevEndTime int64 // track previous endTime for each iteration.
 }
 
-type cwContext struct {
-	mux  sync.Mutex
-	refs int
-	err  error
-	errC chan error
-}
-
 // channelContext implements context.Context by wrapping a channel
 type channelContext struct {
 	done <-chan struct{}
@@ -115,15 +108,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	// Build outlet for events.
-	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKEvents: func(privates []interface{}) {
-			for _, private := range privates {
-				if cwContext, ok := private.(*cwContext); ok {
-					cwContext.done()
-				}
-			}
-		},
-	})
+	in.outlet, err = connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -181,13 +166,6 @@ func parseARN(logGroupARN string) (string, string, error) {
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
-	errC := make(chan error, 1)
-	cwCtx := &cwContext{
-		refs: 1,
-		errC: errC,
-	}
-	defer cwCtx.done()
-
 	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
 	defer cancelFn()
 
@@ -221,7 +199,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 		logEvents := resp.Events
 		in.logger.Debugf("Processing #%v events", len(logEvents))
 
-		err = in.processLogEvents(logEvents, cwCtx)
+		err = in.processLogEvents(logEvents)
 		if err != nil {
 			err = errors.Wrap(err, "processLogEvents failed")
 			in.logger.Error(err)
@@ -276,23 +254,20 @@ func getStartPosition(startPosition string, currentTime time.Time, prevEndTime i
 	return
 }
 
-func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, cwCtx *cwContext) error {
+func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent) error {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, in.config.LogGroupName, in.config.RegionName, cwCtx)
+		event := createEvent(logEvent, in.config.LogGroupName, in.config.RegionName)
 		err := in.forwardEvent(event)
 		if err != nil {
 			err = errors.Wrap(err, "forwardEvent failed")
 			in.logger.Error(err)
-			cwCtx.setError(err)
 			return err
 		}
 	}
 	return nil
 }
 
-func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string, cwCtx *cwContext) beat.Event {
-	cwCtx.Inc()
-
+func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: common.MapStr{
@@ -311,7 +286,6 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 				"region":   regionName,
 			},
 		},
-		Private: cwCtx,
 	}
 	event.SetID(*logEvent.EventId)
 
@@ -339,28 +313,4 @@ func (in *awsCloudWatchInput) Stop() {
 func (in *awsCloudWatchInput) Wait() {
 	in.Stop()
 	in.workerWg.Wait()
-}
-
-func (c *cwContext) setError(err error) {
-	// only care about the last error for now
-	// TODO: add "Typed" error to error for context
-	c.mux.Lock()
-	defer c.mux.Unlock()
-	c.err = err
-}
-
-func (c *cwContext) done() {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-	c.refs--
-	if c.refs == 0 {
-		c.errC <- c.err
-		close(c.errC)
-	}
-}
-
-func (c *cwContext) Inc() {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-	c.refs++
 }
