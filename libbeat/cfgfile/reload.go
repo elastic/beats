@@ -52,7 +52,7 @@ var (
 	configReloads = monitoring.NewInt(nil, "libbeat.config.reloads")
 	moduleStarts  = monitoring.NewInt(nil, "libbeat.config.module.starts")
 	moduleStops   = monitoring.NewInt(nil, "libbeat.config.module.stops")
-	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running")
+	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running") // Number of modules in the runner list (not necessarily in the running state).
 )
 
 // DynamicConfig loads config files from a given path, allowing to reload new changes
