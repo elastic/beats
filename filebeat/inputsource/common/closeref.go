@@ -69,6 +69,8 @@ func (c *Closer) Close() {
 	// propagate close to children.
 	if c.children != nil {
 		for child := range c.children {
+			// Remove parent to prevent circular references (and deadlock).
+			child.parent = nil
 			child.Close()
 		}
 		c.children = nil
@@ -78,7 +80,7 @@ func (c *Closer) Close() {
 	c.mu.Unlock()
 
 	if c.parent != nil {
-		c.removeChild(c)
+		c.parent.removeChild(c)
 	}
 }
 
