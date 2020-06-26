@@ -46,6 +46,14 @@ func NewProcessor(c *common.Config) (processors.Processor, error) {
 	if err != nil {
 		return nil, err
 	}
+	if config.TrimValues != trimModeNone {
+		config.Tokenizer.trimmer, err = newTrimmer(config.TrimChars,
+			config.TrimValues&trimModeLeft != 0,
+			config.TrimValues&trimModeRight != 0)
+		if err != nil {
+			return nil, err
+		}
+	}
 	p := &processor{config: config}
 
 	return p, nil

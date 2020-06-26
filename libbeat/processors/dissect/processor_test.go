@@ -76,6 +76,52 @@ func TestProcessor(t *testing.T) {
 			fields: common.MapStr{"message": "hello world super", "extracted": common.MapStr{"not": "hello"}},
 			values: map[string]string{"extracted.key": "world", "extracted.key2": "super", "extracted.not": "hello"},
 		},
+		{
+			name: "trimming trailing spaces",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "right",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello world\t super "},
+			values: map[string]string{"key": "world", "key2": "super"},
+		},
+		{
+			name: "not trimming by default",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+			},
+			fields: common.MapStr{"message": "hello world\t super "},
+			values: map[string]string{"key": "world\t", "key2": "super "},
+		},
+		{
+			name: "trim leading space",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "left",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			values: map[string]string{"key": "world\t", "key2": "super "},
+		},
+		{
+			name: "trim all space",
+			c: map[string]interface{}{
+				"tokenizer":     "hello %{key} %{key2}",
+				"target_prefix": "",
+				"field":         "message",
+				"trim_values":   "all",
+				"trim_chars":    " \t",
+			},
+			fields: common.MapStr{"message": "hello \tworld\t \tsuper "},
+			values: map[string]string{"key": "world", "key2": "super"},
+		},
 	}
 
 	for _, test := range tests {

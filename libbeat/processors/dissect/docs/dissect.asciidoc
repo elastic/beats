@@ -14,8 +14,6 @@ processors:
       tokenizer: "%{key1} %{key2}"
       field: "message"
       target_prefix: "dissect"
-      ignore_failure: false
-      overwrite_keys: false
 -------
 
 The `dissect` processor has the following configuration settings:
@@ -38,6 +36,16 @@ the original event, allowing execution of subsequent processors (if any). If set
 `overwrite_keys`:: (Optional) When set to true, the processor will overwrite
 existing keys in the event. The default is false, which causes the processor
 to fail when a key already exists.
+
+`trim_values`:: (Optional) Enables the trimming of the extracted values. Useful
+to remove leading and/or trailing spaces. Possible values are:
+- `none`: (default) no trimming is performed.
+- `left`: values are trimmed on the left (leading).
+- `right`: values are trimmed on the right (trailing).
+- `all`: values are trimmed for leading and trailing.
+
+`trim_chars`:: (Optional) Set of characters to trim from values, when trimming
+is enabled. The default is to trim the space character (`" "`).
 
 For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
 found an error will be logged and no modification is done on the original event.
