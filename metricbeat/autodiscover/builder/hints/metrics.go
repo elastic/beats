@@ -235,7 +235,7 @@ func (m *metricHints) getPortName(h string) string {
 		return ""
 	}
 	firstIndex = firstIndex + len("data.ports.")
-	return h[firstIndex:len(h)-1]
+	return h[firstIndex : len(h)-1]
 }
 
 func (m *metricHints) checkHostPort(h string, p int) bool {

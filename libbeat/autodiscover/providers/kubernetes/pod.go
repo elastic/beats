@@ -359,7 +359,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				flag:         true,
 				"host":       host,
 				"port":       port.ContainerPort,
-				"port_name":   port.Name,
+				"port_name":  port.Name,
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
