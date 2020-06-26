@@ -601,8 +601,8 @@ logs:
 				require.NoError(t, err)
 			}
 
-			if !assert.True(t, cmp.Equal(v.Content, m)) {
-				diff := cmp.Diff(v.Content, m)
+			if !assert.True(t, cmp.Equal(m, v.Content)) {
+				diff := cmp.Diff(m, v.Content)
 				if diff != "" {
 					t.Errorf("mismatch (-want +got):\n%s", diff)
 				}

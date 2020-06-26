@@ -385,8 +385,8 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat"},
-			expected: 2,
+			programs: []string{"filebeat", "metricbeat", "endpoint"},
+			expected: 3,
 		},
 		"constraints_config": {
 			programs: []string{"filebeat"},
@@ -416,6 +416,16 @@ func TestConfiguration(t *testing.T) {
 			expected: 1,
 		},
 		"enabled_output_false": {
+			expected: 0,
+		},
+		"endpoint_basic": {
+			programs: []string{"endpoint"},
+			expected: 1,
+		},
+		"endpoint_no_fleet": {
+			expected: 0,
+		},
+		"endpoint_unknown_output": {
 			expected: 0,
 		},
 	}
