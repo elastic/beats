@@ -5,13 +5,15 @@
 package uninstall
 
 import (
+	"context"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall/hooks"
 )
 
 // Uninstaller is an interface allowing un-installation of an artifact
 type Uninstaller interface {
 	// Uninstall uninstalls an artifact.
-	Uninstall(programName, version, installDir string) error
+	Uninstall(ctx context.Context, programName, version, installDir string) error
 }
 
 // NewUninstaller returns a correct uninstaller.
@@ -21,6 +23,6 @@ func NewUninstaller() (Uninstaller, error) {
 
 type nilUninstaller struct{}
 
-func (*nilUninstaller) Uninstall(programName, version, installDir string) error {
+func (*nilUninstaller) Uninstall(_ context.Context, _, _, _ string) error {
 	return nil
 }

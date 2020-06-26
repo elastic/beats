@@ -4,7 +4,10 @@
 
 package dir
 
-import "os"
+import (
+	"context"
+	"os"
+)
 
 // Checker performs basic check that the install directory exists.
 type Checker struct{}
@@ -15,7 +18,7 @@ func NewChecker() *Checker {
 }
 
 // Check checks that the install directory exists.
-func (*Checker) Check(_, _, installDir string) error {
+func (*Checker) Check(_ context.Context, _, _, installDir string) error {
 	_, err := os.Stat(installDir)
 	return err
 }

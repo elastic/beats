@@ -160,11 +160,11 @@ var _ download.Verifier = &DummyVerifier{}
 
 type DummyInstallerChecker struct{}
 
-func (*DummyInstallerChecker) Check(p, v, _ string) error {
+func (*DummyInstallerChecker) Check(_ context.Context, p, v, _ string) error {
 	return nil
 }
 
-func (*DummyInstallerChecker) Install(p, v, _ string) error {
+func (*DummyInstallerChecker) Install(_ context.Context, p, v, _ string) error {
 	return nil
 }
 
@@ -172,7 +172,7 @@ var _ install.InstallerChecker = &DummyInstallerChecker{}
 
 type DummyUninstaller struct{}
 
-func (*DummyUninstaller) Uninstall(p, v, _ string) error {
+func (*DummyUninstaller) Uninstall(_ context.Context, p, v, _ string) error {
 	return nil
 }
 

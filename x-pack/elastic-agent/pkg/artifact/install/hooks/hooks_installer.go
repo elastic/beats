@@ -5,17 +5,18 @@
 package hooks
 
 import (
+	"context"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 type embeddedInstaller interface {
-	Install(programName, version, installDir string) error
+	Install(ctx context.Context, programName, version, installDir string) error
 }
 
 type embeddedChecker interface {
-	Check(programName, version, installDir string) error
+	Check(ctx context.Context, programName, version, installDir string) error
 }
 
 // InstallerChecker runs the PostInstallSteps after running the embedded installer
@@ -35,8 +36,8 @@ func NewInstallerChecker(i embeddedInstaller, c embeddedChecker) (*InstallerChec
 
 // Install performs installation of program in a specific version, then runs the
 // PostInstallSteps for the program if defined.
-func (i *InstallerChecker) Install(programName, version, installDir string) error {
-	if err := i.installer.Install(programName, version, installDir); err != nil {
+func (i *InstallerChecker) Install(ctx context.Context, programName, version, installDir string) error {
+	if err := i.installer.Install(ctx, programName, version, installDir); err != nil {
 		return err
 	}
 
@@ -53,7 +54,7 @@ func (i *InstallerChecker) Install(programName, version, installDir string) erro
 		}
 
 		if spec.PostInstallSteps != nil {
-			return spec.PostInstallSteps.Execute(installDir)
+			return spec.PostInstallSteps.Execute(ctx, installDir)
 		}
 
 		// only one spec for type
@@ -65,8 +66,8 @@ func (i *InstallerChecker) Install(programName, version, installDir string) erro
 
 // Check performs installation check of program to ensure that it is already installed, then
 // runs the InstallerCheckSteps to ensure that the installation is valid.
-func (i *InstallerChecker) Check(programName, version, installDir string) error {
-	err := i.checker.Check(programName, version, installDir)
+func (i *InstallerChecker) Check(ctx context.Context, programName, version, installDir string) error {
+	err := i.checker.Check(ctx, programName, version, installDir)
 	if err != nil {
 		return err
 	}
@@ -84,7 +85,7 @@ func (i *InstallerChecker) Check(programName, version, installDir string) error 
 		}
 
 		if spec.CheckInstallSteps != nil {
-			return spec.CheckInstallSteps.Execute(installDir)
+			return spec.CheckInstallSteps.Execute(ctx, installDir)
 		}
 
 		// only one spec for type

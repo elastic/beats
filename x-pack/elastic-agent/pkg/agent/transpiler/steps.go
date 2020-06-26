@@ -5,12 +5,14 @@
 package transpiler
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -27,14 +29,14 @@ func NewStepList(steps ...Step) *StepList {
 
 // Step is an execution step which needs to be run.
 type Step interface {
-	Execute(rootDir string) error
+	Execute(ctx context.Context, rootDir string) error
 }
 
 // Execute executes a list of steps.
-func (r *StepList) Execute(rootDir string) error {
+func (r *StepList) Execute(ctx context.Context, rootDir string) error {
 	var err error
 	for _, step := range r.Steps {
-		err = step.Execute(rootDir)
+		err = step.Execute(ctx, rootDir)
 		if err != nil {
 			return err
 		}
@@ -132,7 +134,7 @@ type DeleteFileStep struct {
 }
 
 // Execute executes delete file step.
-func (r *DeleteFileStep) Execute(rootDir string) error {
+func (r *DeleteFileStep) Execute(_ context.Context, rootDir string) error {
 	path, isSubpath, err := joinPaths(rootDir, r.Path)
 	if err != nil {
 		return err
@@ -174,7 +176,7 @@ type MoveFileStep struct {
 }
 
 // Execute executes move file step.
-func (r *MoveFileStep) Execute(rootDir string) error {
+func (r *MoveFileStep) Execute(_ context.Context, rootDir string) error {
 	path, isSubpath, err := joinPaths(rootDir, r.Path)
 	if err != nil {
 		return err
@@ -219,12 +221,13 @@ func MoveFile(path, target string, failOnMissing bool) *MoveFileStep {
 
 // ExecFileStep executes a file.
 type ExecFileStep struct {
-	Path string
-	Args []string
+	Path    string
+	Args    []string
+	Timeout int
 }
 
 // Execute executes file with provided arguments.
-func (r *ExecFileStep) Execute(rootDir string) error {
+func (r *ExecFileStep) Execute(ctx context.Context, rootDir string) error {
 	path, isSubpath, err := joinPaths(rootDir, r.Path)
 	if err != nil {
 		return err
@@ -234,15 +237,20 @@ func (r *ExecFileStep) Execute(rootDir string) error {
 		return fmt.Errorf("invalid path value for operation 'Exec': %s", path)
 	}
 
-	args := []string{path}
-	args = append(args, r.Args...)
-	cmd := &exec.Cmd{
-		Path: path,
-		Args: args,
-		Env:  nil,
-		Dir:  rootDir,
+	// timeout defaults to 60 seconds
+	if r.Timeout == 0 {
+		r.Timeout = 60
 	}
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(r.Timeout)*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, path, r.Args...)
+	cmd.Env = nil
+	cmd.Dir = rootDir
 	output, err := cmd.Output()
+	if ctx.Err() == context.DeadlineExceeded {
+		return fmt.Errorf("operation 'Exec' timed out after %d seconds", r.Timeout)
+	}
 	if err != nil {
 		exitErr, ok := err.(*exec.ExitError)
 		if ok && exitErr.Stderr != nil && len(exitErr.Stderr) > 0 {
@@ -254,10 +262,11 @@ func (r *ExecFileStep) Execute(rootDir string) error {
 }
 
 // ExecFile creates a ExecFileStep
-func ExecFile(path string, args ...string) *ExecFileStep {
+func ExecFile(timeoutSecs int, path string, args ...string) *ExecFileStep {
 	return &ExecFileStep{
-		Path: path,
-		Args: args,
+		Path:    path,
+		Args:    args,
+		Timeout: timeoutSecs,
 	}
 }
 

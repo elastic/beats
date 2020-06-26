@@ -5,6 +5,7 @@
 package install
 
 import (
+	"context"
 	"errors"
 	"runtime"
 
@@ -26,7 +27,7 @@ type Installer interface {
 	// Install installs an artifact and returns
 	// location of the installed program
 	// error if something went wrong
-	Install(programName, version, installDir string) error
+	Install(ctx context.Context, programName, version, installDir string) error
 }
 
 // InstallerChecker is an interface that installs but also checks for valid installation.
@@ -34,7 +35,7 @@ type InstallerChecker interface {
 	Installer
 
 	// Check checks if the installation is good.
-	Check(programName, version, installDir string) error
+	Check(ctx context.Context, programName, version, installDir string) error
 }
 
 // NewInstaller returns a correct installer associated with a

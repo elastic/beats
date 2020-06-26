@@ -44,14 +44,14 @@ func TestSerialization(t *testing.T) {
 			),
 		),
 		CheckInstallSteps: transpiler.NewStepList(
-			transpiler.ExecFile("app", "verify", "--installed"),
+			transpiler.ExecFile(25, "app", "verify", "--installed"),
 		),
 		PostInstallSteps: transpiler.NewStepList(
 			transpiler.DeleteFile("d-1", true),
 			transpiler.MoveFile("m-1", "m-2", false),
 		),
 		PreUninstallSteps: transpiler.NewStepList(
-			transpiler.ExecFile("app", "uninstall", "--force"),
+			transpiler.ExecFile(30, "app", "uninstall", "--force"),
 		),
 		When: "1 == 1",
 	}
@@ -99,6 +99,7 @@ check_install:
     args:
     - verify
     - --installed
+    timeout: 25
 post_install:
 - delete_file:
     path: d-1
@@ -113,6 +114,7 @@ pre_uninstall:
     args:
     - uninstall
     - --force
+    timeout: 30
 when: 1 == 1
 `
 	t.Run("serialization", func(t *testing.T) {

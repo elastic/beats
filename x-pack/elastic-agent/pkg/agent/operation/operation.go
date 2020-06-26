@@ -27,7 +27,7 @@ type operation interface {
 	// examples:
 	// - Start does not need to run if process is running
 	// - Fetch does not need to run if package is already present
-	Check(application Application) (bool, error)
+	Check(ctx context.Context, application Application) (bool, error)
 	// Run runs the operation
 	Run(ctx context.Context, application Application) error
 }

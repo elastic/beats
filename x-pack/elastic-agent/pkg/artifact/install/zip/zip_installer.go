@@ -6,6 +6,7 @@ package zip
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -34,7 +35,7 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, installDir string) error {
+func (i *Installer) Install(_ context.Context, programName, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err

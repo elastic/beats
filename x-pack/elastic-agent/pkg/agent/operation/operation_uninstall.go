@@ -39,7 +39,7 @@ func (o *operationUninstall) Name() string {
 // Check checks whether uninstall needs to be ran.
 //
 // Always true.
-func (o *operationUninstall) Check(_ Application) (bool, error) {
+func (o *operationUninstall) Check(_ context.Context, _ Application) (bool, error) {
 	return true, nil
 }
 
@@ -51,5 +51,5 @@ func (o *operationUninstall) Run(ctx context.Context, application Application) (
 		}
 	}()
 
-	return o.uninstaller.Uninstall(o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	return o.uninstaller.Uninstall(ctx, o.program.BinaryName(), o.program.Version(), o.program.Directory())
 }
