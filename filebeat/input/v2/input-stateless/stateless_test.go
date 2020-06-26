@@ -24,13 +24,14 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/stretchr/testify/require"
 )
 
 type fakeStatelessInput struct {
