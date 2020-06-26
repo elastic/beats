@@ -444,7 +444,7 @@ processors:
  - set:
      field: rule.name
      value: "{{panw.panos.ruleset}}"
-     if: "ctx?.panw?.panos?.ruleset != null"
+     ignore_empty_value: true
 
  - append:
      field: related.user
