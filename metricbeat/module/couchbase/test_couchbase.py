@@ -24,5 +24,5 @@ class Test(metricbeat.BaseTest):
         """
         self.check_metricset("couchbase", metricset, self.get_hosts(), self.FIELDS)
 
-        def get_hosts(self):
-            return ["http://Administrator:password@" + self.compose_host()]
+    def get_hosts(self):
+        return ["http://Administrator:password@" + self.compose_host()]
