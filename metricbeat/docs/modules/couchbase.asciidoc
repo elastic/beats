@@ -11,7 +11,7 @@ servers. The default metricsets are `bucket`, `cluster`, `node`.
 [float]
 === Compatibility
 
-The Couchbase module is tested with Couchbase 4.5.1.
+The Couchbase module is tested with Couchbase 6.5.1.
 
 
 [float]
