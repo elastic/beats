@@ -112,7 +112,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
-	fmt.Println(string(rs))
+
 	if err := checkinResponse.Validate(); err != nil {
 		return nil, err
 	}

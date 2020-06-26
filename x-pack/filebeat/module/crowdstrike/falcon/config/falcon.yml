@@ -12,8 +12,15 @@ multiline.match: after
 multiline.max_lines: 5000
 multiline.timeout: 10
 
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
 processors:
 - script:
     lang: javascript
     id: crowdstrike_falcon
     file: ${path.home}/module/crowdstrike/falcon/config/pipeline.js
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.5.0
