@@ -19,6 +19,7 @@ package unsafe
 
 import (
 	"reflect"
+	"runtime"
 	"unsafe"
 )
 
@@ -27,17 +28,23 @@ type emptyInterface struct {
 	word unsafe.Pointer
 }
 
-func Str2Bytes(s string) []byte {
+func Str2Bytes(s string) (b []byte) {
 	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	bh := reflect.SliceHeader{Data: sh.Data, Len: sh.Len, Cap: sh.Len}
-	b := *(*[]byte)(unsafe.Pointer(&bh))
-	return b
+	bh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	bh.Data = sh.Data
+	bh.Cap = sh.Len
+	bh.Len = sh.Len
+	runtime.KeepAlive(s)
+	return
 }
 
-func Bytes2Str(b []byte) string {
+func Bytes2Str(b []byte) (s string) {
 	bh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	sh := reflect.StringHeader{Data: bh.Data, Len: bh.Len}
-	return *((*string)(unsafe.Pointer(&sh)))
+	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
+	sh.Data = bh.Data
+	sh.Len = bh.Len
+	runtime.KeepAlive(b)
+	return
 }
 
 // IfcValuePtr extracts the underlying values pointer from an empty interface{}
