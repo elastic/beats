@@ -6,6 +6,9 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<{beatname_lc}-geoip>>
+* <<{beatname_lc}-template>>
+* <<change-index-name>>
+* <<load-kibana-dashboards>>
 * <<using-environ-vars>>
 * <<configuring-ingest-node>>
 * <<yaml-tips>>
@@ -14,6 +17,12 @@ Learn how to perform common {beatname_uc} configuration tasks.
 --
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
+
+include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
+
+include::{libbeat-dir}/howto/change-index-name.asciidoc[]
+
+include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
 
 :standalone:
 include::{libbeat-dir}/shared-env-vars.asciidoc[]

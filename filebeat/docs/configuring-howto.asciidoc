@@ -7,23 +7,10 @@
 <titleabbrev>Configure</titleabbrev>
 ++++
 
-Before modifying configuration settings, make sure you've completed the
-<<filebeat-configuration,configuration steps>> in the Getting Started.
-This section describes some common use cases for changing configuration options.
-
-To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
-you’ll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
-There's also a full example configuration file at
-+/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated
-options. For mac and win, look in the archive that you extracted.
-
-The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
-
-The following topics describe how to configure Filebeat:
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-filebeat-options>>
+* <<configuration-{beatname_lc}-modules>>
 * <<configuration-general-options>>
 * <<configuration-path>>
 * <<filebeat-configuration-reloading>>
@@ -45,6 +32,8 @@ The following topics describe how to configure Filebeat:
 --
 
 include::./filebeat-options.asciidoc[]
+
+include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
 
 include::./filebeat-general-options.asciidoc[]
 
