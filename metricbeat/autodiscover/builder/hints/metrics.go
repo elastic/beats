@@ -206,7 +206,7 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 	for _, h := range thosts {
 		if strings.Contains(h, "data.ports.") && port != 0 && !noPort && portName != "" {
 			hintPortName := m.getPortName(h)
-			if hintPortName == portName && hintPortName != ""{
+			if hintPortName == portName {
 				host := strings.Replace(h, "${data.ports."+hintPortName+"}", fmt.Sprintf("%v", port), -1)
 				result = append(result, host)
 			}
