@@ -369,6 +369,33 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Named port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 3306,
+				"port_name": "some",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.ports.some}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
 			message: "Module with mutliple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",
