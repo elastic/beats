@@ -197,16 +197,6 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 								},
 							},
 						},
-						{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "logs",
-									"dataset":   "agent",
-									"namespace": "default",
-								},
-							},
-						},
 					},
 				},
 			},
@@ -243,16 +233,6 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 								"fields": map[string]interface{}{
 									"type":      "metrics",
 									"name":      "agent",
-									"namespace": "default",
-								},
-							},
-						},
-						{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "metrics",
-									"dataset":   "agent",
 									"namespace": "default",
 								},
 							},
