@@ -20,6 +20,7 @@ package common
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"net"
 	"strings"
 	"sync"
@@ -51,9 +52,9 @@ type Listener struct {
 	config          *ListenerConfig
 	family          Family
 	wg              sync.WaitGroup
-	done            chan struct{}
 	log             *logp.Logger
-	closer          *Closer
+	ctx             context.Context
+	cancel          context.CancelFunc
 	clientsCount    atomic.Int
 	handlerFactory  HandlerFactory
 	listenerFactory ListenerFactory
@@ -63,10 +64,8 @@ type Listener struct {
 func NewListener(family Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
 	return &Listener{
 		config:          config,
-		done:            make(chan struct{}),
 		family:          family,
 		log:             logp.NewLogger(string(family)).With("address", location),
-		closer:          NewCloser(nil),
 		handlerFactory:  handlerFactory,
 		listenerFactory: listenerFactory,
 	}
@@ -80,7 +79,12 @@ func (l *Listener) Start() error {
 		return err
 	}
 
-	l.closer.SetCallback(func() { l.Listener.Close() })
+	l.ctx, l.cancel = context.WithCancel(context.Background())
+	go func() {
+		<-l.ctx.Done()
+		l.Listener.Close()
+	}()
+
 	l.log.Info("Started listening for " + l.family.String() + " connection")
 
 	l.wg.Add(1)
@@ -101,7 +105,7 @@ func (l *Listener) run() {
 		conn, err := l.Listener.Accept()
 		if err != nil {
 			select {
-			case <-l.closer.Done():
+			case <-l.ctx.Done():
 				return
 			default:
 				l.log.Debugw("Can not accept the connection", "error", err)
@@ -110,13 +114,17 @@ func (l *Listener) run() {
 		}
 
 		handler := l.handlerFactory(*l.config)
-		closer := WithCloser(l.closer, func() { conn.Close() })
+		ctx, cancel := context.WithCancel(l.ctx)
+		go func() {
+			<-ctx.Done()
+			conn.Close()
+		}()
 
 		l.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a " + l.family.String() + " client crash")
 			defer l.wg.Done()
-			defer closer.Close()
+			defer cancel()
 
 			l.registerHandler()
 			defer l.unregisterHandler()
@@ -128,7 +136,7 @@ func (l *Listener) run() {
 				l.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", l.clientsCount.Load())
 			}
 
-			err := handler(closer, conn)
+			err := handler(ctx, conn)
 			if err != nil {
 				l.log.Debugw("client error", "error", err)
 			}
@@ -148,7 +156,7 @@ func (l *Listener) run() {
 // Stop stops accepting new incoming connections and Close any active clients
 func (l *Listener) Stop() {
 	l.log.Info("Stopping" + l.family.String() + "server")
-	l.closer.Close()
+	l.cancel()
 	l.wg.Wait()
 	l.log.Info(l.family.String() + " server stopped")
 }
