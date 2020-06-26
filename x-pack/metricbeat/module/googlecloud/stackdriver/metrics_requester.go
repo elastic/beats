@@ -160,7 +160,7 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 	// When samplePeriod > collectionPeriod, aggregation is not needed, use sample period
 	// to determine startTime and endTime to make sure there will be data point in this time range.
 	if int64(samplePeriod.Seconds()) >= collectionPeriod.Seconds {
-		endTime = time.Now().UTC().Add(-ingestDelay)
+		endTime = currentTime.Add(-ingestDelay)
 		startTime = endTime.Add(-samplePeriod)
 		needsAggregation = false
 	}

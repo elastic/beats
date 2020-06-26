@@ -80,11 +80,11 @@ processors:
 - set:
     field: destination.ip
     value: '{{destination.address}}'
-    if: ctx.destination?.address != null
+    ignore_empty_value: true
 - set:
     field: source.ip
     value: '{{source.address}}'
-    if: ctx.source?.address != null
+    ignore_empty_value: true
 on_failure:
 - set:
     field: error.message

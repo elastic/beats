@@ -30,7 +30,7 @@ processors:
 - set:
     field: event.timezone
     value: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null"
+    ignore_empty_value: true
 - set:
     field: _temp.time
     value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}} {{fortinet.firewall.tz}}"
