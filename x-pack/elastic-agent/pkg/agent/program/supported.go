@@ -29,6 +29,6 @@ func init() {
 			panic("Cannot read spec from " + f)
 		}
 		Supported = append(Supported, s)
-		SupportedMap[strings.ToLower(s.Name)] = true
+		SupportedMap[strings.ToLower(s.Cmd)] = true
 	}
 }
