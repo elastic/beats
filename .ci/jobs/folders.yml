@@ -1,0 +1,5 @@
+---
+#https://docs.openstack.org/infra/jenkins-job-builder/project_folder.html
+- job:
+    name: Beats
+    project-type: folder
