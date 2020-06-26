@@ -490,6 +490,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
+- Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 
 *Heartbeat*
 
