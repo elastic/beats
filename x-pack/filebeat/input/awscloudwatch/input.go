@@ -10,9 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
@@ -87,21 +86,23 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
-
 	logger.Debug("awscloudwatch input config = ", config)
-	logGroupName, regionName, err := parseARN(config.LogGroupARN)
-	if err != nil {
-		return nil, errors.Wrap(err, "parse log group ARN failed")
-	}
 
-	config.LogGroup = logGroupName
-	config.RegionName = regionName
+	if config.LogGroupARN != "" {
+		logGroupName, regionName, err := parseARN(config.LogGroupARN)
+		if err != nil {
+			return nil, errors.Wrap(err, "parse log group ARN failed")
+		}
+
+		config.LogGroupName = logGroupName
+		config.RegionName = regionName
+	}
 
 	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
-	awsConfig.Region = regionName
+	awsConfig.Region = config.RegionName
 
 	closeChannel := make(chan struct{})
 	in := &awsCloudWatchInput{
@@ -136,8 +137,8 @@ func (in *awsCloudWatchInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
-			in.logger.Infof("awscloudwatch input worker for log group: '%v' has started", in.config.LogGroup)
-			defer in.logger.Infof("awscloudwatch input worker for log group '%v' has stopped.", in.config.LogGroup)
+			in.logger.Infof("awscloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
+			defer in.logger.Infof("awscloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
 			defer in.workerWg.Done()
 			in.run()
 		}()
@@ -178,6 +179,7 @@ func parseARN(logGroupARN string) (string, string, error) {
 	return "", "", errors.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
+// getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
 	errC := make(chan error, 1)
 	cwCtx := &cwContext{
@@ -189,7 +191,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
 	defer cancelFn()
 
-	i := 0
+	init := true
 	nextToken := ""
 	currentTime := time.Now()
 	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency)
@@ -198,9 +200,9 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	// overwrite prevEndTime using new endTime
 	in.prevEndTime = endTime
 
-	for nextToken != "" || i == 0 {
+	for nextToken != "" || init {
 		// construct FilterLogEventsInput
-		filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime, i, nextToken)
+		filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime, nextToken)
 
 		// make API request
 		req := svc.FilterLogEventsRequest(filterLogEventsInput)
@@ -210,7 +212,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 			return err
 		}
 
-		// get token for next API call
+		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
 		nextToken = ""
 		if resp.NextToken != nil {
 			nextToken = *resp.NextToken
@@ -226,15 +228,20 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 			cancelFn()
 		}
 
-		// increase counter after making FilterLogEventsRequest API call
-		i++
+		init = false
+
+		// FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region
+		// This sleep is to avoid hitting the API limit.
+		in.logger.Debugf("sleeping for %v before making FilterLogEvents API call again", in.config.APISleep)
+		time.Sleep(in.config.APISleep)
+		in.logger.Debug("done sleeping")
 	}
 	return nil
 }
 
-func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64, i int, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
+func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(in.config.LogGroup),
+		LogGroupName: awssdk.String(in.config.LogGroupName),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
 	}
@@ -247,7 +254,7 @@ func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, end
 		filterLogEventsInput.LogStreamNamePrefix = awssdk.String(in.config.LogStreamPrefix)
 	}
 
-	if i != 0 {
+	if nextToken != "" {
 		filterLogEventsInput.NextToken = awssdk.String(nextToken)
 	}
 	return filterLogEventsInput
@@ -271,7 +278,7 @@ func getStartPosition(startPosition string, currentTime time.Time, prevEndTime i
 
 func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, cwCtx *cwContext) error {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, in.config.LogGroup, in.config.RegionName, cwCtx)
+		event := createEvent(logEvent, in.config.LogGroupName, in.config.RegionName, cwCtx)
 		err := in.forwardEvent(event)
 		if err != nil {
 			err = errors.Wrap(err, "forwardEvent failed")
@@ -287,17 +294,16 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 	cwCtx.Inc()
 
 	event := beat.Event{
-		Timestamp: time.Now().UTC(),
+		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: common.MapStr{
-			"message": *logEvent.Message,
-			"log": common.MapStr{
-				"file.path": logGroup + "/" + *logEvent.LogStreamName,
-			},
+			"message":        *logEvent.Message,
+			"log.file.path":  logGroup + "/" + *logEvent.LogStreamName,
+			"event.ingested": time.Now(),
 			"aws": common.MapStr{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": *logEvent.IngestionTime,
-				"timestamp":      *logEvent.Timestamp,
+				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+				"timestamp":      time.Unix(*logEvent.Timestamp/1000, 0),
 				"event_id":       *logEvent.EventId,
 			},
 			"cloud": common.MapStr{

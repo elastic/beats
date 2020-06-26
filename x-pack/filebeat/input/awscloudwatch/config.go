@@ -14,15 +14,16 @@ import (
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	LogGroupARN               string              `config:"log_group_arn" validate:"nonzero,required"`
+	LogGroupARN               string              `config:"log_group_arn"`
+	LogGroupName              string              `config:"log_group_name"`
+	RegionName                string              `config:"region_name"`
 	LogStreams                []string            `config:"log_streams"`
 	LogStreamPrefix           string              `config:"log_stream_prefix"`
 	StartPosition             string              `config:"start_position" default:"beginning"`
 	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
 	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
+	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
-	LogGroup                  string
-	RegionName                string
 }
 
 func defaultConfig() config {
@@ -31,14 +32,26 @@ func defaultConfig() config {
 			Type: "awscloudwatch",
 		},
 		StartPosition: "beginning",
-		APITimeout:    120 * time.Second,
 		ScanFrequency: 1 * time.Minute,
+		APITimeout:    120 * time.Second,
+		APISleep:      200 * time.Millisecond,
 	}
 }
 
 func (c *config) Validate() error {
 	if c.StartPosition != "beginning" && c.StartPosition != "end" {
-		return errors.New("start_position config parameter can only be either 'beginning' or 'end'")
+		return errors.New("start_position config parameter can only be " +
+			"either 'beginning' or 'end'")
+	}
+
+	if c.LogGroupARN == "" && c.LogGroupName == "" {
+		return errors.New("log_group_arn and log_group_name config parameter" +
+			"cannot be both empty")
+	}
+
+	if c.LogGroupName != "" && c.RegionName == "" {
+		return errors.New("region_name is required when log_group_name " +
+			"config parameter is given")
 	}
 	return nil
 }
