@@ -280,6 +280,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
 from being added to events by default. {pull}18159[18159]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
+- Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 
 *Heartbeat*
 
