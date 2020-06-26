@@ -104,8 +104,10 @@ pipeline {
               ].join(' ')
             }
             steps {
-              release()
-              pushCIDockerImages()
+              withGithubNotify(context: "Packaging ${BEATS_FOLDER}") {
+                release()
+                pushCIDockerImages()
+              }
             }
           }
           stage('Package Mac OS'){
