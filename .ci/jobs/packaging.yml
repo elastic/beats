@@ -1,6 +1,6 @@
 ---
 - job:
-    name: apm-shared/packaging
+    name: Beats/packaging
     display-name: Beats Packaging
     description: Make the packages for beats and publish them on a GCS bucket.
     view: Beats

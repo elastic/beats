@@ -1,8 +1,7 @@
 - job:
-    name: 'apm-beats-update'
+    name: Beats/apm-beats-update
     display-name: 'APM Server Beats update'
     description: 'Check if the Beats lib update works on the APM server master branch'
-    folder: 'Beats'
     view: Beats
     concurrent: true
     project-type: multibranch
@@ -35,7 +34,7 @@
             ignore-tags-older-than: -1
             ignore-tags-newer-than: -1
         - named-branches:
-            - exact-name: 
+            - exact-name:
                 name: 'master'
                 case-sensitive: true
             - regex-name:

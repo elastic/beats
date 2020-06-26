@@ -1,9 +1,8 @@
 ---
 - job:
-    name: 'beats-test-infra'
+    name: Beats/beats-test-infra
     display-name: 'Beats test infra'
     description: 'Pipeline to run the test infra'
-    folder: 'Beats'
     view: Beats
     project-type: pipeline
     pipeline-scm:
