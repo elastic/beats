@@ -371,8 +371,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Named port in the hints should return the corresponding container port",
 			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 3306,
+				"host":      "1.2.3.4",
+				"port":      3306,
 				"port_name": "some",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
