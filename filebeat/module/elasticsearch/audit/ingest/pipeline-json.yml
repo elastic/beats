@@ -57,13 +57,12 @@ processors:
     field: url.query
     path: elasticsearch.audit
 - set:
-    if: ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query
-      == null
+    if: ctx.elasticsearch.audit?.url?.query == null
     field: url.original
     value: '{{elasticsearch.audit.url.path}}'
+    ignore_empty_value: true
 - set:
-    if: ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query
-      != null
+    if: ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null
     field: url.original
     value: '{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}'
 - remove:
