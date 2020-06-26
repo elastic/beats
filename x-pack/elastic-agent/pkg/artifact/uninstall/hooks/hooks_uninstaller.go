@@ -30,24 +30,12 @@ func NewUninstaller(i embeddedUninstaller) (*Uninstaller, error) {
 // Uninstall performs the execution of the PreUninstallSteps
 func (i *Uninstaller) Uninstall(ctx context.Context, programName, version, installDir string) error {
 	// pre uninstall hooks
-	nameLower := strings.ToLower(programName)
-	_, isSupported := program.SupportedMap[nameLower]
-	if !isSupported {
+	spec, ok := program.SupportedMap[strings.ToLower(programName)]
+	if !ok {
 		return nil
 	}
-
-	for _, spec := range program.Supported {
-		if strings.ToLower(spec.Name) != nameLower {
-			continue
-		}
-
-		if spec.PreUninstallSteps != nil {
-			return spec.PreUninstallSteps.Execute(ctx, installDir)
-		}
-
-		// only one spec for type
-		break
+	if spec.PreUninstallSteps != nil {
+		return spec.PreUninstallSteps.Execute(ctx, installDir)
 	}
-
 	return i.uninstaller.Uninstall(ctx, programName, version, installDir)
 }

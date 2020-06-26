@@ -42,25 +42,13 @@ func (i *InstallerChecker) Install(ctx context.Context, programName, version, in
 	}
 
 	// post install hooks
-	nameLower := strings.ToLower(programName)
-	_, isSupported := program.SupportedMap[nameLower]
-	if !isSupported {
+	spec, ok := program.SupportedMap[strings.ToLower(programName)]
+	if !ok {
 		return nil
 	}
-
-	for _, spec := range program.Supported {
-		if strings.ToLower(spec.Name) != nameLower {
-			continue
-		}
-
-		if spec.PostInstallSteps != nil {
-			return spec.PostInstallSteps.Execute(ctx, installDir)
-		}
-
-		// only one spec for type
-		break
+	if spec.PostInstallSteps != nil {
+		return spec.PostInstallSteps.Execute(ctx, installDir)
 	}
-
 	return nil
 }
 
@@ -73,24 +61,12 @@ func (i *InstallerChecker) Check(ctx context.Context, programName, version, inst
 	}
 
 	// installer check steps
-	nameLower := strings.ToLower(programName)
-	_, isSupported := program.SupportedMap[nameLower]
-	if !isSupported {
+	spec, ok := program.SupportedMap[strings.ToLower(programName)]
+	if !ok {
 		return nil
 	}
-
-	for _, spec := range program.Supported {
-		if strings.ToLower(spec.Name) != nameLower {
-			continue
-		}
-
-		if spec.CheckInstallSteps != nil {
-			return spec.CheckInstallSteps.Execute(ctx, installDir)
-		}
-
-		// only one spec for type
-		break
+	if spec.CheckInstallSteps != nil {
+		return spec.CheckInstallSteps.Execute(ctx, installDir)
 	}
-
 	return nil
 }
