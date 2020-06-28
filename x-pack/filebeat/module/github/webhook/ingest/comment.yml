@@ -18,12 +18,7 @@ processors:
     ignore_missing: true
 - append:
     field: event.type
-    value:
-    - info
-    - created
-- set:
-    field: event.outcome
-    value: success
+    value: creation
 - set:
     field: event.kind
     value: event

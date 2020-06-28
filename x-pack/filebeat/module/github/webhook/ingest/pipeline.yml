@@ -33,6 +33,10 @@ processors:
     target_field: github.related.repository.url
     ignore_missing: true
 - rename:
+    field: github.repository.private
+    target_field: github.related.repository.private
+    ignore_missing: true
+- rename:
     field: github.sender.login
     target_field: source.user.name
     ignore_missing: true

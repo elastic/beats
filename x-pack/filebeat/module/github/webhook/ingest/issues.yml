@@ -2,14 +2,13 @@ description: Pipeline to parse issue github wehhooks
 processors:
 - append:
     field: event.type
-    value: info
-- append:
-    field: event.type
     value: creation
     if: ctx.github?.action == 'opened'
 - append:
     field: event.type
-    value: change
+    value: 
+      -  change
+      -  info
     if: "['edited', 'pinned', 'unpinned', 'closed', 'reopened', 'assigned',
       'unassigned', 'labeled', 'unlabeled', 'locked', 'unlocked', 'transferred',
       'milestoned', 'demilestoned'].contains(ctx.github?.action)"
@@ -26,10 +25,43 @@ processors:
 - set:
     field: event.action
     value: issue-{{github.action}}
+- rename:
+    field: github.issue.html_url
+    target_field: github.related.issue.url
+    ignore_missing: true
+- rename:
+    field: github.issue.id
+    target_field: github.related.issue.id
+    ignore_missing: true
+- rename:
+    field: github.issue.assignee.login
+    target_field: github.related.assignee.current_assignee
+    ignore_missing: true
+- rename:
+    field: github.issue.milestone.id
+    target_field: github.related.milestone.id
+    ignore_missing: true
+- rename:
+    field: github.issue.milestone.html_url
+    target_field: github.related.milestone.url
+    ignore_missing: true
+- rename:
+    field: github.issue.milestone.html_url
+    target_field: github.related.milestone.url
+    ignore_missing: true
+- foreach:
+    field: github.issue.assignees
+    processor:
+      append:
+        field: github.related.assignee.new_assignee
+        value: "{{_ingest._value.login}}"
+    if: ctx.github?.issue?.assignees != null
 - remove:
     field:
     - github.repository
-    - github.repository
+    - github.assignee
+    - github.assignees
+    - github.milestone
     - github.organization
     - github.installation
     - github.sender

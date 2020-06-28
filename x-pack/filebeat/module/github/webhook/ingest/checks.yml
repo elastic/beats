@@ -21,9 +21,6 @@ processors:
     if: ctx.github?.check_suite != null
 - append:
     field: event.type
-    value: info
-- append:
-    field: event.type
     value: start
     if: "['created', 'rerequested'].contains(ctx.github?.action)"
 - append:
@@ -51,28 +48,36 @@ processors:
     ignore_missing: true
     if: ctx.event?.url == null
 - append:
-    field: github.related.app
+    field: github.related.app.name
     value: "{{github.check_run.app.name}}"
-    ignore_missing: true
+    if: ctx.github?.checks_run != null && ctx.github?.check_run?.app?.name != null
 - append:
-    field: github.related.app
+    field: github.related.app.id
+    value: "{{github.check_run.app.id}}"
+    if: ctx.github?.checks_run != null && ctx.github?.check_run?.app?.id != null
+- append:
+    field: github.related.app.name
     value: "{{github.check_suite.app.name}}"
-    ignore_missing: true
+    if: ctx.github?.checks_suite != null && ctx.github?.check_suite?.app?.name != null
+- append:
+    field: github.related.app.id
+    value: "{{github.check_suite.app.id}}"
+    if: ctx.github?.checks_suite != null && ctx.github?.check_suite?.app?.id != null
 - rename:
     field: github.check_run.status
-    target_field: github.run.status
+    target_field: github.check.status
     ignore_missing: true
 - rename:
     field: github.check_suite.status
-    target_field: github.suite.status
+    target_field: github.check.status
     ignore_missing: true
 - rename:
     field: github.check_run.conclusion
-    target_field: github.run.conclusion
+    target_field: github.check.conclusion
     ignore_missing: true
 - rename:
     field: github.check_suite.conclusion
-    target_field: github.suite.conclusion
+    target_field: github.check.conclusion
     ignore_missing: true
 - rename:
     field: github.check_run.name
@@ -86,9 +91,10 @@ processors:
     field: github.related.suite.name
     value: "{{github.check_run.check_suite.name}}"
     ignore_missing: true
+    if: ctx.github?.check_run != null
 - rename:
     field: github.check_suite.name
-    target_field: github.suite.name
+    target_field: github.check_suite.name
     ignore_missing: true
 # Since PR's is in arrays of objects we want to create an array of strings with the relevant info
 # to prevent nested datatypes

@@ -2,9 +2,7 @@ description: Pipeline to parse create github wehhooks
 processors:
 - append:
     field: event.type
-    value:
-    - info
-    - creation
+    value: creation
 - set:
     field: event.outcome
     value: success
