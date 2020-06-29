@@ -5,8 +5,11 @@
 package install
 
 import (
+	"context"
 	"errors"
 	"runtime"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/dir"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/hooks"
@@ -24,7 +27,15 @@ type Installer interface {
 	// Install installs an artifact and returns
 	// location of the installed program
 	// error if something went wrong
-	Install(programName, version, installDir string) error
+	Install(ctx context.Context, programName, version, installDir string) error
+}
+
+// InstallerChecker is an interface that installs but also checks for valid installation.
+type InstallerChecker interface {
+	Installer
+
+	// Check checks if the installation is good.
+	Check(ctx context.Context, programName, version, installDir string) error
 }
 
 // NewInstaller returns a correct installer associated with a
@@ -32,7 +43,7 @@ type Installer interface {
 // - rpm -> rpm installer
 // - deb -> deb installer
 // - binary -> zip installer on windows, tar installer on linux and mac
-func NewInstaller(config *artifact.Config) (Installer, error) {
+func NewInstaller(config *artifact.Config) (InstallerChecker, error) {
 	if config == nil {
 		return nil, ErrConfigNotProvided
 	}
@@ -49,5 +60,5 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 		return nil, err
 	}
 
-	return hooks.NewInstaller(installer)
+	return hooks.NewInstallerChecker(installer, dir.NewChecker())
 }
