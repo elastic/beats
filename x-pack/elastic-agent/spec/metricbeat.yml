@@ -1,4 +1,5 @@
 name: Metricbeat
+repo: beats
 cmd: metricbeat
 args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
 post_install:

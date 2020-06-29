@@ -1,4 +1,5 @@
 name: Endpoint Security
+repo: endpoint-dev
 cmd: endpoint-security
 service: 6788
 check_install:

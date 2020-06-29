@@ -39,7 +39,7 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(_ context.Context, programName, version string) (_ string, err error) {
+func (e *Downloader) Download(_ context.Context, _, programName, version string) (_ string, err error) {
 	downloadedFiles := make([]string, 0, 2)
 	defer func() {
 		if err != nil {

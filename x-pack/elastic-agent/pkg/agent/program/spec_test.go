@@ -22,6 +22,7 @@ import (
 func TestSerialization(t *testing.T) {
 	spec := Spec{
 		Name: "hello",
+		Repo: "reponame",
 		Cmd:  "hellocmd",
 		Args: []string{"-c", "first"},
 		Rules: transpiler.NewRuleList(
@@ -56,6 +57,7 @@ func TestSerialization(t *testing.T) {
 		When: "1 == 1",
 	}
 	yml := `name: hello
+repo: reponame
 cmd: hellocmd
 args:
 - -c

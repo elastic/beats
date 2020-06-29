@@ -20,6 +20,7 @@ import (
 )
 
 const (
+	repoName      = "beats"
 	beatName      = "filebeat"
 	version       = "7.5.1"
 	sourcePattern = "/downloads/beats/filebeat/"
@@ -36,6 +37,7 @@ func TestFetchVerify(t *testing.T) {
 	installPath := filepath.Join("testdata", "install")
 	targetPath := filepath.Join("testdata", "download")
 	ctx := context.Background()
+	repoName := "beats"
 	programName := "beat"
 	version := "8.0.0"
 
@@ -77,7 +79,7 @@ func TestFetchVerify(t *testing.T) {
 	// second one should pass
 	// download not skipped: package missing
 	// verify passes because hash is not correct
-	_, err = downloader.Download(ctx, programName, version)
+	_, err = downloader.Download(ctx, repoName, programName, version)
 	assert.NoError(t, err)
 
 	// file downloaded ok
@@ -146,7 +148,7 @@ func TestVerify(t *testing.T) {
 	}
 
 	testClient := NewDownloader(config)
-	artifact, err := testClient.Download(context.Background(), beatName, version)
+	artifact, err := testClient.Download(context.Background(), repoName, beatName, version)
 	if err != nil {
 		t.Fatal(err)
 	}

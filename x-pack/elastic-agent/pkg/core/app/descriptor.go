@@ -16,6 +16,7 @@ import (
 // Descriptor defines a program which needs to be run.
 // Is passed around operator operations.
 type Descriptor struct {
+	repoName     string
 	executionCtx ExecutionContext
 	directory    string
 	spec         ProcessSpec
@@ -27,6 +28,7 @@ func NewDescriptor(pSpec program.Spec, version string, config *artifact.Config, 
 	dir := directory(binaryName, version, config)
 
 	return &Descriptor{
+		repoName:     pSpec.Repo,
 		directory:    dir,
 		executionCtx: NewExecutionContext(pSpec.ServicePort, binaryName, version, tags),
 		spec:         spec(dir, binaryName),
@@ -37,6 +39,11 @@ func NewDescriptor(pSpec program.Spec, version string, config *artifact.Config, 
 // 0 then the application is ran using the `service` application type, versus a `process` application.
 func (p *Descriptor) ServicePort() int {
 	return p.executionCtx.ServicePort
+}
+
+// RepoName is the name of the repository the binary is built from. E.g beats.
+func (p *Descriptor) RepoName() string {
+	return p.repoName
 }
 
 // BinaryName is the name of the binary. E.g filebeat.
