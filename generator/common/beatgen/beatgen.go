@@ -156,7 +156,7 @@ func getConfiguredBeatsRevision(beatsModule, revision string) error {
 	)
 }
 
-// VendorUpdate updates the vendor directory
+// VendorUpdate updates the vendor directory if used
 func VendorUpdate() error {
 	err := sh.Rm("./vendor/github.com/elastic/beats")
 	if err != nil {
