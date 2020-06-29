@@ -1,9 +1,0 @@
-*.coverprofile
-src/
-pkg/
-.idea
-*.iml
-
-# compiled binaries
-bin/
-!bin/test

@@ -37,9 +37,9 @@ processors:
         - "dd/MMM/yyyy:H:m:s Z"
 
   - set:
-      if: "ctx?.aws?.s3access?.remote_ip != null"
       field: client.ip
       value: "{{aws.s3access.remote_ip}}"
+      ignore_empty_value: true
 
   - append:
       if: "ctx?.aws?.s3access?.remote_ip != null"
@@ -47,9 +47,9 @@ processors:
       value: "{{aws.s3access.remote_ip}}"
 
   - set:
-      if: "ctx?.aws?.s3access?.remote_ip != null"
       field: client.address
       value: "{{aws.s3access.remote_ip}}"
+      ignore_empty_value: true
 
   - geoip:
       if: "ctx?.aws?.s3access?.remote_ip != null"
@@ -57,24 +57,24 @@ processors:
       target_field: geo
 
   - set:
-      if: "ctx?.aws?.s3access?.requester != null"
       field: client.user.id
       value: "{{aws.s3access.requester}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.request_id != null"
       field: event.id
       value: "{{aws.s3access.request_id}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.operation != null"
       field: event.action
       value: "{{aws.s3access.operation}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.http_status != null"
       field: http.response.status_code
       value: "{{aws.s3access.http_status}}"
+      ignore_empty_value: true
 
   - convert:
       if: "ctx?.http?.response?.status_code != null"
@@ -87,9 +87,9 @@ processors:
       value: failure
 
   - set:
-      if: "ctx?.aws?.s3access?.error_code != null"
       field: event.code
       value: "{{aws.s3access.error_code}}"
+      ignore_empty_value: true
 
   - set:
       if: "ctx?.aws?.s3access?.error_code == null"
@@ -97,14 +97,14 @@ processors:
       value: success
 
   - set:
-      if: "ctx?.aws?.s3access?.total_time != null"
       field: event.duration
       value: "{{aws.s3access.total_time}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.s3access?.referrer != null"
       field: http.request.referrer
       value: "{{aws.s3access.referrer}}"
+      ignore_empty_value: true
 
   - user_agent:
       if: "ctx?.aws?.s3access?.user_agent != null"
@@ -113,7 +113,7 @@ processors:
   - set:
       field: tls.cipher
       value: '{{aws.s3access.cipher_suite}}'
-      if: ctx.aws?.s3access?.cipher_suite != null
+      ignore_empty_value: true
 
   - script:
       lang: painless

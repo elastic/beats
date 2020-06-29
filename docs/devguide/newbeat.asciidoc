@@ -521,3 +521,11 @@ To move the dependencies to vendor, you need to manually fetch the new
 We suggest you read the following section to learn about maintaining dependencies
 using go modules:
 * https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies[How to upgrade and downgrade dependencies]
+
+Please note that it is your choice whether you put dependencies in the folder vendor or not.
+
+If you choose to abandon the vendor folder, you have to adjust the following things in your Beat:
+
+* add `devtools.UseVendor = false` to the `magefile.go` of your Beat
+* add `devtools.CrossBuildMountModcache = true` to the `magefile.go` of your Beat
+* modify the path to `ES_BEATS` in the `Makefile` so it points to the folder under the module cache (`go list -m -f '{{.Dir}}' $ES_BEATS_IMPORT_PATH`)
