@@ -231,6 +231,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+- Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 
 *Heartbeat*
 

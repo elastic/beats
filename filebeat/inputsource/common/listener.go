@@ -78,6 +78,14 @@ func (l *Listener) Start() error {
 		return err
 	}
 
+	l.ctx, l.cancel = context.WithCancel(context.Background())
+	go func() {
+		<-l.ctx.Done()
+		l.Listener.Close()
+	}()
+
+	l.log.Info("Started listening for " + l.family.String() + " connection")
+
 	l.wg.Add(1)
 	go func() {
 		defer l.wg.Done()
