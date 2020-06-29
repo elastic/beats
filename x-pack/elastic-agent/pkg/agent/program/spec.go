@@ -31,7 +31,7 @@ type Spec struct {
 	ServicePort       int                  `yaml:"service,omitempty"`
 	Cmd               string               `yaml:"cmd"`
 	Args              []string             `yaml:"args"`
-	Artifact      string			       `yaml:"artifact"`
+	Artifact          string               `yaml:"artifact"`
 	Rules             *transpiler.RuleList `yaml:"rules"`
 	CheckInstallSteps *transpiler.StepList `yaml:"check_install"`
 	PostInstallSteps  *transpiler.StepList `yaml:"post_install"`
