@@ -1,0 +1,28 @@
+- key: awscloudwatch
+  title: "awscloudwatch"
+  description: >
+    Fields from AWS CloudWatch logs.
+  fields:
+    - name: awscloudwatch
+      type: group
+      description: >
+        Fields from AWS CloudWatch logs.
+      fields:
+        - name: log_group
+          type: keyword
+          description: The name of the log group to which this event belongs.
+        - name: log_stream
+          type: keyword
+          description: The name of the log stream to which this event belongs.
+        - name: ingestion_time
+          type: keyword
+          description: The time the event was ingested in AWS CloudWatch.
+        - name: timestamp
+          type: keyword
+          description: The time the event occurred.
+        - name: event_id
+          type: keyword
+          description: The ID of the event.
+    - name: log.file.path
+      type: keyword
+      description: log file path (log_group/log_stream) the message belongs to.

@@ -274,7 +274,7 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 			"message":        *logEvent.Message,
 			"log.file.path":  logGroup + "/" + *logEvent.LogStreamName,
 			"event.ingested": time.Now(),
-			"aws": common.MapStr{
+			"awscloudwatch": common.MapStr{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
 				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),

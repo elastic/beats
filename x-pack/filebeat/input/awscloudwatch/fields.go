@@ -19,5 +19,5 @@ func init() {
 // AssetAwscloudwatch returns asset data.
 // This is the base64 encoded gzipped contents of input/awscloudwatch.
 func AssetAwscloudwatch() string {
-	return "eJxUzDEOwjAMBdDdp/jqDgfIwMg9ouQjLNwksl0Vbs/c9Q3vhg9/BfWMZvPoZ832FiA1jQXbxTcBOqO5rtQ5Ch4CAE+l9cDL5359oGMdeRfAaazBAn4XXXeOrCb/AAAA//9bHSrc"
+	return "eJysksFO8zAQhO95ilFP/39ouOeAhEBInEHqsTLxJrFqeyN7S9S3R3ZbGrccIMLHzc58o8yusaNDAzXF1vJeT0raoQLEiKUGq2K+qgBNsQ1mFMO+wX0FAM+GrI7oAjs8bF7xmASbJIDlPtYV0OWVJq+v4ZWjW2R6chipQR94P54m3/B+yExvzp2zLffbOeXC3tFh4qBn8yLB20DZAtxBBkpGx7gQxjSYdoAMJoI+yAveybK/pCn5UQIp9xcBjk6/S2B8TzFZbsU4WpIi6XKEI2lS8WRKGsZftXIbIMmjKLeogis2t+0+BNK3lPx9a/QSyMvT+Sdnl7q6arDujKV6VFJeb+lcuKaykghJhH9fV3h3uYf/GegoRtXTuT4I19VnAAAA//8N9R/P"
 }
