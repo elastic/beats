@@ -19,6 +19,7 @@ package hints
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -87,11 +88,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	if !ok {
 		noPort = true
 	}
-
 	portName, _ := event["port_name"].(string)
-	if portName == "" {
-		portName = ""
-	}
 
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
@@ -201,8 +198,11 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
-	// Only pick hosts that have ${data.port} or the port on current event. This will make
-	// sure that incorrect meta mapping doesn't happen
+	// Only pick hosts that:
+	// 1. have the port and portName on current event and
+	//    portName is equal to the <port_name> of "data.ports.<port_name>"
+	// 2. have ${data.port} or the port on current event.
+	// This will make sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
 		if strings.Contains(h, "data.ports.") && port != 0 && !noPort && portName != "" {
 			hintPortName := m.getPortName(h)
@@ -228,8 +228,16 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 	return result, true
 }
 
-// getPortName returns the port name defined in a host hint ie: for ${data.host}:%{data.ports.web} returns web
+// getPortName returns the port name defined in a host hint ie: for ${data.host}:${data.ports.web} returns web
 func (m *metricHints) getPortName(h string) string {
+
+	re := regexp.MustCompile(`\${data.ports.*\}`)
+	submatchall := re.FindAllString(h, -1)
+	if len(submatchall) < 1 {
+		return ""
+	}
+	h = submatchall[0]
+
 	firstIndex := strings.Index(h, "data.ports.")
 	if firstIndex == -1 {
 		return ""

@@ -288,6 +288,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 0,
+				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -303,6 +304,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
+				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -329,6 +331,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 80,
+				"port_name": "prometheus",
 				"hints": []common.MapStr{
 					{
 						"metrics": common.MapStr{
@@ -347,6 +350,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 3306,
+				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -379,6 +383,60 @@ func TestGenerateHints(t *testing.T) {
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:${data.ports.some}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Named port in the hints should return the corresponding container port for complex hosts",
+			event: bus.Event{
+				"host":      "1.2.3.4",
+				"port":      3306,
+				"port_name": "prometheus",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "http://${data.host}:${data.ports.prometheus}/metrics",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"http://1.2.3.4:3306/metrics"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "data.port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":      "1.2.3.4",
+				"port":      3306,
+				"port_name": "some",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.port}",
 					},
 				},
 			},
