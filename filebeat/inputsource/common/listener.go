@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 // Family represents the type of connection we're handling
@@ -113,17 +114,12 @@ func (l *Listener) run() {
 			}
 		}
 
-		handler := l.handlerFactory(*l.config)
-		ctx, cancel := context.WithCancel(l.ctx)
-		go func() {
-			<-ctx.Done()
-			conn.Close()
-		}()
-
 		l.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a " + l.family.String() + " client crash")
 			defer l.wg.Done()
+
+			ctx, cancel := ctxtool.WithFunc(l.ctx, func() { conn.Close() })
 			defer cancel()
 
 			l.registerHandler()
@@ -136,6 +132,7 @@ func (l *Listener) run() {
 				l.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", l.clientsCount.Load())
 			}
 
+			handler := l.handlerFactory(*l.config)
 			err := handler(ctx, conn)
 			if err != nil {
 				l.log.Debugw("client error", "error", err)
