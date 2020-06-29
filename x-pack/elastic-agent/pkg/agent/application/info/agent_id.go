@@ -21,13 +21,13 @@ import (
 
 // defaultAgentConfigFile is a name of file used to store agent information
 const defaultAgentConfigFile = "fleet.yml"
-const agentInfoKey = "agent_info"
+const agentInfoKey = "agent"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
 
 type persistentAgentInfo struct {
-	ID string `json:"ID" yaml:"ID" config:"ID"`
+	ID string `json:"id" yaml:"id" config:"id"`
 }
 
 type ioStore interface {

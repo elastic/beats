@@ -36,7 +36,7 @@ func (o *operationStop) Name() string {
 // Check checks whether application needs to be stopped.
 //
 // If the application state is not stopped then stop should be performed.
-func (o *operationStop) Check(application Application) (bool, error) {
+func (o *operationStop) Check(_ context.Context, application Application) (bool, error) {
 	if application.State().Status != state.Stopped {
 		return true, nil
 	}
