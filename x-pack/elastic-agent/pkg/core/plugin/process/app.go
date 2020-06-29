@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package app
+package process
 
 import (
 	"context"
@@ -11,27 +11,24 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
 var (
 	// ErrAppNotRunning is returned when configuration is performed on not running application.
 	ErrAppNotRunning = errors.New("application is not running", errors.TypeApplication)
-	// ErrClientNotFound signals that client is not present in the vault.
-	ErrClientNotFound = errors.New("client not present", errors.TypeApplication)
-	// ErrClientNotConfigurable happens when stored client does not implement Config func
-	ErrClientNotConfigurable = errors.New("client does not provide configuration", errors.TypeApplication)
 )
 
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
@@ -41,12 +38,12 @@ type Application struct {
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         Specifier
+	spec         app.Specifier
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
 	startContext context.Context
-	tag          Taggable
+	tag          app.Taggable
 	state        state.State
 	reporter     state.Reporter
 
@@ -72,7 +69,7 @@ type ArgsDecorator func([]string) []string
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
-	spec Specifier,
+	spec app.Specifier,
 	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
@@ -80,7 +77,7 @@ func NewApplication(
 	monitor monitoring.Monitor) (*Application, error) {
 
 	s := spec.Spec()
-	uid, gid, err := getUserGroup(s)
+	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +145,7 @@ func (a *Application) Stop() {
 		a.state.ProcessInfo = nil
 
 		// cleanup drops
-		a.monitor.Cleanup(a.name, a.pipelineID)
+		a.cleanUp()
 	}
 	a.setState(state.Stopped, "Stopped")
 }
@@ -160,7 +157,7 @@ func (a *Application) SetState(status state.Status, msg string) {
 	a.setState(status, msg)
 }
 
-func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
 

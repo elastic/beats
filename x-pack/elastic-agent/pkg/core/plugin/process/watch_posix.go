@@ -4,7 +4,7 @@
 
 // +build !windows
 
-package app
+package process
 
 import (
 	"os"
