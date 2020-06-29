@@ -9,10 +9,14 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -39,6 +43,7 @@ const (
 	buildDir       = "build"
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
+	devEnv         = "DEV"
 	configFile     = "elastic-agent.yml"
 )
 
@@ -552,6 +557,23 @@ func buildVars() map[string]string {
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
 
+	fetchPgp := true
+	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
+		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			fetchPgp = false
+		}
+	}
+	fmt.Println("fetching pgp", fetchPgp)
+
+	if fetchPgp {
+		pgp, err := loadPGPFromWeb()
+		if err != nil {
+			panic(err)
+		}
+		vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.escPgp"] = string(pgp)
+	}
+
 	return vars
 }
 
@@ -559,4 +581,24 @@ func injectBuildVars(m map[string]string) {
 	for k, v := range buildVars() {
 		m[k] = v
 	}
+}
+
+func loadPGPFromWeb() (string, error) {
+	const publicKeyURI = "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+
+	resp, err := http.Get(publicKeyURI)
+	if err != nil {
+		return "", fmt.Errorf("failed loading public key: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("call to '%s' returned unsuccessful status code: %d", publicKeyURI, resp.StatusCode)
+	}
+
+	rawPgp, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return url.PathEscape(string(rawPgp)), nil
 }

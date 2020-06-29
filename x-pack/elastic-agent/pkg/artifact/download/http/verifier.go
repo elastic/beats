@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
@@ -71,9 +72,10 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		// remove bits so they can be redownloaded
 		os.Remove(fullPath)
 		os.Remove(fullPath + ".sha512")
+		return isMatch, err
 	}
 
-	return isMatch, err
+	return v.verifyAsc(programName, version)
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -124,11 +126,21 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 	var pgpBytesLoader sync.Once
 
 	pgpBytesLoader.Do(func() {
-		err = v.loadPGP(v.config.PgpFile)
+		allowEmpty, pgp := release.PGP()
+		if len(pgp) == 0 && !allowEmpty {
+			err = errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
+			return
+		}
+		v.pgpBytes = pgp
 	})
 
 	if err != nil {
 		return false, errors.New(err, "loading PGP")
+	}
+
+	if len(v.pgpBytes) == 0 {
+		// no pgp available skip verification process
+		return true, nil
 	}
 
 	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
@@ -198,36 +210,6 @@ func (v *Verifier) getPublicAsc(sourceURI string) ([]byte, error) {
 
 	if resp.StatusCode != 200 {
 		return nil, errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", sourceURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
-	}
-
-	return ioutil.ReadAll(resp.Body)
-}
-
-func (v *Verifier) loadPGP(file string) error {
-	var err error
-
-	if file == "" {
-		v.pgpBytes, err = v.loadPGPFromWeb()
-		return err
-	}
-
-	v.pgpBytes, err = ioutil.ReadFile(file)
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, file))
-	}
-
-	return nil
-}
-
-func (v *Verifier) loadPGPFromWeb() ([]byte, error) {
-	resp, err := v.client.Get(publicKeyURI)
-	if err != nil {
-		return nil, errors.New(err, "failed loading public key", errors.TypeNetwork, errors.M(errors.MetaKeyURI, publicKeyURI))
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", publicKeyURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, publicKeyURI))
 	}
 
 	return ioutil.ReadAll(resp.Body)

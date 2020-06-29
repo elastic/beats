@@ -20,6 +20,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
@@ -58,9 +59,12 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		// remove bits so they can be redownloaded
 		os.Remove(fullPath)
 		os.Remove(fullPath + ".sha512")
+		return isMatch, err
 	}
 
-	return isMatch, err
+	// TODO: package in asc singature files
+	// return v.verifyAsc(filename, fullPath)
+	return true, nil
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -110,11 +114,21 @@ func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 	var pgpBytesLoader sync.Once
 
 	pgpBytesLoader.Do(func() {
-		err = v.loadPGP(v.config.PgpFile)
+		allowEmpty, pgp := release.PGP()
+		if len(pgp) == 0 && !allowEmpty {
+			err = errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
+			return
+		}
+		v.pgpBytes = pgp
 	})
 
 	if err != nil {
 		return false, errors.New(err, "loading PGP")
+	}
+
+	if len(v.pgpBytes) == 0 {
+		// no pgp available skip verification process
+		return true, nil
 	}
 
 	ascBytes, err := v.getPublicAsc(filename)
@@ -152,19 +166,4 @@ func (v *Verifier) getPublicAsc(filename string) ([]byte, error) {
 	}
 
 	return b, nil
-}
-
-func (v *Verifier) loadPGP(file string) error {
-	var err error
-
-	if file == "" {
-		return errors.New("pgp file not specified for verifier", errors.TypeConfig)
-	}
-
-	v.pgpBytes, err = ioutil.ReadFile(file)
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-
-	return nil
 }
