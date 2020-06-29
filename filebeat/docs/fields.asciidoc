@@ -2104,15 +2104,6 @@ type: keyword
 
 --
 
-*`log.file.path`*::
-+
---
-log file path (log_group/log_stream) the message belongs to.
-
-type: keyword
-
---
-
 [[exported-fields-azure]]
 == Azure fields
 

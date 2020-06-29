@@ -23,6 +23,3 @@
         - name: event_id
           type: keyword
           description: The ID of the event.
-    - name: log.file.path
-      type: keyword
-      description: log file path (log_group/log_stream) the message belongs to.
