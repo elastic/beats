@@ -191,8 +191,8 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
-	if port_name, ok := event["port_name"]; ok {
-		e["port_name"] = port_name
+	if ports, ok := event["ports"]; ok {
+		e["ports"] = ports
 	}
 
 	if rawCont, ok := kubeMeta["container"]; ok {
@@ -303,6 +303,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	}
 
 	emitted := 0
+	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -353,13 +354,13 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 
 		for _, port := range c.Ports {
+			podPorts[port.Name] = port.ContainerPort
 			event := bus.Event{
 				"provider":   p.uuid,
 				"id":         eventID,
 				flag:         true,
 				"host":       host,
 				"port":       port.ContainerPort,
-				"port_name":  port.Name,
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
@@ -372,7 +373,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 
 	// Finally publish a pod level event so that hints that have no exposed ports can get processed.
 	// Log hints would just ignore this event as there is no ${data.container.id}
-	// Publish the pod level hint only if atleast one container level hint was emitted. This ensures that there is
+	// Publish the pod level hint only if at least one container level hint was emitted. This ensures that there is
 	// no unnecessary pod level events emitted prematurely.
 	if emitted != 0 {
 		meta := p.metagen.Generate(pod)
@@ -390,6 +391,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
 			flag:         true,
 			"host":       host,
+			"ports":      podPorts,
 			"kubernetes": kubemeta,
 			"meta": common.MapStr{
 				"kubernetes": meta,
