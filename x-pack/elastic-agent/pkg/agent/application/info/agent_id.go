@@ -21,13 +21,15 @@ import (
 
 // defaultAgentConfigFile is a name of file used to store agent information
 const defaultAgentConfigFile = "fleet.yml"
-const agentInfoKey = "agent"
+const agentInfoKey = "agent_info"
+const agentKey = "agent"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
 
 type persistentAgentInfo struct {
-	ID string `json:"id" yaml:"id" config:"id"`
+	ID    string `json:"id" yaml:"id" config:"id"`
+	CapID string `json:"ID,omitempty" yaml:"ID,omitempty" config:"ID"`
 }
 
 type ioStore interface {
@@ -105,9 +107,13 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 			errors.TypeFilesystem)
 	}
 
-	agentInfoSubMap, found := configMap[agentInfoKey]
+	// handle migration of `agent_info` to `agent` in config
+	agentInfoSubMap, found := configMap[agentKey]
 	if !found {
-		return &persistentAgentInfo{}, nil
+		agentInfoSubMap, found = configMap[agentInfoKey]
+		if !found {
+			return &persistentAgentInfo{}, nil
+		}
 	}
 
 	cc, err := config.NewConfigFrom(agentInfoSubMap)
@@ -118,6 +124,12 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 	pid := &persistentAgentInfo{}
 	if err := cc.Unpack(&pid); err != nil {
 		return nil, errors.New(err, "failed to unpack stored config to map")
+	}
+
+	// handle migration of agent ID from `ID` to `id` in YAML.
+	if pid.ID == "" && pid.CapID != "" {
+		pid.ID = pid.CapID
+		pid.CapID = ""
 	}
 
 	return pid, nil
@@ -146,7 +158,15 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 		return errors.New(err, "failed to unpack stored config to map")
 	}
 
-	configMap[agentInfoKey] = agentInfo
+	// handle migration of agent ID from `ID` to `id` in YAML.
+	if agentInfo.ID == "" && agentInfo.CapID != "" {
+		agentInfo.ID = agentInfo.CapID
+		agentInfo.CapID = ""
+	}
+
+	// set `agent` and remove old `agent_info`
+	configMap[agentKey] = agentInfo
+	delete(configMap, agentInfoKey)
 
 	r, err := yamlToReader(configMap)
 	if err != nil {
