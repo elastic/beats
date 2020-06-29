@@ -178,6 +178,14 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionUnenroll{},
+		&handlerUnenroll{
+			log:     log,
+			emitter: emit,
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)

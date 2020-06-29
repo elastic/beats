@@ -83,6 +83,31 @@ func (a *ActionConfigChange) ID() string {
 	return a.ActionID
 }
 
+// ActionUnenroll is a request for agent to unhook from fleet.
+type ActionUnenroll struct {
+	ActionID   string
+	ActionType string
+}
+
+func (a *ActionUnenroll) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionUnenroll) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionUnenroll) ID() string {
+	return a.ActionID
+}
+
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
 type Actions []Action
 
@@ -115,6 +140,16 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
 					"fail to decode CONFIG_CHANGE action",
+					errors.TypeConfig)
+			}
+		case "UNENROLL":
+			action = &ActionUnenroll{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode UNENROLL action",
 					errors.TypeConfig)
 			}
 		default:
