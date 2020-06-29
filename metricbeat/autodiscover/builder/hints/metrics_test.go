@@ -301,8 +301,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 9090,
+				"host":      "1.2.3.4",
+				"port":      9090,
 				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -328,8 +328,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Module, namespace, host hint shouldn't return when port isn't the same has hint",
 			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 80,
+				"host":      "1.2.3.4",
+				"port":      80,
 				"port_name": "prometheus",
 				"hints": []common.MapStr{
 					{
@@ -347,8 +347,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Non http URLs with valid host port combination should return a valid config",
 			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 3306,
+				"host":      "1.2.3.4",
+				"port":      3306,
 				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
