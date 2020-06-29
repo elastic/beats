@@ -288,7 +288,6 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 0,
-				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",

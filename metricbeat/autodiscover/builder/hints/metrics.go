@@ -61,6 +61,8 @@ type metricHints struct {
 	logger *logp.Logger
 }
 
+var dataPortsRegexp = regexp.MustCompile(`\${data.ports.*\}`)
+
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
@@ -230,9 +232,7 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 
 // getPortName returns the port name defined in a host hint ie: for ${data.host}:${data.ports.web} returns web
 func (m *metricHints) getPortName(h string) string {
-
-	re := regexp.MustCompile(`\${data.ports.*\}`)
-	submatchall := re.FindAllString(h, -1)
+	submatchall := dataPortsRegexp.FindAllString(h, -1)
 	if len(submatchall) < 1 {
 		return ""
 	}
