@@ -461,7 +461,7 @@ func (in *HttpjsonInput) getURL() string {
 
 	var dateStr string
 	if in.nextCursorValue == "" {
-		t := timeNow().Add(-in.config.DateCursor.InitialInterval)
+		t := timeNow().UTC().Add(-in.config.DateCursor.InitialInterval)
 		dateStr = t.Format(in.config.DateCursor.GetDateFormat())
 	} else {
 		dateStr = in.nextCursorValue
