@@ -49,8 +49,8 @@ type Application interface {
 // Is passed around operator operations.
 type Descriptor interface {
 	ServicePort() int
-	RepoName() string
 	BinaryName() string
+	ArtifactName() string
 	Version() string
 	ID() string
 	Directory() string

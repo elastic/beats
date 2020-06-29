@@ -28,10 +28,10 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 // to register their spec in a secure way.
 type Spec struct {
 	Name              string               `yaml:"name"`
-	Repo              string               `yaml:"repo"`
 	ServicePort       int                  `yaml:"service,omitempty"`
 	Cmd               string               `yaml:"cmd"`
 	Args              []string             `yaml:"args"`
+	Artifact      string			       `yaml:"artifact"`
 	Rules             *transpiler.RuleList `yaml:"rules"`
 	CheckInstallSteps *transpiler.StepList `yaml:"check_install"`
 	PostInstallSteps  *transpiler.StepList `yaml:"post_install"`

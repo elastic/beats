@@ -16,7 +16,7 @@ import (
 // Descriptor defines a program which needs to be run.
 // Is passed around operator operations.
 type Descriptor struct {
-	repoName     string
+	artifactName string
 	executionCtx ExecutionContext
 	directory    string
 	spec         ProcessSpec
@@ -28,7 +28,7 @@ func NewDescriptor(pSpec program.Spec, version string, config *artifact.Config, 
 	dir := directory(binaryName, version, config)
 
 	return &Descriptor{
-		repoName:     pSpec.Repo,
+		artifactName: pSpec.Artifact,
 		directory:    dir,
 		executionCtx: NewExecutionContext(pSpec.ServicePort, binaryName, version, tags),
 		spec:         spec(dir, binaryName),
@@ -41,9 +41,9 @@ func (p *Descriptor) ServicePort() int {
 	return p.executionCtx.ServicePort
 }
 
-// RepoName is the name of the repository the binary is built from. E.g beats.
-func (p *Descriptor) RepoName() string {
-	return p.repoName
+// ArtifactName is the name of the artifact to download from the artifact store. E.g beats/filebeat.
+func (p *Descriptor) ArtifactName() string {
+	return p.artifactName
 }
 
 // BinaryName is the name of the binary. E.g filebeat.
