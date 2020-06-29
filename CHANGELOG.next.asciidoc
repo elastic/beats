@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
+- Adds `split_events_by` option to httpjson input. {pull}19246[19246]
 
 *Heartbeat*
 
@@ -256,6 +257,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Stop counterCache only when already started {pull}19103[19103]
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 
 *Packetbeat*
 
@@ -413,6 +415,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 - Add automatic retries and exponential backoff to httpjson input. {pull}18956[18956]
+- Changed the panw module to pass through (rather than drop) message types other than threat and traffic. {issue}16815[16815] {pull}19375[19375]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 
@@ -508,6 +511,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
