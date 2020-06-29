@@ -14,13 +14,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
@@ -30,15 +28,22 @@ const (
 // Verifier verifies a downloaded package by comparing with public ASC
 // file from elastic.co website.
 type Verifier struct {
-	config   *artifact.Config
-	pgpBytes []byte
+	config        *artifact.Config
+	pgpBytes      []byte
+	allowEmptyPgp bool
 }
 
 // NewVerifier create a verifier checking downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
-func NewVerifier(config *artifact.Config) (*Verifier, error) {
+func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Verifier, error) {
+	if len(pgp) == 0 && !allowEmptyPgp {
+		return nil, errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
+	}
+
 	v := &Verifier{
-		config: config,
+		config:        config,
+		allowEmptyPgp: allowEmptyPgp,
+		pgpBytes:      pgp,
 	}
 
 	return v, nil
@@ -110,22 +115,6 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 }
 
 func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
-	var err error
-	var pgpBytesLoader sync.Once
-
-	pgpBytesLoader.Do(func() {
-		allowEmpty, pgp := release.PGP()
-		if len(pgp) == 0 && !allowEmpty {
-			err = errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
-			return
-		}
-		v.pgpBytes = pgp
-	})
-
-	if err != nil {
-		return false, errors.New(err, "loading PGP")
-	}
-
 	if len(v.pgpBytes) == 0 {
 		// no pgp available skip verification process
 		return true, nil
