@@ -23,10 +23,10 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
-    upstream('Beats/beats-beats-mbp/master')
+    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
-    booleanParam(name: 'macos', defaultValue: true, description: 'Allow macOS stages.')
+    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
   }
   stages {
@@ -216,38 +216,18 @@ def publishPackages(baseDir){
 }
 
 def withBeatsEnv(Closure body) {
-  def os = goos()
-  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
-
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
-    "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
-    "PYTHON_ENV=${WORKSPACE}/python-env"
-  ]) {
-    deleteDir()
-    //unstash 'source'
-    gitCheckout(basedir: "${BASE_DIR}")
-    dir("${env.BASE_DIR}"){
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install Mage", script: "make mage")
-      body()
+  withMageEnv(){
+    withEnv([
+      "PYTHON_ENV=${WORKSPACE}/python-env"
+    ]) {
+      deleteDir()
+      //unstash 'source'
+      gitCheckout(basedir: "${BASE_DIR}")
+      dir("${env.BASE_DIR}"){
+        sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
+        sh(label: "Install Mage", script: "make mage")
+        body()
+      }
     }
   }
-}
-
-def goos(){
-  def labels = env.NODE_LABELS
-
-  if (labels.contains('linux')) {
-    return 'linux'
-  } else if (labels.contains('windows')) {
-    return 'windows'
-  } else if (labels.contains('darwin')) {
-    return 'darwin'
-  }
-
-  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
