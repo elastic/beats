@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	repoName      = "beats"
 	beatName      = "filebeat"
+	artifactName  = "beats/filebeat"
 	version       = "7.5.1"
 	sourcePattern = "/downloads/beats/filebeat/"
 	source        = "http://artifacts.elastic.co/downloads/"
@@ -57,7 +57,7 @@ func TestDownload(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifactPath, err := testClient.Download(context.Background(), repoName, beatName, version)
+			artifactPath, err := testClient.Download(context.Background(), beatName, artifactName, version)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -95,7 +95,7 @@ func TestVerify(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifact, err := testClient.Download(context.Background(), repoName, beatName, version)
+			artifact, err := testClient.Download(context.Background(), beatName, artifactName, version)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -21,10 +21,10 @@ import (
 
 func TestSerialization(t *testing.T) {
 	spec := Spec{
-		Name: "hello",
-		Repo: "reponame",
-		Cmd:  "hellocmd",
-		Args: []string{"-c", "first"},
+		Name:     "hello",
+		Cmd:      "hellocmd",
+		Args:     []string{"-c", "first"},
+		Artifact: "nested/hellocmd",
 		Rules: transpiler.NewRuleList(
 			transpiler.Copy("inputs", "filebeat"),
 			transpiler.Filter("filebeat", "output", "keystore"),
@@ -57,11 +57,11 @@ func TestSerialization(t *testing.T) {
 		When: "1 == 1",
 	}
 	yml := `name: hello
-repo: reponame
 cmd: hellocmd
 args:
 - -c
 - first
+artifact: nested/hellocmd
 rules:
 - copy:
     from: inputs

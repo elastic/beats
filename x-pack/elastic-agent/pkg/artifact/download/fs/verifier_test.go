@@ -20,10 +20,9 @@ import (
 )
 
 const (
-	repoName      = "beats"
-	beatName      = "filebeat"
-	version       = "7.5.1"
-	sourcePattern = "/downloads/beats/filebeat/"
+	beatName     = "filebeat"
+	artifactName = "beats/filebeat"
+	version      = "7.5.1"
 )
 
 type testCase struct {
@@ -37,8 +36,8 @@ func TestFetchVerify(t *testing.T) {
 	installPath := filepath.Join("testdata", "install")
 	targetPath := filepath.Join("testdata", "download")
 	ctx := context.Background()
-	repoName := "beats"
 	programName := "beat"
+	artifactName := "beats/beat"
 	version := "8.0.0"
 
 	targetFilePath := filepath.Join(targetPath, "beat-8.0.0-darwin-x86_64.tar.gz")
@@ -79,7 +78,7 @@ func TestFetchVerify(t *testing.T) {
 	// second one should pass
 	// download not skipped: package missing
 	// verify passes because hash is not correct
-	_, err = downloader.Download(ctx, repoName, programName, version)
+	_, err = downloader.Download(ctx, programName, artifactName, version)
 	assert.NoError(t, err)
 
 	// file downloaded ok
@@ -148,7 +147,7 @@ func TestVerify(t *testing.T) {
 	}
 
 	testClient := NewDownloader(config)
-	artifact, err := testClient.Download(context.Background(), repoName, beatName, version)
+	artifact, err := testClient.Download(context.Background(), beatName, artifactName, version)
 	if err != nil {
 		t.Fatal(err)
 	}
