@@ -42,7 +42,7 @@ import (
 )
 
 var Supported []Spec
-var SupportedMap map[string]bool
+var SupportedMap map[string]Spec
 
 func init() {
 	// Packed Files
@@ -50,7 +50,7 @@ func init() {
 	// {{ $f }}
 	{{ end -}}
 	unpacked := packer.MustUnpack("{{ .Pack }}")
-	SupportedMap = make(map[string]bool)
+	SupportedMap = make(map[string]Spec)
 
 	for f, v := range unpacked {
 	s, err:= NewSpecFromBytes(v)
@@ -58,7 +58,7 @@ func init() {
 			panic("Cannot read spec from " + f)
 		}
 		Supported = append(Supported, s)
-		SupportedMap[strings.ToLower(s.Name)] = true
+		SupportedMap[strings.ToLower(s.Cmd)] = s
 	}
 }
 `))

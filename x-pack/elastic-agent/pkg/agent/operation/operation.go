@@ -27,7 +27,7 @@ type operation interface {
 	// examples:
 	// - Start does not need to run if process is running
 	// - Fetch does not need to run if package is already present
-	Check(application Application) (bool, error)
+	Check(ctx context.Context, application Application) (bool, error)
 	// Run runs the operation
 	Run(ctx context.Context, application Application) error
 }
@@ -35,6 +35,7 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
+	Started() bool
 	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
