@@ -1337,7 +1337,7 @@ def getVendorPatterns(beatName){
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
   ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
+      go list -mod=mod -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
         |awk '{print \$1"/.*"}'\
         |sed -e "s#github.com/elastic/beats/v7/##g"
     """)
