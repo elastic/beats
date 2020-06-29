@@ -45,7 +45,9 @@ to remove leading and/or trailing spaces. Possible values are:
 - `all`: values are trimmed for leading and trailing.
 
 `trim_chars`:: (Optional) Set of characters to trim from values, when trimming
-is enabled. The default is to trim the space character (`" "`).
+is enabled. The default is to trim the space character (`" "`). To trim multiple
+characters, simply set it to a string containing all characters to trim. For example,
+`trim_chars: " \t"` will trim spaces and/or tabs.
 
 For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
 found an error will be logged and no modification is done on the original event.
