@@ -771,7 +771,7 @@ func TestCursor(t *testing.T) {
 		}
 
 		assert.Equal(t, expectedQuery, gotQuery)
-		assert.Equal(t, expectedNextCursorValue, input.cursor.nextCursorValue)
+		assert.Equal(t, expectedNextCursorValue, input.nextCursorValue)
 		assert.Equal(t, fmt.Sprintf("%s?%s", ts.URL, expectedNextQuery), input.getURL())
 	})
 }
