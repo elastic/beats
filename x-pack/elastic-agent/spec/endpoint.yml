@@ -1,5 +1,6 @@
 name: Endpoint Security
 cmd: endpoint-security
+artifact: endpoint-dev
 service: 6788
 check_install:
 - exec_file:
