@@ -208,8 +208,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 
 		init = false
 
-		// FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region
-		// This sleep is to avoid hitting the API limit.
+		// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
 		in.logger.Debugf("sleeping for %v before making FilterLogEvents API call again", in.config.APISleep)
 		time.Sleep(in.config.APISleep)
 		in.logger.Debug("done sleeping")
@@ -271,15 +270,16 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: common.MapStr{
-			"message":        *logEvent.Message,
-			"log.file.path":  logGroup + "/" + *logEvent.LogStreamName,
-			"event.ingested": time.Now(),
+			"message":       *logEvent.Message,
+			"log.file.path": logGroup + "/" + *logEvent.LogStreamName,
+			"event": common.MapStr{
+				"id":       *logEvent.EventId,
+				"ingested": time.Now(),
+			},
 			"awscloudwatch": common.MapStr{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
 				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
-				"timestamp":      time.Unix(*logEvent.Timestamp/1000, 0),
-				"event_id":       *logEvent.EventId,
 			},
 			"cloud": common.MapStr{
 				"provider": "aws",

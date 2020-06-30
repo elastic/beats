@@ -2086,24 +2086,6 @@ type: keyword
 
 --
 
-*`awscloudwatch.timestamp`*::
-+
---
-The time the event occurred.
-
-type: keyword
-
---
-
-*`awscloudwatch.event_id`*::
-+
---
-The ID of the event.
-
-type: keyword
-
---
-
 [[exported-fields-azure]]
 == Azure fields
 

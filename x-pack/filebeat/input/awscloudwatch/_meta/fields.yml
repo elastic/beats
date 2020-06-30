@@ -17,9 +17,3 @@
         - name: ingestion_time
           type: keyword
           description: The time the event was ingested in AWS CloudWatch.
-        - name: timestamp
-          type: keyword
-          description: The time the event occurred.
-        - name: event_id
-          type: keyword
-          description: The ID of the event.
