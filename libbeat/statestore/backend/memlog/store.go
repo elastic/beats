@@ -95,6 +95,14 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 	panic("TODO: implement me")
 }
 
+func (s *memstore) Set(key string, value interface{}) error {
+	panic("TODO: implement me")
+}
+
+func (s *memstore) Remove(key string) error {
+	panic("TODO: implement me")
+}
+
 func (e entry) Decode(to interface{}) error {
 	return typeconv.Convert(to, e.value)
 }
