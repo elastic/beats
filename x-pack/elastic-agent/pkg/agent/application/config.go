@@ -108,12 +108,12 @@ func localConfigDefault() *localConfig {
 type FleetAgentConfig struct {
 	API       *APIAccess    `config:"api" yaml:"api"`
 	Reporting *LogReporting `config:"reporting" yaml:"reporting"`
-	Info      *AgentInfo    `config:"agent_info" yaml:"agent_info"`
+	Info      *AgentInfo    `config:"agent" yaml:"agent"`
 }
 
 // AgentInfo is a set of agent information.
 type AgentInfo struct {
-	ID string `json:"ID" yaml:"ID" config:"ID"`
+	ID string `json:"id" yaml:"id" config:"id"`
 }
 
 // APIAccess contains the required details to connect to the Kibana endpoint.

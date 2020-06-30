@@ -7,7 +7,7 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // operationRemove uninstall and removes all the bits related to the artifact
@@ -26,7 +26,7 @@ func (o *operationRemove) Name() string {
 // Check checks whether remove needs to run.
 //
 // Always returns false.
-func (o *operationRemove) Check(_ Application) (bool, error) {
+func (o *operationRemove) Check(_ context.Context, _ Application) (bool, error) {
 	return false, nil
 }
 

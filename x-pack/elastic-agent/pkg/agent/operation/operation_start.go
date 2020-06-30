@@ -7,10 +7,10 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operationStart start installed process
@@ -20,8 +20,6 @@ type operationStart struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-
-	pi *process.Info
 }
 
 func newOperationStart(
@@ -49,11 +47,11 @@ func (o *operationStart) Name() string {
 // Only starts the application when in stopped state, any other state
 // and the application is handled by the life cycle inside of the `Application`
 // implementation.
-func (o *operationStart) Check(application Application) (bool, error) {
-	if application.State().Status == state.Stopped {
-		return true, nil
+func (o *operationStart) Check(_ context.Context, application Application) (bool, error) {
+	if application.Started() {
+		return false, nil
 	}
-	return false, nil
+	return true, nil
 }
 
 // Run runs the operation

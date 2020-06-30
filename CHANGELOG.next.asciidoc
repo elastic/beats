@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   `forwarded` from the list. {issue}13920[13920]
 * Cisco {pull}18753[18753]
 * CrowdStrike {pull}19132[19132]
+* Fortinet {pull}19133[19133]
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 * Netflow {pull}19087[19087]
@@ -300,6 +301,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Stop counterCache only when already started {pull}19103[19103]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 
 *Packetbeat*
 
@@ -589,6 +591,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
+- Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
 *Packetbeat*

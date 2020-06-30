@@ -18,12 +18,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 const (
@@ -51,9 +54,10 @@ type Operator struct {
 	apps     map[string]Application
 	appsLock sync.Mutex
 
-	downloader download.Downloader
-	verifier   download.Verifier
-	installer  install.Installer
+	downloader  download.Downloader
+	verifier    download.Verifier
+	installer   install.InstallerChecker
+	uninstaller uninstall.Uninstaller
 }
 
 // NewOperator creates a new operator, this operator holds
@@ -66,7 +70,8 @@ func NewOperator(
 	config *config.Config,
 	fetcher download.Downloader,
 	verifier download.Verifier,
-	installer install.Installer,
+	installer install.InstallerChecker,
+	uninstaller uninstall.Uninstaller,
 	stateResolver *stateresolver.StateResolver,
 	srv *server.Server,
 	reporter state.Reporter,
@@ -89,6 +94,7 @@ func NewOperator(
 		downloader:    fetcher,
 		verifier:      verifier,
 		installer:     installer,
+		uninstaller:   uninstaller,
 		stateResolver: stateResolver,
 		srv:           srv,
 		apps:          make(map[string]Application),
@@ -128,11 +134,11 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	}
 
 	for _, step := range steps {
-		if strings.ToLower(step.Process) != strings.ToLower(monitoringName) {
-			if _, isSupported := program.SupportedMap[strings.ToLower(step.Process)]; !isSupported {
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.Process),
+		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
+			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
+				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
 					errors.TypeApplication,
-					errors.M(errors.MetaKeyAppName, step.Process))
+					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
 		}
 
@@ -173,6 +179,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 func (o *Operator) stop(p Descriptor) (err error) {
 	flow := []operation{
 		newOperationStop(o.logger, o.config),
+		newOperationUninstall(o.logger, p, o.uninstaller),
 	}
 
 	return o.runFlow(p, flow)
@@ -203,7 +210,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			return err
 		}
 
-		shouldRun, err := op.Check(app)
+		shouldRun, err := op.Check(o.bgContext, app)
 		if err != nil {
 			return err
 		}
@@ -244,18 +251,39 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	}
 
 	// TODO: (michal) join args into more compact options version
-	a, err := app.NewApplication(
-		o.bgContext,
-		p.ID(),
-		p.BinaryName(),
-		o.pipelineID,
-		o.config.LoggingConfig.Level.String(),
-		specifier,
-		o.srv,
-		o.config,
-		o.logger,
-		o.reporter,
-		o.monitor)
+	var a Application
+	var err error
+	if p.ServicePort() == 0 {
+		// Applications without service ports defined are ran as through the process application type.
+		a, err = process.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	} else {
+		// Service port is defined application is ran with service application type, with it fetching
+		// the connection credentials through the defined service port.
+		a, err = service.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			p.ServicePort(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	}
 
 	if err != nil {
 		return nil, err

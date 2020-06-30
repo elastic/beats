@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 var (
@@ -47,7 +47,7 @@ func (o *operationConfig) Name() string {
 // Check checks whether config needs to be run.
 //
 // Always returns true.
-func (o *operationConfig) Check(_ Application) (bool, error) { return true, nil }
+func (o *operationConfig) Check(_ context.Context, _ Application) (bool, error) { return true, nil }
 
 // Run runs the operation
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
