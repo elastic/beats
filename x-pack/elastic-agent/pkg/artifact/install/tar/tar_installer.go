@@ -50,7 +50,7 @@ func (i *Installer) Install(_ context.Context, programName, version, installDir 
 		os.RemoveAll(installDir)
 	}
 
-	return unpack(f, installDir)
+	return unpack(f, i.config.InstallPath)
 
 }
 
