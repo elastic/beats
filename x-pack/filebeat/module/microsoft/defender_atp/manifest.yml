@@ -5,6 +5,9 @@ var:
     default: httpjson
   - name: interval
     default: 5m
+  - name: date_cursor
+    default: 
+      value_template: "alertCreationTime gt {{.}}"
   - name: tags
     default: [defender-atp, forwarded]
   - name: url
