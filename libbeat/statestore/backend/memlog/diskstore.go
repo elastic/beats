@@ -423,17 +423,17 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 	log = log.With("temporary", tmpLink, "data_file", checkpointFilePath, "link_file", activeLink)
 
 	if checkpointFilePath == "" {
-		if err := os.Remove(activeLink); err != nil { // try, remove active symlink if present.
+		if err := os.Remove(activeLink); err != nil { // try, remove active.dat if present.
 			log.Errorf("Failed to remove old pointer file: %v", err)
 		}
 		return nil
 	}
 
 	// Atomically try to update the pointer file to the most recent data file.
-	// We 'simulate' the atomic update by create the temporary active.dat.new symlink file,
+	// We 'simulate' the atomic update by create the temporary active.dat.new file,
 	// which we rename to active.dat. If active.dat.tmp exists we remove it.
 	if err := os.Remove(tmpLink); err != nil && !os.IsNotExist(err) {
-		log.Errorf("Failed to remove old temporary symlink file: %v", err)
+		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
 	if err := ioutil.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
@@ -557,8 +557,6 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 // Transactions older then txid will be ignored.
 // loadLogFile returns the last commited txid in logTxid and the total number
 // of operations in logCount.
-// An incomplete transaction is recorded at the end of the log file, if
-// complete is false.
 func loadLogFile(
 	store *memstore,
 	txid uint64,
