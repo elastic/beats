@@ -22,6 +22,7 @@ import (
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 )
 
 // Publisher is used to publish an event and update the cursor in a single call to Publish.
@@ -69,4 +70,39 @@ func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) er
 // Execute updates the persistent store with the scheduled changes and releases the resource.
 func (op *updateOp) Execute(numEvents uint) {
 	panic("TODO: implement me")
+}
+
+func createUpdateOp(store *store, resource *resource, updates interface{}) (*updateOp, error) {
+	ts := time.Now()
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
+
+	cursor := resource.pendingCursor
+	if resource.activeCursorOperations == 0 {
+		var tmp interface{}
+		typeconv.Convert(&tmp, cursor)
+		resource.pendingCursor = tmp
+		cursor = tmp
+	}
+	if err := typeconv.Convert(&cursor, updates); err != nil {
+		return nil, err
+	}
+	resource.pendingCursor = cursor
+
+	resource.Retain()
+	resource.activeCursorOperations++
+	return &updateOp{
+		resource:  resource,
+		store:     store,
+		timestamp: ts,
+		delta:     updates,
+	}, nil
+}
+
+// done releases resources held by the last N updateOps.
+func (op *updateOp) done(n uint) {
+	op.resource.UpdatesReleaseN(n)
+	op.resource = nil
+	*op = updateOp{}
 }
