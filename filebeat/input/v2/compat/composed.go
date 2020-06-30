@@ -32,15 +32,13 @@ type composeFactory struct {
 	fallback cfgfile.RunnerFactory
 }
 
-var _ cfgfile.RunnerFactory = composeFactory{}
-
 // Combine takes two RunnerFactory instances and creates a new RunnerFactory.
 // The new factory will first try to create an input using factory. If this operation fails fallback will be used.
 //
 // The new RunnerFactory will return the error of fallback only if factory did
 // signal that the input type is unknown via v2.ErrUnknown.
 //
-// XXX: This RunnerFactory is used for compining the v2.Loader with the
+// XXX: This RunnerFactory is used for combining the v2.Loader with the
 // existing RunnerFactory for inputs in Filebeat. The Combine function should be removed once the old RunnerFactory is removed.
 func Combine(factory, fallback cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return composeFactory{factory: factory, fallback: fallback}

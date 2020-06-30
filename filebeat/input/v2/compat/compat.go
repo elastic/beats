@@ -21,6 +21,7 @@
 package compat
 
 import (
+	"fmt"
 	"sync"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -29,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert"
+	"github.com/mitchellh/hashstructure"
 )
 
 // factory implements the cfgfile.RunnerFactory interface and wraps the
@@ -45,6 +47,7 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
+	id        string
 	log       *logp.Logger
 	agent     *beat.Info
 	wg        sync.WaitGroup
@@ -81,7 +84,13 @@ func (f *factory) Create(
 		return nil, err
 	}
 
+	id, err := configID(config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &runner{
+		id:        id,
 		log:       f.log.Named(input.Name()),
 		agent:     &f.info,
 		sig:       concert.NewOnceSignaler(),
@@ -100,7 +109,7 @@ func (r *runner) Start() {
 		log.Infof("Input %v starting", name)
 		err := r.input.Run(
 			v2.Context{
-				ID:          "", // TODO: hmmm....
+				ID:          r.id,
 				Agent:       *r.agent,
 				Logger:      log,
 				Cancelation: r.sig,
@@ -119,4 +128,25 @@ func (r *runner) Stop() {
 	r.sig.Trigger()
 	r.wg.Wait()
 	r.log.Infof("Input '%v' stopped", r.input.Name())
+}
+
+func configID(config *common.Config) (string, error) {
+	tmp := struct {
+		ID string `config:"id"`
+	}{}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute id from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
 }
