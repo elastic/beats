@@ -148,9 +148,18 @@ docs:
 
 ## notice : Generates the NOTICE file.
 .PHONY: notice
-notice: python-env
+notice:
 	@echo "Generating NOTICE"
-	@${PYTHON_ENV_EXE} dev-tools/generate_notice.py .
+	go mod tidy
+	go mod download
+	go list -m -json all | go run go.elastic.co/go-licence-detector \
+		-includeIndirect \
+		-rules dev-tools/notice/rules.json \
+		-overrides dev-tools/notice/overrides.json \
+		-noticeTemplate dev-tools/notice/NOTICE.txt.tmpl \
+		-noticeOut NOTICE.txt \
+		-depsOut ""
+
 
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env
