@@ -493,7 +493,12 @@ func (in *HttpjsonInput) getURL() string {
 }
 
 func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
-	switch v, _ := m.GetValue(in.config.DateCursor.Field); t := v.(type) {
+	v, err := m.GetValue(in.config.DateCursor.Field)
+	if err != nil {
+		in.log.Warnf("date_cursor field: %q", err)
+		return
+	}
+	switch t := v.(type) {
 	case string:
 		_, err := time.Parse(in.config.DateCursor.GetDateFormat(), t)
 		if err != nil {

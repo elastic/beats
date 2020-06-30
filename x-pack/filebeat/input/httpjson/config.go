@@ -104,6 +104,17 @@ func (dc *DateCursor) GetDateFormat() string {
 	return dc.DateFormat
 }
 
+func (dc *DateCursor) Validate() error {
+	if dc.DateFormat == "" {
+		return nil
+	}
+	now := time.Now().Format(dc.DateFormat)
+	if _, err := time.Parse(dc.DateFormat, now); err != nil {
+		return errors.New("invalid configuration: date_format is not a valid date layout")
+	}
+	return nil
+}
+
 func (c *config) Validate() error {
 	switch strings.ToUpper(c.HTTPMethod) {
 	case "GET", "POST":
