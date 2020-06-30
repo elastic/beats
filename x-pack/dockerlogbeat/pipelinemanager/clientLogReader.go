@@ -27,12 +27,13 @@ type ClientLogger struct {
 	client        beat.Client
 	pipelineHash  uint64
 	closer        chan struct{}
-	containerMeta logger.Info
+	ContainerMeta logger.Info
 	logger        *logp.Logger
+	logSpool      logger.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -49,7 +50,13 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 
 	clientLogger.Debugf("Created new logger for %d", hash)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hash, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
+	return &ClientLogger{logFile: inputFile,
+		client:        client,
+		pipelineHash:  hash,
+		closer:        make(chan struct{}),
+		ContainerMeta: info,
+		logSpool:      localLog,
+		logger:        clientLogger}, nil
 }
 
 // Close closes the pipeline client and reader
@@ -94,7 +101,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			cl.logger.Debug("Closing publishLoop")
 			return
 		}
-
+		cl.logSpool.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
 		cl.client.Publish(beat.Event{
@@ -102,11 +109,11 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			Fields: common.MapStr{
 				"message": line,
 				"container": common.MapStr{
-					"labels": helper.DeDotLabels(cl.containerMeta.ContainerLabels, true),
-					"id":     cl.containerMeta.ContainerID,
-					"name":   helper.ExtractContainerName([]string{cl.containerMeta.ContainerName}),
+					"labels": helper.DeDotLabels(cl.ContainerMeta.ContainerLabels, true),
+					"id":     cl.ContainerMeta.ContainerID,
+					"name":   helper.ExtractContainerName([]string{cl.ContainerMeta.ContainerName}),
 					"image": common.MapStr{
-						"name": cl.containerMeta.ContainerImageName,
+						"name": cl.ContainerMeta.ContainerImageName,
 					},
 				},
 			},
@@ -114,4 +121,17 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 
 	}
 
+}
+
+func constructLogSpoolMsg(line logdriver.LogEntry) *logger.Message {
+	var msg logger.Message
+	msg.Line = line.Line
+	msg.Source = line.Source
+	msg.Timestamp = time.Unix(0, line.TimeNano)
+	if line.PartialLogMetadata != nil {
+		msg.PLogMetaData.ID = line.PartialLogMetadata.Id
+		msg.PLogMetaData.Last = line.PartialLogMetadata.Last
+		msg.PLogMetaData.Ordinal = int(line.PartialLogMetadata.Ordinal)
+	}
+	return &msg
 }

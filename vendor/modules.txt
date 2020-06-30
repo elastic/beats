@@ -367,8 +367,13 @@ github.com/docker/docker/api/types/versions
 github.com/docker/docker/api/types/volume
 github.com/docker/docker/client
 github.com/docker/docker/daemon/logger
+github.com/docker/docker/daemon/logger/jsonfilelog
+github.com/docker/docker/daemon/logger/jsonfilelog/jsonlog
+github.com/docker/docker/daemon/logger/loggerutils
+github.com/docker/docker/daemon/logger/templates
 github.com/docker/docker/errdefs
 github.com/docker/docker/pkg/archive
+github.com/docker/docker/pkg/filenotify
 github.com/docker/docker/pkg/fileutils
 github.com/docker/docker/pkg/idtools
 github.com/docker/docker/pkg/ioutils
@@ -380,9 +385,11 @@ github.com/docker/docker/pkg/plugins
 github.com/docker/docker/pkg/plugins/transport
 github.com/docker/docker/pkg/pools
 github.com/docker/docker/pkg/progress
+github.com/docker/docker/pkg/pubsub
 github.com/docker/docker/pkg/streamformatter
 github.com/docker/docker/pkg/stringid
 github.com/docker/docker/pkg/system
+github.com/docker/docker/pkg/tailfile
 github.com/docker/docker/pkg/term
 github.com/docker/docker/pkg/term/windows
 # github.com/docker/go-connections v0.4.0
@@ -537,6 +544,7 @@ github.com/gofrs/flock
 github.com/gofrs/uuid
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/gogoproto
+github.com/gogo/protobuf/io
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
@@ -565,6 +573,7 @@ github.com/golang/snappy
 github.com/google/flatbuffers/go
 # github.com/google/go-cmp v0.4.0
 github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/cmpopts
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function

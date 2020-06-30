@@ -6,12 +6,14 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/docker/docker/daemon/logger"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/pkg/errors"
 )
 
@@ -24,6 +26,26 @@ type StartLoggingRequest struct {
 // StopLoggingRequest represents the request object we get on a call to //LogDriver.StopLogging
 type StopLoggingRequest struct {
 	File string
+}
+
+// CapabilitiesResponse represents the response to a capabilities request
+type CapabilitiesResponse struct {
+	Err string
+	Cap logger.Capability
+}
+
+// LogsRequest represents the request object we get from a `docker logs` call
+type LogsRequest struct {
+	Info   logger.Info
+	Config logger.ReadConfig
+}
+
+func reportCaps() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(&CapabilitiesResponse{
+			Cap: logger.Capability{ReadLogs: true},
+		})
+	}
 }
 
 // This gets called when a container starts that requests the log driver
@@ -79,6 +101,28 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 
 		respondOK(w)
 	} // end func
+}
+
+func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var logReq LogsRequest
+		err := json.NewDecoder(r.Body).Decode(&logReq)
+		if err != nil {
+			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
+			return
+		}
+
+		pm.Logger.Infof("Got logging request for container %s\n", logReq.Info.ContainerName)
+		stream, err := pm.CreateReaderForContainer(logReq.Info, logReq.Config)
+		if err != nil {
+			http.Error(w, errors.Wrap(err, "error creating log reader").Error(), http.StatusBadRequest)
+			return
+		}
+		w.Header().Set("Content-Type", "application/x-json-stream")
+		wf := ioutils.NewWriteFlusher(w)
+		io.Copy(wf, stream)
+
+	} //end func
 }
 
 // For the start/stop handler, the daemon expects back an error object. If the body is empty, then all is well.

@@ -66,6 +66,8 @@ func main() {
 	// Create handlers for startup and shutdown of the log driver
 	sdkHandler.HandleFunc("/LogDriver.StartLogging", startLoggingHandler(pipelines))
 	sdkHandler.HandleFunc("/LogDriver.StopLogging", stopLoggingHandler(pipelines))
+	sdkHandler.HandleFunc("/LogDriver.Capabilities", reportCaps())
+	sdkHandler.HandleFunc("/LogDriver.ReadLogs", readLogHandler(pipelines))
 
 	err = sdkHandler.ServeUnix("beatSocket", 0)
 	if err != nil {
