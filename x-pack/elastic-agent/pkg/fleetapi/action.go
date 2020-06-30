@@ -147,11 +147,6 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
-			if err := json.Unmarshal(response.Data, action); err != nil {
-				return errors.New(err,
-					"fail to decode UNENROLL action",
-					errors.TypeConfig)
-			}
 		default:
 			action = &ActionUnknown{
 				ActionID:     response.ActionID,

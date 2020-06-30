@@ -180,8 +180,9 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
-			log:     log,
-			emitter: emit,
+			log:        log,
+			emitter:    emit,
+			dispatcher: router,
 		},
 	)
 

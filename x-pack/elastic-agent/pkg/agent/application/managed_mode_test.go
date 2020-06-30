@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -68,16 +69,16 @@ func testActions() ([]action, error) {
 }
 
 type mockStreamStore struct {
-	store []*configRequest
+	store []configrequest.Request
 }
 
 func newMockStreamStore() *mockStreamStore {
 	return &mockStreamStore{
-		store: make([]*configRequest, 0),
+		store: make([]configrequest.Request, 0),
 	}
 }
 
-func (m *mockStreamStore) Execute(cr *configRequest) error {
+func (m *mockStreamStore) Execute(cr configrequest.Request) error {
 	m.store = append(m.store, cr)
 	return nil
 }

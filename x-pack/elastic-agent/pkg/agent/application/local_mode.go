@@ -26,6 +26,7 @@ type emitterFunc func(*config.Config) error
 // ConfigHandler is capable of handling config and perform actions at it.
 type ConfigHandler interface {
 	HandleConfig(configrequest.Request) error
+	Close() error
 }
 
 type discoverFunc func() ([]string, error)

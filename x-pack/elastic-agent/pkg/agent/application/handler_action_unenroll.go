@@ -8,15 +8,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 type handlerUnenroll struct {
-	log     *logger.Logger
-	emitter emitterFunc
+	log        *logger.Logger
+	emitter    emitterFunc
+	dispatcher programsDispatcher
 }
 
 func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker) error {
@@ -26,17 +26,11 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 		return fmt.Errorf("invalid type, expected ActionUnenroll and received %T", a)
 	}
 
-	// executing empty config stops all the running processes
-	emptyConfig := make(map[string]interface{})
-	c, err := config.NewConfigFrom(emptyConfig)
-	if err != nil {
-		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
-	}
+	// Providing empty map will close all pipelines
+	noPrograms := make(map[routingKey][]program.Program)
+	h.dispatcher.Dispatch(a.ID(), noPrograms)
 
-	h.log.Debugf("handlerUnenroll: emit configuration for action %+v", a)
-	if err := h.emitter(c); err != nil {
-		return err
-	}
+	// TODO: clean action store
 
 	return acker.Ack(ctx, action)
 }

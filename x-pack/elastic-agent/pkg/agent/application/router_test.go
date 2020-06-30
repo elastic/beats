@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -199,7 +200,7 @@ func newMockStream(rk routingKey, notify notifyFunc) *mockStream {
 	}
 }
 
-func (m *mockStream) Execute(req *configRequest) error {
+func (m *mockStream) Execute(req configrequest.Request) error {
 	m.event(executeOp, req)
 	return nil
 }
