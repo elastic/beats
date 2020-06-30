@@ -47,11 +47,11 @@ func (o *operationStart) Name() string {
 // Only starts the application when in stopped state, any other state
 // and the application is handled by the life cycle inside of the `Application`
 // implementation.
-func (o *operationStart) Check(application Application) (bool, error) {
-	if application.State().Status == state.Stopped {
-		return true, nil
+func (o *operationStart) Check(_ context.Context, application Application) (bool, error) {
+	if application.Started() {
+		return false, nil
 	}
-	return false, nil
+	return true, nil
 }
 
 // Run runs the operation
