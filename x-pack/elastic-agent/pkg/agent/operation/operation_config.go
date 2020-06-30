@@ -47,7 +47,7 @@ func (o *operationConfig) Name() string {
 // Check checks whether config needs to be run.
 //
 // Always returns true.
-func (o *operationConfig) Check(_ Application) (bool, error) { return true, nil }
+func (o *operationConfig) Check(_ context.Context, _ Application) (bool, error) { return true, nil }
 
 // Run runs the operation
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {

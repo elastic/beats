@@ -125,6 +125,11 @@ func (a *Application) Name() string {
 	return a.name
 }
 
+// Started returns true if the application is started.
+func (a *Application) Started() bool {
+	return a.srvState != nil
+}
+
 // SetState sets the status of the application.
 func (a *Application) SetState(status state.Status, msg string) {
 	a.appLock.Lock()

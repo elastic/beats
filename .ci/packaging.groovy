@@ -22,15 +22,21 @@ pipeline {
     disableConcurrentBuilds()
   }
   triggers {
-    issueCommentTrigger('(?i)^\\/packaging$')
+    issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     upstream('Beats/beats-beats-mbp/master')
   }
   parameters {
-    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
+    booleanParam(name: 'macos', defaultValue: true, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
   }
   stages {
     stage('Checkout') {
+      when {
+        beforeAgent true
+        not {
+          triggeredBy 'SCMTrigger'
+        }
+      }
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
@@ -40,6 +46,12 @@ pipeline {
       }
     }
     stage('Build Packages'){
+      when {
+        beforeAgent true
+        not {
+          triggeredBy 'SCMTrigger'
+        }
+      }
       matrix {
         axes {
           axis {
@@ -92,12 +104,14 @@ pipeline {
               ].join(' ')
             }
             steps {
-              release()
-              pushCIDockerImages()
+              withGithubNotify(context: "Packaging ${BEATS_FOLDER}") {
+                release()
+                pushCIDockerImages()
+              }
             }
           }
           stage('Package Mac OS'){
-            agent { label 'macosx' }
+            agent { label 'macosx-10.12' }
             options { skipDefaultCheckout() }
             when {
               beforeAgent true
