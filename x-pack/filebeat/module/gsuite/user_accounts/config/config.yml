@@ -11,9 +11,8 @@ http_client_timeout: {{ .http_client_timeout }}
 {{ end }}
 
 oauth2.provider: google
-oauth2.google.credentials_file: {{ .credentials_file }}
-oauth2.google.credentials_json: {{ .credentials_json }}
 oauth2.google.jwt_file: {{ .jwt_file }}
+oauth2.google.delegated_account: {{ .delegated_account }}
 oauth2.scopes:
   - https://www.googleapis.com/auth/admin.reports.audit.readonly
 

@@ -3,9 +3,8 @@ module_version: 1.0
 var:
   - name: input
     default: httpjson
-  - name: credentials_file
-  - name: credentials_json
   - name: jwt_file
+  - name: delegated_account
   - name: http_client_timeout
     default: 60s
   - name: user_key

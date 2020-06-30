@@ -19,21 +19,16 @@ It is compatible with a subset of applications under the https://developers.goog
 
 include::../include/configuring-intro.asciidoc[]
 
-To allow the filebeat module to ingest data from the Google Reports API, you would need to create application credentials following the instructions from https://developers.google.com/admin-sdk/reports/v1/guides/authorizing[Google authorization guide], https://developers.google.com/identity/protocols/oauth2/service-account[Google OAuth2 guide for services] and https://cloud.google.com/docs/authentication/production[Google Authentication for Server to Server Applications]
+To allow the filebeat module to ingest data from the Google Reports API, you would need an admin account, and set up a `ServiceAccount` to access `Admin SDK API`. Also notice, Domain-Wide Delegation is required for your application in order to work properly.
 
-This module will make use of the following `oauth2 scopes`:
+You can follow instructions found https://developers.google.com/admin-sdk/reports/v1/guides/delegation[here] for this matter.
+
+This module will make use of the following `oauth2 scope`:
 
 - `https://www.googleapis.com/auth/admin.reports.audit.readonly`
 
-This module supports different ways to provide `oauth2` credentials to it:
-
-- `credentials_file`
-- `credentials_json`
-- `jwt_file`
-
-They are equivalent, and which one to use will depend on how you set up the authorization and your preference.
-
-If none of them is provided, the module will fallback to authorize using the Application Default Credentials (ADC) mechanism.
+Once you have downloaded your service account credentials as a JSON file,
+you can set up your module:
 
 [float]
 ===== Configuration options
@@ -43,25 +38,23 @@ If none of them is provided, the module will fallback to authorize using the App
 - module: gsuite
   saml:
     enabled: true
-    var.credentials_file: "./credentials_file.json"
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_user: "user@example.com"
   user_accounts:
     enabled: true
-    var.credentials_file: "./credentials_file.json"
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_user: "user@example.com"
 ----
 
 Every fileset has the following configuration options:
-
-*`var.credentials_file`*::
-
-Specifies the path to the credentials file.
 
 *`var.jwt_file`*::
 
 Specifies the path to the JWT credentials file.
 
-*`var.credentials_json`*::
+*`var.delegated_user`*::
 
-Raw JSON containing the credentials. It can be either the content of `var.credentials_file` or `var.jwt_file`.
+Email of the admin user used to access the API.
 
 
 *`var.http_client_timeout`*::
