@@ -3,6 +3,5 @@
 {{ $dep.Name }},{{ $dep.URL }},{{ $dep.Version | canonicalVersion }},{{ $dep.Version | revision }},{{ $dep.LicenceType }}
 {{- end -}}
 {{- end -}}
-name,url,version,revision,license
-{{ template "depInfo" .Direct }}
-{{ template "depInfo" .Indirect }}
+
+name,url,version,revision,license{{ template "depInfo" .Direct }}{{ template "depInfo" .Indirect }}
