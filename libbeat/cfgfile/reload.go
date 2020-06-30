@@ -52,7 +52,7 @@ var (
 	configReloads = monitoring.NewInt(nil, "libbeat.config.reloads")
 	moduleStarts  = monitoring.NewInt(nil, "libbeat.config.module.starts")
 	moduleStops   = monitoring.NewInt(nil, "libbeat.config.module.stops")
-	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running")
+	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running") // Number of modules in the runner list (not necessarily in the running state).
 )
 
 // DynamicConfig loads config files from a given path, allowing to reload new changes
@@ -73,7 +73,7 @@ type Reload struct {
 // of new Runners
 type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
-	Create(p beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.PipelineConnector, config *common.Config) (Runner, error)
 
 	// CheckConfig tests if a confiugation can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must

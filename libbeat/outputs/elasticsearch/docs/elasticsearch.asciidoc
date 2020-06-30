@@ -37,13 +37,14 @@ output.elasticsearch:
   password: "{pwd}"
 ------------------------------------------------------------------------------
 
-To use an API key to connect to {es}, use `api_key`.
+To use an API key to connect to {es}, use `api_key`. The value must be the ID of
+the API key and the API key joined by a colon.
 
 ["source","yaml",subs="attributes,callouts"]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  api_key: "KnR6yE41RrSowb0kQ0HWoA"
+  api_key: "VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
 ------------------------------------------------------------------------------
 
 If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
@@ -135,8 +136,8 @@ The default value is 1.
 
 ===== `api_key`
 
-Instead of using usernames and passwords,
-you can use API keys to secure communication with {es}.
+Instead of using usernames and passwords, you can use API keys to secure communication
+with {es}. The value must be the ID of the API key and the API key joined by a colon.
 For more information, see <<beats-api-keys>>.
 
 ===== `username`
@@ -677,7 +678,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
-===== `kebreros`
+===== `kerberos`
 
 Configuration options for Kerberos authentication.
 

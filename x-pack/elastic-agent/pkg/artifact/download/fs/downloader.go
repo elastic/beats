@@ -39,25 +39,29 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(_ context.Context, programName, version string) (string, error) {
-	// create a destination directory root/program
-	destinationDir := filepath.Join(e.config.TargetDirectory, programName)
-	if err := os.MkdirAll(destinationDir, 0755); err != nil {
-		return "", errors.New(err, "creating directory for downloaded artifact failed", errors.TypeFilesystem, errors.M(errors.MetaKeyPath, destinationDir))
-	}
+func (e *Downloader) Download(_ context.Context, programName, artifactName, version string) (_ string, err error) {
+	downloadedFiles := make([]string, 0, 2)
+	defer func() {
+		if err != nil {
+			for _, path := range downloadedFiles {
+				os.Remove(path)
+			}
+		}
+	}()
 
 	// download from source to dest
-	path, err := e.download(e.config.OS(), programName, version)
+	path, err := e.download(e.config.OS(), programName, artifactName, version)
+	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
-		os.Remove(path)
 		return "", err
 	}
 
-	_, err = e.downloadHash(e.config.OS(), programName, version)
+	hashPath, err := e.downloadHash(e.config.OS(), programName, artifactName, version)
+	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
 
-func (e *Downloader) download(operatingSystem, programName, version string) (string, error) {
+func (e *Downloader) download(operatingSystem, programName, _, version string) (string, error) {
 	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
@@ -71,7 +75,7 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 	return e.downloadFile(filename, fullPath)
 }
 
-func (e *Downloader) downloadHash(operatingSystem, programName, version string) (string, error) {
+func (e *Downloader) downloadHash(operatingSystem, programName, _, version string) (string, error) {
 	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
@@ -103,6 +107,10 @@ func (e *Downloader) downloadFile(filename, fullPath string) (string, error) {
 	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return "", err
+	}
+
 	return fullPath, nil
 }
 

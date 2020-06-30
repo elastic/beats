@@ -26,6 +26,7 @@ require (
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/antlr/antlr4 v0.0.0-20200225173536-225249fdaef5
+	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
@@ -36,9 +37,9 @@ require (
 	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
 	github.com/cespare/xxhash/v2 v2.1.1
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
+	github.com/cloudfoundry/noaa v2.1.0+incompatible
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
-	github.com/coreos/bbolt v1.3.1-coreos.6.0.20180318001526-af9db2027c98
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
@@ -58,13 +59,14 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
+	github.com/elastic/go-concert v0.0.2
 	github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
-	github.com/elastic/go-licenser v0.2.1
+	github.com/elastic/go-licenser v0.3.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.1.0
-	github.com/elastic/go-structform v0.0.6
+	github.com/elastic/go-structform v0.0.7
 	github.com/elastic/go-sysinfo v1.3.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
@@ -96,6 +98,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/h2non/filetype v1.0.12
 	github.com/hashicorp/go-multierror v1.1.0
+	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
@@ -122,6 +125,7 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
+	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0
@@ -135,9 +139,9 @@ require (
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
-	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
+	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/urso/ecslog v0.0.1
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
@@ -146,18 +150,20 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
 	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+	go.elastic.co/go-licence-detector v0.4.0
+	go.etcd.io/bbolt v1.3.4
 	go.uber.org/atomic v1.5.0
 	go.uber.org/multierr v1.3.0
 	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
-	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e
+	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
+	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4
+	golang.org/x/tools v0.0.0-20200630154851-b2d8b0336632
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.29.1
@@ -174,6 +180,7 @@ require (
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic.0.20200519143807-cbc80333a91e
+	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
@@ -182,4 +189,5 @@ replace (
 	github.com/google/gopacket => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
+	golang.org/x/tools => golang.org/x/tools v0.0.0-20200615191743-991d59a616de // release 1.13
 )

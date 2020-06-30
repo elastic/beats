@@ -104,7 +104,7 @@ func NewWithRawConfig(log *logger.Logger, config *config.Config, wrapper wrapper
 
 	cfg := &Config{}
 	if err := config.Unpack(cfg); err != nil {
-		return nil, errors.Wrap(err, "invidate configuration")
+		return nil, errors.Wrap(err, "invalidate configuration")
 	}
 
 	return NewWithConfig(l, cfg, wrapper)

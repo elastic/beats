@@ -8,11 +8,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // operationFetch fetches artifact from preconfigured source
@@ -22,22 +22,19 @@ type operationFetch struct {
 	program        Descriptor
 	operatorConfig *config.Config
 	downloader     download.Downloader
-	eventProcessor callbackHooks
 }
 
 func newOperationFetch(
 	logger *logger.Logger,
 	program Descriptor,
 	operatorConfig *config.Config,
-	downloader download.Downloader,
-	eventProcessor callbackHooks) *operationFetch {
+	downloader download.Downloader) *operationFetch {
 
 	return &operationFetch{
 		logger:         logger,
 		program:        program,
 		operatorConfig: operatorConfig,
 		downloader:     downloader,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -46,11 +43,10 @@ func (o *operationFetch) Name() string {
 	return "operation-fetch"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationFetch) Check() (bool, error) {
+// Check checks whether fetch needs to occur.
+//
+// If the artifacts already exists then fetch will not be ran.
+func (o *operationFetch) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
@@ -70,15 +66,11 @@ func (o *operationFetch) Check() (bool, error) {
 func (o *operationFetch) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 
-	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.Version())
+	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.ArtifactName(), o.program.Version())
 	if err == nil {
 		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
 	}
