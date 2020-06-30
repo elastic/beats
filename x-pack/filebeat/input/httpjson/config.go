@@ -26,6 +26,7 @@ type config struct {
 	HTTPRequestBody      common.MapStr     `config:"http_request_body"`
 	Interval             time.Duration     `config:"interval"`
 	JSONObjects          string            `config:"json_objects_array"`
+	SplitEventsBy        string            `config:"split_events_by"`
 	NoHTTPBody           bool              `config:"no_http_body"`
 	Pagination           *Pagination       `config:"pagination"`
 	RateLimit            *RateLimit        `config:"rate_limit"`

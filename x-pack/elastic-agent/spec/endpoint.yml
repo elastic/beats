@@ -1,4 +1,27 @@
-name: Endpoint
+name: Endpoint Security
+cmd: endpoint-security
+service: 6788
+check_install:
+- exec_file:
+    path: "endpoint-security"
+    args:
+    - "verify"
+    timeout: 30
+post_install:
+- exec_file:
+    path: "endpoint-security"
+    args:
+    - "install"
+    - "--upgrade"
+    - "--resources"
+    - "endpoint-security-resources.zip"
+    timeout: 120
+pre_uninstall:
+- exec_file:
+    path: "endpoint-security"
+    args:
+      - "uninstall"
+    timeout: 120
 rules:
 - fix_stream: {}
 
