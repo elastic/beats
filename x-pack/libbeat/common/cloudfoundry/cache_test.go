@@ -25,7 +25,7 @@ func TestClientCacheWrap(t *testing.T) {
 		Memory: 1, // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
-	cache := newClientCacheWrap(fakeClient, ttl, logp.NewLogger("cloudfoundry"))
+	cache := newClientCacheWrap(fakeClient, ttl, ttl, logp.NewLogger("cloudfoundry"))
 
 	missingAppGuid := mustCreateFakeGuid()
 

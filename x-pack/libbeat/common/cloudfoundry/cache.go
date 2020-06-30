@@ -22,21 +22,23 @@ type cfClient interface {
 
 // clientCacheWrap wraps the cloudfoundry client to add a cache in front of GetAppByGuid.
 type clientCacheWrap struct {
-	cache  *common.Cache
-	client cfClient
-	log    *logp.Logger
+	cache    *common.Cache
+	client   cfClient
+	log      *logp.Logger
+	errorTTL time.Duration
 }
 
 // newClientCacheWrap creates a new cache for application data.
-func newClientCacheWrap(client cfClient, ttl time.Duration, log *logp.Logger) *clientCacheWrap {
+func newClientCacheWrap(client cfClient, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) *clientCacheWrap {
 	return &clientCacheWrap{
-		cache:  common.NewCacheWithExpireOnAdd(ttl, 100),
-		client: client,
-		log:    log,
+		cache:    common.NewCacheWithExpireOnAdd(ttl, 100),
+		client:   client,
+		errorTTL: errorTTL,
+		log:      log,
 	}
 }
 
-type cachedAppResponse struct {
+type appResponse struct {
 	app *cfclient.App
 	err error
 }
@@ -45,15 +47,17 @@ type cachedAppResponse struct {
 // stores it in the internal cache
 func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 	app, err := c.client.GetAppByGuid(guid)
-	resp := cachedAppResponse{
+	resp := appResponse{
 		app: &app,
 		err: err,
 	}
+	timeout := time.Duration(0)
 	if err != nil {
 		// Cache nil, because is what we want to return when there was an error
 		resp.app = nil
+		timeout = c.errorTTL
 	}
-	c.cache.Put(guid, &resp)
+	c.cache.PutWithTimeout(guid, &resp, timeout)
 	return resp.app, resp.err
 }
 
@@ -64,7 +68,7 @@ func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
 	if cachedResp == nil {
 		return c.fetchAppByGuid(guid)
 	}
-	resp, ok := cachedResp.(*cachedAppResponse)
+	resp, ok := cachedResp.(*appResponse)
 	if !ok {
 		return nil, fmt.Errorf("error converting cached app response (of type %T), this is likely a bug", cachedResp)
 	}
