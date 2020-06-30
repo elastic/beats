@@ -23,12 +23,12 @@ var gsuite = (function () {
             { from: "message", to: "event.original" },
             { from: "json.events.name", to: "event.action" },
             { from: "json.id.applicationName", to: "event.provider" },
-            { from: "json.id.uniqueQualifier", to: "event.id" },
+            { from: "json.id.uniqueQualifier", to: "event.id", type: "string" },
             { from: "json.actor.email", to: "client.user.email" },
-            { from: "json.actor.profileId", to: "client.user.id" },
-            { from: "json.ipAddress", to: "client.ip" },
+            { from: "json.actor.profileId", to: "client.user.id", type: "string" },
+            { from: "json.ipAddress", to: "client.ip", type: "ip" },
             { from: "json.kind", to: "gsuite.kind" },
-            { from: "json.id.customerId", to: "gsuite.customer.id" },
+            { from: "json.id.customerId", to: "gsuite.customer.id", type: "string" },
             { from: "json.actor.callerType", to: "gsuite.actor.type" },
             { from: "json.actor.key", to: "gsuite.actor.key" },
             { from: "json.ownerDomain", to: "gsuite.owner.domain" },
@@ -47,16 +47,11 @@ var gsuite = (function () {
         fail_on_error: false,
     });
 
-    var cleanup = function(evt) {
-        evt.Delete("json.id.time");
-    };
-
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
         .Add(convertFields)
         .Add(copyFields)
-        .Add(cleanup)
         .Build();
 
     return {

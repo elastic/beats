@@ -10,14 +10,12 @@ var:
   - name: user_key
     default: all
   - name: interval
-    default: 60s
+    default: 5s
   - name: tags
     default: [forwarded]
 
 input: config/config.yml
-ingest_pipeline:
-  - ../ingest/common.yml
-  - ingest/pipeline.yml
+ingest_pipeline: ../ingest/common.yml
 
 requires.processors:
 - name: geoip

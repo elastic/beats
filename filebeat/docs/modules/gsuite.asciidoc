@@ -44,11 +44,11 @@ you can set up your module:
   saml:
     enabled: true
     var.jwt_file: "./credentials_file.json"
-    var.delegated_user: "user@example.com"
+    var.delegated_account: "user@example.com"
   user_accounts:
     enabled: true
     var.jwt_file: "./credentials_file.json"
-    var.delegated_user: "user@example.com"
+    var.delegated_account: "user@example.com"
 ----
 
 Every fileset has the following configuration options:
@@ -57,7 +57,7 @@ Every fileset has the following configuration options:
 
 Specifies the path to the JWT credentials file.
 
-*`var.delegated_user`*::
+*`var.delegated_account`*::
 
 Email of the admin user used to access the API.
 
