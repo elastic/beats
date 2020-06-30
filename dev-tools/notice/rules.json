@@ -1,5 +1,5 @@
 {
-  "whitelist": [
+  "allowlist": [
     "Apache-2.0",
     "BSD",
     "BSD-2-Clause",
@@ -11,7 +11,7 @@
     "MPL-2.0",
     "Public Domain"
   ],
-  "yellowlist": [
+  "maybelist": [
     "EPL-1.0",
     "GPL-3.0"
   ]

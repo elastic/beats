@@ -21,9 +21,10 @@ import (
 
 func TestSerialization(t *testing.T) {
 	spec := Spec{
-		Name: "hello",
-		Cmd:  "hellocmd",
-		Args: []string{"-c", "first"},
+		Name:     "hello",
+		Cmd:      "hellocmd",
+		Args:     []string{"-c", "first"},
+		Artifact: "nested/hellocmd",
 		Rules: transpiler.NewRuleList(
 			transpiler.Copy("inputs", "filebeat"),
 			transpiler.Filter("filebeat", "output", "keystore"),
@@ -60,6 +61,7 @@ cmd: hellocmd
 args:
 - -c
 - first
+artifact: nested/hellocmd
 rules:
 - copy:
     from: inputs
