@@ -25887,63 +25887,176 @@ Microsoft Module
 [float]
 === microsoft
 
-- name: defender_atp
-  type: group
-  release: beta
-  default_field: false
-  description: >
-    Module for ingesting Microsoft Defender ATP.
-  fields:
-    - name: lastUpdateTime
-      type: keyword
-      description: >
-        The date and time (in UTC) the alert was last updated.
+Fields from Microsoft ATP
 
-    - name: resolvedTime
-      type: keyword
-      description: >
-        The date and time in which the status of the alert was changed to 'Resolved'.
 
-    - name: incidentId
-      type: keyword
-      description: >
-        The Incident ID of the Alert.
 
-    - name: investigationId
-      type: keyword
-      description: >
-        The Investigation ID related to the Alert.
+[float]
+=== defender_atp
 
-    - name: investigationId
-      type: keyword
-      description: >
-        The current state of the Investigation.
+Module for ingesting Microsoft Defender ATP.
 
-    - name: investigationId
-      type: keyword
-      description: >
-        Owner of the alert.
 
-    - name: status
-      type: keyword
-      description: >
-        Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
 
-    - name: classification
-      type: keyword
-      description: >
-        Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+*`microsoft.defender_atp.lastUpdateTime`*::
++
+--
+The date and time (in UTC) the alert was last updated.
 
-    - name: determination
-      type: keyword
-      description: >
-        Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
 
-    - name: threatFamilyName
-      type: keyword
-      description: >
-        Threat family.
+type: keyword
 
+--
+
+*`microsoft.defender_atp.resolvedTime`*::
++
+--
+The date and time in which the status of the alert was changed to 'Resolved'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.incidentId`*::
++
+--
+The Incident ID of the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationId`*::
++
+--
+The Investigation ID related to the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationState`*::
++
+--
+The current state of the Investigation.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.assignedTo`*::
++
+--
+Owner of the alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.status`*::
++
+--
+Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.classification`*::
++
+--
+Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.determination`*::
++
+--
+Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.threatFamilyName`*::
++
+--
+Threat family.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.domainName`*::
++
+--
+Domain name related to the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.ipAddress`*::
++
+--
+IP address involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.aadUserId`*::
++
+--
+ID of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.accountName`*::
++
+--
+Username of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.entityType`*::
++
+--
+The type of evidence
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.userPrincipalName`*::
++
+--
+Principal name of the user involved in the alert
+
+
+type: keyword
+
+--
 
 [[exported-fields-misp]]
 == MISP fields

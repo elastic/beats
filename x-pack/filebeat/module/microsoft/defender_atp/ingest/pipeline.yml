@@ -7,7 +7,6 @@ processors:
         - json.comments
         - host
       ignore_missing: true
-
 #########################
 ## ECS General Mapping ##
 #########################
