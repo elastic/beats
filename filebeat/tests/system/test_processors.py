@@ -302,6 +302,166 @@ class Test(BaseTest):
             ["42", "hello world", "string\twith tabs and \"broken\" quotes"],
         ])
 
+    def test_decode_csv_fields_header_in_string(self):
+        """
+        Check CSV decoding using header in string
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    },
+                    "headers": {
+                        "message": {
+                            "string": "column1,column2,column3"
+                        }
+                    }
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            "I,am,Mark\n"
+        ])
+
+        self._assert_expected_lines(["I"], field="csv.column1")
+
+        self._assert_expected_lines(["am"], field="csv.column2")
+
+        self._assert_expected_lines(["Mark"], field="csv.column3")
+
+    def test_decode_csv_fields_header_in_file(self):
+        """
+        Check CSV decoding using header in conf file
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    },
+                    "headers": {
+                        "message": {
+                            "file": {
+                                "path": "tests/system/header_test"
+                            }
+                        }
+                    }
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            "I,am,Mark\n"
+        ])
+
+        self._assert_expected_lines(["I"], field="csv.column1_1")
+
+        self._assert_expected_lines(["am"], field="csv.column1_2")
+
+        self._assert_expected_lines(["Mark"], field="csv.column1_3")
+
+    def test_decode_csv_fields_header_in_file_with_offset(self):
+        """
+        Check CSV decoding using header in conf file with offset
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    },
+                    "headers": {
+                        "message": {
+                            "offset": 2,
+                            "file": {
+                                "path": "tests/system/header_test"
+                            }
+                        }
+                    }
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            "I,am,Mark\n"
+        ])
+
+        self._assert_expected_lines(["I"], field="csv.column2_1")
+
+        self._assert_expected_lines(["am"], field="csv.column2_2")
+
+        self._assert_expected_lines(["Mark"], field="csv.column2_3")
+
+    def test_decode_csv_fields_header_in_file_offset_too_large(self):
+        """
+        Check CSV decoding using header in conf file with an offset too large
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    },
+                    "headers": {
+                        "message": {
+                            "offset": 5,
+                            "file": {
+                                "path": "tests/system/header_test"
+                            }
+                        }
+                    }
+                },
+            }]
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("column1,column2,column3\nI,am,Mark\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=2))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()[1]
+        assert "csv.column1" not in output
+        assert "csv.column2" not in output
+        assert "csv.column3" not in output
+
+    def test_decode_csv_fields_header_in_current_file(self):
+        """
+        Check CSV decoding using header in current file
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    },
+                    "headers": {
+                        "message": {
+                            "in_file": True
+                        }
+                    }
+                },
+            }]
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("column1,column2,column3\nI,am,Mark\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=2))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()[1]
+        assert output["csv.column1"] == "I"
+        assert output["csv.column2"] == "am"
+        assert output["csv.column3"] == "Mark"
+
     def test_urldecode_defaults(self):
         """
         Check URL-decoding using defaults
