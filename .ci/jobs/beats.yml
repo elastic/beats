@@ -34,7 +34,7 @@
             ignore-tags-older-than: -1
             ignore-tags-newer-than: -1
         - change-request:
-            ignore-target-only-changes: false
+            ignore-target-only-changes: true
         - named-branches:
             - exact-name:
                 name: 'master'
