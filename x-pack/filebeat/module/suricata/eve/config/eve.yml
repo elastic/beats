@@ -375,7 +375,7 @@ processors:
         }
   - convert:
       ignore_missing: true
-      ignore_failure: true
+      fail_on_error: false
       mode: copy
       fields:
         - {from: suricata.eve.tls.subject, to: tls.server.subject}

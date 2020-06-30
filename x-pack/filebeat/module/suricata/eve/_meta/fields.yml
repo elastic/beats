@@ -1,6 +1,5 @@
 - name: eve
   type: group
-  default_field: false
   description: >
     Fields exported by the EVE JSON logs
   fields:
@@ -668,6 +667,7 @@
 
       - name: ja3s
         type: group
+        default_field: false
         fields:
           - name: string
             type: keyword
@@ -676,6 +676,7 @@
 
       - name: ja3
         type: group
+        default_field: false
         fields:
           - name: string
             type: keyword
