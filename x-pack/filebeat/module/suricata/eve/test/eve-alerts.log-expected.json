@@ -1636,7 +1636,6 @@
             "10.137.3.54",
             "10.128.2.48"
         ],
-        "rule.category": "",
         "rule.id": "2610003",
         "rule.name": "SURICATA TLS on unusual port",
         "service.type": "suricata",
