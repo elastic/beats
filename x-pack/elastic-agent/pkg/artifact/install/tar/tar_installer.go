@@ -50,8 +50,9 @@ func (i *Installer) Install(_ context.Context, programName, version, installDir 
 		os.RemoveAll(installDir)
 	}
 
-	return unpack(f, installDir)
-
+	// unpack must occur in directory that holds the installation directory
+	// or the extraction will be double nested
+	return unpack(f, filepath.Dir(installDir))
 }
 
 func unpack(r io.Reader, dir string) error {

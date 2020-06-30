@@ -11,7 +11,7 @@
           branch-discovery: no-pr
           discover-pr-forks-strategy: merge-current
           discover-pr-forks-trust: permission
-          discover-pr-origin: merge-current          
+          discover-pr-origin: merge-current
           discover-tags: true
           notification-context: 'beats-ci'
           repo: golang-crossbuild
@@ -25,7 +25,7 @@
                 ignore-tags-newer-than: -1
             - regular-branches: true
             - change-request:
-                ignore-target-only-changes: false
+                ignore-target-only-changes: true
           clean:
             after: true
             before: true
