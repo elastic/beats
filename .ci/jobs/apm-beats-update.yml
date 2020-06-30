@@ -44,7 +44,7 @@
                 regex: '8\.\d+'
                 case-sensitive: true
         - change-request:
-            ignore-target-only-changes: false
+            ignore-target-only-changes: true
         clean:
             after: true
             before: true
