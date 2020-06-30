@@ -1,57 +1,122 @@
-description: Pipeline to parse milestone github wehhooks
+description: Pipeline to parse project github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.project.creator.login}}'
-    if: ctx.github?.project?.creator?.type == 'User' && !(ctx.related.user).contains(ctx.github.project.creator.login)
-- append:
-    field: event.type
-    value: info
 - append:
     field: event.type
     value: creation
-    if: ctx.github?.action == 'added'
+    if: ctx.github?.action == 'created'
 - append:
     field: event.type
     value: change
-    if: '[''edited'', ''closed'', ''reopened''].contains(ctx.github?.action)'
+    if: "['edited', 'closed', 'moved', 'converted'].contains(ctx.github?.action)"
 - append:
     field: event.type
     value: deletion
     if: ctx.github?.action == 'deleted'
 - set:
-    field: event.outcome
-    value: success
-- set:
-    field: event.kind
-    value: event
+    field: event.action
+    value: project_card-{{github.action}}
+    if: ctx.github?.project_card != null
 - set:
     field: event.action
-    value: organization-{{github.action}}
+    value: project_column-{{github.action}}
+    if: ctx.github?.project_column != null
+- set:
+    field: event.action
+    value: project-{{github.action}}
+    if: ctx.github?.project != null
+###############
+#Project_cards#
+###############
 - rename:
-    field: github.project_card.url
-    target_field: event.url
+    field: github.project_card
+    target_field: _temp_.project_card
     ignore_missing: true
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: _temp_.project_card.url
+    target_field: github.project_card.url
     ignore_missing: true
 - rename:
-    field: github.sender.id
-    target_field: source.user.id
+    field: _temp_.project_card.id
+    target_field: github.project_card.id
+    ignore_missing: true
+- rename:
+    field: _temp_.project_card.project_url
+    target_field: github.related.project.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project_card.column_url
+    target_field: github.related.column.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project_card.creator.login
+    target_field: github.related.user.name
+    ignore_missing: true
+- rename:
+    field: _temp_.project_card.creator.id
+    target_field: github.related.user.id
+    ignore_missing: true
+################
+#Project_column#
+################
+- rename:
+    field: github.project_column
+    target_field: _temp_.project_column
+    ignore_missing: true
+- rename:
+    field: _temp_.project_column.url
+    target_field: github.project_column.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project_column.id
+    target_field: github.project_column.id
+    ignore_missing: true
+- rename:
+    field: _temp_.project_column.project_url
+    target_field: github.related.project.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project_column.cards_url
+    target_field: github.related.card.url
+    ignore_missing: true
+#########
+#Project#
+#########
+- rename:
+    field: github.project
+    target_field: _temp_.project
+    ignore_missing: true
+- rename:
+    field: _temp_.project.html_url
+    target_field: github.project.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project.id
+    target_field: github.project.id
+    ignore_missing: true
+- rename:
+    field: _temp_.project.columns_url
+    target_field: github.related.column.url
+    ignore_missing: true
+- rename:
+    field: _temp_.project.name
+    target_field: github.project.name
+    ignore_missing: true
+- rename:
+    field: _temp_.project.number
+    target_field: github.project.number
+    ignore_missing: true
+- rename:
+    field: _temp_.project.state
+    target_field: github.project.state
+    ignore_missing: true
+- remove:
+    field:
+    - github.repository
+    - github.organization
+    - github.installation
+    - _temp_
+    - github.changes
+    - github.sender
     ignore_missing: true
 on_failure:
 - set:

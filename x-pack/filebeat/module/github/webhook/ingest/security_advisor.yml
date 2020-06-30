@@ -1,57 +1,47 @@
-description: Pipeline to parse milestone github wehhooks
+description: Pipeline to parse security_advisory github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.project.creator.login}}'
-    if: ctx.github?.project?.creator?.type == 'User' && !(ctx.related.user).contains(ctx.github.project.creator.login)
-- append:
-    field: event.type
-    value: info
 - append:
     field: event.type
     value: creation
-    if: ctx.github?.action == 'added'
+    if: ctx.github?.action == 'published'
 - append:
     field: event.type
     value: change
-    if: '[''edited'', ''closed'', ''reopened''].contains(ctx.github?.action)'
-- append:
-    field: event.type
-    value: deletion
-    if: ctx.github?.action == 'deleted'
-- set:
-    field: event.outcome
-    value: success
+    if: "['edited', 'closed', 'reopened'].contains(ctx.github?.action)"
+- remove:
+    field: event.kind
+    ignore_missing: true
 - set:
     field: event.kind
-    value: event
+    value: alert
 - set:
     field: event.action
-    value: organization-{{github.action}}
+    value: security_advisor-{{github.action}}
 - rename:
-    field: github.project_card.url
-    target_field: event.url
+    field: github.security_advisory
+    target_field: _temp_.security_advisory
     ignore_missing: true
+- foreach:
+    field: _temp_.security_advisory.identifiers
+    processor:
+      append:
+        field: github.security_advisory.identifiers
+        value: "{{_ingest._value.value}}"
+    if: ctx._temp_?.security_advisory?.identifiers != null
+- foreach:
+    field: _temp_.security_advisory.references
+    processor:
+      append:
+        field: github.security_advisory.references
+        value: "{{_ingest._value.url}}"
+    if: ctx._temp_?.security_advisory?.references != null
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: _temp_.security_advisory.vulnerabilities
+    target_field: github.security_advisory.vulnerabilities
     ignore_missing: true
-- rename:
-    field: github.sender.id
-    target_field: source.user.id
+- remove:
+    field:
+    - _temp_
     ignore_missing: true
 on_failure:
 - set:

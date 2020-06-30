@@ -1,27 +1,8 @@
-description: Pipeline to parse milestone github wehhooks
+description: Pipeline to parse organization github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.membership.user.login}}'
-    if: ctx.github?.membership?.user?.type == 'User' && !(ctx.related.user).contains(ctx.github.membership.user.login)
 - append:
     field: event.type
-    value:
-    - info
-    - iam
+    value: iam
 - append:
     field: event.type
     value: creation
@@ -29,31 +10,55 @@ processors:
 - append:
     field: event.type
     value: change
-    if: '[''renamed'', ''member_added'', ''member_removed'', ''member_invited''].contains(ctx.github?.action)'
+    if: "['renamed', 'member_added', 'member_removed', 'member_invited'].contains(ctx.github?.action)"
 - append:
     field: event.type
     value: deletion
     if: ctx.github?.action == 'deleted'
-- set:
-    field: event.outcome
-    value: success
-- set:
-    field: event.kind
-    value: event
+- append:
+    field: related.user
+    value: "{{github.membership.user.login}}"
+    if: ctx.github?.membership?.user?.login != null
 - set:
     field: event.action
     value: organization-{{github.action}}
 - rename:
-    field: github.milestone.url
-    target_field: event.url
+    field: github.membership.url
+    target_field: github.related.membership.url
     ignore_missing: true
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: github.membership.state
+    target_field: github.related.membership.state
     ignore_missing: true
 - rename:
-    field: github.sender.id
-    target_field: source.user.id
+    field: github.membership.role
+    target_field: github.related.membership.role
+    ignore_missing: true
+- rename:
+    field: github.membership.role
+    target_field: github.related.membership.role
+    ignore_missing: true
+- rename:
+    field: github.membership.user.login
+    target_field: github.related.user.name
+    ignore_missing: true
+- rename:
+    field: github.membership.user.id
+    target_field: github.related.user.id
+    ignore_missing: true
+- rename:
+    field: github.membership.user.site_admin
+    target_field: github.related.user.site_admin
+    ignore_missing: true
+- remove:
+    field:
+    - github.check_run
+    - github.check_suite
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
+    - github.membership
     ignore_missing: true
 on_failure:
 - set:

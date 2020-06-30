@@ -1,4 +1,4 @@
-description: Pipeline to parse check_run and check_suite github wehhooks
+description: initial pipeline for all github wehhooks
 processors:
 - set:
     field: observer.name
@@ -9,12 +9,15 @@ processors:
 - set:
     field: observer.vendor
     value: Github
+- set:
+    field: event.kind
+    value: event
 - append:
     field: event.category
     value: web
 - rename:
     field: github.organization.login
-    target_field: github.related.organization
+    target_field: github.related.organization.name
     ignore_missing: true
 - append:
     field: related.user

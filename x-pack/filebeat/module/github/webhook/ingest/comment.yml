@@ -16,12 +16,13 @@ processors:
     field: github.comment.html_url
     target_field: github.related.comment.url
     ignore_missing: true
+- rename:
+    field: github.comment.pull_request_review_id
+    target_field: github.related.pull_request.id
+    ignore_missing: true
 - append:
     field: event.type
     value: creation
-- set:
-    field: event.kind
-    value: event
 - set:
     field: event.action
     value: commit_comment-{{github.action}}
@@ -33,7 +34,7 @@ processors:
 - set:
     field: event.action
     value: review_comment-{{github.action}}
-    if: ctx.github?.issue != null && ctx.github?.pull_request != null
+    if: ctx.github?.issue == null && ctx.github?.pull_request != null && ctx.github?.comment != null
 - remove:
     field:
     - github.comment

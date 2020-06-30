@@ -1,0 +1,68 @@
+description: Pipeline to parse pull_request github wehhooks
+processors:
+- append:
+    field: event.type
+    value: creation
+    if: ctx.github?.action == 'submitted'
+- append:
+    field: event.type
+    value: change
+    if: "['edited', 'edited', 'dismissed'].contains(ctx.github?.action)"
+- set:
+    field: event.action
+    value: pull_request_review-{{github.action}}
+    if: ctx.github?.review != null
+- rename:
+    field: github.review
+    target_field: _temp_.review
+    ignore_missing: true
+- rename:
+    field: _temp_.review.id
+    target_field: github.review.id
+    ignore_missing: true
+- rename:
+    field: _temp_.review.html_url
+    target_field: github.review.url
+    ignore_missing: true
+- rename:
+    field: _temp_.review.state
+    target_field: github.review.state
+    ignore_missing: true
+- rename:
+    field: _temp_.review.user.login
+    target_field: github.related.user.name
+    ignore_missing: true
+- rename:
+    field: _temp_.review.user.id
+    target_field: github.related.user.id
+    ignore_missing: true
+- rename:
+    field: _temp_.review.user.id
+    target_field: github.related.user.id
+    ignore_missing: true
+- rename:
+    field: github.pull_request.id
+    target_field: github.related.pull_request.id
+    ignore_missing: true
+- rename:
+    field: github.pull_request.number
+    target_field: github.related.pull_request.number
+    ignore_missing: true
+- rename:
+    field: github.pull_request.html_url
+    target_field: github.related.pull_request.url
+    ignore_missing: true
+- remove:
+    field:
+    - github.repository
+    - github.organization
+    - github.installation
+    - _temp_
+    - github.changes
+    - github.sender
+    - github.pull_request
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

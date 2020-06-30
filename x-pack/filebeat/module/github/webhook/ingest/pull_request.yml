@@ -1,74 +1,136 @@
-Error: open pull_request.json: no such file or directory
-Usage:
-  yq read [yaml_file] [path_expression] [flags]
-
-Aliases:
-  read, r
-
-Examples:
-
-yq read things.yaml 'a.b.c'
-yq r - 'a.b.c' # reads from stdin
-yq r things.yaml 'a.*.c'
-yq r things.yaml 'a.**.c' # deep splat
-yq r things.yaml 'a.(child.subchild==co*).c'
-yq r -d1 things.yaml 'a.array[0].blah'
-yq r things.yaml 'a.array[*].blah'
-yq r -- things.yaml '--key-starting-with-dashes.blah'
-      
-
-Flags:
-  -c, --collect               collect results into array
-  -D, --defaultValue string   default value printed when there are no results
-  -d, --doc string            process document index number (0 based, * for all documents) (default "0")
-  -X, --explodeAnchors        explode anchors
-  -h, --help                  help for read
-  -l, --length                print length of results
-  -p, --printMode string      print mode (v (values, default), p (paths), pv (path and value pairs) (default "v")
-      --stripComments         print yaml without any comments
-      --unwrapScalar          unwrap scalar, print the value with no quotes, colors or comments (default true)
-
-Global Flags:
-  -C, --colors        print with colors
-  -I, --indent int    sets indent level for output (default 2)
-  -P, --prettyPrint   pretty print
-  -j, --tojson        output as json. By default it prints a json document in one line, use the prettyPrint flag to print a formatted doc.
-  -v, --verbose       verbose mode
-
-Error: open pull_request.json: no such file or directory
-Usage:
-  yq read [yaml_file] [path_expression] [flags]
-
-Aliases:
-  read, r
-
-Examples:
-
-yq read things.yaml 'a.b.c'
-yq r - 'a.b.c' # reads from stdin
-yq r things.yaml 'a.*.c'
-yq r things.yaml 'a.**.c' # deep splat
-yq r things.yaml 'a.(child.subchild==co*).c'
-yq r -d1 things.yaml 'a.array[0].blah'
-yq r things.yaml 'a.array[*].blah'
-yq r -- things.yaml '--key-starting-with-dashes.blah'
-      
-
-Flags:
-  -c, --collect               collect results into array
-  -D, --defaultValue string   default value printed when there are no results
-  -d, --doc string            process document index number (0 based, * for all documents) (default "0")
-  -X, --explodeAnchors        explode anchors
-  -h, --help                  help for read
-  -l, --length                print length of results
-  -p, --printMode string      print mode (v (values, default), p (paths), pv (path and value pairs) (default "v")
-      --stripComments         print yaml without any comments
-      --unwrapScalar          unwrap scalar, print the value with no quotes, colors or comments (default true)
-
-Global Flags:
-  -C, --colors        print with colors
-  -I, --indent int    sets indent level for output (default 2)
-  -P, --prettyPrint   pretty print
-  -j, --tojson        output as json. By default it prints a json document in one line, use the prettyPrint flag to print a formatted doc.
-  -v, --verbose       verbose mode
-
+description: Pipeline to parse pull_request github wehhooks
+processors:
+- append:
+    field: event.type
+    value: creation
+    if: ctx.github?.action == 'opened'
+- append:
+    field: event.type
+    value: change
+    if: "['edited', 'closed', 'assigned', 'unassigned', 'review_requested', 
+    'review_request_removed', 'ready_for_review', 'labeled', 'unlabeled', 
+    'synchronize', 'locked', 'unlocked', 'reopened', 'edited', 
+    'dismissed'].contains(ctx.github?.action)"
+- set:
+    field: event.action
+    value: pull_request-{{github.action}}
+##############
+#pull_request#
+##############
+- rename:
+    field: github.pull_request
+    target_field: _temp_.pull_request
+    ignore_missing: true
+- rename:
+    field: github.number
+    target_field: github.pull_request.number
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.html_url
+    target_field: github.pull_request.url
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.id
+    target_field: github.pull_request.id
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.state
+    target_field: github.pull_request.state
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.locked
+    target_field: github.pull_request.locked
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.created_at
+    target_field: github.pull_request.created_at
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.updated_at
+    target_field: github.pull_request.updated_at
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.closed_at
+    target_field: github.pull_request.closed_at
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.merged_at
+    target_field: github.pull_request.merged_at
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.assignee
+    target_field: github.pull_request.assignee
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.head.sha
+    target_field: github.pull_request.head_sha
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.head.repo.id
+    target_field: github.related.repository.head_id
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.head.repo.full_name
+    target_field: github.related.repository.head_name
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.base.sha
+    target_field: github.pull_request.base_sha
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.base.repo.id
+    target_field: github.related.repository.base_id
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.base.repo.full_name
+    target_field: github.related.repository.base_name
+    ignore_missing: true
+- foreach:
+    field: _temp_.pull_request.labels
+    processor:
+      append:
+        field: github.related.label.id
+        value: "{{_ingest._value.id}}"
+    if: ctx._temp_.?.pull_request.labels != null
+- foreach:
+    field: _temp_.pull_request.labels
+    processor:
+      append:
+        field: github.related.label.name
+        value: "{{_ingest._value.name}}"
+    if: ctx._temp_.?.pull_request.labels != null
+- foreach:
+    field: _temp_.pull_request.requested_teams
+    processor:
+      append:
+        field: github.related.team.name
+        value: "{{_ingest._value.name}}"
+    if: ctx._temp_.?.pull_request.requested_teams != null
+- foreach:
+    field: _temp_.pull_request.requested_teams
+    processor:
+      append:
+        field: github.related.team.id
+        value: "{{_ingest._value.id}}"
+    if: ctx._temp_.?.pull_request.requested_teams != null
+- rename:
+    field: _temp_.pull_request.user.login
+    target_field: github.related.user.name
+    ignore_missing: true
+- rename:
+    field: _temp_.pull_request.user.id
+    target_field: github.related.user.id
+    ignore_missing: true
+- remove:
+    field:
+    - github.repository
+    - github.organization
+    - github.installation
+    - _temp_
+    - github.changes
+    - github.sender
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

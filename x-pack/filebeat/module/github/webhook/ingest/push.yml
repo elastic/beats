@@ -1,57 +1,35 @@
 description: Pipeline to parse milestone github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.project.creator.login}}'
-    if: ctx.github?.project?.creator?.type == 'User' && !(ctx.related.user).contains(ctx.github.project.creator.login)
-- append:
-    field: event.type
-    value: info
 - append:
     field: event.type
     value: creation
-    if: ctx.github?.action == 'added'
-- append:
-    field: event.type
-    value: change
-    if: '[''edited'', ''closed'', ''reopened''].contains(ctx.github?.action)'
+    if: ctx.github?.created == 'true'
 - append:
     field: event.type
     value: deletion
-    if: ctx.github?.action == 'deleted'
-- set:
-    field: event.outcome
-    value: success
-- set:
-    field: event.kind
-    value: event
+    if: ctx.github?.deleted == 'true'
 - set:
     field: event.action
-    value: organization-{{github.action}}
+    value: push-action
 - rename:
-    field: github.project_card.url
-    target_field: event.url
+    field: github.ref
+    target_field: github.push.ref
     ignore_missing: true
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: github.forced
+    target_field: github.push.forced
     ignore_missing: true
 - rename:
-    field: github.sender.id
-    target_field: source.user.id
+    field: github.pusher.name
+    target_field: github.related.user.name
+    ignore_missing: true
+- remove:
+    field:
+    - github.commits
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
     ignore_missing: true
 on_failure:
 - set:

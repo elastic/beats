@@ -16,14 +16,37 @@ processors:
     value: deletion
     if: ctx.github?.action == 'removed'
 - set:
-    field: event.outcome
-    value: success
-- set:
     field: event.kind
     value: event
 - set:
     field: event.action
     value: member-{{github.action}}
+- rename:
+    field: github.member
+    target_field: _temp_.member
+    ignore_missing: true
+- rename:
+    field: _temp_.member.login
+    target_field: github.member.name
+    ignore_missing: true
+- rename:
+    field: _temp_.member.id
+    target_field: github.member.id
+    ignore_missing: true
+- rename:
+    field: _temp_.member.site_admin
+    target_field: github.member.site_admin
+    ignore_missing: true
+- remove:
+    field:
+    - github.check_run
+    - github.check_suite
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
+    - _temp_
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

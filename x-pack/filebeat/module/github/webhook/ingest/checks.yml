@@ -37,7 +37,7 @@ processors:
     target_field: event.end
     if: ctx.github?.action == 'completed' && ctx.github?.check_run != null
 # Since we are removing all unecessary at the end of the pipeline, we first rename
-# we are interested in
+# the fields which is interesting
 - rename:
     field: github.check_run.html_url
     target_field: event.url
@@ -65,30 +65,30 @@ processors:
     if: ctx.github?.checks_suite != null && ctx.github?.check_suite?.app?.id != null
 - rename:
     field: github.check_run.status
-    target_field: github.check.status
+    target_field: github.check_run.status
     ignore_missing: true
 - rename:
     field: github.check_suite.status
-    target_field: github.check.status
+    target_field: github.check_suite.status
     ignore_missing: true
 - rename:
     field: github.check_run.conclusion
-    target_field: github.check.conclusion
+    target_field: github.check_run.conclusion
     ignore_missing: true
 - rename:
     field: github.check_suite.conclusion
-    target_field: github.check.conclusion
+    target_field: github.check_suite.conclusion
     ignore_missing: true
 - rename:
     field: github.check_run.name
-    target_field: github.check.name
+    target_field: github.check_run.name
     ignore_missing: true
 - rename:
     field: github.check_run.id
     target_field: github.check.id
     ignore_missing: true
 - append:
-    field: github.related.suite.name
+    field: github.related.check_suite.name
     value: "{{github.check_run.check_suite.name}}"
     ignore_missing: true
     if: ctx.github?.check_run != null

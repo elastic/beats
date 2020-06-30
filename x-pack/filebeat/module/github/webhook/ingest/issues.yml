@@ -6,9 +6,7 @@ processors:
     if: ctx.github?.action == 'opened'
 - append:
     field: event.type
-    value: 
-      -  change
-      -  info
+    value: change
     if: "['edited', 'pinned', 'unpinned', 'closed', 'reopened', 'assigned',
       'unassigned', 'labeled', 'unlabeled', 'locked', 'unlocked', 'transferred',
       'milestoned', 'demilestoned'].contains(ctx.github?.action)"

@@ -1,22 +1,5 @@
-description: Pipeline to parse member github wehhooks
+description: Pipeline to parse membership github wehhooks
 processors:
-- set:
-    field: observer.name
-    value: '{{github.repository.name}}'
-- set:
-    field: observer.product
-    value: Webhook
-- set:
-    field: observer.vendor
-    value: Github
-- append:
-    field: related.user
-    value: '{{github.sender.login}}'
-    if: ctx.github?.sender?.type == 'User'
-- append:
-    field: related.user
-    value: '{{github.member.login}}'
-    if: ctx.github?.member?.type == 'User' && !(ctx.related.user).contains(ctx.github.member.login)
 - append:
     field: event.type
     value:
@@ -32,21 +15,37 @@ processors:
     value: deletion
     if: ctx.github?.action == 'removed'
 - set:
-    field: event.outcome
-    value: success
-- set:
     field: event.kind
     value: event
 - set:
     field: event.action
     value: membership-{{github.action}}
 - rename:
-    field: github.sender.login
-    target_field: source.user.name
+    field: github.member.login
+    target_field: github.related.member.name
     ignore_missing: true
 - rename:
-    field: github.sender.id
-    target_field: source.user.id
+    field: github.member.id
+    target_field: github.related.member.id
+    ignore_missing: true
+- rename:
+    field: github.team.name
+    target_field: github.related.team.name
+    ignore_missing: true
+- rename:
+    field: github.team.id
+    target_field: github.related.team.id
+    ignore_missing: true
+- remove:
+    field:
+    - github.check_run
+    - github.check_suite
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
+    - github.team
+    - github.member
     ignore_missing: true
 on_failure:
 - set:
