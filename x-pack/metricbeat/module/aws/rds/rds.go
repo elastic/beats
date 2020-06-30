@@ -215,6 +215,52 @@ func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, m
 					Value: *tag.Value,
 				})
 		}
+
+		// WIP - Get tags from cluster
+		describeDBClustersInput := &rds.DescribeDBClustersInput{
+			DBClusterIdentifier: dbInstance.DBClusterIdentifier,
+		}
+
+		reqCluster := svc.DescribeDBClustersRequest(describeDBClustersInput)
+		outputCluster, err := reqCluster.Send(context.TODO())
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "Error DescribeDBClustersRequest")
+		}
+
+		for _, dbCluster := range outputCluster.DBClusters {
+			// Get tags for each RDS instance
+			listTagsInput := rds.ListTagsForResourceInput{
+				ResourceName: dbCluster.DBClusterArn,
+			}
+			reqListTags := svc.ListTagsForResourceRequest(&listTagsInput)
+			outputListTags, err := reqListTags.Send(context.TODO())
+			if err != nil {
+				m.Logger().Warn("ListTagsForResourceRequest-Cluster failed, rds:ListTagsForResource permission is required for getting tags.")
+				dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
+				return dbInstanceIDs, dbDetailsMap, nil
+			}
+
+			if m.TagsFilter != nil {
+				// Check with each tag filter
+				// If tag filter doesn't exist in tagKeys/tagValues,
+				// then remove this dbInstance entry from dbDetailsMap.
+				if exists := aws.CheckTagFiltersExist(m.TagsFilter, outputListTags.TagList); !exists {
+					//delete(dbDetailsMap, *dbInstance.DBInstanceIdentifier)
+					continue
+				}
+			}
+
+			for _, tag := range outputListTags.TagList {
+				// By default, replace dot "." using underscore "_" for tag keys.
+				// Note: tag values are not dedotted.
+				dbDetails.tags = append(dbDetails.tags,
+					aws.Tag{
+						Key:   common.DeDot(*tag.Key),
+						Value: *tag.Value,
+					})
+			}
+		}
+
 		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
 	}
 	return dbInstanceIDs, dbDetailsMap, nil
