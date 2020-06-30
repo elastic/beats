@@ -266,15 +266,15 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		canDrop = true
 	}
 
-	waitClose := cfg.WaitClose
+	waitCloseTimeout := cfg.WaitClose
 	reportEvents := p.waitCloser != nil
 
 	switch p.waitCloseMode {
 	case NoWaitOnClose:
 
 	case WaitOnClientClose:
-		if waitClose <= 0 {
-			waitClose = p.waitCloseTimeout
+		if waitCloseTimeout <= 0 {
+			waitCloseTimeout = p.waitCloseTimeout
 		}
 	}
 
@@ -311,8 +311,8 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	var waiter *clientCloseWaiter
-	if waitClose > 0 {
-		waiter = newClientCloseWaiter(waitClose)
+	if waitCloseTimeout > 0 || cfg.WaitCloseChan != nil {
+		waiter = newClientCloseWaiter(waitCloseTimeout, cfg.WaitCloseChan)
 	}
 
 	if waiter != nil {

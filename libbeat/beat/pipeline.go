@@ -48,11 +48,17 @@ type ClientConfig struct {
 
 	CloseRef CloseRef
 
-	// WaitClose sets the maximum duration to wait on ACK, if client still has events
-	// active non-acknowledged events in the publisher pipeline.
-	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
-	// is configured
+	// WaitClose holds a channel which controls the blocking behaviour of Close.
+	// If WaitClose is greater than zero, then Close will block until all events
+	// in the publisher pipeline have been acknowledged, WaitClose elapses, or
+	// (if non-nil) WaitCloseChan is signalled.
 	WaitClose time.Duration
+
+	// WaitCloseChan holds a channel which controls the blocking behaviour of Close.
+	// If WaitCloseChan is non-nil, then Close will block until all events in the
+	// publisher pipeline have been acknowledged, the channel is signalled, or
+	// (if specified) WaitClose elapses.
+	WaitCloseChan <-chan struct{}
 
 	// Configure ACK callback.
 	ACKHandler ACKer

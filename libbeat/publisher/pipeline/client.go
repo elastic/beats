@@ -46,10 +46,11 @@ type client struct {
 	reportEvents bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen    atomic.Bool   // set to false during shutdown, such that no new events will be accepted anymore.
-	closeOnce sync.Once     // closeOnce ensure that the client shutdown sequence is only executed once
-	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
-	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
+	isOpen    atomic.Bool     // set to false during shutdown, such that no new events will be accepted anymore.
+	closeOnce sync.Once       // closeOnce ensure that the client shutdown sequence is only executed once
+	closeRef  beat.CloseRef   // extern closeRef for sending a signal that the client should be closed.
+	done      chan struct{}   // the done channel will be closed if closeRef is signalled, or Close is run.
+	waitClose <-chan struct{} // waitClose controls waiting for event acknowledgement during Close
 
 	eventer beat.ClientEventer
 }
@@ -58,9 +59,10 @@ type clientCloseWaiter struct {
 	events  atomic.Uint32
 	closing atomic.Bool
 
-	signalAll  chan struct{} // ack loop notifies `close` that all events have been acked
-	signalDone chan struct{} // shutdown handler telling `wait` that shutdown has been completed
-	waitClose  time.Duration
+	signalAll        chan struct{} // ack loop notifies `close` that all events have been acked
+	signalDone       chan struct{} // shutdown handler telling `wait` that shutdown has been completed
+	waitCloseTimeout time.Duration
+	waitCloseAbort   <-chan struct{}
 }
 
 func (c *client) PublishAll(events []beat.Event) {
@@ -235,11 +237,12 @@ func (c *client) onDroppedOnPublish(e beat.Event) {
 	}
 }
 
-func newClientCloseWaiter(timeout time.Duration) *clientCloseWaiter {
+func newClientCloseWaiter(timeout time.Duration, abort <-chan struct{}) *clientCloseWaiter {
 	return &clientCloseWaiter{
-		signalAll:  make(chan struct{}, 1),
-		signalDone: make(chan struct{}),
-		waitClose:  timeout,
+		signalAll:        make(chan struct{}, 1),
+		signalDone:       make(chan struct{}),
+		waitCloseTimeout: timeout,
+		waitCloseAbort:   abort,
 	}
 }
 
@@ -282,9 +285,17 @@ func (w *clientCloseWaiter) signalClose() {
 	go func() {
 		defer w.finishClose()
 
+		var timeoutChan <-chan time.Time
+		if w.waitCloseTimeout > 0 {
+			timer := time.NewTimer(w.waitCloseTimeout)
+			defer timer.Stop()
+			timeoutChan = timer.C
+		}
+
 		select {
 		case <-w.signalAll:
-		case <-time.After(w.waitClose):
+		case <-timeoutChan:
+		case <-w.waitCloseAbort:
 		}
 	}()
 }
