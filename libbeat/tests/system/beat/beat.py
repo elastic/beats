@@ -743,7 +743,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             if is_documented(key, aliases):
                 errors.append("Key '{}' found in event is documented as an alias!".format(key))
                 next
-            if not(has_compatible_type(key, flat[key], types)):
+            if os.getenv('TESTING_FILEBEAT_TYPES', default=False) and not(has_compatible_type(key, flat[key], types)):
                 errors.append("Key '{}' found in event has incompatible type expected '{}' got '{}'!".format(key, types[key], type(flat[key])))
         if len(errors) > 0:
             raise Exception("Documentation Errors:\n{}".format('\n'.join(errors)))
