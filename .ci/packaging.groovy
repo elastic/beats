@@ -7,6 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
+    JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
@@ -23,10 +24,11 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
-    upstream('Beats/beats-beats-mbp/master')
+    // disable upstream trigger on a PR basis
+    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
-    booleanParam(name: 'macos', defaultValue: true, description: 'Allow macOS stages.')
+    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
   }
   stages {
@@ -42,7 +44,7 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        //stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       }
     }
     stage('Build Packages'){
@@ -104,7 +106,7 @@ pipeline {
               ].join(' ')
             }
             steps {
-              withGithubNotify(context: "Packaging ${BEATS_FOLDER}") {
+              withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                 release()
                 pushCIDockerImages()
               }
@@ -127,8 +129,10 @@ pipeline {
               ].join(' ')
             }
             steps {
-              withMacOSEnv(){
-                release()
+              withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+                withMacOSEnv(){
+                  release()
+                }
               }
             }
           }
@@ -216,38 +220,15 @@ def publishPackages(baseDir){
 }
 
 def withBeatsEnv(Closure body) {
-  def os = goos()
-  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
-
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
-    "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
-    "PYTHON_ENV=${WORKSPACE}/python-env"
-  ]) {
-    deleteDir()
-    //unstash 'source'
-    gitCheckout(basedir: "${BASE_DIR}")
-    dir("${env.BASE_DIR}"){
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install Mage", script: "make mage")
-      body()
+  withMageEnv(){
+    withEnv([
+      "PYTHON_ENV=${WORKSPACE}/python-env"
+    ]) {
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      dir("${env.BASE_DIR}"){
+        body()
+      }
     }
   }
-}
-
-def goos(){
-  def labels = env.NODE_LABELS
-
-  if (labels.contains('linux')) {
-    return 'linux'
-  } else if (labels.contains('windows')) {
-    return 'windows'
-  } else if (labels.contains('darwin')) {
-    return 'darwin'
-  }
-
-  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
