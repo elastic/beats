@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
 
+	"github.com/docker/docker/api/types/backend"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	helper "github.com/elastic/beats/v7/libbeat/common/docker"
@@ -70,7 +71,6 @@ func (cl *ClientLogger) Close() error {
 // ConsumePipelineAndSend consumes events from the FIFO pipe and sends them to the pipeline client
 func (cl *ClientLogger) ConsumePipelineAndSend() {
 	publishWriter := make(chan logdriver.LogEntry, 500)
-
 	go cl.publishLoop(publishWriter)
 	// Clean up the reader after we're done
 	defer func() {
@@ -101,6 +101,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			cl.logger.Debug("Closing publishLoop")
 			return
 		}
+
 		cl.logSpool.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
@@ -125,10 +126,12 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 
 func constructLogSpoolMsg(line logdriver.LogEntry) *logger.Message {
 	var msg logger.Message
+
 	msg.Line = line.Line
 	msg.Source = line.Source
 	msg.Timestamp = time.Unix(0, line.TimeNano)
 	if line.PartialLogMetadata != nil {
+		msg.PLogMetaData = &backend.PartialLogMetaData{}
 		msg.PLogMetaData.ID = line.PartialLogMetadata.Id
 		msg.PLogMetaData.Last = line.PartialLogMetadata.Last
 		msg.PLogMetaData.Ordinal = int(line.PartialLogMetadata.Ordinal)
