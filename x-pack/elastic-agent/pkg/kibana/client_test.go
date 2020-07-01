@@ -34,7 +34,7 @@ func addCatchAll(mux *http.ServeMux, t *testing.T) *http.ServeMux {
 }
 
 func TestPortDefaults(t *testing.T) {
-	l, err := logger.New()
+	l, err := logger.New("")
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -69,7 +69,7 @@ func TestPortDefaults(t *testing.T) {
 // - Prefix.
 func TestHTTPClient(t *testing.T) {
 	ctx := context.Background()
-	l, err := logger.New()
+	l, err := logger.New("")
 	require.NoError(t, err)
 
 	t.Run("Guard against double slashes on path", withServer(
