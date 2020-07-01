@@ -311,6 +311,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
+- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
