@@ -263,7 +263,8 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 
 	targetList, ok := targetListNode.Value().(*List)
 	if !ok {
-		return errors.New("target node is not a list")
+		// not a list; skip
+		return nil
 	}
 
 	for _, listItem := range targetList.value {

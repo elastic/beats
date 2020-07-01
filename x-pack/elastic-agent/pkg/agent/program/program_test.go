@@ -461,7 +461,7 @@ func TestConfiguration(t *testing.T) {
 			for _, program := range defPrograms {
 				programConfig, err := ioutil.ReadFile(filepath.Join(
 					"testdata",
-					name+"-"+strings.ToLower(program.Spec.Name)+".yml",
+					name+"-"+strings.ToLower(program.Spec.Cmd)+".yml",
 				))
 
 				require.NoError(t, err)
