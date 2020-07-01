@@ -128,14 +128,15 @@ func TestCreateEvent(t *testing.T) {
 	}
 
 	expectedEventFields := common.MapStr{
-		"message":       "test-message-1",
+		"message": "test-message-1",
+		"event": common.MapStr{
+			"id": *logEvent.EventId,
+		},
 		"log.file.path": "logGroup1" + "/" + *logEvent.LogStreamName,
 		"awscloudwatch": common.MapStr{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,
 			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
-			"timestamp":      time.Unix(*logEvent.Timestamp/1000, 0),
-			"event_id":       *logEvent.EventId,
 		},
 		"cloud": common.MapStr{
 			"provider": "aws",
