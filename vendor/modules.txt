@@ -93,7 +93,7 @@ github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
 # github.com/Microsoft/hcsshim v0.8.7
 github.com/Microsoft/hcsshim/osversion
-# github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 => github.com/elastic/sarama v1.24.1-elastic.0.20200519143807-cbc80333a91e
+# github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 => github.com/elastic/sarama v1.19.1-0.20200629123429-0e7b69039eec
 github.com/Shopify/sarama
 # github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 github.com/StackExchange/wmi
