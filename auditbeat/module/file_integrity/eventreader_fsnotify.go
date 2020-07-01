@@ -53,6 +53,8 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 
 	r.watcher = watcher
 	if err := r.watcher.Start(); err != nil {
+		// Ensure that watcher is closed so that we don't leak watchers
+		r.watcher.Close()
 		return nil, errors.Wrap(err, "unable to start watcher")
 	}
 
