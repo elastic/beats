@@ -111,7 +111,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New()
+		log, _ := logger.New("fleet_gateway")
 		rep := getReporter(agentInfo, log, t)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -243,7 +243,7 @@ func TestFleetGateway(t *testing.T) {
 		dispatcher := newTestingDispatcher()
 
 		ctx, cancel := context.WithCancel(context.Background())
-		log, _ := logger.New()
+		log, _ := logger.New("tst")
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -328,7 +328,7 @@ func TestFleetGateway(t *testing.T) {
 		dispatcher := newTestingDispatcher()
 
 		ctx, cancel := context.WithCancel(context.Background())
-		log, _ := logger.New()
+		log, _ := logger.New("tst")
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,

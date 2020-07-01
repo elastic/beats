@@ -43,7 +43,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig(config)
+	logger, err := logger.NewFromConfig("", config)
 	if err != nil {
 		return err
 	}

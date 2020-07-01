@@ -7,7 +7,7 @@ PYTHON_ENV?=$(BUILD_DIR)/python-env
 PYTHON_EXE?=python3
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
-FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
+FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
 REVIEWDOG=reviewdog
@@ -96,8 +96,8 @@ clean: mage
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
@@ -148,9 +148,18 @@ docs:
 
 ## notice : Generates the NOTICE file.
 .PHONY: notice
-notice: python-env
+notice:
 	@echo "Generating NOTICE"
-	@${PYTHON_ENV_EXE} dev-tools/generate_notice.py .
+	go mod tidy
+	go mod download
+	go list -m -json all | go run go.elastic.co/go-licence-detector \
+		-includeIndirect \
+		-rules dev-tools/notice/rules.json \
+		-overrides dev-tools/notice/overrides.json \
+		-noticeTemplate dev-tools/notice/NOTICE.txt.tmpl \
+		-noticeOut NOTICE.txt \
+		-depsOut ""
+
 
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env

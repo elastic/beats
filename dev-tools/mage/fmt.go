@@ -74,8 +74,8 @@ func GoImports() error {
 			return err
 		}
 	} else {
-		if err := gotool.Get(
-			gotool.Get.Package(filepath.Join(GoImportsImportPath)),
+		if err := gotool.Install(
+			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
 		); err != nil {
 			return err
 		}

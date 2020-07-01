@@ -1,7 +1,7 @@
 ---
 - job:
     name: Beats/beats-windows-mbp
-    display-name: Beats Pipeline for Windows 
+    display-name: Beats Pipeline for Windows
     description: Jenkins pipeline for the Beats project running on windows agents.
     view: Beats
     project-type: multibranch
@@ -11,7 +11,7 @@
           branch-discovery: no-pr
           discover-pr-forks-strategy: merge-current
           discover-pr-forks-trust: permission
-          discover-pr-origin: merge-current          
+          discover-pr-origin: merge-current
           discover-tags: false
           # Run MBP for the master branch and PRs
           head-filter-regex: '(master|PR-.*)'
@@ -27,10 +27,10 @@
                 ignore-tags-newer-than: -1
             - regular-branches: true
             - change-request:
-                ignore-target-only-changes: false
+                ignore-target-only-changes: true
           property-strategies:
             # Builds for PRs won't be triggered automatically.
-            # Only the master branch will be triggered automatically. 
+            # Only the master branch will be triggered automatically.
             named-branches:
               defaults:
                 - suppress-scm-triggering: true
