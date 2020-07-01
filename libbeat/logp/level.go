@@ -81,6 +81,26 @@ func (l *Level) Unpack(str string) error {
 	return errors.Errorf("invalid level '%v'", str)
 }
 
+// MarshalYAML marshals level in a correct form
+func (l Level) MarshalYAML() (interface{}, error) {
+	s, found := levelStrings[l]
+	if found {
+		return s, nil
+	}
+
+	return nil, errors.Errorf("invalid level '%d'", l)
+}
+
+// MarshalJSON marshals level in a correct form
+func (l Level) MarshalJSON() ([]byte, error) {
+	s, found := levelStrings[l]
+	if found {
+		return []byte(s), nil
+	}
+
+	return nil, errors.Errorf("invalid level '%d'", l)
+}
+
 func (l Level) zapLevel() zapcore.Level {
 	z, found := zapLevels[l]
 	if found {

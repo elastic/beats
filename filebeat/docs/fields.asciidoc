@@ -24801,6 +24801,16 @@ type: keyword
 
 --
 
+*`kafka.log.thread`*::
++
+--
+Thread name the log is coming from.
+
+
+type: keyword
+
+--
+
 [float]
 === trace
 
