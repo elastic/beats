@@ -7,6 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
+    JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
@@ -22,8 +23,9 @@ pipeline {
     disableConcurrentBuilds()
   }
   triggers {
-    issueCommentTrigger('(?i)^\\/packaging$')
-    upstream('Beats/beats-beats-mbp/7.7')
+    issueCommentTrigger('(?i)^\\/packag[ing|e]$')
+    // disable upstream trigger on a PR basis
+    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
@@ -31,15 +33,27 @@ pipeline {
   }
   stages {
     stage('Checkout') {
+      when {
+        beforeAgent true
+        not {
+          triggeredBy 'SCMTrigger'
+        }
+      }
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        //stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       }
     }
     stage('Build Packages'){
+      when {
+        beforeAgent true
+        not {
+          triggeredBy 'SCMTrigger'
+        }
+      }
       matrix {
         axes {
           axis {
@@ -53,6 +67,7 @@ pipeline {
               'packetbeat',
               'winlogbeat',
               'x-pack/auditbeat',
+              'x-pack/elastic-agent',
               'x-pack/dockerlogbeat',
               'x-pack/filebeat',
               'x-pack/functionbeat',
@@ -91,12 +106,14 @@ pipeline {
               ].join(' ')
             }
             steps {
-              release()
-              pushCIDockerImages()
+              withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                release()
+                pushCIDockerImages()
+              }
             }
           }
           stage('Package Mac OS'){
-            agent { label 'macosx' }
+            agent { label 'macosx-10.12' }
             options { skipDefaultCheckout() }
             when {
               beforeAgent true
@@ -112,8 +129,10 @@ pipeline {
               ].join(' ')
             }
             steps {
-              withMacOSEnv(){
-                release()
+              withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+                withMacOSEnv(){
+                  release()
+                }
               }
             }
           }
@@ -201,38 +220,15 @@ def publishPackages(baseDir){
 }
 
 def withBeatsEnv(Closure body) {
-  def os = goos()
-  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
-
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
-    "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
-    "PYTHON_ENV=${WORKSPACE}/python-env"
-  ]) {
-    deleteDir()
-    //unstash 'source'
-    gitCheckout(basedir: "${BASE_DIR}")
-    dir("${env.BASE_DIR}"){
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install Mage", script: "make mage")
-      body()
+  withMageEnv(){
+    withEnv([
+      "PYTHON_ENV=${WORKSPACE}/python-env"
+    ]) {
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      dir("${env.BASE_DIR}"){
+        body()
+      }
     }
   }
-}
-
-def goos(){
-  def labels = env.NODE_LABELS
-
-  if (labels.contains('linux')) {
-    return 'linux'
-  } else if (labels.contains('windows')) {
-    return 'windows'
-  } else if (labels.contains('darwin')) {
-    return 'darwin'
-  }
-
-  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
