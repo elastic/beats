@@ -1,9 +1,0 @@
-language: go
-go_import_path: go.elastic.co/fastjson
-
-go:
-  - stable
-  - "1.8.x"
-
-script:
-  - go test -v ./...

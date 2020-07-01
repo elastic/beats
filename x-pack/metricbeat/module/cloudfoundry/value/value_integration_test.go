@@ -13,12 +13,26 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry/mtest"
 )
 
 func TestFetch(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("cloudfoundry"))
+
+	t.Run("v1", func(t *testing.T) {
+		testFetch(t, "v1")
+	})
+
+	t.Run("v2", func(t *testing.T) {
+		testFetch(t, "v2")
+	})
+}
+
+func testFetch(t *testing.T, version string) {
 	config := mtest.GetConfig(t, "value")
+	config["version"] = version
 
 	ms := mbtest.NewPushMetricSetV2(t, config)
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
