@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"sync"
@@ -37,6 +38,9 @@ const (
 
 var userAgent = useragent.UserAgent("Filebeat")
 
+// for testing
+var timeNow = time.Now
+
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
@@ -55,6 +59,8 @@ type HttpjsonInput struct {
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+
+	nextCursorValue string
 }
 
 // RequestInfo struct has the information for generating an HTTP request
@@ -343,6 +349,7 @@ func createRequestInfoFromBody(m common.MapStr, idField string, requestField str
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
 func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *RequestInfo) error {
+	ri.URL = in.getURL()
 	for {
 		req, err := in.createHTTPRequest(ctx, ri)
 		if err != nil {
@@ -407,8 +414,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			in.log.Debug("http.response.body is not a valid JSON object", string(responseData))
 			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
 		}
-
-		if mm != nil && in.config.Pagination != nil && in.config.Pagination.IsEnabled() {
+		if mm != nil && in.config.Pagination.IsEnabled() {
 			if in.config.Pagination.Header != nil {
 				// Pagination control using HTTP Header
 				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
@@ -427,7 +433,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			} else {
 				// Pagination control using HTTP Body fields
-				ri, err := createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
+				ri, err = createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
 				if err != nil {
 					return err
 				}
@@ -441,7 +447,67 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			}
 		}
+		if mm != nil && in.config.DateCursor.IsEnabled() {
+			in.advanceCursor(common.MapStr(mm))
+		}
 		return nil
+	}
+}
+
+func (in *HttpjsonInput) getURL() string {
+	if !in.config.DateCursor.IsEnabled() {
+		return in.config.URL
+	}
+
+	var dateStr string
+	if in.nextCursorValue == "" {
+		t := timeNow().UTC().Add(-in.config.DateCursor.InitialInterval)
+		dateStr = t.Format(in.config.DateCursor.GetDateFormat())
+	} else {
+		dateStr = in.nextCursorValue
+	}
+
+	url, err := url.Parse(in.config.URL)
+	if err != nil {
+		return in.config.URL
+	}
+
+	q := url.Query()
+
+	var value string
+	if in.config.DateCursor.ValueTemplate == nil {
+		value = dateStr
+	} else {
+		buf := new(bytes.Buffer)
+		if err := in.config.DateCursor.ValueTemplate.Execute(buf, dateStr); err != nil {
+			return in.config.URL
+		}
+		value = buf.String()
+	}
+
+	q.Set(in.config.DateCursor.URLField, value)
+
+	url.RawQuery = q.Encode()
+
+	return url.String()
+}
+
+func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
+	v, err := m.GetValue(in.config.DateCursor.Field)
+	if err != nil {
+		in.log.Warnf("date_cursor field: %q", err)
+		return
+	}
+	switch t := v.(type) {
+	case string:
+		_, err := time.Parse(in.config.DateCursor.GetDateFormat(), t)
+		if err != nil {
+			return
+		}
+		in.nextCursorValue = t
+	default:
+		in.log.Warn("date_cursor field must be a string, cursor will not advance")
+		return
 	}
 }
 
@@ -455,7 +521,6 @@ func (in *HttpjsonInput) run() error {
 	}
 
 	ri := &RequestInfo{
-		URL:        in.URL,
 		ContentMap: common.MapStr{},
 		Headers:    in.HTTPHeaders,
 	}

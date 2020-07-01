@@ -18,17 +18,47 @@
 package memlog
 
 import (
+	"io"
 	"os"
 	"syscall"
 )
 
-// isTxIDLessEqual compares two IDs by checking that their distance is < 2^63.
-// It always returns true if
-//  - a == b
-//  - a < b (mod 2^63)
-//  - b > a after an integer rollover that is still within the distance of <2^63-1
-func isTxIDLessEqual(a, b uint64) bool {
-	return int64(a-b) <= 0
+// ensureWriter writes the buffer to the underlying writer
+// for as long as w returns a retryable error (e.g. EAGAIN)
+// or the input buffer has been exhausted.
+//
+// XXX: this code was written and tested with go1.13 and go1.14, which does not
+//      handled EINTR. Some users report EINTR getting triggered more often in
+//      go1.14 due to changes in the signal handling for implementing
+//      preemption.
+//      In future versions EINTR will be handled by go for us.
+//      See: https://github.com/golang/go/issues/38033
+type ensureWriter struct {
+	w io.Writer
+}
+
+// countWriter keeps track of the amount of bytes written over time.
+type countWriter struct {
+	n uint64
+	w io.Writer
+}
+
+func (c *countWriter) Write(p []byte) (int, error) {
+	n, err := c.w.Write(p)
+	c.n += uint64(n)
+	return n, err
+}
+
+func (e *ensureWriter) Write(p []byte) (int, error) {
+	var N int
+	for len(p) > 0 {
+		n, err := e.w.Write(p)
+		N, p = N+n, p[n:]
+		if isRetryErr(err) {
+			return N, err
+		}
+	}
+	return N, nil
 }
 
 func isRetryErr(err error) bool {

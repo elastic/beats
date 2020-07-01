@@ -7,6 +7,7 @@ package httpjson
 import (
 	"regexp"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/pkg/errors"
@@ -35,6 +36,7 @@ type config struct {
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  string            `config:"url" validate:"required"`
+	DateCursor           *DateCursor       `config:"date_cursor"`
 }
 
 // Pagination contains information about httpjson pagination settings
@@ -65,6 +67,54 @@ type RateLimit struct {
 	Remaining string `config:"remaining"`
 }
 
+type DateCursor struct {
+	Enabled         *bool         `config:"enabled"`
+	Field           string        `config:"field" validate:"required"`
+	URLField        string        `config:"url_field" validate:"required"`
+	ValueTemplate   *Template     `config:"value_template"`
+	DateFormat      string        `config:"date_format"`
+	InitialInterval time.Duration `config:"initial_interval"`
+}
+
+type Template struct {
+	*template.Template
+}
+
+func (t *Template) Unpack(in string) error {
+	tpl, err := template.New("tpl").Parse(in)
+	if err != nil {
+		return err
+	}
+
+	*t = Template{Template: tpl}
+
+	return nil
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (dc *DateCursor) IsEnabled() bool {
+	return dc != nil && (dc.Enabled == nil || *dc.Enabled)
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (dc *DateCursor) GetDateFormat() string {
+	if dc.DateFormat == "" {
+		return time.RFC3339
+	}
+	return dc.DateFormat
+}
+
+func (dc *DateCursor) Validate() error {
+	if dc.DateFormat == "" {
+		return nil
+	}
+	now := time.Now().Format(dc.DateFormat)
+	if _, err := time.Parse(dc.DateFormat, now); err != nil {
+		return errors.New("invalid configuration: date_format is not a valid date layout")
+	}
+	return nil
+}
+
 func (c *config) Validate() error {
 	switch strings.ToUpper(c.HTTPMethod) {
 	case "GET", "POST":
@@ -81,6 +131,9 @@ func (c *config) Validate() error {
 		}
 	}
 	if c.Pagination != nil {
+		if c.DateCursor.IsEnabled() {
+			return errors.Errorf("invalid configuration: date_cursor cannnot be set in combination with other pagination mechanisms")
+		}
 		if c.Pagination.Header != nil {
 			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" || len(c.Pagination.ExtraBodyContent) > 0 {
 				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")

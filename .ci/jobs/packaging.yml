@@ -4,7 +4,7 @@
     display-name: Beats Packaging
     description: Make the packages for beats and publish them on a GCS bucket.
     view: Beats
-    disabled: true
+    disabled: false
     project-type: multibranch
     script-path: .ci/packaging.groovy
     scm:
