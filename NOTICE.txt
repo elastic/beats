@@ -7054,8 +7054,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
 Overwrite: github.com/elastic/sarama
-Overwrite-Version: v1.24.1
-Overwrite-Revision: cbc80333a91e
+Overwrite-Version: v1.19.1
+Overwrite-Revision: 0e7b69039eec
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
