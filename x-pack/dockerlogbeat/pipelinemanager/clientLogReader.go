@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/daemon/logger"
 
 	"github.com/docker/docker/api/types/backend"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	helper "github.com/elastic/beats/v7/libbeat/common/docker"
