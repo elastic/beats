@@ -209,6 +209,8 @@ func (m *mockStream) Close() error {
 	return nil
 }
 
+func (m *mockStream) Shutdown() {}
+
 func (m *mockStream) event(op rOp, args ...interface{}) {
 	m.notify(m.rk, op, args...)
 }
