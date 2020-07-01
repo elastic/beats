@@ -7,6 +7,7 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -725,5 +726,52 @@ func TestArrayWithSplitResponse(t *testing.T) {
 			message, _ := e.GetValue("message")
 			assert.JSONEq(t, expectedFields[i], message.(string))
 		}
+	})
+}
+
+func TestCursor(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":                  "GET",
+		"date_cursor.field":            "@timestamp",
+		"date_cursor.url_field":        "$filter",
+		"date_cursor.value_template":   "alertCreationTime ge {{.}}",
+		"date_cursor.initial_interval": "10m",
+		"date_cursor.date_format":      "2006-01-02T15:04:05Z",
+	}
+
+	timeNow = func() time.Time {
+		t, _ := time.Parse("2006-01-02T15:04:05Z", "2002-10-02T15:10:00Z")
+		return t
+	}
+
+	const (
+		expectedQuery           = "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"
+		expectedNextCursorValue = "2002-10-02T15:00:01Z"
+		expectedNextQuery       = "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A01Z"
+	)
+	var gotQuery string
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		gotQuery = r.URL.Query().Encode()
+		w.Write([]byte(`[{"@timestamp":"2002-10-02T15:00:00Z"},{"@timestamp":"2002-10-02T15:00:01Z"}]`))
+	}))
+
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, expectedQuery, gotQuery)
+		assert.Equal(t, expectedNextCursorValue, input.nextCursorValue)
+		assert.Equal(t, fmt.Sprintf("%s?%s", ts.URL, expectedNextQuery), input.getURL())
 	})
 }
