@@ -5,6 +5,8 @@ var:
     default: httpjson
   - name: jwt_file
   - name: delegated_account
+  - name: initial_interval
+    default: 24h
   - name: http_client_timeout
     default: 60s
   - name: user_key
