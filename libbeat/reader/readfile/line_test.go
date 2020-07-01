@@ -21,7 +21,9 @@ package readfile
 
 import (
 	"bytes"
+	"encoding/hex"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,10 +33,12 @@ import (
 )
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
-var tests = []struct {
+type LineTestSpec struct {
 	encoding string
 	strings  []string
-}{
+}
+
+var tests = []LineTestSpec{
 	{"plain", []string{"I can", "eat glass"}},
 	{"latin1", []string{"I kå Glas frässa", "ond des macht mr nix!"}},
 	{"utf-16be", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
@@ -71,13 +75,10 @@ var tests = []struct {
 }
 
 func TestReaderEncodings(t *testing.T) {
-	for _, test := range tests {
-		t.Logf("test codec: %v", test.encoding)
-
+	runTest := func(t *testing.T, test LineTestSpec) {
 		codecFactory, ok := encoding.FindEncoding(test.encoding)
 		if !ok {
-			t.Errorf("can not find encoding '%v'", test.encoding)
-			continue
+			t.Fatalf("can not find encoding '%v'", test.encoding)
 		}
 
 		buffer := bytes.NewBuffer(nil)
@@ -94,10 +95,9 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(buffer, Config{codec, 1024, LineFeed})
+		reader, err := NewLineReader(buffer, Config{codec, 1024, LineFeed, Unlimited})
 		if err != nil {
-			t.Errorf("failed to initialize reader: %v", err)
-			continue
+			t.Fatal("failed to initialize reader:", err)
 		}
 
 		// read decodec lines from buffer
@@ -120,9 +120,8 @@ func TestReaderEncodings(t *testing.T) {
 
 		// validate lines and byte offsets
 		if len(test.strings) != len(readLines) {
-			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
+			t.Fatalf("number of lines mismatch (expected=%v actual=%v)",
 				len(test.strings), len(readLines))
-			continue
 		}
 		for i := range test.strings {
 			expected := test.strings[i]
@@ -130,6 +129,12 @@ func TestReaderEncodings(t *testing.T) {
 			assert.Equal(t, expected, actual)
 			assert.Equal(t, expectedCount[i], byteCounts[i])
 		}
+	}
+
+	for _, test := range tests {
+		t.Run(test.encoding, func(t *testing.T) {
+			runTest(t, test)
+		})
 	}
 }
 
@@ -150,7 +155,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(buffer, Config{codec, 1024, terminator})
+		reader, err := NewLineReader(buffer, Config{codec, 1024, terminator, Unlimited})
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -222,7 +227,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(buffer, Config{codec, buffer.Len(), LineFeed})
+	reader, err := NewLineReader(buffer, Config{codec, buffer.Len(), LineFeed, Unlimited})
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -247,4 +252,57 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 
 func testReadLine(t *testing.T, line []byte) {
 	testReadLines(t, [][]byte{line})
+}
+
+func randomBytes(sz int) ([]byte, error) {
+	bytes := make([]byte, sz)
+	if _, err := rand.Read(bytes); err != nil {
+		return nil, err
+	}
+	return bytes, nil
+}
+
+func randomString(sz int) (string, error) {
+	var bytes []byte
+	var err error
+	if bytes, err = randomBytes(sz/2 + sz%2); err != nil {
+		return "", err
+	}
+	s := hex.EncodeToString(bytes)
+	return s[:sz], nil
+}
+
+func TestMaxBytesLimit(t *testing.T) {
+	const (
+		enc          = "plain"
+		bufferSize   = 1024
+		lineMaxLimit = 10023
+		lineLen      = 23720 // exceeds lineMaxLimit
+	)
+
+	codecFactory, ok := encoding.FindEncoding(enc)
+	if !ok {
+		t.Fatalf("can not find encoding '%v'", enc)
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	codec, _ := codecFactory(buffer)
+
+	// Generate random long string that exceeds the line max limit
+	s, err := randomString(lineLen)
+	if err != nil {
+		t.Fatal("failed to generate random string:", err)
+	}
+
+	// create line reader
+	reader, err := NewLineReader(strings.NewReader(s), Config{codec, bufferSize, LineFeed, lineMaxLimit})
+	if err != nil {
+		t.Fatal("failed to initialize reader:", err)
+	}
+
+	// read decodec lines from buffer
+	_, _, err = reader.Next()
+	if err != ErrExceededMaxBytesLimit {
+		t.Fatalf("want: %v, got: %v", ErrExceededMaxBytesLimit, err)
+	}
 }

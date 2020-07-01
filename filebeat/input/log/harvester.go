@@ -631,6 +631,8 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
+	logp.Debug("harvester", "newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
+
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
@@ -648,6 +650,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		Codec:      h.encoding,
 		BufferSize: h.config.BufferSize,
 		Terminator: h.config.LineTerminator,
+		MaxBytes:   h.config.MaxBytes,
 	})
 	if err != nil {
 		return nil, err

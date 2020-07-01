@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 
@@ -28,12 +29,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+var ErrExceededMaxBytesLimit = errors.New("exceeded max bytes in line limit")
+
+const Unlimited = 0
+
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
 	reader     io.Reader
 	bufferSize int
+	maxBytes   int
 	nl         []byte
 	decodedNl  []byte
 	inBuffer   *streambuf.Buffer
@@ -62,6 +68,7 @@ func NewLineReader(input io.Reader, config Config) (*LineReader, error) {
 	return &LineReader{
 		reader:     input,
 		bufferSize: config.BufferSize,
+		maxBytes:   config.MaxBytes,
 		decoder:    config.Codec.NewDecoder(),
 		nl:         nl,
 		decodedNl:  terminator,
@@ -147,6 +154,11 @@ func (r *LineReader) advance() error {
 
 		// Check if buffer has newLine character
 		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+
+		// If newLine is not found and exceeded max bytes limit
+		if idx == -1 && r.maxBytes != 0 && r.inBuffer.Len() > r.maxBytes {
+			return ErrExceededMaxBytesLimit
+		}
 	}
 
 	// found encoded byte sequence for newline in buffer
