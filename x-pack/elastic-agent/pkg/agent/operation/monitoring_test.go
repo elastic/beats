@@ -120,7 +120,8 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
-	installer := &DummyInstaller{}
+	installer := &DummyInstallerChecker{}
+	uninstaller := &DummyUninstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
 	if err != nil {
@@ -132,7 +133,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +147,8 @@ type testMonitorableApp struct {
 	monitor monitoring.Monitor
 }
 
-func (*testMonitorableApp) Name() string { return "" }
+func (*testMonitorableApp) Name() string  { return "" }
+func (*testMonitorableApp) Started() bool { return false }
 func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
 	return nil
 }

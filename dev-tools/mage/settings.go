@@ -60,11 +60,11 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
-	UseVendor    = true
+	UseVendor    = false
 
 	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
-	CrossBuildMountModcache = false
+	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
@@ -110,7 +110,7 @@ func init() {
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
 	}
-	UseVendor, err = strconv.ParseBool(EnvOr("USE_VENDOR", "true"))
+	UseVendor, err = strconv.ParseBool(EnvOr("USE_VENDOR", "false"))
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse USE_VENDOR env value"))
 	}

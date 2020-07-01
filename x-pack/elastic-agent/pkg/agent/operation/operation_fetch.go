@@ -46,7 +46,7 @@ func (o *operationFetch) Name() string {
 // Check checks whether fetch needs to occur.
 //
 // If the artifacts already exists then fetch will not be ran.
-func (o *operationFetch) Check(_ Application) (bool, error) {
+func (o *operationFetch) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
@@ -70,7 +70,7 @@ func (o *operationFetch) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.Version())
+	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.ArtifactName(), o.program.Version())
 	if err == nil {
 		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
 	}
