@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 - Adds `split_events_by` option to httpjson input. {pull}19246[19246]
+- Adds `date_cursor` option to httpjson input. {pull}19483[19483]
 
 *Heartbeat*
 
@@ -196,6 +197,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
+- Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 
 *Heartbeat*
 
@@ -257,6 +259,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Stop counterCache only when already started {pull}19103[19103]
+- Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 
 *Packetbeat*
