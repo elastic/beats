@@ -43,4 +43,4 @@
 - module: aws
   period: 1h
   metricsets:
-    - autodiscover
+    - resource

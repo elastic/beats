@@ -1,0 +1,8 @@
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect resource metrics.
+----
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----

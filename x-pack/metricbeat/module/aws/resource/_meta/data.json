@@ -1,10 +1,10 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
-        "autodiscover": {
+        "resource": {
             "resource": {
-                "arn": "arn:aws:sns:eu-west-1:428152502467:FirstTopic",
-                "name": "sns"
+                "arn": "arn:aws:rds:eu-west-1:428152502467:cluster:cluster-vno4erilytfx3bkpbmkd7kxsom",
+                "name": "rds"
             }
         }
     },
@@ -17,12 +17,12 @@
         "region": "eu-west-1"
     },
     "event": {
-        "dataset": "aws.autodiscover",
+        "dataset": "aws.resource",
         "duration": 115000,
         "module": "aws"
     },
     "metricset": {
-        "name": "autodiscover",
+        "name": "resource",
         "period": 10000
     },
     "service": {
