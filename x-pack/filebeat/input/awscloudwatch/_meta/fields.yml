@@ -5,6 +5,7 @@
   fields:
     - name: awscloudwatch
       type: group
+      default_field: false
       description: >
         Fields from AWS CloudWatch logs.
       fields:
