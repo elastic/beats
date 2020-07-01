@@ -578,7 +578,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 		},
 	})
 	require.NoError(t, err)
-	log, err := logger.NewFromConfig(cfg)
+	log, err := logger.NewFromConfig("", cfg)
 	require.NoError(t, err)
 	return log
 }
