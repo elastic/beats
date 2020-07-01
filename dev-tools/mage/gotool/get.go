@@ -27,7 +27,6 @@ func runGoGet(opts ...ArgOpt) error {
 	return runVGo("get", args)
 }
 
-func (goGet) Download() ArgOpt                   { return flagBoolIf("-d", true) }
-func (goGet) Update() ArgOpt                     { return flagBoolIf("-u", true) }
-func (goGet) Modules111Mode(onOff string) ArgOpt { return envArg("GO111MODULE", onOff) }
-func (goGet) Package(pkg string) ArgOpt          { return posArg(pkg) }
+func (goGet) Download() ArgOpt          { return flagBoolIf("-d", true) }
+func (goGet) Update() ArgOpt            { return flagBoolIf("-u", true) }
+func (goGet) Package(pkg string) ArgOpt { return posArg(pkg) }
