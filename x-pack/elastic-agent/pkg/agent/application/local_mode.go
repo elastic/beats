@@ -135,10 +135,11 @@ func (l *Local) Start() error {
 
 // Stop stops a local agent.
 func (l *Local) Stop() error {
+	err := l.source.Stop()
 	l.cancelCtxFn()
 	l.router.Shutdown()
 	l.srv.Stop()
-	return l.source.Stop()
+	return err
 }
 
 // AgentInfo retrieves agent information.
