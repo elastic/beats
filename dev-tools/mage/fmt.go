@@ -75,6 +75,7 @@ func GoImports() error {
 		}
 	} else {
 		if err := gotool.Get(
+			gotool.Get.Modules111Mode("off"),
 			gotool.Get.Package(filepath.Join(GoImportsImportPath)),
 		); err != nil {
 			return err
