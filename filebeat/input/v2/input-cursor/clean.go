@@ -65,7 +65,7 @@ func gcStore(log *logp.Logger, started time.Time, store *store) {
 
 	keys := gcFind(states.table, started, time.Now())
 	if len(keys) == 0 {
-		log.Debug("No entries to remove found")
+		log.Debug("No entries to remove were found")
 		return
 	}
 
