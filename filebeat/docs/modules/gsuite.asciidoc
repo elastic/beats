@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == GSuite module
 
+beta[]
+
 This is a module for ingesting data from the different GSuite audit reports API's.
 
 include::../include/gs-link.asciidoc[]
