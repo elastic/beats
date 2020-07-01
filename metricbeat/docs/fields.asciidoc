@@ -1563,22 +1563,6 @@ type: object
 --
 
 [float]
-=== autodiscover
-
-`autodiscover` contains the metrics that reports what services are running on a specific AWS account.
-
-
-
-*`aws.autodiscover.resource`*::
-+
---
-AWS resource
-
-type: object
-
---
-
-[float]
 === billing
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
@@ -3894,6 +3878,31 @@ The remaining available space for the cluster volume, measured in bytes.
 
 
 type: long
+
+--
+
+[float]
+=== resource
+
+`resource` contains the metrics that reports what services are running on a specific AWS account.
+
+
+
+*`aws.resource.name`*::
++
+--
+resource name in AWS
+
+type: keyword
+
+--
+
+*`aws.resource.arn`*::
++
+--
+resource ARN in AWS
+
+type: keyword
 
 --
 

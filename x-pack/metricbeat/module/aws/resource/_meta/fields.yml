@@ -1,0 +1,12 @@
+- name: resource
+  type: group
+  description: >
+    `resource` contains the metrics that reports what services are running on a specific AWS account.
+  release: experimental
+  fields:
+    - name: name
+      type: keyword
+      description: resource name in AWS
+    - name: arn
+      type: keyword
+      description: resource ARN in AWS
