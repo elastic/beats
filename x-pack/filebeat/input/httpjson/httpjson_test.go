@@ -7,6 +7,7 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -20,6 +21,8 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -38,7 +41,6 @@ const (
 
 var (
 	once sync.Once
-	url  string
 )
 
 func testSetup(t *testing.T) {
@@ -90,6 +92,10 @@ func createServer(newServer func(handler http.Handler) *httptest.Server) *httpte
 				"hello": "world",
 				"embedded": map[string]string{
 					"hello": "world",
+				},
+				"list": []map[string]interface{}{
+					{"foo": "bar"},
+					{"hello": "world"},
 				},
 			}
 			b, _ := json.Marshal(message)
@@ -157,8 +163,24 @@ func createCustomServerWithArrayResponse(newServer func(handler http.Handler) *h
 	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		message := map[string]interface{}{
-			"hello": []map[string]string{
-				{"foo": "bar"},
+			"hello": []map[string]interface{}{
+				{
+					"foo": "bar",
+					"list": []map[string]interface{}{
+						{"foo": "bar"},
+						{"hello": "world"},
+					},
+				},
+				{
+					"foo": "bar",
+					"list": []map[string]interface{}{
+						{"foo": "bar"},
+					},
+				},
+				{
+					"bar":  "foo",
+					"list": []map[string]interface{}{},
+				},
 				{"bar": "foo"},
 			},
 		}
@@ -602,5 +624,154 @@ func TestOAuth2(t *testing.T) {
 		if err := group.Wait(); err != nil {
 			t.Fatal(err)
 		}
+	})
+}
+
+func TestSplitResponseWithKey(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":     "GET",
+		"split_events_by": "list",
+		"interval":        0,
+	}
+	ts := createTestServer(HTTPTestServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestSplitResponseWithoutKey(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":     "GET",
+		"split_events_by": "not_found",
+		"interval":        0,
+	}
+	ts := createTestServer(HTTPTestServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestArrayWithSplitResponse(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":        "GET",
+		"json_objects_array": "hello",
+		"split_events_by":    "list",
+		"interval":           0,
+	}
+
+	expectedFields := []string{
+		`{
+			"foo": "bar",
+			"list": {
+				"foo": "bar"
+			}
+		}`,
+		`{
+			"foo": "bar",
+			"list": {
+				"hello": "world"
+			}
+		}`,
+		`{
+			"foo": "bar",
+			"list": {
+				"foo": "bar"
+			}
+		}`,
+		`{
+			"bar":  "foo",
+			"list": []
+		}`,
+		`{"bar": "foo"}`,
+	}
+
+	ts := createTestServer(ArrayResponseServer)
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(5)
+		if !ok {
+			t.Fatalf("Expected 5 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+
+		for i, e := range events {
+			message, _ := e.GetValue("message")
+			assert.JSONEq(t, expectedFields[i], message.(string))
+		}
+	})
+}
+
+func TestCursor(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":                  "GET",
+		"date_cursor.field":            "@timestamp",
+		"date_cursor.url_field":        "$filter",
+		"date_cursor.value_template":   "alertCreationTime ge {{.}}",
+		"date_cursor.initial_interval": "10m",
+		"date_cursor.date_format":      "2006-01-02T15:04:05Z",
+	}
+
+	timeNow = func() time.Time {
+		t, _ := time.Parse("2006-01-02T15:04:05Z", "2002-10-02T15:10:00Z")
+		return t
+	}
+
+	const (
+		expectedQuery           = "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"
+		expectedNextCursorValue = "2002-10-02T15:00:01Z"
+		expectedNextQuery       = "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A01Z"
+	)
+	var gotQuery string
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		gotQuery = r.URL.Query().Encode()
+		w.Write([]byte(`[{"@timestamp":"2002-10-02T15:00:00Z"},{"@timestamp":"2002-10-02T15:00:01Z"}]`))
+	}))
+
+	runTest(t, ts, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, expectedQuery, gotQuery)
+		assert.Equal(t, expectedNextCursorValue, input.nextCursorValue)
+		assert.Equal(t, fmt.Sprintf("%s?%s", ts.URL, expectedNextQuery), input.getURL())
 	})
 }

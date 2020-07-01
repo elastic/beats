@@ -93,8 +93,16 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	base.Logger().Debug("Metricset level config for period: ", metricSet.Period)
 	base.Logger().Debug("Metricset level config for tags filter: ", metricSet.TagsFilter)
 
-	// Get IAM account name
-	awsConfig.Region = "us-east-1"
+	// Get IAM account name, set region by aws_partition, default is aws global partition
+	// refer https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+	switch config.AWSConfig.AWSPartition {
+	case "aws-cn":
+		awsConfig.Region = "cn-north-1"
+	case "aws-us-gov":
+		awsConfig.Region = "us-gov-east-1"
+	default:
+		awsConfig.Region = "us-east-1"
+	}
 	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
 		config.AWSConfig.Endpoint, "iam", "", awsConfig))
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})

@@ -8,6 +8,7 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/googlepubsub"
