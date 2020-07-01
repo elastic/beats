@@ -47,6 +47,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   `forwarded` from the list. {issue}13920[13920]
 * Cisco {pull}18753[18753]
 * Checkpoint {pull}18754[18754]
+* Netflow {pull}19087[19087]
+* Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
+* Zeek {pull}19113[19113] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 will no longer send the `host` field that contains information about the host Filebeat is
@@ -55,6 +58,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+- Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 
@@ -141,11 +145,14 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Add better handling for Kubernetes Update and Delete watcher events. {pull}18882[18882]
 - Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 - Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
+- Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 
 *Auditbeat*
 
@@ -155,6 +162,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
 
 *Filebeat*
 
@@ -213,6 +221,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
 
 *Heartbeat*
 
@@ -286,6 +295,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
+- Stop counterCache only when already started {pull}19103[19103]
+- Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 
 *Packetbeat*
 
@@ -321,6 +332,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
 - Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
 - Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
+- Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Add document_id setting to decode_json_fields processor. {pull}15859[15859]
 - Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
@@ -355,6 +367,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
+- Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
 *Auditbeat*
 
@@ -472,6 +485,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
+- Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
+- Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 
 *Heartbeat*
 
@@ -485,6 +500,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 - Added an `id` config option to inputs to allow running multiple inputs on the
   same journal. {pull}18467{18467}
+- Add basic ECS categorization and `log.syslog` fields. {pull}19176[19176]
 
 *Metricbeat*
 
@@ -568,14 +584,17 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 
 *Packetbeat*
 
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 
 *Functionbeat*
 
 - Add monitoring info about triggered functions. {pull}14876[14876]
 - Add Google Cloud Platform support. {pull}13598[13598]
+- Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 
 *Winlogbeat*
 

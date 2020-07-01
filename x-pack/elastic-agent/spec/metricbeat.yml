@@ -14,9 +14,8 @@ rules:
     on_conflict: insert_after
     type: metrics
 
-- extract_list_items:
-    path: datasources
-    item: inputs
+- rename:
+    from: inputs
     to: inputsstreams
 
 - map:
@@ -66,6 +65,12 @@ rules:
         key: enabled
     - remove_key:
         key: dataset
+    - remove_key:
+        key: dataset.name
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
+        key: use_output
 
 - copy:
     from: inputs

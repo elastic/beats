@@ -75,7 +75,7 @@ The URL of the Cloud Foundry UAA API. Optional. Default: "(value from ${api_addr
 [float]
 === `rlp_address`
 
-The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(value from ${api_address}/v2/info)".
+The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(`log-stream` subdomain under the same domain as `api_server`)".
 
 [float]
 === `client_id`
@@ -92,6 +92,12 @@ Client Secret to authenticate with Cloud Foundry. Default: "".
 
 Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
 from the RLP Gateway. Default: "(generated UUID)".
+
+[float]
+==== `version`
+
+Consumer API version to connect with Cloud Foundry to collect events. Use `v1` to collect events using Doppler/Traffic Control.
+Use `v2` to collect events from the RLP Gateway. Default: "`v1`".
 
 [float]
 === `ssl`

@@ -133,12 +133,15 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 
 	if !v4.ClientIPAddr().IsUnspecified() {
 		dhcpData.Put("client_ip", v4.ClientIPAddr().String())
+		pbf.AddIP(v4.ClientIPAddr().String())
 	}
 	if !v4.YourIPAddr().IsUnspecified() {
 		dhcpData.Put("assigned_ip", v4.YourIPAddr().String())
+		pbf.AddIP(v4.YourIPAddr().String())
 	}
 	if !v4.GatewayIPAddr().IsUnspecified() {
 		dhcpData.Put("relay_ip", v4.GatewayIPAddr().String())
+		pbf.AddIP(v4.GatewayIPAddr().String())
 	}
 	if serverName := v4.ServerHostNameToString(); serverName != "" {
 		dhcpData.Put("server_name", serverName)
