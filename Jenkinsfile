@@ -1091,7 +1091,7 @@ def isChanged(patterns){
 def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -1104,7 +1104,7 @@ def isChangedOSSCode(patterns) {
 def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",
