@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -69,6 +70,11 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		return nil, errors.New(err, "initiating installer")
 	}
 
+	uninstaller, err := uninstall.NewUninstaller()
+	if err != nil {
+		return nil, errors.New(err, "initiating uninstaller")
+	}
+
 	stateResolver, err := stateresolver.NewStateResolver(log)
 	if err != nil {
 		return nil, err
@@ -82,6 +88,7 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		fetcher,
 		verifier,
 		installer,
+		uninstaller,
 		stateResolver,
 		srv,
 		r,
