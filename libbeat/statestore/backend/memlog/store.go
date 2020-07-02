@@ -59,7 +59,7 @@ type entry struct {
 // If an error in in the log file is detected, the store opening routine continues from the last known valid state and will trigger a checkpoint
 // operation on subsequent writes, also truncating the log file.
 // Old data files are scheduled for deletion later.
-func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, mustCheckMeta bool, checkpoint CheckpointPredicate) (*store, error) {
+func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
 	fi, err := os.Stat(home)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(home, os.ModeDir|0770)
@@ -72,14 +72,14 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, must
 			return nil, err
 		}
 	} else if !fi.Mode().IsDir() {
-		return nil, fmt.Errorf("'%v' is no directory", home)
+		return nil, fmt.Errorf("'%v' is not a directory", home)
 	} else {
 		if err := pathEnsurePermissions(filepath.Join(home, metaFileName), mode); err != nil {
 			return nil, fmt.Errorf("failed to update meta file permissions: %w", err)
 		}
 	}
 
-	if mustCheckMeta {
+	if !ignoreVersionCheck {
 		meta, err := readMetaFile(home)
 		if err != nil {
 			return nil, err
@@ -127,7 +127,7 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, must
 		// Error indicates the log file was incomplete or corrupted.
 		// Anyways, we already have the table in a valid state and will
 		// continue opening the store from here.
-		logp.Warn("Incomplete or corrupted log file in %v. Continue with last known complete and consistend state. Reason: %v", home, err)
+		logp.Warn("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
 	}
 
 	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, checkpoint)
