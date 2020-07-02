@@ -31,8 +31,8 @@ func TestStreamCheck(t *testing.T) {
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
-						"dataset.namespace": "someNamespace",
-						"streams":           []map[string]interface{}{{"dataset.name": "someDatasetName"}},
+						"dataset.namespace": "somenamespace",
+						"streams":           []map[string]interface{}{{"dataset.name": "somedatasetname"}},
 					},
 				},
 			},
@@ -44,12 +44,12 @@ func TestStreamCheck(t *testing.T) {
 				"inputs": []map[string]interface{}{
 					{
 						"dataset": map[string]interface{}{
-							"namespace": "someNamespace",
+							"namespace": "somenamespace",
 						},
 						"streams": []map[string]interface{}{
 							{
 								"dataset": map[string]interface{}{
-									"name": "someDatasetName",
+									"name": "somedatasetname",
 								},
 							},
 						},
@@ -84,12 +84,110 @@ func TestStreamCheck(t *testing.T) {
 			},
 			result: ErrInvalidDataset,
 		},
+
+		{
+			name: "dataset.name invalid dot - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": "."}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+		{
+			name: "dataset.name invalid dotdot- compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": ".."}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+		{
+			name: "dataset.name invalid uppercase - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": "myNameIs"}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+		{
+			name: "dataset.name invalid space- compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": "outer space"}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+		{
+			name: "dataset.name invalid invalid char- compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": "is\\thisvalid"}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+		{
+			name: "dataset.name invalid invalid prefix- compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": "_isthisvalid"}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+
 		{
 			name: "namespace invalid - compact",
 			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": ""}},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name 1 - compact",
+			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"dataset.namespace": ""},
+					{"dataset.namespace": "."},
 				},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name 2 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": ".."}},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name uppercase - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": "someUpper"}},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name space - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": "some space"}},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name invalid char - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": "isitok?"}},
+			},
+			result: ErrInvalidNamespace,
+		},
+		{
+			name: "namespace invalid name invalid prefix - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{{"dataset.namespace": "+isitok"}},
 			},
 			result: ErrInvalidNamespace,
 		},

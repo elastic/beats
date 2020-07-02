@@ -5,6 +5,8 @@
 package filters
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -116,10 +118,68 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 	return nil
 }
 
+// The only two requirement are that it has only characters allowed in an Elasticsearch index name
+// and does NOT contain a `-`.
+// Index names must meet the following criteria:
+//     Lowercase only
+//     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+//     Cannot start with -, _, +
+//     Cannot be . or ..
+//     Names starting with . are deprecated, except for hidden indices and internal indices managed by plugins
+
 func isNamespaceValid(namespace string) bool {
-	return len(namespace) > 0
+	// Cannot be . or ..
+	if namespace == "." || namespace == ".." {
+		return false
+	}
+
+	if len(namespace) <= 0 || len(namespace) > 255 {
+		return false
+	}
+
+	// Lowercase only
+	if strings.ToLower(namespace) != namespace {
+		return false
+	}
+
+	// Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+	if strings.ContainsAny(namespace, "\\/*?\"<>| ,#-") {
+		return false
+	}
+
+	// Cannot start with -, _, +
+	if strings.HasPrefix(namespace, "-") || strings.HasPrefix(namespace, "_") || strings.HasPrefix(namespace, "+") {
+		return false
+	}
+
+	return true
 }
 
+// The same requirements as for the namespace apply.
 func isDatasetValid(dataset string) bool {
-	return len(dataset) > 0
+	// Cannot be . or ..
+	if dataset == "." || dataset == ".." {
+		return false
+	}
+
+	if len(dataset) <= 0 || len(dataset) > 255 {
+		return false
+	}
+
+	// Lowercase only
+	if strings.ToLower(dataset) != dataset {
+		return false
+	}
+
+	// Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+	if strings.ContainsAny(dataset, "\\/*?\"<>| ,#-") {
+		return false
+	}
+
+	// Cannot start with -, _, +
+	if strings.HasPrefix(dataset, "-") || strings.HasPrefix(dataset, "_") || strings.HasPrefix(dataset, "+") {
+		return false
+	}
+
+	return true
 }
