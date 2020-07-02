@@ -193,7 +193,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_XPACK_FILEBEAT != "false" && params.macosTest
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest
             }
           }
           steps {
