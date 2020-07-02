@@ -373,6 +373,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
+- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
