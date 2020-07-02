@@ -180,13 +180,15 @@ processors:
     field: event.type
     value: creation
 - set:
-    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID' && ctx.auditd.log?.vm != null"
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
     field: container.name
     value: "{{ auditd.log.vm }}"
+    ignore_empty_value: true
 - set:
-    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID' && ctx.auditd.log?.virt != null"
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
     field: container.runtime
     value: "{{ auditd.log.virt }}"
+    ignore_empty_value: true
 - rename:
     ignore_failure: true
     field: auditd.log.arch
