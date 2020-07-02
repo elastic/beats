@@ -53,8 +53,6 @@ type Application struct {
 	monitor monitoring.Monitor
 
 	processConfig  *process.Config
-	downloadConfig *artifact.Config
-	retryConfig    *retry.Config
 
 	logger *logger.Logger
 
@@ -92,8 +90,6 @@ func NewApplication(
 		spec:           spec,
 		srv:            srv,
 		processConfig:  cfg.ProcessConfig,
-		downloadConfig: cfg.DownloadConfig,
-		retryConfig:    cfg.RetryConfig,
 		logger:         logger,
 		limiter:        b,
 		reporter:       reporter,
