@@ -715,6 +715,39 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return True
             return False
 
+        def has_compatible_format(field_name, value, types):
+            if field_name not in types:
+                # must be a pattern_match
+                return True
+            doc_type = types[field_name]
+            if doc_type in ['date']:
+                parsed = False
+                try:
+                    datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    parsed = True
+                except:
+                    pass
+                try:
+                    datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
+                    parsed = True
+                except:
+                    pass
+                try:
+                    datetime.utcfromtimestamp(value)
+                    parsed = True
+                except:
+                    pass
+                try:
+                    datetime.utcfromtimestamp(value / 1000)
+                    parsed = True
+                except:
+                    pass
+                if parsed:
+                    return True
+                else:
+                    return False
+            return True
+
         def has_compatible_type(field_name, value, types):
             if field_name not in types:
                 # must be a pattern_match
@@ -728,6 +761,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 expected_types = (dict, list, type(None))
             elif doc_type in ['byte', 'short', 'integer', 'long', 'double', 'float', 'scaled_float']:
                 expected_types = (int, float, complex, list)
+            elif doc_type in ['date']:
+                expected_types = (int, str)
             else:
                 # everything else should be a string or array
                 expected_types = (str, list, type(None))
@@ -743,8 +778,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
             if is_documented(key, aliases):
                 errors.append("Key '{}' found in event is documented as an alias!".format(key))
                 next
-            if os.getenv('TESTING_FILEBEAT_TYPES', default=False) and not(has_compatible_type(key, flat[key], types)):
-                errors.append("Key '{}' found in event has incompatible type expected '{}' got '{}'!".format(key, types[key], type(flat[key])))
+            if os.getenv('TESTING_FILEBEAT_TYPES', default=False):
+                if not(has_compatible_type(key, flat[key], types)):
+                    errors.append("Key '{}' found in event has incompatible type expected '{}' got '{}'!".format(key, types[key], type(flat[key])))
+                if not(has_compatible_format(key, flat[key], types)):
+                    errors.append("Value '{}' for Key '{}' not in supported format!".format(flat[key], key))
+
         if len(errors) > 0:
             raise Exception("Documentation Errors:\n{}".format('\n'.join(errors)))
 
