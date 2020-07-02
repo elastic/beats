@@ -110,4 +110,3 @@ include::elasticsearch/node_stats.asciidoc[]
 include::elasticsearch/pending_tasks.asciidoc[]
 
 include::elasticsearch/shard.asciidoc[]
-
