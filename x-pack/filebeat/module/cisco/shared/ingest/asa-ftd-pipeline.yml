@@ -306,6 +306,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "message"
@@ -314,6 +315,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338003'"
       field: "message"
@@ -330,6 +332,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "message"
@@ -338,6 +341,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338007'"
       field: "message"
@@ -354,6 +358,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "message"
@@ -362,6 +367,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338103'"
       field: "message"
@@ -378,6 +384,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "message"
@@ -386,6 +393,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "message"
@@ -394,6 +402,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "message"
@@ -402,6 +411,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "message"
@@ -410,18 +420,22 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.address"
       value: "{{destination.address}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.port"
       value: "{{destination.port}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.address"
       value: "{{source.address}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.port"
       value: "{{source.port}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '734001'"
       field: "message"
@@ -959,7 +973,7 @@ processors:
   - set:
       field: "_temp_.duration_hms"
       value: "{{event.duration}}"
-      if: "ctx.event?.duration != null"
+      ignore_empty_value: true
 
   #
   # Process the flow duration "hh:mm:ss" present in some messages
@@ -1232,19 +1246,23 @@ processors:
   - set:
       field: source.nat.ip
       value: "{{_temp_.cisco.mapped_source_ip}}"
-      if: "ctx._temp_.cisco.mapped_source_ip != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+      if: "(ctx?._temp_?.cisco?.mapped_source_ip != ctx?.source?.ip || ctx?._temp_?.cisco?.mapped_source_port != ctx?.source?.port)"
+      ignore_empty_value: true
   - set:
       field: source.nat.port
       value: "{{_temp_.cisco.mapped_source_port}}"
-      if: "ctx._temp_.cisco.mapped_source_port != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+      if: "(ctx?._temp_?.cisco.mapped_source_ip != ctx?.source?.ip || ctx?._temp_?.cisco?.mapped_source_port != ctx?.source?.port)"
+      ignore_empty_value: true
   - set:
       field: destination.nat.ip
       value: "{{_temp_.cisco.mapped_destination_ip}}"
-      if: "ctx._temp_.cisco.mapped_destination_ip != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+      if: "(ctx?._temp_?.cisco.mapped_destination_ip != ctx?.destination?.ip || ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port)"
+      ignore_empty_value: true
   - set:
       field: destination.nat.port
       value: "{{_temp_.cisco.mapped_destination_port}}"
-      if: "ctx._temp_.cisco.mapped_destination_port != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+      if: "(ctx?._temp_?.cisco?.mapped_destination_ip != ctx?.destination?.ip || ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port)"
+      ignore_empty_value: true
 
   #
   # Populate ECS event.code
