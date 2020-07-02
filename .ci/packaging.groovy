@@ -38,7 +38,7 @@ pipeline {
       when {
         beforeAgent true
         expression {
-          return isCommentTrigger() || isUserTrigger()
+          return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
         }
       }
       stages {
