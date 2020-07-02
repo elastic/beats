@@ -24,7 +24,6 @@ inputs:
     #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
     #   Cannot start with -, _, +
     #   Cannot be . or ..
-    #   Names starting with . are deprecated, except for hidden indices and internal indices managed by plugins
     dataset.namespace: default
     use_output: default
     streams:

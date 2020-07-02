@@ -125,7 +125,6 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 //     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
 //     Cannot start with -, _, +
 //     Cannot be . or ..
-//     Names starting with . are deprecated, except for hidden indices and internal indices managed by plugins
 
 func isNamespaceValid(namespace string) bool {
 	// Cannot be . or ..
