@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
+* <<exported-fields-awscloudwatch>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
@@ -2039,6 +2040,47 @@ type: keyword
 --
 The type of traffic: IPv4, IPv6, or EFA.
 
+
+type: keyword
+
+--
+
+[[exported-fields-awscloudwatch]]
+== awscloudwatch fields
+
+Fields from AWS CloudWatch logs.
+
+
+
+[float]
+=== awscloudwatch
+
+Fields from AWS CloudWatch logs.
+
+
+
+*`awscloudwatch.log_group`*::
++
+--
+The name of the log group to which this event belongs.
+
+type: keyword
+
+--
+
+*`awscloudwatch.log_stream`*::
++
+--
+The name of the log stream to which this event belongs.
+
+type: keyword
+
+--
+
+*`awscloudwatch.ingestion_time`*::
++
+--
+The time the event was ingested in AWS CloudWatch.
 
 type: keyword
 
