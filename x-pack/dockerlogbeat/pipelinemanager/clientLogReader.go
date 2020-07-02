@@ -5,7 +5,6 @@
 package pipelinemanager
 
 import (
-	"os"
 	"strings"
 	"time"
 
@@ -83,7 +82,7 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
-			cl.logger.Error(os.Stderr, "Error getting message: %s\n", err)
+			cl.logger.Errorf("Error getting message: %s\n", err)
 			return
 		}
 		publishWriter <- log

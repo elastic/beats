@@ -28,21 +28,21 @@ type StopLoggingRequest struct {
 	File string
 }
 
-// CapabilitiesResponse represents the response to a capabilities request
-type CapabilitiesResponse struct {
+// capabilitiesResponse represents the response to a capabilities request
+type capabilitiesResponse struct {
 	Err string
 	Cap logger.Capability
 }
 
-// LogsRequest represents the request object we get from a `docker logs` call
-type LogsRequest struct {
+// logsRequest represents the request object we get from a `docker logs` call
+type logsRequest struct {
 	Info   logger.Info
 	Config logger.ReadConfig
 }
 
 func reportCaps() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(&CapabilitiesResponse{
+		json.NewEncoder(w).Encode(&capabilitiesResponse{
 			Cap: logger.Capability{ReadLogs: true},
 		})
 	}
@@ -58,7 +58,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 			return
 		}
 
-		pm.Logger.Infof("Got start request object from container %#v\n", startReq.Info.ContainerName)
+		pm.Logger.Debugf("Got start request object from container %#v\n", startReq.Info.ContainerName)
 		pm.Logger.Debugf("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
 		pm.Logger.Debugf("Got a container with the following log opts: %#v\n", startReq.Info.Config)
 
@@ -89,7 +89,7 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
 			return
 		}
-		pm.Logger.Infof("Got stop request object %#v\n", stopReq)
+		pm.Logger.Debugf("Got stop request object %#v\n", stopReq)
 		// Run the stop async, since nothing 'depends' on it,
 		// and we can break people's docker automation if this times out.
 		go func() {
@@ -105,14 +105,14 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 
 func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var logReq LogsRequest
+		var logReq logsRequest
 		err := json.NewDecoder(r.Body).Decode(&logReq)
 		if err != nil {
 			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
 			return
 		}
 
-		pm.Logger.Infof("Got logging request for container %s\n", logReq.Info.ContainerName)
+		pm.Logger.Debugf("Got logging request for container %s\n", logReq.Info.ContainerName)
 		stream, err := pm.CreateReaderForContainer(logReq.Info, logReq.Config)
 		if err != nil {
 			http.Error(w, errors.Wrap(err, "error creating log reader").Error(), http.StatusBadRequest)
@@ -121,6 +121,7 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 		w.Header().Set("Content-Type", "application/x-json-stream")
 		wf := ioutils.NewWriteFlusher(w)
 		io.Copy(wf, stream)
+		wf.Close()
 
 	} //end func
 }
