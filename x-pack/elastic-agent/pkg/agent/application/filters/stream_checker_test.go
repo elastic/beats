@@ -7,9 +7,10 @@ package filters
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestStreamCheck(t *testing.T) {
