@@ -75,3 +75,4 @@
 - Rename input.type logs to logfile {pull}19360[19360]
 - Agent now installs/uninstalls Elastic Endpoint {pull}19248[19248]
 - Agent now downloads Elastic Endpoint {pull}19503[19503]
+- Refuse invalid stream values in configuration {pull}19587[19587]
