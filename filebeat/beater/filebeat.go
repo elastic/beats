@@ -229,16 +229,20 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: newEventACKer(finishedLogger, registrarChannel).ackEvents,
-	})
-	if err != nil {
-		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)
-		return err
-	}
+	// setup event counting for startup and a global common ACKer, such that all events will be
+	// routed to the reigstrar after they've been ACKed.
+	// Events with Private==nil or the type of private != file.State are directly
+	// forwarded to `finishedLogger`. Events from the `logs` input will first be forwarded
+	// to the registrar via `registrarChannel`, which finally forwards the events to finishedLogger as well.
+	// The finishedLogger decrements the counters in wgEvents after all events have been securely processed
+	// by the registry.
+	fb.pipeline = withPipelineEventCounter(b.Publisher, wgEvents)
+	fb.pipeline = pipetool.WithACKer(fb.pipeline, eventACKer(finishedLogger, registrarChannel))
 
-	fb.pipeline = pipetool.WithDefaultGuarantees(b.Publisher, beat.GuaranteedSend)
-	fb.pipeline = withPipelineEventCounter(fb.pipeline, wgEvents)
+	// Filebeat by default required infinite retry. Let's configure this for all
+	// inputs by default.  Inputs (and InputController) can overwrite the sending
+	// guarantees explicitly when connecting with the pipeline.
+	fb.pipeline = pipetool.WithDefaultGuarantees(fb.pipeline, beat.GuaranteedSend)
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
