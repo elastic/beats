@@ -95,7 +95,7 @@ func NewConfigFromURL(kURL string) (*Config, error) {
 func NewWithRawConfig(log *logger.Logger, config *config.Config, wrapper wrapperFunc) (*Client, error) {
 	l := log
 	if l == nil {
-		log, err := logger.New()
+		log, err := logger.New("kibana_client")
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func NewWithRawConfig(log *logger.Logger, config *config.Config, wrapper wrapper
 
 	cfg := &Config{}
 	if err := config.Unpack(cfg); err != nil {
-		return nil, errors.Wrap(err, "invidate configuration")
+		return nil, errors.Wrap(err, "invalidate configuration")
 	}
 
 	return NewWithConfig(l, cfg, wrapper)

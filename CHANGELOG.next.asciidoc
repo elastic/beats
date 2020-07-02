@@ -226,8 +226,10 @@ field. You can revert this change by configuring tags for the module and omittin
 - Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
+- Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
+- Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 
 *Heartbeat*
 
@@ -303,6 +305,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Stop counterCache only when already started {pull}19103[19103]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+- Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 
 *Packetbeat*
@@ -373,6 +376,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
+- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 
@@ -494,6 +498,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for v1 consumer API in Cloud Foundry input, use it by default. {pull}19125[19125]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
+- Add awscloudwatch input. {pull}19025[19025]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 
 *Heartbeat*
@@ -592,6 +597,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Accept prefix as metric_types config parameter in googlecloud stackdriver metricset. {pull}19345[19345]
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]

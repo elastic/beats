@@ -76,17 +76,16 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, sdc stackDriv
 	results := make([]timeSeriesWithAligner, 0)
 
 	aligner := sdc.Aligner
-	serviceName := sdc.ServiceName
-	for _, mt := range sdc.MetricTypes {
+	for mt, meta := range metricsMeta {
 		wg.Add(1)
 
+		metricMeta := meta
 		go func(mt string) {
 			defer wg.Done()
 
-			metricMeta := metricsMeta[mt]
 			r.logger.Debugf("For metricType %s, metricMeta = %s", mt, metricMeta)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, serviceName+".googleapis.com/"+mt, interval, aligner)
+			ts := r.Metric(ctx, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
