@@ -27,7 +27,7 @@ inputs:
         dataset.name: system.cpu
       - metricset: memory
         dataset.name: system.memory
-      - metricset: network≈
+      - metricset: network
         dataset.name: system.network
       - metricset: filesystem
         dataset.name: system.filesystem
