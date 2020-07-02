@@ -34,11 +34,7 @@
           description: >
             The type of API resource.
           example: audit#activity
-        - name: owner.domain
+        - name: organization.domain
           type: keyword
           description: >
               The domain that is affected by the report's event.
-        - name: customer.id
-          type: keyword
-          description: >
-              The unique identifier for a G Suite account.

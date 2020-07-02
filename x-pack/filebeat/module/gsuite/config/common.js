@@ -28,10 +28,10 @@ var gsuite = (function () {
             { from: "json.actor.profileId", to: "client.user.id", type: "string" },
             { from: "json.ipAddress", to: "client.ip", type: "ip" },
             { from: "json.kind", to: "gsuite.kind" },
-            { from: "json.id.customerId", to: "gsuite.customer.id", type: "string" },
+            { from: "json.id.customerId", to: "organization.id", type: "string" },
             { from: "json.actor.callerType", to: "gsuite.actor.type" },
             { from: "json.actor.key", to: "gsuite.actor.key" },
-            { from: "json.ownerDomain", to: "gsuite.owner.domain" },
+            { from: "json.ownerDomain", to: "gsuite.organization.domain" },
             { from: "json.events.type", to: "gsuite.event.type" },
         ],
         mode: "rename",
@@ -39,9 +39,25 @@ var gsuite = (function () {
         fail_on_error: false,
     });
 
+    var completeUserData = function(evt) {
+        var email = evt.Get("client.user.email");
+        if (!email) {
+            return;
+        }
+
+        var data = email.split("@");
+        if (data.length !== 2) {
+            return;
+        }
+
+        evt.Put("client.user.name", data[0]);
+        evt.Put("client.user.domain", data[1]);
+    };
+
     var copyFields = new processor.Convert({
         fields: [
             { from: "client.ip", to: "related.ip" },
+            { from: "client.user.name", to: "related.user" },
         ],
         ignore_missing: true,
         fail_on_error: false,
@@ -51,6 +67,7 @@ var gsuite = (function () {
         .Add(decodeJson)
         .Add(parseTimestamp)
         .Add(convertFields)
+        .Add(completeUserData)
         .Add(copyFields)
         .Build();
 

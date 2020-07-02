@@ -23290,20 +23290,10 @@ example: audit#activity
 
 --
 
-*`gsuite.owner.domain`*::
+*`gsuite.organization.domain`*::
 +
 --
 The domain that is affected by the report's event.
-
-
-type: keyword
-
---
-
-*`gsuite.customer.id`*::
-+
---
-The unique identifier for a G Suite account.
 
 
 type: keyword

@@ -56,7 +56,6 @@ Specifies the path to the JWT credentials file.
 
 Email of the admin user used to access the API.
 
-
 *`var.http_client_timeout`*::
 
 Duration of the time limit on HTTP requests made by the module. Defaults to
@@ -76,16 +75,17 @@ Specifies the user key to fetch reports from. Defaults to `all`.
 This is a list of GSuite Reports fields that are mapped to ECS.
 
 [options="header"]
-|================================================================================
-| GSuite Reports             | ECS Fields                                       |
-| items[].id.time            | @timestamp                                       |
-| items[].id.uniqueQualifier | event.id                                         |
-| items[].id.applicationName | event.provider                                   |
-| items[].events[].name      | event.action                                     |
-| items[].ipAddress          | client.ip, related.ip, client.as.*, client.geo.* |
-| items[].actor.email        | client.user.email                                |
-| items[].actor.profileId    | client.user.id                                   |
-|================================================================================
+|=======================================================================================
+| GSuite Reports             | ECS Fields                                              |
+| items[].id.time            | @timestamp                                              |
+| items[].id.uniqueQualifier | event.id                                                |
+| items[].id.applicationName | event.provider                                          |
+| items[].events[].name      | event.action                                            |
+| items[].customerId         | organization.id                                         |
+| items[].ipAddress          | client.ip, related.ip, client.as.*, client.geo.*        |
+| items[].actor.email        | client.user.email, client.user.name, client.user.domain |
+| items[].actor.profileId    | client.user.id                                          |
+|=======================================================================================
 
 These are the common ones to all filesets.
 
