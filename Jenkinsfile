@@ -1236,50 +1236,50 @@ def loadConfigEnvVars(){
   // Auditbeat depends on metricbeat as framework, but does not include any of
   // the modules from Metricbeat.
   // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
-  env.BUILD_AUDITBEAT = isChangedOSSCode(getVendorPatterns('auditbeat'))
-  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/auditbeat'))
+  env.BUILD_AUDITBEAT = isChangedOSSCode(getProjectDependencies('auditbeat'))
+  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/auditbeat'))
 
   // Dockerlogbeat is a standalone Beat that only relies on libbeat.
-  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/dockerlogbeat'))
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/dockerlogbeat'))
 
   // Filebeat depends on libbeat only.
   // The Filebeat x-pack build contains all functionality from OSS Filebeat.
-  env.BUILD_FILEBEAT = isChangedOSSCode(getVendorPatterns('filebeat'))
-  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/filebeat'))
+  env.BUILD_FILEBEAT = isChangedOSSCode(getProjectDependencies('filebeat'))
+  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/filebeat'))
 
   // Metricbeat depends on libbeat only.
   // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
-  env.BUILD_METRICBEAT = isChangedOSSCode(getVendorPatterns('metricbeat'))
-  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/metricbeat'))
+  env.BUILD_METRICBEAT = isChangedOSSCode(getProjectDependencies('metricbeat'))
+  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/metricbeat'))
 
   // Functionbeat is a standalone beat that depends on libbeat only.
   // Functionbeat is available as x-pack build only.
-  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/functionbeat'))
+  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/functionbeat'))
 
   // Heartbeat depends on libbeat only.
   // The Heartbeat x-pack build contains all functionality from OSS Heartbeat.
-  env.BUILD_HEARTBEAT = isChangedOSSCode(getVendorPatterns('heartbeat'))
-  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/heartbeat'))
+  env.BUILD_HEARTBEAT = isChangedOSSCode(getProjectDependencies('heartbeat'))
+  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/heartbeat'))
 
   // Journalbeat depends on libbeat only.
   // The Journalbeat x-pack build contains all functionality from OSS Journalbeat.
-  env.BUILD_JOURNALBEAT = isChangedOSSCode(getVendorPatterns('journalbeat'))
-  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/journalbeat'))
+  env.BUILD_JOURNALBEAT = isChangedOSSCode(getProjectDependencies('journalbeat'))
+  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/journalbeat'))
 
   // Packetbeat depends on libbeat only.
   // The Packetbeat x-pack build contains all functionality from OSS Packetbeat.
-  env.BUILD_PACKETBEAT = isChangedOSSCode(getVendorPatterns('packetbeat'))
-  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/packetbeat'))
+  env.BUILD_PACKETBEAT = isChangedOSSCode(getProjectDependencies('packetbeat'))
+  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/packetbeat'))
 
   // Winlogbeat depends on libbeat only.
   // The Winlogbeat x-pack build contains all functionality from OSS Winlogbeat.
-  env.BUILD_WINLOGBEAT = isChangedOSSCode(getVendorPatterns('winlogbeat'))
-  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/winlogbeat'))
+  env.BUILD_WINLOGBEAT = isChangedOSSCode(getProjectDependencies('winlogbeat'))
+  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/winlogbeat'))
 
   // Elastic-agent is a self-contained product, that depends on libbeat only.
   // The agent acts as a supervisor for other Beats like Filebeat or Metricbeat.
   // The agent is available as x-pack build only.
-  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/elastic-agent'))
+  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode(getProjectDependencies('x-pack/elastic-agent'))
 
   // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
   // if the deployment scripts have been updated. No Beats specific testing is
@@ -1287,8 +1287,8 @@ def loadConfigEnvVars(){
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
   def generatorPatterns = ['^generator/.*']
-  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
-  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
+  generatorPatterns.addAll(getProjectDependencies('generator/common/beatgen'))
+  generatorPatterns.addAll(getProjectDependencies('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 
   // Skip all the stages for changes only related to the documentation
@@ -1327,7 +1327,7 @@ def isDocChangedOnly(){
 /**
   This method grab the dependencies of a Go module and transform them on regexp
 */
-def getVendorPatterns(beatName){
+def getProjectDependencies(beatName){
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
   def output = ""
@@ -1337,9 +1337,10 @@ def getVendorPatterns(beatName){
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
   ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      go list -mod=mod -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
-        |awk '{print \$1"/.*"}'\
-        |sed -e "s#github.com/elastic/beats/v7/##g"
+      go list -deps ./${beatName} \
+        | grep 'elastic/beats' \
+        | sed -e "s#github.com/elastic/beats/v7/##g" \
+        | awk '{print "^" \$1 "/.*"}'
     """)
   }
   return output?.split('\n').collect{ item -> item as String }
