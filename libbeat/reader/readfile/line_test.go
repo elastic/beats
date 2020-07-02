@@ -22,9 +22,11 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
+	"io"
 	"math/rand"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/transform"
@@ -254,7 +256,16 @@ func testReadLine(t *testing.T, line []byte) {
 	testReadLines(t, [][]byte{line})
 }
 
-func randomBytes(sz int) ([]byte, error) {
+func randomInt(r *rand.Rand, min, max int) int {
+	return r.Intn(max+1-min) + min
+}
+
+func randomBool(r *rand.Rand) bool {
+	n := randomInt(r, 0, 1)
+	return n != 0
+}
+
+func randomBytes(r *rand.Rand, sz int) ([]byte, error) {
 	bytes := make([]byte, sz)
 	if _, err := rand.Read(bytes); err != nil {
 		return nil, err
@@ -262,10 +273,14 @@ func randomBytes(sz int) ([]byte, error) {
 	return bytes, nil
 }
 
-func randomString(sz int) (string, error) {
+func randomString(r *rand.Rand, sz int) (string, error) {
+	if sz == 0 {
+		return "", nil
+	}
+
 	var bytes []byte
 	var err error
-	if bytes, err = randomBytes(sz/2 + sz%2); err != nil {
+	if bytes, err = randomBytes(r, sz/2+sz%2); err != nil {
 		return "", err
 	}
 	s := hex.EncodeToString(bytes)
@@ -274,10 +289,11 @@ func randomString(sz int) (string, error) {
 
 func TestMaxBytesLimit(t *testing.T) {
 	const (
-		enc          = "plain"
-		bufferSize   = 1024
-		lineMaxLimit = 10023
-		lineLen      = 23720 // exceeds lineMaxLimit
+		enc           = "plain"
+		numberOfLines = 102
+		bufferSize    = 1024
+		lineMaxLimit  = 3012
+		lineLen       = 5720 // exceeds lineMaxLimit
 	)
 
 	codecFactory, ok := encoding.FindEncoding(enc)
@@ -287,22 +303,81 @@ func TestMaxBytesLimit(t *testing.T) {
 
 	buffer := bytes.NewBuffer(nil)
 	codec, _ := codecFactory(buffer)
+	nl := lineTerminatorCharacters[LineFeed]
 
-	// Generate random long string that exceeds the line max limit
-	s, err := randomString(lineLen)
-	if err != nil {
-		t.Fatal("failed to generate random string:", err)
+	// Generate random lines lengths including empty lines
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	lineCount := randomInt(rnd, 11, 142)
+	lines := make([]string, lineCount)
+
+	var b strings.Builder
+
+	for i := 0; i < lineCount; i++ {
+		var sz int
+		// Non-empty line
+		if randomBool(rnd) {
+			// Boundary to the lineMaxLimit
+			if randomBool(rnd) {
+				sz = randomInt(rnd, lineMaxLimit-1, lineMaxLimit+1)
+			} else {
+				sz = randomInt(rnd, 0, lineLen)
+			}
+		} else {
+			// Randomly empty or one characters lines(another possibly boundary conditions)
+			sz = randomInt(rnd, 0, 1)
+		}
+
+		s, err := randomString(rnd, sz)
+		if err != nil {
+			t.Fatal("failed to generate random string:", err)
+		}
+
+		lines[i] = s
+		if len(s) > 0 {
+			b.WriteString(s)
+		}
+		b.Write(nl)
 	}
 
-	// create line reader
-	reader, err := NewLineReader(strings.NewReader(s), Config{codec, bufferSize, LineFeed, lineMaxLimit})
+	// Create line reader
+	reader, err := NewLineReader(strings.NewReader(b.String()), Config{codec, bufferSize, LineFeed, lineMaxLimit})
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
 
-	// read decodec lines from buffer
-	_, _, err = reader.Next()
-	if err != ErrExceededMaxBytesLimit {
-		t.Fatalf("want: %v, got: %v", ErrExceededMaxBytesLimit, err)
+	// Read decodec lines and test
+	var idx int
+	for i := 0; ; i++ {
+		b, n, err := reader.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				t.Fatal("unexpected error:", err)
+			}
+		}
+
+		// Find the next expected line from the original test array
+		var line string
+		for ; idx < len(lines); idx++ {
+			// Expected to be dropped
+			if len(lines[idx]) > lineMaxLimit {
+				continue
+			}
+			line = lines[idx]
+			idx++
+			break
+		}
+
+		gotLen := n - len(nl)
+		s := string(b[:len(b)-len(nl)])
+		if len(line) != gotLen {
+			t.Fatalf("invalid line length, expected: %d got: %d", len(line), gotLen)
+		}
+
+		if line != s {
+			t.Fatalf("lines do not match, expected: %s got: %s", line, s)
+		}
 	}
 }
