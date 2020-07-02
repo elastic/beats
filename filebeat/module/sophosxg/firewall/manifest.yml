@@ -1,0 +1,33 @@
+module_version: 1.0
+
+var:
+  - name: syslog_host
+    default: localhost
+  - name: tags
+    default: [sophosxg-firewall, forwarded]
+  - name: syslog_port
+    default: 9005
+  - name: input
+    default: udp
+  - name: host_name
+    default: firewall.localgroup.local
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/firewall.yml
+  - ingest/idp.yml
+  - ingest/atp.yml
+  - ingest/antivirus.yml
+  - ingest/sandstorm.yml
+  - ingest/cfilter.yml
+  - ingest/event.yml
+  - ingest/waf.yml
+  - ingest/antispam.yml
+  - ingest/systemhealth.yml
+  - ingest/wifi.yml
+
+input: config/firewall.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

@@ -1,0 +1,15 @@
+description: Pipeline for parsing sophos firewall logs (wifi pipeline)
+processors:
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.outcome
+    value: succes
+    if: 'ctx?.sophosxg?.firewall?.log_type == "Wireless Protection"'
+
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
