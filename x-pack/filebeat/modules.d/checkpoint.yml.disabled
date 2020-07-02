@@ -5,8 +5,16 @@
   firewall:
     enabled: true
 
-    # Set which input to use between syslog (default) or file.
+    # Set which input to use between syslog (default), file or (m)tls.
     #var.input: syslog
+    
+    # In case you are using var.input: tls
+    #var.cafile: /my/ca.ct
+    #var.certfile: /my/cert.crt
+    #var.keyfile: /my/key.key
+    
+    # Set the pipeline name
+    #var.pipeline: mypipeline
 
     # The interface to listen to UDP based syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
