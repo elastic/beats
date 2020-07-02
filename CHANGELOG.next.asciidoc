@@ -228,6 +228,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
+- Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 
 *Heartbeat*
 
