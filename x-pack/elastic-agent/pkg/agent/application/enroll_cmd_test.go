@@ -43,7 +43,7 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	log, _ := logger.New()
+	log, _ := logger.New("tst")
 
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
