@@ -72,6 +72,8 @@ type Filebeat struct {
 
 // New creates a new Filebeat pointer instance.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+	fmt.Println("New")
+
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
