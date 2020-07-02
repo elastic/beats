@@ -91,7 +91,7 @@ endif::[]
 
 Some of the features described here require an Elastic license. For
 more information, see https://www.elastic.co/subscriptions and
-{stack-ov}/license-management.html[License Management].
+{kibana-ref}/managing-licenses.html[License Management].
 
 
 [options="header"]
@@ -1053,8 +1053,8 @@ Sets the path for log files. See the <<directory-layout>> section for details.
 *`--strict.perms`*::
 Sets strict permission checking on configuration files. The default is `-strict.perms=true`.
 ifndef::apm-server[]
-See {beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
-the _Beats Platform Reference_ for more information.
+See {beats-ref}/config-file-permissions.html[Config file ownership and permissions]
+for more information.
 endif::[]
 ifdef::apm-server[]
 See <<config-file-ownership>> for more information.

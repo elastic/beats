@@ -21,14 +21,14 @@ var packageArchMap = map[string]string{
 }
 
 // GetArtifactName constructs a path to a downloaded artifact
-func GetArtifactName(program, version, operatingSystem, arch string) (string, error) {
+func GetArtifactName(programName, version, operatingSystem, arch string) (string, error) {
 	key := fmt.Sprintf("%s-binary-%s", operatingSystem, arch)
 	suffix, found := packageArchMap[key]
 	if !found {
 		return "", errors.New(fmt.Sprintf("'%s' is not a valid combination for a package", key), errors.TypeConfig)
 	}
 
-	return fmt.Sprintf("%s-%s-%s", program, version, suffix), nil
+	return fmt.Sprintf("%s-%s-%s", programName, version, suffix), nil
 }
 
 // GetArtifactPath returns a full path of artifact for a program in specific version

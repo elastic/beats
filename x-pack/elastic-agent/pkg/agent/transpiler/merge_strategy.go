@@ -4,8 +4,6 @@
 
 package transpiler
 
-import "fmt"
-
 type injector interface {
 	Inject(target []Node, source interface{}) []Node
 	InjectItem(target []Node, source Node) []Node
@@ -82,12 +80,10 @@ func (replaceInjector) InjectCollection(target []Node, source []Node) []Node {
 
 func inject(i injector, target []Node, source interface{}) []Node {
 	if sourceCollection, ok := source.([]Node); ok {
-		fmt.Printf(">>[%T] list of nodes %T %d\n", i, source, len(sourceCollection))
 		return i.InjectCollection(target, sourceCollection)
 	}
 
 	if node, ok := source.(Node); ok {
-		fmt.Printf(">> one of nodes %T\n", source)
 		return i.InjectItem(target, node)
 	}
 

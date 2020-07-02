@@ -26,9 +26,13 @@ type config struct {
 	HTTPRequestBody      common.MapStr     `config:"http_request_body"`
 	Interval             time.Duration     `config:"interval"`
 	JSONObjects          string            `config:"json_objects_array"`
+	SplitEventsBy        string            `config:"split_events_by"`
 	NoHTTPBody           bool              `config:"no_http_body"`
 	Pagination           *Pagination       `config:"pagination"`
 	RateLimit            *RateLimit        `config:"rate_limit"`
+	RetryMax             int               `config:"retry.max_attempts"`
+	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
+	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  string            `config:"url" validate:"required"`
 }
@@ -95,5 +99,8 @@ func defaultConfig() config {
 	var c config
 	c.HTTPMethod = "GET"
 	c.HTTPClientTimeout = 60 * time.Second
+	c.RetryWaitMin = 1 * time.Second
+	c.RetryWaitMax = 60 * time.Second
+	c.RetryMax = 5
 	return c
 }

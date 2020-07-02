@@ -240,19 +240,19 @@ processors:
 - set:
     field: observer.egress.zone
     value: "{{iptables.ubiquiti.output_zone}}"
-    if: ctx?.iptables?.ubiquiti?.output_zone != null
+    ignore_empty_value: true
 - set:
     field: observer.ingress.zone
     value: "{{iptables.ubiquiti.input_zone}}"
-    if: ctx?.iptables?.ubiquiti?.input_zone != null
+    ignore_empty_value: true
 - set:
     field: rule.id
     value: "{{iptables.ubiquiti.rule_number}}"
-    if: ctx?.iptables?.ubiquiti?.rule_number != null
+    ignore_empty_value: true
 - set:
     field: rule.name
     value: "{{iptables.ubiquiti.rule_set}}"
-    if: ctx?.iptables?.ubiquiti?.rule_set != null
+    ignore_empty_value: true
 on_failure:
 - set:
     field: error.message
