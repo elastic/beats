@@ -32,6 +32,7 @@ type messageBuffer struct {
 	truncated      int
 	err            error // last seen error
 	message        reader.Message
+	notMatched     bool
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -59,6 +60,16 @@ func (b *messageBuffer) load(m reader.Message) {
 	b.message.AddFields(m.Fields)
 }
 
+// load loads the reader with the given message. It is recommended to either
+// run clear or finalize before.
+func (b *messageBuffer) loadNotMatched(m reader.Message) {
+	b.addLine(m)
+	// Timestamp of first message is taken as overall timestamp
+	b.message.Ts = m.Ts
+	b.notMatched = true
+	b.message.AddFields(m.Fields)
+}
+
 // clearBuffer resets the reader buffer variables
 func (b *messageBuffer) clear() {
 	b.message = reader.Message{}
@@ -67,6 +78,7 @@ func (b *messageBuffer) clear() {
 	b.processedLines = 0
 	b.truncated = 0
 	b.err = nil
+	b.notMatched = false
 }
 
 // addLine adds the read content to the message

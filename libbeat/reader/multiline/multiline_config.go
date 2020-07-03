@@ -29,15 +29,18 @@ type multilineType uint8
 const (
 	patternMode multilineType = iota
 	countMode
+	wildPatternMode
 
-	patternStr = "pattern"
-	countStr   = "count"
+	patternStr     = "pattern"
+	countStr       = "count"
+	wildPatternStr = "wild-pattern"
 )
 
 var (
 	multilineTypes = map[string]multilineType{
-		patternStr: patternMode,
-		countStr:   countMode,
+		patternStr:     patternMode,
+		countStr:       countMode,
+		wildPatternStr: wildPatternMode,
 	}
 )
 
@@ -68,6 +71,10 @@ func (c *Config) Validate() error {
 	} else if c.Type == countMode {
 		if c.LinesCount == 0 {
 			return fmt.Errorf("multiline.count_lines cannot be zero when count based is selected")
+		}
+	} else if c.Type == wildPatternMode {
+		if c.Pattern == nil {
+			return fmt.Errorf("multiline.pattern cannot be empty when pattern based matching is selected")
 		}
 	}
 	return nil
