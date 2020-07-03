@@ -25,7 +25,7 @@ func TestManagedModeRouting(t *testing.T) {
 		return m, nil
 	}
 
-	log, _ := logger.New()
+	log, _ := logger.New("")
 	router, _ := newRouter(log, streamFn)
 	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}})
 

@@ -22,6 +22,8 @@ import (
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 // Publisher is used to publish an event and update the cursor in a single call to Publish.
@@ -63,10 +65,89 @@ type updateOp struct {
 // The ACK ordering in the publisher pipeline guarantees that update operations
 // will be ACKed and executed in the correct order.
 func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) error {
-	panic("TODO: implement me")
+	if cursorUpdate == nil {
+		return c.forward(event)
+	}
+
+	op, err := createUpdateOp(c.cursor.store, c.cursor.resource, cursorUpdate)
+	if err != nil {
+		return err
+	}
+
+	event.Private = op
+	return c.forward(event)
+}
+
+func (c *cursorPublisher) forward(event beat.Event) error {
+	c.client.Publish(event)
+	if c.canceler == nil {
+		return nil
+	}
+	return c.canceler.Err()
+}
+
+func createUpdateOp(store *store, resource *resource, updates interface{}) (*updateOp, error) {
+	ts := time.Now()
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
+
+	cursor := resource.pendingCursor
+	if resource.activeCursorOperations == 0 {
+		var tmp interface{}
+		typeconv.Convert(&tmp, cursor)
+		resource.pendingCursor = tmp
+		cursor = tmp
+	}
+	if err := typeconv.Convert(&cursor, updates); err != nil {
+		return nil, err
+	}
+	resource.pendingCursor = cursor
+
+	resource.Retain()
+	resource.activeCursorOperations++
+	return &updateOp{
+		resource:  resource,
+		store:     store,
+		timestamp: ts,
+		delta:     updates,
+	}, nil
+}
+
+// done releases resources held by the last N updateOps.
+func (op *updateOp) done(n uint) {
+	op.resource.UpdatesReleaseN(n)
+	op.resource = nil
+	*op = updateOp{}
 }
 
 // Execute updates the persistent store with the scheduled changes and releases the resource.
-func (op *updateOp) Execute(numEvents uint) {
-	panic("TODO: implement me")
+func (op *updateOp) Execute(n uint) {
+	resource := op.resource
+	defer op.done(n)
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
+
+	resource.activeCursorOperations -= n
+	if resource.activeCursorOperations == 0 {
+		resource.cursor = resource.pendingCursor
+		resource.pendingCursor = nil
+	} else {
+		typeconv.Convert(&resource.cursor, op.delta)
+	}
+
+	if resource.internalState.Updated.Before(op.timestamp) {
+		resource.internalState.Updated = op.timestamp
+	}
+
+	err := op.store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
+	if err != nil {
+		if !statestore.IsClosed(err) {
+			op.store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
+		}
+	} else {
+		resource.internalInSync = true
+		resource.stored = true
+	}
 }
