@@ -20,8 +20,9 @@ package acker
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 type fakeACKer struct {
