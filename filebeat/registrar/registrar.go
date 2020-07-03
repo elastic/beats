@@ -146,8 +146,6 @@ func (r *Registrar) Run() {
 	}()
 
 	var (
-		// we keep a long running write transaction.
-		// The 'filebeat' store must not be used outside of the Registrar.
 		timer  *time.Timer
 		flushC <-chan time.Time
 
