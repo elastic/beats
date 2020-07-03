@@ -1053,11 +1053,6 @@ def dumpFilteredEnvironment(){
   echo "DOCKER_CACHE: ${env.DOCKER_CACHE}"
   echo "GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}"
   echo "PIP_INSTALL_PARAMS: ${env.PIP_INSTALL_PARAMS}"
-  echo(env.getEnvironment()
-          .findAll{ it.key.startsWith('BUILD_') }
-          .collect(
-            {"${it.key} = ${it.value}"}
-          ).join("\n"))
   echo "### END ENV DUMP ###"
 }
 
