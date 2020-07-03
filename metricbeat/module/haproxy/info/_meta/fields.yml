@@ -153,14 +153,17 @@
             - name: in
               type: long
               description: >
+                Incoming compressed data in bits per second.
 
             - name: out
               type: long
               description: >
+                Outgoing compressed data in bits per second.
 
             - name: rate_limit
               type: long
               description: >
+                Rate limit of compressed data in bits per second.
 
     - name: connection
       type: group
@@ -175,14 +178,17 @@
             - name: value
               type: long
               description: >
+                Number of connections in the last second.
 
             - name: limit
               type: long
               description: >
+                Rate limit of connections.
 
             - name: max
               type: long
               description: >
+                Maximum rate of connections.
 
         - name: current
           type: long
@@ -221,14 +227,17 @@
     - name: requests.total
       type: long
       description: >
+        Total number of requests.
 
     - name: sockets.max
       type: long
       description: >
+        Maximum number of sockets.
 
     - name: requests.max
       type: long
       description: >
+        Maximum number of requests.
 
     - name: pipes
       type: group
@@ -237,14 +246,17 @@
         - name: used
           type: integer
           description: >
+            Number of used pipes during kernel-based tcp splicing.
 
         - name: free
           type: integer
           description: >
+            Number of free pipes.
 
         - name: max
           type: integer
           description: >
+            Maximum number of used pipes.
 
     - name: session
       type: group
@@ -253,14 +265,17 @@
         - name: rate.value
           type: integer
           description: >
+            Rate of session per seconds.
 
         - name: rate.limit
           type: integer
           description: >
+            Rate limit of sessions.
 
         - name: rate.max
           type: integer
           description: >
+            Maximum rate of sessions.
 
 
     - name: ssl
@@ -269,15 +284,18 @@
       fields:
         - name: rate.value
           type: integer
-          description:
+          description: >
+            Rate of SSL requests.
 
         - name: rate.limit
           type: integer
-          description:
+          description: >
+            Rate limit of SSL requests.
 
         - name: rate.max
           type: integer
-          description:
+          description: >
+            Maximum rate of SSL requests.
 
         - name: frontend
           type: group
@@ -285,16 +303,19 @@
           fields:
             - name: key_rate.value
               type: integer
-              description:
+              description: >
+                Key rate of SSL frontend.
 
             - name: key_rate.max
               type: integer
-              description:
+              description: >
+                Maximum key rate of SSL frontend.
 
             - name: session_reuse.pct
               type: scaled_float
               format: percent
-              description:
+              description: >
+                Rate of reuse of SSL frontend sessions.
 
         - name: backend
           type: group
@@ -302,17 +323,21 @@
           fields:
             - name: key_rate.value
               type: integer
-              description:
+              description: >
+                Key rate of SSL backend sessions.
 
             - name: key_rate.max
               type: integer
-              description: MaxConnRate
+              description: >
+                Maximum key rate of SSL backend sessions.
         - name: cached_lookups
           type: long
-          description:
+          description: >
+            Number of SSL cache lookups.
         - name: cache_misses
           type: long
-          description:
+          description: >
+            Number of SSL cache misses.
 
 
     - name: zlib_mem_usage
@@ -323,12 +348,15 @@
         - name: value
           type: integer
           description: >
+            Memory usage of zlib.
 
         - name: max
           type: integer
           description: >
+            Maximum memory usage of zlib.
 
     - name: idle.pct
       type: scaled_float
       format: percent
       description: >
+        Percentage of idle time.
