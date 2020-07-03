@@ -5,6 +5,9 @@
 package filters
 
 import (
+	"crypto/sha512"
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,12 +16,18 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+const semiLongString = ""
+
 func TestStreamCheck(t *testing.T) {
 	type testCase struct {
 		name      string
 		configMap map[string]interface{}
 		result    error
 	}
+
+	h := hex.EncodeToString(sha512.New().Sum(nil))
+	semiLongString := h[:86]
+	longString := fmt.Sprintf("%s%s", h, h)
 
 	testCases := []testCase{
 		{
@@ -203,6 +212,67 @@ func TestStreamCheck(t *testing.T) {
 				},
 			},
 			result: ErrInvalidNamespace,
+		},
+		{
+			name: "type invalid name 1 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"dataset.type": "-invalidstart"},
+				},
+			},
+			result: ErrInvalidIndex,
+		},
+		{
+			name: "type invalid combined length 1 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"dataset.type":      semiLongString,
+						"dataset.namespace": semiLongString,
+						"streams":           []map[string]interface{}{{"dataset.name": semiLongString}},
+					},
+				},
+			},
+			result: ErrInvalidIndex,
+		},
+		{
+			name: "type invalid type length 1 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"dataset.type": longString},
+				},
+			},
+			result: ErrInvalidIndex,
+		},
+
+		{
+			name: "type invalid namespace length 1 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"dataset.namespace": longString},
+				},
+			},
+			result: ErrInvalidNamespace,
+		},
+
+		{
+			name: "type invalid dataset.name length 1 - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{{"dataset.name": longString}}},
+				},
+			},
+			result: ErrInvalidDataset,
+		},
+
+		{
+			name: "type empty streams - compact",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"streams": []map[string]interface{}{}},
+				},
+			},
+			result: nil,
 		},
 	}
 

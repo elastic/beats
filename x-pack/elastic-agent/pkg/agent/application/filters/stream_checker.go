@@ -5,6 +5,7 @@
 package filters
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -17,6 +18,9 @@ var ErrInvalidNamespace = errors.New("provided namespace is invalid", errors.Typ
 
 // ErrInvalidDataset is error returned when dataset name value provided is invalid.
 var ErrInvalidDataset = errors.New("provided dataset name is invalid", errors.TypeConfig)
+
+// ErrInvalidIndex occurs when concatenation of {dataset.type}-{dataset.name}-{dataset.namespace} does not meet index criteria.
+var ErrInvalidIndex = errors.New("provided combination of type, dataset name and namespace is invalid", errors.TypeConfig)
 
 // StreamChecker checks for invalid values in stream namespace and dataset.
 func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
@@ -36,14 +40,18 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 	}
 
 	for _, inputNode := range inputsNodeListCollection {
+		namespace := "default"
+		datasetName := "generic"
 		// fail only if dataset.namespace or dataset[namespace] is found and invalid
 		// not provided values are ok and will be fixed by rules
 		if nsNode, found := inputNode.Find("dataset.namespace"); found {
 			nsKey, ok := nsNode.(*transpiler.Key)
 			if ok {
-				if newNamespace := nsKey.Value().(transpiler.Node).String(); !isNamespaceValid(newNamespace) {
+				newNamespace := nsKey.Value().(transpiler.Node).String()
+				if !isValid(newNamespace) {
 					return ErrInvalidNamespace
 				}
+				namespace = newNamespace
 			}
 		} else {
 			dsNode, found := inputNode.Find("dataset")
@@ -55,9 +63,37 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 					if found {
 						nsKey, ok := nsNode.(*transpiler.Key)
 						if ok {
-							if newNamespace := nsKey.Value().(transpiler.Node).String(); !isNamespaceValid(newNamespace) {
+							newNamespace := nsKey.Value().(transpiler.Node).String()
+							if !isValid(newNamespace) {
 								return ErrInvalidNamespace
 							}
+							namespace = newNamespace
+						}
+					}
+				}
+			}
+		}
+
+		// get the type, longest type for now is metrics
+		datasetType := "metrics"
+		if nsNode, found := inputNode.Find("dataset.type"); found {
+			nsKey, ok := nsNode.(*transpiler.Key)
+			if ok {
+				newDataset := nsKey.Value().(transpiler.Node).String()
+				datasetType = newDataset
+			}
+		} else {
+			dsNode, found := inputNode.Find("dataset")
+			if found {
+				// got a dataset
+				datasetMap, ok := dsNode.Value().(*transpiler.Dict)
+				if ok {
+					nsNode, found := datasetMap.Find("type")
+					if found {
+						nsKey, ok := nsNode.(*transpiler.Key)
+						if ok {
+							newDataset := nsKey.Value().(transpiler.Node).String()
+							datasetType = newDataset
 						}
 					}
 				}
@@ -65,53 +101,57 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 		}
 
 		streamsNode, ok := inputNode.Find("streams")
-		if !ok {
-			continue
-		}
-
-		streamsList, ok := streamsNode.Value().(*transpiler.List)
-		if !ok {
-			continue
-		}
-
-		streamNodes, ok := streamsList.Value().([]transpiler.Node)
-		if !ok {
-			return errors.New("streams is not a list", errors.TypeConfig)
-		}
-
-		for _, streamNode := range streamNodes {
-			streamMap, ok := streamNode.(*transpiler.Dict)
-			if !ok {
-				continue
-			}
-
-			// fix this only if in compact form
-			if dsNameNode, found := streamMap.Find("dataset.name"); found {
-				dsKey, ok := dsNameNode.(*transpiler.Key)
-				if ok {
-					if newDataset := dsKey.Value().(transpiler.Node).String(); !isDatasetValid(newDataset) {
-						return ErrInvalidDataset
-					}
+		if ok {
+			streamsList, ok := streamsNode.Value().(*transpiler.List)
+			if ok {
+				streamNodes, ok := streamsList.Value().([]transpiler.Node)
+				if !ok {
+					return errors.New("streams is not a list", errors.TypeConfig)
 				}
-			} else {
-				datasetNode, found := streamMap.Find("dataset")
-				if found {
-					datasetMap, ok := datasetNode.Value().(*transpiler.Dict)
+
+				for _, streamNode := range streamNodes {
+					streamMap, ok := streamNode.(*transpiler.Dict)
 					if !ok {
 						continue
 					}
 
-					dsNameNode, found := datasetMap.Find("name")
-					if found {
+					// fix this only if in compact form
+					if dsNameNode, found := streamMap.Find("dataset.name"); found {
 						dsKey, ok := dsNameNode.(*transpiler.Key)
 						if ok {
-							if newDataset := dsKey.Value().(transpiler.Node).String(); !isDatasetValid(newDataset) {
+							newDataset := dsKey.Value().(transpiler.Node).String()
+							if !isValid(newDataset) {
 								return ErrInvalidDataset
+							}
+							datasetName = newDataset
+						}
+					} else {
+						datasetNode, found := streamMap.Find("dataset")
+						if found {
+							datasetMap, ok := datasetNode.Value().(*transpiler.Dict)
+							if !ok {
+								continue
+							}
+
+							dsNameNode, found := datasetMap.Find("name")
+							if found {
+								dsKey, ok := dsNameNode.(*transpiler.Key)
+								if ok {
+									newDataset := dsKey.Value().(transpiler.Node).String()
+									if !isValid(newDataset) {
+										return ErrInvalidDataset
+									}
+									datasetName = newDataset
+								}
 							}
 						}
 					}
 				}
 			}
+		}
+
+		if indexName := fmt.Sprintf("%s-%s-%s", datasetType, datasetName, namespace); !matchesIndexContraints(indexName) {
+			return ErrInvalidIndex
 		}
 	}
 
@@ -120,13 +160,17 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 
 // The only two requirement are that it has only characters allowed in an Elasticsearch index name
 // and does NOT contain a `-`.
+func isValid(namespace string) bool {
+	return matchesIndexContraints(namespace) && !strings.Contains(namespace, "-")
+}
+
+// The only two requirement are that it has only characters allowed in an Elasticsearch index name
 // Index names must meet the following criteria:
 //     Lowercase only
 //     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
 //     Cannot start with -, _, +
 //     Cannot be . or ..
-
-func isNamespaceValid(namespace string) bool {
+func matchesIndexContraints(namespace string) bool {
 	// Cannot be . or ..
 	if namespace == "." || namespace == ".." {
 		return false
@@ -142,41 +186,12 @@ func isNamespaceValid(namespace string) bool {
 	}
 
 	// Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-	if strings.ContainsAny(namespace, "\\/*?\"<>| ,#-") {
+	if strings.ContainsAny(namespace, "\\/*?\"<>| ,#") {
 		return false
 	}
 
 	// Cannot start with -, _, +
 	if strings.HasPrefix(namespace, "-") || strings.HasPrefix(namespace, "_") || strings.HasPrefix(namespace, "+") {
-		return false
-	}
-
-	return true
-}
-
-// The same requirements as for the namespace apply.
-func isDatasetValid(dataset string) bool {
-	// Cannot be . or ..
-	if dataset == "." || dataset == ".." {
-		return false
-	}
-
-	if len(dataset) <= 0 || len(dataset) > 255 {
-		return false
-	}
-
-	// Lowercase only
-	if strings.ToLower(dataset) != dataset {
-		return false
-	}
-
-	// Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-	if strings.ContainsAny(dataset, "\\/*?\"<>| ,#-") {
-		return false
-	}
-
-	// Cannot start with -, _, +
-	if strings.HasPrefix(dataset, "-") || strings.HasPrefix(dataset, "_") || strings.HasPrefix(dataset, "+") {
 		return false
 	}
 
