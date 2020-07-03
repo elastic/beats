@@ -235,3 +235,33 @@ You can label Docker containers with useful info to decode logs structured as JS
   co.elastic.logs/json.add_error_key: true
   co.elastic.logs/json.message_key: log
 -----
+
+===== Usage in Docker Swarm
+
+You must ensure you use the `label` field directly under the service, not the `label` field under `deploy`. The latter sets labels for the 
+Docker Swarm "service", and these labels will not be applied to all containers started to run that "service".  
+
+[source,yaml]
+-----
+  your_service:
+    labels:
+      # Do this
+      co.elastic.logs/module: traefik
+    deploy:
+      labels:
+        # Do not put your labels here, it will not work
+-----
+
+===== Arrays in docker labels (for copy_fields, rename, etc)
+
+The following shows how to configure and array, as needed for the copy_fields processor
+
+[source,yaml]
+-----
+  labels:
+      co.elastic.logs/module: traefik
+      co.elastic.logs/processors.copy_fields.fields.0.from: message
+      co.elastic.logs/processors.copy_fields.fields.0.to: event.original
+      co.elastic.logs/processors.copy_fields.fail_on_error: "false"
+      co.elastic.logs/processors.copy_fields.ignore_missing: "true"
+-----
