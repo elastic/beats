@@ -3,6 +3,7 @@ FROM golang:1.13.10
 RUN \
     apt-get update \
       && apt-get install -y --no-install-recommends \
+         libsystemd-dev \
          netcat \
          rsync \
          python3 \
