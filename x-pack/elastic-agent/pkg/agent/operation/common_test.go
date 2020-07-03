@@ -96,7 +96,7 @@ func getLogger() *logger.Logger {
 			"level": "error",
 		},
 	})
-	l, _ := logger.NewFromConfig(cfg)
+	l, _ := logger.NewFromConfig("", cfg)
 	return l
 }
 
@@ -144,7 +144,7 @@ func waitFor(t *testing.T, check func() error) {
 
 type DummyDownloader struct{}
 
-func (*DummyDownloader) Download(_ context.Context, p, v string) (string, error) {
+func (*DummyDownloader) Download(_ context.Context, p, a, v string) (string, error) {
 	return "", nil
 }
 

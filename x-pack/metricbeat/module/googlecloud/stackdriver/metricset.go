@@ -9,13 +9,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3"
-
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
-
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -216,41 +215,54 @@ func (mc *stackDriverConfig) Validate() error {
 // (sample period and ingest delay) of each given metric type
 func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.MetricClient) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
+	req := &monitoringpb.ListMetricDescriptorsRequest{
+		Name: "projects/" + m.config.ProjectID,
+	}
 
 	for _, sdc := range m.stackDriverConfig {
 		for _, mt := range sdc.MetricTypes {
-			req := &monitoringpb.ListMetricDescriptorsRequest{
-				Name:   "projects/" + m.config.ProjectID,
-				Filter: fmt.Sprintf(`metric.type = "%s"`, sdc.ServiceName+".googleapis.com/"+mt),
-			}
-
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
 			it := client.ListMetricDescriptors(ctx, req)
-			out, err := it.Next()
-			if err != nil {
-				err = errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
-				m.Logger().Error(err)
-				return metricsWithMeta, err
-			}
 
-			// Set samplePeriod default to 60 seconds and ingestDelay default to 0.
-			meta := metricMeta{
-				samplePeriod: 60 * time.Second,
-				ingestDelay:  0 * time.Second,
-			}
+			for {
+				out, err := it.Next()
+				if err != nil && err != iterator.Done {
+					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+					m.Logger().Error(err)
+					return metricsWithMeta, err
+				}
 
-			if out.Metadata.SamplePeriod != nil {
-				m.Logger().Debugf("For metric type %s: sample period = %s", mt, out.Metadata.SamplePeriod)
-				meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
-			}
+				if out != nil {
+					metricsWithMeta = m.getMetadata(out, metricsWithMeta)
+				}
 
-			if out.Metadata.IngestDelay != nil {
-				m.Logger().Debugf("For metric type %s: ingest delay = %s", mt, out.Metadata.IngestDelay)
-				meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+				if err == iterator.Done {
+					break
+				}
 			}
-
-			metricsWithMeta[mt] = meta
 		}
 	}
 
 	return metricsWithMeta, nil
+}
+
+func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta map[string]metricMeta) map[string]metricMeta {
+	// Set samplePeriod default to 60 seconds and ingestDelay default to 0.
+	meta := metricMeta{
+		samplePeriod: 60 * time.Second,
+		ingestDelay:  0 * time.Second,
+	}
+
+	if out.Metadata.SamplePeriod != nil {
+		m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
+		meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
+	}
+
+	if out.Metadata.IngestDelay != nil {
+		m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
+		meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+	}
+
+	metricsWithMeta[out.Type] = meta
+	return metricsWithMeta
 }

@@ -8,6 +8,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2/google"
@@ -348,6 +349,32 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"google.credentials_file": "./testdata/invalid_credentials.json",
 				},
 				"url": "localhost",
+			},
+		},
+		{
+			name:        "date_cursor must fail in combination with pagination",
+			expectedErr: "invalid configuration: date_cursor cannnot be set in combination with other pagination mechanisms accessing config",
+			input: map[string]interface{}{
+				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo"},
+				"pagination": map[string]interface{}{
+					"header": map[string]interface{}{"field_name": "foo", "regex_pattern": "bar"},
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name:        "date_cursor.date_format will fail if invalid",
+			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
+			input: map[string]interface{}{
+				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": "1234"},
+				"url":         "localhost",
+			},
+		},
+		{
+			name: "date_cursor must work with a valid date_format",
+			input: map[string]interface{}{
+				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": time.RFC3339},
+				"url":         "localhost",
 			},
 		},
 	}

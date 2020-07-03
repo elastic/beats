@@ -70,7 +70,7 @@ func (o *operationFetch) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.Version())
+	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.ArtifactName(), o.program.Version())
 	if err == nil {
 		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
 	}

@@ -50,6 +50,7 @@ type Application interface {
 type Descriptor interface {
 	ServicePort() int
 	BinaryName() string
+	ArtifactName() string
 	Version() string
 	ID() string
 	Directory() string
