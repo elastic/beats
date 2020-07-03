@@ -32,6 +32,8 @@ import (
 )
 
 type Registrar struct {
+	log *logp.Logger
+
 	// registrar event input and output
 	Channel              chan []file.State
 	out                  successLogger
@@ -77,6 +79,7 @@ func New(stateStore StateStore, out successLogger, flushTimeout time.Duration) (
 	}
 
 	r := &Registrar{
+		log:          logp.NewLogger("registrar"),
 		Channel:      make(chan []file.State, 1),
 		out:          out,
 		done:         make(chan struct{}),
@@ -102,7 +105,7 @@ func (r *Registrar) loadStates() error {
 	}
 
 	r.states.SetStates(states)
-	logp.Info("States Loaded from registrar: %+v", len(states))
+	r.log.Infof("States Loaded from registrar: %+v", len(states))
 
 	return nil
 }
@@ -125,16 +128,16 @@ func (r *Registrar) Start() error {
 
 // Stop stops the registry. It waits until Run function finished.
 func (r *Registrar) Stop() {
-	logp.Info("Stopping Registrar")
+	r.log.Info("Stopping Registrar")
+	defer r.log.Info("Registrar stopped")
 
 	close(r.done)
 	r.wg.Wait()
-	logp.Info("Registrar stopped")
 }
 
 func (r *Registrar) Run() {
-	logp.Debug("registrar", "Starting Registrar")
-	defer logp.Debug("registrar", "Stopping Registrar")
+	r.log.Debug("Starting Registrar")
+	defer r.log.Debug("Stopping Registrar")
 
 	defer r.store.Close()
 
@@ -161,16 +164,13 @@ func (r *Registrar) Run() {
 	for {
 		select {
 		case <-r.done:
-			logp.Info("Ending Registrar")
+			r.log.Info("Ending Registrar")
 			return
 
 		case states := <-directIn:
 			// no flush timeout configured. Directly update registry
 			r.onEvents(states)
-			if err := r.commitStateUpdates(); err != nil {
-				r.failing(err)
-				return
-			}
+			r.commitStateUpdates()
 
 		case states := <-collectIn:
 			// flush timeout configured. Only update internal state and track pending
@@ -183,10 +183,7 @@ func (r *Registrar) Run() {
 
 		case <-flushC:
 			timer.Stop()
-			if err := r.commitStateUpdates(); err != nil {
-				r.failing(err)
-				return
-			}
+			r.commitStateUpdates()
 
 			flushC = nil
 			timer = nil
@@ -194,7 +191,7 @@ func (r *Registrar) Run() {
 	}
 }
 
-func (r *Registrar) commitStateUpdates() error {
+func (r *Registrar) commitStateUpdates() {
 	// First clean up states
 	r.gcStates()
 	states := r.states.GetStates()
@@ -202,11 +199,12 @@ func (r *Registrar) commitStateUpdates() error {
 
 	registryWrites.Inc()
 
-	logp.Debug("registrar", "Registry file updated. %d active states.", len(states))
+	r.log.Debug("Registry file updated. %d active states.", len(states))
 	registrySuccess.Inc()
 
 	if err := writeStates(r.store, states); err != nil {
-		logp.Err("Error writing registrar state to statestore: %v", err)
+		r.log.Errorf("Error writing registrar state to statestore: %v", err)
+		registryFails.Inc()
 	}
 
 	if r.out != nil {
@@ -214,15 +212,6 @@ func (r *Registrar) commitStateUpdates() error {
 	}
 	r.bufferedStateUpdates = 0
 
-	return nil
-}
-
-func (r *Registrar) failing(err error) {
-	logp.Err("Registrar storage access failed with: %+v", err)
-	logp.Err("Registrar is failing. Wait for shutdown.")
-	<-r.done
-	logp.Info("Ending failing Registrar.")
-	return
 }
 
 // onEvents processes events received from the publisher pipeline
@@ -240,7 +229,7 @@ func (r *Registrar) onEvents(states []file.State) {
 		}
 	}
 
-	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
+	r.log.Debug("Registrar state updates processed. Count: %v", len(states))
 
 	// new set of events received -> mark state registry ready for next
 	// cleanup phase in case gc'able events are stored in the registry.
@@ -263,7 +252,7 @@ func (r *Registrar) gcStates() {
 	})
 	statesCleanup.Add(int64(cleanedStates))
 
-	logp.Debug("registrar",
+	r.log.Debug(
 		"Registrar states cleaned up. Before: %d, After: %d, Pending: %d",
 		beforeCount, beforeCount-cleanedStates, pendingClean)
 
@@ -273,7 +262,7 @@ func (r *Registrar) gcStates() {
 
 // processEventStates gets the states from the events and writes them to the registrar state
 func (r *Registrar) processEventStates(states []file.State) {
-	logp.Debug("registrar", "Processing %d events", len(states))
+	r.log.Debug("Processing %d events", len(states))
 
 	ts := time.Now()
 	for i := range states {
