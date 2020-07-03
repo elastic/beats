@@ -81,6 +81,7 @@ func init() {
 type PythonTestArgs struct {
 	TestName            string            // Test name used in logging.
 	Env                 map[string]string // Env vars to add to the current env.
+	Files               []string          // Globs used by nosetests to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
 }
@@ -142,7 +143,11 @@ func PythonNoseTest(params PythonTestArgs) error {
 		)
 	}
 
-	testFiles, err := FindFiles(nosetestsTestFiles...)
+	files := nosetestsTestFiles
+	if len(params.Files) > 0 {
+		files = params.Files
+	}
+	testFiles, err := FindFiles(files...)
 	if err != nil {
 		return err
 	}
@@ -165,6 +170,20 @@ func PythonNoseTest(params PythonTestArgs) error {
 
 	// TODO: Aggregate all the individual code coverage reports and generate
 	// and HTML report.
+}
+
+// PythonNoseTestForModule executes python system tests for modules.
+//
+// Use `MODULE=module` to run only tests for `module`.
+func PythonNoseTestForModule(params PythonTestArgs) error {
+	if module := EnvOr("MODULE", ""); module != "" {
+		params.Files = []string{
+			fmt.Sprintf("module/%s/test_*.py", module),
+			fmt.Sprintf("module/%s/*/test_*.py", module),
+		}
+		params.TestName += "-" + module
+	}
+	return PythonNoseTest(params)
 }
 
 // PythonVirtualenv constructs a virtualenv that contains the given modules as

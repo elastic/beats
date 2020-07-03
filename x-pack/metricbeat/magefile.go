@@ -145,6 +145,7 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest executes the python system tests in the integration
 // environment (Docker).
+// Use MODULE=module to run only tests for `module`.
 // Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
 // Use any other NOSE_* environment variable to influence the behavior of
 // nosetests.
@@ -158,6 +159,6 @@ func PythonIntegTest(ctx context.Context) error {
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+		return devtools.PythonNoseTestForModule(devtools.DefaultPythonTestIntegrationArgs())
 	})
 }
