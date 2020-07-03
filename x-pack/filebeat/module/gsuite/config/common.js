@@ -54,14 +54,16 @@ var gsuite = (function () {
         evt.Put("client.user.domain", data[1]);
     };
 
-    var copyFields = new processor.Convert({
-        fields: [
-            { from: "client.ip", to: "related.ip" },
-            { from: "client.user.name", to: "related.user" },
-        ],
-        ignore_missing: true,
-        fail_on_error: false,
-    });
+    var copyFields = function(evt) {
+        var ip = evt.Get("client.ip");
+        if (ip) {
+            evt.Put("related.ip", [ip]);
+        }
+        var userName = evt.Get("client.user.name");
+        if (userName) {
+            evt.Put("related.user", [userName]);
+        }
+    };
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)

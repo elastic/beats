@@ -6,11 +6,8 @@ var saml = (function () {
     var processor = require("processor");
 
     var categorizeEvent = function(evt) {
-        evt.Put("event.type", "access");
-        evt.Put("event.category", "authentication");
-    };
-
-    var setEventOutcome = function(evt) {
+        evt.Put("event.type", ["info"]);
+        evt.Put("event.category", ["authentication"]);
         switch (evt.Get("event.action")) {
             case "login_failure":
                 evt.Put("event.outcome", "failure");
@@ -30,11 +27,19 @@ var saml = (function () {
         var prefixRegex = /^(saml_)/;
 
         params.forEach(function(p){
+            p.name = p.name.replace(prefixRegex, "");
+
             // all saml event parameters are strings.
             // for this reason we know for sure they are in the 'value' field.
             // https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml
-            p.name = p.name.replace(prefixRegex, "");
-            evt.Put("gsuite.saml."+p.name, p.value);
+            switch (p.name) {
+                case "status_code":
+                case "second_level_status_code":
+                    evt.Put("gsuite.saml."+p.name, parseInt(p.value));
+                    break;
+                default:
+                    evt.Put("gsuite.saml."+p.name, p.value);
+            }
         });
 
         evt.Delete("json.events.parameters");
@@ -42,7 +47,6 @@ var saml = (function () {
 
     var pipeline = new processor.Chain()
         .Add(categorizeEvent)
-        .Add(setEventOutcome)
         .Add(processParams)
         .Build();
 

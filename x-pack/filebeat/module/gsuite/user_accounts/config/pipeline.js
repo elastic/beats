@@ -6,8 +6,8 @@ var userAccounts = (function () {
     var processor = require("processor");
 
     var categorizeEvent = function(evt) {
-        evt.Put("event.type", "change");
-        evt.Put("event.category", "authentication");
+        evt.Put("event.type", ["change", "user"]);
+        evt.Put("event.category", ["iam"]);
     };
 
     var pipeline = new processor.Chain()

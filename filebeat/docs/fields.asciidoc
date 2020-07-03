@@ -23347,7 +23347,7 @@ type: keyword
 SAML status code.
 
 
-type: keyword
+type: long
 
 --
 
@@ -23357,7 +23357,7 @@ type: keyword
 SAML second level status code.
 
 
-type: keyword
+type: long
 
 --
 
