@@ -29,7 +29,6 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/urso/sderr"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -41,6 +40,11 @@ type Reader struct {
 	log     *logp.Logger
 	backoff backoff.Backoff
 	journal journal
+}
+
+type canceler interface {
+	Done() <-chan struct{}
+	Err() error
 }
 
 type journal interface {
@@ -146,7 +150,7 @@ func (r *Reader) Seek(mode SeekMode, cursor string) (err error) {
 
 // Next reads a new journald entry from the journal. It blocks if there is
 // currently no entry available in the journal, or until an error has occured.
-func (r *Reader) Next(cancel input.Canceler) (*sdjournal.JournalEntry, error) {
+func (r *Reader) Next(cancel canceler) (*sdjournal.JournalEntry, error) {
 	for cancel.Err() == nil {
 		c, err := r.journal.Next()
 		if err != nil && err != io.EOF {
