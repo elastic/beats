@@ -337,6 +337,7 @@ func TestManager_InputsRun(t *testing.T) {
 		}()
 
 		cancel()
+		wg.Wait()
 		require.NoError(t, err)
 		require.Equal(t, 0, clientCounters.Active())
 	})
