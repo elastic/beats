@@ -241,6 +241,48 @@ func TestMultilineCount(t *testing.T) {
 	)
 }
 
+func TestMultilineWhilePattern(t *testing.T) {
+	pattern := match.MustCompile(`^{`)
+	testMultilineOK(t,
+		Config{
+			Type:    whilePatternMode,
+			Pattern: &pattern,
+			Negate:  false,
+		},
+		3,
+		"{line1\n{line1.1\n",
+		"not matched line\n",
+		"{line2\n{line2.1\n",
+	)
+	// use negated
+	testMultilineOK(t,
+		Config{
+			Type:    whilePatternMode,
+			Pattern: &pattern,
+			Negate:  true,
+		},
+		3,
+		"{line1\n",
+		"panic:\n~stacktrace~\n",
+		"{line2\n",
+	)
+	// truncated
+	maxLines := 2
+	testMultilineTruncated(t,
+		Config{
+			Type:     whilePatternMode,
+			Pattern:  &pattern,
+			MaxLines: &maxLines,
+		},
+		1,
+		true,
+		[]string{
+			"{line1\n{line1.1\n{line1.2\n"},
+		[]string{
+			"{line1\n{line1.1\n"},
+	)
+}
+
 func testMultilineOK(t *testing.T, cfg Config, events int, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	r := createMultilineTestReader(t, buf, cfg)
