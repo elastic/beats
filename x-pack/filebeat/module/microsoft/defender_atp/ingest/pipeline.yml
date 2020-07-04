@@ -42,7 +42,7 @@ processors:
   - set:
       field: event.action
       value: '{{json.category}}'
-      if: ctx.json?.category.? != null
+      if: ctx.json?.category != null
   - set:
       field: event.provider
       value: defender_atp

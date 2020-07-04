@@ -7,16 +7,12 @@ interval: {{ .interval }}
 json_objects_array: value
 split_events_by: evidence
 url: {{ .url }}
-date_cursor.value_template: {{ .date_cursor.value_template }}
 
-date_cursor.field: "alertCreationTime"
-date_cursor.url_field: '$filter'
-
-date_cursor.initial_interval: 10m
-date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
 
 oauth2: {{ .oauth2 | tojson }}
+oauth2.provider: azure
 oauth2.azure.resource: https://api.securitycenter.windows.com/
+
 
 {{ else if eq .input "file" }}
 

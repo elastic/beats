@@ -13,8 +13,7 @@ var:
   - name: url
     default: "https://api.securitycenter.windows.com/api/alerts"
   - name: oauth2
-    default:
-      provider: azure
+      
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/atp.yml
