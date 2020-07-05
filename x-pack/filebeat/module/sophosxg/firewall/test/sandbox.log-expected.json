@@ -9,6 +9,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138301618041 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip=\"\" filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -22,7 +23,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138301618041 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip= filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
@@ -38,8 +38,7 @@
         "sophosxg.firewall.priority": "Information",
         "sophosxg.firewall.reason": "eligible",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -54,6 +53,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138302218042 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith@iview.com\" src_ip=10.198.47.112 filename=\"1.exe\" filetype=\"application/octet-stream\" filesize=153006 sha1sum=\"83cd339302bf5e8ed5240ca6383418089c337a81\" source=\"jsmith@iview.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
         "event.outcome": "success",
         "event.severity": "2",
         "event.timezone": "-02:00",
@@ -68,7 +68,6 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 345,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138302218042 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith@iview.com\" src_ip=10.198.47.112 filename=\"1.exe\" filetype=\"application/octet-stream\" filesize=153006 sha1sum=\"83cd339302bf5e8ed5240ca6383418089c337a81\" source=\"jsmith@iview.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
@@ -97,8 +96,7 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith@iview.com",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -111,6 +109,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44313350024-P29PUA log_id=136501618041 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip=\"\" filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -124,7 +123,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 811,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44313350024-P29PUA log_id=136501618041 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip= filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
@@ -140,8 +138,7 @@
         "sophosxg.firewall.priority": "Information",
         "sophosxg.firewall.reason": "eligible",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -155,6 +152,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136528618043 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Pending\" priority=Information user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"pending\" destination=\"\" subject=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -169,7 +167,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1153,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136528618043 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Pending\" priority=Information user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"pending\" destination=\"\" subject=\"\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
@@ -198,8 +195,7 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -214,6 +210,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"cloud malicious\" destination=\"\" subject=\"",
         "event.outcome": "success",
         "event.severity": "2",
         "event.timezone": "-02:00",
@@ -228,7 +225,6 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 1601,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"cloud malicious\" destination=\"\" subject=\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
@@ -257,8 +253,7 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -273,6 +268,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:36 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"\" src_ip=172.16.34.24 filename=\"SBTestFile1.pdf\" filetype=\"application/pdf\" filesize=1124 sha1sum=\"d910c4a81122c360fe57f67a04999425a65249db\" source=\"sophostest.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
         "event.outcome": "success",
         "event.severity": "2",
         "event.timezone": "-02:00",
@@ -287,7 +283,6 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 2052,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:36 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"\" src_ip=172.16.34.24 filename=\"SBTestFile1.pdf\" filetype=\"application/pdf\" filesize=1124 sha1sum=\"d910c4a81122c360fe57f67a04999425a65249db\" source=\"sophostest.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
@@ -312,8 +307,7 @@
         "sophosxg.firewall.source": "sophostest.com",
         "source.ip": "172.16.34.24",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     }
 ]

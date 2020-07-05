@@ -10,6 +10,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:57 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062910617701 log_type=\"Event\" log_component=\"Firewall Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"Open Group\" auth_client=\"CTA\" auth_mechanism=\"AD\" reason=\"\" src_ip=172.17.35.116 message=\"User elastic.user@elastic.test.com of group Open Group logged in successfully to Firewall through AD authentication mechanism from 172.17.35.116\" name=\"elastic.user@elastic.test.com\" src_mac=",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -22,7 +23,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:57 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062910617701 log_type=\"Event\" log_component=\"Firewall Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"Open Group\" auth_client=\"CTA\" auth_mechanism=\"AD\" reason=\"\" src_ip=172.17.35.116 message=\"User elastic.user@elastic.test.com of group Open Group logged in successfully to Firewall through AD authentication mechanism from 172.17.35.116\" name=\"elastic.user@elastic.test.com\" src_mac=",
         "message": "User elastic.user@elastic.test.com of group Open Group logged in successfully to Firewall through AD authentication mechanism from 172.17.35.116",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -44,8 +44,7 @@
         "source.user.group.name": "Open Group",
         "source.user.name": "sophosxg.firewall.name",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -62,13 +61,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:58 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062511418055 log_type=\"Event\" log_component=\"IPSec\" log_subtype=\"System\" status=\"Failed\" priority=Warning user_name=\"elastic.user@elastic.test.com\" connectionname=\"Location-1\" connectiontype=\"0\" localinterfaceip=214.167.51.66 localgateway=\"\" localnetwork=\"172.17.32.0/19\" remoteinterfaceip=83.20.132.250 remotenetwork=\"10.84.234.5/32\" message=\"location-1 - IKE message retransmission timed out (Remote: 83.20.132.250)\"",
         "event.severity": "4",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 597,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:58 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062511418055 log_type=\"Event\" log_component=\"IPSec\" log_subtype=\"System\" status=\"Failed\" priority=Warning user_name=\"elastic.user@elastic.test.com\" connectionname=\"Location-1\" connectiontype=\"0\" localinterfaceip=214.167.51.66 localgateway=\"\" localnetwork=\"172.17.32.0/19\" remoteinterfaceip=83.20.132.250 remotenetwork=\"10.84.234.5/32\" message=\"location-1 - IKE message retransmission timed out (Remote: 83.20.132.250)\"",
         "message": "location-1 - IKE message retransmission timed out (Remote: 83.20.132.250)",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -102,8 +101,7 @@
         "source.ip": "83.20.132.250",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -112,13 +110,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:59 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062511318057 log_type=\"Event\" log_component=\"IPSec\" log_subtype=\"System\" status=\"Expire\" priority=Error user_name=\"\" connectionname=\"\" connectiontype=\"0\" localinterfaceip=\"\" localgateway=\"\" localnetwork=\"\" remoteinterfaceip=\"\" remotenetwork=\"\" message=\"IKE_SA timed out before it could be established\"",
         "event.severity": "3",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 1134,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:59 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062511318057 log_type=\"Event\" log_component=\"IPSec\" log_subtype=\"System\" status=\"Expire\" priority=Error user_name=\"\" connectionname=\"\" connectiontype=\"0\" localinterfaceip=\"\" localgateway=\"\" localnetwork=\"\" remoteinterfaceip=\"\" remotenetwork=\"\" message=\"IKE_SA timed out before it could be established\"",
         "message": "IKE_SA timed out before it could be established",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -137,8 +135,7 @@
         "sophosxg.firewall.priority": "Error",
         "sophosxg.firewall.status": "Expire",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -151,6 +148,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:00 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063210617704 log_type=\"Event\" log_component=\"My Account Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"Local\" reason=\"\" src_ip=83.9.140.96 message=\"User elastic.user@elastic.test.com logged in successfully to MyAccount through Local authentication mechanism\" name=\"\" src_mac=",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -162,7 +160,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1554,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:00 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063210617704 log_type=\"Event\" log_component=\"My Account Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"Local\" reason=\"\" src_ip=83.9.140.96 message=\"User elastic.user@elastic.test.com logged in successfully to MyAccount through Local authentication mechanism\" name=\"\" src_mac=",
         "message": "User elastic.user@elastic.test.com logged in successfully to MyAccount through Local authentication mechanism",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -191,8 +188,7 @@
         "source.ip": "83.9.140.96",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -205,6 +201,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:01 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=064011517819 log_type=\"Event\" log_component=\"Anti-Virus\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=1.0.407794 newversion=1.0.407795  message=\"Avira AV definitions upgraded from 1.0.407794 to 1.0.407795.\"",
         "event.severity": "5",
         "event.timezone": "-02:00",
         "event.type": [
@@ -214,7 +211,6 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2080,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:01 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=064011517819 log_type=\"Event\" log_component=\"Anti-Virus\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=1.0.407794 newversion=1.0.407795  message=\"Avira AV definitions upgraded from 1.0.407794 to 1.0.407795.\"",
         "message": "Avira AV definitions upgraded from 1.0.407794 to 1.0.407795.",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -233,8 +229,7 @@
         "sophosxg.firewall.priority": "Notice",
         "sophosxg.firewall.status": "Successful",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -243,13 +238,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:02 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=063411660022 log_type=\"Event\" log_component=\"DHCP Server\" log_subtype=\"System\" status=\"Expire\" priority=Information ipaddress=\"192.168.110.10\" client_physical_address=\"-\" client_host_name=\"\" message=\"Lease 192.168.110.10 expired\" raw_data=\"192.168.110.10\"",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2428,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:02 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=063411660022 log_type=\"Event\" log_component=\"DHCP Server\" log_subtype=\"System\" status=\"Expire\" priority=Information ipaddress=\"192.168.110.10\" client_physical_address=\"-\" client_host_name=\"\" message=\"Lease 192.168.110.10 expired\" raw_data=\"192.168.110.10\"",
         "message": "Lease 192.168.110.10 expired",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -269,8 +264,7 @@
         "sophosxg.firewall.raw_data": "192.168.110.10",
         "sophosxg.firewall.status": "Expire",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -283,6 +277,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:03 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063110617710 log_type=\"Event\" log_component=\"SSL VPN Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"AD\" reason=\"\" src_ip=217.250.157.135 message=\"User elastic.user@elastic.test.com authenticated successfully to login to SSLVPN through AD authentication mechanism\" name=\"\" src_mac=",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -294,7 +289,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2802,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:03 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063110617710 log_type=\"Event\" log_component=\"SSL VPN Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"AD\" reason=\"\" src_ip=217.250.157.135 message=\"User elastic.user@elastic.test.com authenticated successfully to login to SSLVPN through AD authentication mechanism\" name=\"\" src_mac=",
         "message": "User elastic.user@elastic.test.com authenticated successfully to login to SSLVPN through AD authentication mechanism",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -323,8 +317,7 @@
         "source.ip": "217.250.157.135",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -335,13 +328,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:04 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062811617824 log_type=\"Event\" log_component=\"SSL VPN\" log_subtype=\"System\" priority=Information Mode=\"Remote Access\" sessionid=\"\" starttime=0 user_name=\"elastic.user@elastic.test.com\" ipaddress=10.82.234.5 sent_bytes=0 recv_bytes=0 status=\"Established\" message=\"SSL VPN User 'elastic.user@elastic.test.com' connected \" timestamp=1589960866 connectionname=\"\" remote_ip=10.82.234.12",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 3333,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:04 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062811617824 log_type=\"Event\" log_component=\"SSL VPN\" log_subtype=\"System\" priority=Information Mode=\"Remote Access\" sessionid=\"\" starttime=0 user_name=\"elastic.user@elastic.test.com\" ipaddress=10.82.234.5 sent_bytes=0 recv_bytes=0 status=\"Established\" message=\"SSL VPN User 'elastic.user@elastic.test.com' connected \" timestamp=1589960866 connectionname=\"\" remote_ip=10.82.234.12",
         "message": "SSL VPN User 'elastic.user@elastic.test.com' connected ",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -350,7 +343,6 @@
         "observer.vendor": "Sophos",
         "server.bytes": 0,
         "service.type": "sophosxg",
-        "sophosxg.firewall.Mode": "Remote Access",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
         "sophosxg.firewall.ipaddress": "10.82.234.5",
@@ -358,7 +350,7 @@
         "sophosxg.firewall.log_subtype": "System",
         "sophosxg.firewall.log_type": "Event",
         "sophosxg.firewall.message_id": "17824",
-        "sophosxg.firewall.priority": "Information",
+        "sophosxg.firewall.priority": "Information Mode=\"Remote Access",
         "sophosxg.firewall.remote_ip": "10.82.234.12",
         "sophosxg.firewall.sessionid": "",
         "sophosxg.firewall.starttime": "0",
@@ -367,8 +359,7 @@
         "source.bytes": 0,
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -381,6 +372,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:05 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063010517708 log_type=\"Event\" log_component=\"VPN Authentication\" log_subtype=\"Authentication\" status=\"Failed\" priority=Notice user_name=\"hendrikl\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"AD,AD,Local\" reason=\"wrong credentials\" src_ip=91.67.201.4 message=\"User elastic01 failed to login to VPN through AD,AD,Local authentication mechanism because of wrong credentials\" name=\"\" src_mac=",
         "event.outcome": "failure",
         "event.severity": "5",
         "event.timezone": "-02:00",
@@ -388,7 +380,6 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3832,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:05 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063010517708 log_type=\"Event\" log_component=\"VPN Authentication\" log_subtype=\"Authentication\" status=\"Failed\" priority=Notice user_name=\"hendrikl\" usergroupname=\"\" auth_client=\"N/A\" auth_mechanism=\"AD,AD,Local\" reason=\"wrong credentials\" src_ip=91.67.201.4 message=\"User elastic01 failed to login to VPN through AD,AD,Local authentication mechanism because of wrong credentials\" name=\"\" src_mac=",
         "message": "User elastic01 failed to login to VPN through AD,AD,Local authentication mechanism because of wrong credentials",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -418,8 +409,7 @@
         "source.ip": "91.67.201.4",
         "source.user.name": "hendrikl",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -428,13 +418,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:06 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=066911518017 log_type=\"Event\" log_component=\"ATP\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=1.0.0297 newversion=1.0.0298  message=\"ATP definitions upgraded from 1.0.0297 to 1.0.0298.\"",
         "event.severity": "5",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4346,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:06 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=066911518017 log_type=\"Event\" log_component=\"ATP\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=1.0.0297 newversion=1.0.0298  message=\"ATP definitions upgraded from 1.0.0297 to 1.0.0298.\"",
         "message": "ATP definitions upgraded from 1.0.0297 to 1.0.0298.",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -453,45 +443,7 @@
         "sophosxg.firewall.priority": "Notice",
         "sophosxg.firewall.status": "Successful",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2020-05-18T14:39:07.000-02:00",
-        "client.ip": "10.83.234.5",
-        "event.code": "062009617502",
-        "event.dataset": "sophosxg.firewall",
-        "event.kind": "event",
-        "event.module": "sophosxg",
-        "event.severity": "6",
-        "event.timezone": "-02:00",
-        "fileset.name": "firewall",
-        "input.type": "log",
-        "log.level": "informational",
-        "log.offset": 4674,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:07 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=062009617502 log_type=\"Event\" log_component=\"GUI\" log_subtype=\"Admin\" status=\"Successful\" priority=Information user_name=\"admin\" src_ip=10.83.234.5 SysLog_SERVER_NAME='Logstash' message=\"SysLog Server 'Logstash' settings were changed by 'admin' from '10.83.234.5' using 'GUI'\"",
-        "message": "SysLog Server 'Logstash' settings were changed by 'admin' from '10.83.234.5' using 'GUI'",
-        "observer.name": "firewall.localgroup.local",
-        "observer.product": "XG",
-        "observer.serial_number": "1234567890123457",
-        "observer.type": "firewall",
-        "observer.vendor": "Sophos",
-        "service.type": "sophosxg",
-        "sophosxg.firewall.SysLog_SERVER_NAME": "'Logstash'",
-        "sophosxg.firewall.device": "SFW",
-        "sophosxg.firewall.device_name": "XG230",
-        "sophosxg.firewall.log_component": "GUI",
-        "sophosxg.firewall.log_subtype": "Admin",
-        "sophosxg.firewall.log_type": "Event",
-        "sophosxg.firewall.message_id": "17502",
-        "sophosxg.firewall.priority": "Information",
-        "sophosxg.firewall.status": "Successful",
-        "source.ip": "10.83.234.5",
-        "source.user.name": "admin",
-        "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -501,6 +453,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:08 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062109517507 log_type=\"Event\" log_component=\"CLI\" log_subtype=\"Admin\" status=\"Failed\" priority=Notice user_name=\"root\" src_ip=172.66.35.15 message=\"User 'root' failed to login from '172.66.35.15' using ssh because of wrong credentials\"",
         "event.outcome": "failure",
         "event.severity": "5",
         "event.timezone": "-02:00",
@@ -508,7 +461,6 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5069,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:08 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=062109517507 log_type=\"Event\" log_component=\"CLI\" log_subtype=\"Admin\" status=\"Failed\" priority=Notice user_name=\"root\" src_ip=172.66.35.15 message=\"User 'root' failed to login from '172.66.35.15' using ssh because of wrong credentials\"",
         "message": "User 'root' failed to login from '172.66.35.15' using ssh because of wrong credentials",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -531,8 +483,7 @@
         "source.ip": "172.66.35.15",
         "source.user.name": "root",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -541,13 +492,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:09 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063911517818 log_type=\"Event\" log_component=\"IPS\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=9.17.09 newversion=9.17.10  message=\"IPS definitions upgraded from 9.17.09 to 9.17.10.\"",
         "event.severity": "5",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5423,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:09 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063911517818 log_type=\"Event\" log_component=\"IPS\" log_subtype=\"System\" priority=Notice status=\"Successful\" oldversion=9.17.09 newversion=9.17.10  message=\"IPS definitions upgraded from 9.17.09 to 9.17.10.\"",
         "message": "IPS definitions upgraded from 9.17.09 to 9.17.10.",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -566,8 +517,7 @@
         "sophosxg.firewall.priority": "Notice",
         "sophosxg.firewall.status": "Successful",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -576,13 +526,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:10 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063311617923 log_type=\"Event\" log_component=\"Appliance\" log_subtype=\"System\" priority=Information backup_mode='appliance'  message=\"Scheduled backup to appliance   is successful.\"",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5747,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:10 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=063311617923 log_type=\"Event\" log_component=\"Appliance\" log_subtype=\"System\" priority=Information backup_mode='appliance'  message=\"Scheduled backup to appliance   is successful.\"",
         "message": "Scheduled backup to appliance   is successful.",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -599,8 +549,7 @@
         "sophosxg.firewall.message_id": "17923",
         "sophosxg.firewall.priority": "Information",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -616,6 +565,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:39:20 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=062910617703 log_type=\"Event\" log_component=\"Firewall Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"VPN.SSL.Users.elastic\" auth_client=\"IPSec\" auth_mechanism=\"N/A\" reason=\"\" src_ip=10.84.234.38 src_mac=\"\" start_time=1591086575 sent_bytes=0 recv_bytes=0 message=\"User elastic.user@elastic.test.com was logged out of firewall\" name=\"elastic.user@elastic.test.com\" timestamp=1591086576",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -628,7 +578,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6045,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:39:20 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=062910617703 log_type=\"Event\" log_component=\"Firewall Authentication\" log_subtype=\"Authentication\" status=\"Successful\" priority=Information user_name=\"elastic.user@elastic.test.com\" usergroupname=\"VPN.SSL.Users.elastic\" auth_client=\"IPSec\" auth_mechanism=\"N/A\" reason=\"\" src_ip=10.84.234.38 src_mac=\"\" start_time=1591086575 sent_bytes=0 recv_bytes=0 message=\"User elastic.user@elastic.test.com was logged out of firewall\" name=\"elastic.user@elastic.test.com\" timestamp=1591086576",
         "message": "User elastic.user@elastic.test.com was logged out of firewall",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -654,8 +603,7 @@
         "source.user.group.name": "VPN.SSL.Users.elastic",
         "source.user.name": "sophosxg.firewall.name",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -668,6 +616,7 @@
         "event.end": "2017-03-16T12:56:01.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-03-16 time=12:56:01 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618014 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Connected\" eventtime=\"2017-03-16 12:56:01 IST\" duration=164000 branch_name=Gaurav Patel recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/Gaurav Patel is now re-connected after 164000 ms\"",
         "event.severity": "6",
         "event.start": "2017-03-14T17:22:41.000Z",
         "event.timezone": "-02:00",
@@ -675,7 +624,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6643,
-        "log.original": "device=\"SFW\" date=2017-03-16 time=12:56:01 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618014 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Connected\" eventtime=\"2017-03-16 12:56:01 IST\" duration=164000 branch_name=Gaurav Patel recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/Gaurav Patel is now re-connected after 164000 ms\"",
         "message": "A350196C47072B0/Gaurav Patel is now re-connected after 164000 ms",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -697,8 +645,7 @@
         "sophosxg.firewall.status": "Connected",
         "source.bytes": 0,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -711,6 +658,7 @@
         "event.end": "2017-03-16T12:53:27.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-03-16 time=12:53:27 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618015 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Disconnected\" eventtime=\"2017-03-16 12:53:27 IST\" duration=0 branch_name=Gaurav Patel recv_bytes=31488 sent_bytes=22368 message=\"A350196C47072B0/Gaurav Patel is now disconnected\"",
         "event.severity": "6",
         "event.start": "2017-03-16T14:53:27.000Z",
         "event.timezone": "-02:00",
@@ -718,7 +666,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7072,
-        "log.original": "device=\"SFW\" date=2017-03-16 time=12:53:27 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618015 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Disconnected\" eventtime=\"2017-03-16 12:53:27 IST\" duration=0 branch_name=Gaurav Patel recv_bytes=31488 sent_bytes=22368 message=\"A350196C47072B0/Gaurav Patel is now disconnected\"",
         "message": "A350196C47072B0/Gaurav Patel is now disconnected",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -740,8 +687,7 @@
         "sophosxg.firewall.status": "Disconnected",
         "source.bytes": 22368,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -754,6 +700,7 @@
         "event.end": "2017-03-16T12:46:26.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-03-16 time=12:46:26 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618016 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Interim\" eventtime=\"2017-03-16 12:46:26 IST\" duration=0 branch_name=NY recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/NY transfered bytes TX: 0 RX: 0\"",
         "event.severity": "6",
         "event.start": "2017-03-16T14:46:26.000Z",
         "event.timezone": "-02:00",
@@ -761,7 +708,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7491,
-        "log.original": "device=\"SFW\" date=2017-03-16 time=12:46:26 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618016 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Interim\" eventtime=\"2017-03-16 12:46:26 IST\" duration=0 branch_name=NY recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/NY transfered bytes TX: 0 RX: 0\"",
         "message": "A350196C47072B0/NY transfered bytes TX: 0 RX: 0",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -783,8 +729,7 @@
         "sophosxg.firewall.status": "Interim",
         "source.bytes": 0,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
@@ -793,13 +738,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2018-06-06 time=11:12:10 timezone=\"IST\" device_name=\"SG430\" device_id=S4000806149EE49 log_id=063711517815 log_type=\"Event\" log_component=\"DDNS\" log_subtype=\"System\" status=\"Success\" priority=Notice host=test1. customtest.dyndns.org updatedip=10.198.232.86 reason=\"\" message=\"DDNS update for host test1.customtest.dyndns.org was Successful. Updated with IP 10.198.232.86.\"",
         "event.severity": "5",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 7886,
-        "log.original": "device=\"SFW\" date=2018-06-06 time=11:12:10 timezone=\"IST\" device_name=\"SG430\" device_id=S4000806149EE49 log_id=063711517815 log_type=\"Event\" log_component=\"DDNS\" log_subtype=\"System\" status=\"Success\" priority=Notice host=test1. customtest.dyndns.org updatedip=10.198.232.86 reason=\"\" message=\"DDNS update for host test1.customtest.dyndns.org was Successful. Updated with IP 10.198.232.86.\"",
         "message": "DDNS update for host test1.customtest.dyndns.org was Successful. Updated with IP 10.198.232.86.",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -818,8 +763,7 @@
         "sophosxg.firewall.status": "Success",
         "sophosxg.firewall.updatedip": "10.198.232.86",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     }
 ]

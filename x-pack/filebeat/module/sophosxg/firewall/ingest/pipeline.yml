@@ -4,6 +4,7 @@ processors:
     field: message
     patterns:
     - '%{SYSLOG5424PRI}%{GREEDYDATA:log.original}$'
+
 # replace all "= ", "=- ", "=/ " with double quotes or "-", "/" to truly indicate no value
 - gsub:
     field: log.original
@@ -34,6 +35,9 @@ processors:
     ignore_failure: false
     trim_value: "\""
 
+#########################
+## ECS General Mapping ##
+#########################
 - set:
     field: observer.vendor
     value: Sophos
@@ -50,73 +54,31 @@ processors:
     field: event.dataset
     value: sophosxg.firewall
 
-#
 # Parse the date
-#
 - set:
-    field: _temp.time
+    field: _temp_.time
     value: "{{sophosxg.firewall.date}} {{sophosxg.firewall.time}}"
 - date:
     if: "ctx.event.timezone == null"
-    field: _temp.time
+    field: _temp_.time
     target_field: "@timestamp"
     formats:
     - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 - date:
     if: "ctx.event.timezone != null"
     timezone: "{{ event.timezone }}"
-    field: _temp.time
+    field: _temp_.time
     target_field: "@timestamp"
     formats:
     - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
-# Handle event.duration
-- set:
-      field: "_temp_.duration_hms"
-      value: "{{sophosxg.firewall.duration}}"
-      if: "ctx.sophosxg?.firewall?.duration != null"
-#
-# Process the flow duration
-# This will fill event.start, event.end and event.duration
-#
-- script:
-      lang: painless
-      if: "ctx?._temp_?.duration_hms != null"
-      source: >
-        long parse_hms(String s) {
-            long cur = 0, total = 0;
-            for (char c: s.toCharArray()) {
-                if (c >= (char)'0' && c <= (char)'9') {
-                    cur = (cur*10) + (long)c - (char)'0';
-                } else if (c == (char)':') {
-                    total = (total + cur) * 60;
-                    cur = 0;
-                } else {
-                    return 0;
-                }
-            }
-            return total + cur;
-        }
-        if (ctx?.event == null) {
-            ctx['event'] = new HashMap();
-        }
-        String end = ctx['@timestamp'];
-        ctx.event['end'] = end;
-        long nanos = parse_hms(ctx._temp_.duration_hms) * 1000000000L;
-        ctx.event['duration'] = nanos;
-        ctx.event['start'] = ZonedDateTime.ofInstant(
-            Instant.parse(end).minusNanos(nanos),
-            ZoneOffset.UTC);
-
-#
-# extract from log_id example '010101600001' the new field "event.severity"
-#
+# extract from event_severity from log_id, example: 010101600001"
 - set:
     field: event.severity
     value: "{{sophosxg.firewall.log_id}}"
@@ -133,53 +95,14 @@ processors:
 - set:
     field: sophosxg.firewall.message_id
     value: "{{sophosxg.firewall.log_id}}"
+    ignore_empty_value: true
 - gsub:
     field: sophosxg.firewall.message_id
     pattern: "(^.{1,7})"
     replacement: ""
+    ignore_failure: true
 
-#
-# Set log.level
-#
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '0' "
-    value: unknown
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '1' "
-    value: alert
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '2' "
-    value: critical
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '3' "
-    value: error
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '4' "
-    value: warning
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '5' "
-    value: notification
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '6' "
-    value: informational
-- set:
-    field: "log.level"
-    if: "ctx.event.severity == '7' "
-    value: debug
-
-# set hostname with observer.name
-- set:
-    field: "host.name"
-    if: "ctx.observer.name != null"
-    value: "{{observer.name}}"
-
+#TODO Make script to ensure field is null or not
 # normalize ECS field values and publish Sophos-XG specific fields
 - rename:
     field: sophosxg.firewall.device_id
@@ -215,6 +138,7 @@ processors:
     ignore_missing: true
     if: 'ctx.sophosxg?.firewall?.log_id != "" '
 
+#TODO Make script to ensure field is null or not
 # remove fields without values.
 - remove:
     field: sophosxg.firewall.src_ip
@@ -444,7 +368,6 @@ processors:
     field:
         - message
         - _temp_
-        - _temp
         - sophosxg.firewall.date
         - sophosxg.firewall.time
         - sophosxg.firewall.duration

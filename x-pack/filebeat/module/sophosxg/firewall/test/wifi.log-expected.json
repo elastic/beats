@@ -1,9 +1,11 @@
 [
     {
         "@timestamp": "2017-02-01T14:17:35.000-02:00",
+        "event.code": "106025618011",
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-02-01 time=14:17:35 timezone=\"IST\" device_name=\"SG115\" device_id=S110016E28BA631 log_id=106025618011 log_type=\"Wireless Protection\" log_component=\"Wireless Protection\" log_subtype=\"Information\" priority=Information ap=A40024A636F7862 ssid=SPIDIGO2015 clients_conn_ssid=2",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -11,7 +13,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
-        "log.original": "device=\"SFW\" date=2017-02-01 time=14:17:35 timezone=\"IST\" device_name=\"SG115\" device_id=S110016E28BA631 log_id=106025618011 log_type=\"Wireless Protection\" log_component=\"Wireless Protection\" log_subtype=\"Information\" priority=Information ap=A40024A636F7862 ssid=SPIDIGO2015 clients_conn_SSID=2",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S110016E28BA631",
@@ -19,25 +20,26 @@
         "observer.vendor": "Sophos",
         "service.type": "sophosxg",
         "sophosxg.firewall.ap": "A40024A636F7862",
+        "sophosxg.firewall.clients_conn_ssid": "2",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "SG115",
         "sophosxg.firewall.log_component": "Wireless Protection",
-        "sophosxg.firewall.log_id": "106025618011",
         "sophosxg.firewall.log_subtype": "Information",
         "sophosxg.firewall.log_type": "Wireless Protection",
         "sophosxg.firewall.message_id": "18011",
         "sophosxg.firewall.priority": "Information",
-        "sophosxg.firewall.ssid": "SPIDIGO2015 clients_conn_SSID=2",
+        "sophosxg.firewall.ssid": "SPIDIGO2015",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     },
     {
         "@timestamp": "2017-02-01T14:19:47.000-02:00",
+        "event.code": "106025618011",
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-02-01 time=14:19:47 timezone=\"IST\" device_name=\"SG115\" device_id=S110016E28BA631 log_id=106025618011 log_type=\"Wireless Protection\" log_component=\"Wireless Protection\" log_subtype=\"Information\" priority=Information ap=A40024A636F7862 ssid=SPIDIGO2015 clients_conn_ssid=3",
         "event.outcome": "succes",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -45,7 +47,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 298,
-        "log.original": "device=\"SFW\" date=2017-02-01 time=14:19:47 timezone=\"IST\" device_name=\"SG115\" device_id=S110016E28BA631 log_id=106025618011 log_type=\"Wireless Protection\" log_component=\"Wireless Protection\" log_subtype=\"Information\" priority=Information ap=A40024A636F7862 ssid=SPIDIGO2015 clients_conn_SSID=3",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S110016E28BA631",
@@ -53,18 +54,17 @@
         "observer.vendor": "Sophos",
         "service.type": "sophosxg",
         "sophosxg.firewall.ap": "A40024A636F7862",
+        "sophosxg.firewall.clients_conn_ssid": "3",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "SG115",
         "sophosxg.firewall.log_component": "Wireless Protection",
-        "sophosxg.firewall.log_id": "106025618011",
         "sophosxg.firewall.log_subtype": "Information",
         "sophosxg.firewall.log_type": "Wireless Protection",
         "sophosxg.firewall.message_id": "18011",
         "sophosxg.firewall.priority": "Information",
-        "sophosxg.firewall.ssid": "SPIDIGO2015 clients_conn_SSID=3",
+        "sophosxg.firewall.ssid": "SPIDIGO2015",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ]
     }
 ]

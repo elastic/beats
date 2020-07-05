@@ -21,6 +21,7 @@
         "event.id": "C366ACFB-7A6F-4870-B359-A6CFDA8C85F7",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=18:44:31 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=086304418010 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Drop\" priority=Warning user_name=\"jsmith\" protocol=\"TCP\" src_port=22623 dst_port=80 sourceip=10.198.47.71 destinationip=46.161.30.47 url=46.161.30.47 threatname=C2/Generic-A eventid=C366ACFB-7A6F-4870-B359-A6CFDA8C85F7 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "4",
         "event.timezone": "-02:00",
@@ -32,7 +33,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 0,
-        "log.original": "device=\"SFW\" date=2017-01-31 time=18:44:31 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=086304418010 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Drop\" priority=Warning user_name=\"jsmith\" protocol=\"TCP\" src_port=22623 dst_port=80 sourceip=10.198.47.71 destinationip=46.161.30.47 url=46.161.30.47 threatname=C2/Generic-A eventid=C366ACFB-7A6F-4870-B359-A6CFDA8C85F7 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid= execution_path=\"\"",
         "network.transport": "tcp",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -62,8 +62,7 @@
         "source.port": 22623,
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ],
         "url.original": "46.161.30.47"
     },
@@ -92,6 +91,7 @@
         "event.id": "E91DAD80-BDE4-4682-B7E8-FE394B70A36C",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:34 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=086504418010 log_type=\"ATP\" log_component=\"Web\" log_subtype=\"Drop\" priority=Warning user_name=\"\" protocol=\"TCP\" src_port=57579 dst_port=80 sourceip=172.16.34.24 destinationip=13.226.155.22 url=http://sophostest.com/callhome/index.html threatname=C2/Generic-A eventid=E91DAD80-BDE4-4682-B7E8-FE394B70A36C eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "4",
         "event.timezone": "-02:00",
@@ -103,7 +103,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 489,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:34 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=086504418010 log_type=\"ATP\" log_component=\"Web\" log_subtype=\"Drop\" priority=Warning user_name=\"\" protocol=\"TCP\" src_port=57579 dst_port=80 sourceip=172.16.34.24 destinationip=13.226.155.22 url=http://sophostest.com/callhome/index.html threatname=C2/Generic-A eventid=E91DAD80-BDE4-4682-B7E8-FE394B70A36C eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "network.transport": "tcp",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -129,8 +128,7 @@
         "source.ip": "172.16.34.24",
         "source.port": 57579,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ],
         "url.original": "http://sophostest.com/callhome/index.html"
     },
@@ -159,6 +157,7 @@
         "event.id": "34AC8531-E7C0-4368-9978-5740952EE9AB",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:35 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=086504418010 log_type=\"ATP\" log_component=\"Web\" log_subtype=\"Drop\" priority=Warning user_name=\"\" protocol=\"TCP\" src_port=57540 dst_port=80 sourceip=172.16.34.24 destinationip=13.226.155.22 url=http://sophostest.com/callhome/index.html threatname=C2/Generic-A eventid=34AC8531-E7C0-4368-9978-5740952EE9AB eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "4",
         "event.timezone": "-02:00",
@@ -170,7 +169,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 991,
-        "log.original": "device=\"SFW\" date=2020-05-18 time=14:38:35 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=086504418010 log_type=\"ATP\" log_component=\"Web\" log_subtype=\"Drop\" priority=Warning user_name=\"\" protocol=\"TCP\" src_port=57540 dst_port=80 sourceip=172.16.34.24 destinationip=13.226.155.22 url=http://sophostest.com/callhome/index.html threatname=C2/Generic-A eventid=34AC8531-E7C0-4368-9978-5740952EE9AB eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "network.transport": "tcp",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -196,8 +194,7 @@
         "source.ip": "172.16.34.24",
         "source.port": 57540,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ],
         "url.original": "http://sophostest.com/callhome/index.html"
     },
@@ -223,6 +220,7 @@
         "event.id": "C7E26E6F-0097-4EA2-89DE-C31C40636CB2",
         "event.kind": "alert",
         "event.module": "sophosxg",
+        "event.original": "device=\"SFW\" date=2018-06-05 time=08:49:00 timezone=\"BST\" device_name=\"XG310\" device_id=C30006T22TGR89B log_id=086320518009 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Alert\" priority=Notice user_name=\"\" protocol=\"ICMP\" src_port=0 dst_port=0 sourceip=10.198.32.89 destinationip=82.211.30.202 url=82.211.30.202 threatname=C2/Generic-A eventid=C7E26E6F-0097-4EA2-89DE-C31C40636CB2 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "5",
         "event.timezone": "-02:00",
@@ -234,7 +232,6 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 1493,
-        "log.original": "device=\"SFW\" date=2018-06-05 time=08:49:00 timezone=\"BST\" device_name=\"XG310\" device_id=C30006T22TGR89B log_id=086320518009 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Alert\" priority=Notice user_name=\"\" protocol=\"ICMP\" src_port=0 dst_port=0 sourceip=10.198.32.89 destinationip=82.211.30.202 url=82.211.30.202 threatname=C2/Generic-A eventid=C7E26E6F-0097-4EA2-89DE-C31C40636CB2 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid= execution_path=\"\"",
         "network.transport": "icmp",
         "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
@@ -260,8 +257,7 @@
         "source.ip": "10.198.32.89",
         "source.port": 0,
         "tags": [
-            "sophosxg-firewall",
-            "forwarded"
+            "sophosxg-firewall forwarded"
         ],
         "url.original": "82.211.30.202"
     }
