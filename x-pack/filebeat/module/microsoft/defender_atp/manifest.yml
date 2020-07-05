@@ -7,11 +7,11 @@ var:
     default: 5m
   - name: date_cursor
     default: 
-      value_template: "alertCreationTime gt {{.}}"
+      value_template: "lastUpdateTime gt {{.}}"
   - name: tags
     default: [defender-atp, forwarded]
   - name: url
-    default: "https://api.securitycenter.windows.com/api/alerts"
+    default: "https://api.securitycenter.windows.com/api/alerts?$expand=evidence"
   - name: oauth2
       
 

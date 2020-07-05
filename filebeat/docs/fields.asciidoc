@@ -25998,6 +25998,16 @@ type: keyword
 
 --
 
+*`microsoft.defender_atp.rbacGroupName`*::
++
+--
+User group related to the alert
+
+
+type: keyword
+
+--
+
 *`microsoft.defender_atp.evidence.domainName`*::
 +
 --

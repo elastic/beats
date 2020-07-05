@@ -8,9 +8,6 @@
     # How often the API should be polled
     #var.interval: 5m
 
-    # Alerts URL, should match the choosen interval
-    #var.url: "https://api.securitycenter.windows.com/api/alerts"
-
     # Oauth Client ID
     #var.oauth2.client.id: ""
 
@@ -19,9 +16,3 @@
    
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
-
-    # Common SSL options
-    #var.ssl: |-
-    #  {
-    #    verification_mode: none
-    #  }

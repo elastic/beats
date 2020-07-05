@@ -75,23 +75,33 @@ A predefined URL towards the Oauth2 service for Microsoft. The URL should always
 This is a list of Defender ATP fields that are mapped to ECS.
 
 [options="header"]
-|==============================================================
-| Defender ATP Fields        | ECS Fields                     |
-| alertCreationTime          | @timestamp                     |
-| id                         | event.id                       |
-| category                   | threat.technique.name          |
-| aadTenantId                | cloud.account.id               |
-| machineId                  | cloud.instance.id              |
-| title                      | message                        |
-| description                | rule.description               |
-| firstEventTime             | event.start                    |
-| lastEventTime              | event.end                      |
-| computerDnsName            | host.hostname                  |
-| detectionSource            | observer.name                  |
-| severity                   | event.severity                 |
-| relatedUser.userName       | host.user.name                 |
-| relatedUser.domainName     | host.user.domain               |
-|==============================================================
+|======================================================================|
+| Defender ATP Fields                 | ECS Fields                     |
+| alertCreationTime                   | @timestamp                     |
+| aadTenantId                         | cloud.account.id               |
+| category                            | threat.technique.name          |
+| computerDnsName                     | host.hostname                  |
+| description                         | rule.description               |
+| detectionSource                     | observer.name                  |
+| evidence.fileName                   | file.name                      |
+| evidence.filePath                   | file.path                      |
+| evidence.processId                  | process.pid                    |
+| evidence.processCommandLine         | process.command_line           |
+| evidence.processCreationTime        | process.start                  |
+| evidence.parentProcessId            | process.parent.pid             |
+| evidence.parentProcessCreationTime  | process.parent.start           |
+| evidence.sha1                       | file.hash.sha1                 |
+| evidence.sha256                     | file.hash.sha256               |
+| evidence.url                        | url.full                       |
+| firstEventTime                      | event.start                    |
+| id                                  | event.id                       |
+| lastEventTime                       | event.end                      |
+| machineId                           | cloud.instance.id              |
+| relatedUser.userName                | host.user.name                 |
+| relatedUser.domainName              | host.user.domain               |
+| title                               | message                        |
+| severity                            | event.severity                 |
+|======================================================================|
 
 [float]
 === Example dashboard

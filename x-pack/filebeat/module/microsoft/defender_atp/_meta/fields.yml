@@ -55,6 +55,11 @@
       description: >
         Threat family.
 
+    - name: rbacGroupName
+      type: keyword
+      description: >
+        User group related to the alert
+
     - name: evidence.domainName
       type: keyword
       description: >
