@@ -6,11 +6,11 @@ processors:
 - set:
     field: event.action
     value: "{{sophosxg.firewall.log_subtype}}"
-    if: "ctx.sophosxg?.firewall?.log_subtype != null"
+    ignore_empty_value: true
 - set:
     field: event.outcome
     value: success
-    if: "ctx.sophosxg?.firewall?.log_subtype != null"
+    ignore_empty_value: true
 
 # set spam / intrusion alert on SMTP, POP3, IMAP
 - set:
@@ -24,8 +24,7 @@ processors:
 - append:
     field: event.category
     value: intrusion_detection
-    if: '["13012"].contains(ctx.sophosxg?.firewall?.message_id)'
-
+    if: "ctx.sophosxg?.firewall?.message_id == '13012'"
 - append:
     field: event.category
     value: network
@@ -35,12 +34,11 @@ processors:
      - allowed
      - connection
     if: '["13003", "13007", "13008", "13010", "13013", "14003", "15003", "18035"].contains(ctx.sophosxg?.firewall?.message_id)'
-
 - append:
     field: event.type
     value:
       - info
-      - diened
+      - denied
       - connection
     if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.sophosxg?.firewall?.message_id)'
 
@@ -54,7 +52,7 @@ processors:
 - set:
     field: server.ip
     value: '{{destination.ip}}'
-    if: "ctx.destination?.ip != null"
+    ignore_empty_value: true
 # destination.port
 - convert:
     field: sophosxg.firewall.dst_port
@@ -66,14 +64,13 @@ processors:
 - set:
     field: server.port
     value: '{{destination.port}}'
-    if: "ctx.destination?.port != null"
+    ignore_empty_value: true
 - convert:
     field: server.port
-    target_field: server.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.server?.port != null"
+
 # destination.bytes pkts
 - convert:
     field: sophosxg.firewall.recv_bytes
@@ -85,24 +82,24 @@ processors:
 - set:
     field: server.bytes
     value: '{{destination.bytes}}'
-    if: "ctx.destination?.bytes != null"
+    ignore_empty_value: true
 - convert:
     field: server.bytes
-    target_field: server.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
     if: "ctx.server?.bytes != null"
+
 # source.ip
 - rename:
     field: sophosxg.firewall.src_ip
     target_field: source.ip
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.src_ip != null"
 - set:
     field: client.ip
     value: '{{source.ip}}'
-    if: "ctx.source?.ip != null"
+    ignore_empty_value: true
+
 # source.port
 - convert:
     field: sophosxg.firewall.src_port
@@ -114,14 +111,13 @@ processors:
 - set:
     field: client.port
     value: '{{source.port}}'
-    if: "ctx.source?.port != null"
+    ignore_empty_value: true
 - convert:
     field: client.port
-    target_field: client.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.client?.port != null"
+
 # source.bytes pkts
 - convert:
     field: sophosxg.firewall.sent_bytes
@@ -133,36 +129,31 @@ processors:
 - set:
     field: client.bytes
     value: '{{source.bytes}}'
-    if: "ctx.source?.bytes != null"
+    ignore_empty_value: true
 - convert:
     field: client.bytes
-    target_field: client.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.bytes != null"
+
 # mail handling
 - rename:
     field: sophosxg.firewall.to_email_address
     target_field: destination.user.email
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.to_email_address != null"
 - rename:
     field: sophosxg.firewall.from_email_address
     target_field: source.user.email
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.from_email_address != null"
-
 - rename:
     field: sophosxg.firewall.protocol
     target_field: network.transport
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.protocol != null"
 - rename:
      field: sophosxg.firewall.src_domainname
      target_field: source.domain
      ignore_missing: true
-     if: "ctx.sophosxg?.firewall?.src_domainname != null"
 
 # Geolocation for source.
 - geoip:
@@ -170,12 +161,14 @@ processors:
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
+
 # Geolocation for destination.
 - geoip:
     field: destination.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
+
 # IP Autonomous System (AS) Lookup
 - geoip:
     database_file: GeoLite2-ASN.mmdb
@@ -193,18 +186,21 @@ processors:
     - asn
     - organization_name
     ignore_missing: true
+
 # Geolocation for source nat.
 - geoip:
     field: source.nat.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
+
 # Geolocation for destination nat.
 - geoip:
     field: destination.nat.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
+
 # IP Autonomous System (AS) Lookup nat
 - geoip:
     database_file: GeoLite2-ASN.mmdb
@@ -240,8 +236,6 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
-
-
 - lowercase:
       field: network.protocol
       ignore_failure: true
