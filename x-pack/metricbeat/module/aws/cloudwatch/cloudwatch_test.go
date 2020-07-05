@@ -834,6 +834,60 @@ func TestCompareAWSDimensions(t *testing.T) {
 			[]cloudwatch.Dimension{},
 			false,
 		},
+		{
+			"compare with wildcard dimension value, one same name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, one different name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("IDx"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, two same name dimensions",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, different length, case1",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, different length, case2",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
 	}
 
 	for _, c := range cases {

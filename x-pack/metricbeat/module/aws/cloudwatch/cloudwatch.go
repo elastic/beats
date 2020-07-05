@@ -6,7 +6,6 @@ package cloudwatch
 
 import (
 	"reflect"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -26,15 +25,16 @@ import (
 )
 
 var (
-	metricsetName      = "cloudwatch"
-	metricNameIdx      = 0
-	namespaceIdx       = 1
-	statisticIdx       = 2
-	identifierNameIdx  = 3
-	identifierValueIdx = 4
-	defaultStatistics  = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
-	labelSeparator     = "|"
-	dimensionSeparator = ","
+	metricsetName          = "cloudwatch"
+	metricNameIdx          = 0
+	namespaceIdx           = 1
+	statisticIdx           = 2
+	identifierNameIdx      = 3
+	identifierValueIdx     = 4
+	defaultStatistics      = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
+	labelSeparator         = "|"
+	dimensionSeparator     = ","
+	dimensionValueWildcard = "*"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -252,8 +252,21 @@ func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDet
 						statistic:        configPerNamespace.statistics,
 						tags:             configPerNamespace.tags,
 					})
+			} else if configPerNamespace.names != nil && configPerNamespace.dimensions != nil {
+				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
+					continue
+				}
+				if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
+					continue
+				}
+				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+					metricsWithStatistics{
+						cloudwatchMetric: listMetric,
+						statistic:        configPerNamespace.statistics,
+						tags:             configPerNamespace.tags,
+					})
 			} else {
-				// if no metric name or dimensions given, then keep all listMetricsOutput
+				// if no metric name and no dimensions given, then keep all listMetricsOutput
 				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
@@ -320,8 +333,10 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 				Value: &value,
 			})
 		}
-
-		if config.MetricName != nil && config.Dimensions != nil {
+		// if any Dimension value contains wildcard, then compare dimensions with
+		// listMetrics result in filterListMetricsOutput
+		if config.MetricName != nil && config.Dimensions != nil &&
+			!configDimensionValueContainsWildcard(config.Dimensions) {
 			namespace := config.Namespace
 			for i := range config.MetricName {
 				metricsWithStats := metricsWithStatistics{
@@ -589,22 +604,37 @@ func reportEvents(eventsWithIdentifier map[string]mb.Event, report mb.ReporterV2
 	return nil
 }
 
+func configDimensionValueContainsWildcard(dim []Dimension) bool {
+	for i := range dim {
+		if dim[i].Value == dimensionValueWildcard {
+			return true
+		}
+	}
+	return false
+}
+
 func compareAWSDimensions(dim1 []cloudwatch.Dimension, dim2 []cloudwatch.Dimension) bool {
 	if len(dim1) != len(dim2) {
 		return false
 	}
-	var dim1String []string
-	var dim2String []string
-	for i := range dim1 {
-		dim1String = append(dim1String, dim1[i].String())
-	}
-	for i := range dim2 {
-		dim2String = append(dim2String, dim2[i].String())
-	}
 
-	sort.Strings(dim1String)
-	sort.Strings(dim2String)
-	return reflect.DeepEqual(dim1String, dim2String)
+	var dim1NameToValue = make(map[string]string, len(dim1))
+	var dim2NameToValue = make(map[string]string, len(dim1))
+
+	for i := range dim2 {
+		dim1NameToValue[*dim1[i].Name] = *dim1[i].Value
+		dim2NameToValue[*dim2[i].Name] = *dim2[i].Value
+	}
+	for name, v1 := range dim1NameToValue {
+		v2, exists := dim2NameToValue[name]
+		if exists && v2 == dimensionValueWildcard {
+			// wildcard can represent any value, so we set the
+			// dimension name with value in CloudWatch ListMetircs result,
+			// then the compare result is true
+			dim2NameToValue[name] = v1
+		}
+	}
+	return reflect.DeepEqual(dim1NameToValue, dim2NameToValue)
 }
 
 func insertTags(events map[string]mb.Event, identifier string, resourceTagMap map[string][]resourcegroupstaggingapi.Tag) {
