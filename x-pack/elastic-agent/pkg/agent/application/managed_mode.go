@@ -46,6 +46,7 @@ type Managed struct {
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     *fleetGateway
+	router      *router
 	srv         *server.Server
 }
 
@@ -140,6 +141,7 @@ func newManaged(
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
+	managedApplication.router = router
 
 	emit := emitter(
 		log,
@@ -221,6 +223,7 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
+	m.router.Shutdown()
 	m.srv.Stop()
 	return nil
 }

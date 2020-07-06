@@ -35,6 +35,10 @@ func (b *operatorStream) Execute(cfg *configRequest) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
+func (b *operatorStream) Shutdown() {
+	b.configHandler.Shutdown()
+}
+
 func streamFactory(ctx context.Context, cfg *config.Config, srv *server.Server, r state.Reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
