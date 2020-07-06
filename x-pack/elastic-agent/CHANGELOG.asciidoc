@@ -11,6 +11,7 @@
 ==== Breaking changes
 - Rename agent to elastic-agent {pull}17391[17391]
 - Change fleet.yml structure, causes upgraded agent to register as new agent {pull}19248[19248]
+- Remove obfuscation of fleet.yml, causes re-enroll of agent to Fleet {pull}19678[19678]
 
 ==== Bugfixes
 
