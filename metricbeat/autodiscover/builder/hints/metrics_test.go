@@ -303,7 +303,6 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host":      "1.2.3.4",
 				"port":      9090,
-				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -330,7 +329,6 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host":      "1.2.3.4",
 				"port":      80,
-				"port_name": "prometheus",
 				"hints": []common.MapStr{
 					{
 						"metrics": common.MapStr{
@@ -349,7 +347,6 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host":      "1.2.3.4",
 				"port":      3306,
-				"port_name": "prometheus",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -375,8 +372,7 @@ func TestGenerateHints(t *testing.T) {
 			message: "Named port in the hints should return the corresponding container port",
 			event: bus.Event{
 				"host":      "1.2.3.4",
-				"port":      3306,
-				"port_name": "some",
+				"ports": common.MapStr{"some": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -402,8 +398,7 @@ func TestGenerateHints(t *testing.T) {
 			message: "Named port in the hints should return the corresponding container port for complex hosts",
 			event: bus.Event{
 				"host":      "1.2.3.4",
-				"port":      3306,
-				"port_name": "prometheus",
+				"ports": common.MapStr{"prometheus": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -430,7 +425,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host":      "1.2.3.4",
 				"port":      3306,
-				"port_name": "some",
+				"ports": common.MapStr{"prometheus": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
