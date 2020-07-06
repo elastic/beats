@@ -69,9 +69,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	// XXX: enable once we have systemd available in the cross build image
-	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
-
+	mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
