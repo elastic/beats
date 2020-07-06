@@ -105,6 +105,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                    deleteDir()
                     release()
                     pushCIDockerImages()
                   }
@@ -128,6 +129,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+                    deleteDir()
                     withMacOSEnv(){
                       release()
                     }
@@ -224,7 +226,6 @@ def withBeatsEnv(Closure body) {
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
-      deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}"){
         body()
