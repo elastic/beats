@@ -303,7 +303,7 @@ func (l ackerList) Close() {
 
 // ConnectionOnly ensures that the given ACKer is only used for as long as the
 // pipeline Client is active.  Once the Client is closed, the ACKer will drop
-// it's internal state and no more ACK events will be processed.
+// its internal state and no more ACK events will be processed.
 func ConnectionOnly(a beat.ACKer) beat.ACKer {
 	return &clientOnlyACKer{acker: a}
 }
