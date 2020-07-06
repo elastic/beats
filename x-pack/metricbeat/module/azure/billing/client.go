@@ -34,18 +34,14 @@ func NewClient(config Config) (*Client, error) {
 }
 
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
-func (client *Client) Forcast(report mb.ReporterV2) (consumption.ForecastsListResult, error) {
+func (client *Client) GetMetrics(report mb.ReporterV2) (consumption.ForecastsListResult, error) {
 	var top int32 = 10
 	endTime := time.Now().UTC()
 	startTime := endTime.Add(client.Config.Period * (-2))
-	actualCosts3, _ := client.BillingService.GetUsageDetails( fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId), "meterDetails",
+	usageDetails, _ := client.BillingService.GetUsageDetails( fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId), "meterDetails",
 		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)),
 		"", &top, "properties/usageStart")
-	_= actualCosts3
 
-	//dsds, _ := client.BillingService.GetCharges("/providers/Microsoft.Billing/billingAccounts/56437391", "")
-	//_ = dsds
-
-	//usageEnd=2020-06-01T23:59:59.0000000Z
+	_= usageDetails
 	return client.BillingService.GetForcast("")
 }
