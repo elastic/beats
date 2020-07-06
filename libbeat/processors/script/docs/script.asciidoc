@@ -114,7 +114,7 @@ too long (like preventing an infinite `while` loop). By default there is no
 timeout.
 
 `max_cached_sessions`:: This sets the maximum number of Javascript VM sessions
-that will be cached to avoid reallocation.
+that will be cached to avoid reallocation. The default is `4`.
 
 [float]
 ==== Event API
