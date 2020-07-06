@@ -19,7 +19,6 @@ package hints
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -60,8 +59,6 @@ type metricHints struct {
 
 	logger *logp.Logger
 }
-
-var dataPortsRegexp = regexp.MustCompile(`\${data.ports.*\}`)
 
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
