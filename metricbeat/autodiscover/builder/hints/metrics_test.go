@@ -301,8 +301,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
-				"host":      "1.2.3.4",
-				"port":      9090,
+				"host": "1.2.3.4",
+				"port": 9090,
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -327,8 +327,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Module, namespace, host hint shouldn't return when port isn't the same has hint",
 			event: bus.Event{
-				"host":      "1.2.3.4",
-				"port":      80,
+				"host": "1.2.3.4",
+				"port": 80,
 				"hints": []common.MapStr{
 					{
 						"metrics": common.MapStr{
@@ -345,8 +345,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Non http URLs with valid host port combination should return a valid config",
 			event: bus.Event{
-				"host":      "1.2.3.4",
-				"port":      3306,
+				"host": "1.2.3.4",
+				"port": 3306,
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
 						"module":    "mockmoduledefaults",
@@ -371,7 +371,7 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Named port in the hints should return the corresponding container port",
 			event: bus.Event{
-				"host":      "1.2.3.4",
+				"host":  "1.2.3.4",
 				"ports": common.MapStr{"some": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -397,7 +397,7 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "Named port in the hints should return the corresponding container port for complex hosts",
 			event: bus.Event{
-				"host":      "1.2.3.4",
+				"host":  "1.2.3.4",
 				"ports": common.MapStr{"prometheus": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -423,8 +423,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			message: "data.port in the hints should return the corresponding container port",
 			event: bus.Event{
-				"host":      "1.2.3.4",
-				"port":      3306,
+				"host":  "1.2.3.4",
+				"port":  3306,
 				"ports": common.MapStr{"prometheus": 3306},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
