@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (wifi pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: event
@@ -8,7 +11,9 @@ processors:
     value: succes
     if: 'ctx?.sophosxg?.firewall?.log_type == "Wireless Protection"'
 
-
+#############
+## Cleanup ##
+#############
 on_failure:
 - set:
     field: error.message

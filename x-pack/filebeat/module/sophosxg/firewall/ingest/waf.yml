@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (waf pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: event
@@ -15,7 +18,6 @@ processors:
     field: event.outcome
     value: success
     if: "ctx.sophosxg?.firewall?.reason != null"
-
 - set:
     field: event.kind
     value: alert
@@ -32,7 +34,6 @@ processors:
       - intrusion_detection
       - network
     if: "ctx.sophosxg?.firewall?.reason != 'Antivirus' && ctx.sophosxg?.firewall?.reason != '-'"
-
 - append:
     field: event.type
     value:
@@ -46,9 +47,9 @@ processors:
       - connection
     if: 'ctx.sophosxg?.firewall?.reason != "-"'
 
-
-# normalize ECS field values and publish Sophos-XG specific fields
-# destination.ip
+####################################
+## ECS Server/Destination Mapping ##
+####################################
 - rename:
     field: sophosxg.firewall.localip
     target_field: destination.ip
@@ -58,7 +59,6 @@ processors:
     field: server.ip
     value: '{{destination.ip}}'
     if: "ctx.destination?.ip != null"
-# destination.bytes
 - convert:
     field: sophosxg.firewall.bytessent
     target_field: destination.bytes
@@ -73,7 +73,10 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.bytessent != null"
-# source.ip
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
 - rename:
     field: sophosxg.firewall.sourceip
     target_field: source.ip
@@ -83,7 +86,6 @@ processors:
     field: client.ip
     value: '{{source.ip}}'
     if: "ctx.source?.ip != null"
-# source.bytes
 - convert:
     field: sophosxg.firewall.bytesrcv
     target_field: source.bytes
@@ -102,7 +104,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.bytes != null"
-# username
 - rename:
     field: sophosxg.firewall.user_name
     target_field: source.user.name
@@ -114,7 +115,9 @@ processors:
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user_gp != null"
 
-# url - http user-agent handling
+#####################
+## ECS URL Mapping ##
+#####################
 - rename:
     field: sophosxg.firewall.url
     target_field: url.full
@@ -125,6 +128,10 @@ processors:
     target_field: url.domain
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.domain != null"
+
+############################
+## ECS User Agent Mapping ##
+############################
 - rename:
     field: sophosxg.firewall.referer
     target_field: http.request.referrer
@@ -151,19 +158,19 @@ processors:
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.useragent != null"
 
-# Geolocation for source.
+#############################
+## ECS Network/Geo Mapping ##
+#############################
 - geoip:
     field: source.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination.
 - geoip:
     field: destination.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -180,19 +187,16 @@ processors:
     - asn
     - organization_name
     ignore_missing: true
-# Geolocation for source nat.
 - geoip:
     field: source.nat.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination nat.
 - geoip:
     field: destination.nat.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup nat
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.nat.ip
@@ -227,22 +231,36 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+- script:
+    lang: painless
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+    ignore_failure: true
+- script:
+    lang: painless
+    source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
+    if: "ctx?.source?.packets != null && ctx?.destination?.packets != null"
+    ignore_failure: true
 
+#########################
+## ECS Related Mapping ##
+#########################
 - append:
+    field: related.ip
+    value: '{{source.ip}}'
     if: 'ctx?.source?.ip != null'
-    field: related.ip
-    value:
-      - '{{source.ip}}'
 - append:
-    if: 'ctx?.destination?.ip != null'
     field: related.ip
-    value:
-      - '{{destination.ip}}'
+    value: '{{destination.ip}}'
+    if: 'ctx?.destination?.ip != null'
 - append:
     field: related.user
     value: "{{source.user.name}}"
     if: "ctx.source?.user?.name != null"
 
+#############
+## Cleanup ##
+#############
 - lowercase:
       field: http.request.method
       ignore_failure: true

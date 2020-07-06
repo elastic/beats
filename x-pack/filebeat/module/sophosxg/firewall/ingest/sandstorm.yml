@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (sandbox pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: event
@@ -11,7 +14,6 @@ processors:
     field: event.outcome
     value: success
     if: "ctx.sophosxg?.firewall?.log_subtype != null"
-
 - set:
     field: event.kind
     value: alert
@@ -22,12 +24,10 @@ processors:
       - malware
       - network
     if: 'ctx.sophosxg?.firewall?.log_subtype == "Denied"'
-
 - append:
     field: event.category
     value: network
     if: "ctx.sophosxg?.firewall?.log_subtype != 'Denied'"
-
 - append:
     field: event.type
     value: allowed
@@ -50,8 +50,15 @@ processors:
       - diened
       - connection
     if: "ctx.sophosxg?.firewall?.log_subtype == 'Denied'"
+- rename:
+    field: sophosxg.firewall.log_id
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.event?.code == null"
 
-# source.ip
+###############################
+## ECS Client/Source Mapping ##
+###############################
 - rename:
     field: sophosxg.firewall.src_ip
     target_field: source.ip
@@ -61,14 +68,15 @@ processors:
     field: client.ip
     value: '{{source.ip}}'
     if: "ctx.source?.ip != null"
-
-# username - usergroup
 - rename:
     field: sophosxg.firewall.user_name
     target_field: source.user.name
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user_name != null"
-# file handling
+
+######################
+## ECS File Mapping ##
+######################
 - rename:
     field: sophoxg.firewall.filename
     target_field: file.name
@@ -85,22 +93,14 @@ processors:
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.filetype != null"
 - rename:
-    field: sophosxg.firewall.filename
-    target_field: file.name
-    ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.filename == null"
-
-- rename:
-    field: sophosxg.firewall.log_id
-    target_field: event.code
-    ignore_missing: true
-    if: "ctx.event?.code == null"
-
-- rename:
     field: sophosxg.firewall.sha1sum
     target_field: file.hash.sha1
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.sha1sum != null"
+
+#########################
+## ECS Related Mapping ##
+#########################
 - append:
     field: related.ip
     value: "{{source.ip}}"
@@ -114,6 +114,9 @@ processors:
     value: "{{file.hash.sha1}}"
     if: "ctx.file?.hash?.sha1 != null"
 
+#############
+## Cleanup ##
+#############
 - lowercase:
       field: event.action
       ignore_failure: true

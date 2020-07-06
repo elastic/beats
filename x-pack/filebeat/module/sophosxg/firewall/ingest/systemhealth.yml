@@ -1,22 +1,22 @@
 description: Pipeline for parsing sophos firewall logs (systemhealth pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
+#TODO: Need to setup a different field naming convention, maybe "cpu.idle, cpu.system etc"
 - set:
     field: event.kind
     value: event
-
-# remove "%" (CPU, Disk) and convert string to float (CPU, Disk) / integer (Memory)
 - rename:
     field: sophosxg.firewall.idle
     target_field: sophosxg.firewall.idle_cpu
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.idle !=null"
-
 - gsub:
     field: sophosxg.firewall.idle_cpu
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
-
 - convert:
     field: sophosxg.firewall.idle_cpu
     target_field: sophosxg.firewall.idle_cpu
@@ -24,19 +24,16 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.idle_cpu != null"
-
 - rename:
     field: sophosxg.firewall.system
     target_field: sophosxg.firewall.system_cpu
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.system !=null"
-
 - gsub:
     field: sophosxg.firewall.system_cpu
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
-
 - convert:
     field: sophosxg.firewall.system_cpu
     target_field: sophosxg.firewall.system_cpu
@@ -44,19 +41,16 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.system_cpu != null"
-
 - rename:
     field: sophosxg.firewall.user
     target_field: sophosxg.firewall.user_cpu
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user !=null"
-
 - gsub:
     field: sophosxg.firewall.user_cpu
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
-
 - convert:
     field: sophosxg.firewall.user_cpu
     target_field: sophosxg.firewall.user_cpu
@@ -64,7 +58,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user_cpu != null"
-
 - convert:
     field: sophosxg.firewall.used
     target_field: sophosxg.firewall.used
@@ -72,7 +65,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.used != null"
-
 - convert:
     field: sophosxg.firewall.total_memory
     target_field: sophosxg.firewall.total_memory
@@ -80,7 +72,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.total_memory != null"
-
 - convert:
     field: sophosxg.firewall.free
     target_field: sophosxg.firewall.free
@@ -88,27 +79,23 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.free != null"
-
 - gsub:
     field: sophosxg.firewall.Configuration
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
-
 - convert:
     field: sophosxg.firewall.Configuration
-    target_field: sophosxg.firewall.Configuration
+    target_field: sophosxg.firewall.configuration
     type: float
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.Configuration != null"
-
 - gsub:
     field: sophosxg.firewall.Reports
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
-
 - convert:
     field: sophosxg.firewall.Reports
     target_field: sophosxg.firewall.Reports
@@ -116,13 +103,11 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.Reports != null"
-
 - gsub:
     field: sophosxg.firewall.Temp
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
-
 - convert:
     field: sophosxg.firewall.Temp
     target_field: sophosxg.firewall.Temp
@@ -130,13 +115,11 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.Temp != null"
-
 - gsub:
     field: sophosxg.firewall.Signature
     pattern: "(.{1}$)"
     replacement: ""
     if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
-
 - convert:
     field: sophosxg.firewall.Signature
     target_field: sophosxg.firewall.Signature
@@ -144,7 +127,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.Signature != null"
-
 - convert:
     field: sophosxg.firewall.users
     target_field: sophosxg.firewall.users
@@ -152,8 +134,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.users != null"
-
-# convert transmittedkbits / receivedkbits to float (unit kbits)
 - convert:
     field: sophosxg.firewall.transmittedkbits
     target_field: sophosxg.firewall.transmittedkbits
@@ -161,7 +141,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.transmittedkbits != null"
-
 - convert:
     field: sophosxg.firewall.receivedkbits
     target_field: sophosxg.firewall.receivedkbits
@@ -170,6 +149,9 @@ processors:
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.receivedkbits != null"
 
+#############
+## Cleanup ##
+#############
 on_failure:
 - set:
     field: error.message
