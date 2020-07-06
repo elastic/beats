@@ -133,14 +133,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	// Initialize metrics.
 	initMetrics("total")
 
-	// setup global event ACK handler
-	err := eb.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: acker.ACKEvents,
-	})
-	if err != nil {
-		return err
-	}
-
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
 		state, _ := persistedState[log.source.Name()]
