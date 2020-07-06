@@ -19,6 +19,7 @@
             "start"
         ],
         "fileset.name": "falcon",
+        "host.name": "hostnameofmachine",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -52,6 +53,7 @@
             "end"
         ],
         "fileset.name": "falcon",
+        "host.name": "hostnameofmachine",
         "input.type": "log",
         "log.flags": [
             "multiline"
