@@ -858,15 +858,11 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=3), max_timeout=10)
 
         # Make sure all states are cleaned up
-        self.wait_until(self.logs.nextCheck(re.compile("Registrar.*After: 1")))
-
+        self.wait_until(lambda: self.registry.count() == 1)
         filebeat.check_kill_and_wait()
 
-        # Check that the first to files were removed from the registry
-        data = self.registry.load()
-        assert len(data) == 1
-
         # Make sure the last file in the registry is the correct one and has the correct offset
+        data = self.registry.load()
         assert data[0]["offset"] == self.input_logs.size(file2)
 
     @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/10606')
@@ -1050,15 +1046,12 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=30)
 
-        self.wait_until(
-            lambda: self.log_contains("Registry file updated. 1 active states.",
-                                      logfile="filebeat.log"), max_timeout=10)
+        self.wait_until(lambda: self.registry.count() == 1, max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
         # Check that ttl > 0 was set because of clean_inactive
         data = self.get_registry()
-        assert len(data) == 1
         assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
         # New config file which does not match the existing clean_inactive
@@ -1108,16 +1101,12 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=1),
             max_timeout=30)
-
-        self.wait_until(
-            lambda: self.log_contains("Registry file updated. 1 active states.",
-                                      logfile="filebeat.log"), max_timeout=10)
+        self.wait_until(lambda: self.registry.count() == 1)
 
         filebeat.check_kill_and_wait()
 
         # Check that ttl > 0 was set because of clean_inactive
         data = self.get_registry()
-        assert len(data) == 1
         assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
         # new config file with other clean_inactive
