@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 [role="xpack"]
 
 :modulename: gsuite
-:has-dashboards: true
+:has-dashboards: false
 
 == GSuite module
 
@@ -26,7 +26,7 @@ It is compatible with a subset of applications under the https://developers.goog
 
 === Configure the module
 
-To allow the filebeat module to ingest data from the Google Reports API, you would need an admin account, and set up a `ServiceAccount` to access `Admin SDK API`. Also notice, https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application in order to work properly.
+In order for filebeat to ingest data from the Google Reports API you must set up a `ServiceAccount` that has access to the `Admin SDK API`. Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
 
 This module will make use of the following `oauth2 scope`:
 
@@ -93,14 +93,6 @@ This is a list of GSuite Reports fields that are mapped to ECS.
 |=======================================================================================
 
 These are the common ones to all filesets.
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
 
 :has-dashboards!:
 
