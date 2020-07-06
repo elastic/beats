@@ -6,8 +6,13 @@ package reporter
 
 import (
 	"context"
-	"errors"
+	"fmt"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 var result Event
@@ -24,67 +29,92 @@ type info struct{}
 
 func (*info) AgentID() string { return "id" }
 
+type testScenario struct {
+	Status        state.Status
+	StatusMessage string
+	EventType     string
+	EventSubType  string
+	EventMessage  string
+}
+
 func TestTypes(t *testing.T) {
 	rep := NewReporter(context.Background(), nil, &info{}, &testReporter{})
-	// test starting
-	rep.OnStarting(context.Background(), "a1")
-	if r := result.Type(); r != EventTypeState {
-		t.Errorf("OnStarting: expected record type '%v', got '%v'", EventTypeState, r)
+	scenarios := []testScenario{
+		{
+			Status:        state.Stopped,
+			StatusMessage: "Stopped",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeStopped,
+			EventMessage:  "Application: a-stopped[id]: State changed to STOPPED: Stopped",
+		},
+		{
+			Status:        state.Starting,
+			StatusMessage: "Starting",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeStarting,
+			EventMessage:  "Application: a-starting[id]: State changed to STARTING: Starting",
+		},
+		{
+			Status:        state.Configuring,
+			StatusMessage: "Configuring",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeConfig,
+			EventMessage:  "Application: a-configuring[id]: State changed to CONFIG: Configuring",
+		},
+		{
+			Status:        state.Running,
+			StatusMessage: "Running",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeRunning,
+			EventMessage:  "Application: a-running[id]: State changed to RUNNING: Running",
+		},
+		{
+			Status:        state.Degraded,
+			StatusMessage: "Degraded",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeRunning,
+			EventMessage:  "Application: a-degraded[id]: State changed to DEGRADED: Degraded",
+		},
+		{
+			Status:        state.Failed,
+			StatusMessage: "Failed",
+			EventType:     EventTypeError,
+			EventSubType:  EventSubTypeFailed,
+			EventMessage:  "Application: a-failed[id]: State changed to FAILED: Failed",
+		},
+		{
+			Status:        state.Crashed,
+			StatusMessage: "Crashed",
+			EventType:     EventTypeError,
+			EventSubType:  EventSubTypeFailed,
+			EventMessage:  "Application: a-crashed[id]: State changed to CRASHED: Crashed",
+		},
+		{
+			Status:        state.Stopping,
+			StatusMessage: "Stopping",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeStopping,
+			EventMessage:  "Application: a-stopping[id]: State changed to STOPPING: Stopping",
+		},
+		{
+			Status:        state.Restarting,
+			StatusMessage: "Restarting",
+			EventType:     EventTypeState,
+			EventSubType:  EventSubTypeStarting,
+			EventMessage:  "Application: a-restarting[id]: State changed to RESTARTING: Restarting",
+		},
 	}
-
-	if r := result.SubType(); r != EventSubTypeStarting {
-		t.Errorf("OnStarting: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	}
-
-	// test in progress
-	rep.OnRunning(context.Background(), "a2")
-	if r := result.Type(); r != EventTypeState {
-		t.Errorf("OnRunning: expected record type '%v', got '%v'", EventTypeState, r)
-	}
-
-	if r := result.SubType(); r != EventSubTypeInProgress {
-		t.Errorf("OnRunning: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	}
-
-	// test stopping
-	rep.OnStopping(context.Background(), "a3")
-	if r := result.Type(); r != EventTypeState {
-		t.Errorf("OnStopping: expected record type '%v', got '%v'", EventTypeState, r)
-	}
-
-	if r := result.SubType(); r != EventSubTypeStopping {
-		t.Errorf("OnStopping: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	}
-
-	// test stopped
-	rep.OnStopped(context.Background(), "a4")
-	if r := result.Type(); r != EventTypeState {
-		t.Errorf("OnStopped: expected record type '%v', got '%v'", EventTypeState, r)
-	}
-
-	if r := result.SubType(); r != EventSubTypeStopped {
-		t.Errorf("OnStopped: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	}
-
-	// test failing
-	err := errors.New("e1")
-	rep.OnFailing(context.Background(), "a5", err)
-	if r := result.Type(); r != EventTypeError {
-		t.Errorf("OnFailing: expected record type '%v', got '%v'", EventTypeState, r)
-	}
-
-	if r := result.SubType(); r != EventSubTypeConfig {
-		t.Errorf("OnFailing: expected event type '%v', got '%v'", EventSubTypeStarting, r)
-	}
-
-	// test fatal
-	err = errors.New("e2")
-	rep.OnFatal(context.Background(), "a6", err)
-	if r := result.Type(); r != EventTypeError {
-		t.Errorf("OnFatal: expected record type '%v', got '%v'", EventTypeState, r)
-	}
-
-	if r := result.SubType(); r != EventSubTypeConfig {
-		t.Errorf("OnFatal: expected event type '%v', got '%v'", EventSubTypeStarting, r)
+	for _, scenario := range scenarios {
+		t.Run(scenario.StatusMessage, func(t *testing.T) {
+			appID := fmt.Sprintf("a-%s", strings.ToLower(scenario.StatusMessage))
+			appName := fmt.Sprintf("app-%s", strings.ToLower(scenario.StatusMessage))
+			rep.OnStateChange(appID, appName, state.State{
+				Status:  scenario.Status,
+				Message: scenario.StatusMessage,
+			})
+			assert.Equal(t, scenario.EventType, result.Type())
+			assert.Equal(t, scenario.EventSubType, result.SubType())
+			assert.Equal(t, scenario.EventMessage, result.Message())
+		})
 	}
 }

@@ -1,3 +1,4 @@
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/)
 [![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
@@ -85,7 +86,7 @@ your dev environment to build Beats from the source.
 
 ## Snapshots
 
-For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/elastic+beats+master+multijob-package-linux/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/Beats/job/packaging/job/master/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
 
 ## CI
 

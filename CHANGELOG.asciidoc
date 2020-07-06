@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378] {pull}14754[14754]
 - Fix azure filesets test files. {issue}14185[14185] {pull}14235[14235]
 - Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
+- Remove references to non-existent Zeek `signatures` fileset. {pull}18878[18878]
 
 *Metricbeat*
 
@@ -155,6 +156,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
 - Add support for gzipped files in S3 input {pull}13980[13980]
 - Add Filebeat Azure Dashboards {pull}14127[14127]
+- Add support for thread ID in Filebeat Kafka module. {pull}19463[19463]
 
 
 *Heartbeat*

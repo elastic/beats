@@ -7,16 +7,12 @@ package application
 import (
 	"fmt"
 
-	"github.com/urso/ecslog"
-	"github.com/urso/ecslog/backend"
-	"github.com/urso/ecslog/backend/appender"
-	"github.com/urso/ecslog/backend/layout"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 )
 
 // IntrospectOutputCmd is an introspect subcommand that shows configurations of the agent.
@@ -202,9 +198,5 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	backend, err := appender.Console(backend.Error, layout.Text(true))
-	if err != nil {
-		return nil, err
-	}
-	return ecslog.New(backend), nil
+	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }

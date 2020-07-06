@@ -40,6 +40,12 @@ func TestCloudwatch(t *testing.T) {
 	expectedEvent := beat.Event{
 		Timestamp: expectedTime,
 		Fields: common.MapStr{
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+			},
 			"message":              "my interesting message",
 			"id":                   "1234567890123456789",
 			"owner":                "me",
@@ -79,6 +85,13 @@ func TestKinesis(t *testing.T) {
 	assert.Equal(t, 1, len(events))
 
 	fields := common.MapStr{
+		"cloud": common.MapStr{
+			"provider": "aws",
+			"region":   "us-east-1",
+		},
+		"event": common.MapStr{
+			"kind": "event",
+		},
 		"event_id":                "1234",
 		"event_name":              "connect",
 		"event_source":            "web",
@@ -130,6 +143,13 @@ ciJ9XX0=`),
 	assert.Equal(t, 3, len(events))
 
 	envelopeFields := common.MapStr{
+		"cloud": common.MapStr{
+			"provider": "aws",
+			"region":   "us-east-1",
+		},
+		"event": common.MapStr{
+			"kind": "event",
+		},
 		"event_id":                "1234",
 		"event_name":              "connect",
 		"event_source":            "web",

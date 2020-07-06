@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 var (
@@ -25,19 +26,16 @@ type operationConfig struct {
 	logger         *logger.Logger
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
-	eventProcessor callbackHooks
 }
 
 func newOperationConfig(
 	logger *logger.Logger,
 	operatorConfig *config.Config,
-	cfg map[string]interface{},
-	eventProcessor callbackHooks) *operationConfig {
+	cfg map[string]interface{}) *operationConfig {
 	return &operationConfig{
 		logger:         logger,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
-		eventProcessor: eventProcessor,
 	}
 }
 
@@ -46,21 +44,16 @@ func (o *operationConfig) Name() string {
 	return "operation-config"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationConfig) Check() (bool, error) { return true, nil }
+// Check checks whether config needs to be run.
+//
+// Always returns true.
+func (o *operationConfig) Check(_ context.Context, _ Application) (bool, error) { return true, nil }
 
 // Run runs the operation
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error())
 		}
 	}()
 	return application.Configure(ctx, o.cfg)

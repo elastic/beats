@@ -10,6 +10,7 @@
 
 ==== Breaking changes
 - Rename agent to elastic-agent {pull}17391[17391]
+- Change fleet.yml structure, causes upgraded agent to register as new agent {pull}19248[19248]
 
 ==== Bugfixes
 
@@ -67,3 +68,10 @@
 - Pick up version from libbeat {pull}18350[18350]
 - Use shorter hash for application differentiator {pull}18770[18770]
 - When not port are specified and the https is used fallback to 443 {pull}18844[18844]
+- Change monitoring defaults for agent {pull}18927[18927]
+- Agent verifies packages before using them {pull}18876[18876]
+- Change stream.* to dataset.* fields {pull}18967[18967]
+- Agent now runs the GRPC server and spawned application connect by to Agent {pull}18973[18973]
+- Rename input.type logs to logfile {pull}19360[19360]
+- Agent now installs/uninstalls Elastic Endpoint {pull}19248[19248]
+- Agent now downloads Elastic Endpoint {pull}19503[19503]

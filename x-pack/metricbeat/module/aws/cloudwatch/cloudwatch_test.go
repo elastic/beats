@@ -1407,10 +1407,14 @@ func TestInsertTags(t *testing.T) {
 	tagValue1 := "engineering"
 	tagKey2 := "owner"
 	tagValue2 := "foo"
+	identifierContainsArn := "arn:aws:ec2:ap-northeast-1:111111111111:eip-allocation/eipalloc-0123456789abcdef,SYNFlood"
+	tagKey3 := "env"
+	tagValue3 := "dev"
 
 	events := map[string]mb.Event{}
 	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
 	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
@@ -1423,6 +1427,12 @@ func TestInsertTags(t *testing.T) {
 		{
 			Key:   awssdk.String(tagKey2),
 			Value: awssdk.String(tagValue2),
+		},
+	}
+	resourceTagMap["eipalloc-0123456789abcdef"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey3),
+			Value: awssdk.String(tagValue3),
 		},
 	}
 
@@ -1443,6 +1453,12 @@ func TestInsertTags(t *testing.T) {
 			identifier2,
 			"aws.tags.owner",
 			tagValue2,
+		},
+		{
+			"test identifier with arn value",
+			identifierContainsArn,
+			"aws.tags.env",
+			tagValue3,
 		},
 	}
 

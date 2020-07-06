@@ -60,7 +60,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
-		// doesn't have the required cf.app.id value to add more information
+		// doesn't have the required cloudfoundry.app.id value to add more information
 		return event, nil
 	}
 	val, _ := valI.(string)

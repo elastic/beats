@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -165,9 +166,12 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
+	binaryName := "configurable"
+	if runtime.GOOS == "windows" {
+		binaryName += ".exe"
+	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86", "main.go")),
-		RunGo("build", "-o", filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "configurablebyfile"), filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -419,7 +423,14 @@ func (Demo) NoEnroll() error {
 }
 
 func runAgent(env map[string]string) error {
-	supportedEnvs := map[string]int{"FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+	prevPlatforms := os.Getenv("PLATFORMS")
+	defer os.Setenv("PLATFORMS", prevPlatforms)
+
+	// setting this improves build time
+	os.Setenv("PLATFORMS", "+all linux/amd64")
+	devtools.Platforms = devtools.NewPlatformList("+all linux/amd64")
+
+	supportedEnvs := map[string]int{"FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
 	dockerImageOut, err := sh.Output("docker", "image", "ls")
@@ -431,7 +442,6 @@ func runAgent(env map[string]string) error {
 	if !strings.Contains(dockerImageOut, tag) {
 		// produce docker package
 		packageAgent([]string{
-			"linux-x86.tar.gz",
 			"linux-x86_64.tar.gz",
 		}, devtools.UseElasticAgentDemoPackaging)
 
@@ -447,7 +457,11 @@ func runAgent(env map[string]string) error {
 	}
 
 	// prepare env variables
-	var envs []string
+	envs := []string{
+		// providing default kibana to be fixed for os-es if not provided
+		"KIBANA_HOST=http://localhost:5601",
+	}
+
 	envs = append(envs, os.Environ()...)
 	for k, v := range env {
 		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
@@ -460,6 +474,9 @@ func runAgent(env map[string]string) error {
 		if _, isSupported := supportedEnvs[parts[0]]; !isSupported {
 			continue
 		}
+
+		// fix value
+		e = fmt.Sprintf("%s=%s", parts[0], fixOsEnv(parts[0], parts[1]))
 
 		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
 	}
@@ -515,6 +532,18 @@ func dockerTag() string {
 	}
 
 	return tagBase
+}
+
+func fixOsEnv(k, v string) string {
+	switch k {
+	case "KIBANA_HOST":
+		// network host works in a weird way here
+		if runtime.GOOS == "darwin" || runtime.GOOS == "windows" {
+			return strings.Replace(strings.ToLower(v), "localhost", "host.docker.internal", 1)
+		}
+	}
+
+	return v
 }
 
 func buildVars() map[string]string {

@@ -20,8 +20,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 )
 
 type mockStore struct {
@@ -43,7 +43,7 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	log, _ := logger.New()
+	log, _ := logger.New("tst")
 
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {

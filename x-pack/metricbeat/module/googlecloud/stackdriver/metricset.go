@@ -9,13 +9,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3"
-
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
-
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -51,6 +50,7 @@ type MetricSet struct {
 
 //stackDriverConfig holds a configuration specific for stackdriver metricset.
 type stackDriverConfig struct {
+	ServiceName string   `config:"service"  validate:"required"`
 	MetricTypes []string `config:"metric_types" validate:"required"`
 	Aligner     string   `config:"aligner"`
 }
@@ -65,7 +65,6 @@ type config struct {
 	Region              string `config:"region"`
 	ProjectID           string `config:"project_id" validate:"required"`
 	ExcludeLabels       bool   `config:"exclude_labels"`
-	ServiceName         string `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string `config:"credentials_file_path"`
 
 	opt    []option.ClientOption
@@ -84,7 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	stackDriverConfigs := struct {
-		StackDriverMetrics []stackDriverConfig `config:"stackdriver.metrics" validate:"nonzero,required"`
+		StackDriverMetrics []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&stackDriverConfigs); err != nil {
@@ -125,31 +124,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	responses, err := m.requester.Metrics(ctx, m.stackDriverConfig, m.metricsMeta)
-	if err != nil {
-		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
-	}
+	for _, sdc := range m.stackDriverConfig {
+		m.Logger().Debugf("stackdriver config: %v", sdc)
+		responses, err := m.requester.Metrics(ctx, sdc, m.metricsMeta)
+		if err != nil {
+			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
+			m.Logger().Error(err)
+			return err
+		}
 
-	events, err := m.eventMapping(ctx, responses)
-	if err != nil {
-		return err
-	}
+		events, err := m.eventMapping(ctx, responses, sdc.ServiceName)
+		if err != nil {
+			err = errors.Wrap(err, "eventMapping failed")
+			m.Logger().Error(err)
+			return err
+		}
 
-	for _, event := range events {
-		reporter.Event(event)
+		m.Logger().Debugf("Total %d of events are created for service name = %s and metric type = %s.", len(events), sdc.ServiceName, sdc.MetricTypes)
+		for _, event := range events {
+			reporter.Event(event)
+		}
 	}
-
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner) ([]mb.Event, error) {
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, serviceName string) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger())
 
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config); err != nil {
+		if gcpService, err = NewMetadataServiceForConfig(m.config, serviceName); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
@@ -209,39 +215,54 @@ func (mc *stackDriverConfig) Validate() error {
 // (sample period and ingest delay) of each given metric type
 func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.MetricClient) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
+	req := &monitoringpb.ListMetricDescriptorsRequest{
+		Name: "projects/" + m.config.ProjectID,
+	}
 
 	for _, sdc := range m.stackDriverConfig {
 		for _, mt := range sdc.MetricTypes {
-			req := &monitoringpb.ListMetricDescriptorsRequest{
-				Name:   "projects/" + m.config.ProjectID,
-				Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
-			}
-
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
 			it := client.ListMetricDescriptors(ctx, req)
-			out, err := it.Next()
-			if err != nil {
-				return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
-			}
 
-			// Set samplePeriod default to 60 seconds and ingestDelay default to 0.
-			meta := metricMeta{
-				samplePeriod: 60 * time.Second,
-				ingestDelay:  0 * time.Second,
-			}
+			for {
+				out, err := it.Next()
+				if err != nil && err != iterator.Done {
+					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+					m.Logger().Error(err)
+					return metricsWithMeta, err
+				}
 
-			if out.Metadata.SamplePeriod != nil {
-				m.Logger().Debugf("For metric type %s: sample period = %s", mt, out.Metadata.SamplePeriod)
-				meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
-			}
+				if out != nil {
+					metricsWithMeta = m.getMetadata(out, metricsWithMeta)
+				}
 
-			if out.Metadata.IngestDelay != nil {
-				m.Logger().Debugf("For metric type %s: ingest delay = %s", mt, out.Metadata.IngestDelay)
-				meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+				if err == iterator.Done {
+					break
+				}
 			}
-
-			metricsWithMeta[mt] = meta
 		}
 	}
 
 	return metricsWithMeta, nil
+}
+
+func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta map[string]metricMeta) map[string]metricMeta {
+	// Set samplePeriod default to 60 seconds and ingestDelay default to 0.
+	meta := metricMeta{
+		samplePeriod: 60 * time.Second,
+		ingestDelay:  0 * time.Second,
+	}
+
+	if out.Metadata.SamplePeriod != nil {
+		m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
+		meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
+	}
+
+	if out.Metadata.IngestDelay != nil {
+		m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
+		meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+	}
+
+	metricsWithMeta[out.Type] = meta
+	return metricsWithMeta
 }

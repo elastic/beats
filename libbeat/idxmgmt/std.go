@@ -20,6 +20,7 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -198,6 +199,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		MultiKey:         "indices",
 		EnableSingleOnly: true,
 		FailEmpty:        mode != ilm.ModeEnabled,
+		Case:             outil.SelectorLowerCase,
 	}
 
 	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
@@ -354,13 +356,13 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	}
 
 	if alias, err := events.GetMetaStringValue(*evt, events.FieldMetaAlias); err == nil {
-		return alias
+		return strings.ToLower(alias)
 	}
 
 	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaIndex); err == nil {
 		ts := evt.Timestamp.UTC()
 		return fmt.Sprintf("%s-%d.%02d.%02d",
-			idx, ts.Year(), ts.Month(), ts.Day())
+			strings.ToLower(idx), ts.Year(), ts.Month(), ts.Day())
 	}
 
 	// This is functionally identical to Meta["alias"], returning the overriding
@@ -368,7 +370,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	// to send the index for particular inputs to formatted string templates,
 	// which are then expanded by a processor to the "raw_index" field.
 	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaRawIndex); err == nil {
-		return idx
+		return strings.ToLower(idx)
 	}
 
 	return ""

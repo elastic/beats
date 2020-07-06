@@ -10,7 +10,9 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"sync"
@@ -22,10 +24,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 )
 
 const (
@@ -34,6 +38,9 @@ const (
 
 var userAgent = useragent.UserAgent("Filebeat")
 
+// for testing
+var timeNow = time.Now
+
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
@@ -41,6 +48,7 @@ func init() {
 	}
 }
 
+// HttpjsonInput struct has the HttpJsonInput configuration and other userful info.
 type HttpjsonInput struct {
 	config
 	log      *logp.Logger
@@ -51,12 +59,29 @@ type HttpjsonInput struct {
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+
+	nextCursorValue string
 }
 
+// RequestInfo struct has the information for generating an HTTP request
 type RequestInfo struct {
 	URL        string
 	ContentMap common.MapStr
 	Headers    common.MapStr
+}
+
+type retryLogger struct {
+	log *logp.Logger
+}
+
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+	}
+}
+
+func (l *retryLogger) Printf(s string, args ...interface{}) {
+	l.log.Debugf(s, args...)
 }
 
 // NewInput creates a new httpjson input
@@ -71,11 +96,7 @@ func NewInput(
 		return nil, err
 	}
 	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -166,24 +187,61 @@ func (in *HttpjsonInput) createHTTPRequest(ctx context.Context, ri *RequestInfo)
 
 // processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
 func (in *HttpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
-	var m map[string]interface{}
+	var last map[string]interface{}
 	for _, t := range events {
 		switch v := t.(type) {
 		case map[string]interface{}:
-			m = v
-			d, err := json.Marshal(v)
-			if err != nil {
-				return nil, errors.Wrapf(err, "failed to marshal %+v", v)
-			}
-			ok := in.outlet.OnEvent(makeEvent(string(d)))
-			if !ok {
-				return nil, errors.New("function OnEvent returned false")
+			for _, e := range in.splitEvent(v) {
+				last = e
+				d, err := json.Marshal(e)
+				if err != nil {
+					return nil, errors.Wrapf(err, "failed to marshal %+v", e)
+				}
+				ok := in.outlet.OnEvent(makeEvent(string(d)))
+				if !ok {
+					return nil, errors.New("function OnEvent returned false")
+				}
 			}
 		default:
 			return nil, errors.Errorf("expected only JSON objects in the array but got a %T", v)
 		}
 	}
-	return m, nil
+	return last, nil
+}
+
+func (in *HttpjsonInput) splitEvent(event map[string]interface{}) []map[string]interface{} {
+	m := common.MapStr(event)
+
+	hasSplitKey, _ := m.HasKey(in.config.SplitEventsBy)
+	if in.config.SplitEventsBy == "" || !hasSplitKey {
+		return []map[string]interface{}{event}
+	}
+
+	splitOnIfc, _ := m.GetValue(in.config.SplitEventsBy)
+	splitOn, ok := splitOnIfc.([]interface{})
+	// if not an array or is empty, we do nothing
+	if !ok || len(splitOn) == 0 {
+		return []map[string]interface{}{event}
+	}
+
+	var events []map[string]interface{}
+	for _, split := range splitOn {
+		s, ok := split.(map[string]interface{})
+		// if not an object, we do nothing
+		if !ok {
+			return []map[string]interface{}{event}
+		}
+
+		mm := m.Clone()
+		_, err := mm.Put(in.config.SplitEventsBy, s)
+		if err != nil {
+			return []map[string]interface{}{event}
+		}
+
+		events = append(events, mm)
+	}
+
+	return events
 }
 
 // getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
@@ -291,6 +349,7 @@ func createRequestInfoFromBody(m common.MapStr, idField string, requestField str
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
 func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *RequestInfo) error {
+	ri.URL = in.getURL()
 	for {
 		req, err := in.createHTTPRequest(ctx, ri)
 		if err != nil {
@@ -337,7 +396,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					return err
 				}
 			} else {
-				v, err = common.MapStr(mm).GetValue(in.config.JSONObjects)
+				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
 					return err
 				}
@@ -355,8 +414,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			in.log.Debug("http.response.body is not a valid JSON object", string(responseData))
 			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
 		}
-
-		if mm != nil && in.config.Pagination != nil && in.config.Pagination.IsEnabled() {
+		if mm != nil && in.config.Pagination.IsEnabled() {
 			if in.config.Pagination.Header != nil {
 				// Pagination control using HTTP Header
 				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
@@ -375,7 +433,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			} else {
 				// Pagination control using HTTP Body fields
-				ri, err := createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
+				ri, err = createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
 				if err != nil {
 					return err
 				}
@@ -389,7 +447,67 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			}
 		}
+		if mm != nil && in.config.DateCursor.IsEnabled() {
+			in.advanceCursor(common.MapStr(mm))
+		}
 		return nil
+	}
+}
+
+func (in *HttpjsonInput) getURL() string {
+	if !in.config.DateCursor.IsEnabled() {
+		return in.config.URL
+	}
+
+	var dateStr string
+	if in.nextCursorValue == "" {
+		t := timeNow().UTC().Add(-in.config.DateCursor.InitialInterval)
+		dateStr = t.Format(in.config.DateCursor.GetDateFormat())
+	} else {
+		dateStr = in.nextCursorValue
+	}
+
+	url, err := url.Parse(in.config.URL)
+	if err != nil {
+		return in.config.URL
+	}
+
+	q := url.Query()
+
+	var value string
+	if in.config.DateCursor.ValueTemplate == nil {
+		value = dateStr
+	} else {
+		buf := new(bytes.Buffer)
+		if err := in.config.DateCursor.ValueTemplate.Execute(buf, dateStr); err != nil {
+			return in.config.URL
+		}
+		value = buf.String()
+	}
+
+	q.Set(in.config.DateCursor.URLField, value)
+
+	url.RawQuery = q.Encode()
+
+	return url.String()
+}
+
+func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
+	v, err := m.GetValue(in.config.DateCursor.Field)
+	if err != nil {
+		in.log.Warnf("date_cursor field: %q", err)
+		return
+	}
+	switch t := v.(type) {
+	case string:
+		_, err := time.Parse(in.config.DateCursor.GetDateFormat(), t)
+		if err != nil {
+			return
+		}
+		in.nextCursorValue = t
+	default:
+		in.log.Warn("date_cursor field must be a string, cursor will not advance")
+		return
 	}
 }
 
@@ -397,33 +515,12 @@ func (in *HttpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	client, err := in.newHTTPClient(ctx)
 	if err != nil {
 		return err
-	}
-
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return err
-	}
-
-	// Make transport client
-	var client *http.Client
-	client = &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			TLSClientConfig:   tlsConfig.ToConfig(),
-			DisableKeepAlives: true,
-		},
-		Timeout: in.config.HTTPClientTimeout,
 	}
 
 	ri := &RequestInfo{
-		URL:        in.URL,
 		ContentMap: common.MapStr{},
 		Headers:    in.HTTPHeaders,
 	}
@@ -460,6 +557,39 @@ func (in *HttpjsonInput) Stop() {
 // Wait is an alias for Stop.
 func (in *HttpjsonInput) Wait() {
 	in.Stop()
+}
+
+func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make retryable HTTP client
+	var client *retryablehttp.Client = &retryablehttp.Client{
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: in.config.HTTPClientTimeout,
+				}).DialContext,
+				TLSClientConfig:   tlsConfig.ToConfig(),
+				DisableKeepAlives: true,
+			},
+			Timeout: in.config.HTTPClientTimeout,
+		},
+		Logger:       newRetryLogger(),
+		RetryWaitMin: in.config.RetryWaitMin,
+		RetryWaitMax: in.config.RetryWaitMax,
+		RetryMax:     in.config.RetryMax,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client.StandardClient())
+	}
+
+	return client.StandardClient(), nil
 }
 
 func makeEvent(body string) beat.Event {

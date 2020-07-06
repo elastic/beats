@@ -289,11 +289,11 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313008'"
       field: "message"
-      pattern: "%{event.outcome} %{network.transport} type=%{_temp_.cisco.icmp_type} , code=%{_temp_.cisco.icmp_code} from %{source.address} on interface %{_temp_.cisco.source_interface}"
+      pattern: "%{event.outcome} %{network.transport} type=%{_temp_.cisco.icmp_type}, code=%{_temp_.cisco.icmp_code} from %{source.address} on interface %{_temp_.cisco.source_interface}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313009'"
       field: "message"
-      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code} , for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}"
+      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code}, for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '322001'"
       field: "message"
@@ -306,6 +306,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "message"
@@ -314,6 +315,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338003'"
       field: "message"
@@ -330,6 +332,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "message"
@@ -338,6 +341,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338007'"
       field: "message"
@@ -354,6 +358,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "message"
@@ -362,6 +367,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338103'"
       field: "message"
@@ -378,6 +384,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "message"
@@ -386,6 +393,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "message"
@@ -394,6 +402,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "server.domain"
       value: "{{source.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "message"
@@ -402,6 +411,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "server.domain"
       value: "{{destination.domain}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "message"
@@ -410,18 +420,22 @@ processors:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.address"
       value: "{{destination.address}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.port"
       value: "{{destination.port}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.address"
       value: "{{source.address}}"
+      ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.port"
       value: "{{source.port}}"
+      ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '734001'"
       field: "message"
@@ -959,7 +973,7 @@ processors:
   - set:
       field: "_temp_.duration_hms"
       value: "{{event.duration}}"
-      if: "ctx.event?.duration != null"
+      ignore_empty_value: true
 
   #
   # Process the flow duration "hh:mm:ss" present in some messages
@@ -1232,19 +1246,23 @@ processors:
   - set:
       field: source.nat.ip
       value: "{{_temp_.cisco.mapped_source_ip}}"
-      if: "ctx._temp_.cisco.mapped_source_ip != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+      if: "(ctx?._temp_?.cisco?.mapped_source_ip != ctx?.source?.ip || ctx?._temp_?.cisco?.mapped_source_port != ctx?.source?.port)"
+      ignore_empty_value: true
   - set:
       field: source.nat.port
       value: "{{_temp_.cisco.mapped_source_port}}"
-      if: "ctx._temp_.cisco.mapped_source_port != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+      if: "(ctx?._temp_?.cisco.mapped_source_ip != ctx?.source?.ip || ctx?._temp_?.cisco?.mapped_source_port != ctx?.source?.port)"
+      ignore_empty_value: true
   - set:
       field: destination.nat.ip
       value: "{{_temp_.cisco.mapped_destination_ip}}"
-      if: "ctx._temp_.cisco.mapped_destination_ip != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+      if: "(ctx?._temp_?.cisco.mapped_destination_ip != ctx?.destination?.ip || ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port)"
+      ignore_empty_value: true
   - set:
       field: destination.nat.port
       value: "{{_temp_.cisco.mapped_destination_port}}"
-      if: "ctx._temp_.cisco.mapped_destination_port != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+      if: "(ctx?._temp_?.cisco?.mapped_destination_ip != ctx?.destination?.ip || ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port)"
+      ignore_empty_value: true
 
   #
   # Populate ECS event.code
@@ -1289,6 +1307,93 @@ processors:
       target_field: cisco.{< .internal_prefix >}.rule_name
       ignore_missing: true
 
+  # ECS categorization
+  - script:
+      lang: painless
+      params:
+        connection-finished:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - end
+        connection-started:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - start
+        file-detected:
+          kind: alert
+          category:
+            - malware
+          type:
+            - info
+        firewall-rule:
+          kind: event
+          category:
+            - network
+          type:
+            - info
+        flow-expiration:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - end
+        intrusion-detected:
+          kind: alert
+          category:
+            - intrusion_detection
+          type:
+            - info
+        malware-detected:
+          kind: alert
+          category:
+            - malware
+          type:
+            - info
+      source: >-
+        if (ctx?.event?.action == null || !params.containsKey(ctx.event.action)) {
+          return;
+        }
+        ctx.event.kind = params.get(ctx.event.action).get('kind');
+        ctx.event.category = params.get(ctx.event.action).get('category').clone();
+        ctx.event.type = params.get(ctx.event.action).get('type').clone();
+
+        if (ctx?.event?.outcome == null) {
+          return;
+        }
+        if (ctx.event.category.contains('network') || ctx.event.category.contains('intrusion_detection')) {
+          if (ctx.event.outcome == 'allow') {
+            ctx.event.type.add('allowed');
+          }
+          if (ctx.event.outcome == 'deny') {
+            ctx.event.type.add('denied');
+          }
+          if (ctx.event.outcome == 'block') {
+            ctx.event.type.add('denied');
+          }
+        }
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      if: "ctx?.source?.ip != null"
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      if: "ctx?.destination?.ip != null"
+  - append:
+      field: related.user
+      value: "{{user.name}}"
+      if: "ctx?.user?.name != null"
+  - append:
+      field: related.hash
+      value: "{{file.hash.sha256}}"
+      if: "ctx?.file?.hash?.sha256 != null"
 on_failure:
   # Copy any fields under _temp_.cisco to its final destination. Those can help
   # with diagnosing the failure.

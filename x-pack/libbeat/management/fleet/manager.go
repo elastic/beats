@@ -5,6 +5,7 @@
 package fleet
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -13,22 +14,18 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/server"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 
 	xmanagement "github.com/elastic/beats/v7/x-pack/libbeat/management"
 )
-
-// ConfigManager provides a functionality to retrieve config channel
-// using which manager is informed about config changes.
-type ConfigManager interface {
-	ConfigChan() chan<- map[string]interface{}
-}
 
 // Manager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat.
@@ -36,16 +33,18 @@ type Manager struct {
 	config    *Config
 	logger    *logp.Logger
 	beatUUID  uuid.UUID
-	done      chan struct{}
 	registry  *reload.Registry
-	wg        sync.WaitGroup
 	blacklist *xmanagement.ConfigBlacklist
+	client    *client.Client
+	lock      sync.Mutex
+	status    management.Status
+	msg       string
 
-	configChan chan map[string]interface{}
+	stopFunc func()
 }
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
-func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -56,33 +55,35 @@ func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID 
 }
 
 // NewFleetManagerWithConfig returns a X-Pack Beats Fleet Management manager.
-func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
+	log := logp.NewLogger(management.DebugK)
+
+	m := &Manager{
+		config:   c,
+		logger:   log.Named("fleet"),
+		beatUUID: beatUUID,
+		registry: registry,
+	}
+
+	var err error
 	var blacklist *xmanagement.ConfigBlacklist
-
+	var eac *client.Client
 	if c.Enabled && c.Mode == xmanagement.ModeFleet {
-		var err error
-
 		// Initialize configs blacklist
 		blacklist, err = xmanagement.NewConfigBlacklist(c.Blacklist)
 		if err != nil {
 			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
 		}
+
+		// Initialize the client
+		eac, err = client.NewFromReader(os.Stdin, m)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create elastic-agent-client")
+		}
 	}
 
-	log := logp.NewLogger(management.DebugK)
-
-	m := &Manager{
-		config:     c,
-		blacklist:  blacklist,
-		logger:     log.Named("fleet"),
-		done:       make(chan struct{}),
-		beatUUID:   beatUUID,
-		registry:   registry,
-		configChan: make(chan map[string]interface{}),
-	}
-
-	go m.startGrpcServer()
-
+	m.blacklist = blacklist
+	m.client = eac
 	return m, nil
 }
 
@@ -91,13 +92,8 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled && cm.config.Mode == xmanagement.ModeFleet
 }
 
-// ConfigChan returns a channel used to communicate configuration changes.
-func (cm *Manager) ConfigChan() chan<- map[string]interface{} {
-	return cm.configChan
-}
-
 // Start the config manager
-func (cm *Manager) Start() {
+func (cm *Manager) Start(stopFunc func()) {
 	if !cm.Enabled() {
 		return
 	}
@@ -105,8 +101,11 @@ func (cm *Manager) Start() {
 	cfgwarn.Beta("Fleet management is enabled")
 	cm.logger.Info("Starting fleet management service")
 
-	cm.wg.Add(1)
-	go cm.worker()
+	cm.stopFunc = stopFunc
+	err := cm.client.Start(context.Background())
+	if err != nil {
+		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
+	}
 }
 
 // Stop the config manager
@@ -115,10 +114,8 @@ func (cm *Manager) Stop() {
 		return
 	}
 
-	// stop collecting configuration
 	cm.logger.Info("Stopping fleet management service")
-	close(cm.done)
-	cm.wg.Wait()
+	cm.client.Stop()
 }
 
 // CheckRawConfig check settings are correct to start the beat. This method
@@ -129,28 +126,65 @@ func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 	return nil
 }
 
-func (cm *Manager) worker() {
-	defer cm.wg.Done()
+// UpdateStatus updates the manager with the current status for the beat.
+func (cm *Manager) UpdateStatus(status management.Status, msg string) {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
 
-	// Start worker loop: fetch + apply  new settings
-WORKERLOOP:
-	for {
-		select {
-		case cfg := <-cm.configChan:
-			blocks, err := cm.toConfigBlocks(cfg)
-			if err != nil {
-				cm.logger.Errorf("Could not apply the configuration, error: %+v", err)
-				continue WORKERLOOP
-			}
-
-			if errs := cm.apply(blocks); !errs.IsEmpty() {
-				cm.logger.Errorf("Could not apply the configuration, error: %+v", errs)
-				continue WORKERLOOP
-			}
-		case <-cm.done:
-			return
-		}
+	if cm.status != status || cm.msg != msg {
+		cm.status = status
+		cm.msg = msg
+		cm.client.Status(statusToProtoStatus(status), msg)
+		cm.logger.Infof("Status change to %s: %s", status, msg)
 	}
+}
+
+func (cm *Manager) OnConfig(s string) {
+	cm.UpdateStatus(management.Configuring, "Updating configuration")
+
+	var configMap common.MapStr
+	uconfig, err := common.NewConfigFrom(s)
+	if err != nil {
+		err = errors.Wrap(err, "config blocks unsuccessfully generated")
+		cm.logger.Error(err)
+		cm.UpdateStatus(management.Failed, err.Error())
+		return
+	}
+
+	err = uconfig.Unpack(&configMap)
+	if err != nil {
+		err = errors.Wrap(err, "config blocks unsuccessfully generated")
+		cm.logger.Error(err)
+		cm.UpdateStatus(management.Failed, err.Error())
+		return
+	}
+
+	blocks, err := cm.toConfigBlocks(configMap)
+	if err != nil {
+		err = errors.Wrap(err, "failed to parse configuration")
+		cm.logger.Error(err)
+		cm.UpdateStatus(management.Failed, err.Error())
+		return
+	}
+
+	if errs := cm.apply(blocks); !errs.IsEmpty() {
+		// `cm.apply` already logs the errors; currently allow beat to run degraded
+		cm.UpdateStatus(management.Degraded, errs.Error())
+		return
+	}
+
+	cm.client.Status(proto.StateObserved_HEALTHY, "Running")
+}
+
+func (cm *Manager) OnStop() {
+	if cm.stopFunc != nil {
+		cm.client.Status(proto.StateObserved_STOPPING, "Stopping")
+		cm.stopFunc()
+	}
+}
+
+func (cm *Manager) OnError(err error) {
+	cm.logger.Errorf("elastic-agent-client got error: %s", err)
 }
 
 func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
@@ -268,12 +302,24 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 	return res, nil
 }
 
-func (cm *Manager) startGrpcServer() {
-	cm.logger.Info("initiating fleet config manager")
-	s := NewConfigServer(cm.ConfigChan())
-	if err := server.NewGrpcServer(os.Stdin, s); err != nil {
-		panic(err)
+func statusToProtoStatus(status management.Status) proto.StateObserved_Status {
+	switch status {
+	case management.Unknown:
+		// unknown is reported as healthy, as the status is unknown
+		return proto.StateObserved_HEALTHY
+	case management.Starting:
+		return proto.StateObserved_STARTING
+	case management.Configuring:
+		return proto.StateObserved_CONFIGURING
+	case management.Running:
+		return proto.StateObserved_HEALTHY
+	case management.Degraded:
+		return proto.StateObserved_DEGRADED
+	case management.Failed:
+		return proto.StateObserved_FAILED
+	case management.Stopping:
+		return proto.StateObserved_STOPPING
 	}
+	// unknown status, still reported as healthy
+	return proto.StateObserved_HEALTHY
 }
-
-var _ ConfigManager = &Manager{}

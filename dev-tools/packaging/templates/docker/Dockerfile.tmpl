@@ -31,9 +31,9 @@ RUN groupadd --gid 1000 {{ .BeatName }}
 
 RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0770 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0660 {} \; && \
-    chmod 0770 {{ $beatBinary }} && \
+    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    chmod 0750 {{ $beatBinary }} && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}

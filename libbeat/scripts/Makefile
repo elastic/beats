@@ -25,7 +25,7 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
-INSTALL_CMD?=install ${INSTALL_FLAG}
+INSTALL_CMD?=get
 export INSTALL_FLAG
 export INSTALL_CMD
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
@@ -145,7 +145,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
 ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
-	go install github.com/mitchellh/gox
+	go ${INSTALL_CMD} github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 endif
@@ -174,7 +174,7 @@ fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on th
 
 .PHONY: lint
 lint:
-	@go install $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	@go {INSTALL_CMD} $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 .PHONY: clean
@@ -492,7 +492,3 @@ ifdef NO_COLLECT
 .PHONY: collect
 collect:
 endif
-
-.PHONY: vendor
-vendor:
-	@mage vendor
