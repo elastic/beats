@@ -26,8 +26,8 @@ import (
 )
 
 type StateOS struct {
-	Inode  uint64 `json:"inode,"`
-	Device uint64 `json:"device,"`
+	Inode  uint64 `json:"inode," struct:"inode"`
+	Device uint64 `json:"device," struct:"device"`
 }
 
 // GetOSState returns the FileStateOS for non windows systems
