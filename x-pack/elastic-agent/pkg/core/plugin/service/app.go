@@ -242,6 +242,25 @@ func (a *Application) Stop() {
 	a.stopCredsListener()
 }
 
+// Shutdown disconnects the service, but doesn't signal it to stop.
+func (a *Application) Shutdown() {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	if a.srvState == nil {
+		return
+	}
+
+	// destroy the application in the server, this skips sending
+	// the expected stopping state to the service
+	a.setState(state.Stopped, "Stopped")
+	a.srvState.Destroy()
+	a.srvState = nil
+
+	a.cleanUp()
+	a.stopCredsListener()
+}
+
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application is needed.

@@ -152,7 +152,8 @@ func (*testMonitorableApp) Started() bool { return false }
 func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) Stop() {}
+func (*testMonitorableApp) Stop()     {}
+func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }

@@ -21,6 +21,7 @@ type routingKey = string
 type stream interface {
 	Execute(*configRequest) error
 	Close() error
+	Shutdown()
 }
 
 type streamFunc func(*logger.Logger, routingKey) (stream, error)
@@ -111,4 +112,17 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 	}
 
 	return nil
+}
+
+// Shutdown shutdowns the router because Agent is stopping.
+func (r *router) Shutdown() {
+	keys := r.routes.Keys()
+	for _, k := range keys {
+		p, ok := r.routes.Get(k)
+		if !ok {
+			continue
+		}
+		p.(stream).Shutdown()
+		r.routes.Remove(k)
+	}
 }

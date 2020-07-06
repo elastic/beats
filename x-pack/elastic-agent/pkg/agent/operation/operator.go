@@ -158,6 +158,13 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	return nil
 }
 
+// Shutdown handles shutting down the running apps for Agent shutdown.
+func (o *Operator) Shutdown() {
+	for _, app := range o.apps {
+		app.Shutdown()
+	}
+}
+
 // Start starts a new process based on a configuration
 // specific configuration of new process is passed
 func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {

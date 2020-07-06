@@ -49,6 +49,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - `management.ConfigManager` has been renamed to `management.Manager`. {pull}19114[19114]
 - `UpdateStatus` has been added to the `management.Manager` interface. {pull}19114[19114]
 - Remove `common.MapStrPointer` parameter from `cfgfile.Runnerfactory` interface. {pull}19135[19135]
+- Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
+- Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
 
 ==== Bugfixes
 
