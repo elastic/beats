@@ -46,8 +46,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
-
 *Packetbeat*
 
 *Winlogbeat*
@@ -67,8 +65,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 *Journalbeat*
 
 *Metricbeat*
-
-- Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 
 *Packetbeat*
 
