@@ -51,6 +51,8 @@ type PipelineManager struct {
 	clients map[string]*ClientLogger
 	// Client Logger key: container hash
 	clientLogger map[string]logger.Logger
+	// logDirectory is the bindmount for local container logsd
+	logDirectory string
 }
 
 // NewPipelineManager creates a new Pipeline map
@@ -60,6 +62,7 @@ func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 		pipelines:    make(map[uint64]*Pipeline),
 		clients:      make(map[string]*ClientLogger),
 		clientLogger: make(map[string]logger.Logger),
+		logDirectory: "/var/log/docker/containers",
 	}
 }
 
@@ -106,9 +109,9 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 		return nil, errors.Wrap(err, "error creating reader for docker log stream")
 	}
 
-	// Why is this empty? What should be here? Who knows!
+	// Why is this empty by default? What should be here? Who knows!
 	if info.LogPath == "" {
-		info.LogPath = filepath.Join("/var/log/docker", info.ContainerID)
+		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID)
 	}
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
 	if err != nil {
@@ -261,6 +264,16 @@ func (pm *PipelineManager) removeLogger(info logger.Info) {
 	}
 	logger.Close()
 	delete(pm.clientLogger, info.ContainerID)
+	if os.Getenv("DESTROY_LOGS_ON_STOP") == "true" {
+		pm.removeLogFile(info.ContainerID)
+	}
+}
+
+// removeLogFile removes a log file for a given container. Disabled by default.
+func (pm *PipelineManager) removeLogFile(id string) error {
+	toRemove := filepath.Join(pm.logDirectory, id)
+
+	return os.Remove(toRemove)
 }
 
 // removeClient deregisters a client
