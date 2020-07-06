@@ -37,3 +37,7 @@ processors:
   - decode_json_fields:
       fields: [message]
       target: json
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

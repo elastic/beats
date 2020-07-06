@@ -223,7 +223,6 @@ processors:
     field: json.evidence.userSid
     target_field: host.user.id
     ignore_missing: true
-    if: ctx?.json?.evidence?.userSid != null
 #########################
 ## ECS Related Mapping ##
 #########################
