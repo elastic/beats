@@ -49,9 +49,9 @@ var (
 		devtools.LinuxS390x,
 	}
 
-	deps = devtools.NewPackageInstaller().
-		AddEach(journaldPlatforms, "libsystemd-dev").
-		Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
+	journaldDeps = devtools.NewPackageInstaller().
+			AddEach(journaldPlatforms, "libsystemd-dev").
+			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
 )
 
 func init() {
@@ -69,7 +69,9 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	mg.Deps(deps.Installer(devtools.Platform.Name))
+	// XXX: enable once we have systemd available in the cross build image
+	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
+
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
