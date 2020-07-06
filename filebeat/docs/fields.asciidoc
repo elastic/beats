@@ -34596,6 +34596,36 @@ type: keyword
 
 --
 
+
+*`suricata.eve.tls.ja3s.string`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.ja3s.hash`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.tls.ja3.string`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.ja3.hash`*::
++
+--
+type: keyword
+
+--
+
 *`suricata.eve.app_proto_ts`*::
 +
 --

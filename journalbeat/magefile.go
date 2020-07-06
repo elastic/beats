@@ -26,7 +26,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
@@ -62,9 +61,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if d, ok := deps[devtools.Platform.Name]; ok {
-		mg.Deps(d)
-	}
+	mg.Deps(deps.Installer(devtools.Platform.Name))
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
@@ -122,88 +119,18 @@ func Fields() error {
 // - Install required headers on builders for different architectures.
 
 var (
-	deps = map[string]func() error{
-		"linux/386":      installLinux386,
-		"linux/amd64":    installLinuxAMD64,
-		"linux/arm64":    installLinuxARM64,
-		"linux/armv5":    installLinuxARMLE,
-		"linux/armv6":    installLinuxARMLE,
-		"linux/armv7":    installLinuxARMHF,
-		"linux/mips":     installLinuxMIPS,
-		"linux/mipsle":   installLinuxMIPSLE,
-		"linux/mips64le": installLinuxMIPS64LE,
-		"linux/ppc64le":  installLinuxPPC64LE,
-		"linux/s390x":    installLinuxS390X,
-
-		// No deb packages
-		//"linux/ppc64": installLinuxPpc64,
-		//"linux/mips64": installLinuxMips64,
+	journaldPlatforms = []devtools.PlatformDescription{
+		devtools.Linux386, devtools.LinuxAMD64,
+		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
+		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
+		devtools.LinuxPPC64LE,
+		devtools.LinuxS390x,
 	}
+
+	deps = devtools.NewPackageInstaller().
+		AddEach(journaldPlatforms, libsystemdDevPkgName).
+		Add(devtools.Linux386, libsystemdPkgName, libgcryptPkgName)
 )
-
-func installLinuxAMD64() error {
-	return installDependencies("", libsystemdDevPkgName)
-}
-
-func installLinuxARM64() error {
-	return installDependencies("arm64", libsystemdDevPkgName+":arm64")
-}
-
-func installLinuxARMHF() error {
-	return installDependencies("armhf", libsystemdDevPkgName+":armhf")
-}
-
-func installLinuxARMLE() error {
-	return installDependencies("armel", libsystemdDevPkgName+":armel")
-}
-
-func installLinux386() error {
-	return installDependencies("i386", libsystemdDevPkgName+":i386", libsystemdPkgName+":i386", libgcryptPkgName+":i386")
-}
-
-func installLinuxMIPS() error {
-	return installDependencies("mips", libsystemdDevPkgName+":mips")
-}
-
-func installLinuxMIPS64LE() error {
-	return installDependencies("mips64el", libsystemdDevPkgName+":mips64el")
-}
-
-func installLinuxMIPSLE() error {
-	return installDependencies("mipsel", libsystemdDevPkgName+":mipsel")
-}
-
-func installLinuxPPC64LE() error {
-	return installDependencies("ppc64el", libsystemdDevPkgName+":ppc64el")
-}
-
-func installLinuxS390X() error {
-	return installDependencies("s390x", libsystemdDevPkgName+":s390x")
-}
-
-func installDependencies(arch string, pkgs ...string) error {
-	if arch != "" {
-		err := sh.Run("dpkg", "--add-architecture", arch)
-		if err != nil {
-			return errors.Wrap(err, "error while adding architecture")
-		}
-	}
-
-	if err := sh.Run("apt-get", "update"); err != nil {
-		return err
-	}
-
-	params := append([]string{"install", "-y",
-		"--no-install-recommends",
-
-		// Journalbeat is built with old versions of Debian that don't update
-		// their repositories, so they have expired keys.
-		// Allow unauthenticated packages.
-		// This was not enough: "-o", "Acquire::Check-Valid-Until=false",
-		"--allow-unauthenticated",
-	}, pkgs...)
-	return sh.Run("apt-get", params...)
-}
 
 func selectImage(platform string) (string, error) {
 	tagSuffix := "main"

@@ -133,7 +133,6 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 		moduleConfig := common.MapStr{
 			"module":     mod,
 			"metricsets": msets,
-			"hosts":      hosts,
 			"timeout":    tout,
 			"period":     ival,
 			"enabled":    true,
@@ -154,21 +153,45 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 			moduleConfig["password"] = password
 		}
 
-		logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+		// If there are hosts that match, ensure that there is a module config for each valid host.
+		// We do this because every config that is from a Pod that has an exposed port will generate a valid
+		// module config. However, the pod level hint will generate a config with all hosts that are defined in the
+		// config. To make sure that these pod level configs get deduped, it is essential that we generate exactly one
+		// module config per host.
+		if len(hosts) != 0 {
+			for _, h := range hosts {
+				mod := moduleConfig.Clone()
+				mod["hosts"] = []string{h}
 
-		// Create config object
-		cfg, err := common.NewConfigFrom(moduleConfig)
-		if err != nil {
-			logp.Debug("hints.builder", "config merge failed with error: %v", err)
+				logp.Debug("hints.builder", "generated config: %v", mod)
+
+				// Create config object
+				cfg := m.generateConfig(mod)
+				configs = append(configs, cfg)
+			}
+		} else {
+			logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+
+			// Create config object
+			cfg := m.generateConfig(moduleConfig)
+			configs = append(configs, cfg)
 		}
-		logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
-		configs = append(configs, cfg)
+
 	}
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
 	return template.ApplyConfigTemplate(event, configs, options...)
+}
+
+func (m *metricHints) generateConfig(mod common.MapStr) *common.Config {
+	cfg, err := common.NewConfigFrom(mod)
+	if err != nil {
+		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+	}
+	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
+	return cfg
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
