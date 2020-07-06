@@ -6,7 +6,7 @@ var saml = (function () {
     var processor = require("processor");
 
     var categorizeEvent = function(evt) {
-        evt.Put("event.type", ["info"]);
+        evt.Put("event.type", ["start"]);
         evt.Put("event.category", ["authentication"]);
         switch (evt.Get("event.action")) {
             case "login_failure":
