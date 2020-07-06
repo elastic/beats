@@ -219,8 +219,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
+	registryMigrator := registrar.NewMigrator(config.Registry)
+	if err := registryMigrator.Run(); err != nil {
+		logp.Err("Failed to migrate registry file: %+v", err)
+		return err
+	}
+
+	stateStore, err := openStateStore(b.Info, logp.NewLogger("filebeat"), config.Registry)
+	if err != nil {
+		logp.Err("Failed to open state store: %+v", err)
+		return err
+	}
+	defer stateStore.Close()
+
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.Registry, finishedLogger)
+	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
