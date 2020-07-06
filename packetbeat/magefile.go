@@ -22,7 +22,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"strings"
 	"time"
 
@@ -81,9 +80,6 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	mg.Deps(patchCGODirectives)
-	defer undoPatchCGODirectives()
-
 	// These Windows builds write temporary .s and .o files into the packetbeat
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
@@ -97,9 +93,6 @@ func CrossBuild() error {
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
 func CrossBuildXPack() error {
-	mg.Deps(patchCGODirectives)
-	defer undoPatchCGODirectives()
-
 	// These Windows builds write temporary .s and .o files into the packetbeat
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
@@ -412,23 +405,6 @@ func generateWin64StaticWinpcap() error {
 			"--output-lib", "/libpcap/win/WpdPack/Lib/x64/libwpcap.a",
 			"--input-def", devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 	)
-}
-
-const pcapGoFile = "{{ elastic_beats_dir }}/vendor/github.com/tsg/gopacket/pcap/pcap.go"
-
-var cgoDirectiveRegex = regexp.MustCompile(`(?m)#cgo .*(?:LDFLAGS|CFLAGS).*$`)
-
-func patchCGODirectives() error {
-	// cgo directives do not support GOARM tags so we will clear the tags
-	// and set them via CGO_LDFLAGS and CGO_CFLAGS.
-	// Ref: https://github.com/golang/go/issues/7211
-	f := devtools.MustExpand(pcapGoFile)
-	log.Println("Patching", f, cgoDirectiveRegex.String())
-	return devtools.FindReplace(f, cgoDirectiveRegex, "")
-}
-
-func undoPatchCGODirectives() error {
-	return sh.Run("git", "checkout", devtools.MustExpand(pcapGoFile))
 }
 
 // customizePackaging modifies the device in the configuration files based on

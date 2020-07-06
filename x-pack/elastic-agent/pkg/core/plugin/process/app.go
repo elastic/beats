@@ -120,6 +120,11 @@ func (a *Application) Name() string {
 	return a.name
 }
 
+// Started returns true if the application is started.
+func (a *Application) Started() bool {
+	return a.state.Status != state.Stopped
+}
+
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()

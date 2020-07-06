@@ -34,7 +34,7 @@ type router struct {
 func newRouter(log *logger.Logger, factory streamFunc) (*router, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New()
+		log, err = logger.New("router")
 		if err != nil {
 			return nil, err
 		}

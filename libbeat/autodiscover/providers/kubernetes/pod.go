@@ -287,6 +287,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	var (
 		annotations = common.MapStr{}
 		nsAnn       = common.MapStr{}
+		events      = make([]bus.Event, 0)
 	)
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
@@ -302,7 +303,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 	}
 
-	emitted := 0
 	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
@@ -349,8 +349,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 					"kubernetes": meta,
 				},
 			}
-			p.publish(event)
-			emitted++
+			events = append(events, event)
 		}
 
 		for _, port := range c.Ports {
@@ -366,16 +365,16 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 					"kubernetes": meta,
 				},
 			}
-			p.publish(event)
-			emitted++
+			events = append(events, event)
 		}
 	}
 
-	// Finally publish a pod level event so that hints that have no exposed ports can get processed.
+	// Publish a pod level event so that hints that have no exposed ports can get processed.
 	// Log hints would just ignore this event as there is no ${data.container.id}
-	// Publish the pod level hint only if at least one container level hint was emitted. This ensures that there is
+	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
 	// no unnecessary pod level events emitted prematurely.
-	if emitted != 0 {
+	// We publish the pod level hint first so that it doesn't override a valid container level event.
+	if len(events) != 0 {
 		meta := p.metagen.Generate(pod)
 
 		// Information that can be used in discovering a workload
@@ -398,6 +397,10 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			},
 		}
 		p.publish(event)
+	}
 
+	// Publish the container level hints finally.
+	for _, event := range events {
+		p.publish(event)
 	}
 }
