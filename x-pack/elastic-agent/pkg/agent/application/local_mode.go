@@ -23,9 +23,10 @@ import (
 
 type emitterFunc func(*config.Config) error
 
-// ConfigHandler is capable of handling config and perform actions at it.
+// ConfigHandler is capable of handling config, perform actions at it, shutdown any long running process.
 type ConfigHandler interface {
 	HandleConfig(configrequest.Request) error
+	Shutdown()
 }
 
 type discoverFunc func() ([]string, error)
@@ -39,6 +40,7 @@ type Local struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
+	router      *router
 	source      source
 	agentInfo   *info.AgentInfo
 	srv         *server.Server
@@ -97,6 +99,7 @@ func newLocal(
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
+	localApplication.router = router
 
 	discover := discoverer(pathConfigFile, c.Management.Path)
 	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
@@ -132,9 +135,11 @@ func (l *Local) Start() error {
 
 // Stop stops a local agent.
 func (l *Local) Stop() error {
+	err := l.source.Stop()
 	l.cancelCtxFn()
+	l.router.Shutdown()
 	l.srv.Stop()
-	return l.source.Stop()
+	return err
 }
 
 // AgentInfo retrieves agent information.
