@@ -507,7 +507,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
-- Add support for named ports in hints autodiscover. {pull}19398[19398]
+- Add support for named ports in autodiscover. {pull}19398[19398]
 
 *Packetbeat*
 
