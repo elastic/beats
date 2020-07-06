@@ -6,7 +6,6 @@
     view: Beats
     concurrent: true
     project-type: multibranch
-    periodic-folder-trigger: 1w
     prune-dead-branches: true
     number-to-keep: 10
     days-to-keep: 30
@@ -19,6 +18,7 @@
         discover-pr-forks-strategy: 'merge-current'
         discover-pr-forks-trust: 'permission'
         discover-pr-origin: 'merge-current'
+        head-filter-regex: '(master|7\.[x789]|8\.\d+|PR-.*)'
         discover-tags: true
         notification-context: "beats-ci"
         property-strategies:

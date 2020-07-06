@@ -18,11 +18,19 @@
 package cursor
 
 import (
+	"context"
 	"fmt"
+	"runtime/debug"
 	"time"
+
+	"github.com/urso/sderr"
+
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/unison"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented
@@ -62,7 +70,29 @@ func (inp *managedInput) Name() string { return inp.input.Name() }
 
 // Test runs the Test method for each configured source.
 func (inp *managedInput) Test(ctx input.TestContext) error {
-	panic("TODO: implement me")
+	var grp unison.MultiErrGroup
+	for _, source := range inp.sources {
+		source := source
+		grp.Go(func() (err error) {
+			return inp.testSource(ctx, source)
+		})
+	}
+
+	errs := grp.Wait()
+	if len(errs) > 0 {
+		return sderr.WrapAll(errs, "input tests failed")
+	}
+	return nil
+}
+
+func (inp *managedInput) testSource(ctx input.TestContext, source Source) (err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			err = fmt.Errorf("input panic with: %+v\n%s", v, debug.Stack())
+			ctx.Logger.Errorf("Input crashed with: %+v", err)
+		}
+	}()
+	return inp.input.Test(source, ctx)
 }
 
 // Run creates a go-routine per source, waiting until all go-routines have
@@ -73,7 +103,68 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
-	panic("TODO: implement me")
+	// Setup cancellation using a custom cancel context. All workers will be
+	// stopped if one failed badly by returning an error.
+	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
+	defer cancel()
+	ctx.Cancelation = cancelCtx
+
+	var grp unison.MultiErrGroup
+	for _, source := range inp.sources {
+		source := source
+		grp.Go(func() (err error) {
+			// refine per worker context
+			inpCtx := ctx
+			inpCtx.ID = ctx.ID + "::" + source.Name()
+			inpCtx.Logger = ctx.Logger.With("source", source.Name())
+
+			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
+				cancel()
+			}
+			return err
+		})
+	}
+
+	if errs := grp.Wait(); len(errs) > 0 {
+		return sderr.WrapAll(errs, "input %{id} failed", ctx.ID)
+	}
+	return nil
+}
+
+func (inp *managedInput) runSource(
+	ctx input.Context,
+	store *store,
+	source Source,
+	pipeline beat.PipelineConnector,
+) (err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			err = fmt.Errorf("input panic with: %+v\n%s", v, debug.Stack())
+			ctx.Logger.Errorf("Input crashed with: %+v", err)
+		}
+	}()
+
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		CloseRef:  ctx.Cancelation,
+		ACKEvents: newInputACKHandler(ctx.Logger),
+	})
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	resourceKey := inp.createSourceID(source)
+	resource, err := inp.manager.lock(ctx, resourceKey)
+	if err != nil {
+		return err
+	}
+	defer releaseResource(resource)
+
+	store.UpdateTTL(resource, inp.cleanTimeout)
+
+	cursor := makeCursor(store, resource)
+	publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+	return inp.input.Run(ctx, source, cursor, publisher)
 }
 
 func (inp *managedInput) createSourceID(s Source) string {
@@ -81,4 +172,29 @@ func (inp *managedInput) createSourceID(s Source) string {
 		return fmt.Sprintf("%v::%v::%v", inp.manager.Type, inp.userID, s.Name())
 	}
 	return fmt.Sprintf("%v::%v", inp.manager.Type, s.Name())
+}
+
+func newInputACKHandler(log *logp.Logger) func([]interface{}) {
+	return func(private []interface{}) {
+		var n uint
+		var last int
+		for i := 0; i < len(private); i++ {
+			current := private[i]
+			if current == nil {
+				continue
+			}
+
+			if _, ok := current.(*updateOp); !ok {
+				continue
+			}
+
+			n++
+			last = i
+		}
+
+		if n == 0 {
+			return
+		}
+		private[last].(*updateOp).Execute(n)
+	}
 }
