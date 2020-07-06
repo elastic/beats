@@ -191,10 +191,10 @@ and descriptions.
 [float]
 ==== `event_logs.event_id`
 
-A whitelist and blacklist of event IDs. The value is a comma-separated list. The
-accepted values are single event IDs to include (e.g. 4624), a range of event
-IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735).
-*{vista_and_newer}*
+A list of included and excluded (blocked) event IDs. The value is a
+comma-separated list. The accepted values are single event IDs to include (e.g.
+4624), a range of event IDs to include (e.g. 4700-4800), and single event IDs to
+exclude (e.g. -4735). *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
