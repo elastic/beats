@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (firewall pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: event
@@ -11,8 +14,6 @@ processors:
     field: event.outcome
     value: success
     if: "ctx.sophosxg?.firewall?.log_subtype != null"
-
-# set alert on DOS, IP Spoof, Source Routed and Heartbead
 - set:
     field: event.kind
     value: alert
@@ -21,7 +22,6 @@ processors:
     field: event.category
     value: intrusion_detection
     if: '["03001", "05001", "05151", "00003", "00004"].contains(ctx.sophosxg?.firewall?.message_id)'
-
 - append:
     field: event.category
     value: network
@@ -45,9 +45,15 @@ processors:
       - diened
       - connection
     if: "ctx.sophosxg?.firewall?.status == 'Deny'"
+- rename:
+    field: sophosxg.firewall.log_id
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.event?.code == null"
 
-# normalize ECS field values and publish Sophos-XG specific fields
-# destination.ip
+####################################
+## ECS Server/Destination Mapping ##
+####################################
 - rename:
     field: sophosxg.firewall.dst_ip
     target_field: destination.ip
@@ -67,7 +73,6 @@ processors:
     target_field: destination.ip
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.destinationip !=null"
-# destination.port
 - convert:
     field: sophosxg.firewall.dst_port
     target_field: destination.port
@@ -104,7 +109,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.server?.nat?.port != null"
-# destination.mac
 - rename:
     field: sophosxg.firewall.dst_mac
     target_field: destination.mac
@@ -114,7 +118,6 @@ processors:
     field: server.mac
     value: '{{destination.mac}}'
     if: "ctx.destination?.mac != null"
-# destination.bytes pkts
 - convert:
     field: sophosxg.firewall.recv_bytes
     target_field: destination.bytes
@@ -151,7 +154,10 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.server?.packets != null"
-# source.ip
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
 - rename:
     field: sophosxg.firewall.src_ip
     target_field: source.ip
@@ -171,7 +177,6 @@ processors:
     target_field: source.ip
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.sourceip != null"
-# source.port
 - convert:
     field: sophosxg.firewall.src_port
     target_field: source.port
@@ -208,7 +213,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.nat?.port != null"    
-# source.mac
 - rename:
     field: sophosxg.firewall.src_mac
     target_field: source.mac
@@ -218,7 +222,6 @@ processors:
     field: client.mac
     value: '{{source.mac}}'
     if: "ctx.source?.mac != null"
-# source.bytes pkts
 - convert:
     field: sophosxg.firewall.sent_bytes
     target_field: source.bytes
@@ -257,7 +260,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.packets != null"
-# username - usergroup
 - rename:
     field: sophosxg.firewall.user_name
     target_field: source.user.name
@@ -269,6 +271,9 @@ processors:
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user_gp != null"
 
+######################
+## ECS Rule Mapping ##
+######################
 - rename:
     field: sophosxg.firewall.fw_rule_id
     target_field: rule.id
@@ -279,6 +284,10 @@ processors:
     target_field: rule.ruleset
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.policy_type != null"
+
+#############################
+## ECS Network/Geo Mapping ##
+#############################
 - rename:
     field: sophosxg.firewall.application
     target_field: network.protocol
@@ -289,25 +298,16 @@ processors:
     target_field: network.transport
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.protocol != null"
-- rename:
-    field: sophosxg.firewall.log_id
-    target_field: event.code
-    ignore_missing: true
-    if: "ctx.event?.code == null"
-
-# Geolocation for source.
 - geoip:
     field: source.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination.
 - geoip:
     field: destination.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -324,19 +324,16 @@ processors:
     - asn
     - organization_name
     ignore_missing: true
-# Geolocation for source nat.
 - geoip:
     field: source.nat.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination nat.
 - geoip:
     field: destination.nat.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup nat
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.nat.ip
@@ -371,124 +368,52 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
-# sum network.bytes
 - script:
     lang: painless
     source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
     if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
     ignore_failure: true
-# sum network.packetes
 - script:
     lang: painless
     source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
     if: "ctx?.source?.packets != null && ctx?.destination?.packets != null"
     ignore_failure: true
+- set:
+    field: network.direction
+    value: inbound
+    if: "['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.egress?.zone) && ctx?.observer?.ingress?.zone == 'WAN'"
+- set:
+    field: network.direction
+    value: outbound
+    if: "['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.ingress?.zone) && ctx?.observer?.egress?.zone == 'WAN'"
+- set:
+    field: network.direction
+    value: internal
+    if: "['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.ingress?.zone) && ['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.egress?.zone)"
 
-# Set network.direction using src/dst zone (traffic logs).
-- set:
-    field: network.direction
-    value: inbound
-    if: 'ctx?.observer?.ingress?.zone == "WAN" && ctx?.observer?.egress?.zone == "DMZ"'
-- set:
-    field: network.direction
-    value: inbound
-    if: 'ctx?.observer?.ingress?.zone == "WAN" && ctx?.observer?.egress?.zone == "LAN"'
-- set:
-    field: network.direction
-    value: inbound
-    if: 'ctx?.observer?.ingress?.zone == "WAN" && ctx?.observer?.egress?.zone == "VPN"'
-- set:
-    field: network.direction
-    value: inbound
-    if: 'ctx?.observer?.ingress?.zone == "WAN" && ctx?.observer?.egress?.zone == "WiFi"'
-- set:
-    field: network.direction
-    value: outbound
-    if: 'ctx?.observer?.ingress?.zone == "LAN" && ctx?.observer?.egress?.zone == "WAN"'
-- set:
-    field: network.direction
-    value: outbound
-    if: 'ctx?.observer?.ingress?.zone == "DMZ" && ctx?.observer?.egress?.zone == "WAN"'
-- set:
-    field: network.direction
-    value: outbound
-    if: 'ctx?.observer?.ingress?.zone == "VPN" && ctx?.observer?.egress?.zone == "WAN"'
-- set:
-    field: network.direction
-    value: outbound
-    if: 'ctx?.observer?.ingress?.zone == "WiFi" && ctx?.observer?.egress?.zone == "WAN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "LAN" && ctx?.observer?.egress?.zone == "DMZ"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "LAN" && ctx?.observer?.egress?.zone == "VPN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "LAN" && ctx?.observer?.egress?.zone == "WiFi"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "DMZ" && ctx?.observer?.egress?.zone == "LAN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "DMZ" && ctx?.observer?.egress?.zone == "VPN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "DMZ" && ctx?.observer?.egress?.zone == "WiFi"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "VPN" && ctx?.observer?.egress?.zone == "LAN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "VPN" && ctx?.observer?.egress?.zone == "DMZ"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "VPN" && ctx?.observer?.egress?.zone == "WiFi"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "WiFi" && ctx?.observer?.egress?.zone == "LAN"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "WiFi" && ctx?.observer?.egress?.zone == "DMZ"'
-- set:
-    field: network.direction
-    value: internal
-    if: 'ctx?.observer?.ingress?.zone == "WiFi" && ctx?.observer?.egress?.zone == "VPN"'
-
-
-# Build related.ip array from src/dest/NAT IPs.
+#########################
+## ECS Related Mapping ##
+#########################
 - append:
     if: 'ctx?.source?.ip != null'
     field: related.ip
-    value:
-      - '{{source.ip}}'
+    value: '{{source.ip}}'
 - append:
     if: 'ctx?.destination?.ip != null'
     field: related.ip
-    value:
-      - '{{destination.ip}}'
+    value: '{{destination.ip}}'
 - append:
     if: 'ctx?.source?.nat?.ip != null'
     field: related.ip
-    value:
-      - '{{source.nat.ip}}'
+    value: '{{source.nat.ip}}'
 - append:
     if: 'ctx?.destination?.nat?.ip != null'
     field: related.ip
-    value:
-      - '{{destination.nat.ip}}'
+    value: '{{destination.nat.ip}}'
 
+#############
+## Cleanup ##
+#############
 - lowercase:
       field: network.protocol
       ignore_failure: true

@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (ipd pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: alert
@@ -20,12 +23,18 @@ processors:
 - append:
     field: event.type
     value:
-      - diened
+      - denied
       - connection
     if: '["06001", "06002", "07001", "07002"].contains(ctx.sophosxg?.firewall?.message_id)'
+- rename:
+    field: sophosxg.firewall.log_id
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.sophosxg?.firewall?.log_id != null"
 
-# normalize ECS field values and publish Sophos-XG specific fields
-# destination.ip
+####################################
+## ECS Server/Destination Mapping ##
+####################################
 - rename:
     field: sophosxg.firewall.dst_ip
     target_field: destination.ip
@@ -35,7 +44,6 @@ processors:
     field: server.ip
     value: '{{destination.ip}}'
     if: "ctx.destination?.ip != null"
-# destination.port
 - convert:
     field: sophosxg.firewall.dst_port
     target_field: destination.port
@@ -54,7 +62,10 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.server?.port != null"
-# source.ip
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
 - rename:
     field: sophosxg.firewall.src_ip
     target_field: source.ip
@@ -64,7 +75,6 @@ processors:
     field: client.ip
     value: '{{source.ip}}'
     if: "ctx.source?.ip != null"
-# source.port
 - convert:
     field: sophosxg.firewall.src_port
     target_field: source.port
@@ -83,19 +93,15 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.port != null"
-
-# username
 - rename:
     field: sophosxg.firewall.user_name
     target_field: source.user.name
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.user_name != null"
 
-- rename:
-    field: sophosxg.firewall.log_id
-    target_field: event.code
-    ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.log_id != null"
+######################
+## ECS Rule Mapping ##
+######################
 - rename:
     field: sophosxg.firewall.signature_id
     target_field: rule.id
@@ -111,25 +117,25 @@ processors:
     target_field: rule.category
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.classification != null"
+
+#############################
+## ECS Network/Geo Mapping ##
+#############################
 - rename:
     field: sophosxg.firewall.protocol
     target_field: network.transport
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.protocol != null"
-
-# Geolocation for source.
 - geoip:
     field: source.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination.
 - geoip:
     field: destination.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -146,19 +152,16 @@ processors:
     - asn
     - organization_name
     ignore_missing: true
-# Geolocation for source nat.
 - geoip:
     field: source.nat.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-# Geolocation for destination nat.
 - geoip:
     field: destination.nat.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-# IP Autonomous System (AS) Lookup nat
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.nat.ip
@@ -194,6 +197,9 @@ processors:
     target_field: destination.as.organization.name
     ignore_missing: true
 
+#########################
+## ECS Related Mapping ##
+#########################
 - append:
     if: 'ctx?.source?.ip != null'
     field: related.ip
@@ -208,6 +214,10 @@ processors:
     field: related.user
     value: "{{source.user.name}}"
     if: "ctx.source?.user?.name != null"
+
+#############
+## Cleanup ##
+#############
 - lowercase:
       field: network.protocol
       ignore_failure: true

@@ -1,5 +1,8 @@
 description: Pipeline for parsing sophos firewall logs (cfilter pipeline)
 processors:
+#######################
+## ECS Event Mapping ##
+#######################
 - set:
     field: event.kind
     value: event
@@ -11,8 +14,6 @@ processors:
     field: event.outcome
     value: success
     ignore_empty_value: true
-
-# set spam / intrusion alert on SMTP, POP3, IMAP
 - set:
     field: event.kind
     value: alert
@@ -42,8 +43,9 @@ processors:
       - connection
     if: '["13001", "13002", "13004", "13005", "13006", "13009", "13012", "13014", "14001", "14002", "15001", "15002"].contains(ctx.sophosxg?.firewall?.message_id)'
 
-# normalize ECS field values and publish Sophos-XG specific fields
-# destination.ip
+####################################
+## ECS Server/Destination Mapping ##
+####################################
 - rename:
     field: sophosxg.firewall.dst_ip
     target_field: destination.ip
@@ -53,7 +55,6 @@ processors:
     field: server.ip
     value: '{{destination.ip}}'
     ignore_empty_value: true
-# destination.port
 - convert:
     field: sophosxg.firewall.dst_port
     target_field: destination.port
@@ -70,8 +71,6 @@ processors:
     type: long
     ignore_failure: true
     ignore_missing: true
-
-# destination.bytes pkts
 - convert:
     field: sophosxg.firewall.recv_bytes
     target_field: destination.bytes
@@ -89,8 +88,14 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.server?.bytes != null"
+- rename:
+    field: sophosxg.firewall.to_email_address
+    target_field: destination.user.email
+    ignore_missing: true
 
-# source.ip
+###############################
+## ECS Client/Source Mapping ##
+###############################
 - rename:
     field: sophosxg.firewall.src_ip
     target_field: source.ip
@@ -99,8 +104,6 @@ processors:
     field: client.ip
     value: '{{source.ip}}'
     ignore_empty_value: true
-
-# source.port
 - convert:
     field: sophosxg.firewall.src_port
     target_field: source.port
@@ -117,8 +120,6 @@ processors:
     type: long
     ignore_failure: true
     ignore_missing: true
-
-# source.bytes pkts
 - convert:
     field: sophosxg.firewall.sent_bytes
     target_field: source.bytes
@@ -136,40 +137,32 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.client?.bytes != null"
-
-# mail handling
-- rename:
-    field: sophosxg.firewall.to_email_address
-    target_field: destination.user.email
-    ignore_missing: true
 - rename:
     field: sophosxg.firewall.from_email_address
     target_field: source.user.email
-    ignore_missing: true
-- rename:
-    field: sophosxg.firewall.protocol
-    target_field: network.transport
     ignore_missing: true
 - rename:
      field: sophosxg.firewall.src_domainname
      target_field: source.domain
      ignore_missing: true
 
-# Geolocation for source.
+#############################
+## ECS Network/Geo Mapping ##
+#############################
+- rename:
+    field: sophosxg.firewall.protocol
+    target_field: network.transport
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-
-# Geolocation for destination.
 - geoip:
     field: destination.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-
-# IP Autonomous System (AS) Lookup
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -186,22 +179,16 @@ processors:
     - asn
     - organization_name
     ignore_missing: true
-
-# Geolocation for source nat.
 - geoip:
     field: source.nat.ip
     target_field: source.geo
     ignore_missing: true
     if: "ctx.source?.geo == null"
-
-# Geolocation for destination nat.
 - geoip:
     field: destination.nat.ip
     target_field: destination.geo
     ignore_missing: true
     if: "ctx.destination?.geo == null"
-
-# IP Autonomous System (AS) Lookup nat
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.nat.ip
@@ -236,6 +223,10 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+
+#############
+## Cleanup ##
+#############
 - lowercase:
       field: network.protocol
       ignore_failure: true

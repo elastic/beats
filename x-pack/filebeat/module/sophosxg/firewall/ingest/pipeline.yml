@@ -35,25 +35,6 @@ processors:
     ignore_failure: false
     trim_value: "\""
 
-#########################
-## ECS General Mapping ##
-#########################
-- set:
-    field: observer.vendor
-    value: Sophos
-- set:
-    field: observer.product
-    value: XG
-- set:
-    field: observer.type
-    value: firewall
-- set:
-    field: event.module
-    value: sophosxg
-- set:
-    field: event.dataset
-    value: sophosxg.firewall
-
 # Parse the date
 - set:
     field: _temp_.time
@@ -78,10 +59,24 @@ processors:
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
 
-# extract from event_severity from log_id, example: 010101600001"
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.module
+    value: sophosxg
+- set:
+    field: event.dataset
+    value: sophosxg.firewall
 - set:
     field: event.severity
     value: "{{sophosxg.firewall.log_id}}"
+- rename:
+    field: log.original
+    target_field: event.original
+    ignore_missing: true
+
+# extract from event_severity from log_id, example: 010101600001"
 - gsub:
     field: event.severity
     pattern: "(^.{1,6})"
@@ -91,19 +86,18 @@ processors:
     pattern: "(.{1,5}$)"
     replacement: ""  
 
-# extract from log_id the new field "sophosxg.firewall.message_id"
+##########################
+## ECS Observer Mapping ##
+##########################
 - set:
-    field: sophosxg.firewall.message_id
-    value: "{{sophosxg.firewall.log_id}}"
-    ignore_empty_value: true
-- gsub:
-    field: sophosxg.firewall.message_id
-    pattern: "(^.{1,7})"
-    replacement: ""
-    ignore_failure: true
-
-#TODO Make script to ensure field is null or not
-# normalize ECS field values and publish Sophos-XG specific fields
+    field: observer.vendor
+    value: Sophos
+- set:
+    field: observer.product
+    value: XG
+- set:
+    field: observer.type
+    value: firewall
 - rename:
     field: sophosxg.firewall.device_id
     target_field: observer.serial_number
@@ -128,10 +122,18 @@ processors:
     target_field: observer.egress.zone
     ignore_missing: true
     if: 'ctx.sophosxg?.firewall?.dstzonetype != "" '
-- rename:
-    field: log.original
-    target_field: event.original
-    ignore_missing: true
+
+# extract from log_id the new field "sophosxg.firewall.message_id"
+- set:
+    field: sophosxg.firewall.message_id
+    value: "{{sophosxg.firewall.log_id}}"
+    ignore_empty_value: true
+- gsub:
+    field: sophosxg.firewall.message_id
+    pattern: "(^.{1,7})"
+    replacement: ""
+    ignore_failure: true
+
 - rename:
     field: sophosxg.firewall.log_id
     target_field: event.code
@@ -139,7 +141,9 @@ processors:
     if: 'ctx.sophosxg?.firewall?.log_id != "" '
 
 #TODO Make script to ensure field is null or not
-# remove fields without values.
+#############
+## Cleanup ##
+#############
 - remove:
     field: sophosxg.firewall.src_ip
     if: 'ctx.sophosxg?.firewall?.src_ip == "" '
@@ -362,8 +366,6 @@ processors:
 - remove:
     field: sophosxg.firewall.user_agent
     if: 'ctx.sophosxg?.firewall?.user_agent == "" '
-
-#  remove unnecessary fields.
 - remove:
     field:
         - message
@@ -377,47 +379,40 @@ processors:
         - sophosxg.firewall.dstzone
         - syslog5424_pri
     ignore_missing: true
-# go to the firewall pipeline.
+
+###############################
+## Product Speific Pipelines ##
+###############################
 - pipeline:
     name: '{< IngestPipeline "firewall" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Firewall'"
-# go to the ipd pipeline.
 - pipeline:
     name: '{< IngestPipeline "idp" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'IDP'"
-# go to the ipd pipeline.
 - pipeline:
     name: '{< IngestPipeline "atp" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'ATP'"
-# go to the antivirus pipeline.
 - pipeline:
     name: '{< IngestPipeline "antivirus" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Anti-Virus'"
-# go to the sandstorm pipeline.
 - pipeline:
     name: '{< IngestPipeline "sandstorm" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Sandbox'"
-# go to the cfilter pipeline.
 - pipeline:
     name: '{< IngestPipeline "cfilter" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Content Filtering'"
-# go to the cfilter pipeline.
 - pipeline:
     name: '{< IngestPipeline "event" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Event'"
-# go to the waf pipeline.
 - pipeline:
     name: '{< IngestPipeline "waf" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'WAF'"
-# go to the antispam pipeline.
 - pipeline:
     name: '{< IngestPipeline "antispam" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Anti-Spam'"
-# go to the systemhealth pipeline.
 - pipeline:
     name: '{< IngestPipeline "systemhealth" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'System Health'"
-# go to the wifi pipeline.
 - pipeline:
     name: '{< IngestPipeline "wifi" >}'
     if: "ctx.sophosxg?.firewall?.log_type == 'Wireless Protection'"
