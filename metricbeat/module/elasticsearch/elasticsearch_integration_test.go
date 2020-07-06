@@ -591,7 +591,7 @@ func ingestAndEnrichDoc(host string) error {
 }
 
 func countIndices(elasticsearchHostPort string) (int, error) {
-	return countCatItems(elasticsearchHostPort, "indices", "&expand_wildcards=all")
+	return countCatItems(elasticsearchHostPort, "indices", "&expand_wildcards=open,hidden")
 
 }
 
