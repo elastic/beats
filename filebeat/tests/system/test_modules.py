@@ -216,7 +216,11 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    host_keys = ["agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    # Strip host.name if event is not tagged as `forwarded`.
+    if "tags" not in obj or "forwarded" not in obj["tags"]:
+        host_keys.append("host.name")
+
     # The create timestamps area always new
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run
