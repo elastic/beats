@@ -211,3 +211,9 @@ func genIDWithHash(meta map[string]string, fileID string) string {
 
 	return b.String()
 }
+
+// mockIdentifier is used for testing
+type MockIdentifier struct{}
+
+func (m *MockIdentifier) GenerateID(s *State) { return }
+func (m *MockIdentifier) Name() string        { return "mock" }
