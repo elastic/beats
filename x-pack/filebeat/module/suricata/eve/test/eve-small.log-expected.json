@@ -43,6 +43,7 @@
         "@timestamp": "2018-07-05T19:07:20.910Z",
         "destination.address": "192.168.156.70",
         "destination.bytes": 343,
+        "destination.domain": "l2.io",
         "destination.ip": "192.168.156.70",
         "destination.packets": 3,
         "destination.port": 443,
@@ -96,6 +97,8 @@
         "tags": [
             "suricata"
         ],
+        "tls.client.server_name": "l2.io",
+        "tls.resumed": true,
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     },
