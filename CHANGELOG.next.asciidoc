@@ -264,6 +264,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Stop counterCache only when already started {pull}19103[19103]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 
 *Packetbeat*
 
