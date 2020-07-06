@@ -102,6 +102,9 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 	}
 
 	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
 	cmd = append(cmd,
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
@@ -127,15 +130,18 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
-	cmd := []string{
-		"run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
 		"-out", CreateDir(out),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
-	}
+	)
 	assetCmd := sh.RunCmd("go", cmd...)
 
 	return assetCmd()
@@ -157,6 +163,9 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 	}
 
 	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
 	cmd = append(cmd,
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
@@ -185,13 +194,16 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		return err
 	}
 
-	cmd := []string{
-		"run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		"-out", options.Outfile, "-buildTags", options.BuildTags,
 		"-pkg", options.Pkg,
-	}
+	)
 
 	includeListCmd := sh.RunCmd("go", cmd...)
 

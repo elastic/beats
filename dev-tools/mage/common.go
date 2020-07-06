@@ -806,9 +806,14 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	return
 }
 
-// listModuleDir calls gotool.ListModuleVendorDir.
+// listModuleDir calls gotool.ListModuleVendorDir or
+// gotool.ListModuleCacheDir, depending on the value of
+// UseVendor.
 func listModuleDir(modpath string) (string, error) {
-	return gotool.ListModuleVendorDir(modpath)
+	if UseVendor {
+		return gotool.ListModuleVendorDir(modpath)
+	}
+	return gotool.ListModuleCacheDir(modpath)
 }
 
 // ListMatchingEnvVars returns all of the environment variables names that begin
