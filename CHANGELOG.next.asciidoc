@@ -320,6 +320,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
+- Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
+- Add support to trim captured values in the dissect processor. {pull}19464[19464]
 
 *Auditbeat*
 
