@@ -67,7 +67,6 @@ var (
 
 	ErrFileTruncate = errors.New("detected file being truncated")
 	ErrRenamed      = errors.New("file was renamed")
-	ErrRemoved      = errors.New("file was removed")
 	ErrInactive     = errors.New("file inactive")
 	ErrClosed       = errors.New("reader closed")
 )
@@ -88,9 +87,10 @@ type Harvester struct {
 	stopLock sync.Mutex
 
 	// internal harvester state
-	state  file.State
-	states *file.States
-	log    *Log
+	state      file.State
+	states     *file.States
+	identifier file.StateIdentifier
+	log        *Log
 
 	// file reader pipeline
 	reader          reader.Reader
@@ -122,6 +122,7 @@ func NewHarvester(
 	config *common.Config,
 	state file.State,
 	states *file.States,
+	ider file.StateIdentifier,
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
@@ -135,6 +136,7 @@ func NewHarvester(
 		config:        defaultConfig(),
 		state:         state,
 		states:        states,
+		identifier:    ider,
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
@@ -312,10 +314,6 @@ func (h *Harvester) Run() error {
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.state.Source)
 				h.state.Offset = 0
 				filesTruncated.Add(1)
-			case ErrRemoved:
-				logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
-			case ErrRenamed:
-				logp.Info("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
 			case ErrClosed:
 				logp.Info("Reader was closed: %s. Closing.", h.state.Source)
 			case io.EOF:
@@ -336,6 +334,11 @@ func (h *Harvester) Run() error {
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
 		state := h.getState()
+
+		if h.shouldBeClosed(state) {
+			return nil
+		}
+
 		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
@@ -352,6 +355,35 @@ func (h *Harvester) Run() error {
 		h.metrics.lastPublished.Set(time.Now())
 		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
 	}
+}
+
+// shouldBeClosed checks if the underlying file has been renamed or removed.
+// then decides based on close_renamed and close_removed if the harverster should be stopped.
+func (h *Harvester) shouldBeClosed(state *file.State) bool {
+	if !h.config.CloseRenamed && !h.config.CloseRemoved {
+		return false
+	}
+
+	// check if identifier of state has changed
+	if state.IsEqual(h.state) {
+		if h.config.CloseRenamed {
+			info, err := h.source.Stat()
+			if err != nil {
+				logp.Err("Unexpected error reading from %s; error: %s", h.source.Name(), err)
+				return false
+			}
+			if state.Source != info.Name() {
+				logp.Info("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
+				return true
+			}
+		}
+	} else {
+		if h.config.CloseRemoved {
+			logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
+			return true
+		}
+	}
+	return false
 }
 
 func (h *Harvester) monitorFileSize() {
@@ -584,6 +616,8 @@ func (h *Harvester) getState() file.State {
 
 	// refreshes the values in State with the values from the harvester itself
 	state.FileStateOS = file_helper.GetOSState(h.state.Fileinfo)
+	h.identifier.GenerateID(&state)
+
 	return state
 }
 

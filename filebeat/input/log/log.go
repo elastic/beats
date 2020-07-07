@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -35,6 +34,7 @@ type Log struct {
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
+	id           string
 }
 
 // NewLog creates a new log instance to read log sources
@@ -71,11 +71,6 @@ func (f *Log) Read(buf []byte) (int, error) {
 		case <-f.done:
 			return 0, ErrClosed
 		default:
-		}
-
-		err := f.checkFileDisappearedErrors()
-		if err != nil {
-			return totalN, err
 		}
 
 		n, err := f.fs.Read(buf)
@@ -149,42 +144,6 @@ func (f *Log) errorChecks(err error) error {
 	age := time.Since(f.lastTimeRead)
 	if age > f.config.CloseInactive {
 		return ErrInactive
-	}
-
-	return nil
-}
-
-// checkFileDisappearedErrors checks if the log file has been removed or renamed (rotated).
-func (f *Log) checkFileDisappearedErrors() error {
-	// No point doing a stat call on the file if configuration options are
-	// not enabled
-	if !f.config.CloseRenamed && !f.config.CloseRemoved {
-		return nil
-	}
-
-	// Refetch fileinfo to check if the file was renamed or removed.
-	// Errors if the file was removed/rotated after reading and before
-	// calling the stat function
-	info, statErr := f.fs.Stat()
-	if statErr != nil {
-		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
-		return statErr
-	}
-
-	if f.config.CloseRenamed {
-		// Check if the file can still be found under the same path
-		if !file.IsSameFile(f.fs.Name(), info) {
-			logp.Debug("harvester", "close_renamed is enabled and file %s has been renamed", f.fs.Name())
-			return ErrRenamed
-		}
-	}
-
-	if f.config.CloseRemoved {
-		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		if f.fs.Removed() {
-			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
-			return ErrRemoved
-		}
 	}
 
 	return nil
