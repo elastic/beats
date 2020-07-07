@@ -15,7 +15,7 @@
   },
   "mounts": [
     {
-      "name": "log dir mount",
+      "name": "LOG_DIR",
       "description": "Mount for local log cache",
       "destination": "/var/log/docker",
       "source": "/var/log",
@@ -23,6 +23,9 @@
       "options": [
         "rw",
         "rbind"
+      ],
+      "Settable": [
+        "source"
       ]
     }
   ],
