@@ -18,6 +18,7 @@
 package prometheus
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -99,6 +100,13 @@ func OpUnixTimestampValue() MetricOption {
 func OpMultiplyBuckets(multiplier float64) MetricOption {
 	return opMultiplyBuckets{
 		multiplier: multiplier,
+	}
+}
+
+// OpSetSuffix extends the field's name with the given suffix
+func OpSetSuffix(suffix string) MetricOption {
+	return opSetSuffix{
+		suffix: suffix,
 	}
 }
 
@@ -376,6 +384,20 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	histogram["bucket"] = multiplied
 	histogram["sum"] = sum * o.multiplier
 	return field, histogram, labels
+}
+
+type opSetSuffix struct {
+	suffix string
+}
+
+// Process will extend the field's name with the given suffix
+func (o opSetSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	_, ok := value.(float64)
+	if !ok {
+		return field, value, labels
+	}
+	field = fmt.Sprintf("%v.%v", field, o.suffix)
+	return field, value, labels
 }
 
 type opUnixTimestampValue struct {
