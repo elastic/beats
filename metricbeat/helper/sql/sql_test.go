@@ -36,7 +36,7 @@ type mockVariableMode struct {
 }
 
 func (m *mockVariableMode) Scan(dest ...interface{}) error {
-	d1 := dest[0].(*interface{})
+	d1 := dest[0].(*string)
 	*d1 = m.results[m.index].k
 
 	d2 := dest[1].(*interface{})
