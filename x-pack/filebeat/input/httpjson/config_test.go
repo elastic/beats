@@ -377,6 +377,29 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url":         "localhost",
 			},
 		},
+		{
+			name:        "google must fail if the delegated_account is set without jwt_file",
+			expectedErr: "invalid configuration: google.delegated_account can only be provided with a jwt_file accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.credentials_file":  "./testdata/credentials.json",
+					"google.delegated_account": "delegated@account.com",
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name: "google must work with delegated_account and a valid jwt_file",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.jwt_file":          "./testdata/credentials.json",
+					"google.delegated_account": "delegated@account.com",
+				},
+				"url": "localhost",
+			},
+		},
 	}
 
 	for _, c := range cases {

@@ -547,6 +547,14 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+#-------------------------------- Gsuite Module --------------------------------
+- module: gsuite
+  # All logs
+  saml:
+    enabled: true
+  user_accounts:
+    enabled: true
+
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
