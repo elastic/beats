@@ -346,12 +346,24 @@ func (c *cfg) ID() string {
 	return c.id
 }
 
+func (c *cfg) ShortID() string {
+	return c.id
+}
+
 func (c *cfg) Programs() []program.Program {
 	return c.programs
 }
 
 func (c *cfg) CreatedAt() time.Time {
 	return c.createdAt
+}
+
+func (c *cfg) ProgramNames() []string {
+	names := make([]string, 0, len(c.programs))
+	for _, name := range c.programs {
+		names = append(names, name.Spec.Name)
+	}
+	return names
 }
 
 func p(identifier, checksum string) program.Program {
