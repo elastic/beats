@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds Gsuite User Accounts support. {pull}19329[19329]
 - Adds Gsuite Login audit support. {pull}19702[19702]
 - Adds Gsuite Admin support. {pull}19769[19769]
+- Adds Gsuite Drive support. {pull}19704[19704]
 
 *Heartbeat*
 
