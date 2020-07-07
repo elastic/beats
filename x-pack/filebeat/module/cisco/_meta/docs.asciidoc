@@ -11,6 +11,7 @@ filesets for receiving logs over syslog or read from a file:
 - `asa` fileset: supports Cisco ASA firewall logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
+- `nexus` fileset: supports Cisco Nexus switch logs.
 
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
