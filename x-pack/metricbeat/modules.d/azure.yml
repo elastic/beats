@@ -1,9 +1,0 @@
-# Module: azure
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-azure.html
-
-- module: azure
-  metricsets:
-  - billing
-  enabled: true
-  period: 300s
-

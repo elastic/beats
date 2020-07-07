@@ -5,11 +5,13 @@
 package billing
 
 import (
+	"time"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/pkg/errors"
-	"time"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -67,11 +69,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	results, err := m.client.GetMetrics(report)
 	if err != nil {
-		return errors.Wrap(err, "error retrieving forcast")
+		return errors.Wrap(err, "error retrieving usage information")
 	}
-	err = EventsMapping(results, report)
-	if err != nil {
-		return errors.Wrap(err, "error running EventsMapping")
+	events := EventsMapping(results)
+	for _, event := range events {
+		isOpen := report.Event(event)
+		if !isOpen {
+			break
+		}
 	}
 
 	return nil

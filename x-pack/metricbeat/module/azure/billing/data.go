@@ -5,18 +5,91 @@
 package billing
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/Azure/azure-sdk-for-go/profiles/latest/consumption/mgmt/consumption"
+	"github.com/shopspring/decimal"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"time"
 )
 
-func EventsMapping(results consumption.ForecastsListResult, report mb.ReporterV2) error {
-	event := mb.Event{
-		ModuleFields:    common.MapStr{},
-		MetricSetFields: common.MapStr{},
-		Timestamp:       time.Now(),
+func EventsMapping(results Usage) []mb.Event {
+	var events []mb.Event
+	if len(results.UsageDetails) > 0 {
+		for _, usageDetail := range results.UsageDetails {
+			event := mb.Event{
+				ModuleFields: common.MapStr{
+					"resource": common.MapStr{
+						"type":  usageDetail.ConsumedService,
+						"group": getResourceGroupFromId(*usageDetail.InstanceID),
+					},
+					"subscription_id": usageDetail.SubscriptionGUID,
+				},
+				MetricSetFields: common.MapStr{
+					"pretax_cost":     usageDetail.PretaxCost,
+					"department_name": usageDetail.DepartmentName,
+					"product":         usageDetail.Product,
+					"usage_start":     usageDetail.UsageStart,
+					"usage_end":       usageDetail.UsageEnd,
+					"currency":        usageDetail.Currency,
+					"billing_period":  usageDetail.BillingPeriodID,
+					"account_name":    usageDetail.AccountName,
+				},
+				Timestamp: time.Now().UTC(),
+			}
+			event.RootFields = common.MapStr{}
+			event.RootFields.Put("cloud.provider", "azure")
+			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
+			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
+			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
+			events = append(events, event)
+		}
 	}
-	report.Event(event)
-	return nil
+
+	groupedCosts := make(map[*string][]consumption.Forecast)
+	for _, forecast := range results.ForecastCosts {
+		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
+	}
+	for _, forecast := range results.ActualCosts {
+		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
+	}
+	for date, items := range groupedCosts {
+		var actualCost *decimal.Decimal
+		var forecastCost *decimal.Decimal
+		for _, item := range items {
+			if item.ChargeType == consumption.ChargeTypeActual {
+				actualCost = item.Charge
+			} else {
+				forecastCost = item.Charge
+			}
+		}
+		event := mb.Event{
+			RootFields: common.MapStr{
+				"cloud.provider": "azure",
+			},
+			MetricSetFields: common.MapStr{
+				"actual_cost":   actualCost,
+				"forecast_cost": forecastCost,
+				"usage_date":    date,
+				"currency":      items[0].Currency,
+			},
+			Timestamp: time.Now().UTC(),
+		}
+		events = append(events, event)
+	}
+	return events
+}
+
+// getResourceGroupFromId maps resource group from resource ID
+func getResourceGroupFromId(path string) string {
+	params := strings.Split(path, "/")
+	for i, param := range params {
+		if param == "resourceGroups" {
+			return fmt.Sprintf("%s", params[i+1])
+		}
+	}
+	return ""
 }
