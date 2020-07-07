@@ -5,6 +5,7 @@
 package pipelinemanager
 
 import (
+	"io"
 	"strings"
 	"time"
 
@@ -82,6 +83,10 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
+			// don't log anything on EOF
+			if err == io.EOF {
+				return
+			}
 			cl.logger.Errorf("Error getting message: %s\n", err)
 			return
 		}
