@@ -166,7 +166,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 			continue
 		}
 
-		runner, err := factory.Create(b.Publisher, moduleCfg, nil)
+		runner, err := factory.Create(b.Publisher, moduleCfg)
 		if err != nil {
 			return nil, err
 		}
