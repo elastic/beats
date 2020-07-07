@@ -12,11 +12,12 @@ import (
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	helper "github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	helper "github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
 
 // ClientLogger is an instance of a pipeline logger client meant for reading from a single log stream
@@ -25,31 +26,31 @@ import (
 type ClientLogger struct {
 	logFile       *pipereader.PipeReader
 	client        beat.Client
-	pipelineHash  string
+	pipelineHash  uint64
 	closer        chan struct{}
 	containerMeta logger.Info
 	logger        *logp.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hashstring string, info logger.Info) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
 	}
 	clientLogger := logp.NewLogger("clientLogReader")
-	settings.ACKCount = func(n int) {
+	settings.ACKHandler = acker.Counting(func(n int) {
 		clientLogger.Debugf("Pipeline client ACKS; %v", n)
-	}
+	})
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)
 	if err != nil {
 		return nil, err
 	}
 
-	clientLogger.Debugf("Created new logger for %s", hashstring)
+	clientLogger.Debugf("Created new logger for %d", hash)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
+	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hash, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
 }
 
 // Close closes the pipeline client and reader

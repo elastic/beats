@@ -26,8 +26,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 func init() {
@@ -67,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ContainerList(ctx, types.ContainerListOptions{Size: true})
+	containers, err := m.dockerClient.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get docker containers list")
 	}

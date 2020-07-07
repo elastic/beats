@@ -27,13 +27,12 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const (
@@ -54,7 +53,6 @@ type kubernetesAnnotator struct {
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
-	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -92,32 +90,12 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	config := defaultKubernetesAnnotatorConfig()
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
-
-	err := cfg.Unpack(&config)
+	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+		return nil, err
 	}
 
-	//Load default indexer configs
-	if config.DefaultIndexers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
-			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
-		}
-		Indexing.RUnlock()
-	}
-
-	//Load default matcher configs
-	if config.DefaultMatchers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
-			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
-		}
-		Indexing.RUnlock()
-	}
-
+	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
@@ -129,6 +107,27 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	go processor.init(config, cfg)
 
 	return processor, nil
+}
+
+func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorConfig, error) {
+	config := defaultKubernetesAnnotatorConfig()
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+	}
+
+	//Load and append default indexer configs
+	if config.DefaultIndexers.Enabled {
+		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
+	}
+
+	//Load and append default matcher configs
+	if config.DefaultMatchers.Enabled {
+		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
+	}
+
+	return config, nil
 }
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
@@ -208,11 +207,14 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
+		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
 
+	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
+		k.log.Debugf("Index key %s did not match any of the cached resources", index)
 		return event, nil
 	}
 
@@ -226,6 +228,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
 	for _, m := range metadata {
+		k.log.Debugf("Created index %s for pod %s/%s", m.Index, pod.GetNamespace(), pod.GetName())
 		k.cache.set(m.Index, m.Data)
 	}
 }

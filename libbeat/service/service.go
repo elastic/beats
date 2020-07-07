@@ -22,7 +22,7 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"log"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -32,8 +32,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.
@@ -41,6 +41,7 @@ import (
 // the service shut downs gracefully.
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
+	logger := logp.NewLogger("service")
 
 	// On termination signals, gracefully stop the Beat
 	sigc := make(chan os.Signal, 1)
@@ -50,9 +51,9 @@ func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 
 		switch sig {
 		case syscall.SIGINT, syscall.SIGTERM:
-			logp.Debug("service", "Received sigterm/sigint, stopping")
+			logger.Debug("Received sigterm/sigint, stopping")
 		case syscall.SIGHUP:
-			logp.Debug("service", "Received sighup, stopping")
+			logger.Debug("Received sighup, stopping")
 		}
 
 		cancel()
@@ -61,9 +62,14 @@ func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 
 	// Handle the Windows service events
 	go ProcessWindowsControlEvents(func() {
-		logp.Debug("service", "Received svc stop/shutdown request")
+		logger.Debug("Received svc stop/shutdown request")
 		callback.Do(stopFunction)
 	})
+}
+
+// NotifyTermination tells the OS that the service is stopped.
+func NotifyTermination() {
+	notifyWindowsServiceStopped()
 }
 
 // cmdline flags
@@ -87,34 +93,46 @@ func withCPUProfile() bool { return *cpuprofile != "" }
 // BeforeRun takes care of necessary actions such as creating files
 // before the beat should run.
 func BeforeRun() {
+	logger := logp.NewLogger("service")
 	if withCPUProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
-			log.Fatal(err)
+			logger.Errorf("Failed to create CPU profile: %v", err)
+			os.Exit(1)
 		}
 		pprof.StartCPUProfile(cpuOut)
 	}
 
-	if *httpprof != "" {
-		logp.Info("start pprof endpoint")
-		go func() {
-			mux := http.NewServeMux()
-
-			// register pprof handler
-			mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-				http.DefaultServeMux.ServeHTTP(w, r)
-			})
-
-			// register metrics handler
-			mux.HandleFunc("/debug/vars", metricsHandler)
-
-			endpoint := http.ListenAndServe(*httpprof, mux)
-			logp.Info("finished pprof endpoint: %v", endpoint)
-		}()
+	if *httpprof == "" {
+		return
 	}
+
+	logger.Info("Start pprof endpoint")
+	mux := http.NewServeMux()
+
+	// Register pprof handler
+	mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+		http.DefaultServeMux.ServeHTTP(w, r)
+	})
+
+	// Register metrics handler
+	mux.HandleFunc("/debug/vars", metricsHandler)
+
+	// Ensure we are listening before returning
+	listener, err := net.Listen("tcp", *httpprof)
+	if err != nil {
+		logger.Errorf("Failed to start pprof listener: %v", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		// Serve returns always a non-nil error
+		err := http.Serve(listener, mux)
+		logger.Infof("Finished pprof endpoint: %v", err)
+	}()
 }
 
-// report expvar and all libbeat/monitoring metrics
+// metricsHandler reports expvar and all libbeat/monitoring metrics
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -142,6 +160,7 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 // Cleanup handles cleaning up the runtime and OS environments. This includes
 // tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
+	logger := logp.NewLogger("service")
 	if withCPUProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
@@ -152,25 +171,29 @@ func Cleanup() {
 
 		writeHeapProfile(*memprofile)
 
-		debugMemStats()
+		debugMemStats(logger.Named("mem"))
 	}
 }
 
-func debugMemStats() {
+func debugMemStats(logger *logp.Logger) {
+	if !logger.IsDebug() {
+		return
+	}
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	logp.Debug("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
+	logger.Debug("Memory stats: In use: %d Total (even if freed): %d System: %d",
 		m.Alloc, m.TotalAlloc, m.Sys)
 }
 
 func writeHeapProfile(filename string) {
+	logger := logp.NewLogger("service")
 	f, err := os.Create(filename)
 	if err != nil {
-		logp.Err("Failed creating file %s: %s", filename, err)
+		logger.Errorf("Failed creating file %s: %s", filename, err)
 		return
 	}
 	pprof.WriteHeapProfile(f)
 	f.Close()
 
-	logp.Info("Created memory profile file %s.", filename)
+	logger.Infof("Created memory profile file %s.", filename)
 }

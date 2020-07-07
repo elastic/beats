@@ -27,13 +27,14 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/pkg/errors"
 )
@@ -69,16 +70,15 @@ func NewInput(
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-		ACKEvents: func(events []interface{}) {
-			for _, event := range events {
-				if meta, ok := event.(eventMeta); ok {
-					meta.handler.ack(meta.message)
+		ACKHandler: acker.ConnectionOnly(
+			acker.EventPrivateReporter(func(_ int, events []interface{}) {
+				for _, event := range events {
+					if meta, ok := event.(eventMeta); ok {
+						meta.handler.ack(meta.message)
+					}
 				}
-			}
-		},
+			}),
+		),
 		CloseRef:  doneChannelContext(inputContext.Done),
 		WaitClose: config.WaitClose,
 	})

@@ -1,12 +1,32 @@
 [
     {
-        "@timestamp": 1547688796000,
+        "@timestamp": "2019-01-17T01:33:16.636Z",
+        "client.ip": "10.178.98.102",
+        "event.category": [
+            "file"
+        ],
         "event.dataset": "zeek.files",
         "event.id": "C8I0zn3r9EPbfLgta6",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "info"
+        ],
+        "file.hash.md5": "79e4a9840d7d3a96d7c04fe2434c892e",
+        "file.hash.sha1": "a8985d3a65e5e5c4b2d7d66d40c6dd2fb19c5436",
+        "file.mime_type": "application/pkix-cert",
         "fileset.name": "files",
         "input.type": "log",
         "log.offset": 0,
+        "related.hash": [
+            "79e4a9840d7d3a96d7c04fe2434c892e",
+            "a8985d3a65e5e5c4b2d7d66d40c6dd2fb19c5436"
+        ],
+        "related.ip": [
+            "35.199.178.4",
+            "10.178.98.102"
+        ],
+        "server.ip": "35.199.178.4",
         "service.type": "zeek",
         "tags": [
             "zeek.files"
@@ -37,13 +57,33 @@
         "zeek.session_id": "C8I0zn3r9EPbfLgta6"
     },
     {
-        "@timestamp": 1547688801000,
+        "@timestamp": "2019-01-17T01:33:21.566Z",
+        "client.ip": "10.178.98.102",
+        "event.category": [
+            "file"
+        ],
         "event.dataset": "zeek.files",
         "event.id": "C6sjVo23iNApLnlAt6",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "info"
+        ],
+        "file.hash.md5": "b9742f12eb97eff531d94f7800c6706c",
+        "file.hash.sha1": "b88d13fe319d342e7a808ce3a0a1158111fc3c2a",
+        "file.mime_type": "application/pkix-cert",
         "fileset.name": "files",
         "input.type": "log",
         "log.offset": 452,
+        "related.hash": [
+            "b9742f12eb97eff531d94f7800c6706c",
+            "b88d13fe319d342e7a808ce3a0a1158111fc3c2a"
+        ],
+        "related.ip": [
+            "17.134.127.250",
+            "10.178.98.102"
+        ],
+        "server.ip": "17.134.127.250",
         "service.type": "zeek",
         "tags": [
             "zeek.files"

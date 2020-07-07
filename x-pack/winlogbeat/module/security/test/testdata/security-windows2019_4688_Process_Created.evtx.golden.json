@@ -7,8 +7,9 @@
       "code": 4688,
       "kind": "event",
       "module": "security",
+      "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "process_start"
+      "type": "start"
     },
     "host": {
       "name": "vagrant"
@@ -32,10 +33,7 @@
       "pid": 4556
     },
     "related": {
-      "user": [
-        "vagrant",
-        "-"
-      ]
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT",
@@ -64,6 +62,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x274a2"
+      },
       "opcode": "Info",
       "process": {
         "pid": 4,

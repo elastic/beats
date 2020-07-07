@@ -27,14 +27,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/config"
-	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/config"
+	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 )
 
 // Debug logging functions for this package.
@@ -132,14 +132,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// Initialize metrics.
 	initMetrics("total")
-
-	// setup global event ACK handler
-	err := eb.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKEvents: acker.ACKEvents,
-	})
-	if err != nil {
-		return err
-	}
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {

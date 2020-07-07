@@ -20,10 +20,8 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"regexp"
 	"strings"
 	"time"
 
@@ -31,25 +29,23 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -84,9 +80,6 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	mg.Deps(patchCGODirectives)
-	defer undoPatchCGODirectives()
-
 	// These Windows builds write temporary .s and .o files into the packetbeat
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
@@ -100,9 +93,6 @@ func CrossBuild() error {
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
 func CrossBuildXPack() error {
-	mg.Deps(patchCGODirectives)
-	defer undoPatchCGODirectives()
-
 	// These Windows builds write temporary .s and .o files into the packetbeat
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
@@ -192,24 +182,6 @@ func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
 // -----------------------------------------------------------------------------
 // Customizations specific to Packetbeat.
 // - Config file contains an OS specific device name (affects darwin, windows).
@@ -280,7 +252,7 @@ var crossBuildDeps = map[string]func() error{
 
 // buildLibpcapFromSource builds libpcap from source because the library needs
 // to be compiled with -fPIC.
-// See https://github.com/elastic/beats/pull/4217.
+// See https://github.com/elastic/beats/v7/pull/4217.
 func buildLibpcapFromSource(params map[string]string) error {
 	tarFile, err := devtools.DownloadFile(libpcapURL, "/libpcap")
 	if err != nil {
@@ -422,7 +394,7 @@ func generateWin64StaticWinpcap() error {
 
 	// Notes: We are using absolute path to make sure the files
 	// are available for x-pack build.
-	// Ref: https://github.com/elastic/beats/issues/1259
+	// Ref: https://github.com/elastic/beats/v7/issues/1259
 	defer devtools.DockerChown(devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
 	return devtools.RunCmds(
 		// Requires mingw-w64-tools.
@@ -433,23 +405,6 @@ func generateWin64StaticWinpcap() error {
 			"--output-lib", "/libpcap/win/WpdPack/Lib/x64/libwpcap.a",
 			"--input-def", devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 	)
-}
-
-const pcapGoFile = "{{ elastic_beats_dir }}/vendor/github.com/tsg/gopacket/pcap/pcap.go"
-
-var cgoDirectiveRegex = regexp.MustCompile(`(?m)#cgo .*(?:LDFLAGS|CFLAGS).*$`)
-
-func patchCGODirectives() error {
-	// cgo directives do not support GOARM tags so we will clear the tags
-	// and set them via CGO_LDFLAGS and CGO_CFLAGS.
-	// Ref: https://github.com/golang/go/issues/7211
-	f := devtools.MustExpand(pcapGoFile)
-	log.Println("Patching", f, cgoDirectiveRegex.String())
-	return devtools.FindReplace(f, cgoDirectiveRegex, "")
-}
-
-func undoPatchCGODirectives() error {
-	return sh.Run("git", "checkout", devtools.MustExpand(pcapGoFile))
 }
 
 // customizePackaging modifies the device in the configuration files based on

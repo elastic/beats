@@ -2,11 +2,9 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kibana.html
 
 - module: kibana
-  metricsets:
-    - stats
+  xpack.enabled: true
   period: 10s
   hosts: ["localhost:5601"]
   #basepath: ""
   #username: "user"
   #password: "secret"
-  xpack.enabled: true

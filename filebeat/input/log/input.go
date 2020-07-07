@@ -27,15 +27,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 const (
@@ -85,17 +85,29 @@ func NewInput(
 		}
 	}
 
+	inputConfig := defaultConfig
+
+	if err := cfg.Unpack(&inputConfig); err != nil {
+		return nil, err
+	}
+	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
+	}
+	if err := inputConfig.normalizeGlobPatterns(); err != nil {
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
+	}
+
+	if len(inputConfig.Paths) == 0 {
+		return nil, fmt.Errorf("each input must have at least one path defined")
+	}
+
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
 	//  on the timings the outlets must be closed/unblocked.
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +125,7 @@ func NewInput(
 	}
 
 	p := &Input{
-		config:      defaultConfig,
+		config:      inputConfig,
 		cfg:         cfg,
 		harvesters:  harvester.NewRegistry(),
 		outlet:      out,
@@ -123,25 +135,11 @@ func NewInput(
 		meta:        meta,
 	}
 
-	if err := cfg.Unpack(&p.config); err != nil {
-		return nil, err
-	}
-	if err := p.config.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
-	}
-	if err := p.config.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
-	}
-
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
 	_, err = p.createHarvester(file.State{}, nil)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(p.config.Paths) == 0 {
-		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
 	err = p.loadStates(context.States)
@@ -161,7 +159,7 @@ func NewInput(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the input will be loaded and updated. All other states will not be touched.
 func (p *Input) loadStates(states []file.State) error {
-	logp.Debug("input", "exclude_files: %s. Number of stats: %d", p.config.ExcludeFiles, len(states))
+	logp.Debug("input", "exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.

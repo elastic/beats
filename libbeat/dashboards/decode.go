@@ -21,8 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (
@@ -45,7 +45,8 @@ func DecodeExported(result common.MapStr) common.MapStr {
 			// All fields are optional, so errors are not caught
 			err := decodeValue(o, key)
 			if err != nil {
-				logp.Debug("dashboards", "Error while decoding dashboard objects: %+v", err)
+				logger := logp.NewLogger("dashboards")
+				logger.Debugf("Error while decoding dashboard objects: %+v", err)
 			}
 		}
 	}

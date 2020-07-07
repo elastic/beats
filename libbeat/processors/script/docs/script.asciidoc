@@ -1,7 +1,11 @@
 [[processor-script]]
 === Script Processor
 
-The script processor executes Javascript code to process an event. The processor
+++++
+<titleabbrev>script</titleabbrev>
+++++
+
+The `script` processor executes Javascript code to process an event. The processor
 uses a pure Go implementation of ECMAScript 5.1 and has no external
 dependencies. This can be useful in situations where one of the other processors
 doesn't provide the functionality you need to filter events.
@@ -12,13 +16,13 @@ file or by pointing the processor at external file(s).
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    source: >
-      function process(event) {
-          event.Tag("js");
-      }
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Tag("js");
+        }
 ----
 
 This loads `filter.js` from disk.
@@ -26,10 +30,10 @@ This loads `filter.js` from disk.
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    file: ${path.config}/filter.js
+  - script:
+      lang: javascript
+      id: my_filter
+      file: ${path.config}/filter.js
 ----
 
 Parameters can be passed to the script by adding `params` to the config.
@@ -39,21 +43,21 @@ code must define a `register(params)` function to receive the parameters.
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    params:
-      threshold: 15
-    source: >
-      var params = {threshold: 42};
-      function register(scriptParams) {
-          params = scriptParams;
-      }
-      function process(event) {
-          if (event.Get("severity") < params.threshold) {
-              event.Cancel();
-          }
-      }
+  - script:
+      lang: javascript
+      id: my_filter
+      params:
+        threshold: 15
+      source: >
+        var params = {threshold: 42};
+        function register(scriptParams) {
+            params = scriptParams;
+        }
+        function process(event) {
+            if (event.Get("severity") < params.threshold) {
+                event.Cancel();
+            }
+        }
 ----
 
 If the script defines a `test()` function it will be invoked when the processor
@@ -108,6 +112,9 @@ the `process` function takes longer than the `timeout` period the function
 is interrupted. You can set this option to prevent a script from running for
 too long (like preventing an infinite `while` loop). By default there is no
 timeout.
+
+`max_cached_sessions`:: This sets the maximum number of Javascript VM sessions
+that will be cached to avoid reallocation. The default is `4`.
 
 [float]
 ==== Event API

@@ -23,22 +23,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/jsontransform"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 // JSONReader parses JSON inputs
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
+	logger *logp.Logger
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
 func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
-	return &JSONReader{reader: r, cfg: cfg}
+	return &JSONReader{
+		reader: r,
+		cfg:    cfg,
+		logger: logp.NewLogger("reader_json"),
+	}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
@@ -49,7 +54,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
-			logp.Err("Error decoding JSON: %v", err)
+			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}

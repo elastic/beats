@@ -9,20 +9,20 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
 
 	// Register JS "require" modules.
-	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
 	// Register required processors.
-	_ "github.com/elastic/beats/libbeat/cmd/instance"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v7/libbeat/cmd/instance"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
 var logInputHeaders = []string{
@@ -43,11 +43,11 @@ var testCases = []testCase{
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.255",
 			"destination.port":      int64(15600),
-			"event.category":        "network_traffic",
+			"event.category":        []string{"network", "network_traffic"},
 			"event.code":            "IPACCESSLOGP",
 			"event.outcome":         "deny",
 			"event.severity":        int64(6),
-			"event.type":            "firewall",
+			"event.type":            []string{"connection", "firewall"},
 			"log.level":             "informational",
 			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 100 denied udp 198.51.100.1(55934) -> 198.51.100.255(15600), 1 packet",
@@ -66,11 +66,11 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.2",
-			"event.category":        "network_traffic",
+			"event.category":        []string{"network", "network_traffic"},
 			"event.code":            "IPACCESSLOGDP",
 			"event.outcome":         "deny",
 			"event.severity":        int64(6),
-			"event.type":            "firewall",
+			"event.type":            []string{"connection", "firewall"},
 			"icmp.code":             int64(5),
 			"icmp.type":             int64(3),
 			"log.level":             "informational",
@@ -90,11 +90,11 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "170",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.168.168.168",
-			"event.category":        "network_traffic",
+			"event.category":        []string{"network", "network_traffic"},
 			"event.code":            "IPACCESSLOGRP",
 			"event.outcome":         "deny",
 			"event.severity":        int64(6),
-			"event.type":            "firewall",
+			"event.type":            []string{"connection", "firewall"},
 			"log.level":             "informational",
 			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 170 denied igmp 198.51.100.1 -> 224.168.168.168, 1 packet",
@@ -112,11 +112,11 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "INBOUND-ON-AP",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.0.0.2",
-			"event.category":        "network_traffic",
+			"event.category":        []string{"network", "network_traffic"},
 			"event.code":            "IPACCESSLOGSP",
 			"event.outcome":         "deny",
 			"event.severity":        int64(6),
-			"event.type":            "firewall",
+			"event.type":            []string{"connection", "firewall"},
 			"igmp.type":             int64(20),
 			"log.level":             "informational",
 			"log.original":          isdef.IsNonEmptyString,
@@ -135,11 +135,11 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "1",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "239.10.10.10",
-			"event.category":        "network_traffic",
+			"event.category":        []string{"network", "network_traffic"},
 			"event.code":            "IPACCESSLOGNP",
 			"event.outcome":         "allow",
 			"event.severity":        int64(6),
-			"event.type":            "firewall",
+			"event.type":            []string{"connection", "firewall"},
 			"log.level":             "informational",
 			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 1 permitted 0 198.51.100.1 -> 239.10.10.10, 1 packet",

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/server"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestParseMetrics(t *testing.T) {
@@ -447,4 +447,39 @@ func TestChangeType(t *testing.T) {
 	assert.Equal(t, common.MapStr{
 		"metric01": map[string]interface{}{"count": int64(2)},
 	}, events[0].MetricSetFields)
+}
+
+func BenchmarkIngest(b *testing.B) {
+	tests := []string{
+		"metric01:1.0|g|#k1:v1,k2:v2",
+		"metric02:2|c|#k1:v1,k2:v2",
+		"metric03:3|c|@0.1|#k1:v1,k2:v2",
+		"metric04:4|ms|#k1:v1,k2:v2",
+		"metric05:5|h|#k1:v1,k2:v2",
+		"metric06:6|h|#k1:v1,k2:v2",
+		"metric07:7|ms|#k1:v1,k2:v2",
+		"metric08:seven|s|#k1:v1,k2:v2",
+		"metric09,k1=v1,k2=v2:8|h",
+		"metric10.with.dots,k1=v1,k2=v2:9|h",
+	}
+
+	events := make([]*testUDPEvent, len(tests))
+	for i, d := range tests {
+		events[i] = &testUDPEvent{
+			event: common.MapStr{
+				server.EventDataKey: []byte(d),
+			},
+			meta: server.Meta{
+				"client_ip": "127.0.0.1",
+			},
+		}
+	}
+	ms := mbtest.NewMetricSet(b, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		err := ms.processor.Process(events[i%len(events)])
+		assert.NoError(b, err)
+	}
+
 }

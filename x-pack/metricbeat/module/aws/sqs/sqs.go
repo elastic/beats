@@ -16,10 +16,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
-	"github.com/elastic/beats/metricbeat/mb"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var metricsetName = "sqs"
@@ -133,7 +133,7 @@ func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
 	req := svc.ListQueuesRequest(listQueuesInput)
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		err = errors.Wrap(err, "Error DescribeInstances")
+		err = errors.Wrap(err, "Error ListQueues")
 		return nil, err
 	}
 	return output.QueueUrls, nil

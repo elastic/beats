@@ -9,5 +9,5 @@ var:
       - C:\ProgramData\IBM\MQ\errors\*.LOG*
       - C:\ProgramData\IBM\MQ\qmgrs\*\errors\*.LOG*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/errorlog.yml

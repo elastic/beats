@@ -1,0 +1,45 @@
+- module: o365
+  audit:
+    enabled: true
+
+    # Set the application_id (also known as client ID):
+    var.application_id: "<MyApplicationID>"
+
+    # Configure the tenants to monitor:
+    # Use the tenant ID (also known as directory ID) and the domain name.
+    # var.tenants:
+    #  - id: "tenant_id_1"
+    #    name: "mydomain.onmicrosoft.com"
+    #  - id: "tenant_id_2"
+    #    name: "mycompany.com"
+    var.tenants:
+     - id: "<MyTenantID>"
+       name: "mytenant.onmicrosoft.com"
+
+    # List of content-types to fetch. By default all known content-types
+    # are retrieved:
+    # var.content_type:
+    #  - "Audit.AzureActiveDirectory"
+    #  - "Audit.Exchange"
+    #  - "Audit.SharePoint"
+    #  - "Audit.General"
+    #  - "DLP.All"
+
+    # Use the following settings to enable certificate-based authentication:
+    # var.certificate: "/path/to/certificate.pem"
+    # var.key: "/path/to/private_key.pem"
+    # var.key_passphrase: "myPrivateKeyPassword"
+
+    # Client-secret based authentication:
+    # Comment the following line if using certificate authentication.
+    var.client_secret: "<YourClientSecretHere>"
+
+    # Advanced settings, use with care:
+    # var.api:
+    #   # Settings for custom endpoints:
+    #   authentication_endpoint: "https://login.microsoftonline.us/"
+    #   resource: "https://manage.office365.us"
+    #
+    #   max_retention: 168h
+    #   max_requests_per_minute: 2000
+    #   poll_interval: 3m

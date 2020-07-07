@@ -14,13 +14,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const xPackURL = "/_license"
+const licenseURL = "/_license"
 
-// params defaults query parameters to send to the '_xpack' endpoint by default we only need
+// params defaults query parameters to send to the '_license' endpoint by default we only need
 // machine parseable data.
 var params = map[string]string{
 	"human": "false",
@@ -88,12 +88,12 @@ func NewElasticFetcher(client esclient) *ElasticFetcher {
 	return &ElasticFetcher{client: client, log: logp.NewLogger("elasticfetcher")}
 }
 
-// Fetch retrieves the license information from an Elasticsearch Client, it will call the `_xpack`
-// end point and will return a parsed license. If the `_xpack` endpoint is unreacheable we will
+// Fetch retrieves the license information from an Elasticsearch Client, it will call the `_license`
+// endpoint and will return a parsed license. If the `_license` endpoint is unreacheable we will
 // return the OSS License otherwise we return an error.
 func (f *ElasticFetcher) Fetch() (*License, error) {
-	status, body, err := f.client.Request("GET", xPackURL, "", params, nil)
-	// When we are running an OSS release of elasticsearch the _xpack endpoint will return a 405,
+	status, body, err := f.client.Request("GET", licenseURL, "", params, nil)
+	// When we are running an OSS release of elasticsearch the _license endpoint will return a 405,
 	// "Method Not Allowed", so we return the default OSS license.
 	if status == http.StatusBadRequest {
 		f.log.Debug("Received 'Bad request' (400) response from server, fallback to OSS license")
@@ -146,7 +146,7 @@ func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 // esClientMux is taking care of round robin request over an array of elasticsearch client, note that
 // calling request is not threadsafe.
 type esClientMux struct {
-	clients []elasticsearch.Client
+	clients []eslegclient.Connection
 	idx     int
 }
 
@@ -177,12 +177,12 @@ func (mux *esClientMux) Request(
 
 // newESClientMux takes a list of clients and randomize where we start and the list of  host we are
 // querying.
-func newESClientMux(clients []elasticsearch.Client) *esClientMux {
+func newESClientMux(clients []eslegclient.Connection) *esClientMux {
 	// randomize where we start
 	idx := rand.Intn(len(clients))
 
 	// randomize the list of round robin hosts.
-	tmp := make([]elasticsearch.Client, len(clients))
+	tmp := make([]eslegclient.Connection, len(clients))
 	copy(tmp, clients)
 	rand.Shuffle(len(tmp), func(i, j int) {
 		tmp[i], tmp[j] = tmp[j], tmp[i]

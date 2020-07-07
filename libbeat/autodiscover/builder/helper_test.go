@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestGetProcessors(t *testing.T) {
@@ -217,5 +217,99 @@ func TestGenerateHints(t *testing.T) {
 			annMap.Put(k, v)
 		}
 		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic"))
+	}
+}
+func TestGetHintsAsList(t *testing.T) {
+	tests := []struct {
+		input   common.MapStr
+		output  []common.MapStr
+		message string
+	}{
+		{
+			input: common.MapStr{
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+			output: []common.MapStr{
+				{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+			message: "Single hint should return a single set of configs",
+		},
+		{
+			input: common.MapStr{
+				"metrics": common.MapStr{
+					"1": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+				},
+			},
+			output: []common.MapStr{
+				{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+			message: "Single hint with numeric prefix should return a single set of configs",
+		},
+		{
+			input: common.MapStr{
+				"metrics": common.MapStr{
+					"1": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+					"2": common.MapStr{
+						"module": "dropwizard",
+						"period": "20s",
+					},
+				},
+			},
+			output: []common.MapStr{
+				{
+					"module": "prometheus",
+					"period": "15s",
+				},
+				{
+					"module": "dropwizard",
+					"period": "20s",
+				},
+			},
+			message: "Multiple hints with numeric prefix should return configs in numeric ordering",
+		},
+		{
+			input: common.MapStr{
+				"metrics": common.MapStr{
+					"1": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+					"module": "dropwizard",
+					"period": "20s",
+				},
+			},
+			output: []common.MapStr{
+				{
+					"module": "prometheus",
+					"period": "15s",
+				},
+				{
+					"module": "dropwizard",
+					"period": "20s",
+				},
+			},
+			message: "Multiple hints with numeric prefix and default should return configs with defaults at the last",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.message, func(t *testing.T) {
+			assert.Equal(t, test.output, GetHintsAsList(test.input, "metrics"))
+		})
 	}
 }

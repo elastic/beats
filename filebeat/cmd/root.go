@@ -22,23 +22,21 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/filebeat/beater"
+	"github.com/elastic/beats/v7/filebeat/beater"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
 // Name of this beat
-var Name = "filebeat"
+const Name = "filebeat"
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
-func init() {
+// Filebeat build the beat root command for executing filebeat and it's subcommands.
+func Filebeat(inputs beater.PluginFactory) *cmd.BeatsRootCmd {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
@@ -47,10 +45,12 @@ func init() {
 		Name:          Name,
 		HasDashboards: true,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
-	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
-	RootCmd.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
-	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
-	RootCmd.AddCommand(genGenerateCmd())
+
+	command := cmd.GenRootCmdWithSettings(beater.New(inputs), settings)
+	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
+	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	command.AddCommand(genGenerateCmd())
+	return command
 }

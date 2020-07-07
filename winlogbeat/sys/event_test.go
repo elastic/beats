@@ -94,6 +94,7 @@ func TestXML(t *testing.T) {
 				EventIdentifier: EventIdentifier{ID: 91},
 				LevelRaw:        4,
 				TaskRaw:         9,
+				KeywordsRaw:     0x4000000000000004,
 				TimeCreated:     TimeCreated{allXMLTimeCreated},
 				RecordID:        100,
 				Correlation:     Correlation{"{A066CCF1-8AB3-459B-B62F-F79F957A5036}", "{85FC0930-9C49-42DA-804B-A7368104BD1B}"},

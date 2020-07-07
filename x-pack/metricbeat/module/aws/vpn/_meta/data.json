@@ -1,0 +1,44 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/VPN"
+        },
+        "dimensions": {
+            "TunnelIpAddress": "52.41.186.45"
+        },
+        "vpn": {
+            "metrics": {
+                "TunnelDataIn": {
+                    "sum": 0
+                },
+                "TunnelDataOut": {
+                    "sum": 0
+                },
+                "TunnelState": {
+                    "avg": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-west-2"
+    },
+    "event": {
+        "dataset": "aws.vpn",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "vpn",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -69,8 +69,9 @@ type WatchOptions struct {
 }
 
 type item struct {
-	object interface{}
-	state  string
+	object    interface{}
+	objectRaw interface{}
+	state     string
 }
 
 type watcher struct {
@@ -175,8 +176,7 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	if err != nil {
 		return
 	}
-
-	w.queue.Add(&item{key, state})
+	w.queue.Add(&item{key, obj, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -204,6 +204,11 @@ func (w *watcher) process(ctx context.Context) bool {
 			return nil
 		}
 		if !exists {
+			if entry.state == delete {
+				w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
+				// delete anyway in order to clean states
+				w.handler.OnDelete(entry.objectRaw)
+			}
 			return nil
 		}
 

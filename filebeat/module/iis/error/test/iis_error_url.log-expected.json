@@ -4,8 +4,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "t3",
         "http.response.status_code": 400,
@@ -13,6 +22,10 @@
         "iis.error.reason_phrase": "URL",
         "input.type": "log",
         "log.offset": 0,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -28,8 +41,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 400,
@@ -37,6 +59,10 @@
         "iis.error.reason_phrase": "URL",
         "input.type": "log",
         "log.offset": 91,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -52,8 +78,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 403,
@@ -61,6 +96,10 @@
         "iis.error.reason_phrase": "Forbidden",
         "input.type": "log",
         "log.offset": 211,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -76,8 +115,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 400,
@@ -85,6 +133,10 @@
         "iis.error.reason_phrase": "URL",
         "input.type": "log",
         "log.offset": 333,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -100,8 +152,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 404,
@@ -109,6 +170,10 @@
         "iis.error.reason_phrase": "NotFound",
         "input.type": "log",
         "log.offset": 450,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -124,8 +189,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 403,
@@ -133,6 +207,10 @@
         "iis.error.reason_phrase": "Forbidden",
         "input.type": "log",
         "log.offset": 602,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -148,8 +226,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "OPTIONS",
         "http.response.status_code": 404,
@@ -157,6 +244,10 @@
         "iis.error.reason_phrase": "NotFound",
         "input.type": "log",
         "log.offset": 733,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",
@@ -172,8 +263,17 @@
         "destination.address": "192.168.101.101",
         "destination.ip": "192.168.101.101",
         "destination.port": 443,
+        "event.category": [
+            "web",
+            "network"
+        ],
         "event.dataset": "iis.error",
+        "event.kind": "event",
         "event.module": "iis",
+        "event.outcome": "failure",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "error",
         "http.request.method": "GET",
         "http.response.status_code": 400,
@@ -181,6 +281,10 @@
         "iis.error.reason_phrase": "URL",
         "input.type": "log",
         "log.offset": 829,
+        "related.ip": [
+            "149.42.83.135",
+            "192.168.101.101"
+        ],
         "service.type": "iis",
         "source.address": "149.42.83.135",
         "source.geo.continent_name": "North America",

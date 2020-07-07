@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var fields = [1]string{"msg"}
@@ -96,7 +96,7 @@ func TestInvalidJSONMultiple(t *testing.T) {
 }
 
 func TestDocumentID(t *testing.T) {
-	logp.TestingSetup()
+	log := logp.NewLogger("decode_json_fields_test")
 
 	input := common.MapStr{
 		"msg": `{"log": "message", "myid": "myDocumentID"}`,
@@ -109,7 +109,7 @@ func TestDocumentID(t *testing.T) {
 
 	p, err := NewDecodeJSONFields(config)
 	if err != nil {
-		logp.Err("Error initializing decode_json_fields")
+		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
 	}
 
@@ -401,11 +401,11 @@ func TestAddErrKeyOption(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
-	logp.TestingSetup()
+	log := logp.NewLogger("decode_json_fields_test")
 
 	p, err := NewDecodeJSONFields(config)
 	if err != nil {
-		logp.Err("Error initializing decode_json_fields")
+		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
 	}
 

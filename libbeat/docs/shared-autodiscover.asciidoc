@@ -124,6 +124,7 @@ running configuration for a container, 60s by default.
 =======================================
 endif::[]
 
+
 [float]
 ===== Kubernetes
 
@@ -241,24 +242,7 @@ running configuration for a container, 60s by default.
           include_labels: ["nodelabel2"]
 -------------------------------------------------------------------------------------
 
-
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
-
-[float]
-===== Manually Defining Ports with Kubernetes
-
-Declare exposed ports in your pod spec if possible. Otherwise, you will need to use
-multiple templates with complex filtering rules. The {port} variable will not be
-present, and you will need to hardcode ports. Example: `{data.host}:1234`
-
-When ports are not declared, Autodiscover generates a config using your provided
-template once per pod, and once per container. These generated configs are
-de-duplicated after they are generated. If the generated configs for multiple
-containers are identical, they will be merged into one config.
-
-Pods share an identical host. If only the `{data.host}` variable is interpolated,
-then one config will be generated per host. The configs will be identical.
-After they are de-duplicated, only one will be used.
 
 ifdef::autodiscoverJolokia[]
 [float]
@@ -360,14 +344,6 @@ include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
-
-ifdef::autodiscoverHints[]
-[[configuration-autodiscover-hints]]
-=== Hints based autodiscover
-
-include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
-endif::autodiscoverHints[]
-
 ifdef::autodiscoverAWSEC2[]
 [float]
 ===== Amazon EC2s
@@ -412,6 +388,13 @@ include::../../{beatname_lc}/docs/autodiscover-aws-ec2-config.asciidoc[]
 This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
 
 endif::autodiscoverAWSEC2[]
+
+ifdef::autodiscoverHints[]
+[[configuration-autodiscover-hints]]
+=== Hints based autodiscover
+
+include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
+endif::autodiscoverHints[]
 
 [[configuration-autodiscover-advanced]]
 === Advanced usage

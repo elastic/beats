@@ -29,15 +29,7 @@ Check the <<dynamic-script-compilations>> section for more information.
 
 include::../include/what-happens.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard for ASA:
-
-[role="screenshot"]
-image::./images/kibana-cisco-asa.png[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -104,6 +96,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 *`var.syslog_port`*::
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-asa, forwarded]`.
 
 :has-dashboards!:
 
@@ -247,6 +245,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9003.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ftd, forwarded]`.
+
 :has-dashboards!:
 
 :fileset_ex!:
@@ -278,6 +282,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9002.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ios, forwarded]`.
+
 include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
@@ -288,16 +298,24 @@ include::../include/timezone-support.asciidoc[]
 [[dynamic-script-compilations]]
 === Dynamic Script Compilations
 
-The `asa` and `ftd` filesets are based on ingest pipelines and make extensive
-use of script processors and painless conditions. This can cause the pipelines
-to fail loading the first time the module is used, due to exceeding the maximum
-script compilation limits. It is recommended to tune the following parameters
-on your cluster:
+The `asa` and `ftd` filesets are based on Elasticsearch ingest pipelines and
+make extensive use of script processors and painless conditions. This can cause
+the pipelines to fail loading the first time the module is used, due to exceeding
+the maximum script compilation limits. It is recommended to tune the following
+parameters on your Elasticsearch cluster:
 
 - {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
   Increase to at least `100/5m`.
 
-- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
+- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache.max_size]:
   Increase to at least `200` if using both filesets or other script-heavy modules.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for ASA:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
 
 :modulename!:

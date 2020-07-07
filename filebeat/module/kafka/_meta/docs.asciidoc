@@ -6,22 +6,16 @@
 The +{modulename}+ module collects and parses the logs created by
 https://kafka.apache.org/[Kafka].
 
+The module has additional support for parsing thread ID from logs.
+
 include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from versions 0.9, 1.1.0 and 2.0.0.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard to see Kafka logs and stack traces.
-
-[role="screenshot"]
-image::./images/filebeat-kafka-logs-overview.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -73,6 +67,14 @@ The path to your Kafka installation. The default is `/opt`. For example:
 include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard to see Kafka logs and stack traces.
+
+[role="screenshot"]
+image::./images/filebeat-kafka-logs-overview.png[]
 
 :has-dashboards!:
 

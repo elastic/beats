@@ -10,11 +10,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/mssql"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
 )
 
 type dbInfo struct {
@@ -55,8 +54,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The mssql transaction_log metricset is beta.")
-
 	logger := logp.NewLogger("mssql.transaction_log").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
@@ -127,7 +124,7 @@ func (m *MetricSet) Close() error {
 
 func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (common.MapStr, error) {
 	// According to MS docs a single result is always returned for this query
-	row := m.db.QueryRow(fmt.Sprintf(`USE %s; SELECT * FROM sys.dm_db_log_space_usage;`, dbName))
+	row := m.db.QueryRow(fmt.Sprintf(`USE [%s]; SELECT * FROM sys.dm_db_log_space_usage;`, dbName))
 
 	var res logSpace
 	if err := row.Scan(&res.id, &res.totalLogSizeInBytes, &res.usedLogSpaceInBytes, &res.usedLogSpaceInPercent,
@@ -153,7 +150,7 @@ func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (common.MapStr, error) 
 }
 func (m *MetricSet) getLogStats(db dbInfo) (common.MapStr, error) {
 	// According to MS docs a single result is always returned for this query
-	row := m.db.QueryRow(fmt.Sprintf(`USE %s; SELECT database_id,total_log_size_mb,active_log_size_mb,log_backup_time,log_since_last_log_backup_mb,log_since_last_checkpoint_mb,log_recovery_size_mb FROM sys.dm_db_log_stats(%d);`, db.name, db.id))
+	row := m.db.QueryRow(fmt.Sprintf(`USE [%s]; SELECT database_id,total_log_size_mb,active_log_size_mb,log_backup_time,log_since_last_log_backup_mb,log_since_last_checkpoint_mb,log_recovery_size_mb FROM sys.dm_db_log_stats(%d);`, db.name, db.id))
 
 	var res logStats
 	if err := row.Scan(&res.databaseID, &res.sizeMB, &res.activeSizeMB, &res.backupTime, &res.sinceLastBackupMB, &res.sinceLastCheckpointMB, &res.recoverySizeMB); err != nil {

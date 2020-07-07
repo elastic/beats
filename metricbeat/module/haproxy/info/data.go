@@ -20,11 +20,11 @@ package info
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/haproxy"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
 
 	"reflect"
 	"strconv"
@@ -33,12 +33,20 @@ import (
 
 var (
 	schema = s.Schema{
-		"processes":   c.Int("Nbproc"),
-		"process_num": c.Int("ProcessNum"),
-		"pid":         c.Int("Pid"),
-		"ulimit_n":    c.Int("UlimitN"),
-		"tasks":       c.Int("Tasks"),
-		"run_queue":   c.Int("RunQueue"),
+		"threads":            c.Int("Nbthread", s.Optional),
+		"processes":          c.Int("Nbproc"),
+		"process_num":        c.Int("ProcessNum"),
+		"pid":                c.Int("Pid"),
+		"ulimit_n":           c.Int("UlimitN"),
+		"tasks":              c.Int("Tasks"),
+		"run_queue":          c.Int("RunQueue"),
+		"stopping":           c.Int("Stopping"),
+		"jobs":               c.Int("Jobs"),
+		"unstoppable_jobs":   c.Int("UnstoppableJobs", s.Optional),
+		"listeners":          c.Int("Listeners", s.Optional),
+		"dropped_logs":       c.Int("DroppedLogs", s.Optional),
+		"busy_polling":       c.Int("BusyPolling", s.Optional),
+		"failed_resolutions": c.Int("FailedResolutions", s.Optional),
 
 		"uptime": s.Object{
 			"sec": c.Int("UptimeSec"),
@@ -48,6 +56,24 @@ var (
 			"max": s.Object{
 				"bytes": c.Int("MemMax"),
 			},
+		},
+
+		"peers": s.Object{
+			"active":    c.Int("ActivePeers", s.Optional),
+			"connected": c.Int("ConnectedPeers", s.Optional),
+		},
+
+		"bytes": s.Object{
+			"out": s.Object{
+				"total": c.Int("TotalBytesOut", s.Optional),
+				"rate":  c.Int("BytesOutRate", s.Optional),
+			},
+		},
+
+		"pool": s.Object{
+			"allocated": c.Int("PoolAlloc", s.Optional),
+			"used":      c.Int("PoolUsed", s.Optional),
+			"failed":    c.Int("PoolFailed", s.Optional),
 		},
 
 		"compress": s.Object{
@@ -160,7 +186,11 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 			}
 			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
 		} else {
-			source[typeOfT.Field(i).Name] = f.Interface()
+			if f.Interface().(string) == "" {
+				source[typeOfT.Field(i).Name] = "0"
+			} else {
+				source[typeOfT.Field(i).Name] = f.Interface()
+			}
 		}
 
 	}

@@ -1,18 +1,30 @@
 [
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 0,
         "process.name": "sshd",
         "process.pid": 2738,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -30,6 +42,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -43,18 +56,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 209,
         "process.name": "sshd",
         "process.pid": 2738,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -72,6 +97,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -85,18 +111,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 418,
         "process.name": "sshd",
         "process.pid": 2738,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -114,6 +152,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -127,6 +166,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -140,6 +180,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -153,6 +194,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -166,6 +208,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -179,18 +222,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 1105,
         "process.name": "sshd",
         "process.pid": 2742,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -208,6 +263,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -221,18 +277,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 1314,
         "process.name": "sshd",
         "process.pid": 2742,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -250,6 +318,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -263,18 +332,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 1523,
         "process.name": "sshd",
         "process.pid": 2742,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -292,6 +373,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -305,18 +387,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 1732,
         "process.name": "sshd",
         "process.pid": 2742,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -334,6 +428,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -347,18 +442,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 1941,
         "process.name": "sshd",
         "process.pid": 2742,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -376,6 +483,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -389,6 +497,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -402,6 +511,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -415,6 +525,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -428,6 +539,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -441,6 +553,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -454,6 +567,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -467,18 +581,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 2889,
         "process.name": "sshd",
         "process.pid": 2754,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -496,6 +622,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -509,18 +636,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 3098,
         "process.name": "sshd",
         "process.pid": 2758,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -538,6 +677,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -551,18 +691,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 3306,
         "process.name": "sshd",
         "process.pid": 2754,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -580,6 +732,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -593,18 +746,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 3515,
         "process.name": "sshd",
         "process.pid": 2758,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -622,6 +787,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -635,18 +801,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 3723,
         "process.name": "sshd",
         "process.pid": 2754,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -664,6 +842,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -677,18 +856,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 3932,
         "process.name": "sshd",
         "process.pid": 2758,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -706,6 +897,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -719,6 +911,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -732,18 +925,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 4259,
         "process.name": "sshd",
         "process.pid": 2754,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -761,6 +966,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -774,18 +980,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 4468,
         "process.name": "sshd",
         "process.pid": 2754,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -803,6 +1021,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -816,6 +1035,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -829,6 +1049,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -842,6 +1063,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -855,6 +1077,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -868,18 +1091,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 5155,
         "process.name": "sshd",
         "process.pid": 2762,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -897,6 +1132,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -910,18 +1146,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 5364,
         "process.name": "sshd",
         "process.pid": 2762,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -939,6 +1187,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -952,18 +1201,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 5573,
         "process.name": "sshd",
         "process.pid": 2762,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -981,6 +1242,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -994,18 +1256,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 5782,
         "process.name": "sshd",
         "process.pid": 2762,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1023,6 +1297,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1036,18 +1311,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 5991,
         "process.name": "sshd",
         "process.pid": 2762,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1065,6 +1352,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1078,6 +1366,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1091,6 +1380,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1104,6 +1394,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1117,6 +1408,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1130,18 +1422,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 6678,
         "process.name": "sshd",
         "process.pid": 2766,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1159,6 +1463,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1172,18 +1477,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 6887,
         "process.name": "sshd",
         "process.pid": 2766,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1201,6 +1518,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1214,18 +1532,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 7096,
         "process.name": "sshd",
         "process.pid": 2766,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1243,6 +1573,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1256,18 +1587,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 7305,
         "process.name": "sshd",
         "process.pid": 2766,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1285,6 +1628,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1298,18 +1642,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 7514,
         "process.name": "sshd",
         "process.pid": 2766,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1327,6 +1683,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1340,6 +1697,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1353,6 +1711,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1366,6 +1725,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1379,6 +1739,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1392,18 +1753,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 8199,
         "process.name": "sshd",
         "process.pid": 2778,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -1421,6 +1794,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1434,18 +1808,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 8407,
         "process.name": "sshd",
         "process.pid": 2778,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -1463,6 +1849,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1476,18 +1863,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 8615,
         "process.name": "sshd",
         "process.pid": 2778,
+        "related.ip": [
+            "116.31.116.27"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 134764,
         "source.as.organization.name": "CHINANET Guangdong province network",
@@ -1505,6 +1904,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1518,6 +1918,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1531,6 +1932,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1544,6 +1946,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1557,18 +1960,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 9205,
         "process.name": "sshd",
         "process.pid": 2785,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1586,6 +2001,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1599,18 +2015,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 9414,
         "process.name": "sshd",
         "process.pid": 2785,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1628,6 +2056,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1641,18 +2070,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 9623,
         "process.name": "sshd",
         "process.pid": 2785,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1670,6 +2111,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1683,18 +2125,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 9832,
         "process.name": "sshd",
         "process.pid": 2785,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1712,6 +2166,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1725,18 +2180,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 10041,
         "process.name": "sshd",
         "process.pid": 2785,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1754,6 +2221,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1767,6 +2235,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1780,6 +2249,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1793,6 +2263,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1806,6 +2277,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -1819,18 +2291,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
-        "event.type": "authentication_failure",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 10728,
         "process.name": "sshd",
         "process.pid": 2797,
+        "related.ip": [
+            "202.109.143.106"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
         "source.as.number": 4134,
         "source.as.organization.name": "No.31,Jin-rong Street",
@@ -1848,6 +2332,7 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",

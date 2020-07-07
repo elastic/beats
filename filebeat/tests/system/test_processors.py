@@ -302,6 +302,32 @@ class Test(BaseTest):
             ["42", "hello world", "string\twith tabs and \"broken\" quotes"],
         ])
 
+    def test_urldecode_defaults(self):
+        """
+        Check URL-decoding using defaults
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "urldecode": {
+                    "fields": [{
+                        "from": "message",
+                        "to": "decoded"
+                    }]
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            "correct data\n",
+            "correct%20data\n",
+        ])
+
+        self._assert_expected_lines([
+            "correct data",
+            "correct data",
+        ], field="decoded")
+
     def test_javascript_processor_add_host_metadata(self):
         """
         Check JS processor with add_host_metadata

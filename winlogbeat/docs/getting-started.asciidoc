@@ -1,23 +1,34 @@
-[[winlogbeat-getting-started]]
-== Getting Started With Winlogbeat
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+++++
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
+++++
 
-* <<winlogbeat-installation>>
-* <<winlogbeat-configuration>>
-* <<config-winlogbeat-logstash>>
-* <<winlogbeat-template>>
-* <<load-kibana-dashboards>>
-* <<winlogbeat-starting>>
-* <<view-kibana-dashboards>>
+This guide describes how to get started quickly with Windows log monitoring.
+You'll learn how to:
 
-[[winlogbeat-installation]]
-=== Step 1: Install Winlogbeat
+* install {beatname_uc} on each system you want to monitor
+* specify the location of your log files
+* parse log data into fields and send it to {es}
+* visualize the log data in {kib}
 
-*Before you begin*: If you haven't installed the {stack}, do that now. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+[role="screenshot"]
+image::./images/winlogbeat-dashboard.png[{beatname_uc} dashboard]
 
-. Download the Winlogbeat zip file from the
+[float]
+=== Before you begin
+
+You need {es} for storing and searching your data, and {kib} for visualizing and
+managing it.
+
+include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
+
+[float]
+[[installation]]
+=== Step 1: Install {beatname_uc}
+
+. Download the {beatname_uc} zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
@@ -26,7 +37,7 @@ icon and select Run As Administrator).
 . From the PowerShell prompt, run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
-------------------------------------------------
+----
 PS C:\Users\Administrator> cd 'C:\Program Files\Winlogbeat'
 PS C:\Program Files\Winlogbeat> .\install-service-winlogbeat.ps1
 
@@ -40,103 +51,111 @@ Do you want to run C:\Program Files\Winlogbeat\install-service-winlogbeat.ps1?
 Status   Name               DisplayName
 ------   ----               -----------
 Stopped  winlogbeat         winlogbeat
-------------------------------------------------
+----
 
 NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
 
-Before starting Winlogbeat, you should look at the configuration options in the
-configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
-There’s also a full example configuration file called `winlogbeat.reference.yml` that
-shows all non-deprecated options. For more information about these options, see
-<<configuring-howto-winlogbeat>>.
+[float]
+[[set-connection]]
+=== Step 2: Connect to the {stack}
 
-[[winlogbeat-configuration]]
-=== Step 2: Configure Winlogbeat
+include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
-To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+[float]
+[[configuration]]
+=== Step 3: Configure {beatname_uc}
 
-Here is a sample of the `winlogbeat.yml` file:
+In `winlogbeat.yml`, configure the event logs that you want to monitor.
 
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
-  - name: Security
-  - name: System
-
-output.elasticsearch:
-  hosts:
-    - localhost:9200
-
-logging.to_files: true
-logging.files:
-  path: C:\ProgramData\winlogbeat\Logs
-logging.level: info
---------------------------------------------------------------------------------
-
-To configure Winlogbeat:
-
-. In the `event_logs` section, specify the event logs that you want to monitor.
-By default, Winlogbeat is set to monitor application, security, and system logs:
+. Under `winlogbeat.event_log`, specify a list of event logs to monitor. By
+default, {beatname_uc} monitors application, security, and system logs.
 +
 [source,yaml]
-----------------------------------------------------------------------
+----
 winlogbeat.event_logs:
   - name: Application
   - name: Security
   - name: System
-----------------------------------------------------------------------
+----
 +
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
-include::{libbeat-dir}/step-configure-output.asciidoc[]
-
-include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
-
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+. (Optional) Set logging options to write Winlogbeat logs to a file:
++
+[source,yaml]
+----
+logging.to_files: true
+logging.files:
+  path: C:\ProgramData\winlogbeat\Logs
+logging.level: info
+----
 
 . After you save your configuration file, test it with the following command.
 +
 [source,shell]
-----------------------------------------------------------------------
+----
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml -e
-----------------------------------------------------------------------
+----
 
-[[config-winlogbeat-logstash]]
-=== Step 3: Configure Winlogbeat to use Logstash
 
-include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
+For more information about configuring {beatname_uc}, also see:
 
-[[winlogbeat-template]]
-=== Step 4: Load the index template in Elasticsearch
+* <<configuring-howto-{beatname_lc},Configure {beatname_uc}>>
+* {beats-ref}/config-file-format.html[Config file format]
+ifeval::["{beatname_lc}"!="apm-server"]
+* <<{beatname_lc}-reference-yml,+{beatname_lc}.reference.yml+>>: This reference configuration
+file shows all non-deprecated options. You'll find it in the same location as
++{beatname_lc}.yml+.
 
-include::{libbeat-dir}/shared-template-load.asciidoc[]
+[float]
+[[setup-assets]]
+=== Step 4: Set up assets
 
-[[load-kibana-dashboards]]
-=== Step 5: Set up the Kibana dashboards
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
-include::{libbeat-dir}/dashboards.asciidoc[]
+. Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
 
-[[winlogbeat-starting]]
-=== Step 6: Start Winlogbeat
+. From the installation directory, run:
++
+--
+include::{libbeat-dir}/tab-widgets/setup.asciidoc[tag=win]
+--
 
-Start the Winlogbeat service with the following command. If you are accessing a
-secured Elasticsearch cluster, make sure you've configured credentials as
-described in <<{beatname_lc}-configuration>>.
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}
+and deploys the sample dashboards for visualizing the data in {kib}.
 
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>> and <<load-kibana-dashboards>>.
+=====
+
+[float]
+[[start]]
+=== Step 5: Start {beatname_uc}
+
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who is
+<<privileges-to-publish-events,authorized to publish events>>.
+
+To start the {beatname_uc} service, run:
+
+// tag::start-step[]
 [source,shell]
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ----------------------------------------------------------------------
 
-Winlogbeat should now be running. If you used the configuration described here,
-then you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
+{beatname_uc} should now be running. If you used the logging configuration
+described here, you can view the log file at
+`C:\ProgramData\winlogbeat\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services
 management console in Windows. To launch the management console, run
@@ -146,28 +165,33 @@ this command:
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
+// end::start-step[]
 
+[float]
+==== Stop {beatname_uc}
 
-==== Stop Winlogbeat
-
-Stop the Winlogbeat service with the following command:
+Stop the {beatname_uc} service with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 ----------------------------------------------------------------------
 
-[[view-kibana-dashboards]]
-=== Step 7: View the sample Kibana dashboards
+[float]
+[[view-data]]
+=== Step 6: View your data in {kib}
 
-To make it easier for you to start monitoring your servers in Kibana, we have
-created example {beatname_uc} dashboards. You loaded the dashboards earlier
-when you ran the `setup` command.
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
-include::{libbeat-dir}/opendashboards.asciidoc[]
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
-The dashboards are provided as examples. We recommend that you
-{kibana-ref}/dashboard.html[customize] them to meet your needs.
+[float]
+=== What's next?
 
-[role="screenshot"]
-image::./images/winlogbeat-dashboard.png[Winlogbeat statistics]
+Now that you have your logs streaming into {es}, learn how to unify your logs,
+metrics, uptime, and application performance data.
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[]
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

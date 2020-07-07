@@ -15,15 +15,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -64,6 +64,23 @@ func (action eventAction) String() string {
 		return "host_changed"
 	default:
 		return ""
+	}
+}
+
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionHost:
+		return "info"
+	case eventActionIDChanged:
+		return "change"
+	case eventActionReboot:
+		return "start"
+	case eventActionHostnameChanged:
+		return "change"
+	case eventActionHostChanged:
+		return "change"
+	default:
+		return "info"
 	}
 }
 
@@ -322,8 +339,10 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"host"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"message": hostMessage(host, action),
 		},

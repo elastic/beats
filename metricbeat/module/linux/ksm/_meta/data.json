@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.ksm",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "ksm": {
+            "stats": {
+                "pages_shared": 100,
+                "pages_sharing": 10,
+                "pages_unshared": 0,
+                "pages_volatile": 0,
+                "full_scans": 2000,
+                "stable_node_chains": 0,
+                "stable_node_dups": 0
+            }
+        }
+    },
+    "metricset": {
+        "name": "ksm",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
+}

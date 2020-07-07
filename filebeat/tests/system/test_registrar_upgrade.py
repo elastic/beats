@@ -94,4 +94,6 @@ class Test(BaseTest):
         migrated_registry_dir = os.path.abspath(self.working_dir + "/registry")
         assert os.path.isdir(migrated_registry_dir)
         assert os.path.isdir(migrated_registry_dir + "/filebeat")
-        assert os.path.isfile(migrated_registry_dir + "/filebeat/data.json")
+        assert os.path.isfile(migrated_registry_dir + "/filebeat/log.json")
+        assert os.path.isfile(migrated_registry_dir + "/filebeat/1.json")
+        assert os.path.isfile(migrated_registry_dir + "/filebeat/active.dat")

@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
+from deepdiff import DeepDiff
 
 
 def load_fileset_test_cases():
@@ -108,6 +109,8 @@ class Test(BaseTest):
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
 
+        self.assert_explicit_ecs_version_set(module, fileset)
+
         try:
             self.es.indices.delete(index=self.index_name)
         except:
@@ -197,26 +200,27 @@ class Test(BaseTest):
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
 
-        for ev in expected:
+        for idx in range(len(expected)):
+            ev = expected[idx]
+            obj = objects[idx]
+
+            # Flatten objects for easier comparing
+            obj = self.flatten_object(obj, {}, "")
+            clean_keys(obj)
             clean_keys(ev)
-            found = False
-            for obj in objects:
 
-                # Flatten objects for easier comparing
-                obj = self.flatten_object(obj, {}, "")
-                clean_keys(obj)
+            d = DeepDiff(ev, obj, ignore_order=True)
 
-                if ev == obj:
-                    found = True
-                    break
-
-            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev), pretty_json(objects))
+            assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
+    host_keys = ["agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    # Strip host.name if event is not tagged as `forwarded`.
+    if "tags" not in obj or "forwarded" not in obj["tags"]:
+        host_keys.append("host.name")
+
     # The create timestamps area always new
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run

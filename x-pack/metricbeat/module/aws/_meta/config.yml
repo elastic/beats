@@ -2,7 +2,11 @@
   period: 1m
   metricsets:
     - elb
+    - natgateway
+    - rds
+    - transitgateway
     - usage
+    - vpn
 - module: aws
   period: 5m
   metricsets:

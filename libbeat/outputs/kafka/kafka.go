@@ -23,12 +23,12 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 const (
@@ -38,10 +38,8 @@ const (
 	// not return ErrTempBulkFailure
 	defaultMaxWaitRetry = 60 * time.Second
 
-	debugSelector = "kafka"
+	logSelector = "kafka"
 )
-
-var debugf = logp.MakeDebug(debugSelector)
 
 var (
 	errNoTopicSet = errors.New("No topic configured")
@@ -49,7 +47,7 @@ var (
 )
 
 func init() {
-	sarama.Logger = kafkaLogger{}
+	sarama.Logger = kafkaLogger{log: logp.NewLogger(logSelector)}
 
 	outputs.RegisterType("kafka", makeKafka)
 }
@@ -60,24 +58,20 @@ func makeKafka(
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
-	debugf("initialize kafka output")
+	log := logp.NewLogger(logSelector)
+	log.Debug("initialize kafka output")
 
 	config, err := readConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "topic",
-		MultiKey:         "topics",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
+	topic, err := buildTopicSelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(config)
+	libCfg, err := newSaramaConfig(log, config)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -102,4 +96,14 @@ func makeKafka(
 		retry = -1
 	}
 	return outputs.Success(config.BulkMaxSize, retry, client)
+}
+
+func buildTopicSelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "topic",
+		MultiKey:         "topics",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
+	})
 }

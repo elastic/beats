@@ -539,7 +539,8 @@ func PackageZip(spec PackageSpec) error {
 	// Add files to zip.
 	for _, pkgFile := range spec.Files {
 		if err := addFileToZip(w, baseDir, pkgFile); err != nil {
-			return errors.Wrapf(err, "failed adding file=%+v to zip", pkgFile)
+			p, _ := filepath.Abs(pkgFile.Source)
+			return errors.Wrapf(err, "failed adding file=%+v to zip", p)
 		}
 	}
 

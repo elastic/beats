@@ -23,6 +23,7 @@ endif::[]
 NOTE: Elastic provides no warranty or support for community-sourced Beats.
 
 [horizontal]
+https://github.com/visasimbu/IIBBeat[IIBBeat]:: Periodically executes shell commands or batch commands to collect IBM Integration node, Integration server, app status, bar file deployment time and bar file location to Logstash or Elasticsearch.
 https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
@@ -78,6 +79,7 @@ https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/nfvsap/natsbeat[natsbeat]:: Collects data from NATS monitoring endpoints
 https://github.com/radoondas/netatmobeat[netatmobeat]:: Reads data from Netatmo weather station.
+https://github.com/hmschreck/netbeat[netbeat]:: Reads configurable data from SNMP-enabled devices.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
 https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.

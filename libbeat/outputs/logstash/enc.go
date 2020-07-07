@@ -20,11 +20,12 @@ package logstash
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 )
 
-func makeLogstashEventEncoder(info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
+func makeLogstashEventEncoder(log *logp.Logger, info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
 	enc := json.New(info.Version, json.Config{
 		Pretty:     false,
 		EscapeHTML: escapeHTML,
@@ -33,7 +34,7 @@ func makeLogstashEventEncoder(info beat.Info, escapeHTML bool, index string) fun
 	return func(event interface{}) (d []byte, err error) {
 		d, err = enc.Encode(index, event.(*beat.Event))
 		if err != nil {
-			debugf("Failed to encode event: %v", event)
+			log.Debugf("Failed to encode event: %v", event)
 		}
 		return
 	}

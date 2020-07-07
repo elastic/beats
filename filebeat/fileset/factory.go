@@ -20,15 +20,14 @@ package fileset
 import (
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -43,33 +42,33 @@ func init() {
 
 // Factory for modules
 type Factory struct {
-	outlet                channel.Factory
-	registrar             *registrar.Registrar
-	beatVersion           string
+	beatInfo              beat.Info
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
 	pipelineCallbackID    uuid.UUID
-	beatDone              chan struct{}
+	inputFactory          cfgfile.RunnerFactory
 }
 
 // Wrap an array of inputs and implements cfgfile.Runner interface
 type inputsRunner struct {
 	id                    uint64
 	moduleRegistry        *ModuleRegistry
-	inputs                []*input.Runner
+	inputs                []cfgfile.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
 	pipelineCallbackID    uuid.UUID
 	overwritePipelines    bool
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
-	pipelineLoaderFactory PipelineLoaderFactory, overwritePipelines bool, beatDone chan struct{}) *Factory {
+func NewFactory(
+	inputFactory cfgfile.RunnerFactory,
+	beatInfo beat.Info,
+	pipelineLoaderFactory PipelineLoaderFactory,
+	overwritePipelines bool,
+) *Factory {
 	return &Factory{
-		outlet:                outlet,
-		registrar:             registrar,
-		beatVersion:           beatVersion,
-		beatDone:              beatDone,
+		inputFactory:          inputFactory,
+		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		pipelineCallbackID:    uuid.Nil,
 		overwritePipelines:    overwritePipelines,
@@ -77,9 +76,9 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	// Start a registry of one module:
-	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
+	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
 	if err != nil {
 		return nil, err
 	}
@@ -97,10 +96,9 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		return nil, err
 	}
 
-	inputs := make([]*input.Runner, len(pConfigs))
-	connector := f.outlet(p)
+	inputs := make([]cfgfile.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		inputs[i], err = input.New(pConfig, connector, f.beatDone, f.registrar.GetStates(), meta)
+		inputs[i], err = f.inputFactory.Create(p, pConfig)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err
@@ -115,6 +113,11 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
 	}, nil
+}
+
+func (f *Factory) CheckConfig(c *common.Config) error {
+	_, err := f.Create(pubpipeline.NewNilPipeline(), c)
+	return err
 }
 
 func (p *inputsRunner) Start() {
@@ -138,7 +141,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *elasticsearch.Client) error {
+		callback := func(esClient *eslegclient.Connection) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)
@@ -156,6 +159,7 @@ func (p *inputsRunner) Start() {
 		moduleList.Add(m)
 	}
 }
+
 func (p *inputsRunner) Stop() {
 	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)

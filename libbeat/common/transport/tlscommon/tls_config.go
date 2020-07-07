@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
@@ -67,7 +67,7 @@ type TLSConfig struct {
 
 	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
 	// the server certificate.
-	CASha256 pins
+	CASha256 []string
 }
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
@@ -80,7 +80,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 	insecure := c.Verification != VerifyFull
 	if insecure {
-		logp.Warn("SSL/TLS verifications disabled.")
+		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
 
 	// When we are usign the CAsha256 pin to validate the CA used to validate the chain

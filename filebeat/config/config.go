@@ -25,12 +25,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 // Defaults for config variables which are not set
@@ -51,18 +51,20 @@ type Config struct {
 }
 
 type Registry struct {
-	Path         string        `config:"path"`
-	Permissions  os.FileMode   `config:"file_permissions"`
-	FlushTimeout time.Duration `config:"flush"`
-	MigrateFile  string        `config:"migrate_file"`
+	Path          string        `config:"path"`
+	Permissions   os.FileMode   `config:"file_permissions"`
+	FlushTimeout  time.Duration `config:"flush"`
+	CleanInterval time.Duration `config:"cleanup_interval"`
+	MigrateFile   string        `config:"migrate_file"`
 }
 
 var (
 	DefaultConfig = Config{
 		Registry: Registry{
-			Path:        "registry",
-			Permissions: 0600,
-			MigrateFile: "",
+			Path:          "registry",
+			Permissions:   0600,
+			MigrateFile:   "",
+			CleanInterval: 5 * time.Minute,
 		},
 		ShutdownTimeout:    0,
 		OverwritePipelines: false,

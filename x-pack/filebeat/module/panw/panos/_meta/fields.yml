@@ -127,3 +127,7 @@
       type: keyword
       description: >
         Palo Alto Networks name for the threat.
+    - name: action
+      type: keyword
+      description: >-
+        Action taken for the session.

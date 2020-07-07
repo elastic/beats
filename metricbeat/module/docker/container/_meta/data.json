@@ -38,8 +38,8 @@
                 "org_label-schema_version": "6.5.1"
             },
             "size": {
-                "rw": 193031181,
-                "root_fs": 1290400448
+                "root_fs": 0,
+                "rw": 0
             },
             "status": "Up 7 minutes (healthy)"
         }

@@ -22,10 +22,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const flagParsingError = "dissect_parsing_error"
@@ -45,6 +45,14 @@ func NewProcessor(c *common.Config) (processors.Processor, error) {
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
+	}
+	if config.TrimValues != trimModeNone {
+		config.Tokenizer.trimmer, err = newTrimmer(config.TrimChars,
+			config.TrimValues&trimModeLeft != 0,
+			config.TrimValues&trimModeRight != 0)
+		if err != nil {
+			return nil, err
+		}
 	}
 	p := &processor{config: config}
 
@@ -72,7 +80,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		); err != nil {
 			return event, errors.Wrap(err, "cannot add new flag the event")
 		}
-
+		if p.config.IgnoreFailure {
+			return event, nil
+		}
 		return event, err
 	}
 
@@ -94,7 +104,7 @@ func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, err
 	var prefixKey string
 	for k, v := range m {
 		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound {
+		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound || p.config.OverwriteKeys {
 			event.PutValue(prefixKey, v)
 		} else {
 			event.Fields = copy

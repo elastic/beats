@@ -27,9 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	_ "github.com/elastic/beats/libbeat/processors/add_id"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -423,6 +423,26 @@ func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, procs)
 	require.Len(t, procs.List, 1)
+}
+
+func TestProcessorsForMetricSet_ListModules(t *testing.T) {
+	source := NewLightModulesSource("testdata/lightmodules")
+	modules, err := source.Modules()
+	require.NoError(t, err)
+
+	// Check that regular file in directory is not listed as module
+	require.FileExists(t, "testdata/lightmodules/regular_file")
+	assert.NotContains(t, modules, "regular_file")
+
+	expectedModules := []string{
+		"broken",
+		"httpextended",
+		"mixed",
+		"mixedbroken",
+		"service",
+		"unpack",
+	}
+	assert.ElementsMatch(t, expectedModules, modules, "Modules found: %v", modules)
 }
 
 type metricSetWithOption struct {

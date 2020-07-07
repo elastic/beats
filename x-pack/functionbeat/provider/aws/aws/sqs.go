@@ -15,13 +15,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 const batchSize = 10
@@ -63,8 +63,8 @@ func NewSQS(provider provider.Provider, cfg *common.Config) (provider.Function, 
 }
 
 // SQSDetails returns the details of the feature.
-func SQSDetails() *feature.Details {
-	return feature.NewDetails("SQS trigger", "receive events from a SQS queue", feature.Stable)
+func SQSDetails() feature.Details {
+	return feature.MakeDetails("SQS trigger", "receive events from a SQS queue", feature.Stable)
 }
 
 // Run starts the lambda function and wait for web triggers.

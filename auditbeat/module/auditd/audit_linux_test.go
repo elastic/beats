@@ -34,14 +34,14 @@ import (
 
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/metricbeat/mb"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/go-libaudit"
-	"github.com/elastic/go-libaudit/auparse"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/go-libaudit/v2"
+	"github.com/elastic/go-libaudit/v2/auparse"
 )
 
 // Specify the -audit flag when running these tests to interact with the real
@@ -141,23 +141,24 @@ func TestLoginType(t *testing.T) {
 
 	for idx, expected := range []common.MapStr{
 		{
-			"event.category": "authentication",
-			"event.type":     "authentication_failure",
+			"event.category": []string{"authentication"},
+			"event.type":     []string{"start", "authentication_failure"},
 			"event.outcome":  "failure",
 			"user.name":      "(invalid user)",
 			"user.id":        nil,
 			"session":        nil,
 		},
 		{
-			"event.category": "authentication",
-			"event.type":     "authentication_success",
+			"event.category": []string{"authentication"},
+			"event.type":     []string{"start", "authentication_success"},
 			"event.outcome":  "success",
 			"user.name":      "adrian",
 			"user.audit.id":  nil,
 			"auditd.session": nil,
 		},
 		{
-			"event.category": "user-login",
+			"event.category": []string{"authentication"},
+			"event.type":     []string{"info"},
 			"event.outcome":  "success",
 			"user.name":      "root",
 			"user.id":        "0",

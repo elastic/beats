@@ -1,0 +1,47 @@
+name: Endpoint Security
+cmd: endpoint-security
+artifact: endpoint-dev
+service: 6788
+check_install:
+- exec_file:
+    path: "endpoint-security"
+    args:
+    - "verify"
+    timeout: 30
+post_install:
+- exec_file:
+    path: "endpoint-security"
+    args:
+    - "install"
+    - "--upgrade"
+    - "--resources"
+    - "endpoint-security-resources.zip"
+    timeout: 120
+pre_uninstall:
+- exec_file:
+    path: "endpoint-security"
+    args:
+      - "uninstall"
+    timeout: 120
+rules:
+- fix_stream: {}
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - endpoint
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
+
+- filter:
+    selectors:
+    - fleet
+    - inputs
+    - output
+
+when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')

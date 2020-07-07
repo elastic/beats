@@ -18,10 +18,14 @@
 package index
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 // init registers the MetricSet with the central registry.
@@ -35,7 +39,7 @@ func init() {
 
 const (
 	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics
+	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices&expand_wildcards=open,hidden"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -67,14 +71,22 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
-	if err != nil {
-		return err
-	}
-
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
+	}
+
+	if err := m.updateServicePath(*info.Version.Number); err != nil {
+		if m.XPack {
+			m.Logger().Error(err)
+			return nil
+		}
+		return err
+	}
+
+	content, err := m.HTTP.FetchContent()
+	if err != nil {
+		return err
 	}
 
 	if m.XPack {
@@ -91,4 +103,36 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func (m *MetricSet) updateServicePath(esVersion common.Version) error {
+	p, err := getServicePath(esVersion)
+	if err != nil {
+		return err
+	}
+
+	m.SetServiceURI(p)
+	return nil
+
+}
+
+func getServicePath(esVersion common.Version) (string, error) {
+	currPath := statsPath
+	if esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		// Can't request bulk stats so don't change service URI
+		return currPath, nil
+	}
+
+	u, err := url.Parse(currPath)
+	if err != nil {
+		return "", err
+	}
+
+	if strings.HasSuffix(u.Path, ",bulk") {
+		// Bulk stats already being requested so don't change service URI
+		return currPath, nil
+	}
+
+	u.Path += ",bulk"
+	return u.String(), nil
 }

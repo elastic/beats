@@ -20,8 +20,8 @@ package bucket
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type BucketQuota struct {
@@ -31,7 +31,7 @@ type BucketQuota struct {
 
 type BucketBasicStats struct {
 	QuotaPercentUsed float64 `json:"quotaPercentUsed"`
-	OpsPerSec        int64   `json:"opsPerSec"`
+	OpsPerSec        float64 `json:"opsPerSec"`
 	DiskFetches      int64   `json:"diskFetches"`
 	ItemCount        int64   `json:"itemCount"`
 	DiskUsed         int64   `json:"diskUsed"`

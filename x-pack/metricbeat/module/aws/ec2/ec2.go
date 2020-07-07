@@ -16,10 +16,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
@@ -45,7 +45,6 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	TagsFilter []aws.Tag `config:"tags_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -54,15 +53,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
-	}
-
-	config := struct {
-		Tags []aws.Tag `config:"tags_filter"`
-	}{}
-
-	err = base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
@@ -76,8 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:  metricSet,
-		TagsFilter: config.Tags,
+		MetricSet: metricSet,
 	}, nil
 }
 
@@ -201,13 +190,17 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					// If tag filter doesn't exist in tagKeys/tagValues,
 					// then do not report this event/instance.
 					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+						// if tag filter doesn't exist, remove this event initial
+						// entry to avoid report an empty event.
+						delete(events, instanceID)
 						continue
 					}
 				}
 
-				// By default, replace dot "." using under bar "_" for tag keys and values
+				// By default, replace dot "." using underscore "_" for tag keys.
+				// Note: tag values are not dedotted.
 				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
@@ -217,7 +210,11 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
-				events[instanceID].RootFields.Put("cloud.availability_zone", *instanceOutput[instanceID].Placement.AvailabilityZone)
+
+				placement := instanceOutput[instanceID].Placement
+				if placement != nil {
+					events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+				}
 
 				if len(output.Values) > timestampIdx {
 					metricSetFieldResults[instanceID][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
@@ -235,23 +232,28 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				monitoringStates[instanceID] = monitoringState
 
-				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
-				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
-				events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
-				events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
-				events[instanceID].MetricSetFields.Put("instance.core.count", *instanceOutput[instanceID].CpuOptions.CoreCount)
-				events[instanceID].MetricSetFields.Put("instance.threads_per_core", *instanceOutput[instanceID].CpuOptions.ThreadsPerCore)
+				cpuOptions := instanceOutput[instanceID].CpuOptions
+				if cpuOptions != nil {
+					events[instanceID].MetricSetFields.Put("instance.core.count", *cpuOptions.CoreCount)
+					events[instanceID].MetricSetFields.Put("instance.threads_per_core", *cpuOptions.ThreadsPerCore)
+				}
+
 				publicIP := instanceOutput[instanceID].PublicIpAddress
 				if publicIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.public.ip", *publicIP)
 				}
 
-				events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
-				events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 				privateIP := instanceOutput[instanceID].PrivateIpAddress
 				if privateIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
 				}
+
+				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
+				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
+				events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
+				events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
+				events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
+				events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 			}
 		}
 	}

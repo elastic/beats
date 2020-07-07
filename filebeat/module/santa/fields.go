@@ -20,7 +20,7 @@
 package santa
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -32,5 +32,5 @@ func init() {
 // AssetSanta returns asset data.
 // This is the base64 encoded gzipped contents of module/santa.
 func AssetSanta() string {
-	return "eJyUk82O2jAQgO88xWhP7WFRl4o95FAphfRHBS0iK7W3yhtPiJXEE9lOW96+spMFk8QtcCJj+/s8npl7KPEYgWbSsBmAEabCCO4+Ex0qhNSG72YAHHWmRGMEyQg+zACgW4Mt8bbCGUAusOI6ckv3IFmNZ6r9mWODERwUtU0fmWCeMf3nmcUyu/EUfgWWePxNintx/MPqxiaR/EhWXvxCF3e0kYVjJvSNnnizefoeEq17IJiCme5BOBiicj6WK2T6NvUq2T+HzHtHg5wUmAJtZtrdZEJcE8dbtNuQ86lBxYyQB4cEyrsumVByocuR0u+OEfuT6wyXz/pr+i3e7ZJ437eFnnun/E4can9R1dZ4sTTQPBfY73JHvKv7nJdW/w9iM7T7oFFkKKMqgNKoBKuuonVbQbb1C6rQzTS3fwa8U+ks50G/v0r3MV3/6w1siYf3Pg/FbrdJIE3XkG7fLR8Wm6uMDhnQ5cMXP7lYM1qbxvd1LYXk8CYXFeqjNli77nsbzLKV5hZ6w0zRs14ZGSojcpExg/OM6prkT69GU+N2YVi5I44FuaIaMjtcWhyknTQfHtbqgi2Wj9ca0y/xYvkIBdOFHeKw728AAAD//5mnu+4="
+	return "eJyUk82O2jAQgO88xWhP7WFRl4o9cKiUQvqjghaRldpb5Y0nxErsiWynLW9f2UkhJPGWcCJj+/tm7Jl7KPC0AsOUZTMAK2yJK7j7THQsERIXvpsBcDSpFpUVpFbwYQYAzRrsiNclzgAygSU3K790D4pJvFDdz54qXMFRU121kRHmBdN+XlgsdRvP4X/AAk+/SfNOHP8wWbki4h/xuhO/0kUNbWDhmAoz0RNtt0/fQ6JNCwSbM9tcCAdLVMyHco3MTFOv48NzyHzwNMhIg83RVWZ8JiNiSRynaHch51OFmlmhjh4JlDVdMqLkwhQDZbc7BuxPvjN8PZuvybdov4+jQ9sWZt451e3EvvYXlbXEq6We5jnHdpc/0km9y3mpzf8grkK3DypNllIqAyiDWrDyJlqzFVQtX1CHMjPc/enxzk/nOA/m/U26j8nmtTtwT9zP+zIU+/02hiTZQLJ7t3xYbG8yemRAl/Vv/Oxi1WBtHN++ayEUhzeZKNGcjEXpu+9tsMpa2Sn0itl8pOFT1FZkImUW5ylJSepn751CY3dlW/ujngmZJgmpGzQjjspNXVfyegomZ4vl41R78iVaLB8hZyZ3wx12/w0AAP//xDi+7g=="
 }

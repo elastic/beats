@@ -1,0 +1,23 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "kvm.status",
+        "duration": 115000,
+        "module": "kvm"
+    },
+    "kvm": {
+        "id": 1,
+        "name": "buster-amd64",
+        "status": {
+            "state": "running"
+        }
+    },
+    "metricset": {
+        "name": "status",
+        "period": 10000
+    },
+    "service": {
+        "address": "unix:///var/run/libvirt/libvirt-sock",
+        "type": "kvm"
+    }
+}

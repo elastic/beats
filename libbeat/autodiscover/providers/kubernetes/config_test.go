@@ -22,9 +22,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/go-ucfg"
+
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
@@ -76,6 +78,6 @@ func newMockBuilder(_ *common.Config) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil
 }
 
-func (m *mockBuilder) CreateConfig(event bus.Event) []*common.Config {
+func (m *mockBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	return nil
 }
