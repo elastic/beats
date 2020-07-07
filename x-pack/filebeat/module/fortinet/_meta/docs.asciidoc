@@ -59,6 +59,8 @@ A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[fortinet-firewall, forwarded]`.
 
+:fileset_ex!:
+
 [float]
 ==== Fortinet ECS fields
 
