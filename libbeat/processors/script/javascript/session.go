@@ -19,7 +19,6 @@ package javascript
 
 import (
 	"reflect"
-	"sync"
 	"time"
 
 	"github.com/dop251/goja"
@@ -83,16 +82,24 @@ type session struct {
 }
 
 func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
+	// Create a logger
+	logger := logp.NewLogger(logName)
+	if conf.Tag != "" {
+		logger = logger.With("instance_id", conf.Tag)
+	}
+	// Measure load times
+	start := time.Now()
+	defer func() {
+		took := time.Now().Sub(start)
+		logger.Debugf("Load of javascript pipeline took %v", took)
+	}()
 	// Setup JS runtime.
 	s := &session{
 		vm:             goja.New(),
-		log:            logp.NewLogger(logName),
+		log:            logger,
 		makeEvent:      newBeatEventV0,
 		timeout:        conf.Timeout,
 		tagOnException: conf.TagOnException,
-	}
-	if conf.Tag != "" {
-		s.log = s.log.With("instance_id", conf.Tag)
 	}
 
 	// Register modules.
@@ -266,7 +273,8 @@ func init() {
 }
 
 type sessionPool struct {
-	pool *sync.Pool
+	New func() *session
+	C   chan *session
 }
 
 func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
@@ -275,24 +283,32 @@ func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
 		return nil, err
 	}
 
-	pool := &sync.Pool{
-		New: func() interface{} {
+	pool := sessionPool{
+		New: func() *session {
 			s, _ := newSession(p, c, false)
 			return s
 		},
+		C: make(chan *session, c.MaxCachedSessions),
 	}
 	pool.Put(s)
 
-	return &sessionPool{pool}, nil
+	return &pool, nil
 }
 
 func (p *sessionPool) Get() *session {
-	s, _ := p.pool.Get().(*session)
-	return s
+	select {
+	case s := <-p.C:
+		return s
+	default:
+		return p.New()
+	}
 }
 
 func (p *sessionPool) Put(s *session) {
 	if s != nil {
-		p.pool.Put(s)
+		select {
+		case p.C <- s:
+		default:
+		}
 	}
 }
