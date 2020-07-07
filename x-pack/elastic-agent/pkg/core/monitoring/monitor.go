@@ -25,6 +25,7 @@ type Monitor interface {
 	IsMonitoringEnabled() bool
 	WatchLogs() bool
 	WatchMetrics() bool
+	Close()
 }
 
 type wrappedConfig struct {

@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -124,6 +125,12 @@ func (o *Operator) State() map[string]state.State {
 	}
 
 	return result
+}
+
+// Close stops all programs handled by operator and clears state
+func (o *Operator) Close() error {
+	o.monitor.Close()
+	return o.HandleConfig(configrequest.New("", time.Now(), nil))
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
