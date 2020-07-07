@@ -1,0 +1,6 @@
+- name: overview
+  type: group
+  description: >
+    `performance` contains the metrics that were obtained by the status SQL query.
+  release: ga
+  fields:

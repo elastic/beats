@@ -32017,6 +32017,506 @@ type: long
 --
 
 [float]
+=== overview
+
+`performance` contains the metrics that were obtained by the status SQL query.
+
+
+[float]
+=== galera_status
+
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
+
+
+
+[float]
+=== apply
+
+Apply status fields.
+
+
+
+*`mysql.galera_status.apply.oooe`*::
++
+--
+How often applier started write-set applying out-of-order (parallelization efficiency).
+
+
+type: double
+
+--
+
+*`mysql.galera_status.apply.oool`*::
++
+--
+How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+
+
+type: double
+
+--
+
+*`mysql.galera_status.apply.window`*::
++
+--
+Average distance between highest and lowest concurrently applied seqno.
+
+
+type: double
+
+--
+
+[float]
+=== cert
+
+Certification status fields.
+
+
+
+*`mysql.galera_status.cert.deps_distance`*::
++
+--
+Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
+
+
+type: double
+
+--
+
+*`mysql.galera_status.cert.index_size`*::
++
+--
+The number of entries in the certification index.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.cert.interval`*::
++
+--
+Average number of transactions received while a transaction replicates.
+
+
+type: double
+
+--
+
+[float]
+=== cluster
+
+Cluster status fields.
+
+
+
+*`mysql.galera_status.cluster.conf_id`*::
++
+--
+Total number of cluster membership changes happened.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.cluster.size`*::
++
+--
+Current number of members in the cluster.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.cluster.status`*::
++
+--
+Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
+
+
+type: keyword
+
+--
+
+[float]
+=== commit
+
+Commit status fields.
+
+
+
+*`mysql.galera_status.commit.oooe`*::
++
+--
+How often a transaction was committed out of order.
+
+
+type: double
+
+--
+
+*`mysql.galera_status.commit.window`*::
++
+--
+Average distance between highest and lowest concurrently committed seqno.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.connected`*::
++
+--
+If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
+
+
+type: keyword
+
+--
+
+[float]
+=== evs
+
+Evs Fields.
+
+
+
+*`mysql.galera_status.evs.evict`*::
++
+--
+Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+
+
+type: keyword
+
+--
+
+*`mysql.galera_status.evs.state`*::
++
+--
+Shows the internal state of the EVS Protocol.
+
+
+type: keyword
+
+--
+
+[float]
+=== flow_ctl
+
+Flow Control fields.
+
+
+
+*`mysql.galera_status.flow_ctl.paused`*::
++
+--
+The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
+
+
+type: double
+
+--
+
+*`mysql.galera_status.flow_ctl.paused_ns`*::
++
+--
+The total time spent in a paused state measured in nanoseconds.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.flow_ctl.recv`*::
++
+--
+Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.flow_ctl.sent`*::
++
+--
+Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.last_committed`*::
++
+--
+The sequence number, or seqno, of the last committed transaction.
+
+
+type: long
+
+--
+
+[float]
+=== local
+
+Node specific Cluster status fields.
+
+
+
+*`mysql.galera_status.local.bf_aborts`*::
++
+--
+Total number of local transactions that were aborted by slave transactions while in execution.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.cert_failures`*::
++
+--
+Total number of local transactions that failed certification test.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.commits`*::
++
+--
+Total number of local transactions committed.
+
+
+type: long
+
+--
+
+[float]
+=== recv
+
+Node specific recv fields.
+
+
+
+*`mysql.galera_status.local.recv.queue`*::
++
+--
+Current (instantaneous) length of the recv queue.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.recv.queue_avg`*::
++
+--
+Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
+
+
+type: double
+
+--
+
+*`mysql.galera_status.local.recv.queue_max`*::
++
+--
+The maximum length of the recv queue since the last FLUSH STATUS command.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.recv.queue_min`*::
++
+--
+The minimum length of the recv queue since the last FLUSH STATUS command.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.replays`*::
++
+--
+Total number of transaction replays due to asymmetric lock granularity.
+
+
+type: long
+
+--
+
+[float]
+=== send
+
+Node specific sent fields.
+
+
+
+*`mysql.galera_status.local.send.queue`*::
++
+--
+Current (instantaneous) length of the send queue.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.send.queue_avg`*::
++
+--
+Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
+
+
+type: double
+
+--
+
+*`mysql.galera_status.local.send.queue_max`*::
++
+--
+The maximum length of the send queue since the last FLUSH STATUS command.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.send.queue_min`*::
++
+--
+The minimum length of the send queue since the last FLUSH STATUS command.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.local.state`*::
++
+--
+Internal Galera Cluster FSM state number.
+
+
+type: keyword
+
+--
+
+*`mysql.galera_status.ready`*::
++
+--
+Whether the server is ready to accept queries.
+
+
+type: keyword
+
+--
+
+[float]
+=== received
+
+Write-Set receive status fields.
+
+
+
+*`mysql.galera_status.received.count`*::
++
+--
+Total number of write-sets received from other nodes.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.received.bytes`*::
++
+--
+Total size of write-sets received from other nodes.
+
+
+type: long
+
+--
+
+[float]
+=== repl
+
+Replication status fields.
+
+
+
+*`mysql.galera_status.repl.data_bytes`*::
++
+--
+Total size of data replicated.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.repl.keys`*::
++
+--
+Total number of keys replicated.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.repl.keys_bytes`*::
++
+--
+Total size of keys replicated.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.repl.other_bytes`*::
++
+--
+Total size of other bits replicated.
+
+
+type: long
+
+--
+
+*`mysql.galera_status.repl.count`*::
++
+--
+Total number of write-sets replicated (sent to other nodes).
+
+
+type: long
+
+--
+
+*`mysql.galera_status.repl.bytes`*::
++
+--
+Total size of write-sets replicated.
+
+
+type: long
+
+--
+
+[float]
 === status
 
 `status` contains the metrics that were obtained by the status SQL query.
@@ -37121,6 +37621,16 @@ type: object
 +
 --
 Non-numeric values collected.
+
+
+type: object
+
+--
+
+*`sql.metrics.boolean.*`*::
++
+--
+Boolean values collected.
 
 
 type: object

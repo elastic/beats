@@ -1,0 +1,62 @@
+{
+    "@timestamp": "2020-06-18T08:38:39.025Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "c1f810aa-6f0e-4550-b29e-96ee1f402d65",
+        "id": "de510575-3657-4099-812a-aafd2febc68e"
+    },
+    "service": {
+        "address": "root:root@tcp(172.18.0.2:3306)/",
+        "type": "mysql"
+    },
+    "mysql": {
+        "performance": {
+            "events_statements": {
+                "max": {
+                    "timer": {
+                        "wait": 8.918075e+09
+                    }
+                },
+                "last": {
+                    "seen": "2020-06-18 08:38:05.753769"
+                },
+                "quantile": {
+                    "95": 9.120108393e+09
+                },
+                "digest": {
+                    "text": "SELECT * FROM `performance_schema` . `global_status` WHERE `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ? OR `VARIABLE_NAME` = ?"
+                },
+                "count": {
+                    "star": 2
+                },
+                "avg": {
+                    "timer": {
+                        "wait": 4.846196e+09
+                    }
+                }
+            }
+        }
+    },
+    "event": {
+        "duration": 3293342,
+        "dataset": "mysql.performance",
+        "module": "mysql"
+    },
+    "metricset": {
+        "period": 10000,
+        "name": "performance"
+    },
+    "ecs": {
+        "version": "1.5.0"
+    }
+}
