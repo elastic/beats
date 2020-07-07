@@ -32,8 +32,8 @@ func EventsMapping(results Usage) []mb.Event {
 					"pretax_cost":     usageDetail.PretaxCost,
 					"department_name": usageDetail.DepartmentName,
 					"product":         usageDetail.Product,
-					"usage_start":     usageDetail.UsageStart,
-					"usage_end":       usageDetail.UsageEnd,
+					"usage_start":     usageDetail.UsageStart.ToTime(),
+					"usage_end":       usageDetail.UsageEnd.ToTime(),
 					"currency":        usageDetail.Currency,
 					"billing_period":  usageDetail.BillingPeriodID,
 					"account_name":    usageDetail.AccountName,
@@ -56,7 +56,7 @@ func EventsMapping(results Usage) []mb.Event {
 	for _, forecast := range results.ActualCosts {
 		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
 	}
-	for date, items := range groupedCosts {
+	for usageDate, items := range groupedCosts {
 		var actualCost *decimal.Decimal
 		var forecastCost *decimal.Decimal
 		for _, item := range items {
@@ -66,6 +66,10 @@ func EventsMapping(results Usage) []mb.Event {
 				forecastCost = item.Charge
 			}
 		}
+		parsedDate, err := time.Parse(time.RFC3339, *usageDate)
+		if err != nil {
+			parsedDate = time.Now().UTC()
+		}
 		event := mb.Event{
 			RootFields: common.MapStr{
 				"cloud.provider": "azure",
@@ -73,7 +77,7 @@ func EventsMapping(results Usage) []mb.Event {
 			MetricSetFields: common.MapStr{
 				"actual_cost":   actualCost,
 				"forecast_cost": forecastCost,
-				"usage_date":    date,
+				"usage_date":    parsedDate,
 				"currency":      items[0].Currency,
 			},
 			Timestamp: time.Now().UTC(),

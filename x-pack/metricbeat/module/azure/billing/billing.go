@@ -67,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	results, err := m.client.GetMetrics(report)
+	results, err := m.client.GetMetrics()
 	if err != nil {
 		return errors.Wrap(err, "error retrieving usage information")
 	}
