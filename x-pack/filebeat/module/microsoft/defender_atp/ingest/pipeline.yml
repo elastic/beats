@@ -14,11 +14,22 @@ processors:
     lang: painless
     params:
       values:
+        - null
         - ""
         - "-"
         - "N/A"
     source: >-
       ctx?.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+- script:
+    lang: painless
+    params:
+      values:
+        - null
+        - ""
+        - "-"
+        - "N/A"
+    source: >-
+      ctx?.json?.evidence.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
 - set:
     field: cloud.provider
     value: azure
