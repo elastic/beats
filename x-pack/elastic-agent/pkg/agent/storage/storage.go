@@ -14,10 +14,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/crypto"
 )
 
-const perms = 0600
+const perms os.FileMode = 0600
 
 type store interface {
 	Save(io.Reader) error
@@ -76,9 +75,6 @@ func NewReplaceOnSuccessStore(target string, replaceWith []byte, wrapped store) 
 
 // Save will replace a target file with new content if the wrapped store is successful.
 func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
-	// get original permission
-	s, err := os.Stat(r.target)
-
 	// Ensure we can read the target files before delegating any call to the wrapped store.
 	target, err := ioutil.ReadFile(r.target)
 	if err != nil {
@@ -111,7 +107,7 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 			errors.M(errors.MetaKeyPath, r.target))
 	}
 
-	fd, err := os.OpenFile(r.target, os.O_CREATE|os.O_WRONLY, s.Mode())
+	fd, err := os.OpenFile(r.target, os.O_CREATE|os.O_WRONLY, perms)
 	if err != nil {
 		// Rollback on any errors to minimize non working state.
 		if err := file.SafeFileRotate(r.target, backFilename); err != nil {
@@ -187,69 +183,6 @@ func (d *DiskStore) Save(in io.Reader) error {
 
 // Load return a io.ReadCloser for the target file.
 func (d *DiskStore) Load() (io.ReadCloser, error) {
-	return os.OpenFile(d.target, os.O_RDONLY, perms)
-}
-
-// EncryptedDiskStore save the persisted configuration and encrypt the data on disk.
-type EncryptedDiskStore struct {
-	target   string
-	password []byte
-}
-
-// NewEncryptedDiskStore creates an encrypted disk store.
-func NewEncryptedDiskStore(target string, password []byte) *EncryptedDiskStore {
-	return &EncryptedDiskStore{target: target, password: password}
-}
-
-// Save accepts a persistedConfig, encrypt it and saved it to a target file, to do so we will
-// make a temporary files if the write is successful we are replacing the target file with the
-// original content.
-func (d *EncryptedDiskStore) Save(in io.Reader) error {
-	const perms = 0600
-
-	tmpFile := d.target + ".tmp"
-
-	fd, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perms)
-	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not save to %s", tmpFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, tmpFile))
-	}
-	// Always clean up the temporary file and ignore errors.
-	defer os.Remove(tmpFile)
-
-	w, err := crypto.NewWriterWithDefaults(fd, d.password)
-	if err != nil {
-		return errors.New(err, "could not encrypt the data to disk",
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, tmpFile))
-	}
-
-	if _, err := io.Copy(w, in); err != nil {
-		return errors.New(err, "could not save content on disk",
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, tmpFile))
-	}
-
-	if err := fd.Close(); err != nil {
-		return errors.New(err, "could not close temporary file",
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, tmpFile))
-	}
-
-	if err := file.SafeFileRotate(d.target, tmpFile); err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not replace target file %s", d.target),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, d.target))
-	}
-
-	return nil
-}
-
-// Load return a io.ReadCloser that will take care on unencrypting the data.
-func (d *EncryptedDiskStore) Load() (io.ReadCloser, error) {
 	fd, err := os.OpenFile(d.target, os.O_RDONLY|os.O_CREATE, perms)
 	if err != nil {
 		return nil, errors.New(err,
@@ -257,15 +190,5 @@ func (d *EncryptedDiskStore) Load() (io.ReadCloser, error) {
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, d.target))
 	}
-
-	r, err := crypto.NewReaderWithDefaults(fd, d.password)
-	if err != nil {
-		fd.Close()
-		return nil, errors.New(err,
-			fmt.Sprintf("could not decode file %s", d.target),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, d.target))
-	}
-
-	return r, nil
+	return fd, nil
 }
