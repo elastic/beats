@@ -110,6 +110,10 @@ func (c *RlpListener) Stop() {
 	c.wg.Wait()
 }
 
+func (c *RlpListener) Wait() {
+	c.wg.Wait()
+}
+
 // getSelectors returns the server side selectors based on the callbacks defined on the listener.
 func (c *RlpListener) getSelectors() []*loggregator_v2.Selector {
 	selectors := make([]*loggregator_v2.Selector, 0)

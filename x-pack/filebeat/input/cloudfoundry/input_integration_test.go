@@ -11,16 +11,17 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
@@ -37,66 +38,43 @@ func TestInput(t *testing.T) {
 }
 
 func testInput(t *testing.T, version string) {
+	defer resources.NewGoroutinesChecker().Check(t)
+
 	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
 	config.SetString("version", -1, version)
+
+	input, err := Plugin().Manager.Create(config)
+	require.NoError(t, err)
+
+	var wg sync.WaitGroup
+	defer wg.Wait()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// Ensure that there is something happening in the firehose
 	apiAddress, err := config.String("api_address", -1)
 	require.NoError(t, err)
-
-	// Ensure that there is something happening in the firehose
 	go makeApiRequests(t, ctx, apiAddress)
 
-	events := make(chan beat.Event)
-	connector := channel.ConnectorFunc(func(*common.Config, beat.ClientConfig) (channel.Outleter, error) {
-		return newOutleter(events), nil
-	})
+	client := pubtest.NewChanClient(0)
 
-	inputCtx := input.Context{Done: make(chan struct{})}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 
-	input, err := NewInput(config, connector, inputCtx)
-	require.NoError(t, err)
-
-	go input.Run()
-	defer input.Stop()
+		inputCtx := v2.Context{
+			Logger:      logp.NewLogger("test"),
+			Cancelation: ctx,
+		}
+		input.Run(inputCtx, pubtest.ConstClient(client))
+	}()
 
 	select {
-	case e := <-events:
+	case e := <-client.Channel:
 		t.Logf("Event received: %+v", e)
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for events")
-	}
-}
-
-type outleter struct {
-	events chan<- beat.Event
-	done   chan struct{}
-}
-
-func newOutleter(events chan<- beat.Event) *outleter {
-	return &outleter{
-		events: events,
-		done:   make(chan struct{}),
-	}
-}
-
-func (o *outleter) Close() error {
-	close(o.done)
-	return nil
-}
-
-func (o *outleter) Done() <-chan struct{} {
-	return o.done
-}
-
-func (o *outleter) OnEvent(e beat.Event) bool {
-	select {
-	case o.events <- e:
-		return true
-	default:
-		return false
 	}
 }
 
