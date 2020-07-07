@@ -1,0 +1,1901 @@
+[
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-nci: SiteEventHandler deny",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-iin: persistent-xss ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 36,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tenima: Telling laboreet ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 66,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-giatq: SPIDER-XSS ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 101,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-lupt: 2016-3-26T10:20:16 [xea] [Thread: qua] [Site: luptatev] com.rapid7.nexpose.datastore.connection.evictionThreadTime is not configured - returning default value admi.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 129,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-isaute: tcup",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 309,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ofdeFini: Using ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 331,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-emulla: mpori",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 357,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Migration",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-nisiuta: 2016-5-22T2:30:33 [tvolu] ecte[Thread: Migration] [Started: tinvolu] [Duration: iurer] iciadese",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 380,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "iciadese",
+        "rsa.internal.messageid": "Migration",
+        "rsa.time.event_time": "2016-05-22T04:30:33.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-iumtotam: Invocation: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 494,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tectobe: Nequepo ConsoleScanImporter: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 526,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tur: roi credentials: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 574,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-equatu: upta",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 606,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-itam: str Approved: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 628,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ionemu: eetdolo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 658,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-amcol: 2016-8-30T3:48:33 [adeser] [Thread: oin] [Site: mvenia] com.rapid7.nexpose.nse.nscClient.connectTimeout is not configured - returning default value madminim.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 683,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2016-08-30T05:48:33.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-siutaliq: dutp",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 857,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-isau: HHH000436: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 881,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-rumwrit: Skipping ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 908,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-eri: 2016-10-26T7:58:50 [quunt] [Thread: olori] [Site: mquae] Freed eriti triggers from 'acquired' / 'blocked' state.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 936,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2016-10-26T09:58:50.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ssecil: nodes: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1063,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-dquia: 2016-11-24T10:03:59 [temporin] [Thread: dol] [Site: tatione] SiteEventHandler  deny",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1088,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-nsec: quidolor j_password: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1188,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-edquian: loremeu Form: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1225,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Accepting",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uela: 2017-1-6T7:11:41 [ntexplic] uto[Thread: Accepting] [Started: iuntNequ] [Duration: esseq] Accepting aincidun ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 1258,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "Accepting",
+        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-nse: 2017/01/20T14:14:16 [modoc] [Thread: boNem] [Site: iumt] Database tsed ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1382,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2017-01-20T16:14:16.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Migration",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-enim: 2017-2-3T9:16:50 [Finibus] radi[Thread: Migration] [Started: xeacom] [Duration: des] atnulapa",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1468,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "atnulapa",
+        "rsa.internal.messageid": "Migration",
+        "rsa.time.event_time": "2017-02-03T11:16:50.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-msequ: uat",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1577,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ataevita: oremqu",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1597,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-oremi: ugitsedq",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1623,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ipsaqu: TagEventHandler cancel",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1648,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tiaecon: Acknowledged: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1688,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-itametc: ProductNotificationService: allow",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1721,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-olori: ido",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1773,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Activation",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-lpaquiof: Activation 2017-5-29T5:37:24 oloreeu",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1793,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "oloreeu",
+        "rsa.internal.messageid": "Activation",
+        "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-umfugi: 2017-6-12T12:39:58 [stquidol] [Thread: Nemoenim] [Site: imadmini] Populating ide",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1849,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Error",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-olu: 2017-6-26T7:42:33 [iameaque] identsun[Thread: Error] [Started: ender] [Duration: inc] tect",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 1947,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "tect",
+        "rsa.internal.messageid": "Error",
+        "rsa.time.event_time": "2017-06-26T09:42:33.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.action": "Upgrading database",
+        "event.code": "Upgrading",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-magnam: 2017-7-11T2:45:07 [uinesc] cid[Thread: Upgrading] [Started: emi] [Duration: Bonorum] Upgrading databaselesti",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2052,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "Upgrading",
+        "rsa.misc.action": [
+            "Upgrading database"
+        ],
+        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-assi: 2017-7-25T9:47:41 [eserun] [Thread: rvelill] [Site: lupta] Default ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2178,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tatevel: midestl",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2261,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "An",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ufugi: An 2017-8-22T11:52:50 cin",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2287,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "cin",
+        "rsa.internal.messageid": "An",
+        "rsa.time.event_time": "2017-08-22T13:52:50.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PostgreSQL",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-onofdeF: 2017-9-6T6:55:24 [ibusBo] orin[Thread: PostgreSQL] [Started: enia] [Duration: iavol] PostgreSQL natuserr ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 2329,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "PostgreSQL",
+        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-orsitam: 2017-9-20T1:57:58 [iquaUten] [Thread: prehende] [Site: lup] com.rapid7.nexpose.nsc.scanExecutorService.minimumCorePoolSize is not configured - returning default value tpers.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2453,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2017-09-20T03:57:58.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Remapped",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-aea: 2017/10/04T21:00:32 [tvolu] dutper[Thread: Remapped] [Started: tlaboru] [Duration: aeabillo] Started: ciad] [Duration: ugiatqu] Remapped eruntmo ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 2645,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "Remapped",
+        "rsa.time.event_time": "2017-10-04T23:00:32.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uatu: Shutting down '",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2805,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ende: DEFAULT SCHEDULER: '",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2836,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-mexerci: 2017-11-16T6:08:15 [urEx] [Thread: ditaut] [Site: ctetur] Storing ] [mvolupta] Storing scan details for squame.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 2872,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2017-11-16T08:08:15.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-exe: Reading ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3002,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-eddoei: Benchmark lorumw",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3025,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ctionofd: j_password: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3059,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-boreetd: tNe",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3091,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ntocca: 2018-1-27T5:21:06 [trudex] tvol[Thread: com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout] [Started: lup] [Duration: mipsamv] com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout is not configured - returning default value exeacomm.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3113,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout is not configured",
+        "rsa.internal.messageid": "com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout",
+        "rsa.misc.result_code": "exeacomm",
+        "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-iadeseru: Adding ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3392,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-eosqui: iatquo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3419,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Establishing",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-iqu: Establishing 2018-3-11T2:28:49 quamqua",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3443,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "quamqua",
+        "rsa.internal.messageid": "Establishing",
+        "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Deleted",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-diduntut: 2018/03/25T09:31:24 [rroq] olore[Thread: Deleted] [Started: eratvolu] [Duration: oconsequ] Started: roqui] [Duration: oluptate] Deleted ntut",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3496,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "ntut",
+        "rsa.internal.messageid": "Deleted",
+        "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Error",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-aturve: Error 2018-4-8T4:33:58 edqui",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3656,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "edqui",
+        "rsa.internal.messageid": "Error",
+        "rsa.time.event_time": "2018-04-08T06:33:58.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-Loremip: Requested: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3702,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "0.16",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-nge: 2018/05/07T06:39:06 [psum] tate[Thread: 0.16] [Started: dtempo] [Duration: lumqu] 0.16: moen",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3732,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "moen",
+        "rsa.internal.messageid": "0.16",
+        "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tur: The: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3839,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Renamed",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-mipsa: 2018-6-4T8:44:15 [uas] iat[Thread: Renamed] [Started: hite] [Duration: adipis] Renamed abo to suntex",
+        "event.outcome": "Success",
+        "file.name": "abo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3859,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "suntex",
+        "rsa.internal.messageid": "Renamed",
+        "rsa.investigations.ec_activity": "Modify",
+        "rsa.investigations.ec_outcome": "Success",
+        "rsa.time.event_time": "2018-06-04T10:44:15.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-exerc: Retrieving ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 3976,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uaturQ: but: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4004,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-dolor: 2018-7-17T5:51:58 [equunt] [Thread: mto] [Site: iae] Invocation ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4027,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2018-07-17T07:51:58.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-magnido: mcolab",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4108,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tiumd: Dumping ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4133,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-orisnis: umq",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4158,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-intoc: 2018-9-12T10:02:15 [obeataev] [Thread: rrorsit] [Site: aincid] Populating umquid",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4180,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2018-09-12T12:02:15.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uisno: enat",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4277,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "suntexpl JVM frames",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-oriss: imadmin suntexpl JVM frames :                        urve",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4298,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "suntexpl JVM frames",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-lupta: utla",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4372,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.action": "accept",
+        "event.code": "AssetGroupEventHandler",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ntore: 2018-11-9T2:12:32 [tect] ion[Thread: AssetGroupEventHandler] [Started: tutl] [Duration: niam] oru accept",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4393,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "AssetGroupEventHandler",
+        "rsa.misc.action": [
+            "accept"
+        ],
+        "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
+        "service.name": "fld1",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ostr: amcorp 0.49: iadolo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4514,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "loading",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-mali: 2018-12-7T4:17:40 [amestqu] qui[Thread: loading] [Started: nemullam] [Duration: modoco] maveni",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4549,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "maveni",
+        "rsa.internal.messageid": "loading",
+        "rsa.time.event_time": "2018-12-07T06:17:40.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Closing",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-upt: 2018-12-21T11:20:14 [giatquo] toccaec[Thread: Closing] [Started: nihilmo] [Duration: atquo] Engine: umetMa] [Engine ID: ngelitse] Closing connection to scan engine.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4659,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "Closing connection to scan engine",
+        "rsa.internal.messageid": "Closing",
+        "rsa.time.event_time": "2018-12-21T13:20:14.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-eosqu: reetdolo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4838,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ten: 2019-1-19T1:25:23 [Utenim] [Thread: itationu] [Site: eprehen] NSXAssetEventHandler  cancel",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4863,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2019-01-19T03:25:23.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-Neq: rcita",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 4968,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "removing",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-quatD: 2019-2-17T3:30:32 [nevol] lumquid[Thread: removing] [Started: Sectio] [Duration: tiumdol] removing laud ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4988,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "removing",
+        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-atquo: 2019-3-3T10:33:06 [estl] [Thread: ern] [Site: ationula] Recovering abilloin emape",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5109,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-Malor: 2019-3-17T5:35:40 [amn] [Thread: nre] [Site: sintoc] com.rapid7.thread.threadPoolNonBlockingOpsProviderParallelism is not configured - returning default value unknown.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5207,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2019-03-17T07:35:40.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Setting",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-pta: 2019-4-1T12:38:14 [ididunt] tlaboree[Thread: Setting] [Started: sequa] [Duration: erc] Setting isq",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5391,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "isq",
+        "rsa.internal.messageid": "Setting",
+        "rsa.time.event_time": "2019-04-01T14:38:14.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ptate: oloreeu credentials: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5504,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-iscinge: Populating ora",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5542,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-orincidi: ScanEventHandler: cancel",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5575,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-mSecti: Updating ius",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5619,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "No",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-aturExc: 2019-6-11T11:51:06 [rsit] intocca[Thread: No] [Started: equuntu] [Duration: ntutlab] eaq",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5649,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "eaq",
+        "rsa.internal.messageid": "No",
+        "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "[Site:",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ipis: 2019-6-25T6:53:40 [nsecte] [Thread: miurere] [Site: tat] persistent-xss ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5756,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "[Site:",
+        "rsa.time.event_time": "2019-06-25T08:53:40.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Activation",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-olupta: 2019-7-10T1:56:14 [ape] amestqu[Thread: Activation] [Started: luptas] [Duration: ariatu] psumqui",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5844,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "psumqui",
+        "rsa.internal.messageid": "Activation",
+        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.action": "allow",
+        "event.code": "AssetGroupEventHandler",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uunturm: 2019-7-24T8:58:48 [nonnumq] tqu[Thread: AssetGroupEventHandler] [Started: ntocca] [Duration: emquelau] adolorsi allow",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 5958,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "AssetGroupEventHandler",
+        "rsa.misc.action": [
+            "allow"
+        ],
+        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
+        "service.name": "fld1",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-agn: Stopping eritinvo ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6094,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.action": "Shutting down",
+        "event.code": "ConsoleScanImporter",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-uisaut: 2019-8-21T11:03:57 [apar] ulpaq[Thread: ConsoleScanImporter] [Started: reeuf] [Duration: orinrepr] tinvo",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6127,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "tinvo",
+        "rsa.internal.messageid": "ConsoleScanImporter",
+        "rsa.misc.action": [
+            "Shutting down"
+        ],
+        "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-ctobeat: common ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6249,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-olab: remagnam Destroying: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6275,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-adipi: idid Destroying: ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6312,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Job",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-lore: 2019-10-18T3:14:14 [uisautem] olorsi[Thread: Job] [Started: everitat] [Duration: tetu] Job execution threads will use class loader of thread: stlaboru",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6346,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.db.index": "stlaboru",
+        "rsa.internal.event_desc": "Job execution threads will use class loader",
+        "rsa.internal.messageid": "Job",
+        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "com.rapid7.nexpose.datastore.connection.evictionThreadTime",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-mco: 2019-11-1T10:16:48 [nofdeF] itvolupt[Thread: com.rapid7.nexpose.datastore.connection.evictionThreadTime] [Started: uradip] [Duration: perspi] com.rapid7.nexpose.datastore.connection.evictionThreadTime is not configured - returning default value uaer.",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6512,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "com.rapid7.nexpose.datastore.connection.evictionThreadTime is not configured",
+        "rsa.internal.messageid": "com.rapid7.nexpose.datastore.connection.evictionThreadTime",
+        "rsa.misc.result_code": "uaer",
+        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "Restarting",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tenim: 2019-11-15T5:19:22 [osqu] cti[Thread: Restarting] [Started: orsitvo] [Duration: elit] iono",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6777,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.event_desc": "iono",
+        "rsa.internal.messageid": "Restarting",
+        "rsa.time.event_time": "2019-11-15T07:19:22.000Z",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-tempori: sedquian",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6884,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "NEXPOSE_GENERIC",
+        "event.dataset": "rapid7.nexpose",
+        "event.module": "rapid7",
+        "event.original": "%NEXPOSE-umfu: No ",
+        "fileset.name": "nexpose",
+        "input.type": "log",
+        "log.offset": 6911,
+        "observer.product": "Nexpose",
+        "observer.type": "Vulnerability",
+        "observer.vendor": "Rapid7",
+        "rsa.internal.messageid": "NEXPOSE_GENERIC",
+        "service.type": "rapid7",
+        "tags": [
+            "rapid7.nexpose",
+            "forwarded"
+        ]
+    }
+]

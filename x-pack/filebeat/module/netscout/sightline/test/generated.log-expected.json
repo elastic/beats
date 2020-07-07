@@ -1,0 +1,2487 @@
+[
+    {
+        "@timestamp": "2020-01-29T08:09:59.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 29 06:09:59 pfsp: The configuration was changed on leader olab to version 1.6078 by rci",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.6078",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "olab",
+        "rsa.misc.version": "1.6078",
+        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "rci"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-12T15:12:33.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 12 13:12:33 pfsp: Alert Autoclassification was restarted on 2016-02-12 13:12:33 uredolor by tatemac",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 96,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
+        "rsa.time.starttime": "2016-02-12T15:12:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "tatemac"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-26T22:15:08.000Z",
+        "event.code": "Device",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 26 20:15:08 pfsp: Device ntium unreachable by controller psaq since 2016-02-26 20:15:08",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 205,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Device",
+        "rsa.misc.node": "ntium",
+        "rsa.misc.parent_node": "psaq",
+        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
+        "rsa.time.starttime": "2016-02-26T22:15:08.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-12T05:17:42.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 12 03:17:42 pfsp:  low  usage alert  dolore usage alert sequa for service abo, squira threshold nostrud observed mest",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 302,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-03-12T05:17:42.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-26T12:20:16.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 26 10:20:16 nci: BGP: ipv6-icmp Hijack local_prefix litesse router orev bgp_prefix pisciv bgp_attributes uii",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 426,
+        "network.protocol": "ipv6-icmp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "uii",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "orev",
+        "rsa.time.event_time": "2020-03-26T12:20:16.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-09T19:22:51.000Z",
+        "event.code": "SNMP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 9 17:22:51 pfsp: Alert SNMP  down for router olupt, leader volup since 2016-04-09 17:22:51 byCicer",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 541,
+        "network.protocol": "SNMP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "SNMP",
+        "rsa.misc.node": "olupt",
+        "rsa.misc.parent_node": "volup",
+        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
+        "rsa.time.starttime": "2016-04-09T19:22:51.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-24T02:25:25.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 24 00:25:25 pfsp:  Flowspec  usage_alert  usage alert isiutal for moenimi mod threshold riosam observed anonnu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 646,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-04-24T02:25:25.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-08T09:27:59.000Z",
+        "destination.ip": [
+            "10.139.108.194"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 8 07:27:59 idolor: Blocked Host: Blocked host10.255.173.170ateiusby Blocked Countries usingipv6-icmpdestination10.139.108.194,URL:https://example.com/lupt/tia.txt?uame=quis#orisn",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 763,
+        "network.protocol": "ipv6-icmp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.255.173.170",
+            "10.139.108.194"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.255.173.170"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://example.com/lupt/tia.txt?uame=quis#orisn"
+    },
+    {
+        "@timestamp": "2020-05-22T16:30:33.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 22 14:30:33 pfsp:  low  usage alert  interface usage alert meumfug for router tetu interface \"eth1133\" speed com threshold eataevi observed byC pct tinculp",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 946,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-05T23:33:08.000Z",
+        "event.code": "SNMP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 5 21:33:08 pfsp: The SNMP  down for router minim, leader eFini since 2016-06-05 21:33:08 amco",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1106,
+        "network.protocol": "SNMP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "SNMP",
+        "rsa.misc.node": "minim",
+        "rsa.misc.parent_node": "eFini",
+        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
+        "rsa.time.starttime": "2016-06-05T23:33:08.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-20T06:35:42.000Z",
+        "event.code": "SNMP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 20 04:35:42 pfsp: The SNMP  restored for router mvolu, leader radip at 2016-06-20 04:35:42 tNequ",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1205,
+        "network.protocol": "SNMP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "SNMP",
+        "rsa.misc.node": "mvolu",
+        "rsa.misc.parent_node": "radip",
+        "rsa.time.endtime": "2016-06-20T06:35:42.000Z",
+        "rsa.time.event_time": "2020-06-20T06:35:42.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-07-04T13:38:16.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 4 11:38:16 tatno: Protection Mode: Changed protection mode to active for protection groupdquiac,URL:https://mail.example.net/uam/untutl.jpg?llu=uptassi#tamremap",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1307,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "dquiac",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-07-04T13:38:16.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://mail.example.net/uam/untutl.jpg?llu=uptassi#tamremap"
+    },
+    {
+        "@timestamp": "2019-07-18T20:40:50.000Z",
+        "destination.ip": [
+            "10.155.162.162"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 18 18:40:50 eum: Blocked Host: Blocked host10.66.171.247atsitby Blocked Countries usingudpdestination10.155.162.162,URL:https://www5.example.org/seq/olorema.jpg?quid=fug#uatDuis",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1473,
+        "network.protocol": "udp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.155.162.162",
+            "10.66.171.247"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.66.171.247"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www5.example.org/seq/olorema.jpg?quid=fug#uatDuis"
+    },
+    {
+        "@timestamp": "2019-08-02T03:43:25.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 2 01:43:25 pfsp:  high  usage alert  interface usage alert uian done for router tempo interface \"eth4780\"",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1656,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-08-02T03:43:25.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-16T10:45:59.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 16 08:45:59 Username:  Flowspec  Change_Log , Subsystem:omnis, Setting Type:antium, Message:Cice",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 1769,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2019-08-16T10:45:59.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-30T17:48:33.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 30 15:48:33 pfsp: Alert Autoclassification was restarted on 2016-08-30 15:48:33 uidexea by anim",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 1873,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-08-30T17:48:33.000Z",
+        "rsa.time.starttime": "2016-08-30T17:48:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "anim"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-14T00:51:07.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 13 22:51:07 Username:  high  Change Log , Subsystem:ari, Setting Type:equun, Message:suntinc",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 1976,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2019-09-14T00:51:07.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-28T07:53:42.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 28 05:53:42 pfsp:  High  usage alert  interface usage alert llamcorp done for router ari interface \"lo3856\"",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2079,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-09-28T07:53:42.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-12T14:56:16.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 12 12:56:16 ele: Protection Mode: Changed protection mode to active for protection grouptenbyCic,URL:https://mail.example.net/ugits/temsequ.gif?ipit=idexea#riat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2197,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "tenbyCic",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://mail.example.net/ugits/temsequ.gif?ipit=idexea#riat"
+    },
+    {
+        "@timestamp": "2019-10-26T21:58:50.000Z",
+        "event.code": "anomaly",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 26 19:58:50 moll: anomaly: anomaly Bandwidth id 2902 status inim severity high classification deomni router tquovol router_name ntsuntin interface aecatcup interface_name \"lo4987\" oluptate",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "high",
+        "log.offset": 2366,
+        "network.interface.name": "lo4987",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "anomaly",
+        "rsa.misc.category": "deomni",
+        "rsa.misc.disposition": "inim",
+        "rsa.misc.node": "ntsuntin",
+        "rsa.misc.policy_name": "Bandwidth",
+        "rsa.misc.severity": "high",
+        "rsa.misc.sig_id": 2902,
+        "rsa.network.interface": "lo4987",
+        "rsa.time.event_time": "2019-10-26T21:58:50.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-10T05:01:24.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 10 03:01:24 pfsp:  High  usage alert  usage alert orsitame for quiratio ite done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2563,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-11-10T05:01:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-24T12:03:59.000Z",
+        "destination.ip": [
+            "10.159.182.171"
+        ],
+        "event.code": "GRE",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 24 10:03:59 pfsp: Alert GRE tunnel down for destination 10.159.182.171, leader umdolore since 2016-11-24 10:03:59 eniam",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2653,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.159.182.171"
+        ],
+        "rsa.internal.messageid": "GRE",
+        "rsa.misc.parent_node": "umdolore",
+        "rsa.time.event_time": "2019-11-24T12:03:59.000Z",
+        "rsa.time.starttime": "2016-11-24T12:03:59.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-08T19:06:33.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 8 17:06:33 pfsp: Autoclassification was restarted on 2016-12-08 17:06:33 olupta by turveli",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2782,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-12-08T19:06:33.000Z",
+        "rsa.time.starttime": "2016-12-08T19:06:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "turveli"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-23T02:09:07.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 23 00:09:07 onsequat: Protection Mode: Changed protection mode to active for protection groupsiuta,URL:https://api.example.net/rporis/end.txt?itaut=rveli#rsint",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 2882,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "siuta",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://api.example.net/rporis/end.txt?itaut=rveli#rsint"
+    },
+    {
+        "@timestamp": "2020-01-06T09:11:41.000Z",
+        "destination.ip": [
+            "10.243.224.205"
+        ],
+        "event.code": "GRE",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 6 07:11:41 pfsp: Alert GRE tunnel down for destination 10.243.224.205, leader uradi since 2017-01-06 07:11:41 aborumSe",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3051,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.243.224.205"
+        ],
+        "rsa.internal.messageid": "GRE",
+        "rsa.misc.parent_node": "uradi",
+        "rsa.time.event_time": "2020-01-06T09:11:41.000Z",
+        "rsa.time.starttime": "2017-01-06T09:11:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-01-20T16:14:16.000Z",
+        "event.code": "Peakflow",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 20 14:14:16 pfsp: The Peakflow device antiumto unreachable by strude since 2017-01-20 14:14:16",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3178,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Peakflow",
+        "rsa.misc.node": "antiumto",
+        "rsa.misc.parent_node": "strude",
+        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
+        "rsa.time.starttime": "2017-01-20T16:14:16.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-03T23:16:50.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 3 21:16:50 pfsp: Autoclassification was restarted on 2017-02-03 21:16:50 aperi by lor",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3281,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
+        "rsa.time.starttime": "2017-02-03T23:16:50.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "lor"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-18T06:19:24.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 18 04:19:24 pfsp: The BGP  Instability for router oin ended",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3376,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "oin",
+        "rsa.time.event_time": "2020-02-18T06:19:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-04T13:21:59.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 4 11:21:59 Username:  high  Change Log , Subsystem:dolore, Setting Type:abor, Message:iqui",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 3445,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-18T20:24:33.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 18 18:24:33 etM: Protection Mode: Changed protection mode to active for protection groupnimadmin,URL:https://www5.example.org/piscing/roq.txt?dun=onproide#luptat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3542,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "nimadmin",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-03-18T20:24:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www5.example.org/piscing/roq.txt?dun=onproide#luptat"
+    },
+    {
+        "@timestamp": "2020-04-02T03:27:07.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 2 01:27:07 Username:  low  Change Log , Subsystem:adm, Setting Type:umdolo, Message:onproide",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 3710,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-16T10:29:41.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 16 08:29:41 pfsp: BGP  Hijack local_prefix tcup router imadmini bgp_prefix ntutla bgp_attributes equa",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3809,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "equa",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "imadmini",
+        "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-30T17:32:16.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 30 15:32:16 pfsp: configuration was changed on leader sunt to version 1.1284 by ume",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 3917,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.1284",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "sunt",
+        "rsa.misc.version": "1.1284",
+        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "ume"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-15T00:34:50.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 14 22:34:50 pfsp: The Autoclassification was restarted on 2017-05-14 22:34:50 picia by mUtenima",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4007,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
+        "rsa.time.starttime": "2017-05-15T00:34:50.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "mUtenima"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-29T07:37:24.000Z",
+        "destination.ip": [
+            "10.60.185.151"
+        ],
+        "event.code": "GRE",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 29 05:37:24 pfsp: The GRE tunnel down for destination 10.60.185.151, leader uidolo since 2017-05-29 05:37:24 lumquido",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4107,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.60.185.151"
+        ],
+        "rsa.internal.messageid": "GRE",
+        "rsa.misc.parent_node": "uidolo",
+        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
+        "rsa.time.starttime": "2017-05-29T07:37:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-12T14:39:58.000Z",
+        "event.code": "Test",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 12 12:39:58 Lor: Test: Test syslog message",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4229,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Test",
+        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-26T21:42:33.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 26 19:42:33 pfsp:  High  usage alert  interface usage alert ostrume for router molest interface \"eth7336\" speed uiineavo threshold tisetq observed irati pct ici",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4277,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-11T04:45:07.000Z",
+        "event.category": "Script mitigation",
+        "event.code": "script",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 11 02:45:07 pfsp: The script vol ran at 2017-07-11 02:45:07  ,  leader riat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4443,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "script",
+        "rsa.misc.disposition": "ongoing",
+        "rsa.misc.event_type": "Script mitigation",
+        "rsa.misc.node": "vol",
+        "rsa.misc.parent_node": "riat",
+        "rsa.time.event_time": "2019-07-11T04:45:07.000Z",
+        "rsa.time.starttime": "2017-07-11T04:45:07.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-25T11:47:41.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 25 09:47:41 imad: Protection Mode: Changed protection mode to active for protection groupmsequi,URL:https://www5.example.org/iquaUten/santium.html?imidest=emagnama#eprehend",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4524,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "msequi",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www5.example.org/iquaUten/santium.html?imidest=emagnama#eprehend"
+    },
+    {
+        "@timestamp": "2019-08-08T18:50:15.000Z",
+        "destination.ip": [
+            "10.28.127.218"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 8 16:50:15 xeac: Blocked Host: Blocked host10.233.107.138attaliqby Blocked Countries usingrdpdestination10.28.127.218,URL:https://www.example.net/nse/sinto.gif?CSed=lupt#psaquae",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4702,
+        "network.protocol": "rdp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.28.127.218",
+            "10.233.107.138"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2019-08-08T18:50:15.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.233.107.138"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www.example.net/nse/sinto.gif?CSed=lupt#psaquae"
+    },
+    {
+        "@timestamp": "2019-08-23T01:52:50.000Z",
+        "event.code": "SNMP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 22 23:52:50 pfsp: Alert SNMP  down for router idex, leader xerci since 2017-08-22 23:52:50 aqu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4887,
+        "network.protocol": "SNMP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "SNMP",
+        "rsa.misc.node": "idex",
+        "rsa.misc.parent_node": "xerci",
+        "rsa.time.event_time": "2019-08-23T01:52:50.000Z",
+        "rsa.time.starttime": "2017-08-23T01:52:50.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-06T08:55:24.000Z",
+        "destination.ip": [
+            "10.32.143.134"
+        ],
+        "event.code": "GRE",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 6 06:55:24 pfsp: Alert GRE tunnel restored for destination 10.32.143.134, leader serror at 2017-09-06 06:55:24 aliqu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 4989,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.32.143.134"
+        ],
+        "rsa.internal.messageid": "GRE",
+        "rsa.misc.parent_node": "serror",
+        "rsa.time.endtime": "2017-09-06T08:55:24.000Z",
+        "rsa.time.event_time": "2019-09-06T08:55:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-20T15:57:58.000Z",
+        "event.code": "Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 20 13:57:58 pfsp: Host Detection alert atDu, start 2017-09-20 13:57:58 eav, duration 141.087000, direction usmodt, host 10.225.160.182, signatures (mque), impact uovolup, importance high, managed_objects (llu), (parent managed object licab)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "high",
+        "log.offset": 5116,
+        "network.direction": "usmodt",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.225.160.182"
+        ],
+        "rsa.internal.messageid": "Host",
+        "rsa.misc.policy_name": "mque",
+        "rsa.misc.severity": "high",
+        "rsa.time.duration_time": 141.087,
+        "rsa.time.event_time": "2019-09-20T15:57:58.000Z",
+        "rsa.time.starttime": "2017-09-20T15:57:58.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.225.160.182"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-04T23:00:32.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 4 21:00:32 pfsp: The Autoclassification was restarted on 2017-10-04 21:00:32 snostrud by nama",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5367,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-10-04T23:00:32.000Z",
+        "rsa.time.starttime": "2017-10-04T23:00:32.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "nama"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-19T06:03:07.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 19 04:03:07 pfsp: configuration was changed on leader magni to version 1.2949 by uptat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5469,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.2949",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "magni",
+        "rsa.misc.version": "1.2949",
+        "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "uptat"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-02T13:05:41.000Z",
+        "event.code": "Peakflow",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 2 11:05:41 pfsp: The Peakflow device sectetur unreachable by uioffi since 2017-11-02 11:05:41",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5564,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Peakflow",
+        "rsa.misc.node": "sectetur",
+        "rsa.misc.parent_node": "uioffi",
+        "rsa.time.event_time": "2019-11-02T13:05:41.000Z",
+        "rsa.time.starttime": "2017-11-02T13:05:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-16T20:08:15.000Z",
+        "destination.ip": [
+            "10.209.182.237"
+        ],
+        "event.code": "GRE",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 16 18:08:15 pfsp: GRE tunnel restored for destination 10.209.182.237, leader tper at 2017-11-16 18:08:15 olor",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5667,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.209.182.237"
+        ],
+        "rsa.internal.messageid": "GRE",
+        "rsa.misc.parent_node": "tper",
+        "rsa.time.endtime": "2017-11-16T20:08:15.000Z",
+        "rsa.time.event_time": "2019-11-16T20:08:15.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-01T03:10:49.000Z",
+        "event.code": "Device",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 1 01:10:49 pfsp: Alert Device xerc reachable again by controller iutali at 2017-12-01 01:10:49 fdeFi",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5786,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Device",
+        "rsa.misc.node": "xerc",
+        "rsa.misc.parent_node": "iutali",
+        "rsa.time.endtime": "2017-12-01T03:10:49.000Z",
+        "rsa.time.event_time": "2019-12-01T03:10:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-15T10:13:24.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 15 08:13:24 pfsp: BGP  down for router ati, leader tlabo since 2017-12-15 08:13:24 uames",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5896,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "ati",
+        "rsa.misc.parent_node": "tlabo",
+        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
+        "rsa.time.starttime": "2017-12-15T10:13:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-29T17:15:58.000Z",
+        "event.category": "Script mitigation",
+        "event.code": "script",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 29 15:15:58 pfsp: script offi ran at 2017-12-29 15:15:58  ,  leader giatnu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 5994,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "script",
+        "rsa.misc.disposition": "ongoing",
+        "rsa.misc.event_type": "Script mitigation",
+        "rsa.misc.node": "offi",
+        "rsa.misc.parent_node": "giatnu",
+        "rsa.time.event_time": "2019-12-29T17:15:58.000Z",
+        "rsa.time.starttime": "2017-12-29T17:15:58.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-01-13T00:18:32.000Z",
+        "destination.ip": [
+            "10.128.31.83"
+        ],
+        "destination.port": 2346,
+        "event.code": "anomaly",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 12 22:18:32 pfsp: Alert anomaly ncidid id 6f3fd2c5 status uamei severity very-high classification aera src 10.128.31.83/2346 nimid dst 10.97.164.220/6205 uptasn start 2018-01-12 10:18:32  duration  50.929000 percent issus rate osamn rateUnit isnisiu protocol udp flags pre url https://internal.example.org/stlabo/dictasu.gif?catc=nsect#idata",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "very-high",
+        "log.offset": 6078,
+        "network.protocol": "udp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.128.31.83",
+            "10.97.164.220"
+        ],
+        "rsa.internal.messageid": "anomaly",
+        "rsa.misc.category": "aera",
+        "rsa.misc.disposition": "uamei",
+        "rsa.misc.event_id": "id 6f3fd2c5",
+        "rsa.misc.policy_name": "ncid",
+        "rsa.misc.severity": "very-high",
+        "rsa.time.duration_time": 50.929,
+        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
+        "rsa.time.starttime": "2018-01-12T12:18:32.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.97.164.220"
+        ],
+        "source.port": 6205,
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://internal.example.org/stlabo/dictasu.gif?catc=nsect#idata"
+    },
+    {
+        "@timestamp": "2020-01-27T07:21:06.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 27 05:21:06 Utenimad: Change Log: Username:orpor, Subsystem:tlabo, Setting Type:ipis, Message:emvel",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 6428,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2020-01-27T07:21:06.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "orpor"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-10T14:23:41.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 10 12:23:41 atcu: Protection Mode: Changed protection mode to active for protection grouplabor,URL:https://internal.example.net/uptatema/intocc.gif?orema=invento#qua",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 6536,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "labor",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://internal.example.net/uptatema/intocc.gif?orema=invento#qua"
+    },
+    {
+        "@timestamp": "2020-02-24T21:26:15.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 24 19:26:15 utlabor: Change Log: Username:rau, Subsystem:idex, Setting Type:mfugiat, Message:nisiuta",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 6711,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2020-02-24T21:26:15.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "rau"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-11T04:28:49.000Z",
+        "event.code": "Flow",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 11 02:28:49 pfsp: Alert Flow down for router tessec, leader olupta since 2018-03-11 02:28:49 litse",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 6821,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Flow",
+        "rsa.misc.node": "tessec",
+        "rsa.misc.parent_node": "olupta",
+        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
+        "rsa.time.starttime": "2018-03-11T04:28:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-25T11:31:24.000Z",
+        "event.code": "Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 25 09:31:24 pfsp: Alert Host Detection alert sperna, start 2018-03-25 09:31:24 sintocc, duration 24.633000, stop 2018-03-25 09:31:24 scivelit, , importance medium, managed_objects (ehen), is now success, (parent managed object quameius)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "medium",
+        "log.offset": 6926,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Host",
+        "rsa.misc.result": "success",
+        "rsa.misc.severity": "medium",
+        "rsa.time.duration_time": 24.633,
+        "rsa.time.endtime": "2018-03-25T11:31:24.000Z",
+        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
+        "rsa.time.starttime": "2018-03-25T11:31:24.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-08T18:33:58.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 8 16:33:58 Username:  low   pps  Change Log , Subsystem:smo, Setting Type:etcons, Message:iusmodi",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 7169,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-23T01:36:32.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 22 23:36:32 Username:  high   jitter  Change Log , Subsystem:uae, Setting Type:officiad, Message:itam",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 7273,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-07T08:39:06.000Z",
+        "event.code": "Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 7 06:39:06 pfsp: The Host Detection alert tur, start 2018-05-7 06:39:06 roi, duration 8.266000, direction ariatu, host 10.52.12.167, signatures (atno), impact tani, importance medium, managed_objects (ntocca), (parent managed object ostru)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "medium",
+        "log.offset": 7381,
+        "network.direction": "ariatu",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.52.12.167"
+        ],
+        "rsa.internal.messageid": "Host",
+        "rsa.misc.policy_name": "atno",
+        "rsa.misc.severity": "medium",
+        "rsa.time.duration_time": 8.266,
+        "rsa.time.event_time": "2020-05-07T08:39:06.000Z",
+        "rsa.time.starttime": "2018-05-07T08:39:06.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.52.12.167"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-21T15:41:41.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 21 13:41:41 pfsp:  low  usage alert  usage alert quamni for fingerprint iatisu done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 7625,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-05-21T15:41:41.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-04T22:44:15.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 4 20:44:15 pfsp:  low  usage alert  usage alert sBon for orro tae threshold ccaec observed ten",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 7713,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-06-04T22:44:15.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-19T05:46:49.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 19 03:46:49 exe: Change Log: Username:imadmini, Subsystem:sauteiru, Setting Type:mod, Message:hilm",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 7813,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "imadmini"
+        ]
+    },
+    {
+        "@timestamp": "2020-07-03T12:49:23.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 3 10:49:23 Username:  high   bps  Change Log , Subsystem:remag, Setting Type:uredol, Message:ccaecat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 7917,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-17T19:51:58.000Z",
+        "event.code": "Device",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 17 17:51:58 pfsp: Alert Device taedicta reachable again by controller itam at 2018-07-17 17:51:58 str",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8023,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Device",
+        "rsa.misc.node": "taedicta",
+        "rsa.misc.parent_node": "itam",
+        "rsa.time.endtime": "2018-07-17T19:51:58.000Z",
+        "rsa.time.event_time": "2019-07-17T19:51:58.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-01T02:54:32.000Z",
+        "destination.ip": [
+            "10.135.82.97"
+        ],
+        "destination.port": 1790,
+        "event.code": "anomaly",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 1 00:54:32 pfsp: The anomaly molli id 3cfa4982 status aturauto severity high classification gitsedqu impact borios src 10.135.82.97/1790 sumdolor dst 10.239.19.5/967 mquelau start 2018-08-01 12:54:32  duration  164.296000 percent boNem rate ess rateUnit ipisci protocol udp flags mvenia  url https://www5.example.org/fugitsed/quam.html?luptate=persp#entsunt, ihilm ",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "high",
+        "log.offset": 8130,
+        "network.protocol": "udp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.239.19.5",
+            "10.135.82.97"
+        ],
+        "rsa.internal.messageid": "anomaly",
+        "rsa.misc.category": "gitsedqu impact borios",
+        "rsa.misc.disposition": "aturauto",
+        "rsa.misc.event_id": "3cfa4982",
+        "rsa.misc.policy_name": "molli",
+        "rsa.misc.severity": "high",
+        "rsa.time.duration_time": 164.296,
+        "rsa.time.event_time": "2019-08-01T02:54:32.000Z",
+        "rsa.time.starttime": "2018-08-01T14:54:32.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.239.19.5"
+        ],
+        "source.port": 967,
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www5.example.org/fugitsed/quam.html?luptate=persp#entsunt, ihilm"
+    },
+    {
+        "@timestamp": "2019-08-15T09:57:06.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 15 07:57:06 pfsp: Autoclassification was restarted on 2018-08-15 07:57:06 fugi by quia",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8503,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-08-15T09:57:06.000Z",
+        "rsa.time.starttime": "2018-08-15T09:57:06.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "quia"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-29T16:59:40.000Z",
+        "event.category": "Script mitigation",
+        "event.code": "script",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 29 14:59:40 pfsp: script temUt ran at 2018-08-29 14:59:40  ,  leader avol",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8597,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "script",
+        "rsa.misc.disposition": "ongoing",
+        "rsa.misc.event_type": "Script mitigation",
+        "rsa.misc.node": "temUt",
+        "rsa.misc.parent_node": "avol",
+        "rsa.time.event_time": "2019-08-29T16:59:40.000Z",
+        "rsa.time.starttime": "2018-08-29T16:59:40.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-13T00:02:15.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 12 22:02:15 pfsp: The Autoclassification was restarted on 2018-09-12 22:02:15 str by iat",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8678,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-09-13T00:02:15.000Z",
+        "rsa.time.starttime": "2018-09-13T00:02:15.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "iat"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-27T07:04:49.000Z",
+        "event.code": "SNMP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 27 05:04:49 pfsp: SNMP  restored for router naal, leader borios at 2018-09-27 05:04:49 tut",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8777,
+        "network.protocol": "SNMP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "SNMP",
+        "rsa.misc.node": "naal",
+        "rsa.misc.parent_node": "borios",
+        "rsa.time.endtime": "2018-09-27T07:04:49.000Z",
+        "rsa.time.event_time": "2019-09-27T07:04:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-11T14:07:23.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 11 12:07:23 Username:  low   loss  Change Log , Subsystem:emquia, Setting Type:inesci, Message:isnisi",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 8878,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2019-10-11T14:07:23.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-25T21:09:57.000Z",
+        "event.code": "Test",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 25 19:09:57 pfsp: Alert Test syslog message",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 8988,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Test",
+        "rsa.time.event_time": "2019-10-25T21:09:57.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-09T04:12:32.000Z",
+        "event.code": "anomaly",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 9 02:12:32 pfsp: anomaly Bandwidth id 5089 status commodo severity medium classification tutlab router sau router_name atevelit interface meius interface_name \"lo4293\" labo",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "medium",
+        "log.offset": 9040,
+        "network.interface.name": "lo4293",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "anomaly",
+        "rsa.misc.category": "tutlab",
+        "rsa.misc.disposition": "commodo",
+        "rsa.misc.node": "atevelit",
+        "rsa.misc.policy_name": "Bandwidth",
+        "rsa.misc.severity": "medium",
+        "rsa.misc.sig_id": 5089,
+        "rsa.network.interface": "lo4293",
+        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-23T11:15:06.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 23 09:15:06 pfsp:  High  usage alert  usage alert tvol for velitess naali done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9222,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-11-23T11:15:06.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-07T18:17:40.000Z",
+        "event.code": "Autoclassification",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 7 16:17:40 pfsp: Alert Autoclassification was restarted on 2018-12-07 16:17:40 temUte by sit",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9310,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Autoclassification restarted",
+        "rsa.internal.messageid": "Autoclassification",
+        "rsa.time.event_time": "2019-12-07T18:17:40.000Z",
+        "rsa.time.starttime": "2018-12-07T18:17:40.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "sit"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-22T01:20:14.000Z",
+        "event.code": "Device",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 21 23:20:14 pfsp: Device elitse unreachable by controller ima since 2018-12-21 23:20:14",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9412,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Device",
+        "rsa.misc.node": "elitse",
+        "rsa.misc.parent_node": "ima",
+        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
+        "rsa.time.starttime": "2018-12-22T01:20:14.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-01-05T08:22:49.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 5 06:22:49 pfsp: The BGP  instability router uptate threshold mac (iumdol) observed tpersp (stla)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9509,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "uptate",
+        "rsa.misc.trigger_val": "tpersp",
+        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-01-19T15:25:23.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "January 19 13:25:23 pfsp: Alert BGP  Instability for router oremagna ended",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9615,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "oremagna",
+        "rsa.time.event_time": "2020-01-19T15:25:23.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-02-02T22:27:57.000Z",
+        "destination.ip": [
+            "10.237.45.67"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 2 20:27:57 pisciv: Blocked Host: Blocked host10.193.30.192atrumetby Blocked Countries usingrdpdestination10.237.45.67,URL:https://www.example.net/par/lorin.txt?hit=urv#ama",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9690,
+        "network.protocol": "rdp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.193.30.192",
+            "10.237.45.67"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.193.30.192"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www.example.net/par/lorin.txt?hit=urv#ama"
+    },
+    {
+        "@timestamp": "2020-02-17T05:30:32.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "February 17 03:30:32 pfsp: Alert configuration was changed on leader litani to version 1.6412 by psumqu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9871,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.6412",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "litani",
+        "rsa.misc.version": "1.6412",
+        "rsa.time.event_time": "2020-02-17T05:30:32.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "psumqu"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-03T12:33:06.000Z",
+        "event.category": "Fault Occured",
+        "event.code": "TMS",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 3 10:33:06 iquidexe: TMS: TMS 'diconse' fault for resource 'elitse' on TMS reseo",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 9975,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "diconse",
+        "rsa.internal.messageid": "TMS",
+        "rsa.internal.resource": "elitse",
+        "rsa.misc.event_type": "Fault Occured",
+        "rsa.misc.node": "reseo",
+        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-17T19:35:40.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "March 17 17:35:40 ipsamvo: Change Log: Username:onula, Subsystem:miu, Setting Type:rationev, Message:rem",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10062,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "onula"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-01T02:38:14.000Z",
+        "event.code": "Test",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 1 00:38:14 pfsp: Alert Test syslog message",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10167,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Test",
+        "rsa.time.event_time": "2020-04-01T02:38:14.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-15T09:40:49.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 15 07:40:49 lillum: Change Log: Username:remips, Subsystem:uisaute, Setting Type:imide, Message:poriss",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10216,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "remips"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-29T16:43:23.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "April 29 14:43:23 cola: Protection Mode: Changed protection mode to active for protection groupamcor,URL:https://internal.example.com/ineavol/iosa.html?usc=rem#amvolupt",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10325,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "amcor",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-04-29T16:43:23.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://internal.example.com/ineavol/iosa.html?usc=rem#amvolupt"
+    },
+    {
+        "@timestamp": "2020-05-13T23:45:57.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 13 21:45:57 mnis: Protection Mode: Changed protection mode to active for protection groupequepor,URL:https://internal.example.org/quaUten/nisiut.txt?teturad=perspici#itation",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10494,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "equepor",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-05-13T23:45:57.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://internal.example.org/quaUten/nisiut.txt?teturad=perspici#itation"
+    },
+    {
+        "@timestamp": "2020-05-28T06:48:31.000Z",
+        "event.code": "Protection_Mode",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "May 28 04:48:31 nimave: Protection Mode: Changed protection mode to active for protection groupisciv,URL:https://mail.example.org/nofd/dipisci.txt?ilmol=eri#quunt",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10672,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.event_desc": "Changed protection mode to active for protection group",
+        "rsa.internal.messageid": "Protection_Mode",
+        "rsa.misc.group": "isciv",
+        "rsa.misc.msgIdPart1": "Protection",
+        "rsa.misc.msgIdPart2": "Mode",
+        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://mail.example.org/nofd/dipisci.txt?ilmol=eri#quunt"
+    },
+    {
+        "@timestamp": "2020-06-11T13:51:06.000Z",
+        "destination.ip": [
+            "10.98.209.10"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 11 11:51:06 iosamnis: Blocked Host: Blocked host10.31.177.226atdeserunby Blocked Countries usingggpdestination10.98.209.10,URL:https://www.example.org/ptateve/enderi.html?toccaec=fugi#labo",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 10835,
+        "network.protocol": "ggp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.98.209.10",
+            "10.31.177.226"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2020-06-11T13:51:06.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.31.177.226"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www.example.org/ptateve/enderi.html?toccaec=fugi#labo"
+    },
+    {
+        "@timestamp": "2020-06-25T20:53:40.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "June 25 18:53:40 pfsp:  High  usage alert  tame alert atione for service lores done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11029,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-10T03:56:14.000Z",
+        "destination.ip": [
+            "10.179.210.218"
+        ],
+        "event.code": "Blocked_Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 10 01:56:14 estl: Blocked Host: Blocked host10.44.47.27atmmodocby Blocked Countries usingigmpdestination10.179.210.218,URL:https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11113,
+        "network.protocol": "igmp",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "related.ip": [
+            "10.44.47.27",
+            "10.179.210.218"
+        ],
+        "rsa.internal.messageid": "Blocked_Host",
+        "rsa.misc.msgIdPart1": "Blocked",
+        "rsa.misc.msgIdPart2": "Host",
+        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
+        "service.type": "netscout",
+        "source.ip": [
+            "10.44.47.27"
+        ],
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo"
+    },
+    {
+        "@timestamp": "2019-07-24T10:58:48.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "July 24 08:58:48 pfsp: Alert configuration was changed on leader emvele to version 1.2883 by lor",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11311,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.2883",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "emvele",
+        "rsa.misc.version": "1.2883",
+        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "lor"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-07T18:01:23.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 7 16:01:23 pfsp: Alert BGP  instability router iquamqua threshold sit (rumSect) observed ita (vitaed)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11408,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "iquamqua",
+        "rsa.misc.trigger_val": "ita",
+        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-22T01:03:57.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "August 21 23:03:57 pfsp:  high   pps  usage alert  usage alert turadip for tatevel boreetdo done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11517,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-05T08:06:31.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 5 06:06:31 pfsp:  low  usage alert  uov alert itlab for service urmag done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11614,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-19T15:09:05.000Z",
+        "event.code": "Change_Log",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "September 19 13:09:05 numquam: Change Log: Username:tMal, Subsystem:ommodo, Setting Type:uptat, Message:idex",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11699,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Change_Log",
+        "rsa.misc.msgIdPart1": "Change",
+        "rsa.misc.msgIdPart2": "Log",
+        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "tMal"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-03T22:11:40.000Z",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 3 20:11:40 Username:  low  Change Log , Subsystem:nimveni, Setting Type:idi, Message:ore",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 11808,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-18T05:14:14.000Z",
+        "event.code": "configuration",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "October 18 03:14:14 pfsp: Alert configuration was changed on leader maveni to version 1.2552 by onu",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 11905,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "observer.version": "1.2552",
+        "rsa.internal.event_desc": "Configuration changed",
+        "rsa.internal.messageid": "configuration",
+        "rsa.misc.parent_node": "maveni",
+        "rsa.misc.version": "1.2552",
+        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ],
+        "user.name": [
+            "onu"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-01T12:16:48.000Z",
+        "event.code": "BGP",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 1 10:16:48 pfsp: Alert BGP  Hijack for prefix tlaboree router norumet done",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 12005,
+        "network.protocol": "BGP",
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "BGP",
+        "rsa.misc.node": "norumet",
+        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-15T19:19:22.000Z",
+        "event.code": "Host",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 15 17:19:22 pfsp: Host Detection alert col, start 2019-11-15 17:19:22 mve, duration 177.586000, stop 2019-11-15 17:19:22 tinvolup, , importance very-high, managed_objects (Sedutpe), is now failure, (parent managed object rroq)",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.level": "very-high",
+        "log.offset": 12089,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "Host",
+        "rsa.misc.result": "failure",
+        "rsa.misc.severity": "very-high",
+        "rsa.time.duration_time": 177.586,
+        "rsa.time.endtime": "2019-11-15T19:19:22.000Z",
+        "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
+        "rsa.time.starttime": "2019-11-15T19:19:22.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-30T02:21:57.000Z",
+        "event.category": "Script mitigation",
+        "event.code": "script",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "November 30 00:21:57 pfsp: script remipsum ran at 2019-11-30 00:21:57  ,  leader tempor",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 12325,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "script",
+        "rsa.misc.disposition": "ongoing",
+        "rsa.misc.event_type": "Script mitigation",
+        "rsa.misc.node": "remipsum",
+        "rsa.misc.parent_node": "tempor",
+        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
+        "rsa.time.starttime": "2019-11-30T02:21:57.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-14T09:24:31.000Z",
+        "event.code": "",
+        "event.dataset": "netscout.sightline",
+        "event.module": "netscout",
+        "event.original": "December 14 07:24:31 pfsp:  low   bps  usage alert  interface usage alert dex for router ccae interface \"eth7168\" speed elitsed threshold labore observed uela pct ntexplic",
+        "fileset.name": "sightline",
+        "input.type": "log",
+        "log.offset": 12413,
+        "observer.product": "Arbor",
+        "observer.type": "DDOS",
+        "observer.vendor": "Netscout",
+        "rsa.internal.messageid": "",
+        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
+        "service.type": "netscout",
+        "tags": [
+            "netscout.sightline",
+            "forwarded"
+        ]
+    }
+]
