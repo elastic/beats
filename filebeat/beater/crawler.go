@@ -62,7 +62,7 @@ func newCrawler(
 
 // Start starts the crawler with all inputs
 func (c *crawler) Start(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	configInputs *common.Config,
 	configModules *common.Config,
 ) error {
@@ -111,7 +111,7 @@ func (c *crawler) Start(
 }
 
 func (c *crawler) startInput(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
 	if !config.Enabled() {
