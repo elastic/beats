@@ -122,7 +122,7 @@ func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSideca
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
-			"-E", "logging.files.permission=0644",
+			"-E", "logging.files.permission=0640",
 			"-E", "logging.files.interval=1h",
 		)
 	}
