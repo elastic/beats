@@ -29,10 +29,10 @@ var (
 	ErrNotACertificate = tlscommon.ErrNotACertificate
 
 	// ErrCertificateNoKey indicate a configuration error with missing key file
-	ErrCertificateNoKey = tlscommon.ErrCertificateNoKey
+	ErrCertificateNoKey = tlscommon.ErrKeyUnspecified
 
 	// ErrKeyNoCertificate indicate a configuration error with missing certificate file
-	ErrKeyNoCertificate = tlscommon.ErrKeyNoCertificate
+	ErrKeyNoCertificate = tlscommon.ErrCertificateUnspecified
 )
 
 // TLSConfig defines config file options for TLS clients.
