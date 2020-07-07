@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"io"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -36,7 +37,14 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	var action actionConfigChangeSerializer
 
 	dec := yaml.NewDecoder(reader)
-	if err := dec.Decode(&action); err != nil {
+	err = dec.Decode(&action)
+	if err == io.EOF {
+		return &actionStore{
+			log:   log,
+			store: store,
+		}, nil
+	}
+	if err != nil {
 		return nil, err
 	}
 
