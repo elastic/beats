@@ -379,7 +379,7 @@ func (b *boolStr) UnmarshalJSON(raw []byte) error {
 }
 
 type IndexSettings struct {
-	Hidden boolStr
+	Hidden bool
 }
 
 // GetIndicesSettings returns a map of index names to their settings.
@@ -394,7 +394,9 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 
 	var resp map[string]struct {
 		Settings struct {
-			Index IndexSettings `json:"index"`
+			Index struct {
+				Hidden boolStr `json:"hidden"`
+			} `json:"index"`
 		} `json:"settings"`
 	}
 
@@ -405,7 +407,9 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 
 	ret := make(map[string]IndexSettings, len(resp))
 	for index, settings := range resp {
-		ret[index] = settings.Settings.Index
+		ret[index] = IndexSettings{
+			Hidden: bool(settings.Settings.Index.Hidden),
+		}
 	}
 
 	return ret, nil

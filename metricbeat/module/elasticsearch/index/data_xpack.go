@@ -154,7 +154,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 
 		settings, exists := indicesSettings[name]
 		if exists {
-			idx.Hidden = bool(settings.Hidden)
+			idx.Hidden = settings.Hidden
 		}
 
 		err = addClusterStateFields(&idx, clusterState)
