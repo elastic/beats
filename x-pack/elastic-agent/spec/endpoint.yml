@@ -16,13 +16,13 @@ post_install:
     - "--upgrade"
     - "--resources"
     - "endpoint-security-resources.zip"
-    timeout: 120
+    timeout: 600
 pre_uninstall:
 - exec_file:
     path: "endpoint-security"
     args:
       - "uninstall"
-    timeout: 120
+    timeout: 600
 rules:
 - fix_stream: {}
 

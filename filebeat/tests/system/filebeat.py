@@ -8,7 +8,7 @@ sys.path.append(os.path.join(curdir, '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
 
-default_registry_file = 'registry/filebeat/data.json'
+default_registry_path = 'registry/filebeat'
 
 
 class BaseTest(TestCase):
@@ -105,16 +105,17 @@ class Registry:
 
     def __init__(self, home, name=None):
         if not name:
-            name = default_registry_file
+            name = default_registry_path
         self.path = os.path.join(home, name)
+        self._meta_path = os.path.join(self.path, "meta.json")
+        self._log_path = os.path.join(self.path, "log.json")
+        self._active_path = os.path.join(self.path, "active.dat")
 
     def exists(self):
-        return os.path.isfile(self.path)
+        return os.path.isfile(self._log_path)
 
     def load(self, filter=None):
-        with open(self.path) as f:
-            entries = json.load(f)
-
+        entries = self._read_registry()
         if filter:
             entries = [x for x in entries if filter(x)]
         return entries
@@ -123,6 +124,32 @@ class Registry:
         if not self.exists():
             return 0
         return len(self.load(filter=filter))
+
+    def _read_registry(self):
+        data = {}
+        data_file_path = None
+        if os.path.isfile(self._active_path):
+            with open(self._active_path) as f:
+                data_file_path = f.read().strip()
+        if data_file_path and os.path.isfile(data_file_path):
+            with open(data_file_path) as f:
+                data = dict((x['_key'], x) for x in json.load(f))
+
+        with open(self._log_path) as f:
+            try:
+                iter_objs = (json.loads(line) for line in f)
+                for action, entry in zip(iter_objs, iter_objs):
+                    if action['op'] == 'remove':
+                        if entry['k'] in data:
+                            del data[entry['k']]
+                    elif action['op'] == 'set':
+                        v = entry['v']
+                        v['_key'] = entry['k']
+                        data[entry['k']] = v
+            except ValueError:  # log file was incomplete, ignore mid writes
+                pass
+
+        return list(data.values())
 
 
 class LogState:
