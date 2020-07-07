@@ -179,8 +179,10 @@ func (p *Input) loadStates(states []file.State) error {
 			}
 
 			// Convert state to current identifier if different
-			if state.IdentifierName != p.fileStateIdentifier.Name() {
-				p.fileStateIdentifier.GenerateID(&state)
+			newId, identifierName := p.fileStateIdentifier.GenerateID(state)
+			if state.IdentifierName != identifierName {
+				state.Id = newId
+				state.IdentifierName = identifierName
 			}
 
 			// Update input states and send new states to registry
@@ -240,7 +242,7 @@ func (p *Input) Run() {
 				newState := file.NewState(stat, state.Source, p.config.Type, p.meta, p.fileStateIdentifier)
 				if state.IdentifierName != newState.IdentifierName {
 					logp.Debug("input", "file_identity configuration for file has changed from %s to %s, generating new id", state.IdentifierName, newState.IdentifierName)
-					p.fileStateIdentifier.GenerateID(&state)
+					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
 				}
 				if state.IsEqual(&newState) {
 					p.removeState(state)
@@ -670,6 +672,7 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		p.cfg,
 		state,
 		p.states,
+		p.fileStateIdentifier,
 		func(state file.State) bool {
 			return p.stateOutlet.OnEvent(beat.Event{Private: state})
 		},

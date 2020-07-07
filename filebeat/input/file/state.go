@@ -56,7 +56,7 @@ func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]strin
 		Meta:        meta,
 	}
 
-	identifier.GenerateID(&s)
+	s.Id, s.IdentifierName = identifier.GenerateID(s)
 
 	return s
 }

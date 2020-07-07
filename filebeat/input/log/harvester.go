@@ -335,7 +335,7 @@ func (h *Harvester) Run() error {
 		// the old offset is reported
 		state := h.getState()
 
-		if h.shouldBeClosed(state) {
+		if h.shouldBeClosed(&state) {
 			return nil
 		}
 
@@ -365,7 +365,7 @@ func (h *Harvester) shouldBeClosed(state *file.State) bool {
 	}
 
 	// check if identifier of state has changed
-	if state.IsEqual(h.state) {
+	if state.IsEqual(&h.state) {
 		if h.config.CloseRenamed {
 			info, err := h.source.Stat()
 			if err != nil {
@@ -616,7 +616,7 @@ func (h *Harvester) getState() file.State {
 
 	// refreshes the values in State with the values from the harvester itself
 	state.FileStateOS = file_helper.GetOSState(h.state.Fileinfo)
-	h.identifier.GenerateID(&state)
+	state.Id, state.IdentifierName = h.identifier.GenerateID(state)
 
 	return state
 }

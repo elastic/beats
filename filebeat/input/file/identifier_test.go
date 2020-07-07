@@ -67,7 +67,7 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		for i := 0; i < len(test.states); i++ {
-			identifier.GenerateID(&test.states[i])
+			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 
 		t.Run(name, func(t *testing.T) {
@@ -111,7 +111,7 @@ func TestPathIdentifier(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		for i := 0; i < len(test.states); i++ {
-			identifier.GenerateID(&test.states[i])
+			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 		t.Run(name, func(t *testing.T) {
 			isSame := test.states[0].IsEqual(&test.states[1])
@@ -180,7 +180,7 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		for i := 0; i < len(test.states); i++ {
-			identifier.GenerateID(&test.states[i])
+			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 		t.Run(name, func(t *testing.T) {
 			isSame := test.states[0].IsEqual(&test.states[1])

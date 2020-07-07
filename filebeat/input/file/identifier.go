@@ -53,10 +53,8 @@ type IdentifierFactory func(*common.Config) (StateIdentifier, error)
 
 // StateIdentifier generates an ID for a State.
 type StateIdentifier interface {
-	// GenerateID generates and returns the ID of the state
-	GenerateID(*State)
-	// Name return the name of the identifier method for comparison.
-	Name() string
+	// GenerateID generates and returns the ID of the state and its type
+	GenerateID(State) (id, identifierType string)
 }
 
 // NewStateIdentifier creates a new state identifier for a log input.
@@ -84,18 +82,9 @@ func newINodeDeviceIdentifier(_ *common.Config) (StateIdentifier, error) {
 	}, nil
 }
 
-func (i *inodeDeviceIdentifier) GenerateID(s *State) {
+func (i *inodeDeviceIdentifier) GenerateID(s State) (id, identifierType string) {
 	stateID := i.name + identitySep + s.FileStateOS.String()
-	if len(s.Meta) == 0 {
-		s.Id = stateID
-	} else {
-		s.Id = genIDWithHash(s.Meta, stateID)
-	}
-	s.IdentifierName = i.name
-}
-
-func (i *inodeDeviceIdentifier) Name() string {
-	return i.name
+	return genIDWithHash(s.Meta, stateID), i.name
 }
 
 type pathIdentifier struct {
@@ -108,18 +97,9 @@ func newPathIdentifier(_ *common.Config) (StateIdentifier, error) {
 	}, nil
 }
 
-func (p *pathIdentifier) GenerateID(s *State) {
+func (p *pathIdentifier) GenerateID(s State) (id, identifierType string) {
 	stateID := p.name + identitySep + s.Source
-	if len(s.Meta) == 0 {
-		s.Id = stateID
-	} else {
-		s.Id = genIDWithHash(s.Meta, stateID)
-	}
-	s.IdentifierName = p.name
-}
-
-func (p *pathIdentifier) Name() string {
-	return p.name
+	return genIDWithHash(s.Meta, stateID), p.name
 }
 
 type inodeMarkerIdentifier struct {
@@ -182,23 +162,18 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 	return i.markerTxt
 }
 
-func (i *inodeMarkerIdentifier) GenerateID(s *State) {
+func (i *inodeMarkerIdentifier) GenerateID(s State) (id, identifierType string) {
 	m := i.markerContents()
 
-	fileID := fmt.Sprintf("%s%s%d-%s", i.name, identitySep, s.FileStateOS.Inode, m)
-	if len(s.Meta) == 0 {
-		s.Id = fileID
-	} else {
-		s.Id = genIDWithHash(s.Meta, fileID)
-	}
-	s.IdentifierName = i.name
-}
-
-func (i *inodeMarkerIdentifier) Name() string {
-	return i.name
+	stateID := fmt.Sprintf("%s%s%d-%s", i.name, identitySep, s.FileStateOS.Inode, m)
+	return genIDWithHash(s.Meta, stateID), i.name
 }
 
 func genIDWithHash(meta map[string]string, fileID string) string {
+	if len(meta) == 0 {
+		return fileID
+	}
+
 	hashValue, _ := hashstructure.Hash(meta, nil)
 	var hashBuf [17]byte
 	hash := strconv.AppendUint(hashBuf[:0], hashValue, 16)
@@ -215,5 +190,4 @@ func genIDWithHash(meta map[string]string, fileID string) string {
 // mockIdentifier is used for testing
 type MockIdentifier struct{}
 
-func (m *MockIdentifier) GenerateID(s *State) { return }
-func (m *MockIdentifier) Name() string        { return "mock" }
+func (m *MockIdentifier) GenerateID(s State) (string, string) { return s.Id, "mock" }
