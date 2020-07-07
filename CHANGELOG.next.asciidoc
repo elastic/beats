@@ -603,6 +603,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
+- Add support for named ports in autodiscover. {pull}19398[19398]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 
 *Packetbeat*
