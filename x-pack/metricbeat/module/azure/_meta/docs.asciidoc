@@ -97,6 +97,11 @@ so the `period` for `container_service` metricset  should be `300s` or multiples
 This metricset will collect relevant metrics from specified database accounts, these metrics will have a timegrain every 5 minutes,
 so the `period` for `database_account` metricset  should be `300s` or multiples of `300s`.
 
+[float]
+=== `billing`
+This metricset will collect relevant usage data and forecast information from the specific subscription, these metrics will have a timegrain every 24 hours,
+so the `period` for `billing` metricset  should be `24h` or multiples of `24h`.
+
 
 [float]
 == Additional notes about metrics and costs
