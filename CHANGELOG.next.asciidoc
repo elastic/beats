@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 - Adds `split_events_by` option to httpjson input. {pull}19246[19246]
 - Adds `date_cursor` option to httpjson input. {pull}19483[19483]
+- Adds Gsuite module with SAML support. {pull}19329[19329]
+- Adds Gsuite User Accounts support. {pull}19329[19329]
 
 *Heartbeat*
 
