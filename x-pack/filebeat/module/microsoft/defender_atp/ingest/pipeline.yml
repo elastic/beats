@@ -10,6 +10,15 @@ processors:
 #########################
 ## ECS General Mapping ##
 #########################
+- script:
+    lang: painless
+    params:
+      values:
+        - ""
+        - "-"
+        - "N/A"
+    source: >-
+      ctx?.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
 - set:
     field: cloud.provider
     value: azure

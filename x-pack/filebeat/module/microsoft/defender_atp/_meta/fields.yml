@@ -6,12 +6,12 @@
     Module for ingesting Microsoft Defender ATP.
   fields:
     - name: lastUpdateTime
-      type: keyword
+      type: date
       description: >
         The date and time (in UTC) the alert was last updated.
 
     - name: resolvedTime
-      type: keyword
+      type: date
       description: >
         The date and time in which the status of the alert was changed to 'Resolved'.
 
@@ -66,7 +66,7 @@
         Domain name related to the alert
 
     - name: evidence.ipAddress
-      type: keyword
+      type: ip
       description: >
         IP address involved in the alert
 
