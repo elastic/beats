@@ -155,6 +155,12 @@ func (a *Application) Stop() {
 	a.setState(state.Stopped, "Stopped")
 }
 
+// Shutdown stops the application (aka. subprocess).
+func (a *Application) Shutdown() {
+	a.logger.Infof("Signaling application to stop because of shutdown: %s", a.id)
+	a.Stop()
+}
+
 // SetState sets the status of the application.
 func (a *Application) SetState(status state.Status, msg string) {
 	a.appLock.Lock()
