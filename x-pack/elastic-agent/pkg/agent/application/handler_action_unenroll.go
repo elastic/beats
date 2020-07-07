@@ -7,16 +7,22 @@ package application
 import (
 	"context"
 	"fmt"
+	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
+// After running Unenroll agent is in idle state, non managed non standalone.
+// For it to be operational again it needs to be either enrolled or reconfigured.
 type handlerUnenroll struct {
 	log        *logger.Logger
 	emitter    emitterFunc
 	dispatcher programsDispatcher
+	closers    []context.CancelFunc
 }
 
 func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker) error {
@@ -30,7 +36,24 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 	noPrograms := make(map[routingKey][]program.Program)
 	h.dispatcher.Dispatch(a.ID(), noPrograms)
 
-	// TODO: clean action store
+	if err := acker.Ack(ctx, action); err != nil {
+		return err
+	}
 
-	return acker.Ack(ctx, action)
+	// commit all acks before quitting.
+	if err := acker.Commit(ctx); err != nil {
+		return err
+	}
+
+	// close fleet gateway loop
+	for _, c := range h.closers {
+		c()
+	}
+
+	// clean action store
+	if err := os.Remove(info.AgentActionStoreFile()); err != nil && !os.IsNotExist(err) {
+		return errors.New(err, "failed to clear action store")
+	}
+
+	return nil
 }

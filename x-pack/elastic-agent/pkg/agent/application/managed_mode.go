@@ -183,6 +183,7 @@ func newManaged(
 			log:        log,
 			emitter:    emit,
 			dispatcher: router,
+			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
 		},
 	)
 
