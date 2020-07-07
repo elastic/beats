@@ -89,7 +89,7 @@ func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	// Each harvester gets its own copy of the outlet
 	h, err := log.NewHarvester(
 		p.cfg,
-		state, nil, nil, nil,
+		state, nil, nil,
 		func() channel.Outleter {
 			return p.outlet
 		},

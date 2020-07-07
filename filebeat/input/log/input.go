@@ -244,7 +244,7 @@ func (p *Input) Run() {
 					logp.Debug("input", "file_identity configuration for file has changed from %s to %s, generating new id", state.IdentifierName, newState.IdentifierName)
 					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
 				}
-				if state.IsEqual(&newState) {
+				if !state.IsEqual(&newState) {
 					p.removeState(state)
 					logp.Debug("input", "Remove state of file as its identity has changed: %s", state.Source)
 				}
@@ -672,7 +672,6 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		p.cfg,
 		state,
 		p.states,
-		p.fileStateIdentifier,
 		func(state file.State) bool {
 			return p.stateOutlet.OnEvent(beat.Event{Private: state})
 		},
