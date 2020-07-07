@@ -62213,6 +62213,226 @@ type: keyword
 --
 
 
+*`gsuite.drive.billable`*::
++
+--
+Whether this activity is billable.
+
+type: boolean
+
+--
+
+*`gsuite.drive.source_folder_id`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.source_folder_title`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.destination_folder_id`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.destination_folder_title`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.file.id`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.file.type`*::
++
+--
+Document Drive type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.originating_app_id`*::
++
+--
+The Google Cloud Project ID of the application that performed the action.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.file.owner.email`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.drive.file.owner.is_shared_drive`*::
++
+--
+Boolean flag denoting whether owner is a shared drive.
+
+
+type: boolean
+
+--
+
+*`gsuite.drive.primary_event`*::
++
+--
+Whether this is a primary event. A single user action in Drive may generate several events.
+
+
+type: boolean
+
+--
+
+*`gsuite.drive.shared_drive_id`*::
++
+--
+The unique identifier of the Team Drive. Only populated for for events relating to a Team Drive or item contained inside a Team Drive.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.visibility`*::
++
+--
+Visibility of target file. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.new_value`*::
++
+--
+When a setting or property of the file changes, the new value for it will appear here.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.old_value`*::
++
+--
+When a setting or property of the file changes, the old value for it will appear here.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.sheets_import_range_recipient_doc`*::
++
+--
+Doc ID of the recipient of a sheets import range.
+
+type: keyword
+
+--
+
+*`gsuite.drive.old_visibility`*::
++
+--
+When visibility changes, this holds the old value.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.visibility_change`*::
++
+--
+When visibility changes, this holds the new overall visibility of the file.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.target_domain`*::
++
+--
+The domain for which the acccess scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.added_role`*::
++
+--
+Added membership role of a user/group in a Team Drive. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.membership_change_type`*::
++
+--
+Type of change in Team Drive membership of a user/group. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.shared_drive_settings_change_type`*::
++
+--
+Type of change in Team Drive settings. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.removed_role`*::
++
+--
+Removed membership role of a user/group in a Team Drive. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
+
+
+type: keyword
+
+--
+
+*`gsuite.drive.target`*::
++
+--
+Target user or group.
+
+type: keyword
+
+--
+
+
 *`gsuite.login.affected_email_address`*::
 +
 --
