@@ -20,6 +20,7 @@ package configure
 import (
 	"flag"
 	"fmt"
+	"go.uber.org/zap/zapcore"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -45,7 +46,7 @@ func init() {
 
 // Logging builds a logp.Config based on the given common.Config and the specified
 // CLI flags.
-func Logging(beatName string, cfg *common.Config) error {
+func Logging(beatName string, cfg *common.Config, wrapSink ...func(zapcore.Core) zapcore.Core) error {
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {
@@ -55,7 +56,7 @@ func Logging(beatName string, cfg *common.Config) error {
 	}
 
 	applyFlags(&config)
-	return logp.Configure(config)
+	return logp.Configure(config, wrapSink...)
 }
 
 func applyFlags(cfg *logp.Config) {
