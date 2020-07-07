@@ -380,6 +380,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 
 *Auditbeat*
 
