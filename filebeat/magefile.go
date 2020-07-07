@@ -39,6 +39,21 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
+// declare journald dependencies for cross build target
+var (
+	journaldPlatforms = []devtools.PlatformDescription{
+		devtools.Linux386, devtools.LinuxAMD64,
+		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
+		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
+		devtools.LinuxPPC64LE,
+		devtools.LinuxS390x,
+	}
+
+	journaldDeps = devtools.NewPackageInstaller().
+			AddEach(journaldPlatforms, "libsystemd-dev").
+			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
+)
+
 func init() {
 	common.RegisterCheckDeps(Update)
 	test.RegisterDeps(IntegTest)
@@ -54,6 +69,9 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	// XXX: enable once we have systemd available in the cross build image
+	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
+
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 

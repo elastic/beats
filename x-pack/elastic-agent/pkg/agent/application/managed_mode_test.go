@@ -87,6 +87,8 @@ func (m *mockStreamStore) Close() error {
 	return nil
 }
 
+func (m *mockStreamStore) Shutdown() {}
+
 const fleetResponse = `
 {
 	"action": "checkin",

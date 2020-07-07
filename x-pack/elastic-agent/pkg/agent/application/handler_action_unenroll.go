@@ -7,10 +7,7 @@ package application
 import (
 	"context"
 	"fmt"
-	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -51,9 +48,9 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 	}
 
 	// clean action store
-	if err := os.Remove(info.AgentActionStoreFile()); err != nil && !os.IsNotExist(err) {
-		return errors.New(err, "failed to clear action store")
-	}
+	// if err := os.Remove(info.AgentActionStoreFile()); err != nil && !os.IsNotExist(err) {
+	// 	return errors.New(err, "failed to clear action store")
+	// }
 
 	return nil
 }

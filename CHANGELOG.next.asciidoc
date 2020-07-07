@@ -138,6 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
+- Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
 
 *Auditbeat*
 
@@ -263,6 +264,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Stop counterCache only when already started {pull}19103[19103]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Fix config example in the perfmon configuration files. {pull}19539[19539]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 
 *Packetbeat*
 
@@ -316,6 +319,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
+- Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
+- Add support to trim captured values in the dissect processor. {pull}19464[19464]
 
 *Auditbeat*
 
@@ -523,6 +530,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
+- The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
 
 *Packetbeat*
 
