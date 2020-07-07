@@ -280,9 +280,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
 
-* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
+* <<metricbeat-metricset-googlecloud-metrics,metrics>>
 
-* <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
+* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
 * <<metricbeat-metricset-googlecloud-storage,storage>>
 
@@ -290,9 +290,9 @@ include::googlecloud/compute.asciidoc[]
 
 include::googlecloud/loadbalancing.asciidoc[]
 
-include::googlecloud/pubsub.asciidoc[]
+include::googlecloud/metrics.asciidoc[]
 
-include::googlecloud/stackdriver.asciidoc[]
+include::googlecloud/pubsub.asciidoc[]
 
 include::googlecloud/storage.asciidoc[]
 
