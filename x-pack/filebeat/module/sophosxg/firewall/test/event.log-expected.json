@@ -3,7 +3,6 @@
         "@timestamp": "2020-05-18T14:38:57.000-02:00",
         "client.ip": "172.17.35.116",
         "event.category": [
-            "network",
             "authentication"
         ],
         "event.code": "062910617701",
@@ -16,8 +15,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "user",
-            "start",
-            "connection"
+            "start"
         ],
         "fileset.name": "firewall",
         "input.type": "log",
@@ -29,6 +27,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "172.17.35.116"
+        ],
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "service.type": "sophosxg",
         "sophosxg.firewall.auth_client": "CTA",
         "sophosxg.firewall.auth_mechanism": "AD",
@@ -42,7 +46,7 @@
         "sophosxg.firewall.status": "Successful",
         "source.ip": "172.17.35.116",
         "source.user.group.name": "Open Group",
-        "source.user.name": "sophosxg.firewall.name",
+        "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
             "sophosxg-firewall forwarded"
         ]
@@ -74,13 +78,19 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "83.20.132.250",
+            "214.167.51.66"
+        ],
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "server.ip": "214.167.51.66",
         "service.type": "sophosxg",
         "sophosxg.firewall.connectionname": "Location-1",
         "sophosxg.firewall.connectiontype": "0",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
-        "sophosxg.firewall.localgateway": "",
         "sophosxg.firewall.localnetwork": "172.17.32.0/19",
         "sophosxg.firewall.log_component": "IPSec",
         "sophosxg.firewall.log_subtype": "System",
@@ -127,7 +137,6 @@
         "sophosxg.firewall.connectiontype": "0",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
-        "sophosxg.firewall.localgateway": "",
         "sophosxg.firewall.log_component": "IPSec",
         "sophosxg.firewall.log_subtype": "System",
         "sophosxg.firewall.log_type": "Event",
@@ -166,6 +175,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "83.9.140.96"
+        ],
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "service.type": "sophosxg",
         "sophosxg.firewall.auth_mechanism": "Local",
         "sophosxg.firewall.device": "SFW",
@@ -252,7 +267,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
         "service.type": "sophosxg",
-        "sophosxg.firewall.client_physical_address": "-",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
         "sophosxg.firewall.ipaddress": "192.168.110.10",
@@ -295,6 +309,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "217.250.157.135"
+        ],
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "service.type": "sophosxg",
         "sophosxg.firewall.auth_mechanism": "AD",
         "sophosxg.firewall.device": "SFW",
@@ -341,6 +361,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "server.bytes": 0,
         "service.type": "sophosxg",
         "sophosxg.firewall.device": "SFW",
@@ -352,7 +375,6 @@
         "sophosxg.firewall.message_id": "17824",
         "sophosxg.firewall.priority": "Information Mode=\"Remote Access",
         "sophosxg.firewall.remote_ip": "10.82.234.12",
-        "sophosxg.firewall.sessionid": "",
         "sophosxg.firewall.starttime": "0",
         "sophosxg.firewall.status": "Established",
         "sophosxg.firewall.timestamp": "1589960866",
@@ -386,6 +408,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "91.67.201.4"
+        ],
+        "related.user": [
+            "hendrikl"
+        ],
         "service.type": "sophosxg",
         "sophosxg.firewall.auth_mechanism": "AD,AD,Local",
         "sophosxg.firewall.device": "SFW",
@@ -467,6 +495,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "172.66.35.15"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "sophosxg",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
@@ -584,10 +618,15 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.ip": [
+            "10.84.234.38"
+        ],
+        "related.user": [
+            "elastic.user@elastic.test.com"
+        ],
         "server.bytes": 0,
         "service.type": "sophosxg",
         "sophosxg.firewall.auth_client": "IPSec",
-        "sophosxg.firewall.auth_mechanism": "N/A",
         "sophosxg.firewall.device": "SFW",
         "sophosxg.firewall.device_name": "XG230",
         "sophosxg.firewall.log_component": "Firewall Authentication",
@@ -601,7 +640,7 @@
         "source.bytes": 0,
         "source.ip": "10.84.234.38",
         "source.user.group.name": "VPN.SSL.Users.elastic",
-        "source.user.name": "sophosxg.firewall.name",
+        "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
             "sophosxg-firewall forwarded"
         ]
@@ -612,13 +651,10 @@
         "destination.bytes": 0,
         "event.code": "066811618014",
         "event.dataset": "sophosxg.firewall",
-        "event.duration": 164000000000000,
-        "event.end": "2017-03-16T12:56:01.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
         "event.original": "device=\"SFW\" date=2017-03-16 time=12:56:01 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618014 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Connected\" eventtime=\"2017-03-16 12:56:01 IST\" duration=164000 branch_name=Gaurav Patel recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/Gaurav Patel is now re-connected after 164000 ms\"",
         "event.severity": "6",
-        "event.start": "2017-03-14T17:22:41.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -654,13 +690,10 @@
         "destination.bytes": 31488,
         "event.code": "066811618015",
         "event.dataset": "sophosxg.firewall",
-        "event.duration": 0,
-        "event.end": "2017-03-16T12:53:27.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
         "event.original": "device=\"SFW\" date=2017-03-16 time=12:53:27 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618015 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Disconnected\" eventtime=\"2017-03-16 12:53:27 IST\" duration=0 branch_name=Gaurav Patel recv_bytes=31488 sent_bytes=22368 message=\"A350196C47072B0/Gaurav Patel is now disconnected\"",
         "event.severity": "6",
-        "event.start": "2017-03-16T14:53:27.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -696,13 +729,10 @@
         "destination.bytes": 0,
         "event.code": "066811618016",
         "event.dataset": "sophosxg.firewall",
-        "event.duration": 0,
-        "event.end": "2017-03-16T12:46:26.000-02:00",
         "event.kind": "event",
         "event.module": "sophosxg",
         "event.original": "device=\"SFW\" date=2017-03-16 time=12:46:26 timezone=\"IST\" device_name=\"XG125w\" device_id=S1601E1F9FCB7EE log_id=066811618016 log_type=\"Event\" log_component=\"RED\" log_subtype=\"System\" priority=Information red_id=A350196C47072B0 status=\"Interim\" eventtime=\"2017-03-16 12:46:26 IST\" duration=0 branch_name=NY recv_bytes=0 sent_bytes=0 message=\"A350196C47072B0/NY transfered bytes TX: 0 RX: 0\"",
         "event.severity": "6",
-        "event.start": "2017-03-16T14:46:26.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",

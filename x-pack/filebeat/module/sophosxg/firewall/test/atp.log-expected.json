@@ -21,12 +21,12 @@
         "event.id": "C366ACFB-7A6F-4870-B359-A6CFDA8C85F7",
         "event.kind": "alert",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2017-01-31 time=18:44:31 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=086304418010 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Drop\" priority=Warning user_name=\"jsmith\" protocol=\"TCP\" src_port=22623 dst_port=80 sourceip=10.198.47.71 destinationip=46.161.30.47 url=46.161.30.47 threatname=C2/Generic-A eventid=C366ACFB-7A6F-4870-B359-A6CFDA8C85F7 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=18:44:31 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=086304418010 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Drop\" priority=Warning user_name=\"jsmith\" protocol=\"TCP\" src_port=22623 dst_port=80 sourceip=10.198.47.71 destinationip=46.161.30.47 url=46.161.30.47 threatname=C2/Generic-A eventid=C366ACFB-7A6F-4870-B359-A6CFDA8C85F7 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid= execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -96,7 +96,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -162,7 +162,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -220,12 +220,12 @@
         "event.id": "C7E26E6F-0097-4EA2-89DE-C31C40636CB2",
         "event.kind": "alert",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2018-06-05 time=08:49:00 timezone=\"BST\" device_name=\"XG310\" device_id=C30006T22TGR89B log_id=086320518009 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Alert\" priority=Notice user_name=\"\" protocol=\"ICMP\" src_port=0 dst_port=0 sourceip=10.198.32.89 destinationip=82.211.30.202 url=82.211.30.202 threatname=C2/Generic-A eventid=C7E26E6F-0097-4EA2-89DE-C31C40636CB2 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid=\"\" execution_path=\"\"",
+        "event.original": "device=\"SFW\" date=2018-06-05 time=08:49:00 timezone=\"BST\" device_name=\"XG310\" device_id=C30006T22TGR89B log_id=086320518009 log_type=\"ATP\" log_component=\"Firewall\" log_subtype=\"Alert\" priority=Notice user_name=\"\" protocol=\"ICMP\" src_port=0 dst_port=0 sourceip=10.198.32.89 destinationip=82.211.30.202 url=82.211.30.202 threatname=C2/Generic-A eventid=C7E26E6F-0097-4EA2-89DE-C31C40636CB2 eventtype=\"Standard\" login_user=\"\" process_user=\"\" ep_uuid= execution_path=\"\"",
         "event.outcome": "success",
         "event.severity": "5",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",

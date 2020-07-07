@@ -5,20 +5,6 @@ processors:
     patterns:
     - '%{SYSLOG5424PRI}%{GREEDYDATA:log.original}$'
 
-# replace all "= ", "=- ", "=/ " with double quotes or "-", "/" to truly indicate no value
-- gsub:
-    field: log.original
-    pattern: "= "
-    replacement: '="" '
-- gsub:
-    field: log.original
-    pattern: "=- "
-    replacement: '="-" '
-- gsub:
-    field: log.original
-    pattern: "=/ "
-    replacement: '="/" '
-
 # optimize fields / strings in log.original for KV processor
 - gsub:
     field: log.original
@@ -59,6 +45,27 @@ processors:
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
 
+# Sets starts, end and duration when start and duration is known
+- script:
+    lang: painless
+    if: ctx?.soposxg?.firewall?.duration != null
+    source: >-
+      ctx.event.duration = Integer.parseInt(ctx.sophosxg.firewall.duration) * 1000000000L;
+      ctx.event.start = ctx['@timestamp'];
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ctx.event.end = start.plus(ctx.event.duration, ChronoUnit.NANOS);
+
+# Removes all empty fields
+- script:
+    lang: painless
+    params:
+      values:
+        - ""
+        - "-"
+        - "N/A"
+    source: >-
+      ctx?.sophosxg?.firewall.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+
 #######################
 ## ECS Event Mapping ##
 #######################
@@ -86,6 +93,42 @@ processors:
     pattern: "(.{1,5}$)"
     replacement: ""  
 
+#####################
+## ECS Log Mapping ##
+#####################
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '0' "
+    value: unknown
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '1' "
+    value: alert
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '2' "
+    value: critical
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '3' "
+    value: error
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '4' "
+    value: warning
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '5' "
+    value: notification
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '6' "
+    value: informational
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '7' "
+    value: debug
+
 ##########################
 ## ECS Observer Mapping ##
 ##########################
@@ -106,22 +149,18 @@ processors:
     field: sophosxg.firewall.out_interface
     target_field: observer.egress.interface.name
     ignore_missing: true
-    if: 'ctx.sophosxg?.firewall?.out_interface != "" '
 - rename:
     field: sophosxg.firewall.in_interface
     target_field: observer.ingress.interface.name
     ignore_missing: true
-    if: 'ctx.sophosxg?.firewall?.in_interface != "" '
 - rename:
     field: sophosxg.firewall.srczonetype
     target_field: observer.ingress.zone
     ignore_missing: true
-    if: 'ctx.sophosxg?.firewall?.srczonetype != "" '
 - rename:
     field: sophosxg.firewall.dstzonetype
     target_field: observer.egress.zone
     ignore_missing: true
-    if: 'ctx.sophosxg?.firewall?.dstzonetype != "" '
 
 # extract from log_id the new field "sophosxg.firewall.message_id"
 - set:
@@ -133,251 +172,27 @@ processors:
     pattern: "(^.{1,7})"
     replacement: ""
     ignore_failure: true
-
 - rename:
     field: sophosxg.firewall.log_id
     target_field: event.code
     ignore_missing: true
-    if: 'ctx.sophosxg?.firewall?.log_id != "" '
 
-#TODO Make script to ensure field is null or not
 #############
 ## Cleanup ##
 #############
-- remove:
-    field: sophosxg.firewall.src_ip
-    if: 'ctx.sophosxg?.firewall?.src_ip == "" '
-- remove:
-    field: sophosxg.firewall.dst_ip
-    if: 'ctx.sophosxg?.firewall?.dst_ip == "" '
-- remove:
-    field: sophosxg.firewall.tran_src_ip
-    if: 'ctx.sophosxg?.firewall?.tran_src_ip == "" '
-- remove:
-    field: sophosxg.firewall.tran_dst_ip
-    if: 'ctx.sophosxg?.firewall?.tran_dst_ip == "" '
-- remove:
-    field: sophosxg.firewall.tran_src_port
-    if: 'ctx.sophosxg?.firewall?.tran_src_port == "" '
-- remove:
-    field: sophosxg.firewall.tran_dst_port
-    if: 'ctx.sophosxg?.firewall?.tran_dst_port == "" '
-- remove:
-    field: sophosxg.firewall.srczonetype
-    if: 'ctx.sophosxg?.firewall?.srczonetype == "" '
-- remove:
-    field: sophosxg.firewall.dstzonetype
-    if: 'ctx.sophosxg?.firewall?.dstzonetype == "" '
-- remove:
-    field: sophosxg.firewall.srczone
-    if: 'ctx.sophosxg?.firewall?.srczone == "" '
-- remove:
-    field: sophosxg.firewall.dstzone
-    if: 'ctx.sophosxg?.firewall?.dstzone == "" '
-- remove:
-    field: sophosxg.firewall.tran_dst_port
-    if: 'ctx.sophosxg?.firewall?.tran_dst_port == "N/A" '
-- remove:
-    field: sophosxg.firewall.user_name
-    if: 'ctx.sophosxg?.firewall?.user_name == "" '
-- remove:
-    field: sophosxg.firewall.user_gp
-    if: 'ctx.sophosxg?.firewall?.user_gp == "" '
-- remove:
-    field: sophosxg.firewall.subject
-    if: 'ctx.sophosxg?.firewall?.subject == "" '
-- remove:
-    field: sophosxg.firewall.destination
-    if: 'ctx.sophosxg?.firewall?.destination == "" '
-- remove:
-    field: sophosxg.firewall.source
-    if: 'ctx.sophosxg?.firewall?.source == "" '
-- remove:
-    field: sophosxg.firewall.process_user
-    if: 'ctx.sophosxg?.firewall?.process_user == "" '
-- remove:
-    field: sophosxg.firewall.ep_uuid
-    if: 'ctx.sophosxg?.firewall?.ep_uuid == "" '
-- remove:
-    field: sophosxg.firewall.login_user
-    if: 'ctx.sophosxg?.firewall?.login_user == "" '
-- remove:
-    field: sophosxg.firewall.execution_path
-    if: 'ctx.sophosxg?.firewall?.execution_path == "" '
-- remove:
-    field: sophosxg.firewall.dst_domainname
-    if: 'ctx.sophosxg?.firewall?.dst_domainname == "" '
-- remove:
-    field: sophosxg.firewall.src_domainname
-    if: 'ctx.sophosxg?.firewall?.src_domainname == "" '
-- remove:
-    field: sophosxg.firewall.filename
-    if: 'ctx.sophosxg?.firewall?.filename == "" '
-- remove:
-    field: sophosxg.firewall.filetype
-    if: 'ctx.sophosxg?.firewall?.filetype == "" '
-- remove:
-    field: sophosxg.firewall.sha1sum
-    if: 'ctx.sophosxg?.firewall?.sha1sum == "" '
-- remove:
-    field: sophosxg.firewall.av_policy_name
-    if: 'ctx.sophosxg?.firewall?.av_policy_name == "" '
-- remove:
-    field: sophosxg.firewall.status
-    if: 'ctx.sophosxg?.firewall?.status == "" '
-- remove:
-    field: sophosxg.firewall.quarantine
-    if: 'ctx.sophosxg?.firewall?.quarantine == "" '
-- remove:
-    field: sophosxg.firewall.src_country_code
-    if: 'ctx.sophosxg?.firewall?.src_country_code == "" '
-- remove:
-    field: sophosxg.firewall.application_technology
-    if: 'ctx.sophosxg?.firewall?.application_technology == "" '
-- remove:
-    field: sophosxg.firewall.dst_country_code
-    if: 'ctx.sophosxg?.firewall?.dst_country_code == "" '
-- remove:
-    field: sophosxg.firewall.application_category
-    if: 'ctx.sophosxg?.firewall?.application_category == "" '
-- remove:
-    field: sophosxg.firewall.vconnid
-    if: 'ctx.sophosxg?.firewall?.vconnid == "" '
-- remove:
-    field: sophosxg.firewall.message
-    if: 'ctx.sophosxg?.firewall?.message == "" '
-- remove:
-    field: sophosxg.firewall.connid
-    if: 'ctx.sophosxg?.firewall?.connid == "" '
-- remove:
-    field: sophosxg.firewall.out_interface
-    if: 'ctx.sophosxg?.firewall?.out_interface == "" '
-- remove:
-    field: sophosxg.firewall.reason
-    if: 'ctx.sophosxg?.firewall?.reason == "" '
-- remove:
-    field: sophosxg.firewall.override_token
-    if: 'ctx.sophosxg?.firewall?.override_token == "" '
-- remove:
-    field: sophosxg.firewall.upload_file_name
-    if: 'ctx.sophosxg?.firewall?.upload_file_name == "" '
-- remove:
-    field: sophosxg.firewall.transactionid
-    if: 'ctx.sophosxg?.firewall?.transactionid == "" '
-- remove:
-    field: sophosxg.firewall.upload_file_type
-    if: 'ctx.sophosxg?.firewall?.upload_file_type == "" '
-- remove:
-    field: sophosxg.firewall.httpresponsecode
-    if: 'ctx.sophosxg?.firewall?.httpresponsecode == "" '
-- remove:
-    field: sophosxg.firewall.download_file_type
-    if: 'ctx.sophosxg?.firewall?.download_file_type == "" '
-- remove:
-    field: sophosxg.firewall.contenttype
-    if: 'ctx.sophosxg?.firewall?.contenttype == "" '
-- remove:
-    field: sophosxg.firewall.override_name
-    if: 'ctx.sophosxg?.firewall?.override_name == "" '
-- remove:
-    field: sophosxg.firewall.application
-    if: 'ctx.sophosxg?.firewall?.application == "" '
-- remove:
-    field: sophosxg.firewall.activityname
-    if: 'ctx.sophosxg?.firewall?.activityname == "" '
-- remove:
-    field: sophosxg.firewall.download_file_name
-    if: 'ctx.sophosxg?.firewall?.download_file_name == "" '
-- remove:
-    field: sophosxg.firewall.override_authorizer
-    if: 'ctx.sophosxg?.firewall?.override_authorizer == "" '
-- remove:
-    field: sophosxg.firewall.exceptions
-    if: 'ctx.sophosxg?.firewall?.exceptions == "" '
-- remove:
-    field: sophosxg.firewall.referer
-    if: 'ctx.sophosxg?.firewall?.referer == "" '
-- remove:
-    field: sophosxg.firewall.usergroupname
-    if: 'ctx.sophosxg?.firewall?.usergroupname == "" '
-- remove:
-    field: sophosxg.firewall.name
-    if: 'ctx.sophosxg?.firewall?.name == "" '
-- remove:
-    field: sophosxg.firewall.auth_client
-    if: 'ctx.sophosxg?.firewall?.auth_client == "N/A" '
-- remove:
-    field: sophosxg.firewall.src_mac
-    if: 'ctx.sophosxg?.firewall?.src_mac == "" '
-- remove:
-    field: sophosxg.firewall.remoteinterfaceip
-    if: 'ctx.sophosxg?.firewall?.remoteinterfaceip == "" '
-- remove:
-    field: sophosxg.firewall.localinterfaceip
-    if: 'ctx.sophosxg?.firewall?.localinterfaceip == "" '
-- remove:
-    field: sophosxg.firewall.querystring
-    if: 'ctx.sophosxg?.firewall?.querystring == "" '
-- remove:
-    field: sophosxg.firewall.user_name
-    if: 'ctx.sophosxg?.firewall?.user_name == "-" '
-- remove:
-    field: sophosxg.firewall.server
-    if: 'ctx.sophosxg?.firewall?.server == "-" '
-- remove:
-    field: sophosxg.firewall.useragent
-    if: 'ctx.sophosxg?.firewall?.useragent == "-" '
-- remove:
-    field: sophosxg.firewall.referer
-    if: 'ctx.sophosxg?.firewall?.referer == "-" '
-- remove:
-    field: sophosxg.firewall.extra
-    if: 'ctx.sophosxg?.firewall?.extra == "-" '
-- remove:
-    field: sophosxg.firewall.contenttype
-    if: 'ctx.sophosxg?.firewall?.contenttype == "-" '
-- remove:
-    field: sophosxg.firewall.cookie
-    if: 'ctx.sophosxg?.firewall?.cookie == "-" '
-- remove:
-    field: sophosxg.firewall.mailid
-    if: 'ctx.sophosxg?.firewall?.mailid == "" '
-- remove:
-    field: sophosxg.firewall.email_subject
-    if: 'ctx.sophosxg?.firewall?.email_subject == "" '
-- remove:
-    field: sophosxg.firewall.virus
-    if: 'ctx.sophosxg?.firewall?.virus == "" '
-- remove:
-    field: sophosxg.firewall.dstdomain
-    if: 'ctx.sophosxg?.firewall?.dstdomain == "" '
-- remove:
-    field: sophosxg.firewall.client_host_name
-    if: 'ctx.sophosxg?.firewall?.client_host_name == "" '
-- remove:
-    field: sophosxg.firewall.connectionname
-    if: 'ctx.sophosxg?.firewall?.connectionname == "" '
-- remove:
-    field: sophosxg.firewall.remotenetwork
-    if: 'ctx.sophosxg?.firewall?.remotenetwork == "" '
-- remove:
-    field: sophosxg.firewall.localnetwork
-    if: 'ctx.sophosxg?.firewall?.localnetwork == "" '
-- remove:
-    field: sophosxg.firewall.user_agent
-    if: 'ctx.sophosxg?.firewall?.user_agent == "" '
+
 - remove:
     field:
-        - message
-        - _temp_
-        - sophosxg.firewall.date
-        - sophosxg.firewall.time
-        - sophosxg.firewall.duration
-        - sophosxg.firewall.timezone
-        - sophosxg.firewall.dir_disp
-        - sophosxg.firewall.srczone
-        - sophosxg.firewall.dstzone
-        - syslog5424_pri
+    - message
+    - _temp_
+    - sophosxg.firewall.date
+    - sophosxg.firewall.time
+    - sophosxg.firewall.duration
+    - sophosxg.firewall.timezone
+    - sophosxg.firewall.dir_disp
+    - sophosxg.firewall.srczone
+    - sophosxg.firewall.dstzone
+    - syslog5424_pri
     ignore_missing: true
 
 ###############################

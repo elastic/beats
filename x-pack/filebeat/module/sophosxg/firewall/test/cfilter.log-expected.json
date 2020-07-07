@@ -19,7 +19,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2017-01-31 time=14:03:33 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=050901616001 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=2 user_name=\"jsmith\" user_gp=\"Open Group\" iap=1 category=\"Entertainment\" category_type=\"Unproductive\" url=\"https://r8---sn-ci5gup-qxas.googlevideo.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=10.198.47.71 dst_ip=182.79.221.19 protocol=\"TCP\" src_port=9444 dst_port=443 sent_bytes=0 recv_bytes=319007 domain=r8---sn-ci5gup-qxas.googlevideo.com exceptions=\"\" activityname=\"\" reason=\"\"",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=14:03:33 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=050901616001 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=2 user_name=\"jsmith\" user_gp=\"Open Group\" iap=1 category=\"Entertainment\" category_type=\"Unproductive\" url=\"https://r8---sn-ci5gup-qxas.googlevideo.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=10.198.47.71 dst_ip=182.79.221.19 protocol=\"TCP\" src_port=9444 dst_port=443 sent_bytes=0 recv_bytes=319007 domain=r8---sn-ci5gup-qxas.googlevideo.com exceptions= activityname=\"\" reason=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -92,13 +92,13 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "alert",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2017-02-01 time=18:20:21 timezone=\"IST\" device_name=\"SG115\" device_id=S110000E28BA631 log_id=050902616002 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Denied\" status=\"\" priority=Information fw_rule_id=1 user_name=\"\" user_gp=\"\" iap=13 category=\"Religion & Spirituality\" category_type=\"Unproductive\" url=\"http://hanuman.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=5.5.5.15 dst_ip=216.58.197.44 protocol=\"TCP\" src_port=46719 dst_port=80 sent_bytes=0 recv_bytes=0 domain=hanuman.com exceptions=\"\" activityname=\"\"",
+        "event.original": "device=\"SFW\" date=2017-02-01 time=18:20:21 timezone=\"IST\" device_name=\"SG115\" device_id=S110000E28BA631 log_id=050902616002 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Denied\" status=\"\" priority=Information fw_rule_id=1 user_name=\"\" user_gp=\"\" iap=13 category=\"Religion & Spirituality\" category_type=\"Unproductive\" url=\"http://hanuman.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=5.5.5.15 dst_ip=216.58.197.44 protocol=\"TCP\" src_port=46719 dst_port=80 sent_bytes=0 recv_bytes=0 domain=hanuman.com exceptions= activityname=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -170,7 +170,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -319,7 +319,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -503,7 +503,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2016-12-02 time=18:50:20 timezone=\"GMT\" device_name=\"SFVUNL\" device_id=C01001K234RXPA1 log_id=050927616005 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Warned\" status=\"\" priority=Information fw_rule_id=2 user_name=\"rich\" user_gp=\"Clientless Open Group\" iap=13 category=\"Search Engines\" category_type=\"Acceptable\" url=\"http://www.google.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=192.168.73.220 dst_ip=64.233.189.147 protocol=\"TCP\" src_port=37832 dst_port=80 sent_bytes=0 recv_bytes=0 domain=www.google.com exceptions=\"\" activityname=\" Search\" reason=\"\"",
+        "event.original": "device=\"SFW\" date=2016-12-02 time=18:50:20 timezone=\"GMT\" device_name=\"SFVUNL\" device_id=C01001K234RXPA1 log_id=050927616005 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Warned\" status=\"\" priority=Information fw_rule_id=2 user_name=\"rich\" user_gp=\"Clientless Open Group\" iap=13 category=\"Search Engines\" category_type=\"Acceptable\" url=\"http://www.google.com/\" contenttype=\"\" override_token=\"\" httpresponsecode=\"\" src_ip=192.168.73.220 dst_ip=64.233.189.147 protocol=\"TCP\" src_port=37832 dst_port=80 sent_bytes=0 recv_bytes=0 domain=www.google.com exceptions= activityname=\" Search\" reason=\"\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -573,7 +573,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2016-12-02 time=18:50:22 timezone=\"GMT\" device_name=\"SFVUNL\" device_id=C01001K234RXPA1 log_id=050901616006 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=2 user_name=\"rich\" user_gp=\"Clientless Open Group\" iap=13 category=\"Search Engines\" category_type=\"Acceptable\" url=\"http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw\" contenttype=\"text/html\" override_token=\"\" httpresponsecode=\"\" src_ip=192.168.73.220 dst_ip=64.233.188.94 protocol=\"TCP\" src_port=46322 dst_port=80 sent_bytes=0 recv_bytes=619 domain=www.google.ca exceptions=\"\" activityname=\"Search\" reason=\"not eligible\"",
+        "event.original": "device=\"SFW\" date=2016-12-02 time=18:50:22 timezone=\"GMT\" device_name=\"SFVUNL\" device_id=C01001K234RXPA1 log_id=050901616006 log_type=\"Content Filtering\" log_component=\"HTTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=2 user_name=\"rich\" user_gp=\"Clientless Open Group\" iap=13 category=\"Search Engines\" category_type=\"Acceptable\" url=\"http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw\" contenttype=\"text/html\" override_token=\"\" httpresponsecode=\"\" src_ip=192.168.73.220 dst_ip=64.233.188.94 protocol=\"TCP\" src_port=46322 dst_port=80 sent_bytes=0 recv_bytes=619 domain=www.google.ca exceptions= activityname=\"Search\" reason=\"not eligible\"",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",

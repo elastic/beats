@@ -19,7 +19,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -89,7 +89,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -161,7 +161,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -231,7 +231,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -295,7 +295,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",

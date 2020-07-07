@@ -31,7 +31,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -107,7 +107,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -181,7 +181,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -263,7 +263,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -342,7 +342,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -412,7 +412,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -481,7 +481,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "file.directory": "/var/www//home/ftp-user/ta_test_file_1ta-cl1-46",
@@ -540,7 +540,7 @@
         "event.dataset": "sophosxg.firewall",
         "event.kind": "event",
         "event.module": "sophosxg",
-        "event.original": "device=\"SFW\" date=2018-06-21 time=19:50:48 timezone=\"CEST\" device_name=\"SF01V\" device_id=SFDemo-2df0960 log_id=031001609002 log_type=\"Anti-Virus\" log_component=\"FTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=0 user_name=\"\" virus=\"\" FTP_url=\"/var/www//home/ftp-user/ta_test_file_1ta-cl1-46\" FTP_direction=\"Download\" filename=\"/home/ftp-user /ta_test_file_1ta-cl1-46\" file_size=19926248 file_path=\"/var/www//home/ftp-user/ta_test_file_1ta-cl1-46\" ftpcommand=\"RETR\" src_ip=10.146.13.49 src_country_code=\"\" dst_ip=10.8.142.181 dst_country_code=\"\" protocol=\"TCP\" src_port=39936 dst_port=21 dstdomain=\"\" sent_bytes=0 recv_bytes=19926248",
+        "event.original": "device=\"SFW\" date=2018-06-21 time=19:50:48 timezone=\"CEST\" device_name=\"SF01V\" device_id=SFDemo-2df0960 log_id=031001609002 log_type=\"Anti-Virus\" log_component=\"FTP\" log_subtype=\"Allowed\" status=\"\" priority=Information fw_rule_id=0 user_name=\"\" virus=\"\" FTP_url=\"/var/www//home/ftp-user/ta_test_file_1ta-cl1-46\" FTP_direction=\"Download\" filename=\"/home/ftp-user /ta_test_file_1ta-cl1-46\" file_size=19926248 file_path=\"/var/www//home/ftp-user/ta_test_file_1ta-cl1-46\" ftpcommand=\"RETR\" src_ip=10.146.13.49 src_country_code= dst_ip=10.8.142.181 dst_country_code= protocol=\"TCP\" src_port=39936 dst_port=21 dstdomain=\"\" sent_bytes=0 recv_bytes=19926248",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
