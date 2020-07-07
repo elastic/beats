@@ -1525,3 +1525,47 @@ func TestInsertTags(t *testing.T) {
 		})
 	}
 }
+
+func TestConfigDimensionValueContainsWildcard(t *testing.T) {
+	cases := []struct {
+		title          string
+		dimensions     []Dimension
+		expectedResult bool
+	}{
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: "i-2222",
+				},
+			},
+			false,
+		},
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: dimensionValueWildcard,
+				},
+			},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			result := configDimensionValueContainsWildcard(c.dimensions)
+			assert.Equal(t, c.expectedResult, result)
+		})
+	}
+}
