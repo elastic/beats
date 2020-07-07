@@ -12,24 +12,32 @@ processors:
 #########################
 - script:
     lang: painless
+    if: ctx?.json != null
     params:
       values:
         - null
         - ""
         - "-"
         - "N/A"
-    source: >-
-      ctx?.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+    source: |
+      if (!ctx['json'].empty) {
+        ctx.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      }
+
 - script:
     lang: painless
+    if: ctx?.json?.evidence != null
     params:
       values:
         - null
         - ""
         - "-"
         - "N/A"
-    source: >-
-      ctx?.json?.evidence.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+    source: |
+      if (!ctx.json['evidence'].empty) {
+        ctx.json.evidence.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      }
+
 - set:
     field: cloud.provider
     value: azure
@@ -49,6 +57,7 @@ processors:
     field: json.title
     target_field: message
     ignore_missing: true
+
 #######################
 ## ECS Event Mapping ##
 #######################
