@@ -191,6 +191,9 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
+	if ports, ok := event["ports"]; ok {
+		e["ports"] = ports
+	}
 
 	if rawCont, ok := kubeMeta["container"]; ok {
 		container = rawCont.(common.MapStr)
@@ -300,6 +303,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 	}
 
+	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -349,6 +353,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 
 		for _, port := range c.Ports {
+			podPorts[port.Name] = port.ContainerPort
 			event := bus.Event{
 				"provider":   p.uuid,
 				"id":         eventID,
@@ -385,6 +390,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
 			flag:         true,
 			"host":       host,
+			"ports":      podPorts,
 			"kubernetes": kubemeta,
 			"meta": common.MapStr{
 				"kubernetes": meta,

@@ -33,8 +33,9 @@ type position struct {
 // Dissector is a tokenizer based on the Dissect syntax as defined at:
 // https://www.elastic.co/guide/en/logstash/current/plugins-filters-dissect.html
 type Dissector struct {
-	raw    string
-	parser *parser
+	raw     string
+	parser  *parser
+	trimmer trimmer
 }
 
 // Dissect takes the raw string and will use the defined tokenizer to return a map with the
@@ -57,7 +58,12 @@ func (d *Dissector) Dissect(s string) (Map, error) {
 	if len(positions) == 0 {
 		return nil, errParsingFailure
 	}
-
+	if d.trimmer != nil {
+		for idx, pos := range positions {
+			pos.start, pos.end = d.trimmer.Trim(s, pos.start, pos.end)
+			positions[idx] = pos
+		}
+	}
 	return d.resolve(s, positions), nil
 }
 
