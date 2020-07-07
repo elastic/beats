@@ -29,6 +29,7 @@
   port: "9201"
 
   # Secure settings for the server using TLS/SSL:
+  ssl.enabled: false
   ssl.certificate: "/etc/pki/server/cert.pem"
   ssl.key: "/etc/pki/server/cert.key"
 
