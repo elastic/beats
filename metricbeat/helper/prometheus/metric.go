@@ -103,9 +103,10 @@ func OpMultiplyBuckets(multiplier float64) MetricOption {
 	}
 }
 
-// OpSetSuffix extends the field's name with the given suffix
-func OpSetSuffix(suffix string) MetricOption {
-	return opSetSuffix{
+// OpSetSuffix extends the field's name with the given suffix if the value of the metric
+// is numeric (and not histogram or quantile), otherwise does nothing
+func OpSetNumericMetricSuffix(suffix string) MetricOption {
+	return opSetNumericMetricSuffix{
 		suffix: suffix,
 	}
 }
@@ -386,12 +387,12 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	return field, histogram, labels
 }
 
-type opSetSuffix struct {
+type opSetNumericMetricSuffix struct {
 	suffix string
 }
 
 // Process will extend the field's name with the given suffix
-func (o opSetSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opSetNumericMetricSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	_, ok := value.(float64)
 	if !ok {
 		return field, value, labels
