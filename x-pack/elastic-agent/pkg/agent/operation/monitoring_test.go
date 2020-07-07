@@ -175,6 +175,9 @@ func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []st
 // Cleanup cleans up all drops.
 func (b *testMonitor) Cleanup(string, string) error { return nil }
 
+// Close closes the monitor.
+func (b *testMonitor) Close() {}
+
 // Prepare executes steps in order for monitoring to work correctly
 func (b *testMonitor) Prepare(string, string, int, int) error { return nil }
 
