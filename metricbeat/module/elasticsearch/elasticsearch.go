@@ -360,8 +360,26 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	return xpack, err
 }
 
+type boolStr bool
+
+func (b *boolStr) UnmarshalJSON(raw []byte) error {
+	var bs string
+	err := json.Unmarshal(raw, &bs)
+	if err != nil {
+		return err
+	}
+
+	bv, err := strconv.ParseBool(bs)
+	if err != nil {
+		return err
+	}
+
+	*b = boolStr(bv)
+	return nil
+}
+
 type IndexSettings struct {
-	Hidden bool
+	Hidden boolStr
 }
 
 // GetIndicesSettings returns a map of index names to their settings.
@@ -376,9 +394,7 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 
 	var resp map[string]struct {
 		Settings struct {
-			Index struct {
-				Hidden string `json:"hidden"`
-			} `json:"index"`
+			Index IndexSettings `json:"index"`
 		} `json:"settings"`
 	}
 
@@ -389,11 +405,7 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 
 	ret := make(map[string]IndexSettings, len(resp))
 	for index, settings := range resp {
-		isHidden, err := strconv.ParseBool(settings.Settings.Index.Hidden)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not parse hidden setting as boolean")
-		}
-		ret[index] = IndexSettings{Hidden: isHidden}
+		ret[index] = settings.Settings.Index
 	}
 
 	return ret, nil
