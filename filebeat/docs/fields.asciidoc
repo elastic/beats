@@ -21666,6 +21666,24 @@ type: keyword
 
 --
 
+*`gsuite.admin.service.name`*::
++
+--
+The service name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.url.name`*::
++
+--
+The website name.
+
+type: keyword
+
+--
+
 
 *`gsuite.login.affected_email_address`*::
 >>>>>>> 78c75950b... Add delegated admin settings

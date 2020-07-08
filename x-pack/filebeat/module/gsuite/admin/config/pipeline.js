@@ -44,6 +44,8 @@ var login = (function () {
             case "UNASSIGN_ROLE":
             case "TRANSFER_DOCUMENT_OWNERSHIP":
             case "CHANGE_DOCS_SETTING":
+            case "CHANGE_SITES_SETTING":
+            case "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -55,6 +57,7 @@ var login = (function () {
             case "INSERT_CHROME_OS_PRINT_SERVER":
             case "INSERT_CHROME_OS_PRINTER":
             case "CREATE_ROLE":
+            case "ADD_WEB_ADDRESS":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -67,6 +70,7 @@ var login = (function () {
             case "DELETE_CHROME_OS_PRINTER":
             case "REMOVE_CHROME_OS_APPLICATION_SETTINGS":
             case "DELETE_ROLE":
+            case "DELETE_WEB_ADDRESS":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
@@ -74,6 +78,7 @@ var login = (function () {
                 break;
             case "ISSUE_DEVICE_COMMAND":
             case "DRIVE_DATA_RESTORE":
+            case "VIEW_SITE_DETAILS":
                 evt.Put("event.type", ["info"]);
                 break;
         }
@@ -276,6 +281,22 @@ var login = (function () {
                 {
                     from: "gsuite.admin.END_DATE_TIME",
                     to: "event.end",
+                },
+                {
+                    from: "gsuite.admin.SITE_LOCATION",
+                    to: "url.path",
+                },
+                {
+                    from: "gsuite.admin.WEB_ADDRESS",
+                    to: "url.full",
+                },
+                {
+                    from: "gsuite.admin.SITE_NAME",
+                    to: "gsuite.admin.url.name",
+                },
+                {
+                    from: "gsuite.admin.SERVICE_NAME",
+                    to: "gsuite.admin.service.name",
                 },
             ],
             mode: "rename",

@@ -83,3 +83,9 @@
     - name: privilege.name
       type: keyword
       description: Privilege name.
+    - name: service.name
+      type: keyword
+      description: The service name.
+    - name: url.name
+      type: keyword
+      description: The website name.
