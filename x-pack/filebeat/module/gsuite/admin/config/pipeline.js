@@ -36,6 +36,12 @@ var login = (function () {
             case "UPDATE_DEVICE":
             case "SEND_CHROME_OS_DEVICE_COMMAND":
             case "CHANGE_CONTACTS_SETTING":
+            case "ASSIGN_ROLE":
+            case "ADD_PRIVILEGE":
+            case "REMOVE_PRIVILEGE":
+            case "RENAME_ROLE":
+            case "UPDATE_ROLE":
+            case "UNASSIGN_ROLE":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -46,6 +52,7 @@ var login = (function () {
             case "MEET_INTEROP_CREATE_GATEWAY":
             case "INSERT_CHROME_OS_PRINT_SERVER":
             case "INSERT_CHROME_OS_PRINTER":
+            case "CREATE_ROLE":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -57,6 +64,7 @@ var login = (function () {
             case "DELETE_CHROME_OS_PRINT_SERVER":
             case "DELETE_CHROME_OS_PRINTER":
             case "REMOVE_CHROME_OS_APPLICATION_SETTINGS":
+            case "DELETE_ROLE":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
@@ -232,6 +240,18 @@ var login = (function () {
                 {
                     from: "gsuite.admin.DEVICE_PREVIOUS_ORG_UNIT",
                     to: "gsuite.admin.old_value",
+                },
+                {
+                    from: "gsuite.admin.ROLE_NAME",
+                    to: "gsuite.admin.role.name",
+                },
+                {
+                    from: "gsuite.admin.ROLE_ID",
+                    to: "gsuite.admin.role.id",
+                },
+                {
+                    from: "gsuite.admin.PRIVILEGE_NAME",
+                    to: "gsuite.admin.privilege.name",
                 },
             ],
             mode: "rename",

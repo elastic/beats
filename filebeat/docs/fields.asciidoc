@@ -21635,7 +21635,40 @@ type: keyword
 
 --
 
+<<<<<<< HEAD
 *`cisco.rsa.time.timestamp`*::
+=======
+*`gsuite.admin.role.id`*::
++
+--
+Unique identifier for this role privilege.
+
+type: keyword
+
+--
+
+*`gsuite.admin.role.name`*::
++
+--
+The role name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.privilege.name`*::
++
+--
+Privilege name.
+
+type: keyword
+
+--
+
+
+*`gsuite.login.affected_email_address`*::
+>>>>>>> 78c75950b... Add delegated admin settings
 +
 --
 type: keyword

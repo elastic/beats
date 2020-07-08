@@ -72,3 +72,14 @@
     - name: device.command_details
       type: keyword
       description: Command details.
+    - name: role.id
+      type: keyword
+      description: Unique identifier for this role privilege.
+    - name: role.name
+      type: keyword
+      description: >
+        The role name.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings
+    - name: privilege.name
+      type: keyword
+      description: Privilege name.
