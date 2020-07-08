@@ -1,7 +1,7 @@
 {{ if eq .input "httpjson" }}
 type: httpjson
 
-url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/drive?maxResults=2
+url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/drive
 json_objects_array: items
 split_events_by: events
 
