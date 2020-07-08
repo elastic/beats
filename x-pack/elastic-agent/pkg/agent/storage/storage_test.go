@@ -49,6 +49,11 @@ func TestReplaceOrRollbackStore(t *testing.T) {
 
 		require.True(t, bytes.Equal(writtenContent, replaceWith))
 		requireFilesCount(t, dir, 2)
+
+		info, err := os.Stat(target)
+		require.NoError(t, err)
+
+		require.Equal(t, perms, info.Mode())
 	})
 
 	t.Run("when save is not successful", func(t *testing.T) {
@@ -97,6 +102,11 @@ func TestReplaceOrRollbackStore(t *testing.T) {
 
 		require.True(t, bytes.Equal(writtenContent, replaceWith))
 		requireFilesCount(t, dir, 1)
+
+		info, err := os.Stat(target)
+		require.NoError(t, err)
+
+		require.Equal(t, perms, info.Mode())
 	})
 
 	t.Run("when target file do not exist", func(t *testing.T) {
@@ -115,7 +125,7 @@ func TestDiskStore(t *testing.T) {
 		target, err := genFile([]byte("hello world"))
 		require.NoError(t, err)
 		defer os.Remove(target)
-		d := &DiskStore{target: target}
+		d := NewDiskStore(target)
 
 		msg := []byte("bonjour la famille")
 		err = d.Save(bytes.NewReader(msg))
@@ -125,6 +135,11 @@ func TestDiskStore(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, msg, content)
+
+		info, err := os.Stat(target)
+		require.NoError(t, err)
+
+		require.Equal(t, perms, info.Mode())
 	})
 
 	t.Run("when the target do no exist", func(t *testing.T) {
@@ -133,7 +148,7 @@ func TestDiskStore(t *testing.T) {
 		defer os.Remove(dir)
 
 		target := filepath.Join(dir, "hello.txt")
-		d := &DiskStore{target: target}
+		d := NewDiskStore(target)
 
 		msg := []byte("bonjour la famille")
 		err = d.Save(bytes.NewReader(msg))
@@ -143,6 +158,11 @@ func TestDiskStore(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, msg, content)
+
+		info, err := os.Stat(target)
+		require.NoError(t, err)
+
+		require.Equal(t, perms, info.Mode())
 	})
 
 	t.Run("return an io.ReadCloser to the target file", func(t *testing.T) {
@@ -150,7 +170,7 @@ func TestDiskStore(t *testing.T) {
 		target, err := genFile(msg)
 		require.NoError(t, err)
 
-		d := &DiskStore{target: target}
+		d := NewDiskStore(target)
 		r, err := d.Load()
 		require.NoError(t, err)
 		defer r.Close()
@@ -158,47 +178,11 @@ func TestDiskStore(t *testing.T) {
 		content, err := ioutil.ReadAll(r)
 		require.NoError(t, err)
 		require.Equal(t, msg, content)
-	})
-}
 
-func TestEncryptedDiskStore(t *testing.T) {
-	t.Run("when the target file already exists", func(t *testing.T) {
-		target, err := genFile([]byte("hello world"))
-		require.NoError(t, err)
-		defer os.Remove(target)
-		d := &EncryptedDiskStore{target: target}
-
-		msg := []byte("bonjour la famille")
-		err = d.Save(bytes.NewReader(msg))
+		info, err := os.Stat(target)
 		require.NoError(t, err)
 
-		// lets read the file
-		nd := &EncryptedDiskStore{target: target}
-		r, err := nd.Load()
-		require.NoError(t, err)
-
-		content, err := ioutil.ReadAll(r)
-		require.NoError(t, err)
-
-		require.Equal(t, msg, content)
-	})
-
-	t.Run("when the target do not exist", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "configs")
-		require.NoError(t, err)
-		defer os.Remove(dir)
-
-		target := filepath.Join(dir, "hello.txt")
-		d := &DiskStore{target: target}
-
-		msg := []byte("bonjour la famille")
-		err = d.Save(bytes.NewReader(msg))
-		require.NoError(t, err)
-
-		content, err := ioutil.ReadFile(target)
-		require.NoError(t, err)
-
-		require.Equal(t, msg, content)
+		require.Equal(t, perms, info.Mode())
 	})
 }
 

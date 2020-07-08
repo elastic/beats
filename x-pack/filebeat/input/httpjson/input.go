@@ -398,6 +398,9 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			} else {
 				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
+					if err == common.ErrKeyNotFound {
+						return nil
+					}
 					return err
 				}
 				switch ts := v.(type) {

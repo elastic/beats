@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 - Adds `split_events_by` option to httpjson input. {pull}19246[19246]
 - Adds `date_cursor` option to httpjson input. {pull}19483[19483]
+- Adds Gsuite module with SAML support. {pull}19329[19329]
+- Adds Gsuite User Accounts support. {pull}19329[19329]
 
 *Heartbeat*
 
@@ -267,6 +269,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
+- Fix k8s scheduler compatibility issue. {pull}19699[19699]
 
 *Packetbeat*
 
@@ -533,6 +536,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
 - Add support for named ports in autodiscover. {pull}19398[19398]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
+- Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
 - The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
 
 *Packetbeat*
