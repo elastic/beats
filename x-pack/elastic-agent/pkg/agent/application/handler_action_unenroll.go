@@ -55,10 +55,5 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 		c()
 	}
 
-	// clean action store
-	// if err := os.Remove(info.AgentActionStoreFile()); err != nil && !os.IsNotExist(err) {
-	// 	return errors.New(err, "failed to clear action store")
-	// }
-
 	return nil
 }
