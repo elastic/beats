@@ -177,62 +177,20 @@ func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3C
 	run(t, collector, receiver)
 }
 
-func newInputContext() input.Context {
-	return input.Context{
-		Done: make(chan struct{}),
-	}
-}
-
 type eventReceiver struct {
 	ch chan beat.Event
 }
 
-type stubOutleter struct {
-	sync.Mutex
-	cond   *sync.Cond
-	done   bool
-	Events []beat.Event
-}
-
-func newStubOutlet() *stubOutleter {
-	o := &stubOutleter{}
-	o.cond = sync.NewCond(o)
-	return o
-}
-
-func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
-	o.Lock()
-	defer o.Unlock()
-
-	for len(o.Events) < numEvents && !o.done {
-		o.cond.Wait()
+func (r *eventReceiver) waitForEvents(n int) ([]beat.Event, bool) {
+	buf := make([]beat.Event, 0, n)
+	for event := range r.ch {
+		buf = append(buf, event)
+		n--
+		if n == 0 {
+			return buf, true
+		}
 	}
-
-	size := numEvents
-	if size >= len(o.Events) {
-		size = len(o.Events)
-	}
-
-	out := make([]beat.Event, size)
-	copy(out, o.Events)
-	return out, len(out) == numEvents
-}
-
-func (o *stubOutleter) Close() error {
-	o.Lock()
-	defer o.Unlock()
-	o.done = true
-	return nil
-}
-
-func (o *stubOutleter) Done() <-chan struct{} { return nil }
-
-func (o *stubOutleter) OnEvent(event beat.Event) bool {
-	o.Lock()
-	defer o.Unlock()
-	o.Events = append(o.Events, event)
-	o.cond.Broadcast()
-	return !o.done
+	return buf, false
 }
 
 func TestS3Input(t *testing.T) {
