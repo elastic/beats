@@ -715,6 +715,7 @@ class Test(BaseTest):
         # assert that renaming of the file went undetected
         assert not self.log_contains("File rename was detected:" + testfile + " -> " + renamedfile)
 
+    @unittest.skipIf(sys.platform.startswith("win"))
     def test_inode_marker_based_identity_tracking(self):
         """
         File is picked up again if the contents of the marker file changes.
@@ -748,6 +749,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=2))
         proc.check_kill_and_wait()
 
+    @unittest.skipIf(sys.platform.startswith("win"))
     def test_inode_marker_based_identity_tracking_to_path_based(self):
         """
         File reading can be continued after file_identity is changed.

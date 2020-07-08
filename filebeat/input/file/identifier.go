@@ -165,7 +165,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 func (i *inodeMarkerIdentifier) GenerateID(s State) (id, identifierType string) {
 	m := i.markerContents()
 
-	stateID := fmt.Sprintf("%s%s%d-%s", i.name, identitySep, s.FileStateOS.Inode, m)
+	stateID := fmt.Sprintf("%s%s%d-%s", i.name, identitySep, s.FileStateOS.InodeString(), m)
 	return genIDWithHash(s.Meta, stateID), i.name
 }
 
