@@ -12,14 +12,27 @@ var login = (function () {
             case "UPDATE_MANAGED_CONFIGURATION":
             case "GPLUS_PREMIUM_FEATURES":
             case "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED":
+            case "UPDATE_BUILDING":
+            case "UPDATE_CALENDAR_RESOURCE_FEATURE":
+            case "RENAME_CALENDAR_RESOURCE":
+            case "UPDATE_CALENDAR_RESOURCE":
+            case "CHANGE_CALENDAR_SETTING":
+            case "CANCEL_CALENDAR_EVENTS":
+            case "RELEASE_CALENDAR_RESOURCES":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
             case "CREATE_MANAGED_CONFIGURATION":
+            case "CREATE_BUILDING":
+            case "CREATE_CALENDAR_RESOURCE":
+            case "CREATE_CALENDAR_RESOURCE_FEATURE":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
             case "DELETE_MANAGED_CONFIGURATION":
+            case "DELETE_BUILDING":
+            case "DELETE_CALENDAR_RESOURCE":
+            case "DELETE_CALENDAR_RESOURCE_FEATURE":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
@@ -64,6 +77,21 @@ var login = (function () {
         evt.Put("group.name", data[0]);
         evt.Put("group.domain", data[1]);
     };
+
+    var setRelatedUserInfo = function(evt) {
+        var email = evt.Get("gsuite.admin.user.email");
+        if (!email) {
+            return;
+        }
+
+        var data = email.split("@");
+        if (data.length !== 2) {
+            return;
+        }
+
+        evt.AppendTo("related.user", data[0]);
+    };
+
 
     var pipeline = new processor.Chain()
         .Add(categorizeEvent)
@@ -118,12 +146,25 @@ var login = (function () {
                     from: "gsuite.admin.FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTION",
                     to: "gsuite.admin.non_featured_services_selection",
                 },
+                {
+                    from: "gsuite.admin.FIELD_NAME",
+                    to: "gsuite.admin.field",
+                },
+                {
+                    from: "gsuite.admin.RESOURCE_IDENTIFIER",
+                    to: "gsuite.admin.resource.id",
+                },
+                {
+                    from: "gsuite.admin.USER_EMAIL",
+                    to: "gsuite.admin.user.email",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
         .Add(setGroupInfo)
+        .Add(setRelatedUserInfo)
         .Build();
 
     return {

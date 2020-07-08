@@ -61573,6 +61573,33 @@ type: keyword
 
 --
 
+*`gsuite.admin.field`*::
++
+--
+The name of the field.
+
+type: keyword
+
+--
+
+*`gsuite.admin.resource.id`*::
++
+--
+The name of the resource identifier.
+
+type: keyword
+
+--
+
+*`gsuite.admin.user.email`*::
++
+--
+The user's primary email address.
+
+type: keyword
+
+--
+
 
 *`gsuite.login.affected_email_address`*::
 +

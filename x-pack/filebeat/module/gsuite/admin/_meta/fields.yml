@@ -39,3 +39,12 @@
       description: >
         Non-featured services selection.
         For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED
+    - name: field
+      type: keyword
+      description: The name of the field.
+    - name: resource.id
+      type: keyword
+      description: The name of the resource identifier.
+    - name: user.email
+      type: keyword
+      description: The user's primary email address.
