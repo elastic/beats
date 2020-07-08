@@ -242,6 +242,10 @@ func (f *fleetGateway) shouldUnroll() bool {
 }
 
 func isUnauth(err error) bool {
+	if err == nil {
+		return false
+	}
+
 	return strings.Contains(err.Error(), fleetapi.ErrInvalidAPIKey.Error())
 }
 
