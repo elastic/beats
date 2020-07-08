@@ -35,6 +35,7 @@ var login = (function () {
             case "MOVE_DEVICE_TO_ORG_UNIT_DETAILED":
             case "UPDATE_DEVICE":
             case "SEND_CHROME_OS_DEVICE_COMMAND":
+            case "CHANGE_CONTACTS_SETTING":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
