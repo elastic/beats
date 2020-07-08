@@ -19,6 +19,8 @@ var login = (function () {
             case "CHANGE_CALENDAR_SETTING":
             case "CANCEL_CALENDAR_EVENTS":
             case "RELEASE_CALENDAR_RESOURCES":
+            case "MEET_INTEROP_MODIFY_GATEWAY":
+            case "CHANGE_CHAT_SETTING":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -26,6 +28,7 @@ var login = (function () {
             case "CREATE_BUILDING":
             case "CREATE_CALENDAR_RESOURCE":
             case "CREATE_CALENDAR_RESOURCE_FEATURE":
+            case "MEET_INTEROP_CREATE_GATEWAY":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -33,6 +36,7 @@ var login = (function () {
             case "DELETE_BUILDING":
             case "DELETE_CALENDAR_RESOURCE":
             case "DELETE_CALENDAR_RESOURCE_FEATURE":
+            case "MEET_INTEROP_DELETE_GATEWAY":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
@@ -157,6 +161,10 @@ var login = (function () {
                 {
                     from: "gsuite.admin.USER_EMAIL",
                     to: "gsuite.admin.user.email",
+                },
+                {
+                    from: "gsuite.admin.GATEWAY_NAME",
+                    to: "gsuite.admin.gateway.name",
                 },
             ],
             mode: "rename",

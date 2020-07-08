@@ -61600,6 +61600,15 @@ type: keyword
 
 --
 
+*`gsuite.admin.gateway.name`*::
++
+--
+Gateway name. Present on some chat settings.
+
+type: keyword
+
+--
+
 
 *`gsuite.login.affected_email_address`*::
 +

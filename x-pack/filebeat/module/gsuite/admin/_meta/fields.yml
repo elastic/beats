@@ -48,3 +48,6 @@
     - name: user.email
       type: keyword
       description: The user's primary email address.
+    - name: gateway.name
+      type: keyword
+      description: Gateway name. Present on some chat settings.
