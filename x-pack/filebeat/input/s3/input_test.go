@@ -162,7 +162,8 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestNewS3BucketReader(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
+	config := defaultConfig()
+	p := &s3Collector{cancelation: context.TODO(), config: &config}
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(info.name),
 		Key:    awssdk.String(info.key),
@@ -171,7 +172,7 @@ func TestNewS3BucketReader(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
+	ctx, cancelFn := context.WithTimeout(p.cancelation, p.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -198,7 +199,8 @@ func TestNewS3BucketReader(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
+	config := defaultConfig()
+	p := &s3Collector{cancelation: context.TODO(), config: &config}
 	errC := make(chan error)
 	s3Context := &s3Context{
 		refs: 1,
@@ -222,7 +224,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// The Context will interrupt the request if the timeout expires.
 	var cancelFn func()
-	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
+	ctx, cancelFn := context.WithTimeout(p.cancelation, p.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
