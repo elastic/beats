@@ -390,7 +390,7 @@ var select5 = linear_select([
 	msg29,
 ]);
 
-var part22 = match("MESSAGE#28:Plugins", "nwparser.payload", "%{event_description}, as %{reason->} ", processor_chain([
+var part22 = match("MESSAGE#28:Plugins", "nwparser.payload", "%{event_description}, as %{reason}", processor_chain([
 	dup1,
 	dup11,
 	dup2,
@@ -399,7 +399,7 @@ var part22 = match("MESSAGE#28:Plugins", "nwparser.payload", "%{event_descriptio
 
 var msg30 = msg("Plugins", part22);
 
-var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulename->} (process %{process_id}) finished its job in %{duration->} seconds ", processor_chain([
+var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulename->} (process %{process_id}) finished its job in %{duration->} seconds", processor_chain([
 	dup1,
 	dup12,
 	setc("ec_outcome","Success"),
@@ -410,7 +410,7 @@ var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulenam
 
 var msg31 = msg("process_finished", part23);
 
-var part24 = match("MESSAGE#30:process_notfinished_killed", "nwparser.payload", "%{rulename->} (pid %{process_id}) is slow to finish - killing it ", processor_chain([
+var part24 = match("MESSAGE#30:process_notfinished_killed", "nwparser.payload", "%{rulename->} (pid %{process_id}) is slow to finish - killing it", processor_chain([
 	dup7,
 	dup12,
 	dup11,

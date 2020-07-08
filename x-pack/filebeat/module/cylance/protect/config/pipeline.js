@@ -226,16 +226,14 @@ var select4 = linear_select([
 	part7,
 ]);
 
-var part8 = match("MESSAGE#1:CylancePROTECT:02/4_0", "nwparser.p0", "%{checksum}; Category: %{category}, User: %{user_fname->} %{user_lname->} (%{mail_id})%{p0}");
+var part8 = match("MESSAGE#1:CylancePROTECT:02/4_0", "nwparser.p0", "%{checksum}; Category: %{category}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
 
-var part9 = match("MESSAGE#1:CylancePROTECT:02/4_1", "nwparser.p0", "%{checksum}, User: %{user_fname->} %{user_lname->} (%{mail_id})%{p0}");
+var part9 = match("MESSAGE#1:CylancePROTECT:02/4_1", "nwparser.p0", "%{checksum}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
 
 var select5 = linear_select([
 	part8,
 	part9,
 ]);
-
-var part10 = match("MESSAGE#1:CylancePROTECT:02/5", "nwparser.p0", "%{} ");
 
 var all2 = all_match({
 	processors: [
@@ -244,7 +242,6 @@ var all2 = all_match({
 		dup11,
 		select4,
 		select5,
-		part10,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -257,19 +254,19 @@ var all2 = all_match({
 
 var msg2 = msg("CylancePROTECT:02", all2);
 
-var part11 = match("MESSAGE#2:CylancePROTECT:03/3_0", "nwparser.p0", "Devices: %{node},%{p0}");
+var part10 = match("MESSAGE#2:CylancePROTECT:03/3_0", "nwparser.p0", "Devices: %{node},%{p0}");
 
-var part12 = match("MESSAGE#2:CylancePROTECT:03/3_1", "nwparser.p0", "Device: %{node};%{p0}");
+var part11 = match("MESSAGE#2:CylancePROTECT:03/3_1", "nwparser.p0", "Device: %{node};%{p0}");
 
-var part13 = match("MESSAGE#2:CylancePROTECT:03/3_2", "nwparser.p0", "Policy: %{policyname},%{p0}");
+var part12 = match("MESSAGE#2:CylancePROTECT:03/3_2", "nwparser.p0", "Policy: %{policyname},%{p0}");
 
 var select6 = linear_select([
+	part10,
 	part11,
 	part12,
-	part13,
 ]);
 
-var part14 = match("MESSAGE#2:CylancePROTECT:03/4", "nwparser.p0", "%{}User: %{user_fname->} %{user_lname->} (%{mail_id})");
+var part13 = match("MESSAGE#2:CylancePROTECT:03/4", "nwparser.p0", "%{}User: %{user_fname->} %{user_lname->} (%{mail_id})");
 
 var all3 = all_match({
 	processors: [
@@ -277,7 +274,7 @@ var all3 = all_match({
 		dup24,
 		dup11,
 		select6,
-		part14,
+		part13,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -290,13 +287,13 @@ var all3 = all_match({
 
 var msg3 = msg("CylancePROTECT:03", all3);
 
-var part15 = match("MESSAGE#3:CylancePROTECT:04/2", "nwparser.p0", "%{event_type}, Message: Zone: %{info}; Policy: %{policyname}; Value: %{fld3}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
+var part14 = match("MESSAGE#3:CylancePROTECT:04/2", "nwparser.p0", "%{event_type}, Message: Zone: %{info}; Policy: %{policyname}; Value: %{fld3}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
 
 var all4 = all_match({
 	processors: [
 		dup2,
 		dup24,
-		part15,
+		part14,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -309,16 +306,16 @@ var all4 = all_match({
 
 var msg4 = msg("CylancePROTECT:04", all4);
 
-var part16 = match("MESSAGE#4:CylancePROTECT:05/3_0", "nwparser.p0", "Policy Assigned:%{signame}; Devices: %{node->} , User: %{p0}");
+var part15 = match("MESSAGE#4:CylancePROTECT:05/3_0", "nwparser.p0", "Policy Assigned:%{signame}; Devices: %{node->} , User: %{p0}");
 
-var part17 = match("MESSAGE#4:CylancePROTECT:05/3_1", "nwparser.p0", " Provider: %{product}, Source IP: %{saddr}, User: %{p0}");
+var part16 = match("MESSAGE#4:CylancePROTECT:05/3_1", "nwparser.p0", " Provider: %{product}, Source IP: %{saddr}, User: %{p0}");
 
-var part18 = match("MESSAGE#4:CylancePROTECT:05/3_2", "nwparser.p0", "%{info}, User: %{p0}");
+var part17 = match("MESSAGE#4:CylancePROTECT:05/3_2", "nwparser.p0", "%{info}, User: %{p0}");
 
 var select7 = linear_select([
+	part15,
 	part16,
 	part17,
-	part18,
 ]);
 
 var all5 = all_match({
@@ -340,21 +337,21 @@ var all5 = all_match({
 
 var msg5 = msg("CylancePROTECT:05", all5);
 
-var part19 = match("MESSAGE#5:CylancePROTECT:06/2", "nwparser.p0", "%{event_type}, Message: The Device: %{node->} was auto assigned to the Zone: IP Address: %{p0}");
+var part18 = match("MESSAGE#5:CylancePROTECT:06/2", "nwparser.p0", "%{event_type}, Message: The Device: %{node->} was auto assigned to the Zone: IP Address: %{p0}");
 
-var part20 = match("MESSAGE#5:CylancePROTECT:06/3_0", "nwparser.p0", "Fake Devices, User: %{p0}");
+var part19 = match("MESSAGE#5:CylancePROTECT:06/3_0", "nwparser.p0", "Fake Devices, User: %{p0}");
 
-var part21 = match("MESSAGE#5:CylancePROTECT:06/3_1", "nwparser.p0", "%{saddr}, User: %{p0}");
+var part20 = match("MESSAGE#5:CylancePROTECT:06/3_1", "nwparser.p0", "%{saddr}, User: %{p0}");
 
 var select8 = linear_select([
+	part19,
 	part20,
-	part21,
 ]);
 
-var part22 = match("MESSAGE#5:CylancePROTECT:06/4_0", "nwparser.p0", " (%{mail_id})");
+var part21 = match("MESSAGE#5:CylancePROTECT:06/4_0", "nwparser.p0", " (%{mail_id})");
 
 var select9 = linear_select([
-	part22,
+	part21,
 	dup5,
 ]);
 
@@ -362,7 +359,7 @@ var all6 = all_match({
 	processors: [
 		dup2,
 		dup24,
-		part19,
+		part18,
 		select8,
 		select9,
 	],
@@ -377,22 +374,22 @@ var all6 = all_match({
 
 var msg6 = msg("CylancePROTECT:06", all6);
 
-var part23 = match("MESSAGE#6:CylancePROTECT:07/1_0", "nwparser.p0", "[%{fld2}] Event Type: ExploitAttempt, Event Name: %{p0}");
+var part22 = match("MESSAGE#6:CylancePROTECT:07/1_0", "nwparser.p0", "[%{fld2}] Event Type: ExploitAttempt, Event Name: %{p0}");
 
-var part24 = match("MESSAGE#6:CylancePROTECT:07/1_1", "nwparser.p0", " %{fld5->} Event Type: ExploitAttempt, Event Name: %{p0}");
+var part23 = match("MESSAGE#6:CylancePROTECT:07/1_1", "nwparser.p0", " %{fld5->} Event Type: ExploitAttempt, Event Name: %{p0}");
 
 var select10 = linear_select([
+	part22,
 	part23,
-	part24,
 ]);
 
-var part25 = match("MESSAGE#6:CylancePROTECT:07/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), Action: %{action}, Process ID: %{process_id}, Process Name: %{process}, User Name: %{username}, Violation Type: %{signame}, Zone Names: %{info}");
+var part24 = match("MESSAGE#6:CylancePROTECT:07/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), Action: %{action}, Process ID: %{process_id}, Process Name: %{process}, User Name: %{username}, Violation Type: %{signame}, Zone Names: %{info}");
 
 var all7 = all_match({
 	processors: [
 		dup2,
 		select10,
-		part25,
+		part24,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -405,22 +402,22 @@ var all7 = all_match({
 
 var msg7 = msg("CylancePROTECT:07", all7);
 
-var part26 = match("MESSAGE#7:CylancePROTECT:08/1_0", "nwparser.p0", "[%{fld2}] Event Type: DeviceControl, Event Name: %{p0}");
+var part25 = match("MESSAGE#7:CylancePROTECT:08/1_0", "nwparser.p0", "[%{fld2}] Event Type: DeviceControl, Event Name: %{p0}");
 
-var part27 = match("MESSAGE#7:CylancePROTECT:08/1_1", "nwparser.p0", " %{fld5->} Event Type: DeviceControl, Event Name: %{p0}");
+var part26 = match("MESSAGE#7:CylancePROTECT:08/1_1", "nwparser.p0", " %{fld5->} Event Type: DeviceControl, Event Name: %{p0}");
 
 var select11 = linear_select([
+	part25,
 	part26,
-	part27,
 ]);
 
-var part28 = match("MESSAGE#7:CylancePROTECT:08/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, External Device Type: %{fld3}, External Device Vendor ID: %{fld18}, External Device Name: %{fld4}, External Device Product ID: %{fld17}, External Device Serial Number: %{serial_number}, Zone Names: %{info}");
+var part27 = match("MESSAGE#7:CylancePROTECT:08/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, External Device Type: %{fld3}, External Device Vendor ID: %{fld18}, External Device Name: %{fld4}, External Device Product ID: %{fld17}, External Device Serial Number: %{serial_number}, Zone Names: %{info}");
 
 var all8 = all_match({
 	processors: [
 		dup2,
 		select11,
-		part28,
+		part27,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -433,12 +430,12 @@ var all8 = all_match({
 
 var msg8 = msg("CylancePROTECT:08", all8);
 
-var part29 = match("MESSAGE#8:CylancePROTECT:09/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, File Path: %{directory}, Interpreter: %{application}, Interpreter Version: %{version->} (%{fld3}), Zone Names: %{p0}");
+var part28 = match("MESSAGE#8:CylancePROTECT:09/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, File Path: %{directory}, Interpreter: %{application}, Interpreter Version: %{version->} (%{fld3}), Zone Names: %{p0}");
 
-var part30 = match("MESSAGE#8:CylancePROTECT:09/3_0", "nwparser.p0", "%{info}, User Name: %{username}");
+var part29 = match("MESSAGE#8:CylancePROTECT:09/3_0", "nwparser.p0", "%{info}, User Name: %{username}");
 
 var select12 = linear_select([
-	part30,
+	part29,
 	dup14,
 ]);
 
@@ -446,7 +443,7 @@ var all9 = all_match({
 	processors: [
 		dup2,
 		dup27,
-		part29,
+		part28,
 		select12,
 	],
 	on_success: processor_chain([
@@ -460,22 +457,22 @@ var all9 = all_match({
 
 var msg9 = msg("CylancePROTECT:09", all9);
 
-var part31 = match("MESSAGE#9:CylancePROTECT:10/1_0", "nwparser.p0", "[%{fld2}] Event Type: Threat, Event Name: %{p0}");
+var part30 = match("MESSAGE#9:CylancePROTECT:10/1_0", "nwparser.p0", "[%{fld2}] Event Type: Threat, Event Name: %{p0}");
 
-var part32 = match("MESSAGE#9:CylancePROTECT:10/1_1", "nwparser.p0", " %{fld4->} Event Type: Threat, Event Name: %{p0}");
+var part31 = match("MESSAGE#9:CylancePROTECT:10/1_1", "nwparser.p0", " %{fld4->} Event Type: Threat, Event Name: %{p0}");
 
 var select13 = linear_select([
+	part30,
 	part31,
-	part32,
 ]);
 
-var part33 = match("MESSAGE#9:CylancePROTECT:10/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), File Name: %{filename}, Path: %{directory}, Drive Type: %{fld1}, SHA256: %{checksum}, MD5: %{fld3}, Status: %{event_state}, Cylance Score: %{reputation_num}, Found Date: %{fld5}, File Type: %{filetype}, Is Running: %{fld6}, Auto Run: %{fld7}, Detected By: %{fld8}, Zone Names: %{info}, Is Malware: %{fld10}, Is Unique To Cylance: %{fld11}, Threat Classification: %{sigtype->} ");
+var part32 = match("MESSAGE#9:CylancePROTECT:10/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), File Name: %{filename}, Path: %{directory}, Drive Type: %{fld1}, SHA256: %{checksum}, MD5: %{fld3}, Status: %{event_state}, Cylance Score: %{reputation_num}, Found Date: %{fld5}, File Type: %{filetype}, Is Running: %{fld6}, Auto Run: %{fld7}, Detected By: %{fld8}, Zone Names: %{info}, Is Malware: %{fld10}, Is Unique To Cylance: %{fld11}, Threat Classification: %{sigtype}");
 
 var all10 = all_match({
 	processors: [
 		dup2,
 		select13,
-		part33,
+		part32,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -488,22 +485,22 @@ var all10 = all_match({
 
 var msg10 = msg("CylancePROTECT:10", all10);
 
-var part34 = match("MESSAGE#10:CylancePROTECT:11/1_0", "nwparser.p0", "[%{fld2}] Event Type: AppControl, Event Name: %{p0}");
+var part33 = match("MESSAGE#10:CylancePROTECT:11/1_0", "nwparser.p0", "[%{fld2}] Event Type: AppControl, Event Name: %{p0}");
 
-var part35 = match("MESSAGE#10:CylancePROTECT:11/1_1", "nwparser.p0", " %{fld5->} Event Type: AppControl, Event Name: %{p0}");
+var part34 = match("MESSAGE#10:CylancePROTECT:11/1_1", "nwparser.p0", " %{fld5->} Event Type: AppControl, Event Name: %{p0}");
 
 var select14 = linear_select([
+	part33,
 	part34,
-	part35,
 ]);
 
-var part36 = match("MESSAGE#10:CylancePROTECT:11/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), Action: %{action}, Action Type: %{fld3}, File Path: %{directory}, SHA256: %{checksum}, Zone Names: %{info}");
+var part35 = match("MESSAGE#10:CylancePROTECT:11/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, IP Address: (%{saddr}), Action: %{action}, Action Type: %{fld3}, File Path: %{directory}, SHA256: %{checksum}, Zone Names: %{info}");
 
 var all11 = all_match({
 	processors: [
 		dup2,
 		select14,
-		part36,
+		part35,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -515,9 +512,27 @@ var all11 = all_match({
 
 var msg11 = msg("CylancePROTECT:11", all11);
 
-var part37 = match("MESSAGE#11:CylancePROTECT:15/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Threat Class: %{sigtype}, Threat Subclass: %{fld7}, SHA256: %{checksum}, MD5: %{fld8}");
+var part36 = match("MESSAGE#11:CylancePROTECT:15/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Threat Class: %{sigtype}, Threat Subclass: %{fld7}, SHA256: %{checksum}, MD5: %{fld8}");
 
 var all12 = all_match({
+	processors: [
+		dup2,
+		dup28,
+		part36,
+	],
+	on_success: processor_chain([
+		dup6,
+		dup8,
+		dup25,
+		dup26,
+	]),
+});
+
+var msg12 = msg("CylancePROTECT:15", all12);
+
+var part37 = match("MESSAGE#12:CylancePROTECT:14/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Names: (%{node}), Policy Name: %{policyname}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
+
+var all13 = all_match({
 	processors: [
 		dup2,
 		dup28,
@@ -531,15 +546,16 @@ var all12 = all_match({
 	]),
 });
 
-var msg12 = msg("CylancePROTECT:15", all12);
+var msg13 = msg("CylancePROTECT:14", all13);
 
-var part38 = match("MESSAGE#12:CylancePROTECT:14/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Names: (%{node}), Policy Name: %{policyname}, User: %{user_fname->} %{user_lname->} (%{mail_id})");
+var part38 = match("MESSAGE#13:CylancePROTECT:13/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Name: %{node}, Agent Version: %{fld6}, IP Address: (%{saddr}, %{fld15}), MAC Address: (%{macaddr}, %{fld16}), Logged On Users: (%{username}), OS: %{p0}");
 
-var all13 = all_match({
+var all14 = all_match({
 	processors: [
 		dup2,
 		dup28,
 		part38,
+		dup29,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -549,11 +565,11 @@ var all13 = all_match({
 	]),
 });
 
-var msg13 = msg("CylancePROTECT:14", all13);
+var msg14 = msg("CylancePROTECT:13", all14);
 
-var part39 = match("MESSAGE#13:CylancePROTECT:13/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Name: %{node}, Agent Version: %{fld6}, IP Address: (%{saddr}, %{fld15}), MAC Address: (%{macaddr}, %{fld16}), Logged On Users: (%{username}), OS: %{p0}");
+var part39 = match("MESSAGE#14:CylancePROTECT:16/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Name: %{node}, Agent Version: %{fld1}, IP Address: (%{saddr}), MAC Address: (%{macaddr}), Logged On Users: (%{username}), OS: %{p0}");
 
-var all14 = all_match({
+var all15 = all_match({
 	processors: [
 		dup2,
 		dup28,
@@ -568,34 +584,15 @@ var all14 = all_match({
 	]),
 });
 
-var msg14 = msg("CylancePROTECT:13", all14);
-
-var part40 = match("MESSAGE#14:CylancePROTECT:16/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, Device Name: %{node}, Agent Version: %{fld1}, IP Address: (%{saddr}), MAC Address: (%{macaddr}), Logged On Users: (%{username}), OS: %{p0}");
-
-var all15 = all_match({
-	processors: [
-		dup2,
-		dup28,
-		part40,
-		dup29,
-	],
-	on_success: processor_chain([
-		dup6,
-		dup8,
-		dup25,
-		dup26,
-	]),
-});
-
 var msg15 = msg("CylancePROTECT:16", all15);
 
-var part41 = match("MESSAGE#15:CylancePROTECT:25/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, File Path: %{directory}, Interpreter: %{application}, Interpreter Version: %{version}, Zone Names: %{info}, User Name: %{username}");
+var part40 = match("MESSAGE#15:CylancePROTECT:25/2", "nwparser.p0", "%{event_type}, Device Name: %{node}, File Path: %{directory}, Interpreter: %{application}, Interpreter Version: %{version}, Zone Names: %{info}, User Name: %{username}");
 
 var all16 = all_match({
 	processors: [
 		dup2,
 		dup27,
-		part41,
+		part40,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -607,25 +604,25 @@ var all16 = all_match({
 
 var msg16 = msg("CylancePROTECT:25", all16);
 
-var part42 = match("MESSAGE#16:CylancePROTECT:12/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, %{p0}");
+var part41 = match("MESSAGE#16:CylancePROTECT:12/2", "nwparser.p0", "%{vendor_event_cat}, Event Name: %{event_type}, %{p0}");
 
-var part43 = match("MESSAGE#16:CylancePROTECT:12/3_0", "nwparser.p0", "Device Name: %{node}, Zone Names:%{info}");
+var part42 = match("MESSAGE#16:CylancePROTECT:12/3_0", "nwparser.p0", "Device Name: %{node}, Zone Names:%{info}");
 
-var part44 = match("MESSAGE#16:CylancePROTECT:12/3_1", "nwparser.p0", "Device Name: %{node}");
+var part43 = match("MESSAGE#16:CylancePROTECT:12/3_1", "nwparser.p0", "Device Name: %{node}");
 
-var part45 = match("MESSAGE#16:CylancePROTECT:12/3_2", "nwparser.p0", "%{fld1}");
+var part44 = match("MESSAGE#16:CylancePROTECT:12/3_2", "nwparser.p0", "%{fld1}");
 
 var select15 = linear_select([
+	part42,
 	part43,
 	part44,
-	part45,
 ]);
 
 var all17 = all_match({
 	processors: [
 		dup2,
 		dup28,
-		part42,
+		part41,
 		select15,
 	],
 	on_success: processor_chain([
@@ -638,20 +635,20 @@ var all17 = all_match({
 
 var msg17 = msg("CylancePROTECT:12", all17);
 
-var part46 = match("MESSAGE#17:CylancePROTECT:17/0", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, File Path:%{filename}, Interpreter:%{application}, Interpreter Version:%{version}, Zone Names:%{info}, User Name: %{p0}");
+var part45 = match("MESSAGE#17:CylancePROTECT:17/0", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, File Path:%{filename}, Interpreter:%{application}, Interpreter Version:%{version}, Zone Names:%{info}, User Name: %{p0}");
 
-var part47 = match("MESSAGE#17:CylancePROTECT:17/1_0", "nwparser.p0", "%{username}, Device Id: %{fld3}, Policy Name: %{policyname}");
+var part46 = match("MESSAGE#17:CylancePROTECT:17/1_0", "nwparser.p0", "%{username}, Device Id: %{fld3}, Policy Name: %{policyname}");
 
-var part48 = match("MESSAGE#17:CylancePROTECT:17/1_1", "nwparser.p0", "%{username}");
+var part47 = match("MESSAGE#17:CylancePROTECT:17/1_1", "nwparser.p0", "%{username}");
 
 var select16 = linear_select([
+	part46,
 	part47,
-	part48,
 ]);
 
 var all18 = all_match({
 	processors: [
-		part46,
+		part45,
 		select16,
 	],
 	on_success: processor_chain([
@@ -664,27 +661,27 @@ var all18 = all_match({
 
 var msg18 = msg("CylancePROTECT:17", all18);
 
-var part49 = match("MESSAGE#18:CylancePROTECT:18", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, Agent Version:%{fld1}, IP Address: (%{saddr}), MAC Address: (%{macaddr}), Logged On Users: (%{username}), OS:%{os}, Zone Names:%{info}", processor_chain([
+var part48 = match("MESSAGE#18:CylancePROTECT:18", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, Agent Version:%{fld1}, IP Address: (%{saddr}), MAC Address: (%{macaddr}), Logged On Users: (%{username}), OS:%{os}, Zone Names:%{info}", processor_chain([
 	dup6,
 	dup19,
 	dup25,
 	dup26,
 ]));
 
-var msg19 = msg("CylancePROTECT:18", part49);
+var msg19 = msg("CylancePROTECT:18", part48);
 
-var part50 = match("MESSAGE#19:CylancePROTECT:19/0", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, External Device Type:%{device}, External Device Vendor ID:%{fld2}, External Device Name:%{fld3}, External Device Product ID:%{fld4}, External Device Serial Number:%{serial_number}, Zone Names:%{p0}");
+var part49 = match("MESSAGE#19:CylancePROTECT:19/0", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, External Device Type:%{device}, External Device Vendor ID:%{fld2}, External Device Name:%{fld3}, External Device Product ID:%{fld4}, External Device Serial Number:%{serial_number}, Zone Names:%{p0}");
 
-var part51 = match("MESSAGE#19:CylancePROTECT:19/1_0", "nwparser.p0", "%{info}, Device Id: %{fld5}, Policy Name: %{policyname->} ");
+var part50 = match("MESSAGE#19:CylancePROTECT:19/1_0", "nwparser.p0", "%{info}, Device Id: %{fld5}, Policy Name: %{policyname->} ");
 
 var select17 = linear_select([
-	part51,
+	part50,
 	dup14,
 ]);
 
 var all19 = all_match({
 	processors: [
-		part50,
+		part49,
 		select17,
 	],
 	on_success: processor_chain([
@@ -697,37 +694,37 @@ var all19 = all_match({
 
 var msg20 = msg("CylancePROTECT:19", all19);
 
-var part52 = match("MESSAGE#20:CylancePROTECT:20/0", "nwparser.payload", "Event Name:%{event_type}, Message: %{p0}");
+var part51 = match("MESSAGE#20:CylancePROTECT:20/0", "nwparser.payload", "Event Name:%{event_type}, Message: %{p0}");
 
-var part53 = match("MESSAGE#20:CylancePROTECT:20/1_0", "nwparser.p0", "The Device%{p0}");
+var part52 = match("MESSAGE#20:CylancePROTECT:20/1_0", "nwparser.p0", "The Device%{p0}");
 
-var part54 = match("MESSAGE#20:CylancePROTECT:20/1_1", "nwparser.p0", "Device%{p0}");
+var part53 = match("MESSAGE#20:CylancePROTECT:20/1_1", "nwparser.p0", "Device%{p0}");
 
 var select18 = linear_select([
+	part52,
 	part53,
-	part54,
 ]);
 
-var part55 = match("MESSAGE#20:CylancePROTECT:20/2", "nwparser.p0", ":%{node}was auto assigned %{p0}");
+var part54 = match("MESSAGE#20:CylancePROTECT:20/2", "nwparser.p0", ":%{node}was auto assigned %{p0}");
 
-var part56 = match("MESSAGE#20:CylancePROTECT:20/3_0", "nwparser.p0", "to the%{p0}");
+var part55 = match("MESSAGE#20:CylancePROTECT:20/3_0", "nwparser.p0", "to the%{p0}");
 
-var part57 = match("MESSAGE#20:CylancePROTECT:20/3_1", "nwparser.p0", " to%{p0}");
+var part56 = match("MESSAGE#20:CylancePROTECT:20/3_1", "nwparser.p0", " to%{p0}");
 
 var select19 = linear_select([
+	part55,
 	part56,
-	part57,
 ]);
 
-var part58 = match("MESSAGE#20:CylancePROTECT:20/4", "nwparser.p0", "%{}Zone:%{zone}, User:%{user_fname}");
+var part57 = match("MESSAGE#20:CylancePROTECT:20/4", "nwparser.p0", "%{}Zone:%{zone}, User:%{user_fname}");
 
 var all20 = all_match({
 	processors: [
-		part52,
+		part51,
 		select18,
-		part55,
+		part54,
 		select19,
-		part58,
+		part57,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -739,7 +736,7 @@ var all20 = all_match({
 
 var msg21 = msg("CylancePROTECT:20", all20);
 
-var part59 = match("MESSAGE#21:CylancePROTECT:21", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, IP Address: (%{saddr}), File Name:%{filename}, Path:%{directory}, Drive Type:%{fld1}, SHA256:%{checksum}, MD5:%{fld3}, Status:%{event_state}, Cylance Score:%{fld4}, Found Date:%{fld51}, File Type:%{fld6}, Is Running:%{fld7}, Auto Run:%{fld8}, Detected By:%{fld9}, Zone Names: (%{info}), Is Malware:%{fld10}, Is Unique To Cylance:%{fld11}, Threat Classification:%{sigtype}", processor_chain([
+var part58 = match("MESSAGE#21:CylancePROTECT:21", "nwparser.payload", "Event Name:%{event_type}, Device Name:%{node}, IP Address: (%{saddr}), File Name:%{filename}, Path:%{directory}, Drive Type:%{fld1}, SHA256:%{checksum}, MD5:%{fld3}, Status:%{event_state}, Cylance Score:%{fld4}, Found Date:%{fld51}, File Type:%{fld6}, Is Running:%{fld7}, Auto Run:%{fld8}, Detected By:%{fld9}, Zone Names: (%{info}), Is Malware:%{fld10}, Is Unique To Cylance:%{fld11}, Threat Classification:%{sigtype}", processor_chain([
 	dup6,
 	dup19,
 	dup25,
@@ -753,22 +750,22 @@ var part59 = match("MESSAGE#21:CylancePROTECT:21", "nwparser.payload", "Event Na
 	}),
 ]));
 
-var msg22 = msg("CylancePROTECT:21", part59);
+var msg22 = msg("CylancePROTECT:21", part58);
 
-var part60 = match("MESSAGE#22:CylancePROTECT:22/0", "nwparser.payload", "Event Name:%{p0}");
+var part59 = match("MESSAGE#22:CylancePROTECT:22/0", "nwparser.payload", "Event Name:%{p0}");
 
-var part61 = match("MESSAGE#22:CylancePROTECT:22/1_0", "nwparser.p0", " %{event_type}, Device Name: %{device}, IP Address: (%{saddr}), Action: %{action}, Process ID: %{process_id}, Process Name: %{process}, User Name: %{username}, Violation Type: %{signame}, Zone Names:%{p0}");
+var part60 = match("MESSAGE#22:CylancePROTECT:22/1_0", "nwparser.p0", " %{event_type}, Device Name: %{device}, IP Address: (%{saddr}), Action: %{action}, Process ID: %{process_id}, Process Name: %{process}, User Name: %{username}, Violation Type: %{signame}, Zone Names:%{p0}");
 
-var part62 = match("MESSAGE#22:CylancePROTECT:22/1_1", "nwparser.p0", "%{event_type}, Device Name:%{node}, Zone Names:%{p0}");
+var part61 = match("MESSAGE#22:CylancePROTECT:22/1_1", "nwparser.p0", "%{event_type}, Device Name:%{node}, Zone Names:%{p0}");
 
 var select20 = linear_select([
+	part60,
 	part61,
-	part62,
 ]);
 
 var all21 = all_match({
 	processors: [
-		part60,
+		part59,
 		select20,
 		dup30,
 	],
@@ -782,29 +779,29 @@ var all21 = all_match({
 
 var msg23 = msg("CylancePROTECT:22", all21);
 
-var part63 = match("MESSAGE#23:CylancePROTECT:23", "nwparser.payload", "Event Name:%{event_type}, Threat Class:%{sigtype}, Threat Subclass:%{fld1}, SHA256:%{checksum}, MD5:%{fld3}", processor_chain([
+var part62 = match("MESSAGE#23:CylancePROTECT:23", "nwparser.payload", "Event Name:%{event_type}, Threat Class:%{sigtype}, Threat Subclass:%{fld1}, SHA256:%{checksum}, MD5:%{fld3}", processor_chain([
 	dup6,
 	dup19,
 	dup25,
 	dup26,
 ]));
 
-var msg24 = msg("CylancePROTECT:23", part63);
+var msg24 = msg("CylancePROTECT:23", part62);
 
-var part64 = match("MESSAGE#24:CylancePROTECT:24/0", "nwparser.payload", "Event Name:%{event_type}, Message: Provider:%{fld3}, Source IP:%{saddr}, User: %{user_fname->} %{user_lname->} (%{p0}");
+var part63 = match("MESSAGE#24:CylancePROTECT:24/0", "nwparser.payload", "Event Name:%{event_type}, Message: Provider:%{fld3}, Source IP:%{saddr}, User: %{user_fname->} %{user_lname->} (%{p0}");
 
-var part65 = match("MESSAGE#24:CylancePROTECT:24/1_0", "nwparser.p0", "%{mail_id})#015");
+var part64 = match("MESSAGE#24:CylancePROTECT:24/1_0", "nwparser.p0", "%{mail_id})#015");
 
-var part66 = match("MESSAGE#24:CylancePROTECT:24/1_1", "nwparser.p0", "%{mail_id})");
+var part65 = match("MESSAGE#24:CylancePROTECT:24/1_1", "nwparser.p0", "%{mail_id})");
 
 var select21 = linear_select([
+	part64,
 	part65,
-	part66,
 ]);
 
 var all22 = all_match({
 	processors: [
-		part64,
+		part63,
 		select21,
 	],
 	on_success: processor_chain([
@@ -817,11 +814,11 @@ var all22 = all_match({
 
 var msg25 = msg("CylancePROTECT:24", all22);
 
-var part67 = match("MESSAGE#25:CylancePROTECT:26/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device}; Policy Changed: %{fld4->} to '%{policyname}', User: %{user_fname->} %{user_lname->} (%{mail_id}), Zone Names:%{p0}");
+var part66 = match("MESSAGE#25:CylancePROTECT:26/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device}; Policy Changed: %{fld4->} to '%{policyname}', User: %{user_fname->} %{user_lname->} (%{mail_id}), Zone Names:%{p0}");
 
 var all23 = all_match({
 	processors: [
-		part67,
+		part66,
 		dup30,
 	],
 	on_success: processor_chain([
@@ -834,31 +831,31 @@ var all23 = all_match({
 
 var msg26 = msg("CylancePROTECT:26", all23);
 
-var part68 = match("MESSAGE#26:CylancePROTECT:27/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device}; Zones Removed: %{p0}");
+var part67 = match("MESSAGE#26:CylancePROTECT:27/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device}; Zones Removed: %{p0}");
 
-var part69 = match("MESSAGE#26:CylancePROTECT:27/1_0", "nwparser.p0", "%{fld4}; Zones Added: %{fld5},%{p0}");
+var part68 = match("MESSAGE#26:CylancePROTECT:27/1_0", "nwparser.p0", "%{fld4}; Zones Added: %{fld5},%{p0}");
 
-var part70 = match("MESSAGE#26:CylancePROTECT:27/1_1", "nwparser.p0", "%{fld4},%{p0}");
+var part69 = match("MESSAGE#26:CylancePROTECT:27/1_1", "nwparser.p0", "%{fld4},%{p0}");
 
 var select22 = linear_select([
+	part68,
 	part69,
-	part70,
 ]);
 
-var part71 = match("MESSAGE#26:CylancePROTECT:27/2", "nwparser.p0", "%{}User: %{user_fname->} %{user_lname->} (%{mail_id}), Zone Names:%{p0}");
+var part70 = match("MESSAGE#26:CylancePROTECT:27/2", "nwparser.p0", "%{}User: %{user_fname->} %{user_lname->} (%{mail_id}), Zone Names:%{p0}");
 
-var part72 = match("MESSAGE#26:CylancePROTECT:27/3_0", "nwparser.p0", "%{info->} Device Id: %{fld3}");
+var part71 = match("MESSAGE#26:CylancePROTECT:27/3_0", "nwparser.p0", "%{info->} Device Id: %{fld3}");
 
 var select23 = linear_select([
-	part72,
+	part71,
 	dup14,
 ]);
 
 var all24 = all_match({
 	processors: [
-		part68,
+		part67,
 		select22,
-		part71,
+		part70,
 		select23,
 	],
 	on_success: processor_chain([
@@ -871,24 +868,24 @@ var all24 = all_match({
 
 var msg27 = msg("CylancePROTECT:27", all24);
 
-var part73 = match("MESSAGE#27:CylancePROTECT:28/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device->} %{p0}");
+var part72 = match("MESSAGE#27:CylancePROTECT:28/0", "nwparser.payload", "Event Name:%{event_type}, Device Message: Device: %{device->} %{p0}");
 
-var part74 = match("MESSAGE#27:CylancePROTECT:28/1_0", "nwparser.p0", "Agent Self Protection Level Changed: '%{change_old}' to '%{change_new}', User: %{user_fname->} %{user_lname->} (%{mail_id}),%{p0}");
+var part73 = match("MESSAGE#27:CylancePROTECT:28/1_0", "nwparser.p0", "Agent Self Protection Level Changed: '%{change_old}' to '%{change_new}', User: %{user_fname->} %{user_lname->} (%{mail_id}),%{p0}");
 
-var part75 = match("MESSAGE#27:CylancePROTECT:28/1_1", "nwparser.p0", "User: %{user_fname->} %{user_lname->} (%{mail_id}),%{p0}");
+var part74 = match("MESSAGE#27:CylancePROTECT:28/1_1", "nwparser.p0", "User: %{user_fname->} %{user_lname->} (%{mail_id}),%{p0}");
 
 var select24 = linear_select([
+	part73,
 	part74,
-	part75,
 ]);
 
-var part76 = match("MESSAGE#27:CylancePROTECT:28/2", "nwparser.p0", "%{}Zone Names: %{info->} Device Id: %{fld3}");
+var part75 = match("MESSAGE#27:CylancePROTECT:28/2", "nwparser.p0", "%{}Zone Names: %{info->} Device Id: %{fld3}");
 
 var all25 = all_match({
 	processors: [
-		part73,
+		part72,
 		select24,
-		part76,
+		part75,
 	],
 	on_success: processor_chain([
 		dup6,
@@ -938,31 +935,31 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part77 = match("MESSAGE#0:CylancePROTECT:01/0", "nwparser.payload", "%{fld13->} %{fld14->} %{p0}");
+var part76 = match("MESSAGE#0:CylancePROTECT:01/0", "nwparser.payload", "%{fld13->} %{fld14->} %{p0}");
 
-var part78 = match("MESSAGE#0:CylancePROTECT:01/1_0", "nwparser.p0", "[%{fld2}] Event Type: AuditLog, Event Name: %{p0}");
+var part77 = match("MESSAGE#0:CylancePROTECT:01/1_0", "nwparser.p0", "[%{fld2}] Event Type: AuditLog, Event Name: %{p0}");
 
-var part79 = match("MESSAGE#0:CylancePROTECT:01/1_1", "nwparser.p0", " %{fld5->} Event Type: AuditLog, Event Name: %{p0}");
+var part78 = match("MESSAGE#0:CylancePROTECT:01/1_1", "nwparser.p0", " %{fld5->} Event Type: AuditLog, Event Name: %{p0}");
 
-var part80 = match("MESSAGE#0:CylancePROTECT:01/5", "nwparser.p0", "%{user_fname->} %{user_lname->} (%{mail_id})");
+var part79 = match("MESSAGE#0:CylancePROTECT:01/5", "nwparser.p0", "%{user_fname->} %{user_lname->} (%{mail_id})");
 
-var part81 = match("MESSAGE#1:CylancePROTECT:02/2", "nwparser.p0", "%{event_type}, Message: %{p0}");
+var part80 = match("MESSAGE#1:CylancePROTECT:02/2", "nwparser.p0", "%{event_type}, Message: %{p0}");
 
-var part82 = match("MESSAGE#8:CylancePROTECT:09/1_0", "nwparser.p0", "[%{fld2}] Event Type: ScriptControl, Event Name: %{p0}");
+var part81 = match("MESSAGE#8:CylancePROTECT:09/1_0", "nwparser.p0", "[%{fld2}] Event Type: ScriptControl, Event Name: %{p0}");
 
-var part83 = match("MESSAGE#8:CylancePROTECT:09/1_1", "nwparser.p0", " %{fld5->} Event Type: ScriptControl, Event Name: %{p0}");
+var part82 = match("MESSAGE#8:CylancePROTECT:09/1_1", "nwparser.p0", " %{fld5->} Event Type: ScriptControl, Event Name: %{p0}");
 
-var part84 = match("MESSAGE#8:CylancePROTECT:09/3_1", "nwparser.p0", "%{info}");
+var part83 = match("MESSAGE#8:CylancePROTECT:09/3_1", "nwparser.p0", "%{info}");
 
-var part85 = match("MESSAGE#11:CylancePROTECT:15/1_0", "nwparser.p0", "[%{fld2}] Event Type: %{p0}");
+var part84 = match("MESSAGE#11:CylancePROTECT:15/1_0", "nwparser.p0", "[%{fld2}] Event Type: %{p0}");
 
-var part86 = match("MESSAGE#11:CylancePROTECT:15/1_1", "nwparser.p0", " %{fld5->} Event Type: %{p0}");
+var part85 = match("MESSAGE#11:CylancePROTECT:15/1_1", "nwparser.p0", " %{fld5->} Event Type: %{p0}");
 
-var part87 = match("MESSAGE#13:CylancePROTECT:13/3_0", "nwparser.p0", "%{os->} Zone Names: %{info}");
+var part86 = match("MESSAGE#13:CylancePROTECT:13/3_0", "nwparser.p0", "%{os->} Zone Names: %{info}");
 
-var part88 = match("MESSAGE#13:CylancePROTECT:13/3_1", "nwparser.p0", "%{os}");
+var part87 = match("MESSAGE#13:CylancePROTECT:13/3_1", "nwparser.p0", "%{os}");
 
-var part89 = match("MESSAGE#22:CylancePROTECT:22/2_0", "nwparser.p0", "%{info}, Device Id: %{fld3}");
+var part88 = match("MESSAGE#22:CylancePROTECT:22/2_0", "nwparser.p0", "%{info}, Device Id: %{fld3}");
 
 var select26 = linear_select([
 	dup3,

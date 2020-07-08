@@ -77,7 +77,7 @@ var dup25 = linear_select([
 	dup5,
 ]);
 
-var hdr1 = match("HEADER#0:0001", "message", "%MSDHCP-%{hlevel}- %{messageid}: %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%MSDHCP-%{hlevel}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0001"),
 ]));
 

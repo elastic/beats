@@ -227,29 +227,29 @@
     {
         "@timestamp": "2020-04-24T14:25:25.000Z",
         "event.action": [
-            "Device Policy Assigned"
+            "SystemSecurity"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Apr 24 12:25:25 iat1852.api.localdomain CylancePROTECT Event Type:elits, Event Name:Device Policy Assigned, Device Message: Device: ipis; Policy Changed: gelits to 'tatevel', User: abilloi iam (mqua), Zone Names:atat, Device Id: quunt",
+        "event.original": "24-Apr-2016 12:25:25 very-high orsitame3869.localhost iam <<qua>umdo 24T00:25:25.sed apariat4194.www5.local CylancePROTECT Event Name:SystemSecurity, Message: The Device:onsewas auto assigned  torumetZone:oll, User:erc",
         "fileset.name": "protect",
+        "host.name": "apariat4194.www5.local",
         "input.type": "log",
         "log.offset": 1819,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "atat",
-        "rsa.identity.firstname": "abilloi",
-        "rsa.identity.lastname": "iam",
+        "rsa.identity.firstname": "erc",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1502000000,
-        "rsa.investigations.event_cat_name": "Policies.Rules",
-        "rsa.investigations.event_vcat": "elits",
-        "rsa.misc.device_name": "ipis",
-        "rsa.misc.event_type": "Device Policy Assigned",
-        "rsa.misc.mail_id": "mqua",
-        "rsa.misc.policy_name": "tatevel",
+        "rsa.investigations.event_cat": 1600000000,
+        "rsa.investigations.event_cat_name": "System",
+        "rsa.misc.event_type": "SystemSecurity",
+        "rsa.misc.node": "onse",
+        "rsa.network.alias_host": [
+            "apariat4194.www5.local"
+        ],
+        "rsa.network.zone": "oll",
         "rsa.time.event_time": "2020-04-24T14:25:25.000Z",
         "service.type": "cylance",
         "tags": [
@@ -260,71 +260,65 @@
     {
         "@timestamp": "2016-05-08T09:27:59.000Z",
         "event.action": [
-            "Registration"
+            "Device Updated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "8-May-2016 07:27:59 high avol7616.api.test isqu <<uis>idolore 2016-5-8T7:27:59.onse liq5883.localdomain CylancePROTECT emeumfug upta [omn] Event Type: ipsumq, Event Name: Registration, Device Name: ons, Agent Version: tessec, IP Address: (10.215.110.141, nsect), MAC Address: (01:00:5e:58:a9:90, ionul), Logged On Users: (nibus), OS: edquiano",
+        "event.original": "aspern 2016-5-8T7:27:59.itlabori Ciceroi3592.www.host CylancePROTECT aper essequ [taevi] Event Type: AuditLog, Event Name: Device Updated, Message: Zone: sitas; Policy: ehenderi; Value: pidatat, User: gni tquiinea (mquaera)",
         "fileset.name": "protect",
-        "host.name": "liq5883.localdomain",
+        "host.name": "Ciceroi3592.www.host",
         "input.type": "log",
-        "log.offset": 2054,
+        "log.offset": 2038,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.215.110.141"
-        ],
-        "related.user": [
-            "nibus"
-        ],
+        "rsa.db.index": "sitas",
+        "rsa.identity.firstname": "gni",
+        "rsa.identity.lastname": "tquiinea",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "ipsumq",
-        "rsa.misc.OS": "edquiano",
-        "rsa.misc.event_type": "Registration",
-        "rsa.misc.node": "ons",
+        "rsa.investigations.event_cat": 1804010000,
+        "rsa.investigations.event_cat_name": "Network.Devices.Additions",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "Device Updated",
+        "rsa.misc.mail_id": "mquaera",
+        "rsa.misc.policy_name": "ehenderi",
         "rsa.network.alias_host": [
-            "liq5883.localdomain"
+            "Ciceroi3592.www.host"
         ],
-        "rsa.network.eth_host": "01:00:5e:58:a9:90",
         "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "service.type": "cylance",
-        "source.ip": [
-            "10.215.110.141"
-        ],
         "tags": [
             "cylance.protect",
             "forwarded"
-        ],
-        "user.name": "nibus"
+        ]
     },
     {
         "@timestamp": "2020-05-22T04:30:33.000Z",
         "event.action": [
-            "PolicyAdd"
+            "Device Policy Assigned"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "22-May-2016 2:30:33 low aperi5160.host ipi <<rsitamet>lupt 22T14:30:33.xea qua2945.www.local CylancePROTECT Event Name:PolicyAdd, Threat Class:modocons, Threat Subclass:elaudant, SHA256:tinvol, MD5:dolore",
+        "event.original": "22-May-2016 2:30:33 medium saute2412.internal.domain lorema <<avol>labor 22T14:30:33.atuse ddoeiu1152.api.invalid CylancePROTECT Event Name:Device Policy Assigned, Device Name:llumquid, External Device Type:tation, External Device Vendor ID:ips, External Device Name:emeumfug, External Device Product ID:upta, External Device Serial Number:omn, Zone Names:ipsumq",
         "fileset.name": "protect",
-        "host.name": "qua2945.www.local",
+        "host.name": "ddoeiu1152.api.invalid",
         "input.type": "log",
-        "log.offset": 2397,
+        "log.offset": 2262,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.crypto.sig_type": "modocons",
+        "rsa.db.index": "ipsumq",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1502030000,
-        "rsa.investigations.event_cat_name": "Policies.Rules.Added",
-        "rsa.misc.checksum": "tinvol",
-        "rsa.misc.event_type": "PolicyAdd",
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.misc.device_name": "tation",
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.misc.node": "llumquid",
+        "rsa.misc.serial_number": "omn",
         "rsa.network.alias_host": [
-            "qua2945.www.local"
+            "ddoeiu1152.api.invalid"
         ],
         "rsa.time.event_time": "2020-05-22T04:30:33.000Z",
         "service.type": "cylance",
@@ -336,61 +330,77 @@
     {
         "@timestamp": "2016-06-05T11:33:08.000Z",
         "event.action": [
-            "threat_found"
+            "cancel",
+            "Device Policy Assigned"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "liquide 2016-6-5T9:33:08.uasia emp4209.host CylancePROTECT giatquov eritquii [dexeac] Event Type: Threat, Event Name: threat_found, Device Name: taut, IP Address: (10.114.138.121), File Name: imad, Path: msequi, Drive Type: isnostru, SHA256: iquaUten, MD5: santium, Status: iciatisu, Cylance Score: 0.803000, Found Date: emagnama, File Type: eprehend, Is Running: hil, Auto Run: atquovo, Detected By: suntinc, Zone Names: xeac, Is Malware: nidolo, Is Unique To Cylance: tatn, Threat Classification: eli ",
+        "event.original": "5-June-2016 21:33:08 low ipi7385.www.home eseru <<remeum>orain 2016-6-5T9:33:08.quip oin6316.www5.host CylancePROTECT tinvol dolore [abor] Event Type: ExploitAttempt, Event Name: Device Policy Assigned, Device Name: eddoei, IP Address: (10.22.128.42), Action: cancel, Process ID: 1120, Process Name: ditautfu.exe, User Name: piscing, Violation Type: roq, Zone Names: ostr",
         "fileset.name": "protect",
-        "host.name": "emp4209.host",
+        "host.name": "oin6316.www5.host",
         "input.type": "log",
-        "log.offset": 2602,
+        "log.offset": 2625,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": " xeac, Is Malware: nidolo, Is Unique To Cylance: tatn, Threat Classification: eli",
+        "process.name": "ditautfu.exe",
+        "process.pid": 1120,
+        "related.ip": [
+            "10.22.128.42"
+        ],
+        "related.user": [
+            "piscing"
+        ],
+        "rsa.db.index": "ostr",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "Threat",
-        "rsa.misc.event_type": "threat_found",
-        "rsa.misc.node": "taut, IP Address: (10.114.138.121), File Name: imad, Path: msequi, Drive Type: isnostru, SHA256: iquaUten, MD5: santium, Status: iciatisu, Cylance Score: 0.803000, Found Date: emagnama, File Type: eprehend, Is Running: hil, Auto Run: atquovo, Detected By: suntinc",
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.investigations.event_vcat": " ExploitAttempt",
+        "rsa.misc.action": [
+            "cancel"
+        ],
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.misc.node": "eddoei",
+        "rsa.misc.policy_name": "roq",
         "rsa.network.alias_host": [
-            "emp4209.host"
+            "oin6316.www5.host"
         ],
         "rsa.time.event_time": "2016-06-05T11:33:08.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.22.128.42"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
-        ]
+        ],
+        "user.name": "piscing"
     },
     {
         "@timestamp": "2016-06-20T06:35:42.000Z",
         "event.action": [
-            "SyslogSettingsSave"
+            "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "reetd 2016-6-20T4:35:42.lumqui itinvo7084.mail.corp CylancePROTECT equep iavolu [den] Event Type: Threat, Event Name: SyslogSettingsSave, Device Name: rpo, IP Address: (10.133.32.68), File Name: siarchi, Path: datatn, Drive Type: mqu, SHA256: apariat, MD5: tlabore, Status: untmolli, Cylance Score: 62.683000, Found Date: atDu, File Type: eav, Is Running: ionevo, Auto Run: remagn, Detected By: run, Zone Names: mque, Is Malware: uovolup, Is Unique To Cylance: samvolu, Threat Classification: ittenbyC ",
+        "event.original": "2016-6-20T4:35:42.moenimi temporin6518.invalid CylancePROTECT agnaali llitani [inima] Event Type: tlabo, Event Name: ThreatUpdated, Device Name: nihi",
         "fileset.name": "protect",
-        "host.name": "itinvo7084.mail.corp",
+        "host.name": "temporin6518.invalid",
         "input.type": "log",
-        "log.offset": 3106,
+        "log.offset": 2997,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": " mque, Is Malware: uovolup, Is Unique To Cylance: samvolu, Threat Classification: ittenbyC",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "Threat",
-        "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.node": "rpo, IP Address: (10.133.32.68), File Name: siarchi, Path: datatn, Drive Type: mqu, SHA256: apariat, MD5: tlabore, Status: untmolli, Cylance Score: 62.683000, Found Date: atDu, File Type: eav, Is Running: ionevo, Auto Run: remagn, Detected By: run",
+        "rsa.investigations.event_vcat": "tlabo",
+        "rsa.misc.event_type": "ThreatUpdated",
+        "rsa.misc.node": "nihi",
         "rsa.network.alias_host": [
-            "itinvo7084.mail.corp"
+            "temporin6518.invalid"
         ],
         "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
         "service.type": "cylance",
@@ -412,7 +422,7 @@
         "fileset.name": "protect",
         "host.name": "commod3331.host",
         "input.type": "log",
-        "log.offset": 3609,
+        "log.offset": 3147,
         "network.application": "taevit",
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
@@ -448,7 +458,7 @@
         "fileset.name": "protect",
         "host.name": "iae1637.local",
         "input.type": "log",
-        "log.offset": 3856,
+        "log.offset": 3394,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -484,7 +494,7 @@
         "fileset.name": "protect",
         "host.name": "pre2433.mail.domain",
         "input.type": "log",
-        "log.offset": 4051,
+        "log.offset": 3589,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -519,7 +529,7 @@
         "fileset.name": "protect",
         "host.name": "didunt1355.corp",
         "input.type": "log",
-        "log.offset": 4298,
+        "log.offset": 3836,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -562,7 +572,7 @@
         "event.original": "Aug 30 3:48:33 rroquis6074.api.host CylancePROTECT Event Type:iurer, Event Name:ZoneAdd, Message: Device:autfuwas auto assigned to thegnaaliqZone:mni, User:rem",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 4604,
+        "log.offset": 4142,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -593,7 +603,7 @@
         "fileset.name": "protect",
         "host.name": "volupta5074.internal.localhost",
         "input.type": "log",
-        "log.offset": 4764,
+        "log.offset": 4302,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -625,7 +635,7 @@
         "event.original": "Sep 28 5:53:42 ate4627.localdomain CylancePROTECT Event Type:officiad, Event Name:Device Policy Assigned, Message: The Device:quinescwas auto assigned  tomadmiZone:tur, User:roi",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 4996,
+        "log.offset": 4534,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -647,8 +657,8 @@
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
         "event.action": [
-            "accept",
-            "fullaccess"
+            "fullaccess",
+            "accept"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
@@ -658,7 +668,7 @@
         "fileset.name": "protect",
         "host.name": "mod7387.host",
         "input.type": "log",
-        "log.offset": 5174,
+        "log.offset": 4712,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -697,11 +707,11 @@
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "eprehen 2016-10-26T7:58:50.entor xeacomm1940.localhost CylancePROTECT ema rsitv [iciade] Event Type: AuditLog, Event Name: threat_changed, Message: Device: ine; SHA256: lup, User: tatemUt modtemp (quovol)nve ",
+        "event.original": "eprehen 2016-10-26T7:58:50.entor xeacomm1940.localhost CylancePROTECT ema rsitv [iciade] Event Type: AuditLog, Event Name: threat_changed, Message: Device: ine; SHA256: lup, User: tatemUt modtemp (quovol)",
         "fileset.name": "protect",
         "host.name": "xeacomm1940.localhost",
         "input.type": "log",
-        "log.offset": 5450,
+        "log.offset": 4988,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -728,51 +738,18 @@
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
         "event.action": [
-            "SystemSecurity"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2016-11-10T3:01:24.siutali amnih2718.internal.example CylancePROTECT tau exercita [ris] Event Type: eumiu, Event Name: SystemSecurity, Device Name: laudant, Zone Names:isnost",
-        "fileset.name": "protect",
-        "host.name": "amnih2718.internal.example",
-        "input.type": "log",
-        "log.offset": 5659,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.db.index": "isnost",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1600000000,
-        "rsa.investigations.event_cat_name": "System",
-        "rsa.investigations.event_vcat": "eumiu",
-        "rsa.misc.event_type": "SystemSecurity",
-        "rsa.misc.node": "laudant",
-        "rsa.network.alias_host": [
-            "amnih2718.internal.example"
-        ],
-        "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2016-11-24T12:03:59.000Z",
-        "event.action": [
             "block",
             "DeviceEdit"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "itess 2016/11/24T10:03:59.iscinge ofdeFini4153.mail.localhost CylancePROTECT velitse oditem [gitsedqu] Event Type: AppControl, Event Name: DeviceEdit, Device Name: oremi, IP Address: (10.82.173.5), Action: block, Action Type: olor, File Path: ineavo, SHA256: pexe, Zone Names: niamqui",
+        "event.original": "itess 2016/11/10T03:01:24.iscinge ofdeFini4153.mail.localhost CylancePROTECT velitse oditem [gitsedqu] Event Type: AppControl, Event Name: DeviceEdit, Device Name: oremi, IP Address: (10.82.173.5), Action: block, Action Type: olor, File Path: ineavo, SHA256: pexe, Zone Names: niamqui",
         "file.directory": "ineavo",
         "fileset.name": "protect",
         "host.name": "ofdeFini4153.mail.localhost",
         "input.type": "log",
-        "log.offset": 5834,
+        "log.offset": 5193,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -793,7 +770,7 @@
         "rsa.network.alias_host": [
             "ofdeFini4153.mail.localhost"
         ],
-        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
+        "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.82.173.5"
@@ -804,18 +781,18 @@
         ]
     },
     {
-        "@timestamp": "2016-12-08T07:06:33.000Z",
+        "@timestamp": "2016-11-24T12:03:59.000Z",
         "event.action": [
             "SystemSecurity"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "8-December-2016 17:06:33 low gitsed4374.www5.home fugitsed <<quam>quid 2016-12-8T5:06:33.fugiat atisun6373.mail.localhost CylancePROTECT dmin fugi [quia] Event Type: AuditLog, Event Name: SystemSecurity, Message: SHA256: atatn; Reason: unknown, User: rnatur ofdeFin (essequam)",
+        "event.original": "24-November-2016 10:03:59 low gitsed4374.www5.home fugitsed <<quam>quid 2016-11-24T10:03:59.fugiat atisun6373.mail.localhost CylancePROTECT dmin fugi [quia] Event Type: AuditLog, Event Name: SystemSecurity, Message: SHA256: atatn; Reason: unknown, User: rnatur ofdeFin (essequam)",
         "fileset.name": "protect",
         "host.name": "atisun6373.mail.localhost",
         "input.type": "log",
-        "log.offset": 6119,
+        "log.offset": 5478,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -832,7 +809,7 @@
         "rsa.network.alias_host": [
             "atisun6373.mail.localhost"
         ],
-        "rsa.time.event_time": "2016-12-08T07:06:33.000Z",
+        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -840,19 +817,19 @@
         ]
     },
     {
-        "@timestamp": "2016-12-23T14:09:07.000Z",
+        "@timestamp": "2016-12-08T07:06:33.000Z",
         "event.action": [
             "Registration"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "inesci 2016-12-23T12:09:07.isnisi ritatise4412.mail.localdomain CylancePROTECT quatur uisa [eFi] Event Type: ScriptControl, Event Name: Registration, Device Name: cusant, File Path: rpori, Interpreter: ice, Interpreter Version: 1.1645, Zone Names: entorev, User Name: commodo",
+        "event.original": "inesci 2016-12-8T5:06:33.isnisi ritatise4412.mail.localdomain CylancePROTECT quatur uisa [eFi] Event Type: ScriptControl, Event Name: Registration, Device Name: cusant, File Path: rpori, Interpreter: ice, Interpreter Version: 1.1645, Zone Names: entorev, User Name: commodo",
         "file.directory": "rpori",
         "fileset.name": "protect",
         "host.name": "ritatise4412.mail.localdomain",
         "input.type": "log",
-        "log.offset": 6396,
+        "log.offset": 5758,
         "network.application": "ice",
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
@@ -871,7 +848,7 @@
         "rsa.network.alias_host": [
             "ritatise4412.mail.localdomain"
         ],
-        "rsa.time.event_time": "2016-12-23T14:09:07.000Z",
+        "rsa.time.event_time": "2016-12-08T07:06:33.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -880,18 +857,18 @@
         "user.name": "commodo"
     },
     {
-        "@timestamp": "2017-01-06T09:11:41.000Z",
+        "@timestamp": "2016-12-23T14:09:07.000Z",
         "event.action": [
             "PolicyAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "sau 2017-1-6T7:11:41.atevelit meius3932.internal.example CylancePROTECT ccaeca umdolo [uptate] Event Type: AuditLog, Event Name: PolicyAdd, Message: Zone: stenatu; Policy: isiuta; Value: orsitam, User: siutaliq dutp (psaquaea)",
+        "event.original": "sau 2016-12-23T12:09:07.atevelit meius3932.internal.example CylancePROTECT ccaeca umdolo [uptate] Event Type: AuditLog, Event Name: PolicyAdd, Message: Zone: stenatu; Policy: isiuta; Value: orsitam, User: siutaliq dutp (psaquaea)",
         "fileset.name": "protect",
         "host.name": "meius3932.internal.example",
         "input.type": "log",
-        "log.offset": 6672,
+        "log.offset": 6032,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -908,7 +885,7 @@
         "rsa.network.alias_host": [
             "meius3932.internal.example"
         ],
-        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
+        "rsa.time.event_time": "2016-12-23T14:09:07.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -916,18 +893,18 @@
         ]
     },
     {
-        "@timestamp": "2017-01-20T04:14:16.000Z",
+        "@timestamp": "2017-01-06T09:11:41.000Z",
         "event.action": [
             "ZoneAddDevice"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-1-20T2:14:16.proide ano1049.www5.localdomain CylancePROTECT aturve ditemp [edqui] Event Type: AuditLog, Event Name: ZoneAddDevice, Message: Device: temUte;sitUser: olab eumiure (ersp)",
+        "event.original": "2017-1-6T7:11:41.proide ano1049.www5.localdomain CylancePROTECT aturve ditemp [edqui] Event Type: AuditLog, Event Name: ZoneAddDevice, Message: Device: temUte;sitUser: olab eumiure (ersp)",
         "fileset.name": "protect",
         "host.name": "ano1049.www5.localdomain",
         "input.type": "log",
-        "log.offset": 6899,
+        "log.offset": 6262,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -943,7 +920,7 @@
         "rsa.network.alias_host": [
             "ano1049.www5.localdomain"
         ],
-        "rsa.time.event_time": "2017-01-20T04:14:16.000Z",
+        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -951,18 +928,18 @@
         ]
     },
     {
-        "@timestamp": "2017-02-03T11:16:50.000Z",
+        "@timestamp": "2017-01-20T04:14:16.000Z",
         "event.action": [
             "pechange"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "umwrit 2017-2-3T9:16:50.uptate mac765.mail.invalid CylancePROTECT elit seosqui [sequamni] Event Type: AuditLog, Event Name: pechange, Message: Device: tdol; SHA256: sit, User: tiaec nisi (oremagna)ncididun ",
+        "event.original": "umwrit 2017-1-20T2:14:16.uptate mac765.mail.invalid CylancePROTECT elit seosqui [sequamni] Event Type: AuditLog, Event Name: pechange, Message: Device: tdol; SHA256: sit, User: tiaec nisi (oremagna)",
         "fileset.name": "protect",
         "host.name": "mac765.mail.invalid",
         "input.type": "log",
-        "log.offset": 7088,
+        "log.offset": 6450,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -979,7 +956,7 @@
         "rsa.network.alias_host": [
             "mac765.mail.invalid"
         ],
-        "rsa.time.event_time": "2017-02-03T11:16:50.000Z",
+        "rsa.time.event_time": "2017-01-20T04:14:16.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -987,45 +964,81 @@
         ]
     },
     {
-        "@timestamp": "2017-02-18T06:19:24.000Z",
+        "@timestamp": "2020-02-03T11:16:50.000Z",
         "event.action": [
-            "LoginSuccess",
-            "deny"
+            "DeviceRemove"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "ise 2017/02/18T04:19:24.itau apariat1702.internal.local CylancePROTECT ian dolore [onsecte] Event Type: AppControl, Event Name: LoginSuccess, Device Name: ect, IP Address: (10.41.123.102), Action: deny, Action Type: fugia, File Path: oditautf, SHA256: quatu, Zone Names: veli",
-        "file.directory": "oditautf",
+        "event.original": "3-Feb-2017 9:16:50 high rum959.host velillu <<cteturad>bor 3T21:16:50.rauto ationev5770.www.invalid CylancePROTECT Event Name:DeviceRemove, Device Name:nby, Agent Version:mve, IP Address: (10.96.201.115), MAC Address: (01:00:5e:94:55:60), Logged On Users: (inimve), OS:pis, Zone Names:nsequat",
         "fileset.name": "protect",
-        "host.name": "apariat1702.internal.local",
+        "host.name": "ationev5770.www.invalid",
         "input.type": "log",
-        "log.offset": 7295,
+        "log.offset": 6649,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "related.ip": [
-            "10.41.123.102"
+            "10.96.201.115"
         ],
-        "rsa.db.index": "veli",
+        "related.user": [
+            "inimve"
+        ],
+        "rsa.db.index": "nsequat",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1401060000,
-        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
-        "rsa.investigations.event_vcat": " AppControl",
-        "rsa.misc.action": [
-            "deny"
-        ],
-        "rsa.misc.checksum": "quatu",
-        "rsa.misc.event_type": "LoginSuccess",
-        "rsa.misc.node": "ect",
+        "rsa.investigations.event_cat": 1804020000,
+        "rsa.investigations.event_cat_name": "Network.Devices.Removals",
+        "rsa.misc.OS": "pis",
+        "rsa.misc.event_type": "DeviceRemove",
+        "rsa.misc.node": "nby",
         "rsa.network.alias_host": [
-            "apariat1702.internal.local"
+            "ationev5770.www.invalid"
+        ],
+        "rsa.network.eth_host": "01:00:5e:94:55:60",
+        "rsa.time.event_time": "2020-02-03T11:16:50.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.96.201.115"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ],
+        "user.name": "inimve"
+    },
+    {
+        "@timestamp": "2017-02-18T06:19:24.000Z",
+        "event.action": [
+            "threat_changed"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "18-February-2017 04:19:24 low ercit7022.host qui <<ritin>temporin 2017-2-18T4:19:24.equatur adeseru2497.www5.host CylancePROTECT rem asper [idunt] Event Type: ScriptControl, Event Name: threat_changed, Device Name: amcor, File Path: ica, Interpreter: lillum, Interpreter Version: 1.7809 (dicta), Zone Names: taedicta",
+        "file.directory": "ica",
+        "fileset.name": "protect",
+        "host.name": "adeseru2497.www5.host",
+        "input.type": "log",
+        "log.offset": 6942,
+        "network.application": "lillum",
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "observer.version": "1.7809",
+        "rsa.db.index": "taedicta",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " ScriptControl",
+        "rsa.misc.event_type": "threat_changed",
+        "rsa.misc.node": "amcor",
+        "rsa.misc.version": "1.7809",
+        "rsa.network.alias_host": [
+            "adeseru2497.www5.host"
         ],
         "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.type": "cylance",
-        "source.ip": [
-            "10.41.123.102"
-        ],
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1034,31 +1047,30 @@
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
         "event.action": [
-            "Alert"
+            "DeviceEdit"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-3-4T11:21:59.labo ulapar6827.www.local CylancePROTECT par lorin [pitl] Event Type: AuditLog, Event Name: Alert, Message: Zone: urv; Policy: ama; Value: uatur, User: adminimv odi (ptass)",
+        "event.original": "itesseq 2017-3-4T11:21:59.dictasun veniamqu7284.mail.invalid CylancePROTECT nte mvel [nof] Event Type: AuditLog, Event Name: DeviceEdit, Message: The Device: tetur was auto assigned to the Zone: IP Address: 10.230.206.60, User: ipi imveniam (uaeab)",
         "fileset.name": "protect",
-        "host.name": "ulapar6827.www.local",
+        "host.name": "veniamqu7284.mail.invalid",
         "input.type": "log",
-        "log.offset": 7571,
+        "log.offset": 7259,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "urv",
-        "rsa.identity.firstname": "adminimv",
-        "rsa.identity.lastname": "odi",
+        "rsa.db.index": "The Device: tetur was auto assigned to the Zone: IP Address: 10.230.206.60",
+        "rsa.identity.firstname": "ipi",
+        "rsa.identity.lastname": "imveniam",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1609000000,
-        "rsa.investigations.event_cat_name": "System.Alerts",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "Alert",
-        "rsa.misc.mail_id": "ptass",
-        "rsa.misc.policy_name": "ama",
+        "rsa.misc.event_type": "DeviceEdit",
+        "rsa.misc.mail_id": "uaeab",
         "rsa.network.alias_host": [
-            "ulapar6827.www.local"
+            "veniamqu7284.mail.invalid"
         ],
         "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
         "service.type": "cylance",
@@ -1070,71 +1082,76 @@
     {
         "@timestamp": "2017-03-18T08:24:33.000Z",
         "event.action": [
-            "DeviceEdit"
+            "DeviceRemove"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-3-18T6:24:33.mdol itation6137.home CylancePROTECT osqui sequat [sund] Event Type: AuditLog, Event Name: DeviceEdit, Message: Policy: ven; SHA256: rQu; Category: mco, User: cipitl onemulla (evitaed)inimveni ",
+        "event.original": "18-March-2017 18:24:33 low lupta5708.www.test amcor <<rcitat>ineavol 2017-3-18T6:24:33.iosa boNemoe2025.lan CylancePROTECT amvolupt onevolu [mnis] Event Type: AuditLog, Event Name: DeviceRemove, Message: The Device: ites was auto assigned to the Zone: IP Address: 10.126.26.131, User:   (nisiut)",
         "fileset.name": "protect",
-        "host.name": "itation6137.home",
+        "host.name": "boNemoe2025.lan",
         "input.type": "log",
-        "log.offset": 7762,
+        "log.offset": 7508,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "cipitl",
-        "rsa.identity.lastname": "onemulla",
+        "related.ip": [
+            "10.126.26.131"
+        ],
+        "rsa.db.index": "The Device: ites was auto assigned to the Zone: IP Address: 10.126.26.131",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.category": "mco",
-        "rsa.misc.checksum": "rQu",
-        "rsa.misc.event_type": "DeviceEdit",
-        "rsa.misc.mail_id": "evitaed",
-        "rsa.misc.policy_name": "ven; SHA256: rQu; Category: mco",
+        "rsa.investigations.event_cat": 1804020000,
+        "rsa.investigations.event_cat_name": "Network.Devices.Removals",
+        "rsa.investigations.event_vcat": "AuditLog",
+        "rsa.misc.event_type": "DeviceRemove",
+        "rsa.misc.node": "ites",
         "rsa.network.alias_host": [
-            "itation6137.home"
+            "boNemoe2025.lan"
         ],
         "rsa.time.event_time": "2017-03-18T08:24:33.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.126.26.131"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
         ]
     },
     {
-        "@timestamp": "2017-04-02T03:27:07.000Z",
+        "@timestamp": "2020-04-02T03:27:07.000Z",
         "event.action": [
-            "Alert"
+            "SyslogSettingsSave"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-4-2T1:27:07.oremipsu emeumfug4387.internal.lan CylancePROTECT uidol litani [utodita] Event Type: AuditLog, Event Name: Alert, Message: Device: untincul; SHA256: iduntu, User: ccaeca niamq (lapariat)remagn ",
+        "event.original": "2-Apr-2017 1:27:07 low elit429.api.invalid borisnis <<exeaco>emqu 2T01:27:07.nderi acommod6195.www.home CylancePROTECT Event Name:SyslogSettingsSave, Message: Provider:eratvol, Source IP:10.253.132.145, User: est uptatemU (leumiu)#015",
         "fileset.name": "protect",
-        "host.name": "emeumfug4387.internal.lan",
+        "host.name": "acommod6195.www.home",
         "input.type": "log",
-        "log.offset": 7974,
+        "log.offset": 7804,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "ccaeca",
-        "rsa.identity.lastname": "niamq",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1609000000,
-        "rsa.investigations.event_cat_name": "System.Alerts",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.checksum": "iduntu",
-        "rsa.misc.event_type": "Alert",
-        "rsa.misc.mail_id": "lapariat",
-        "rsa.misc.node": "untincul",
-        "rsa.network.alias_host": [
-            "emeumfug4387.internal.lan"
+        "related.ip": [
+            "10.253.132.145"
         ],
-        "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
+        "rsa.identity.firstname": "est",
+        "rsa.identity.lastname": "uptatemU",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.misc.event_type": "SyslogSettingsSave",
+        "rsa.misc.mail_id": "leumiu",
+        "rsa.network.alias_host": [
+            "acommod6195.www.home"
+        ],
+        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.253.132.145"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1143,28 +1160,26 @@
     {
         "@timestamp": "2020-04-16T10:29:41.000Z",
         "event.action": [
-            "Device Policy Assigned"
+            "DeviceEdit"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "16-Apr-2017 8:29:41 medium volupt2952.api.local esseq <<adminima>boru 16T08:29:41.ptateve enderi6555.api.host CylancePROTECT Event Name:Device Policy Assigned, Threat Class:tenatuse, Threat Subclass:psaqua, SHA256:ullamcor, MD5:itationu",
+        "event.original": "Apr 16 8:29:41 enderit4328.corp CylancePROTECT Event Type:Nequepor, Event Name:DeviceEdit, Message: Device:remwas auto assigned to theididZone:tesse, User:sequat",
         "fileset.name": "protect",
-        "host.name": "enderi6555.api.host",
         "input.type": "log",
-        "log.offset": 8185,
+        "log.offset": 8039,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.crypto.sig_type": "tenatuse",
+        "rsa.identity.firstname": "sequat",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1502000000,
-        "rsa.investigations.event_cat_name": "Policies.Rules",
-        "rsa.misc.checksum": "ullamcor",
-        "rsa.misc.event_type": "Device Policy Assigned",
-        "rsa.network.alias_host": [
-            "enderi6555.api.host"
-        ],
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "Nequepor",
+        "rsa.misc.event_type": "DeviceEdit",
+        "rsa.misc.node": "rem",
+        "rsa.network.zone": "tesse",
         "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
         "service.type": "cylance",
         "tags": [
@@ -1173,31 +1188,35 @@
         ]
     },
     {
-        "@timestamp": "2020-04-30T05:32:16.000Z",
+        "@timestamp": "2017-04-30T05:32:16.000Z",
         "event.action": [
-            "ZoneAdd"
+            "threat_changed"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Apr 30 3:32:16 estl2233.api.corp CylancePROTECT Event Type:oluptat, Event Name:ZoneAdd, Device Message: Device: rure; Zones Removed: asiarchi,eaqueipsUser: qua volupta (dmi), Zone Names:untexpl",
+        "event.original": "2017-4-30T3:32:16.aliq mes4801.internal.test CylancePROTECT itaedict oremag [illu] Event Type: AuditLog, Event Name: threat_changed, Message: SHA256: turadip; Reason: success, User: temUt ptassita (its)",
         "fileset.name": "protect",
+        "host.name": "mes4801.internal.test",
         "input.type": "log",
-        "log.offset": 8422,
+        "log.offset": 8201,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "untexpl",
-        "rsa.identity.firstname": "qua",
-        "rsa.identity.lastname": "volupta",
+        "rsa.identity.firstname": "temUt",
+        "rsa.identity.lastname": "ptassita",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "oluptat",
-        "rsa.misc.device_name": "rure",
-        "rsa.misc.event_type": "ZoneAdd",
-        "rsa.misc.mail_id": "dmi",
-        "rsa.time.event_time": "2020-04-30T05:32:16.000Z",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.checksum": "turadip",
+        "rsa.misc.event_type": "threat_changed",
+        "rsa.misc.mail_id": "its",
+        "rsa.misc.result": "success",
+        "rsa.network.alias_host": [
+            "mes4801.internal.test"
+        ],
+        "rsa.time.event_time": "2017-04-30T05:32:16.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1207,29 +1226,30 @@
     {
         "@timestamp": "2017-05-14T12:34:50.000Z",
         "event.action": [
-            "threat_found"
+            "PolicyAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-5-14T10:34:50.licaboN atquo4897.mail.lan CylancePROTECT ntexpl dunt [litsedq] Event Type: DeviceControl, Event Name: threat_found, Device Name: nder, External Device Type: mdolore, External Device Vendor ID: Cic, External Device Name: olorema, External Device Product ID: mollita, External Device Serial Number: tatem, Zone Names: iae",
+        "event.original": "ori 2017-5-14T10:34:50.tconsect rum1594.api.domain CylancePROTECT ulla iqu [oin] Event Type: AuditLog, Event Name: PolicyAdd, Message: Devices: abore,squUser: uiadol Duisa (lupta)",
         "fileset.name": "protect",
-        "host.name": "atquo4897.mail.lan",
+        "host.name": "rum1594.api.domain",
         "input.type": "log",
-        "log.offset": 8616,
+        "log.offset": 8404,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "iae",
+        "rsa.identity.firstname": "uiadol",
+        "rsa.identity.lastname": "Duisa",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " DeviceControl",
-        "rsa.misc.event_type": "threat_found",
-        "rsa.misc.node": "nder",
-        "rsa.misc.serial_number": "tatem",
+        "rsa.investigations.event_cat": 1502030000,
+        "rsa.investigations.event_cat_name": "Policies.Rules.Added",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "PolicyAdd",
+        "rsa.misc.mail_id": "lupta",
+        "rsa.misc.node": "abore",
         "rsa.network.alias_host": [
-            "atquo4897.mail.lan"
+            "rum1594.api.domain"
         ],
         "rsa.time.event_time": "2017-05-14T12:34:50.000Z",
         "service.type": "cylance",
@@ -1241,29 +1261,31 @@
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
         "event.action": [
-            "LoginSuccess"
+            "ZoneAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "29-May-2017 05:37:24 medium taliqui5348.mail.localdomain loremag <<tcu>iatqu 2017-5-29T5:37:24.inBCSedu erspi5757.local CylancePROTECT suntex iacons [occaec] Event Type: DeviceControl, Event Name: LoginSuccess, Device Name: uov, External Device Type: quaeab, External Device Vendor ID: fici, External Device Name: imve, External Device Product ID: quide, External Device Serial Number: quaU, Zone Names: undeomni",
+        "event.original": "2017-5-29T5:37:24.asi ectiono2241.lan CylancePROTECT onu liquaUte [alorum] Event Type: AuditLog, Event Name: ZoneAdd, Message: Zone: ria; Policy: atDu; Value: nsec, User: quidolor oqu (naaliq)",
         "fileset.name": "protect",
-        "host.name": "erspi5757.local",
+        "host.name": "ectiono2241.lan",
         "input.type": "log",
-        "log.offset": 8956,
+        "log.offset": 8584,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "undeomni",
+        "rsa.db.index": "ria",
+        "rsa.identity.firstname": "quidolor",
+        "rsa.identity.lastname": "oqu",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1401060000,
-        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
-        "rsa.investigations.event_vcat": " DeviceControl",
-        "rsa.misc.event_type": "LoginSuccess",
-        "rsa.misc.node": "uov",
-        "rsa.misc.serial_number": "quaU",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "ZoneAdd",
+        "rsa.misc.mail_id": "naaliq",
+        "rsa.misc.policy_name": "atDu",
         "rsa.network.alias_host": [
-            "erspi5757.local"
+            "ectiono2241.lan"
         ],
         "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.type": "cylance",
@@ -1273,31 +1295,33 @@
         ]
     },
     {
-        "@timestamp": "2020-06-12T14:39:58.000Z",
+        "@timestamp": "2017-06-12T14:39:58.000Z",
         "event.action": [
-            "threat_found"
+            "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Jun 12 12:39:58 upt7879.www5.example CylancePROTECT Event Type:idolo, Event Name:threat_found, Device Message: Device: edolo; Zones Removed: ugiatquo; Zones Added: ntium,uptateUser: lloinven econs (lmolesti), Zone Names:apariatu Device Id: lorsita",
+        "event.original": "2017-6-12T12:39:58.eaqueips qua3862.mail.home CylancePROTECT aturQu aaliq [mipsamvo] Event Type: DeviceControl, Event Name: ThreatUpdated, Device Name: rsintoc, External Device Type: reetdo, External Device Vendor ID: oreveri, External Device Name: ehende, External Device Product ID: eaqueip, External Device Serial Number: eum, Zone Names: lamc",
         "fileset.name": "protect",
+        "host.name": "qua3862.mail.home",
         "input.type": "log",
-        "log.offset": 9369,
+        "log.offset": 8777,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "apariatu",
-        "rsa.identity.firstname": "lloinven",
-        "rsa.identity.lastname": "econs",
+        "rsa.db.index": "lamc",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "idolo",
-        "rsa.misc.device_name": "edolo",
-        "rsa.misc.event_type": "threat_found",
-        "rsa.misc.mail_id": "lmolesti",
-        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
+        "rsa.investigations.event_vcat": " DeviceControl",
+        "rsa.misc.event_type": "ThreatUpdated",
+        "rsa.misc.node": "rsintoc",
+        "rsa.misc.serial_number": "eum",
+        "rsa.network.alias_host": [
+            "qua3862.mail.home"
+        ],
+        "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1305,34 +1329,34 @@
         ]
     },
     {
-        "@timestamp": "2017-06-26T09:42:33.000Z",
+        "@timestamp": "2020-06-26T09:42:33.000Z",
         "event.action": [
-            "PolicyAdd"
+            "SystemSecurity"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "26-June-2017 19:42:33 high lupta7560.www5.localdomain ncidi <<tlabori>laudan 2017-6-26T7:42:33.litesseq atcupida7685.local CylancePROTECT dolores equamnih [taliqui] Event Type: AuditLog, Event Name: PolicyAdd, Message: Devices: itempo,orumwUser: redol ecillum (isci)",
+        "event.original": "26-Jun-2017 7:42:33 high metcons5740.mail.localhost sitvo <<temquiav>obeata 26T19:42:33.tatemU mad5185.www5.localhost CylancePROTECT Event Name:SystemSecurity, Device Message: Device: gnaa; Zones Removed: mod; Zones Added: doei,cipitlUser: caboNemo dexerc (strumex), Zone Names:eprehend Device Id: asnu",
         "fileset.name": "protect",
-        "host.name": "atcupida7685.local",
+        "host.name": "mad5185.www5.localhost",
         "input.type": "log",
-        "log.offset": 9617,
+        "log.offset": 9124,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "redol",
-        "rsa.identity.lastname": "ecillum",
+        "rsa.db.index": "eprehend",
+        "rsa.identity.firstname": "caboNemo",
+        "rsa.identity.lastname": "dexerc",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1502030000,
-        "rsa.investigations.event_cat_name": "Policies.Rules.Added",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "PolicyAdd",
-        "rsa.misc.mail_id": "isci",
-        "rsa.misc.node": "itempo",
+        "rsa.investigations.event_cat": 1600000000,
+        "rsa.investigations.event_cat_name": "System",
+        "rsa.misc.device_name": "gnaa",
+        "rsa.misc.event_type": "SystemSecurity",
+        "rsa.misc.mail_id": "strumex",
         "rsa.network.alias_host": [
-            "atcupida7685.local"
+            "mad5185.www5.localhost"
         ],
-        "rsa.time.event_time": "2017-06-26T09:42:33.000Z",
+        "rsa.time.event_time": "2020-06-26T09:42:33.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1342,17 +1366,286 @@
     {
         "@timestamp": "2017-07-11T04:45:07.000Z",
         "event.action": [
-            "allow",
+            "Registration",
+            "deny"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "11-July-2017 02:45:07 low dolor5930.internal.host eritin <<udan>yCic 2017-7-11T2:45:07.nder mdolore2604.api.domain CylancePROTECT saqu iscive [quasiar] Event Type: ExploitAttempt, Event Name: Registration, Device Name: quido, IP Address: (10.63.231.55), Action: deny, Process ID: 2622, Process Name: stquid.exe, User Name: turadipi, Violation Type: usmodi, Zone Names: ree",
+        "fileset.name": "protect",
+        "host.name": "mdolore2604.api.domain",
+        "input.type": "log",
+        "log.offset": 9427,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "process.name": "stquid.exe",
+        "process.pid": 2622,
+        "related.ip": [
+            "10.63.231.55"
+        ],
+        "related.user": [
+            "turadipi"
+        ],
+        "rsa.db.index": "ree",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " ExploitAttempt",
+        "rsa.misc.action": [
+            "deny"
+        ],
+        "rsa.misc.event_type": "Registration",
+        "rsa.misc.node": "quido",
+        "rsa.misc.policy_name": "usmodi",
+        "rsa.network.alias_host": [
+            "mdolore2604.api.domain"
+        ],
+        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.63.231.55"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ],
+        "user.name": "turadipi"
+    },
+    {
+        "@timestamp": "2019-07-25T11:47:41.000Z",
+        "event.action": [
+            "ZoneAddDevice",
+            "allow"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "25-Jul-2017 9:47:41 medium illu4130.internal.lan temUten <<dutper>sitamet 25T09:47:41.utlabo tetur4690.mail.lan CylancePROTECT Event Name: ZoneAddDevice, Device Name: ecatcupi, IP Address: (10.6.6.242), Action: allow, Process ID: 4938, Process Name: onse.exe, User Name: olorem, Violation Type: turvel, Zone Names:eratv",
+        "fileset.name": "protect",
+        "host.name": "tetur4690.mail.lan",
+        "input.type": "log",
+        "log.offset": 9800,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "process.name": "onse.exe",
+        "process.pid": 4938,
+        "related.ip": [
+            "10.6.6.242"
+        ],
+        "related.user": [
+            "olorem"
+        ],
+        "rsa.db.index": "eratv",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.misc.action": [
+            "allow"
+        ],
+        "rsa.misc.device_name": "ecatcupi",
+        "rsa.misc.event_type": "ZoneAddDevice",
+        "rsa.misc.policy_name": "turvel",
+        "rsa.network.alias_host": [
+            "tetur4690.mail.lan"
+        ],
+        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.6.6.242"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ],
+        "user.name": "olorem"
+    },
+    {
+        "@timestamp": "2019-08-08T06:50:15.000Z",
+        "event.action": [
+            "pechange"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Aug 8 4:50:15 umwritte7596.internal.localdomain CylancePROTECT Event Type:nse, Event Name:pechange, Message: Provider:iameaque, Source IP:10.232.119.56, User: tsed eturad (tiumdolo)",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 10120,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.232.119.56"
+        ],
+        "rsa.identity.firstname": "tsed",
+        "rsa.identity.lastname": "eturad",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "nse",
+        "rsa.misc.event_type": "pechange",
+        "rsa.misc.mail_id": "tiumdolo",
+        "rsa.time.event_time": "2019-08-08T06:50:15.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.232.119.56"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-22T13:52:50.000Z",
+        "event.action": [
+            "LoginSuccess"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Aug 22 11:52:50 imadmi6980.www.localdomain CylancePROTECT Event Type:olupta, Event Name:LoginSuccess, Device Name:iatqu, Zone Names:inBCSedu, Device Id: erspi",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 10302,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "inBCSedu",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1401060000,
+        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
+        "rsa.investigations.event_vcat": "olupta",
+        "rsa.misc.event_type": "LoginSuccess",
+        "rsa.misc.node": "iatqu",
+        "rsa.time.event_time": "2019-08-22T13:52:50.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-09-06T08:55:24.000Z",
+        "event.action": [
             "Device Policy Assigned"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "mquisno 2017-7-11T2:45:07.aev inrepr72.internal.home CylancePROTECT nisiu imad [oriosam] Event Type: ExploitAttempt, Event Name: Device Policy Assigned, Device Name: itasp, IP Address: (10.169.5.162), Action: allow, Process ID: 2957, Process Name: odt.exe, User Name: cillumd, Violation Type: riosa, Zone Names: tNe",
+        "event.original": "iacons 2017-9-6T6:55:24.occaec acommodi563.internal.home CylancePROTECT fici imve [quide] Event Type: AuditLog, Event Name: Device Policy Assigned, Message: SHA256: aco; Reason: failure, User: accusa natu (liquid)",
+        "fileset.name": "protect",
+        "host.name": "acommodi563.internal.home",
+        "input.type": "log",
+        "log.offset": 10461,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.identity.firstname": "accusa",
+        "rsa.identity.lastname": "natu",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.checksum": "aco",
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.misc.mail_id": "liquid",
+        "rsa.misc.result": "failure",
+        "rsa.network.alias_host": [
+            "acommodi563.internal.home"
+        ],
+        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-20T03:57:58.000Z",
+        "event.action": [
+            "LoginSuccess"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "20-Sep-2017 1:57:58 medium idolo5752.mail.example ugiatquo <<ntium>uptate 20T13:57:58.lloinven econs2687.internal.localdomain CylancePROTECT Event Name:LoginSuccess, Device Name:lorsita, Zone Names:eavol",
+        "fileset.name": "protect",
+        "host.name": "econs2687.internal.localdomain",
+        "input.type": "log",
+        "log.offset": 10675,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "eavol",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1401060000,
+        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
+        "rsa.misc.event_type": "LoginSuccess",
+        "rsa.misc.node": "lorsita",
+        "rsa.network.alias_host": [
+            "econs2687.internal.localdomain"
+        ],
+        "rsa.time.event_time": "2019-09-20T03:57:58.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-10-04T11:00:32.000Z",
+        "event.action": [
+            "LoginSuccess"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "2017-10-4T9:00:32.npr etconsec5410.api.invalid CylancePROTECT laudan litesseq [atcupida] Event Type: AuditLog, Event Name: LoginSuccess, Message: Source: tob; SHA256: dolores; Category: equamnih; Reason: success, User: deF itempo (orumw)",
+        "fileset.name": "protect",
+        "host.name": "etconsec5410.api.invalid",
+        "input.type": "log",
+        "log.offset": 10879,
+        "observer.product": "tob",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.identity.firstname": "deF",
+        "rsa.identity.lastname": "itempo",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1401060000,
+        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.category": "equamnih",
+        "rsa.misc.checksum": "dolores",
+        "rsa.misc.event_type": "LoginSuccess",
+        "rsa.misc.mail_id": "orumw",
+        "rsa.misc.result": "success",
+        "rsa.network.alias_host": [
+            "etconsec5410.api.invalid"
+        ],
+        "rsa.time.event_time": "2017-10-04T11:00:32.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-10-19T06:03:07.000Z",
+        "event.action": [
+            "Device Policy Assigned",
+            "allow"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "mquisno 2017-10-19T4:03:07.aev inrepr72.internal.home CylancePROTECT nisiu imad [oriosam] Event Type: ExploitAttempt, Event Name: Device Policy Assigned, Device Name: itasp, IP Address: (10.169.5.162), Action: allow, Process ID: 2957, Process Name: odt.exe, User Name: cillumd, Violation Type: riosa, Zone Names: tNe",
         "fileset.name": "protect",
         "host.name": "inrepr72.internal.home",
         "input.type": "log",
-        "log.offset": 9884,
+        "log.offset": 11117,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1378,7 +1671,7 @@
         "rsa.network.alias_host": [
             "inrepr72.internal.home"
         ],
-        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
+        "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.169.5.162"
@@ -1390,7 +1683,7 @@
         "user.name": "cillumd"
     },
     {
-        "@timestamp": "2017-07-25T11:47:41.000Z",
+        "@timestamp": "2017-11-02T13:05:41.000Z",
         "event.action": [
             "cancel",
             "SystemSecurity"
@@ -1398,12 +1691,12 @@
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017/07/25T09:47:41.ntmoll mexer4472.www5.invalid CylancePROTECT nofdeFi aquioff [saqu] Event Type: AppControl, Event Name: SystemSecurity, Device Name: amnisi, IP Address: (10.230.77.49), Action: cancel, Action Type: uisnostr, File Path: reetdol, SHA256: uelauda, Zone Names: ema",
+        "event.original": "2017/11/02T11:05:41.ntmoll mexer4472.www5.invalid CylancePROTECT nofdeFi aquioff [saqu] Event Type: AppControl, Event Name: SystemSecurity, Device Name: amnisi, IP Address: (10.230.77.49), Action: cancel, Action Type: uisnostr, File Path: reetdol, SHA256: uelauda, Zone Names: ema",
         "file.directory": "reetdol",
         "fileset.name": "protect",
         "host.name": "mexer4472.www5.invalid",
         "input.type": "log",
-        "log.offset": 10200,
+        "log.offset": 11434,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1424,7 +1717,7 @@
         "rsa.network.alias_host": [
             "mexer4472.www5.invalid"
         ],
-        "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
+        "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.230.77.49"
@@ -1435,18 +1728,18 @@
         ]
     },
     {
-        "@timestamp": "2017-08-08T06:50:15.000Z",
+        "@timestamp": "2017-11-16T08:08:15.000Z",
         "event.action": [
             "PolicyAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-8-8T4:50:15.uei Nequepo1858.mail.local CylancePROTECT uam orumSec [nisiuta] Event Type: stiaecon, Event Name: PolicyAdd, Device Name: sse",
+        "event.original": "2017-11-16T6:08:15.uei Nequepo1858.mail.local CylancePROTECT uam orumSec [nisiuta] Event Type: stiaecon, Event Name: PolicyAdd, Device Name: sse",
         "fileset.name": "protect",
         "host.name": "Nequepo1858.mail.local",
         "input.type": "log",
-        "log.offset": 10481,
+        "log.offset": 11715,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1459,7 +1752,7 @@
         "rsa.network.alias_host": [
             "Nequepo1858.mail.local"
         ],
-        "rsa.time.event_time": "2017-08-08T06:50:15.000Z",
+        "rsa.time.event_time": "2017-11-16T08:08:15.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1467,18 +1760,18 @@
         ]
     },
     {
-        "@timestamp": "2017-08-22T13:52:50.000Z",
+        "@timestamp": "2017-12-01T03:10:49.000Z",
         "event.action": [
             "Registration"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "22-August-2017 23:52:50 high ici7102.www.localdomain itae <<dtempo>atnula 2017-8-22T11:52:50.ditautf itametc3006.www.test CylancePROTECT remipsu tan [quiac] Event Type: DeviceControl, Event Name: Registration, Device Name: doconse, External Device Type: etdol, External Device Vendor ID: dolorsi, External Device Name: nturmag, External Device Product ID: tura, External Device Serial Number: osquirat, Zone Names: equat",
+        "event.original": "1-December-2017 01:10:49 high ici7102.www.localdomain itae <<dtempo>atnula 2017-12-1T1:10:49.ditautf itametc3006.www.test CylancePROTECT remipsu tan [quiac] Event Type: DeviceControl, Event Name: Registration, Device Name: doconse, External Device Type: etdol, External Device Vendor ID: dolorsi, External Device Name: nturmag, External Device Product ID: tura, External Device Serial Number: osquirat, Zone Names: equat",
         "fileset.name": "protect",
         "host.name": "itametc3006.www.test",
         "input.type": "log",
-        "log.offset": 10624,
+        "log.offset": 11860,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1493,7 +1786,7 @@
         "rsa.network.alias_host": [
             "itametc3006.www.test"
         ],
-        "rsa.time.event_time": "2017-08-22T13:52:50.000Z",
+        "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1501,7 +1794,7 @@
         ]
     },
     {
-        "@timestamp": "2017-09-06T08:55:24.000Z",
+        "@timestamp": "2017-12-15T10:13:24.000Z",
         "event.action": [
             "accept",
             "threat_quarantined"
@@ -1509,12 +1802,12 @@
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "6-September-2017 06:55:24 low idunt4633.internal.host liquam <<min>oluptat 2017/09/06T06:55:24.odt rspici1916.api.localhost CylancePROTECT olor etquasia [nula] Event Type: AppControl, Event Name: threat_quarantined, Device Name: riatur, IP Address: (10.99.209.40), Action: accept, Action Type: dol, File Path: atur, SHA256: issu, Zone Names: identsu",
+        "event.original": "15-December-2017 08:13:24 low idunt4633.internal.host liquam <<min>oluptat 2017/12/15T08:13:24.odt rspici1916.api.localhost CylancePROTECT olor etquasia [nula] Event Type: AppControl, Event Name: threat_quarantined, Device Name: riatur, IP Address: (10.99.209.40), Action: accept, Action Type: dol, File Path: atur, SHA256: issu, Zone Names: identsu",
         "file.directory": "atur",
         "fileset.name": "protect",
         "host.name": "rspici1916.api.localhost",
         "input.type": "log",
-        "log.offset": 11045,
+        "log.offset": 12281,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1535,7 +1828,7 @@
         "rsa.network.alias_host": [
             "rspici1916.api.localhost"
         ],
-        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
+        "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.99.209.40"
@@ -1546,17 +1839,17 @@
         ]
     },
     {
-        "@timestamp": "2019-09-20T03:57:58.000Z",
+        "@timestamp": "2019-12-29T05:15:58.000Z",
         "event.action": [
             "DeviceRemove"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Sep 20 1:57:58 hend1600.api.host CylancePROTECT Event Type:aer, Event Name:DeviceRemove, Device Name:iati, Agent Version:minim, IP Address: (10.14.74.218), MAC Address: (01:00:5e:bc:a3:48), Logged On Users: (Nemoenim), OS:usm, Zone Names:labori",
+        "event.original": "Dec 29 3:15:58 hend1600.api.host CylancePROTECT Event Type:aer, Event Name:DeviceRemove, Device Name:iati, Agent Version:minim, IP Address: (10.14.74.218), MAC Address: (01:00:5e:bc:a3:48), Logged On Users: (Nemoenim), OS:usm, Zone Names:labori",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 11395,
+        "log.offset": 12631,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1575,7 +1868,7 @@
         "rsa.misc.event_type": "DeviceRemove",
         "rsa.misc.node": "iati",
         "rsa.network.eth_host": "01:00:5e:bc:a3:48",
-        "rsa.time.event_time": "2019-09-20T03:57:58.000Z",
+        "rsa.time.event_time": "2019-12-29T05:15:58.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.14.74.218"
@@ -1587,18 +1880,18 @@
         "user.name": "Nemoenim"
     },
     {
-        "@timestamp": "2019-10-04T11:00:32.000Z",
+        "@timestamp": "2020-01-12T12:18:32.000Z",
         "event.action": [
             "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "4-Oct-2017 9:00:32 high isiutali3575.www5.invalid Nemoenim <<imadmini>ide 4T21:00:32.edq evitae7333.www.lan CylancePROTECT Event Name:ThreatUpdated, Device Message: Device: expl User: ess quiad (ihilmole),saquaeaZone Names: ons Device Id: orsitam",
+        "event.original": "12-Jan-2018 10:18:32 high isiutali3575.www5.invalid Nemoenim <<imadmini>ide 12T22:18:32.edq evitae7333.www.lan CylancePROTECT Event Name:ThreatUpdated, Device Message: Device: expl User: ess quiad (ihilmole),saquaeaZone Names: ons Device Id: orsitam",
         "fileset.name": "protect",
         "host.name": "evitae7333.www.lan",
         "input.type": "log",
-        "log.offset": 11640,
+        "log.offset": 12876,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1614,7 +1907,7 @@
         "rsa.network.alias_host": [
             "evitae7333.www.lan"
         ],
-        "rsa.time.event_time": "2019-10-04T11:00:32.000Z",
+        "rsa.time.event_time": "2020-01-12T12:18:32.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1622,18 +1915,18 @@
         ]
     },
     {
-        "@timestamp": "2017-10-19T06:03:07.000Z",
+        "@timestamp": "2018-01-27T07:21:06.000Z",
         "event.action": [
             "DeviceEdit"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-10-19T4:03:07.idex radip163.mail.invalid CylancePROTECT eiusmo ainc [miurerep] Event Type: AuditLog, Event Name: DeviceEdit, Message: Zone: ecill; Policy: iduntu; Value: pisci, User: sunt texplica (oco)",
+        "event.original": "2018-1-27T5:21:06.idex radip163.mail.invalid CylancePROTECT eiusmo ainc [miurerep] Event Type: AuditLog, Event Name: DeviceEdit, Message: Zone: ecill; Policy: iduntu; Value: pisci, User: sunt texplica (oco)",
         "fileset.name": "protect",
         "host.name": "radip163.mail.invalid",
         "input.type": "log",
-        "log.offset": 11887,
+        "log.offset": 13126,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1650,7 +1943,7 @@
         "rsa.network.alias_host": [
             "radip163.mail.invalid"
         ],
-        "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
+        "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1658,51 +1951,64 @@
         ]
     },
     {
-        "@timestamp": "2017-11-02T13:05:41.000Z",
+        "@timestamp": "2018-02-10T14:23:41.000Z",
         "event.action": [
             "threat_changed"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "itametco 2017-11-2T11:05:41.vel quunt3116.localhost CylancePROTECT nonn dents [itsedd] Event Type: Threat, Event Name: threat_changed, Device Name: ptate, IP Address: (10.152.185.155), File Name: quamqua, Path: ntut, Drive Type: mag, SHA256: meum, MD5: mini, Status: Loremip, Cylance Score: 58.130000, Found Date: tur, File Type: atnonpr, Is Running: ita, Auto Run: amquaer, Detected By: aqui, Zone Names: enby, Is Malware: lpa, Is Unique To Cylance: isn, Threat Classification: smod ",
+        "event.original": "itametco 2018-2-10T12:23:41.vel quunt3116.localhost CylancePROTECT nonn dents [itsedd] Event Type: Threat, Event Name: threat_changed, Device Name: ptate, IP Address: (10.152.185.155), File Name: quamqua, Path: ntut, Drive Type: mag, SHA256: meum, MD5: mini, Status: Loremip, Cylance Score: 58.130000, Found Date: tur, File Type: atnonpr, Is Running: ita, Auto Run: amquaer, Detected By: aqui, Zone Names: enby, Is Malware: lpa, Is Unique To Cylance: isn, Threat Classification: smod",
+        "file.directory": "ntut",
+        "file.name": "quamqua",
+        "file.type": "atnonpr",
         "fileset.name": "protect",
         "host.name": "quunt3116.localhost",
         "input.type": "log",
-        "log.offset": 12095,
+        "log.offset": 13333,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": " enby, Is Malware: lpa, Is Unique To Cylance: isn, Threat Classification: smod",
+        "related.ip": [
+            "10.152.185.155"
+        ],
+        "rsa.crypto.sig_type": "smod",
+        "rsa.db.index": "enby",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "Threat",
+        "rsa.investigations.event_vcat": " Threat",
+        "rsa.misc.checksum": "meum",
+        "rsa.misc.event_state": "Loremip",
         "rsa.misc.event_type": "threat_changed",
-        "rsa.misc.node": "ptate, IP Address: (10.152.185.155), File Name: quamqua, Path: ntut, Drive Type: mag, SHA256: meum, MD5: mini, Status: Loremip, Cylance Score: 58.130000, Found Date: tur, File Type: atnonpr, Is Running: ita, Auto Run: amquaer, Detected By: aqui",
+        "rsa.misc.node": "ptate",
         "rsa.network.alias_host": [
             "quunt3116.localhost"
         ],
-        "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
+        "rsa.time.event_time": "2018-02-10T14:23:41.000Z",
+        "rsa.web.reputation_num": 58.13,
         "service.type": "cylance",
+        "source.ip": [
+            "10.152.185.155"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-11-16T08:08:15.000Z",
+        "@timestamp": "2020-02-24T09:26:15.000Z",
         "event.action": [
             "ZoneAddDevice"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "16-Nov-2017 6:08:15 low cte4809.mail.lan uunturma <<ugitsedq>eserun 16T18:08:15.pta emu5311.localdomain CylancePROTECT Event Name:ZoneAddDevice, Device Message: Device: destla User: fugitse minimve (serrorsi),tametcoZone Names: mquisnos Device Id: lore",
+        "event.original": "24-Feb-2018 7:26:15 low cte4809.mail.lan uunturma <<ugitsedq>eserun 24T19:26:15.pta emu5311.localdomain CylancePROTECT Event Name:ZoneAddDevice, Device Message: Device: destla User: fugitse minimve (serrorsi),tametcoZone Names: mquisnos Device Id: lore",
         "fileset.name": "protect",
         "host.name": "emu5311.localdomain",
         "input.type": "log",
-        "log.offset": 12580,
+        "log.offset": 13817,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1718,7 +2024,7 @@
         "rsa.network.alias_host": [
             "emu5311.localdomain"
         ],
-        "rsa.time.event_time": "2019-11-16T08:08:15.000Z",
+        "rsa.time.event_time": "2020-02-24T09:26:15.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1726,17 +2032,17 @@
         ]
     },
     {
-        "@timestamp": "2019-12-01T03:10:49.000Z",
+        "@timestamp": "2020-03-11T04:28:49.000Z",
         "event.action": [
             "PolicyAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Dec 1 1:10:49 isn1684.www.invalid CylancePROTECT Event Type:civelits, Event Name:PolicyAdd, Device Name:quiav, External Device Type:mse, External Device Vendor ID:prehen, External Device Name:nonn, External Device Product ID:hite, External Device Serial Number:ianonnum, Zone Names:nofdeFi, Device Id: henderit, Policy Name: remq ",
+        "event.original": "Mar 11 2:28:49 isn1684.www.invalid CylancePROTECT Event Type:civelits, Event Name:PolicyAdd, Device Name:quiav, External Device Type:mse, External Device Vendor ID:prehen, External Device Name:nonn, External Device Product ID:hite, External Device Serial Number:ianonnum, Zone Names:nofdeFi, Device Id: henderit, Policy Name: remq ",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 12833,
+        "log.offset": 14070,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1749,7 +2055,7 @@
         "rsa.misc.event_type": "PolicyAdd",
         "rsa.misc.node": "quiav",
         "rsa.misc.serial_number": "ianonnum",
-        "rsa.time.event_time": "2019-12-01T03:10:49.000Z",
+        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1757,18 +2063,18 @@
         ]
     },
     {
-        "@timestamp": "2019-12-15T10:13:24.000Z",
+        "@timestamp": "2020-03-25T11:31:24.000Z",
         "event.action": [
             "threat_found"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "15-Dec-2017 8:13:24 medium arch2905.www5.home ror <<onsecte>doei 15T08:13:24.nvolupta tev2820.www.home CylancePROTECT Event Name:threat_found, Device Name:orp, External Device Type:ender, External Device Vendor ID:dico, External Device Name:uptatem, External Device Product ID:upt, External Device Serial Number:ulamc, Zone Names:cept, Device Id: aedictas, Policy Name: eursint ",
+        "event.original": "25-Mar-2018 9:31:24 medium arch2905.www5.home ror <<onsecte>doei 25T09:31:24.nvolupta tev2820.www.home CylancePROTECT Event Name:threat_found, Device Name:orp, External Device Type:ender, External Device Vendor ID:dico, External Device Name:uptatem, External Device Product ID:upt, External Device Serial Number:ulamc, Zone Names:cept, Device Id: aedictas, Policy Name: eursint ",
         "fileset.name": "protect",
         "host.name": "tev2820.www.home",
         "input.type": "log",
-        "log.offset": 13164,
+        "log.offset": 14402,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1783,7 +2089,7 @@
         "rsa.network.alias_host": [
             "tev2820.www.home"
         ],
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
+        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1791,18 +2097,18 @@
         ]
     },
     {
-        "@timestamp": "2017-12-29T05:15:58.000Z",
+        "@timestamp": "2018-04-08T06:33:58.000Z",
         "event.action": [
             "ZoneAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2017-12-29T3:15:58.abori sit1400.www.lan CylancePROTECT ames amni [tatio] Event Type: AuditLog, Event Name: ZoneAdd, Message: Zone: ntsunti; Policy: borios; Value: ani, User: uid idatat (onev)",
+        "event.original": "2018-4-8T4:33:58.abori sit1400.www.lan CylancePROTECT ames amni [tatio] Event Type: AuditLog, Event Name: ZoneAdd, Message: Zone: ntsunti; Policy: borios; Value: ani, User: uid idatat (onev)",
         "fileset.name": "protect",
         "host.name": "sit1400.www.lan",
         "input.type": "log",
-        "log.offset": 13543,
+        "log.offset": 14781,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1819,7 +2125,7 @@
         "rsa.network.alias_host": [
             "sit1400.www.lan"
         ],
-        "rsa.time.event_time": "2017-12-29T05:15:58.000Z",
+        "rsa.time.event_time": "2018-04-08T06:33:58.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1827,18 +2133,18 @@
         ]
     },
     {
-        "@timestamp": "2018-01-12T12:18:32.000Z",
+        "@timestamp": "2018-04-22T13:36:32.000Z",
         "event.action": [
             "Device Updated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "hilmole 2018-1-12T10:18:32.sequ sectetu7182.localdomain CylancePROTECT dolor lorumwri [amnihil] Event Type: orissus, Event Name: Device Updated, uido",
+        "event.original": "hilmole 2018-4-22T11:36:32.sequ sectetu7182.localdomain CylancePROTECT dolor lorumwri [amnihil] Event Type: orissus, Event Name: Device Updated, uido",
         "fileset.name": "protect",
         "host.name": "sectetu7182.localdomain",
         "input.type": "log",
-        "log.offset": 13736,
+        "log.offset": 14972,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1850,7 +2156,7 @@
         "rsa.network.alias_host": [
             "sectetu7182.localdomain"
         ],
-        "rsa.time.event_time": "2018-01-12T12:18:32.000Z",
+        "rsa.time.event_time": "2018-04-22T13:36:32.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -1858,18 +2164,18 @@
         ]
     },
     {
-        "@timestamp": "2018-01-27T07:21:06.000Z",
+        "@timestamp": "2018-05-07T08:39:06.000Z",
         "event.action": [
             "ZoneAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2018-1-27T5:21:06.itse officiad4982.www5.domain CylancePROTECT lumqui quiavolu [upta] Event Type: AuditLog, Event Name: ZoneAdd, Message: Device: umtota;etdoloreUser: magnaa sumquiad (iusmodt)",
+        "event.original": "2018-5-7T6:39:06.itse officiad4982.www5.domain CylancePROTECT lumqui quiavolu [upta] Event Type: AuditLog, Event Name: ZoneAdd, Message: Device: umtota;etdoloreUser: magnaa sumquiad (iusmodt)",
         "fileset.name": "protect",
         "host.name": "officiad4982.www5.domain",
         "input.type": "log",
-        "log.offset": 13886,
+        "log.offset": 15122,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -1885,282 +2191,6 @@
         "rsa.network.alias_host": [
             "officiad4982.www5.domain"
         ],
-        "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2020-02-10T14:23:41.000Z",
-        "event.action": [
-            "threat_quarantined"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "Feb 10 12:23:41 umd3889.api.localhost CylancePROTECT Event Type:dat, Event Name:threat_quarantined, Message: Provider:saquaea, Source IP:10.10.178.151, User: uames tconsec (issus)",
-        "fileset.name": "protect",
-        "input.type": "log",
-        "log.offset": 14079,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.10.178.151"
-        ],
-        "rsa.identity.firstname": "uames",
-        "rsa.identity.lastname": "tconsec",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "dat",
-        "rsa.misc.event_type": "threat_quarantined",
-        "rsa.misc.mail_id": "issus",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.10.178.151"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-02-24T21:26:15.000Z",
-        "event.action": [
-            "ZoneAdd",
-            "block"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2018/02/24T19:26:15.caecat cusanti5019.api.home CylancePROTECT quisn rem [ulamcola] Event Type: AppControl, Event Name: ZoneAdd, Device Name: llita, IP Address: (10.117.150.156), Action: block, Action Type: uredol, File Path: maliqua, SHA256: mcorpori, Zone Names: orisn",
-        "file.directory": "maliqua",
-        "fileset.name": "protect",
-        "host.name": "cusanti5019.api.home",
-        "input.type": "log",
-        "log.offset": 14259,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.117.150.156"
-        ],
-        "rsa.db.index": "orisn",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AppControl",
-        "rsa.misc.action": [
-            "block"
-        ],
-        "rsa.misc.checksum": "mcorpori",
-        "rsa.misc.event_type": "ZoneAdd",
-        "rsa.misc.node": "llita",
-        "rsa.network.alias_host": [
-            "cusanti5019.api.home"
-        ],
-        "rsa.time.event_time": "2018-02-24T21:26:15.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.117.150.156"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-03-11T04:28:49.000Z",
-        "event.action": [
-            "fullaccess"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "11-March-2018 02:28:49 very-high cta5536.mail.localdomain atem <<tecto>cti 2018-3-11T2:28:49.ommodoc nse3544.local CylancePROTECT tvolu dutper [tlaboru] Event Type: aeabillo, Event Name: fullaccess, Device Name: equuntu, Agent Version: quamni, IP Address: (10.186.8.127), MAC Address: (01:00:5e:bf:58:62), Logged On Users: (boreet), OS: luptasnu Zone Names: ento",
-        "fileset.name": "protect",
-        "host.name": "nse3544.local",
-        "input.type": "log",
-        "log.offset": 14530,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.186.8.127"
-        ],
-        "related.user": [
-            "boreet"
-        ],
-        "rsa.db.index": "ento",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "aeabillo",
-        "rsa.misc.OS": "luptasnu",
-        "rsa.misc.event_type": "fullaccess",
-        "rsa.misc.node": "equuntu",
-        "rsa.network.alias_host": [
-            "nse3544.local"
-        ],
-        "rsa.network.eth_host": "01:00:5e:bf:58:62",
-        "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.186.8.127"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "boreet"
-    },
-    {
-        "@timestamp": "2020-03-25T11:31:24.000Z",
-        "event.action": [
-            "SystemSecurity",
-            "block"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "Mar 25 9:31:24 ovolupta1238.internal.localdomain CylancePROTECT Event Type:ametcon, Event Name: SystemSecurity, Device Name: beat, IP Address: (10.202.89.144), Action: block, Process ID: 6944, Process Name: qua.exe, User Name: iarchite, Violation Type: emsequi, Zone Names:ueporroq, Device Id: ute",
-        "fileset.name": "protect",
-        "input.type": "log",
-        "log.offset": 14893,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "process.name": "qua.exe",
-        "process.pid": 6944,
-        "related.ip": [
-            "10.202.89.144"
-        ],
-        "related.user": [
-            "iarchite"
-        ],
-        "rsa.db.index": "ueporroq",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1600000000,
-        "rsa.investigations.event_cat_name": "System",
-        "rsa.investigations.event_vcat": "ametcon",
-        "rsa.misc.action": [
-            "block"
-        ],
-        "rsa.misc.device_name": "beat",
-        "rsa.misc.event_type": "SystemSecurity",
-        "rsa.misc.policy_name": "emsequi",
-        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.202.89.144"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "iarchite"
-    },
-    {
-        "@timestamp": "2018-04-08T06:33:58.000Z",
-        "event.action": [
-            "ZoneAdd"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "8-April-2018 16:33:58 high Bonoru1396.api.invalid rumSecti <<deomni>adipi 2018-4-8T4:33:58.mquis ratvo1100.www.home CylancePROTECT oluptas nderiti [uatu] Event Type: olupta, Event Name: ZoneAdd, Device Names: (orem), Policy Name: giatqu, User: rsint rsi (paq)",
-        "fileset.name": "protect",
-        "host.name": "ratvo1100.www.home",
-        "input.type": "log",
-        "log.offset": 15191,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "rsint",
-        "rsa.identity.lastname": "rsi",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "olupta",
-        "rsa.misc.event_type": "ZoneAdd",
-        "rsa.misc.mail_id": "paq",
-        "rsa.misc.node": "orem",
-        "rsa.misc.policy_name": "giatqu",
-        "rsa.network.alias_host": [
-            "ratvo1100.www.home"
-        ],
-        "rsa.time.event_time": "2018-04-08T06:33:58.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-04-22T13:36:32.000Z",
-        "event.action": [
-            "DeviceEdit"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "onse 2018-4-22T11:36:32.sitam inibusBo1209.www.example CylancePROTECT ddoe uid [amnis] Event Type: AuditLog, Event Name: DeviceEdit, Message: sse, User: ihilm incidi (aedictas)",
-        "fileset.name": "protect",
-        "host.name": "inibusBo1209.www.example",
-        "input.type": "log",
-        "log.offset": 15451,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.db.index": "sse",
-        "rsa.identity.firstname": "ihilm",
-        "rsa.identity.lastname": "incidi",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "DeviceEdit",
-        "rsa.misc.mail_id": "aedictas",
-        "rsa.network.alias_host": [
-            "inibusBo1209.www.example"
-        ],
-        "rsa.time.event_time": "2018-04-22T13:36:32.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-05-07T08:39:06.000Z",
-        "event.action": [
-            "threat_found"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "7-May-2018 06:39:06 low urEx4545.local abore <<iumdo>oreeu 2018-5-7T6:39:06.mea ssec5390.api.example CylancePROTECT emi reprehen [tvol] Event Type: ptat, Event Name: threat_found, Threat Class: tdolo, Threat Subclass: sequatD, SHA256: eleumi, MD5: equ",
-        "fileset.name": "protect",
-        "host.name": "ssec5390.api.example",
-        "input.type": "log",
-        "log.offset": 15628,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.crypto.sig_type": "tdolo",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "ptat",
-        "rsa.misc.checksum": "eleumi",
-        "rsa.misc.event_type": "threat_found",
-        "rsa.network.alias_host": [
-            "ssec5390.api.example"
-        ],
         "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
         "service.type": "cylance",
         "tags": [
@@ -2169,76 +2199,38 @@
         ]
     },
     {
-        "@timestamp": "2018-05-21T03:41:41.000Z",
+        "@timestamp": "2020-05-21T03:41:41.000Z",
         "event.action": [
-            "SyslogSettingsSave"
+            "Alert"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "etc 2018-5-21T1:41:41.eturadip nost5395.www.localhost CylancePROTECT edol sequuntu [quameius] Event Type: AuditLog, Event Name: SyslogSettingsSave, Message: Policy: nima; SHA256: totamrem; Category: aliqu, User: taedict orum (nsequat)orsitam ",
+        "event.original": "21-May-2018 1:41:41 high ident4293.api.example ercitati <<eve>rro 21T13:41:41.oeiusmo nimv4681.internal.lan CylancePROTECT Event Name:Alert, Message: Provider:quisn, Source IP:10.132.23.6, User: etMa llita (ntsunt)#015",
         "fileset.name": "protect",
-        "host.name": "nost5395.www.localhost",
+        "host.name": "nimv4681.internal.lan",
         "input.type": "log",
-        "log.offset": 15880,
+        "log.offset": 15314,
         "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "taedict",
-        "rsa.identity.lastname": "orum",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.category": "aliqu",
-        "rsa.misc.checksum": "totamrem",
-        "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.mail_id": "nsequat",
-        "rsa.misc.policy_name": "nima; SHA256: totamrem; Category: aliqu",
-        "rsa.network.alias_host": [
-            "nost5395.www.localhost"
-        ],
-        "rsa.time.event_time": "2018-05-21T03:41:41.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-06-04T10:44:15.000Z",
-        "event.action": [
-            "Registration"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2018-6-4T8:44:15.oidentsu oditau3188.internal.home CylancePROTECT temqui lup [aeca] Event Type: AuditLog, Event Name: Registration, Message:  Provider: autemv, Source IP: 10.16.200.216, User: eirure boreetd (tNe)",
-        "fileset.name": "protect",
-        "host.name": "oditau3188.internal.home",
-        "input.type": "log",
-        "log.offset": 16123,
-        "observer.product": "autemv",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "related.ip": [
-            "10.16.200.216"
+            "10.132.23.6"
         ],
-        "rsa.identity.firstname": "eirure",
-        "rsa.identity.lastname": "boreetd",
+        "rsa.identity.firstname": "etMa",
+        "rsa.identity.lastname": "llita",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "Registration",
-        "rsa.misc.mail_id": "tNe",
+        "rsa.investigations.event_cat": 1609000000,
+        "rsa.investigations.event_cat_name": "System.Alerts",
+        "rsa.misc.event_type": "Alert",
+        "rsa.misc.mail_id": "ntsunt",
         "rsa.network.alias_host": [
-            "oditau3188.internal.home"
+            "nimv4681.internal.lan"
         ],
-        "rsa.time.event_time": "2018-06-04T10:44:15.000Z",
+        "rsa.time.event_time": "2020-05-21T03:41:41.000Z",
         "service.type": "cylance",
         "source.ip": [
-            "10.16.200.216"
+            "10.132.23.6"
         ],
         "tags": [
             "cylance.protect",
@@ -2246,36 +2238,62 @@
         ]
     },
     {
-        "@timestamp": "2018-06-19T05:46:49.000Z",
+        "@timestamp": "2020-06-04T10:44:15.000Z",
         "event.action": [
-            "pechange"
+            "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "19-June-2018 03:46:49 low asper311.www.corp inibus <<secte>ctobeat 2018-6-19T3:46:49.onsec idestl1167.domain CylancePROTECT itanimi onoru [data] Event Type: ScriptControl, Event Name: pechange, Device Name: eosqui, File Path: dipisciv, Interpreter: uam, Interpreter Version: 1.2575 (llum), Zone Names: mwr",
-        "file.directory": "dipisciv",
+        "event.original": "4-Jun-2018 8:44:15 high temsequi4910.mail.host enbyCic <<iveli>conseq 4T20:44:15.itame tenat5407.www5.test CylancePROTECT Event Name:ThreatUpdated, Device Name:cti, Zone Names:ommodoc",
         "fileset.name": "protect",
-        "host.name": "idestl1167.domain",
+        "host.name": "tenat5407.www5.test",
         "input.type": "log",
-        "log.offset": 16336,
-        "network.application": "uam",
+        "log.offset": 15533,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "observer.version": "1.2575",
-        "rsa.db.index": "mwr",
+        "rsa.db.index": "ommodoc",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " ScriptControl",
-        "rsa.misc.event_type": "pechange",
-        "rsa.misc.node": "eosqui",
-        "rsa.misc.version": "1.2575",
+        "rsa.misc.event_type": "ThreatUpdated",
+        "rsa.misc.node": "cti",
         "rsa.network.alias_host": [
-            "idestl1167.domain"
+            "tenat5407.www5.test"
         ],
-        "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
+        "rsa.time.event_time": "2020-06-04T10:44:15.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-06-19T05:46:49.000Z",
+        "event.action": [
+            "ZoneAdd"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Jun 19 3:46:49 orem7191.mail.test CylancePROTECT Event Type:uisaut, Event Name:ZoneAdd, Device Name:paq, External Device Type:uianon, External Device Vendor ID:nul, External Device Name:onse, External Device Product ID:sitam, External Device Serial Number:inibusBo, Zone Names:illoin",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 15717,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "illoin",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "uisaut",
+        "rsa.misc.device_name": "uianon",
+        "rsa.misc.event_type": "ZoneAdd",
+        "rsa.misc.node": "paq",
+        "rsa.misc.serial_number": "inibusBo",
+        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2285,27 +2303,31 @@
     {
         "@timestamp": "2018-07-03T12:49:23.000Z",
         "event.action": [
-            "threat_changed"
+            "LoginSuccess"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "3-July-2018 10:49:23 low pitlabo3498.www.localdomain ntmollit <<tisu>ionofdeF 2018-7-3T10:49:23.rsp imipsa5374.corp CylancePROTECT ionevo llitani [uscipit] Event Type: luptat, Event Name: threat_changed, Device Name: etco",
+        "event.original": "sequatD 2018-7-3T10:49:23.eleumi equ3413.www.example CylancePROTECT tsunt rnat [oremi] Event Type: AuditLog, Event Name: LoginSuccess, Message: Policy Assigned:ctetu; Devices: oreeu , User: uasiarch Malor (boriosa)",
         "fileset.name": "protect",
-        "host.name": "imipsa5374.corp",
+        "host.name": "equ3413.www.example",
         "input.type": "log",
-        "log.offset": 16642,
+        "log.offset": 16001,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "rsa.identity.firstname": "uasiarch",
+        "rsa.identity.lastname": "Malor",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "luptat",
-        "rsa.misc.event_type": "threat_changed",
-        "rsa.misc.node": "etco",
+        "rsa.investigations.event_cat": 1401060000,
+        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "LoginSuccess",
+        "rsa.misc.mail_id": "boriosa",
+        "rsa.misc.node": "oreeu",
+        "rsa.misc.policy_name": "ctetu",
         "rsa.network.alias_host": [
-            "imipsa5374.corp"
+            "equ3413.www.example"
         ],
         "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "cylance",
@@ -2317,212 +2339,72 @@
     {
         "@timestamp": "2018-07-17T07:51:58.000Z",
         "event.action": [
-            "ZoneAddDevice",
-            "accept"
+            "PolicyAdd"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "17-July-2018 17:51:58 medium eumiu5172.internal.domain rehen <<uaeab>ptat 2018-7-17T5:51:58.mipsu velillu827.www5.domain CylancePROTECT rsitamet leumiur [ssequamn] Event Type: ExploitAttempt, Event Name: ZoneAddDevice, Device Name: olesti, IP Address: (10.221.20.165), Action: accept, Process ID: 7294, Process Name: ritquiin.exe, User Name: reseo, Violation Type: amco, Zone Names: ons",
+        "event.original": "2018-7-17T5:51:58.aliqu taedict4891.api.host CylancePROTECT lor auto [rsinto] Event Type: AuditLog, Event Name: PolicyAdd, Message: The Device: periam was auto assigned to the Zone: IP Address: 10.137.79.74, User:   (lors)",
         "fileset.name": "protect",
-        "host.name": "velillu827.www5.domain",
+        "host.name": "taedict4891.api.host",
         "input.type": "log",
-        "log.offset": 16864,
+        "log.offset": 16216,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "process.name": "ritquiin.exe",
-        "process.pid": 7294,
         "related.ip": [
-            "10.221.20.165"
+            "10.137.79.74"
         ],
-        "related.user": [
-            "reseo"
-        ],
-        "rsa.db.index": "ons",
+        "rsa.db.index": "The Device: periam was auto assigned to the Zone: IP Address: 10.137.79.74",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " ExploitAttempt",
-        "rsa.misc.action": [
-            "accept"
-        ],
-        "rsa.misc.event_type": "ZoneAddDevice",
-        "rsa.misc.node": "olesti",
-        "rsa.misc.policy_name": "amco",
+        "rsa.investigations.event_cat": 1502030000,
+        "rsa.investigations.event_cat_name": "Policies.Rules.Added",
+        "rsa.investigations.event_vcat": "AuditLog",
+        "rsa.misc.event_type": "PolicyAdd",
+        "rsa.misc.node": "periam",
         "rsa.network.alias_host": [
-            "velillu827.www5.domain"
+            "taedict4891.api.host"
         ],
         "rsa.time.event_time": "2018-07-17T07:51:58.000Z",
         "service.type": "cylance",
         "source.ip": [
-            "10.221.20.165"
+            "10.137.79.74"
         ],
         "tags": [
             "cylance.protect",
             "forwarded"
-        ],
-        "user.name": "reseo"
+        ]
     },
     {
         "@timestamp": "2018-08-01T14:54:32.000Z",
         "event.action": [
-            "SyslogSettingsSave"
+            "ZoneAddDevice"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2018-8-1T12:54:32.epreh psaqu5224.api.home CylancePROTECT temporin uam [rudexerc] Event Type: ScriptControl, Event Name: SyslogSettingsSave, Device Name: lor, File Path: nvolupt, Interpreter: dquia, Interpreter Version: 1.5334, Zone Names: bori, User Name: dipi",
-        "file.directory": "nvolupt",
+        "event.original": "1-August-2018 00:54:32 high aquae7068.test ctetura <<quaerat>tDuisau 2018-8-1T12:54:32.aturve ptateve7615.internal.invalid CylancePROTECT tconsect pariat [iutal] Event Type: teturad, Event Name: ZoneAddDevice, Device Names: (isi), Policy Name: idexeac, User: ntu tdolo (nimve)",
         "fileset.name": "protect",
-        "host.name": "psaqu5224.api.home",
+        "host.name": "ptateve7615.internal.invalid",
         "input.type": "log",
-        "log.offset": 17251,
-        "network.application": "dquia",
+        "log.offset": 16439,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "observer.version": "1.5334",
-        "related.user": [
-            "dipi"
-        ],
-        "rsa.db.index": "bori",
+        "rsa.identity.firstname": "ntu",
+        "rsa.identity.lastname": "tdolo",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.node": "lor",
-        "rsa.misc.version": "1.5334",
+        "rsa.investigations.event_vcat": "teturad",
+        "rsa.misc.event_type": "ZoneAddDevice",
+        "rsa.misc.mail_id": "nimve",
+        "rsa.misc.node": "isi",
+        "rsa.misc.policy_name": "idexeac",
         "rsa.network.alias_host": [
-            "psaqu5224.api.home"
+            "ptateve7615.internal.invalid"
         ],
         "rsa.time.event_time": "2018-08-01T14:54:32.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "dipi"
-    },
-    {
-        "@timestamp": "2018-08-15T09:57:06.000Z",
-        "event.action": [
-            "threat_quarantined"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2018-8-15T7:57:06.ite itse1458.www.example CylancePROTECT lupt quatur [dminim] Event Type: ScriptControl, Event Name: threat_quarantined, Device Name: ipsa, File Path: con, Interpreter: eirured, Interpreter Version: 1.3772 (tatiset), Zone Names: quira, User Name: ciatisun",
-        "file.directory": "con",
-        "fileset.name": "protect",
-        "host.name": "itse1458.www.example",
-        "input.type": "log",
-        "log.offset": 17513,
-        "network.application": "eirured",
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "observer.version": "1.3772",
-        "related.user": [
-            "ciatisun"
-        ],
-        "rsa.db.index": "quira",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " ScriptControl",
-        "rsa.misc.event_type": "threat_quarantined",
-        "rsa.misc.node": "ipsa",
-        "rsa.misc.version": "1.3772",
-        "rsa.network.alias_host": [
-            "itse1458.www.example"
-        ],
-        "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "ciatisun"
-    },
-    {
-        "@timestamp": "2019-08-29T04:59:40.000Z",
-        "event.action": [
-            "threat_changed",
-            "deny"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "29-Aug-2018 2:59:40 very-high audant5631.www5.local minimve <<texplica>entorev 29T14:59:40.quuntur olup3841.mail.invalid CylancePROTECT Event Name: threat_changed, Device Name: aerat, IP Address: (10.152.213.228), Action: deny, Process ID: 2571, Process Name: iatquo.exe, User Name: temp, Violation Type: oinvento, Zone Names:ali, Device Id: udexerci",
-        "fileset.name": "protect",
-        "host.name": "olup3841.mail.invalid",
-        "input.type": "log",
-        "log.offset": 17786,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "process.name": "iatquo.exe",
-        "process.pid": 2571,
-        "related.ip": [
-            "10.152.213.228"
-        ],
-        "related.user": [
-            "temp"
-        ],
-        "rsa.db.index": "ali",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.action": [
-            "deny"
-        ],
-        "rsa.misc.device_name": "aerat",
-        "rsa.misc.event_type": "threat_changed",
-        "rsa.misc.policy_name": "oinvento",
-        "rsa.network.alias_host": [
-            "olup3841.mail.invalid"
-        ],
-        "rsa.time.event_time": "2019-08-29T04:59:40.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.152.213.228"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "temp"
-    },
-    {
-        "@timestamp": "2018-09-12T12:02:15.000Z",
-        "event.action": [
-            "LoginSuccess"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "emullam 2018-9-12T10:02:15.quido llo1106.internal.localhost CylancePROTECT assi rch [psa] Event Type: AuditLog, Event Name: LoginSuccess, Message: Devices: atione,tvolupUser: oremeu lab (lla)",
-        "fileset.name": "protect",
-        "host.name": "llo1106.internal.localhost",
-        "input.type": "log",
-        "log.offset": 18137,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "oremeu",
-        "rsa.identity.lastname": "lab",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1401060000,
-        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "LoginSuccess",
-        "rsa.misc.mail_id": "lla",
-        "rsa.misc.node": "atione",
-        "rsa.network.alias_host": [
-            "llo1106.internal.localhost"
-        ],
-        "rsa.time.event_time": "2018-09-12T12:02:15.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2530,58 +2412,274 @@
         ]
     },
     {
-        "@timestamp": "2018-09-27T07:04:49.000Z",
+        "@timestamp": "2018-08-15T09:57:06.000Z",
         "event.action": [
-            "ZoneAdd"
+            "fullaccess"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "oeiusm 2018-9-27T5:04:49.Excepteu mco6956.internal.test CylancePROTECT lorese teturadi [radipi] Event Type: ScriptControl, Event Name: ZoneAdd, Device Name: upidatat, File Path: mod, Interpreter: niamqui, Interpreter Version: 1.7696, Zone Names: xeaco, User Name: taliqu",
-        "file.directory": "mod",
+        "event.original": "ola 2018-8-15T7:57:06.ptat quasi4459.domain CylancePROTECT snostr squamest [quisn] Event Type: pteu, Event Name: fullaccess, Device Names: (illumdo), Policy Name: antium, User: remaper eseosq (iatquovo)",
         "fileset.name": "protect",
-        "host.name": "mco6956.internal.test",
+        "host.name": "quasi4459.domain",
         "input.type": "log",
-        "log.offset": 18329,
-        "network.application": "niamqui",
+        "log.offset": 16716,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "observer.version": "1.7696",
-        "related.user": [
-            "taliqu"
-        ],
-        "rsa.db.index": "xeaco",
+        "rsa.identity.firstname": "remaper",
+        "rsa.identity.lastname": "eseosq",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.event_type": "ZoneAdd",
-        "rsa.misc.node": "upidatat",
-        "rsa.misc.version": "1.7696",
+        "rsa.investigations.event_vcat": "pteu",
+        "rsa.misc.event_type": "fullaccess",
+        "rsa.misc.mail_id": "iatquovo",
+        "rsa.misc.node": "illumdo",
+        "rsa.misc.policy_name": "antium",
         "rsa.network.alias_host": [
-            "mco6956.internal.test"
+            "quasi4459.domain"
         ],
-        "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
+        "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
             "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-08-29T04:59:40.000Z",
+        "event.action": [
+            "SyslogSettingsSave"
         ],
-        "user.name": "taliqu"
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "mollit 2018-8-29T2:59:40.eosqui dipisciv7116.www.host CylancePROTECT llum mwr [cia] Event Type: AuditLog, Event Name: SyslogSettingsSave, Message: Device: estiaec;pitlaboUser: tas rcitat (ree)",
+        "fileset.name": "protect",
+        "host.name": "dipisciv7116.www.host",
+        "input.type": "log",
+        "log.offset": 16919,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.identity.firstname": "tas",
+        "rsa.identity.lastname": "rcitat",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "SyslogSettingsSave",
+        "rsa.misc.mail_id": "ree",
+        "rsa.misc.node": "estiaec",
+        "rsa.network.alias_host": [
+            "dipisciv7116.www.host"
+        ],
+        "rsa.time.event_time": "2018-08-29T04:59:40.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-09-12T12:02:15.000Z",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "temaccu 2018-9-12T10:02:15.uamqua Neq4477.mail.invalid CylancePROTECT nim pteurs [ercitati] Event Type: atem, Event Name: SyslogSettingsSave, Device Name: mipsu, Agent Version: velillu, IP Address: (10.181.241.7), MAC Address: (01:00:5e:e1:72:72), Logged On Users: (riatu), OS: utod",
+        "fileset.name": "protect",
+        "host.name": "Neq4477.mail.invalid",
+        "input.type": "log",
+        "log.offset": 17112,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.181.241.7"
+        ],
+        "related.user": [
+            "riatu"
+        ],
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "atem",
+        "rsa.misc.OS": "utod",
+        "rsa.misc.event_type": "SyslogSettingsSave",
+        "rsa.misc.node": "mipsu",
+        "rsa.network.alias_host": [
+            "Neq4477.mail.invalid"
+        ],
+        "rsa.network.eth_host": "01:00:5e:e1:72:72",
+        "rsa.time.event_time": "2018-09-12T12:02:15.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.181.241.7"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ],
+        "user.name": "riatu"
+    },
+    {
+        "@timestamp": "2019-09-27T07:04:49.000Z",
+        "event.action": [
+            "threat_quarantined"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Sep 27 5:04:49 uipe6805.www5.domain CylancePROTECT Event Type:stenat, Event Name:threat_quarantined, Threat Class:sequamn, Threat Subclass:perspici, SHA256:inimve, MD5:aea",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 17395,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.crypto.sig_type": "sequamn",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "stenat",
+        "rsa.misc.checksum": "inimve",
+        "rsa.misc.event_type": "threat_quarantined",
+        "rsa.time.event_time": "2019-09-27T07:04:49.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2018-10-11T14:07:23.000Z",
+        "event.action": [
+            "LoginSuccess"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "udexerci 2018-10-11T12:07:23.uae imveni193.www5.host CylancePROTECT itationu setquas [nbyCi] Event Type: AuditLog, Event Name: LoginSuccess, Message:  Provider: magnaali, Source IP: 10.201.95.47, User: isno usBono (ameaq)",
+        "fileset.name": "protect",
+        "host.name": "imveni193.www5.host",
+        "input.type": "log",
+        "log.offset": 17567,
+        "observer.product": "magnaali",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.201.95.47"
+        ],
+        "rsa.identity.firstname": "isno",
+        "rsa.identity.lastname": "usBono",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1401060000,
+        "rsa.investigations.event_cat_name": "User.Activity.Successful Logins",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "LoginSuccess",
+        "rsa.misc.mail_id": "ameaq",
+        "rsa.network.alias_host": [
+            "imveni193.www5.host"
+        ],
+        "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.201.95.47"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-10-25T09:09:57.000Z",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "lestiae 2018-10-25T7:09:57.iav umiure5186.api.domain CylancePROTECT tno imvenia [culp] Event Type: AuditLog, Event Name: SyslogSettingsSave, Message: Zone: nesciu; Policy: mali; Value: roinBCSe, User: eetdolor tpersp (assi)",
+        "fileset.name": "protect",
+        "host.name": "umiure5186.api.domain",
+        "input.type": "log",
+        "log.offset": 17789,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "nesciu",
+        "rsa.identity.firstname": "eetdolor",
+        "rsa.identity.lastname": "tpersp",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "SyslogSettingsSave",
+        "rsa.misc.mail_id": "assi",
+        "rsa.misc.policy_name": "mali",
+        "rsa.network.alias_host": [
+            "umiure5186.api.domain"
+        ],
+        "rsa.time.event_time": "2018-10-25T09:09:57.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-11-09T04:12:32.000Z",
+        "event.action": [
+            "Device Updated"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "nihilmo 2018-11-9T2:12:32.reetdo xeaco7887.www.localdomain CylancePROTECT hite umfugi [abor] Event Type: AuditLog, Event Name: Device Updated, Message: Zone: remips; Policy: laboreet; Value: uptate, User: tot reme (emeumfu)",
+        "fileset.name": "protect",
+        "host.name": "xeaco7887.www.localdomain",
+        "input.type": "log",
+        "log.offset": 18013,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "remips",
+        "rsa.identity.firstname": "tot",
+        "rsa.identity.lastname": "reme",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1804010000,
+        "rsa.investigations.event_cat_name": "Network.Devices.Additions",
+        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.misc.event_type": "Device Updated",
+        "rsa.misc.mail_id": "emeumfu",
+        "rsa.misc.policy_name": "laboreet",
+        "rsa.network.alias_host": [
+            "xeaco7887.www.localdomain"
+        ],
+        "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-11-23T11:15:06.000Z",
         "event.action": [
             "SystemSecurity"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2018-10-11T12:07:23.usan gnamali226.internal.test CylancePROTECT edqui tvolu [psu] Event Type: strud, Event Name: SystemSecurity, saute",
+        "event.original": "2018-11-23T9:15:06.usan gnamali226.internal.test CylancePROTECT edqui tvolu [psu] Event Type: strud, Event Name: SystemSecurity, saute",
         "fileset.name": "protect",
         "host.name": "gnamali226.internal.test",
         "input.type": "log",
-        "log.offset": 18600,
+        "log.offset": 18237,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -2593,7 +2691,7 @@
         "rsa.network.alias_host": [
             "gnamali226.internal.test"
         ],
-        "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
+        "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2601,18 +2699,18 @@
         ]
     },
     {
-        "@timestamp": "2018-10-25T09:09:57.000Z",
+        "@timestamp": "2018-12-07T06:17:40.000Z",
         "event.action": [
             "SystemSecurity"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2018-10-25T7:09:57.atcupi eriti7637.domain CylancePROTECT rema mcol [tion] Event Type: AuditLog, Event Name: SystemSecurity, Message: Device: mquis; SHA256: tur, User: itation utlabo (tat)uredo ",
+        "event.original": "2018-12-7T4:17:40.atcupi eriti7637.domain CylancePROTECT rema mcol [tion] Event Type: AuditLog, Event Name: SystemSecurity, Message: Device: mquis; SHA256: tur, User: itation utlabo (tat)",
         "fileset.name": "protect",
         "host.name": "eriti7637.domain",
         "input.type": "log",
-        "log.offset": 18736,
+        "log.offset": 18372,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -2629,7 +2727,7 @@
         "rsa.network.alias_host": [
             "eriti7637.domain"
         ],
-        "rsa.time.event_time": "2018-10-25T09:09:57.000Z",
+        "rsa.time.event_time": "2018-12-07T06:17:40.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2637,160 +2735,30 @@
         ]
     },
     {
-        "@timestamp": "2019-11-09T04:12:32.000Z",
+        "@timestamp": "2019-12-21T13:20:14.000Z",
         "event.action": [
-            "accept",
-            "DeviceRemove"
+            "Device Updated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "9-Nov-2018 2:12:32 medium dminimv2485.internal.host rep <<nostru>docons 9T02:12:32.emipsumq orinr5248.mail.home CylancePROTECT Event Name: DeviceRemove, Device Name: tass, IP Address: (10.94.129.251), Action: accept, Process ID: 782, Process Name: umquiad.exe, User Name: porinc, Violation Type: uameiu, Zone Names:quiado",
+        "event.original": "Dec 21 11:20:14 olu2576.localdomain CylancePROTECT Event Type:enim, Event Name:Device Updated, Device Name:meaquei, External Device Type:snisiu, External Device Vendor ID:atem, External Device Name:remque, External Device Product ID:dol, External Device Serial Number:tvolupt, Zone Names:sedquia, Device Id: inrepr, Policy Name: lla ",
         "fileset.name": "protect",
-        "host.name": "orinr5248.mail.home",
         "input.type": "log",
-        "log.offset": 18931,
+        "log.offset": 18560,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "process.name": "umquiad.exe",
-        "process.pid": 782,
-        "related.ip": [
-            "10.94.129.251"
-        ],
-        "related.user": [
-            "porinc"
-        ],
-        "rsa.db.index": "quiado",
+        "rsa.db.index": "sedquia, Device Id: inrepr, Policy Name: lla",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1804020000,
-        "rsa.investigations.event_cat_name": "Network.Devices.Removals",
-        "rsa.misc.action": [
-            "accept"
-        ],
-        "rsa.misc.device_name": "tass",
-        "rsa.misc.event_type": "DeviceRemove",
-        "rsa.misc.policy_name": "uameiu",
-        "rsa.network.alias_host": [
-            "orinr5248.mail.home"
-        ],
-        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.94.129.251"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "porinc"
-    },
-    {
-        "@timestamp": "2018-11-23T11:15:06.000Z",
-        "event.action": [
-            "SystemSecurity"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "23-November-2018 09:15:06 medium mvol3890.localhost reh <<rsitame>tcons 2018-11-23T9:15:06.squamest ction491.www5.local CylancePROTECT tamet ate [epteur] Event Type: AuditLog, Event Name: SystemSecurity, Message: Device: ill;imveniamUser: sunte exerc (tasu)",
-        "fileset.name": "protect",
-        "host.name": "ction491.www5.local",
-        "input.type": "log",
-        "log.offset": 19253,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "sunte",
-        "rsa.identity.lastname": "exerc",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1600000000,
-        "rsa.investigations.event_cat_name": "System",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "SystemSecurity",
-        "rsa.misc.mail_id": "tasu",
-        "rsa.misc.node": "ill",
-        "rsa.network.alias_host": [
-            "ction491.www5.local"
-        ],
-        "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-12-07T06:17:40.000Z",
-        "event.action": [
-            "threat_found"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "Dec 7 4:17:40 rcit7003.www5.host CylancePROTECT Event Type:orese, Event Name:threat_found, Device Name:eiusm, Agent Version:oremipsu, IP Address: (10.205.246.104), MAC Address: (01:00:5e:55:3b:e8), Logged On Users: (mto), OS:iae, Zone Names:dent",
-        "fileset.name": "protect",
-        "input.type": "log",
-        "log.offset": 19511,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.205.246.104"
-        ],
-        "related.user": [
-            "mto"
-        ],
-        "rsa.db.index": "dent",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "orese",
-        "rsa.misc.OS": "iae",
-        "rsa.misc.event_type": "threat_found",
-        "rsa.misc.node": "eiusm",
-        "rsa.network.eth_host": "01:00:5e:55:3b:e8",
-        "rsa.time.event_time": "2019-12-07T06:17:40.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.205.246.104"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "mto"
-    },
-    {
-        "@timestamp": "2018-12-21T13:20:14.000Z",
-        "event.action": [
-            "ZoneAdd"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2018-12-21T11:20:14.itse lapari2702.www.test CylancePROTECT exeaco upta [ivel] Event Type: AuditLog, Event Name: ZoneAdd, Message: Policy Assigned:reprehe; Devices: deFinib , User: edqui oreseosq (corporis)",
-        "fileset.name": "protect",
-        "host.name": "lapari2702.www.test",
-        "input.type": "log",
-        "log.offset": 19757,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "edqui",
-        "rsa.identity.lastname": "oreseosq",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.event_type": "ZoneAdd",
-        "rsa.misc.mail_id": "corporis",
-        "rsa.misc.node": "deFinib",
-        "rsa.misc.policy_name": "reprehe",
-        "rsa.network.alias_host": [
-            "lapari2702.www.test"
-        ],
-        "rsa.time.event_time": "2018-12-21T13:20:14.000Z",
+        "rsa.investigations.event_cat": 1804010000,
+        "rsa.investigations.event_cat_name": "Network.Devices.Additions",
+        "rsa.investigations.event_vcat": "enim",
+        "rsa.misc.device_name": "snisiu",
+        "rsa.misc.event_type": "Device Updated",
+        "rsa.misc.node": "meaquei",
+        "rsa.misc.serial_number": "tvolupt",
+        "rsa.time.event_time": "2019-12-21T13:20:14.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2800,33 +2768,26 @@
     {
         "@timestamp": "2020-01-05T08:22:49.000Z",
         "event.action": [
-            "ThreatUpdated"
+            "Device Policy Assigned"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "5-Jan-2019 6:22:49 very-high byCice3357.mail.localhost cin <<trum>amestq 5T06:22:49.emvele tNeq5705.home CylancePROTECT Event Name:ThreatUpdated, Device Message: Device: sper Agent Self Protection Level Changed: 'dic' to 'mfugiat', User: magnido liqu (dolor),ingZone Names: amal Device Id: aliq",
+        "event.original": "Jan 5 6:22:49 tqu6566.www.domain CylancePROTECT Event Type:tinvolu, Event Name:Device Policy Assigned, Message: The Device:dunwas auto assigned to thexceZone:dol, User:equamn",
         "fileset.name": "protect",
-        "host.name": "tNeq5705.home",
         "input.type": "log",
-        "log.offset": 19964,
+        "log.offset": 18894,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "amal",
-        "rsa.identity.firstname": "magnido",
-        "rsa.identity.lastname": "liqu",
+        "rsa.identity.firstname": "equamn",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.change_new": "mfugiat",
-        "rsa.misc.change_old": "dic",
-        "rsa.misc.device_name": "sper",
-        "rsa.misc.event_type": "ThreatUpdated",
-        "rsa.misc.mail_id": "dolor",
-        "rsa.network.alias_host": [
-            "tNeq5705.home"
-        ],
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.investigations.event_vcat": "tinvolu",
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.misc.node": "dun",
+        "rsa.network.zone": "dol",
         "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "service.type": "cylance",
         "tags": [
@@ -2837,38 +2798,46 @@
     {
         "@timestamp": "2020-01-19T03:25:23.000Z",
         "event.action": [
-            "threat_quarantined"
+            "DeviceEdit"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "19-Jan-2019 1:25:23 high conse3977.www.lan giatqu <<olors>roid 19T13:25:23.lorum iin1665.api.localdomain CylancePROTECT Event Name:threat_quarantined, Device Message: Device: iat; Policy Changed: orain to 'equaturQ', User: llu quaUt (labor), Zone Names:oris, Device Id: tatemse",
+        "event.original": "19-Jan-2019 1:25:23 low eiu5375.api.domain tcons <<squamest>ction 19T13:25:23.emveleum siuta2155.lan CylancePROTECT Event Name:DeviceEdit, Device Name:utpe, Agent Version:ill, IP Address: (10.185.28.175), MAC Address: (01:00:5e:1d:a2:74), Logged On Users: (tasu), OS:sci, Zone Names:isquames",
         "fileset.name": "protect",
-        "host.name": "iin1665.api.localdomain",
+        "host.name": "siuta2155.lan",
         "input.type": "log",
-        "log.offset": 20259,
+        "log.offset": 19069,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "oris",
-        "rsa.identity.firstname": "llu",
-        "rsa.identity.lastname": "quaUt",
+        "related.ip": [
+            "10.185.28.175"
+        ],
+        "related.user": [
+            "tasu"
+        ],
+        "rsa.db.index": "isquames",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.device_name": "iat",
-        "rsa.misc.event_type": "threat_quarantined",
-        "rsa.misc.mail_id": "labor",
-        "rsa.misc.policy_name": "equaturQ",
+        "rsa.misc.OS": "sci",
+        "rsa.misc.event_type": "DeviceEdit",
+        "rsa.misc.node": "utpe",
         "rsa.network.alias_host": [
-            "iin1665.api.localdomain"
+            "siuta2155.lan"
         ],
+        "rsa.network.eth_host": "01:00:5e:1d:a2:74",
         "rsa.time.event_time": "2020-01-19T03:25:23.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.185.28.175"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
-        ]
+        ],
+        "user.name": "tasu"
     },
     {
         "@timestamp": "2020-02-02T10:27:57.000Z",
@@ -2878,11 +2847,215 @@
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2-Feb-2019 8:27:57 medium tincul407.corp amq <<abillo>lab 2T20:27:57.nsequ ing3291.internal.localhost CylancePROTECT Event Name:threat_found, Message: Device:amnisiuwas auto assigned to theptatZone:epr, User:itanimid",
+        "event.original": "Feb 2 8:27:57 iatnula4065.www5.corp CylancePROTECT Event Type:corporis, Event Name:threat_found, Device Message: Device: mmodic; Zones Removed: essequam; Zones Added: undeo,ficiadeUser: uiinea uianonn (eavolupt), Zone Names:dantium Device Id: ors",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 19361,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "dantium",
+        "rsa.identity.firstname": "uiinea",
+        "rsa.identity.lastname": "uianonn",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "corporis",
+        "rsa.misc.device_name": "mmodic",
+        "rsa.misc.event_type": "threat_found",
+        "rsa.misc.mail_id": "eavolupt",
+        "rsa.time.event_time": "2020-02-02T10:27:57.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-02-17T05:30:32.000Z",
+        "event.action": [
+            "pechange"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "trude 2019-2-17T3:30:32.snulap onsequat5480.mail.localdomain CylancePROTECT pariatur cita [tvo] Event Type: ema, Event Name: pechange, Threat Class: atemacc, Threat Subclass: labore, SHA256: iqua, MD5: ciunt",
+        "fileset.name": "protect",
+        "host.name": "onsequat5480.mail.localdomain",
+        "input.type": "log",
+        "log.offset": 19608,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.crypto.sig_type": "atemacc",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "ema",
+        "rsa.misc.checksum": "iqua",
+        "rsa.misc.event_type": "pechange",
+        "rsa.network.alias_host": [
+            "onsequat5480.mail.localdomain"
+        ],
+        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-03-03T12:33:06.000Z",
+        "event.action": [
+            "Device Policy Assigned"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Mar 3 10:33:06 ostrumex5015.internal.lan CylancePROTECT Event Type:imaven, Event Name:Device Policy Assigned, Threat Class:uiineav, Threat Subclass:nder, SHA256:lore, MD5:nim",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 19816,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.crypto.sig_type": "uiineav",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.investigations.event_vcat": "imaven",
+        "rsa.misc.checksum": "lore",
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-03-17T19:35:40.000Z",
+        "event.action": [
+            "threat_changed",
+            "allow"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "psamvolu 2019/03/17T17:35:40.teturad ritq7853.api.home CylancePROTECT urautodi equamni [fugia] Event Type: AppControl, Event Name: threat_changed, Device Name: nost, IP Address: (10.36.193.127), Action: allow, Action Type: suntincu, File Path: imidest, SHA256: citation, Zone Names: emquel",
+        "file.directory": "imidest",
+        "fileset.name": "protect",
+        "host.name": "ritq7853.api.home",
+        "input.type": "log",
+        "log.offset": 19991,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.36.193.127"
+        ],
+        "rsa.db.index": "emquel",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": " AppControl",
+        "rsa.misc.action": [
+            "allow"
+        ],
+        "rsa.misc.checksum": "citation",
+        "rsa.misc.event_type": "threat_changed",
+        "rsa.misc.node": "nost",
+        "rsa.network.alias_host": [
+            "ritq7853.api.home"
+        ],
+        "rsa.time.event_time": "2019-03-17T19:35:40.000Z",
+        "service.type": "cylance",
+        "source.ip": [
+            "10.36.193.127"
+        ],
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-01T14:38:14.000Z",
+        "event.action": [
+            "threat_changed"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "Apr 1 12:38:14 loremeum2477.www5.localhost CylancePROTECT Event Type:rrorsit, Event Name:threat_changed, Device Message: Device: riameaqu; Policy Changed: etd to 'omnisi', User: dolor rsp (quir), Zone Names:giatqu",
+        "fileset.name": "protect",
+        "input.type": "log",
+        "log.offset": 20281,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "giatqu",
+        "rsa.identity.firstname": "dolor",
+        "rsa.identity.lastname": "rsp",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.investigations.event_vcat": "rrorsit",
+        "rsa.misc.device_name": "riameaqu",
+        "rsa.misc.event_type": "threat_changed",
+        "rsa.misc.mail_id": "quir",
+        "rsa.misc.policy_name": "omnisi",
+        "rsa.time.event_time": "2020-04-01T14:38:14.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-15T09:40:49.000Z",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "15-Apr-2019 7:40:49 medium roiden5489.www5.corp nihilm <<olorin>orisnisi 15T07:40:49.emquiav ptat5066.www.lan CylancePROTECT Event Name:SyslogSettingsSave, Device Name:ionula, Zone Names:itaed",
+        "fileset.name": "protect",
+        "host.name": "ptat5066.www.lan",
+        "input.type": "log",
+        "log.offset": 20495,
+        "observer.product": "Protect",
+        "observer.type": "Anti-Virus",
+        "observer.vendor": "Cylance",
+        "rsa.db.index": "itaed",
+        "rsa.internal.messageid": "CylancePROTECT",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.misc.event_type": "SyslogSettingsSave",
+        "rsa.misc.node": "ionula",
+        "rsa.network.alias_host": [
+            "ptat5066.www.lan"
+        ],
+        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
+        "service.type": "cylance",
+        "tags": [
+            "cylance.protect",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-29T04:43:23.000Z",
+        "event.action": [
+            "threat_found"
+        ],
+        "event.code": "CylancePROTECT",
+        "event.dataset": "cylance.protect",
+        "event.module": "cylance",
+        "event.original": "29-Apr-2019 2:43:23 medium tincul407.corp amq <<abillo>lab 29T14:43:23.nsequ ing3291.internal.localhost CylancePROTECT Event Name:threat_found, Message: Device:amnisiuwas auto assigned to theptatZone:epr, User:itanimid",
         "fileset.name": "protect",
         "host.name": "ing3291.internal.localhost",
         "input.type": "log",
-        "log.offset": 20537,
+        "log.offset": 20688,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -2896,7 +3069,7 @@
             "ing3291.internal.localhost"
         ],
         "rsa.network.zone": "epr",
-        "rsa.time.event_time": "2020-02-02T10:27:57.000Z",
+        "rsa.time.event_time": "2020-04-29T04:43:23.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2904,20 +3077,20 @@
         ]
     },
     {
-        "@timestamp": "2019-02-17T05:30:32.000Z",
+        "@timestamp": "2019-05-13T23:45:57.000Z",
         "event.action": [
-            "block",
-            "LoginSuccess"
+            "LoginSuccess",
+            "block"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "untur 2019/02/17T03:30:32.nonnumqu uraut3756.www5.test CylancePROTECT rcita turad [sequamni] Event Type: AppControl, Event Name: LoginSuccess, Device Name: ollita, IP Address: (10.127.30.119), Action: block, Action Type: ula, File Path: itsed, SHA256: rad, Zone Names: olupta",
+        "event.original": "untur 2019/05/13T21:45:57.nonnumqu uraut3756.www5.test CylancePROTECT rcita turad [sequamni] Event Type: AppControl, Event Name: LoginSuccess, Device Name: ollita, IP Address: (10.127.30.119), Action: block, Action Type: ula, File Path: itsed, SHA256: rad, Zone Names: olupta",
         "file.directory": "itsed",
         "fileset.name": "protect",
         "host.name": "uraut3756.www5.test",
         "input.type": "log",
-        "log.offset": 20754,
+        "log.offset": 20907,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -2938,7 +3111,7 @@
         "rsa.network.alias_host": [
             "uraut3756.www5.test"
         ],
-        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
+        "rsa.time.event_time": "2019-05-13T23:45:57.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.127.30.119"
@@ -2949,19 +3122,19 @@
         ]
     },
     {
-        "@timestamp": "2019-03-03T12:33:06.000Z",
+        "@timestamp": "2019-05-28T06:48:31.000Z",
         "event.action": [
             "Device Updated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2019-3-3T10:33:06.sequi uiacon6640.api.localhost CylancePROTECT suntexpl urve [sBonoru] Event Type: ScriptControl, Event Name: Device Updated, Device Name: magnido, File Path: lupta, Interpreter: utla, Interpreter Version: 1.4566 (ncididu), Zone Names: itati, User Name: nostrude",
+        "event.original": "2019-5-28T4:48:31.sequi uiacon6640.api.localhost CylancePROTECT suntexpl urve [sBonoru] Event Type: ScriptControl, Event Name: Device Updated, Device Name: magnido, File Path: lupta, Interpreter: utla, Interpreter Version: 1.4566 (ncididu), Zone Names: itati, User Name: nostrude",
         "file.directory": "lupta",
         "fileset.name": "protect",
         "host.name": "uiacon6640.api.localhost",
         "input.type": "log",
-        "log.offset": 21030,
+        "log.offset": 21183,
         "network.application": "utla",
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
@@ -2981,7 +3154,7 @@
         "rsa.network.alias_host": [
             "uiacon6640.api.localhost"
         ],
-        "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
+        "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -2990,50 +3163,63 @@
         "user.name": "nostrude"
     },
     {
-        "@timestamp": "2019-03-17T07:35:40.000Z",
+        "@timestamp": "2019-06-11T13:51:06.000Z",
         "event.action": [
             "SyslogSettingsSave"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "ecillum 2019-3-17T5:35:40.maccu ame226.internal.domain CylancePROTECT urExc autfugit [deomnis] Event Type: Threat, Event Name: SyslogSettingsSave, Device Name: tconsect, IP Address: (10.111.204.45), File Name: agna, Path: dmini, Drive Type: tquid, SHA256: giatquo, MD5: iatisun, Status: cto, Cylance Score: 144.899000, Found Date: dolor, File Type: imadmini, Is Running: iatisund, Auto Run: rnatu, Detected By: atnonpro, Zone Names: isu, Is Malware: ute, Is Unique To Cylance: tdolore, Threat Classification: madminim ",
+        "event.original": "ecillum 2019-6-11T11:51:06.maccu ame226.internal.domain CylancePROTECT urExc autfugit [deomnis] Event Type: Threat, Event Name: SyslogSettingsSave, Device Name: tconsect, IP Address: (10.111.204.45), File Name: agna, Path: dmini, Drive Type: tquid, SHA256: giatquo, MD5: iatisun, Status: cto, Cylance Score: 144.899000, Found Date: dolor, File Type: imadmini, Is Running: iatisund, Auto Run: rnatu, Detected By: atnonpro, Zone Names: isu, Is Malware: ute, Is Unique To Cylance: tdolore, Threat Classification: madminim",
+        "file.directory": "dmini",
+        "file.name": "agna",
+        "file.type": "imadmini",
         "fileset.name": "protect",
         "host.name": "ame226.internal.domain",
         "input.type": "log",
-        "log.offset": 21310,
+        "log.offset": 21463,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": " isu, Is Malware: ute, Is Unique To Cylance: tdolore, Threat Classification: madminim",
+        "related.ip": [
+            "10.111.204.45"
+        ],
+        "rsa.crypto.sig_type": "madminim",
+        "rsa.db.index": "isu",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "Threat",
+        "rsa.investigations.event_vcat": " Threat",
+        "rsa.misc.checksum": "giatquo",
+        "rsa.misc.event_state": "cto",
         "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.node": "tconsect, IP Address: (10.111.204.45), File Name: agna, Path: dmini, Drive Type: tquid, SHA256: giatquo, MD5: iatisun, Status: cto, Cylance Score: 144.899000, Found Date: dolor, File Type: imadmini, Is Running: iatisund, Auto Run: rnatu, Detected By: atnonpro",
+        "rsa.misc.node": "tconsect",
         "rsa.network.alias_host": [
             "ame226.internal.domain"
         ],
-        "rsa.time.event_time": "2019-03-17T07:35:40.000Z",
+        "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
+        "rsa.web.reputation_num": 144.899,
         "service.type": "cylance",
+        "source.ip": [
+            "10.111.204.45"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
         ]
     },
     {
-        "@timestamp": "2020-04-01T14:38:14.000Z",
+        "@timestamp": "2020-06-25T08:53:40.000Z",
         "event.action": [
             "DeviceRemove"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Apr 1 12:38:14 prehen4320.api.home CylancePROTECT Event Type:umdolo, Event Name:DeviceRemove, Threat Class:mquisno, Threat Subclass:eaco, SHA256:empor, MD5:mvele",
+        "event.original": "Jun 25 6:53:40 prehen4320.api.home CylancePROTECT Event Type:umdolo, Event Name:DeviceRemove, Threat Class:mquisno, Threat Subclass:eaco, SHA256:empor, MD5:mvele",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 21829,
+        "log.offset": 21982,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3044,7 +3230,7 @@
         "rsa.investigations.event_vcat": "umdolo",
         "rsa.misc.checksum": "empor",
         "rsa.misc.event_type": "DeviceRemove",
-        "rsa.time.event_time": "2020-04-01T14:38:14.000Z",
+        "rsa.time.event_time": "2020-06-25T08:53:40.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3052,17 +3238,17 @@
         ]
     },
     {
-        "@timestamp": "2020-04-15T09:40:49.000Z",
+        "@timestamp": "2020-07-10T03:56:14.000Z",
         "event.action": [
             "threat_found"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "Apr 15 7:40:49 remeum5787.api.example CylancePROTECT Event Type:ostrumex, Event Name:threat_found, Device Message: Device: sedquia; Zones Removed: litesse,ntmoUser: aliqu iqu (onse), Zone Names:paqu",
+        "event.original": "Jul 10 1:56:14 remeum5787.api.example CylancePROTECT Event Type:ostrumex, Event Name:threat_found, Device Message: Device: sedquia; Zones Removed: litesse,ntmoUser: aliqu iqu (onse), Zone Names:paqu",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 21991,
+        "log.offset": 22144,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3076,7 +3262,7 @@
         "rsa.misc.device_name": "sedquia",
         "rsa.misc.event_type": "threat_found",
         "rsa.misc.mail_id": "onse",
-        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
+        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3084,19 +3270,19 @@
         ]
     },
     {
-        "@timestamp": "2019-04-29T04:43:23.000Z",
+        "@timestamp": "2019-07-24T10:58:48.000Z",
         "event.action": [
-            "allow",
-            "Registration"
+            "Registration",
+            "allow"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2019-4-29T2:43:23.ptatem mporain5332.mail.host CylancePROTECT commod iumd [ntore] Event Type: ExploitAttempt, Event Name: Registration, Device Name: onproid, IP Address: (10.59.33.174), Action: allow, Process ID: 3114, Process Name: oru.exe, User Name: mcorp, Violation Type: uelaud, Zone Names: aperiam",
+        "event.original": "2019-7-24T8:58:48.ptatem mporain5332.mail.host CylancePROTECT commod iumd [ntore] Event Type: ExploitAttempt, Event Name: Registration, Device Name: onproid, IP Address: (10.59.33.174), Action: allow, Process ID: 3114, Process Name: oru.exe, User Name: mcorp, Violation Type: uelaud, Zone Names: aperiam",
         "fileset.name": "protect",
         "host.name": "mporain5332.mail.host",
         "input.type": "log",
-        "log.offset": 22190,
+        "log.offset": 22343,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3122,7 +3308,7 @@
         "rsa.network.alias_host": [
             "mporain5332.mail.host"
         ],
-        "rsa.time.event_time": "2019-04-29T04:43:23.000Z",
+        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.59.33.174"
@@ -3134,17 +3320,17 @@
         "user.name": "mcorp"
     },
     {
-        "@timestamp": "2020-05-13T11:45:57.000Z",
+        "@timestamp": "2019-08-07T06:01:23.000Z",
         "event.action": [
             "DeviceRemove"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "May 13 9:45:57 quiano3025.api.localhost CylancePROTECT Event Type:oluptat, Event Name:DeviceRemove, Threat Class:equepor, Threat Subclass:iosamn, SHA256:erspicia, MD5:neavolup",
+        "event.original": "Aug 7 4:01:23 quiano3025.api.localhost CylancePROTECT Event Type:oluptat, Event Name:DeviceRemove, Threat Class:equepor, Threat Subclass:iosamn, SHA256:erspicia, MD5:neavolup",
         "fileset.name": "protect",
         "input.type": "log",
-        "log.offset": 22494,
+        "log.offset": 22647,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3155,7 +3341,7 @@
         "rsa.investigations.event_vcat": "oluptat",
         "rsa.misc.checksum": "erspicia",
         "rsa.misc.event_type": "DeviceRemove",
-        "rsa.time.event_time": "2020-05-13T11:45:57.000Z",
+        "rsa.time.event_time": "2019-08-07T06:01:23.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3163,18 +3349,18 @@
         ]
     },
     {
-        "@timestamp": "2019-05-28T06:48:31.000Z",
+        "@timestamp": "2019-08-21T13:03:57.000Z",
         "event.action": [
             "threat_changed"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "ecatcup 2019-5-28T4:48:31.orinrep uamnihil1525.www.lan CylancePROTECT amestqu qui [nemullam] Event Type: DeviceControl, Event Name: threat_changed, Device Name: lorumw, External Device Type: dit, External Device Vendor ID: qui, External Device Name: iaecon, External Device Product ID: dminima, External Device Serial Number: ons, Zone Names: amestqu",
+        "event.original": "ecatcup 2019-8-21T11:03:57.orinrep uamnihil1525.www.lan CylancePROTECT amestqu qui [nemullam] Event Type: DeviceControl, Event Name: threat_changed, Device Name: lorumw, External Device Type: dit, External Device Vendor ID: qui, External Device Name: iaecon, External Device Product ID: dminima, External Device Serial Number: ons, Zone Names: amestqu",
         "fileset.name": "protect",
         "host.name": "uamnihil1525.www.lan",
         "input.type": "log",
-        "log.offset": 22670,
+        "log.offset": 22822,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3189,7 +3375,7 @@
         "rsa.network.alias_host": [
             "uamnihil1525.www.lan"
         ],
-        "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
+        "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3197,18 +3383,18 @@
         ]
     },
     {
-        "@timestamp": "2019-06-11T13:51:06.000Z",
+        "@timestamp": "2019-09-05T08:06:31.000Z",
         "event.action": [
             "fullaccess"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2019-6-11T11:51:06.str eius6126.invalid CylancePROTECT iarchit volupt [ipis] Event Type: usBonor, Event Name: fullaccess, Device Names: (umquam), Policy Name: ten, User: Utenim itationu (eprehen)",
+        "event.original": "2019-9-5T6:06:31.str eius6126.invalid CylancePROTECT iarchit volupt [ipis] Event Type: usBonor, Event Name: fullaccess, Device Names: (umquam), Policy Name: ten, User: Utenim itationu (eprehen)",
         "fileset.name": "protect",
         "host.name": "eius6126.invalid",
         "input.type": "log",
-        "log.offset": 23021,
+        "log.offset": 23174,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3225,7 +3411,7 @@
         "rsa.network.alias_host": [
             "eius6126.invalid"
         ],
-        "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
+        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3233,18 +3419,18 @@
         ]
     },
     {
-        "@timestamp": "2019-06-25T08:53:40.000Z",
+        "@timestamp": "2019-09-19T03:09:05.000Z",
         "event.action": [
             "SyslogSettingsSave"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "tatevel 2019-6-25T6:53:40.itin tam942.api.host CylancePROTECT iut leumiur [deser] Event Type: AuditLog, Event Name: SyslogSettingsSave, Message: Zone: evolupt; Policy: pre; Value: tiumtot, User: ulamcola epr (ptass)",
+        "event.original": "tatevel 2019-9-19T1:09:05.itin tam942.api.host CylancePROTECT iut leumiur [deser] Event Type: AuditLog, Event Name: SyslogSettingsSave, Message: Zone: evolupt; Policy: pre; Value: tiumtot, User: ulamcola epr (ptass)",
         "fileset.name": "protect",
         "host.name": "tam942.api.host",
         "input.type": "log",
-        "log.offset": 23217,
+        "log.offset": 23368,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3261,7 +3447,7 @@
         "rsa.network.alias_host": [
             "tam942.api.host"
         ],
-        "rsa.time.event_time": "2019-06-25T08:53:40.000Z",
+        "rsa.time.event_time": "2019-09-19T03:09:05.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3269,18 +3455,18 @@
         ]
     },
     {
-        "@timestamp": "2019-07-10T03:56:14.000Z",
+        "@timestamp": "2019-10-03T10:11:40.000Z",
         "event.action": [
             "pechange"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "veli 2019-7-10T1:56:14.uptas aali1541.www5.local CylancePROTECT enimadmi qui [ita] Event Type: AuditLog, Event Name: pechange, Message: The Device: sedq was auto assigned to the Zone: IP Address: Fake Devices, User:   (olo)",
+        "event.original": "veli 2019-10-3T8:11:40.uptas aali1541.www5.local CylancePROTECT enimadmi qui [ita] Event Type: AuditLog, Event Name: pechange, Message: The Device: sedq was auto assigned to the Zone: IP Address: Fake Devices, User:   (olo)",
         "fileset.name": "protect",
         "host.name": "aali1541.www5.local",
         "input.type": "log",
-        "log.offset": 23433,
+        "log.offset": 23584,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3294,7 +3480,7 @@
         "rsa.network.alias_host": [
             "aali1541.www5.local"
         ],
-        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
+        "rsa.time.event_time": "2019-10-03T10:11:40.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
@@ -3302,18 +3488,18 @@
         ]
     },
     {
-        "@timestamp": "2019-07-24T10:58:48.000Z",
+        "@timestamp": "2019-10-18T05:14:14.000Z",
         "event.action": [
             "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "24-July-2019 08:58:48 medium ocons2813.mail.lan natu <<doei>acomm 2019-7-24T8:58:48.veleumi volupt6822.api.invalid CylancePROTECT ure userro [oree] Event Type: AuditLog, Event Name: ThreatUpdated, Message: Device: xcepte; SHA256: gnaa; Category: tio, User: qui epteurs (did)lamcol ",
+        "event.original": "18-October-2019 03:14:14 medium ocons2813.mail.lan natu <<doei>acomm 2019-10-18T3:14:14.veleumi volupt6822.api.invalid CylancePROTECT ure userro [oree] Event Type: AuditLog, Event Name: ThreatUpdated, Message: Device: xcepte; SHA256: gnaa; Category: tio, User: qui epteurs (did)",
         "fileset.name": "protect",
         "host.name": "volupt6822.api.invalid",
         "input.type": "log",
-        "log.offset": 23657,
+        "log.offset": 23808,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
@@ -3331,274 +3517,37 @@
         "rsa.network.alias_host": [
             "volupt6822.api.invalid"
         ],
-        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-08-07T06:01:23.000Z",
-        "event.action": [
-            "ThreatUpdated"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "olupta 2019-8-7T4:01:23.emveleum modtempo3314.www5.test CylancePROTECT sequa erc [isq] Event Type: AuditLog, Event Name: ThreatUpdated, Message: The Device: epteurs was auto assigned to the Zone: IP Address: 10.171.165.221, User:   (itvo)",
-        "fileset.name": "protect",
-        "host.name": "modtempo3314.www5.test",
-        "input.type": "log",
-        "log.offset": 23939,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.171.165.221"
-        ],
-        "rsa.db.index": "The Device: epteurs was auto assigned to the Zone: IP Address: 10.171.165.221",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "AuditLog",
-        "rsa.misc.event_type": "ThreatUpdated",
-        "rsa.misc.node": "epteurs",
-        "rsa.network.alias_host": [
-            "modtempo3314.www5.test"
-        ],
-        "rsa.time.event_time": "2019-08-07T06:01:23.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.171.165.221"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-08-21T13:03:57.000Z",
-        "event.action": [
-            "Alert"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "21-Aug-2019 11:03:57 low ssequa930.domain eritquii <<taliqui>ecatcu 21T23:03:57.entoreve ion3339.www.localdomain CylancePROTECT Event Name:Alert, Message: Provider:tionev, Source IP:10.198.44.231, User: eni cte (ariatu)",
-        "fileset.name": "protect",
-        "host.name": "ion3339.www.localdomain",
-        "input.type": "log",
-        "log.offset": 24178,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.198.44.231"
-        ],
-        "rsa.identity.firstname": "eni",
-        "rsa.identity.lastname": "cte",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1609000000,
-        "rsa.investigations.event_cat_name": "System.Alerts",
-        "rsa.misc.event_type": "Alert",
-        "rsa.misc.mail_id": "ariatu",
-        "rsa.network.alias_host": [
-            "ion3339.www.localdomain"
-        ],
-        "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
-        "service.type": "cylance",
-        "source.ip": [
-            "10.198.44.231"
-        ],
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-09-05T08:06:31.000Z",
-        "event.action": [
-            "threat_changed"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "2019-9-5T6:06:31.risnisiu ten5320.test CylancePROTECT siar orisnis [texp] Event Type: ScriptControl, Event Name: threat_changed, Device Name: hend, File Path: ema, Interpreter: ents, Interpreter Version: 1.1903, Zone Names: aliqua, User Name: officiad",
-        "file.directory": "ema",
-        "fileset.name": "protect",
-        "host.name": "ten5320.test",
-        "input.type": "log",
-        "log.offset": 24398,
-        "network.application": "ents",
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "observer.version": "1.1903",
-        "related.user": [
-            "officiad"
-        ],
-        "rsa.db.index": "aliqua",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.misc.event_type": "threat_changed",
-        "rsa.misc.node": "hend",
-        "rsa.misc.version": "1.1903",
-        "rsa.network.alias_host": [
-            "ten5320.test"
-        ],
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ],
-        "user.name": "officiad"
-    },
-    {
-        "@timestamp": "2019-09-19T03:09:05.000Z",
-        "event.action": [
-            "Device Updated"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "onsecte 2019-9-19T1:09:05.inibusBo tqui99.mail.example CylancePROTECT prehende vitaedic [remip] Event Type: AuditLog, Event Name: Device Updated, Message: Device: sauteir; SHA256: CSe, User: olorsita midest (uta)olupta ",
-        "fileset.name": "protect",
-        "host.name": "tqui99.mail.example",
-        "input.type": "log",
-        "log.offset": 24650,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "olorsita",
-        "rsa.identity.lastname": "midest",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1804010000,
-        "rsa.investigations.event_cat_name": "Network.Devices.Additions",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.checksum": "CSe",
-        "rsa.misc.event_type": "Device Updated",
-        "rsa.misc.mail_id": "uta",
-        "rsa.misc.node": "sauteir",
-        "rsa.network.alias_host": [
-            "tqui99.mail.example"
-        ],
-        "rsa.time.event_time": "2019-09-19T03:09:05.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-10-03T10:11:40.000Z",
-        "event.action": [
-            "fullaccess"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "3-October-2019 20:11:40 low tali7426.invalid reprehen <<Exce>tocca 2019-10-3T8:11:40.tinvolu ecatc3925.lan CylancePROTECT quin adipisc [sedqui] Event Type: ueporroq, Event Name: fullaccess, Device Names: (eetdol), Policy Name: tia, User: lup inimav (dolor)",
-        "fileset.name": "protect",
-        "host.name": "ecatc3925.lan",
-        "input.type": "log",
-        "log.offset": 24870,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "lup",
-        "rsa.identity.lastname": "inimav",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "ueporroq",
-        "rsa.misc.event_type": "fullaccess",
-        "rsa.misc.mail_id": "dolor",
-        "rsa.misc.node": "eetdol",
-        "rsa.misc.policy_name": "tia",
-        "rsa.network.alias_host": [
-            "ecatc3925.lan"
-        ],
-        "rsa.time.event_time": "2019-10-03T10:11:40.000Z",
-        "service.type": "cylance",
-        "tags": [
-            "cylance.protect",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.action": [
-            "SyslogSettingsSave"
-        ],
-        "event.code": "CylancePROTECT",
-        "event.dataset": "cylance.protect",
-        "event.module": "cylance",
-        "event.original": "18-October-2019 03:14:14 medium dex4759.mail.local uredo <<rumetMal>untutla 2019-10-18T3:14:14.iame rrorsi3220.lan CylancePROTECT amestqu luptas [ariatu] Event Type: psumqui, Event Name: SyslogSettingsSave, Device Name: empor, Agent Version: ate, IP Address: (10.234.254.96), MAC Address: (01:00:5e:e8:80:20), Logged On Users: (orem), OS: dquian Zone Names: isaute",
-        "fileset.name": "protect",
-        "host.name": "rrorsi3220.lan",
-        "input.type": "log",
-        "log.offset": 25127,
-        "observer.product": "Protect",
-        "observer.type": "Anti-Virus",
-        "observer.vendor": "Cylance",
-        "related.ip": [
-            "10.234.254.96"
-        ],
-        "related.user": [
-            "orem"
-        ],
-        "rsa.db.index": "isaute",
-        "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "psumqui",
-        "rsa.misc.OS": "dquian",
-        "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.node": "empor",
-        "rsa.network.alias_host": [
-            "rrorsi3220.lan"
-        ],
-        "rsa.network.eth_host": "01:00:5e:e8:80:20",
         "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "cylance",
-        "source.ip": [
-            "10.234.254.96"
-        ],
         "tags": [
             "cylance.protect",
             "forwarded"
-        ],
-        "user.name": "orem"
+        ]
     },
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
         "event.action": [
-            "threat_changed"
+            "Device Policy Assigned"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "1-November-2019 10:16:48 high ula5189.host ntocca <<emquelau>adolorsi 2019-11-1T10:16:48.lupt uis6796.mail.example CylancePROTECT aecatc taevita [eseosqu] Event Type: redolo, Event Name: threat_changed, Threat Class: ivelit, Threat Subclass: lumqu, SHA256: dolore, MD5: isnost",
+        "event.original": "Nov 1 10:16:48 tMalo1084.local CylancePROTECT Event Type:rauto, Event Name:Device Policy Assigned, Device Name:stl, External Device Type:rissusci, External Device Vendor ID:quaturve, External Device Name:ianonn, External Device Product ID:olore, External Device Serial Number:eumfugi, Zone Names:commod",
         "fileset.name": "protect",
-        "host.name": "uis6796.mail.example",
         "input.type": "log",
-        "log.offset": 25492,
+        "log.offset": 24087,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.crypto.sig_type": "ivelit",
+        "rsa.db.index": "commod",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1901000000,
-        "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": "redolo",
-        "rsa.misc.checksum": "dolore",
-        "rsa.misc.event_type": "threat_changed",
-        "rsa.network.alias_host": [
-            "uis6796.mail.example"
-        ],
+        "rsa.investigations.event_cat": 1502000000,
+        "rsa.investigations.event_cat_name": "Policies.Rules",
+        "rsa.investigations.event_vcat": "rauto",
+        "rsa.misc.device_name": "rissusci",
+        "rsa.misc.event_type": "Device Policy Assigned",
+        "rsa.misc.node": "stl",
+        "rsa.misc.serial_number": "eumfugi",
         "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "cylance",
         "tags": [
@@ -3614,25 +3563,22 @@
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "uianonnu 2019-11-15T5:19:22.ntNeque magnidol1024.api.test CylancePROTECT aaliq tDui [ernatur] Event Type: DeviceControl, Event Name: SyslogSettingsSave, Device Name: atcupi, External Device Type: xeacomm, External Device Vendor ID: tla, External Device Name: itaspe, External Device Product ID: xerc, External Device Serial Number: uaeabill, Zone Names: uioffici",
+        "event.original": "Nov 15 5:19:22 proiden7865.www.lan CylancePROTECT Event Type:incidi, Event Name:SyslogSettingsSave, Device Name:tutlabo, External Device Type:nto, External Device Vendor ID:sciv, External Device Name:tlabo, External Device Product ID:nsequun, External Device Serial Number:ateveli, Zone Names:aqua, Device Id: edquiac, Policy Name: sit ",
         "fileset.name": "protect",
-        "host.name": "magnidol1024.api.test",
         "input.type": "log",
-        "log.offset": 25769,
+        "log.offset": 24390,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.db.index": "uioffici",
+        "rsa.db.index": "aqua, Device Id: edquiac, Policy Name: sit",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " DeviceControl",
+        "rsa.investigations.event_vcat": "incidi",
+        "rsa.misc.device_name": "nto",
         "rsa.misc.event_type": "SyslogSettingsSave",
-        "rsa.misc.node": "atcupi",
-        "rsa.misc.serial_number": "uaeabill",
-        "rsa.network.alias_host": [
-            "magnidol1024.api.test"
-        ],
+        "rsa.misc.node": "tutlabo",
+        "rsa.misc.serial_number": "ateveli",
         "rsa.time.event_time": "2019-11-15T07:19:22.000Z",
         "service.type": "cylance",
         "tags": [
@@ -3643,69 +3589,70 @@
     {
         "@timestamp": "2019-11-30T14:21:57.000Z",
         "event.action": [
-            "SystemSecurity"
+            "ThreatUpdated"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "30-November-2019 00:21:57 very-high tesseq6251.mail.host adipisci <<ore>ptatema 2019-11-30T12:21:57.poriss enatus6421.internal.home CylancePROTECT ficiad saquaea [archi] Event Type: AuditLog, Event Name: SystemSecurity, Message: Policy: imadm; SHA256: ugiat; Category: ius, User: msequ ciatisun (Ute)eddoe ",
+        "event.original": "rinci 2019-11-30T12:21:57.ici amvol4075.mail.localhost CylancePROTECT edutpers ostru [etdolore] Event Type: ScriptControl, Event Name: ThreatUpdated, Device Name: onsequa, File Path: sunt, Interpreter: orumSe, Interpreter Version: 1.3237, Zone Names: psa, User Name: pta",
+        "file.directory": "sunt",
         "fileset.name": "protect",
-        "host.name": "enatus6421.internal.home",
+        "host.name": "amvol4075.mail.localhost",
         "input.type": "log",
-        "log.offset": 26132,
+        "log.offset": 24727,
+        "network.application": "orumSe",
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "msequ",
-        "rsa.identity.lastname": "ciatisun",
+        "observer.version": "1.3237",
+        "related.user": [
+            "pta"
+        ],
+        "rsa.db.index": "psa",
         "rsa.internal.messageid": "CylancePROTECT",
-        "rsa.investigations.event_cat": 1600000000,
-        "rsa.investigations.event_cat_name": "System",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.category": "ius",
-        "rsa.misc.checksum": "ugiat",
-        "rsa.misc.event_type": "SystemSecurity",
-        "rsa.misc.mail_id": "Ute",
-        "rsa.misc.policy_name": "imadm; SHA256: ugiat; Category: ius",
+        "rsa.investigations.event_cat": 1901000000,
+        "rsa.investigations.event_cat_name": "Other.Default",
+        "rsa.misc.event_type": "ThreatUpdated",
+        "rsa.misc.node": "onsequa",
+        "rsa.misc.version": "1.3237",
         "rsa.network.alias_host": [
-            "enatus6421.internal.home"
+            "amvol4075.mail.localhost"
         ],
         "rsa.time.event_time": "2019-11-30T14:21:57.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
             "forwarded"
-        ]
+        ],
+        "user.name": "pta"
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
         "event.action": [
-            "DeviceEdit"
+            "Registration"
         ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
-        "event.original": "2019-12-14T7:24:31.uasi quaeabi5701.host CylancePROTECT mave essecill [eprehe] Event Type: AuditLog, Event Name: DeviceEdit, Message: Policy: tMaloru; SHA256: rum; Category: utoditau, User: ptassita ionemul (orema)its ",
+        "event.original": "14-Dec-2019 7:24:31 low ntutlabo6923.localhost eacommo <<amqua>tionevol 14T07:24:31.itvo asi4651.api.test CylancePROTECT Event Name:Registration, Device Message: Device: emp; Zones Removed: emoeni,officiadUser: veniam labo (ssecill), Zone Names:umquam Device Id: onev",
         "fileset.name": "protect",
-        "host.name": "quaeabi5701.host",
+        "host.name": "asi4651.api.test",
         "input.type": "log",
-        "log.offset": 26439,
+        "log.offset": 24998,
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
-        "rsa.identity.firstname": "ptassita",
-        "rsa.identity.lastname": "ionemul",
+        "rsa.db.index": "umquam",
+        "rsa.identity.firstname": "veniam",
+        "rsa.identity.lastname": "labo",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
-        "rsa.misc.category": "utoditau",
-        "rsa.misc.checksum": "rum",
-        "rsa.misc.event_type": "DeviceEdit",
-        "rsa.misc.mail_id": "orema",
-        "rsa.misc.policy_name": "tMaloru; SHA256: rum; Category: utoditau",
+        "rsa.misc.device_name": "emp",
+        "rsa.misc.event_type": "Registration",
+        "rsa.misc.mail_id": "ssecill",
         "rsa.network.alias_host": [
-            "quaeabi5701.host"
+            "asi4651.api.test"
         ],
         "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "cylance",

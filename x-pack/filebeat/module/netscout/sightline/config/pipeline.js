@@ -107,11 +107,13 @@ var dup31 = match("MESSAGE#39:anomaly:Resource_Info:01/1_0", "nwparser.p0", "%{f
 
 var dup32 = match("MESSAGE#39:anomaly:Resource_Info:01/1_1", "nwparser.p0", "duration %{p0}");
 
-var dup33 = setc("eventcategory","1002000000");
+var dup33 = match("MESSAGE#39:anomaly:Resource_Info:01/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}, %{info}");
 
-var dup34 = setc("signame","Bandwidth");
+var dup34 = setc("eventcategory","1002000000");
 
-var dup35 = date_time({
+var dup35 = setc("signame","Bandwidth");
+
+var dup36 = date_time({
 	dest: "starttime",
 	args: ["fld15","fld16","fld17","fld18","fld19","fld20"],
 	fmts: [
@@ -119,9 +121,9 @@ var dup35 = date_time({
 	],
 });
 
-var dup36 = match("MESSAGE#40:anomaly:Resource_Info:02/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}");
+var dup37 = match("MESSAGE#40:anomaly:Resource_Info:02/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}");
 
-var dup37 = date_time({
+var dup38 = date_time({
 	dest: "starttime",
 	args: ["fld2","fld3"],
 	fmts: [
@@ -129,36 +131,36 @@ var dup37 = date_time({
 	],
 });
 
-var dup38 = linear_select([
+var dup39 = linear_select([
 	dup2,
 	dup3,
 ]);
 
-var dup39 = linear_select([
+var dup40 = linear_select([
 	dup6,
 	dup7,
 	dup8,
 	dup9,
 ]);
 
-var dup40 = match("MESSAGE#2:BGP:Down", "nwparser.payload", "%{protocol->} down for router %{node}, leader %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
+var dup41 = match("MESSAGE#2:BGP:Down", "nwparser.payload", "%{protocol->} down for router %{node}, leader %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
 	dup12,
 	dup13,
 	dup14,
 ]));
 
-var dup41 = match("MESSAGE#3:BGP:Restored", "nwparser.payload", "%{protocol->} restored for router %{node}, leader %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
+var dup42 = match("MESSAGE#3:BGP:Restored", "nwparser.payload", "%{protocol->} restored for router %{node}, leader %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
 	dup15,
 	dup13,
 	dup16,
 ]));
 
-var dup42 = linear_select([
+var dup43 = linear_select([
 	dup21,
 	dup22,
 ]);
 
-var dup43 = linear_select([
+var dup44 = linear_select([
 	dup31,
 	dup32,
 ]);
@@ -196,7 +198,7 @@ var part6 = match("HEADER#1:0002/2", "nwparser.p0", "%{}interface %{msgIdPart1->
 var all2 = all_match({
 	processors: [
 		dup1,
-		dup38,
+		dup39,
 		part6,
 	],
 	on_success: processor_chain([
@@ -210,9 +212,9 @@ var part7 = match("HEADER#2:0008/4", "nwparser.p0", "%{} %{msgIdPart1->} %{hfld1
 var all3 = all_match({
 	processors: [
 		dup1,
-		dup38,
-		dup5,
 		dup39,
+		dup5,
+		dup40,
 		part7,
 	],
 	on_success: processor_chain([
@@ -231,9 +233,9 @@ var all3 = all_match({
 var all4 = all_match({
 	processors: [
 		dup1,
-		dup38,
-		dup5,
 		dup39,
+		dup5,
+		dup40,
 		dup10,
 	],
 	on_success: processor_chain([
@@ -320,9 +322,9 @@ var select4 = linear_select([
 	msg2,
 ]);
 
-var msg3 = msg("BGP:Down", dup40);
+var msg3 = msg("BGP:Down", dup41);
 
-var msg4 = msg("BGP:Restored", dup41);
+var msg4 = msg("BGP:Restored", dup42);
 
 var part11 = match("MESSAGE#4:BGP:Instability", "nwparser.payload", "%{protocol->} instability router %{node->} threshold %{fld25->} (%{fld1}) observed %{trigger_val->} (%{fld2})", processor_chain([
 	dup17,
@@ -411,9 +413,9 @@ var select7 = linear_select([
 	msg13,
 ]);
 
-var msg14 = msg("SNMP:Down", dup40);
+var msg14 = msg("SNMP:Down", dup41);
 
-var msg15 = msg("SNMP:Restored", dup41);
+var msg15 = msg("SNMP:Restored", dup42);
 
 var select8 = linear_select([
 	msg14,
@@ -463,7 +465,7 @@ var part24 = match("MESSAGE#19:mitigation:TMS_Start/0", "nwparser.payload", "pfs
 var all6 = all_match({
 	processors: [
 		part24,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -482,7 +484,7 @@ var part25 = match("MESSAGE#20:mitigation:TMS_Stop/0", "nwparser.payload", "pfsp
 var all7 = all_match({
 	processors: [
 		part25,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -501,7 +503,7 @@ var part26 = match("MESSAGE#21:mitigation:Thirdparty_Start/0", "nwparser.payload
 var all8 = all_match({
 	processors: [
 		part26,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -520,7 +522,7 @@ var part27 = match("MESSAGE#22:mitigation:Thirdparty_Stop/0", "nwparser.payload"
 var all9 = all_match({
 	processors: [
 		part27,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -538,7 +540,7 @@ var part28 = match("MESSAGE#23:mitigation:Blackhole_Start/0", "nwparser.payload"
 var all10 = all_match({
 	processors: [
 		part28,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -557,7 +559,7 @@ var part29 = match("MESSAGE#24:mitigation:Blackhole_Stop/0", "nwparser.payload",
 var all11 = all_match({
 	processors: [
 		part29,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -575,7 +577,7 @@ var part30 = match("MESSAGE#25:mitigation:Flowspec_Start/0", "nwparser.payload",
 var all12 = all_match({
 	processors: [
 		part30,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -594,7 +596,7 @@ var part31 = match("MESSAGE#26:mitigation:Flowspec_Stop/0", "nwparser.payload", 
 var all13 = all_match({
 	processors: [
 		part31,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -718,7 +720,7 @@ var part43 = match("MESSAGE#38:script/0", "nwparser.payload", "script %{node->} 
 var all14 = all_match({
 	processors: [
 		part43,
-		dup42,
+		dup43,
 		dup23,
 	],
 	on_success: processor_chain([
@@ -734,92 +736,88 @@ var msg39 = msg("script", all14);
 
 var part44 = match("MESSAGE#39:anomaly:Resource_Info:01/0", "nwparser.payload", "anomaly Bandwidth id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} impact %{fld10->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
 
-var part45 = match("MESSAGE#39:anomaly:Resource_Info:01/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}, %{info}");
-
 var all15 = all_match({
 	processors: [
 		part44,
-		dup43,
-		part45,
+		dup44,
+		dup33,
 	],
 	on_success: processor_chain([
-		dup33,
-		dup13,
 		dup34,
+		dup13,
 		dup35,
+		dup36,
 	]),
 });
 
 var msg40 = msg("anomaly:Resource_Info:01", all15);
 
-var part46 = match("MESSAGE#40:anomaly:Resource_Info:02/0", "nwparser.payload", "anomaly Bandwidth id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
+var part45 = match("MESSAGE#40:anomaly:Resource_Info:02/0", "nwparser.payload", "anomaly Bandwidth id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
 
 var all16 = all_match({
 	processors: [
-		part46,
-		dup43,
-		dup36,
+		part45,
+		dup44,
+		dup37,
 	],
 	on_success: processor_chain([
-		dup33,
-		dup13,
 		dup34,
+		dup13,
 		dup35,
+		dup36,
 	]),
 });
 
 var msg41 = msg("anomaly:Resource_Info:02", all16);
 
-var part47 = match("MESSAGE#41:anomaly:Resource_Info:03/0", "nwparser.payload", "anomaly %{signame->} id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} impact %{fld10->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
-
-var part48 = match("MESSAGE#41:anomaly:Resource_Info:03/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}, %{info->} ");
+var part46 = match("MESSAGE#41:anomaly:Resource_Info:03/0", "nwparser.payload", "anomaly %{signame->} id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} impact %{fld10->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
 
 var all17 = all_match({
 	processors: [
-		part47,
-		dup43,
-		part48,
+		part46,
+		dup44,
+		dup33,
 	],
 	on_success: processor_chain([
-		dup33,
+		dup34,
 		dup13,
-		dup35,
+		dup36,
 	]),
 });
 
 var msg42 = msg("anomaly:Resource_Info:03", all17);
 
-var part49 = match("MESSAGE#42:anomaly:Resource_Info:04/0", "nwparser.payload", "anomaly %{signame->} id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
+var part47 = match("MESSAGE#42:anomaly:Resource_Info:04/0", "nwparser.payload", "anomaly %{signame->} id %{event_id->} status %{disposition->} severity %{severity->} classification %{category->} src %{daddr}/%{dport->} %{fld1->} dst %{saddr}/%{sport->} %{fld2->} start %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{p0}");
 
 var all18 = all_match({
 	processors: [
-		part49,
-		dup43,
-		dup36,
+		part47,
+		dup44,
+		dup37,
 	],
 	on_success: processor_chain([
-		dup33,
+		dup34,
 		dup13,
-		dup35,
+		dup36,
 	]),
 });
 
 var msg43 = msg("anomaly:Resource_Info:04", all18);
 
-var part50 = match("MESSAGE#43:anomaly:Router_Info:01", "nwparser.payload", "anomaly Bandwidth id %{sigid->} status %{disposition->} severity %{severity->} classification %{category->} router %{fld6->} router_name %{node->} interface %{fld4->} interface_name \"%{interface}\" %{fld5}", processor_chain([
-	dup33,
-	dup13,
+var part48 = match("MESSAGE#43:anomaly:Router_Info:01", "nwparser.payload", "anomaly Bandwidth id %{sigid->} status %{disposition->} severity %{severity->} classification %{category->} router %{fld6->} router_name %{node->} interface %{fld4->} interface_name \"%{interface}\" %{fld5}", processor_chain([
 	dup34,
+	dup13,
+	dup35,
 ]));
 
-var msg44 = msg("anomaly:Router_Info:01", part50);
+var msg44 = msg("anomaly:Router_Info:01", part48);
 
-var part51 = match("MESSAGE#44:anomaly:Router_Info:02", "nwparser.payload", "anomaly %{signame->} id %{sigid->} status %{disposition->} severity %{severity->} classification %{category->} router %{fld6->} router_name %{node->} interface %{fld4->} interface_name \"%{interface}\" %{fld5}", processor_chain([
-	dup33,
+var part49 = match("MESSAGE#44:anomaly:Router_Info:02", "nwparser.payload", "anomaly %{signame->} id %{sigid->} status %{disposition->} severity %{severity->} classification %{category->} router %{fld6->} router_name %{node->} interface %{fld4->} interface_name \"%{interface}\" %{fld5}", processor_chain([
+	dup34,
 	dup13,
 ]));
 
-var msg45 = msg("anomaly:Router_Info:02", part51);
+var msg45 = msg("anomaly:Router_Info:02", part49);
 
 var select13 = linear_select([
 	msg40,
@@ -830,31 +828,31 @@ var select13 = linear_select([
 	msg45,
 ]);
 
-var part52 = match("MESSAGE#45:Peakflow:Unreachable", "nwparser.payload", "Peakflow device %{node->} unreachable by %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20}", processor_chain([
+var part50 = match("MESSAGE#45:Peakflow:Unreachable", "nwparser.payload", "Peakflow device %{node->} unreachable by %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20}", processor_chain([
 	dup12,
 	dup13,
 	dup14,
 ]));
 
-var msg46 = msg("Peakflow:Unreachable", part52);
+var msg46 = msg("Peakflow:Unreachable", part50);
 
-var part53 = match("MESSAGE#46:Peakflow:Reachable", "nwparser.payload", "Peakflow device %{node->} reachable again by %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
+var part51 = match("MESSAGE#46:Peakflow:Reachable", "nwparser.payload", "Peakflow device %{node->} reachable again by %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
 	dup15,
 	dup13,
 	dup16,
 ]));
 
-var msg47 = msg("Peakflow:Reachable", part53);
+var msg47 = msg("Peakflow:Reachable", part51);
 
 var select14 = linear_select([
 	msg46,
 	msg47,
 ]);
 
-var part54 = match("MESSAGE#47:Host:Detection", "nwparser.payload", "Host Detection alert %{fld1}, start %{fld2->} %{fld3->} %{fld4}, duration %{duration}, stop %{fld5->} %{fld6->} %{fld7}, , importance %{severity}, managed_objects (%{fld8}), is now %{result}, (parent managed object %{fld9})", processor_chain([
+var part52 = match("MESSAGE#47:Host:Detection", "nwparser.payload", "Host Detection alert %{fld1}, start %{fld2->} %{fld3->} %{fld4}, duration %{duration}, stop %{fld5->} %{fld6->} %{fld7}, , importance %{severity}, managed_objects (%{fld8}), is now %{result}, (parent managed object %{fld9})", processor_chain([
 	dup18,
 	dup13,
-	dup37,
+	dup38,
 	date_time({
 		dest: "endtime",
 		args: ["fld5","fld6"],
@@ -864,44 +862,44 @@ var part54 = match("MESSAGE#47:Host:Detection", "nwparser.payload", "Host Detect
 	}),
 ]));
 
-var msg48 = msg("Host:Detection", part54);
+var msg48 = msg("Host:Detection", part52);
 
-var part55 = match("MESSAGE#48:Host:Detection:01", "nwparser.payload", "Host Detection alert %{fld1}, start %{fld2->} %{fld3->} %{fld4}, duration %{duration}, direction %{direction}, host %{saddr}, signatures (%{signame}), impact %{fld5}, importance %{severity}, managed_objects (%{fld6}), (parent managed object %{fld7})", processor_chain([
+var part53 = match("MESSAGE#48:Host:Detection:01", "nwparser.payload", "Host Detection alert %{fld1}, start %{fld2->} %{fld3->} %{fld4}, duration %{duration}, direction %{direction}, host %{saddr}, signatures (%{signame}), impact %{fld5}, importance %{severity}, managed_objects (%{fld6}), (parent managed object %{fld7})", processor_chain([
 	dup18,
 	dup13,
-	dup37,
+	dup38,
 ]));
 
-var msg49 = msg("Host:Detection:01", part55);
+var msg49 = msg("Host:Detection:01", part53);
 
 var select15 = linear_select([
 	msg48,
 	msg49,
 ]);
 
-var part56 = match("MESSAGE#49:Infrastructure", "nwparser.payload", "AIF license expiring cleared,URL: %{url}", processor_chain([
+var part54 = match("MESSAGE#49:Infrastructure", "nwparser.payload", "AIF license expiring cleared,URL: %{url}", processor_chain([
 	dup18,
 	dup13,
 	setc("event_description","AIF license expiring cleared"),
 ]));
 
-var msg50 = msg("Infrastructure", part56);
+var msg50 = msg("Infrastructure", part54);
 
-var part57 = match("MESSAGE#50:Infrastructure:02", "nwparser.payload", "Hardware sensor detected a critical state. System Fan%{fld1}:%{fld2}Triggering value:%{fld3},URL:%{url}", processor_chain([
+var part55 = match("MESSAGE#50:Infrastructure:02", "nwparser.payload", "Hardware sensor detected a critical state. System Fan%{fld1}:%{fld2}Triggering value:%{fld3},URL:%{url}", processor_chain([
 	dup18,
 	dup13,
 	setc("event_description","Hardware sensor detected a critical state"),
 ]));
 
-var msg51 = msg("Infrastructure:02", part57);
+var msg51 = msg("Infrastructure:02", part55);
 
-var part58 = match("MESSAGE#51:Infrastructure:01", "nwparser.payload", "AIF license expired cleared,URL: %{url}", processor_chain([
+var part56 = match("MESSAGE#51:Infrastructure:01", "nwparser.payload", "AIF license expired cleared,URL: %{url}", processor_chain([
 	dup18,
 	dup13,
 	setc("event_description","AIF license expired cleared"),
 ]));
 
-var msg52 = msg("Infrastructure:01", part58);
+var msg52 = msg("Infrastructure:01", part56);
 
 var select16 = linear_select([
 	msg50,
@@ -909,27 +907,27 @@ var select16 = linear_select([
 	msg52,
 ]);
 
-var part59 = match("MESSAGE#52:Blocked_Host", "nwparser.payload", "Blocked host%{saddr}at%{fld1}by Blocked Countries using%{protocol}destination%{daddr},URL:%{url}", processor_chain([
+var part57 = match("MESSAGE#52:Blocked_Host", "nwparser.payload", "Blocked host%{saddr}at%{fld1}by Blocked Countries using%{protocol}destination%{daddr},URL:%{url}", processor_chain([
 	setc("eventcategory","1803000000"),
 	dup13,
 ]));
 
-var msg53 = msg("Blocked_Host", part59);
+var msg53 = msg("Blocked_Host", part57);
 
-var part60 = match("MESSAGE#53:Change_Log", "nwparser.payload", "Username:%{username}, Subsystem:%{fld1}, Setting Type:%{fld2}, Message:%{fld3}", processor_chain([
+var part58 = match("MESSAGE#53:Change_Log", "nwparser.payload", "Username:%{username}, Subsystem:%{fld1}, Setting Type:%{fld2}, Message:%{fld3}", processor_chain([
 	dup18,
 	dup13,
 ]));
 
-var msg54 = msg("Change_Log", part60);
+var msg54 = msg("Change_Log", part58);
 
-var part61 = match("MESSAGE#54:Protection_Mode", "nwparser.payload", "Changed protection mode to active for protection group%{group},URL:%{url}", processor_chain([
+var part59 = match("MESSAGE#54:Protection_Mode", "nwparser.payload", "Changed protection mode to active for protection group%{group},URL:%{url}", processor_chain([
 	dup18,
 	dup13,
 	setc("event_description","Changed protection mode to active for protection group"),
 ]));
 
-var msg55 = msg("Protection_Mode", part61);
+var msg55 = msg("Protection_Mode", part59);
 
 var chain1 = processor_chain([
 	select3,
@@ -959,33 +957,35 @@ var chain1 = processor_chain([
 
 var hdr6 = match("HEADER#0:0001/0", "message", "%{hmonth->} %{hday->} %{htime->} %{hdata}: %{p0}");
 
-var part62 = match("HEADER#1:0002/1_0", "nwparser.p0", "high %{p0}");
+var part60 = match("HEADER#1:0002/1_0", "nwparser.p0", "high %{p0}");
 
-var part63 = match("HEADER#1:0002/1_1", "nwparser.p0", "low %{p0}");
+var part61 = match("HEADER#1:0002/1_1", "nwparser.p0", "low %{p0}");
 
-var part64 = match("HEADER#2:0008/2", "nwparser.p0", "%{} %{p0}");
+var part62 = match("HEADER#2:0008/2", "nwparser.p0", "%{} %{p0}");
 
-var part65 = match("HEADER#2:0008/3_0", "nwparser.p0", "jitter %{p0}");
+var part63 = match("HEADER#2:0008/3_0", "nwparser.p0", "jitter %{p0}");
 
-var part66 = match("HEADER#2:0008/3_1", "nwparser.p0", "loss %{p0}");
+var part64 = match("HEADER#2:0008/3_1", "nwparser.p0", "loss %{p0}");
 
-var part67 = match("HEADER#2:0008/3_2", "nwparser.p0", "bps %{p0}");
+var part65 = match("HEADER#2:0008/3_2", "nwparser.p0", "bps %{p0}");
 
-var part68 = match("HEADER#2:0008/3_3", "nwparser.p0", "pps %{p0}");
+var part66 = match("HEADER#2:0008/3_3", "nwparser.p0", "pps %{p0}");
 
-var part69 = match("HEADER#3:0003/4", "nwparser.p0", "%{} %{msgIdPart1->} %{msgIdPart2->} %{payload}");
+var part67 = match("HEADER#3:0003/4", "nwparser.p0", "%{} %{msgIdPart1->} %{msgIdPart2->} %{payload}");
 
-var part70 = match("MESSAGE#19:mitigation:TMS_Start/1_0", "nwparser.p0", "%{fld21}, %{p0}");
+var part68 = match("MESSAGE#19:mitigation:TMS_Start/1_0", "nwparser.p0", "%{fld21}, %{p0}");
 
-var part71 = match("MESSAGE#19:mitigation:TMS_Start/1_1", "nwparser.p0", ", %{p0}");
+var part69 = match("MESSAGE#19:mitigation:TMS_Start/1_1", "nwparser.p0", ", %{p0}");
 
-var part72 = match("MESSAGE#19:mitigation:TMS_Start/2", "nwparser.p0", "%{}leader %{parent_node}");
+var part70 = match("MESSAGE#19:mitigation:TMS_Start/2", "nwparser.p0", "%{}leader %{parent_node}");
 
-var part73 = match("MESSAGE#39:anomaly:Resource_Info:01/1_0", "nwparser.p0", "%{fld21->} duration %{p0}");
+var part71 = match("MESSAGE#39:anomaly:Resource_Info:01/1_0", "nwparser.p0", "%{fld21->} duration %{p0}");
 
-var part74 = match("MESSAGE#39:anomaly:Resource_Info:01/1_1", "nwparser.p0", "duration %{p0}");
+var part72 = match("MESSAGE#39:anomaly:Resource_Info:01/1_1", "nwparser.p0", "duration %{p0}");
 
-var part75 = match("MESSAGE#40:anomaly:Resource_Info:02/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}");
+var part73 = match("MESSAGE#39:anomaly:Resource_Info:01/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}, %{info}");
+
+var part74 = match("MESSAGE#40:anomaly:Resource_Info:02/2", "nwparser.p0", "%{} %{duration->} percent %{fld3->} rate %{fld4->} rateUnit %{fld5->} protocol %{protocol->} flags %{fld6->} url %{url}");
 
 var select17 = linear_select([
 	dup2,
@@ -999,13 +999,13 @@ var select18 = linear_select([
 	dup9,
 ]);
 
-var part76 = match("MESSAGE#2:BGP:Down", "nwparser.payload", "%{protocol->} down for router %{node}, leader %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
+var part75 = match("MESSAGE#2:BGP:Down", "nwparser.payload", "%{protocol->} down for router %{node}, leader %{parent_node->} since %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
 	dup12,
 	dup13,
 	dup14,
 ]));
 
-var part77 = match("MESSAGE#3:BGP:Restored", "nwparser.payload", "%{protocol->} restored for router %{node}, leader %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
+var part76 = match("MESSAGE#3:BGP:Restored", "nwparser.payload", "%{protocol->} restored for router %{node}, leader %{parent_node->} at %{fld15}-%{fld16}-%{fld17->} %{fld18}:%{fld19}:%{fld20->} %{fld21}", processor_chain([
 	dup15,
 	dup13,
 	dup16,

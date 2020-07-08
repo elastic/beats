@@ -3,98 +3,98 @@ id=tconsec sn=nsequat time="2016/02/12 13:12:33" fw=10.137.246.137 pri=medium c=
 id=tempor sn=omnis time="2016/02/26 20:15:08" fw=10.245.94.130 pri=high c=inesci m=128 PPPoE LCP Link Down
 id=niamquis sn=itati time="2016/03/12 03:17:42" fw=10.220.19.19 pri=low c=atatnonp m=413 msg="uiano" n=mrema src=10.214.225.125:5710 dst=10.163.217.10:5722
 gitsedqu id=uam sn=temq time="2016-3-26 10:20:16" fw=10.38.77.13 pri=low c=Utenimad m=14 msg="nibusBon" app=ehend sess="ueipsaqu" n=uidolore usr="niamqu" src=10.202.66.28:1852:enp0s5098 dst=10.64.155.245:6613:lo5037 srcMac=01:00:5e:4c:ae:05dstMac=01:00:5e:56:32:70 proto=icmp dstname=mqua3391.www.local arg=mquisnos code=loremagn Category="iciade" rule="tsed" fw_action="allow"
-id=oll sn=erc time="2016/04/09 17:22:51" fw=10.5.195.236 pri=medium c=ccusan m=145 Backup firewall has transitioned to Idle
-id=aveniam sn=uradi time="2016/04/24 00:25:25" fw=10.151.183.33 pri=high c=uaera m=174 IPSEC Replay Detected
-id=ehenderi sn=pidatat time="2016/05/08 07:27:59" fw=10.80.246.230 pri=medium c=mquaera m=src src=10.216.179.229 dst=10.185.126.247 vel
-id=undeo sn=loremip time="2016-5-22 2:30:33" fw=10.134.0.141 pri=very-high c=uis m=1149 msg="idolore" n=onse fw_action="cancel"
-id=omm sn=idestla time="2016/06/05 21:33:08" fw=10.224.68.213 pri=medium c=aborumSe m=654 msg="luptat" sess=torev n=urExc
-id=mquidol sn=ita time="2016/06/20 04:35:42" fw=10.100.76.221 pri=very-high c=lupt m=79 Priority Attack Dropped
-id=qua sn=luptatev time="2016/07/04 11:38:16" fw=10.123.104.59 pri=low c=elaudant m=1110 msg="tinvol"   n=lores
-id=tatiset sn=eprehen time="2016/07/18 18:40:50" fw=10.117.146.33 pri=high c=entsu m=10 Problem loading the Filter list; check Filter settings
-id=aliq sn=rsitam time="2016/08/02 01:43:25" fw=10.79.33.129 pri=high c=umdolo m=353 msg="onproide" n=Nemoen src=10.241.178.107 dst=10.30.196.102 dstname=fugi4637.www.lan lifeSeconds=imadmini"
-prehen id=olupt sn=modoco time="2016/08/16 08:45:59" fw=10.10.110.174 pri=very-high c=tat m=441 msg="tion" n=eataev src= 10.220.85.181 dst= tisetq  10.70.61.205 
-id=riat sn=taut time="2016/08/30 15:48:33" fw=10.114.138.121 pri=very-high c=tati m=133 PPPoE starting CHAP Authentication
-id=oriosamn sn=deFinibu time="2016/09/13 22:51:07" fw=10.45.25.68 pri=very-high c=emagnama m=346 msg="eprehend" n=hil src=10.136.114.84 dst=10.176.205.96
-colabo id=eme sn=numqu time="2016-9-28 5:53:42" fw=10.232.149.140 pri=very-high c=lum m=264 msg="utali" sess="sitvolup" dur=141.548000 n=ipitla usr="quae" src=10.170.120.4:2062:lo6637 dst=10.193.192.62:0:lo2706 fw_action="allow"
-datatn id=mqu sn=apariat time="2016/10/12 12:56:16" fw=10.46.27.57 pri=low c=remi m=36 TCP connection dropped
-id=ionevo sn=remagn time="2016/10/26 19:58:50" fw=10.160.205.242 pri=high c=uovolup m=84 msg="Failed to resolve name" n=samvolu dstname=ittenbyC3936.internal.test
-id=amc sn=atur time="2016/11/10 03:01:24" fw=10.188.37.199 pri=low c=intoc m=995 msg="oluptas" n=tNequepo src=10.52.186.29:2126 dst=10.6.77.80:4921 note="ione"
-gel id=lorsitam sn=mpo time="2016/11/24 10:03:59" fw=10.245.10.170 pri=low c=ulapa m=118 Sending DHCP REQUEST (Verifying).
-id=quioffi sn=uptate time="2016/12/08 17:06:33" fw=10.201.6.10 pri=high c=sequa m=346 msg="aera" n=ate src=10.240.242.122 dst=10.144.97.172
-id=uptasn sn=reme time="2016-12-23 12:09:07" fw=10.70.114.233 pri=high c=udantium m=796 msg="pre" n=xeacom fw_action="deny"
-id=lorinre sn=olorsita time="2017/01/06 07:11:41" fw=10.226.20.99 pri=medium c=econs m=888 msg="blocked;cancel" n=dol src=10.190.83.161:3386:eth4368:tevelite245.mail.local dst=10.120.167.239:602:lo3664:tmollita6036.internal.example
-id=veniamqu sn=nse time="2017/01/20 14:14:16" fw=10.194.247.171 pri=low c=mquisnos m=882 msg="maven" sess=hende n=piscin src=10.112.75.76:1355:eth6843 dst=10.25.39.99:2936:enp0s298 proto=ggp npcs=mveleu
-id=tvolu sn=ecte time="2017/02/03 21:16:50" fw=10.130.14.60 pri=low c=iciadese m=9 No new Filter list available
-olupta id=litse sn=icabo time="2017/02/18 04:19:24" fw=10.89.208.95 pri=low c=llumdolo m=255 msg="nre" n=ercitat src=10.237.163.139 dst=10.162.172.28
-id=Nequepo sn=ipsumd time="2017/03/04 11:21:59" fw=10.48.126.147 pri=medium c=nevo m=136 PPPoE PAP Authentication Failed
-id=reetdolo sn=smo time="2017/03/18 18:24:33" fw=10.107.31.179 pri=high c=uamest m=1079 msg="Clienttcois assigned IP:10.14.111.221"     n=itam
-santiumd id=turadip sn=uatD time="2017/04/02 01:27:07" fw=10.31.77.157 pri=low c=nci m=76 Ripper Attack Dropped
-id=volu sn=nonn time="2017/04/16 08:29:41" fw=10.55.88.154 pri=very-high c=rrorsi m=29 Successful administrator login
-id=sBon sn=orro time="2017/04/30 15:32:16" fw=10.34.194.149 pri=medium c=ten m=196 msg="vita" n=fugiatnu src=10.126.34.82 dst=10.14.1.45 sport=3142 dport=4499 sent=2224  cmd=HEAD
-amvo id=qui sn=tasn time="2017/05/14 22:34:50" fw=10.243.138.88 pri=high c=Sedutp m=998 msg="utp" n=ema usr=rsitv src=10.251.20.13:264 dst=10.101.74.44:2134 note="quin"
-id=tvolupt sn=eufugi time="2017/05/29 05:37:24" fw=10.201.171.120 pri=low c=utpe m=9 No new Filter list available
-temqu id=ovol sn=ptasn time="2017/06/12 12:39:58" fw=10.101.187.122 pri=very-high c=str m=40 IPSec packet dropped
-id=pid sn=illoin time="2017/06/26 19:42:33" fw=10.130.38.118 pri=low c=natuse m=163 Disconnecting PPPoE due to traffic timeout
-quid id=fugiat sn=atisun time="2017/07/11 02:45:07" fw=10.181.206.78 pri=very-high c=tobeata m=167 Denied UDP packet from LAN
-id=essequam sn=acommo time="2017/07/25 09:47:41" fw=10.177.144.70 pri=medium c=iat m=534 msg="etur" n=itecto src=10.226.27.132:2778 dst=10.148.161.250:3791 note="tinv"
-id=isnisi sn=ritatise time="2017/08/08 16:50:15" fw=10.38.54.72 pri=very-high c=ciad m=83 msg="tali" sess=lillum n=cusant src=10.64.50.66:3657:enp0s1540 dst=10.149.0.64:6867:eth2202 note="sau" npcs=atevelit
-id=billo sn=labo time="2017/08/22 23:52:50" fw=10.221.225.29 pri=medium c=boris m=147 Backup missed heartbeats from Active Primary: Backup going Active
-elitse id=ima sn=quasia time="2017/09/06 06:55:24" fw=10.150.107.25 pri=low c=uptate m=1154 msg="mac" sid=iumdol appcat=tpersp appid=stla n=uptatema src=10.97.124.211:6198:eth5313:tiaec5551.www.local dst=10.53.113.23:4027:lo1918:ise5905.www.local
-id=asiarc sn=ian time="2017/09/20 13:57:58" fw=10.53.165.209 pri=medium c=nBCSedut m=135 PPPoE CHAP Authentication Failed
-id=rauto sn=ationev time="2017/10/04 21:00:32" fw=10.92.19.202 pri=high c=nby m=350 msg="mve" n=osqui src=10.161.148.64 dst=10.96.97.81
-id=nsequat sn=doloreme time="2017/10/19 04:03:07" fw=10.206.81.23 pri=high c=tincu m=176 Fraudulent Microsoft Certificate Blocked
-itse id=umexerc sn=oremipsu time="2017/11/02 11:05:41" fw=10.87.13.61 pri=medium c=ssecillu m=1231 msg="liqua" n=utodita note="aec"
-id=elitse sn=reseo time="2017/11/16 18:08:15" fw=10.71.238.250 pri=very-high c=tiaec m=22 Ping of death blocked
-id=plicab sn=oremq time="2017/12/01 01:10:49" fw=10.40.152.253 pri=low c=ritt m=msg msg="iaeco" src=10.53.150.77 dst=10.125.134.213 failure
-id=quaea sn=ametcons time="2017/12/15 08:13:24" fw=10.74.46.22 pri=very-high c=tetur m=7 Log full; deactivating SonicWALL
-id=ariatur sn=rer time="2017/12/29 15:15:58" fw=10.210.243.175 pri=low c=atisetqu m=240 msg="issuscip" n=uisa src=10.240.49.224 dst=10.77.174.205
-id=luptatem sn=uaeratv time="2018/01/12 22:18:32" fw=10.240.190.136 pri=medium c=atcupid m=255 msg="quamnih" n=dminima src=10.44.150.31 dst=10.187.210.173
-id=ntutlabo sn=iusmodte time="2018-1-27 5:21:06" fw=10.108.84.24 pri=low c=iosamnis m=606 msg="volupt" n=rem src=10.113.100.237:3887:eth163 dst=10.251.248.228:6909 srcMac=miurerep 01:00:5e:b4:c3:ed dstMac=01:00:5e:55:b9:89proto=ipv6 fw_action="cancel"
-id=proident sn=maliquam time="2018-2-10 12:23:41" fw=10.229.229.42 pri=high c=vitaedic m=428 msg="orin" n=uii src=10.103.117.31:3987:enp0s3531 dst=10.207.211.230:2800:eth211 srcMac=untincul 01:00:5e:c9:ed:b4 dstMac=01:00:5e:93:39:a4 proto=tcp fw_action="allow"
-id=emvele sn=isnost time="2018/02/24 19:26:15" fw=10.71.112.159 pri=medium c=emqu m=412 msg="riss" n=iquamqua src=10.248.165.185:3436 dst=10.32.39.220 note="aliq"
-id=mven sn=olorsit time="2018/03/11 02:28:49" fw=10.121.239.183 pri=very-high c=consequa m=27 Land Attack Dropped
-id=tatevel sn=boreetdo time="2018/03/25 09:31:24" fw=10.239.118.233 pri=medium c=risnis m=95 Diagnostic Code C
-id=ddoeius sn=ugiatn time="2018/04/08 16:33:58" fw=10.50.102.128 pri=high c=abore m=138 XAUTH Succeeded
-id=uiadol sn=Duisa time="2018/04/22 23:36:32" fw=10.106.195.93 pri=very-high c=boNem m=107 Got DHCP OFFER. Selecting.
-id=emips sn=atv time="2018/05/07 06:39:06" fw=10.2.114.9 pri=high c=alorum m=372 msg="obeataev" n=tempor src=10.134.237.235 dst=10.11.83.126
-id=osquir sn=mod time="2018/05/21 13:41:41" fw=10.28.120.149 pri=very-high c=liquide m=117 Sending DHCP REQUEST (Rebooting).
-id=Sedutpe sn=prehen time="2018/06/04 20:44:15" fw=10.209.43.252 pri=very-high c=lloin m=169 Firewall access from LAN
-tempor id=citatio sn=oluptat time="2018/06/19 03:46:49" fw=10.35.255.235 pri=very-high c=edquian m=117 Sending DHCP REQUEST (Rebooting).
-id=nsequunt sn=proident time="2018/07/03 10:49:23" fw=10.57.167.157 pri=high c=aliquamq m=164 No response from ISP Disconnecting PPPoE.
-ugit id=tatem sn=metcons time="2018/07/17 17:51:58" fw=10.252.102.110 pri=medium c=tamet m=412 msg="perspici" n=ationul src=10.115.53.31:6606 dst=10.99.248.145 note="molestia"
-id=labore sn=uela time="2018/08/01 00:54:32" fw=10.167.74.79 pri=very-high c=iuntNequ m=616 msg="deny" n=archite src=10.143.228.97:1370 dst=10.168.208.169:6168
-licaboN id=atquo sn=cupi time="2018/08/15 07:57:06" fw=10.151.129.181 pri=very-high c=udan m=373 msg="allow" n=nderiti src=10.43.16.73:2604 dst=10.236.56.233:3484
-id=aeab sn=teur time="2018/08/29 14:59:40" fw=10.231.199.50 pri=low c=stquid m=412 msg="turadipi" n=usmodi src=10.184.254.143:4402 dst=10.222.251.114 note="illu"
-id=asuntexp sn=adminim time="2018/09/12 22:02:15" fw=10.115.115.26 pri=high c=modoc m=72 NetBus Attack Dropped
-id=iumt sn=tsed time="2018/09/27 05:04:49" fw=10.249.120.78 pri=medium c=atuse m=34 Login screen timed out
-orsi id=tetura sn=imadmini time="2018/10/11 12:07:23" fw=10.46.192.198 pri=high c=uat m=96 Status
-id=dolorema sn=emagn time="2018-10-25 7:09:57" fw=10.200.86.116 pri=medium m= msg="orinrep" n=quiavolif=enp0s347ucastRx=ratvbcastRx=alorumbytesRx=5253ucastTx=talibcastTx=BCSbytesTx=3474
-id=culpaqui sn=tvolup time="2018/11/09 02:12:32" fw=10.116.146.114 pri=high c=red m=8 New Filter list loaded
-id=tatev sn=luptas time="2018/11/23 09:15:06" fw=10.138.124.174 pri=low c=inculp m=66 Unknown IPSec SPI
-id=iadese sn=nisiu time="2018/12/07 16:17:40" fw=10.101.178.146 pri=medium c=llit m=148 Primary received error signal from Active Backup: Primary going Active
-id=sitametc sn=onsequa time="2018/12/21 23:20:14" fw=10.8.53.182 pri=very-high c=riosa m=9 No new Filter list available
-id=pisc sn=urEx time="2019/01/05 06:22:49" fw=10.193.239.124 pri=low c=ercitat m=49 Failure to add data channel
-id=tnonproi sn=squira time="2019/01/19 13:25:23" fw=10.141.238.139 pri=medium c=uide m=144 Primary firewall has transitioned to Idle
-lmolesti id=meumfugi sn=tquas time="2019/02/02 20:27:57" fw=10.200.22.41 pri=medium c=iame m=83 msg="orroquis" n=aquio src=10.208.79.170:7616:enp0s4472 dst=10.101.163.40:7153:enp0s1370
-id=uisnostr sn=reetdol time="2019/02/17 03:30:32" fw=10.94.132.21 pri=very-high c=odi m=144 Primary firewall has transitioned to Idle
-id=runtmo sn=ore time="2019/03/03 10:33:06" fw=10.176.3.121 pri=very-high c=tas m=104 Retransmitting DHCP REQUEST (Verifying).
-id=mveleum sn=liq time="2019/03/17 17:35:40" fw=10.197.3.44 pri=low c=aali m=21 Cookie removed
-mdolors id=oremi sn=ugitsedq time="2019/04/01 00:38:14" fw=10.143.229.47 pri=medium c=nisiut m=710 msg="cancel" n=quira src=10.175.98.45:3633 dst=10.236.247.87:7360
-tvolup id=consecte sn=pteurs time="2019/04/15 07:40:49" fw=10.152.83.154 pri=high c=saqu m=155 Primary received heartbeat from wrong source
-id=unt sn=tass time="2019/04/29 14:43:23" fw=10.74.8.242 pri=very-high c=uid m=53 The cache is full; too many open connections; some will be dropped
-id=umdolo sn=rroqui time="2019/05/13 21:45:57" fw=10.76.122.196 pri=high c=epteur m=888 msg="malware;deny" n=iame src=10.81.33.64:22:enp0s2909:cta5467.www.localhost dst=10.22.244.71:1865:eth3249:iam7526.mail.test
-cepteur id=aer sn=osquira time="2019/05/28 04:48:31" fw=10.232.158.211 pri=high c=dolorem m=998 msg="sed" n=idata usr=sun src=10.205.21.166:236 dst=10.20.73.247:4228 note="sed"
-id=pernat sn=udan time="2019/06/11 11:51:06" fw=10.124.243.58 pri=high c=urQuis m=165 Backup going Active in preempt mode after reboot
-id=orum sn=Bonoru time="2019/06/25 18:53:40" fw=10.53.168.187 pri=medium c=emacc m=6 Log successfully sent via email
-id=lamcola sn=veli time="2019/07/10 01:56:14" fw=10.104.211.232 pri=high c=idolores m=11 Problem loading the Filter list; check your DNS server
-id=mmod sn=iti time="2019/07/24 08:58:48" fw=10.55.81.14 pri=medium c=asp m=19 Java blocked
-id=mag sn=gelitse time="2019/08/07 16:01:23" fw=10.195.58.44 pri=high c=radip m=413 msg="upta" n=tetura src=10.206.229.61:3467 dst=10.129.101.147:3606
-id=nostrud sn=cteturad time="2019/08/21 23:03:57" fw=10.150.163.151 pri=high c=veniam m=159 Diagnostic Code F
-id=ritati sn=iciade time="2019/09/05 06:06:31" fw=10.202.224.79 pri=low c=nevolupt m=441 msg="aco" n=apar
-id=vol sn=psumd time="2019/09/19 13:09:05" fw=10.103.29.178 pri=low c=rios m=355 msg="labo" n=lpaquiof src=10.78.29.246 dst=10.125.85.128
-enbyCi id=reetdo sn=tat time="2019/10/03 20:11:40" fw=10.164.207.42 pri=low c=hen m=101 Retransmitting DHCP REQUEST (Renewing).
-id=quunt sn=itasp time="2019/10/18 03:14:14" fw=10.210.181.12 pri=high c=met m=714 msg="volup" sess=ptate n=entsu src=10.44.198.184:5695:enp0s5214 dst= umwri 10.21.147.52:1816:eth2990 npcs=tur
-id=ita sn=amquaer time="2019/11/01 10:16:48" fw=10.47.1.90 pri=high c=lpa m=134 PPPoE starting PAP Authentication
-id=smod sn=idunt time="2019/11/15 17:19:22" fw=10.29.120.226 pri=very-high c=aparia m=69 Incompatible IPSec Security Association
-lore id=isci sn=Dui time="2019/11/30 00:21:57" fw=10.205.202.225 pri=high c=civelits m=137 Wan IP Changed
-id=olore sn=orumS time="2019/12/14 07:24:31" fw=10.25.93.121 pri=low c=rchitect m=35 Attempted administrator login from WAN
+id=roinBCSe sn=onse time="2016/04/09 17:22:51" fw=10.136.153.149 pri=high c=imav m=1231 msg="ididu"   n=tion note="orsitame"
+id=umdo sn=sed time="2016-4-24 12:25:25" fw=10.206.224.241 pri=medium c=pteursi m=908 msg="onse" n=rumet src=10.162.42.110:6787:eth4075:temUten4125.www5.example dst=Ciceroi 10.90.131.186:6343:lo5529 srcMac=olo 01:00:5e:60:3e:36 dstMac=01:00:5e:0d:d9:0c proto=ipv6/atquovo fw_action="deny"
+id=ist sn=tnon time="2016/05/08 07:27:59" fw=10.82.29.215 pri=low c=edquiano m=605 msg="loru" n=ema src=10.74.237.180:7041 dst=10.50.66.65:1793
+id=idestla sn=Nemoeni time="2016/05/22 14:30:33" fw=10.196.105.137 pri=high c=luptat m=994 msg="torev" n=urExc usr=sectetur src=10.109.232.112:1640 dst=10.58.208.39:2382 note="fugit"
+id=paqu sn=eseru time="2016/06/05 21:33:08" fw=10.237.30.22 pri=medium c=quip m=13 Restarting SonicWALL; dumping log to email
+id=uisquam sn=ctetura time="2016/06/20 04:35:42" fw=10.241.19.131 pri=very-high c=lapariat m=350 msg="eddoei" n=eve src=10.72.29.73 dst=10.3.117.13
+id=entsu sn=dun time="2016/07/04 11:38:16" fw=10.85.101.196 pri=medium c=itaut m=166 Denied TCP connection from LAN
+id=tema sn=ritatis time="2016/07/18 18:40:50" fw=10.36.241.234 pri=medium c=ccu m=159 Diagnostic Code F
+id=inculpaq sn=agna time="2016/08/02 01:43:25" fw=10.148.13.98 pri=medium c=mqui m=72 msg="civeli" n=errorsi src=10.112.125.84:1284:eth1697 dst=10.193.76.77:4861:lo7388
+id=emp sn=aperia time="2016/08/16 08:45:59" fw=10.157.161.103 pri=medium c=vol m=351 msg="riat" n=taut src=10.114.138.121 dst=10.59.119.118
+id=oriosamn sn=deFinibu time="2016/08/30 15:48:33" fw=10.45.25.68 pri=very-high c=emagnama m=346 msg="eprehend" n=hil src=10.136.114.84 dst=10.176.205.96
+colabo id=eme sn=numqu time="2016-9-13 10:51:07" fw=10.232.149.140 pri=very-high c=lum m=264 msg="utali" sess="sitvolup" dur=141.548000 n=ipitla usr="quae" src=10.170.120.4:2062:lo6637 dst=10.193.192.62:0:lo2706 fw_action="allow"
+datatn id=mqu sn=apariat time="2016/09/28 05:53:42" fw=10.46.27.57 pri=low c=remi m=36 TCP connection dropped
+id=ionevo sn=remagn time="2016/10/12 12:56:16" fw=10.160.205.242 pri=high c=uovolup m=84 msg="Failed to resolve name" n=samvolu dstname=ittenbyC3936.internal.test
+id=amc sn=atur time="2016/10/26 19:58:50" fw=10.188.37.199 pri=low c=intoc m=995 msg="oluptas" n=tNequepo src=10.52.186.29:2126 dst=10.6.77.80:4921 note="ione"
+gel id=lorsitam sn=mpo time="2016/11/10 03:01:24" fw=10.245.10.170 pri=low c=ulapa m=118 Sending DHCP REQUEST (Verifying).
+id=quioffi sn=uptate time="2016/11/24 10:03:59" fw=10.201.6.10 pri=high c=sequa m=346 msg="aera" n=ate src=10.240.242.122 dst=10.144.97.172
+id=uptasn sn=reme time="2016-12-8 5:06:33" fw=10.70.114.233 pri=high c=udantium m=796 msg="pre" n=xeacom fw_action="deny"
+id=lorinre sn=olorsita time="2016/12/23 00:09:07" fw=10.226.20.99 pri=medium c=econs m=888 msg="blocked;cancel" n=dol src=10.190.83.161:3386:eth4368:tevelite245.mail.local dst=10.120.167.239:602:lo3664:tmollita6036.internal.example
+id=veniamqu sn=nse time="2017/01/06 07:11:41" fw=10.194.247.171 pri=low c=mquisnos m=882 msg="maven" sess=hende n=piscin src=10.112.75.76:1355:eth6843 dst=10.25.39.99:2936:enp0s298 proto=ggp npcs=mveleu
+id=tvolu sn=ecte time="2017/01/20 14:14:16" fw=10.130.14.60 pri=low c=iciadese m=9 No new Filter list available
+olupta id=litse sn=icabo time="2017/02/03 21:16:50" fw=10.89.208.95 pri=low c=llumdolo m=255 msg="nre" n=ercitat src=10.237.163.139 dst=10.162.172.28
+id=reetdolo sn=smo time="2017/02/18 04:19:24" fw=10.107.31.179 pri=high c=uamest m=1079 msg="Clienttcois assigned IP:10.14.111.221"     n=itam
+santiumd id=turadip sn=uatD time="2017/03/04 11:21:59" fw=10.31.77.157 pri=low c=nci m=76 Ripper Attack Dropped
+id=volu sn=nonn time="2017/03/18 18:24:33" fw=10.55.88.154 pri=very-high c=rrorsi m=29 Successful administrator login
+id=sBon sn=orro time="2017/04/02 01:27:07" fw=10.34.194.149 pri=medium c=ten m=196 msg="vita" n=fugiatnu src=10.126.34.82 dst=10.14.1.45 sport=3142 dport=4499 sent=2224  cmd=HEAD
+amvo id=qui sn=tasn time="2017/04/16 08:29:41" fw=10.243.138.88 pri=high c=Sedutp m=998 msg="utp" n=ema usr=rsitv src=10.251.20.13:264 dst=10.101.74.44:2134 note="quin"
+id=tvolupt sn=eufugi time="2017/04/30 15:32:16" fw=10.201.171.120 pri=low c=utpe m=9 No new Filter list available
+temqu id=ovol sn=ptasn time="2017/05/14 22:34:50" fw=10.101.187.122 pri=very-high c=str m=40 IPSec packet dropped
+id=pid sn=illoin time="2017/05/29 05:37:24" fw=10.130.38.118 pri=low c=natuse m=163 Disconnecting PPPoE due to traffic timeout
+quid id=fugiat sn=atisun time="2017/06/12 12:39:58" fw=10.181.206.78 pri=very-high c=tobeata m=167 Denied UDP packet from LAN
+id=essequam sn=acommo time="2017/06/26 19:42:33" fw=10.177.144.70 pri=medium c=iat m=534 msg="etur" n=itecto src=10.226.27.132:2778 dst=10.148.161.250:3791 note="tinv"
+id=isnisi sn=ritatise time="2017/07/11 02:45:07" fw=10.38.54.72 pri=very-high c=ciad m=83 msg="tali" sess=lillum n=cusant src=10.64.50.66:3657:enp0s1540 dst=10.149.0.64:6867:eth2202 note="sau" npcs=atevelit
+id=billo sn=labo time="2017/07/25 09:47:41" fw=10.221.225.29 pri=medium c=boris m=147 Backup missed heartbeats from Active Primary: Backup going Active
+elitse id=ima sn=quasia time="2017/08/08 16:50:15" fw=10.150.107.25 pri=low c=uptate m=1154 msg="mac" sid=iumdol appcat=tpersp appid=stla n=uptatema src=10.97.124.211:6198:eth5313:tiaec5551.www.local dst=10.53.113.23:4027:lo1918:ise5905.www.local
+id=asiarc sn=ian time="2017/08/22 23:52:50" fw=10.53.165.209 pri=medium c=nBCSedut m=135 PPPoE CHAP Authentication Failed
+id=rauto sn=ationev time="2017/09/06 06:55:24" fw=10.92.19.202 pri=high c=nby m=350 msg="mve" n=osqui src=10.161.148.64 dst=10.96.97.81
+id=nsequat sn=doloreme time="2017/09/20 13:57:58" fw=10.206.81.23 pri=high c=tincu m=176 Fraudulent Microsoft Certificate Blocked
+itse id=umexerc sn=oremipsu time="2017/10/04 21:00:32" fw=10.87.13.61 pri=medium c=ssecillu m=1231 msg="liqua" n=utodita note="aec"
+id=elitse sn=reseo time="2017/10/19 04:03:07" fw=10.71.238.250 pri=very-high c=tiaec m=22 Ping of death blocked
+id=plicab sn=oremq time="2017/11/02 11:05:41" fw=10.40.152.253 pri=low c=ritt m=msg msg="iaeco" src=10.53.150.77 dst=10.125.134.213 failure
+id=quaea sn=ametcons time="2017/11/16 18:08:15" fw=10.74.46.22 pri=very-high c=tetur m=7 Log full; deactivating SonicWALL
+id=ariatur sn=rer time="2017/12/01 01:10:49" fw=10.210.243.175 pri=low c=atisetqu m=240 msg="issuscip" n=uisa src=10.240.49.224 dst=10.77.174.205
+id=luptatem sn=uaeratv time="2017/12/15 08:13:24" fw=10.240.190.136 pri=medium c=atcupid m=255 msg="quamnih" n=dminima src=10.44.150.31 dst=10.187.210.173
+id=ntutlabo sn=iusmodte time="2017-12-29 3:15:58" fw=10.108.84.24 pri=low c=iosamnis m=606 msg="volupt" n=rem src=10.113.100.237:3887:eth163 dst=10.251.248.228:6909 srcMac=miurerep 01:00:5e:b4:c3:ed dstMac=01:00:5e:55:b9:89proto=ipv6 fw_action="cancel"
+id=proident sn=maliquam time="2018-1-12 10:18:32" fw=10.229.229.42 pri=high c=vitaedic m=428 msg="orin" n=uii src=10.103.117.31:3987:enp0s3531 dst=10.207.211.230:2800:eth211 srcMac=untincul 01:00:5e:c9:ed:b4 dstMac=01:00:5e:93:39:a4 proto=tcp fw_action="allow"
+id=emvele sn=isnost time="2018/01/27 05:21:06" fw=10.71.112.159 pri=medium c=emqu m=412 msg="riss" n=iquamqua src=10.248.165.185:3436 dst=10.32.39.220 note="aliq"
+id=mven sn=olorsit time="2018/02/10 12:23:41" fw=10.121.239.183 pri=very-high c=consequa m=27 Land Attack Dropped
+id=tatevel sn=boreetdo time="2018/02/24 19:26:15" fw=10.239.118.233 pri=medium c=risnis m=95 Diagnostic Code C
+id=ddoeius sn=ugiatn time="2018/03/11 02:28:49" fw=10.50.102.128 pri=high c=abore m=138 XAUTH Succeeded
+id=uiadol sn=Duisa time="2018/03/25 09:31:24" fw=10.106.195.93 pri=very-high c=boNem m=107 Got DHCP OFFER. Selecting.
+id=emips sn=atv time="2018/04/08 16:33:58" fw=10.2.114.9 pri=high c=alorum m=372 msg="obeataev" n=tempor src=10.134.237.235 dst=10.11.83.126
+id=osquir sn=mod time="2018/04/22 23:36:32" fw=10.28.120.149 pri=very-high c=liquide m=117 Sending DHCP REQUEST (Rebooting).
+id=Sedutpe sn=prehen time="2018/05/07 06:39:06" fw=10.209.43.252 pri=very-high c=lloin m=169 Firewall access from LAN
+tempor id=citatio sn=oluptat time="2018/05/21 13:41:41" fw=10.35.255.235 pri=very-high c=edquian m=117 Sending DHCP REQUEST (Rebooting).
+id=nsequunt sn=proident time="2018/06/04 20:44:15" fw=10.57.167.157 pri=high c=aliquamq m=164 No response from ISP Disconnecting PPPoE.
+ugit id=tatem sn=metcons time="2018/06/19 03:46:49" fw=10.252.102.110 pri=medium c=tamet m=412 msg="perspici" n=ationul src=10.115.53.31:6606 dst=10.99.248.145 note="molestia"
+id=labore sn=uela time="2018/07/03 10:49:23" fw=10.167.74.79 pri=very-high c=iuntNequ m=616 msg="deny" n=archite src=10.143.228.97:1370 dst=10.168.208.169:6168
+licaboN id=atquo sn=cupi time="2018/07/17 17:51:58" fw=10.151.129.181 pri=very-high c=udan m=373 msg="allow" n=nderiti src=10.43.16.73:2604 dst=10.236.56.233:3484
+id=aeab sn=teur time="2018/08/01 00:54:32" fw=10.231.199.50 pri=low c=stquid m=412 msg="turadipi" n=usmodi src=10.184.254.143:4402 dst=10.222.251.114 note="illu"
+id=asuntexp sn=adminim time="2018/08/15 07:57:06" fw=10.115.115.26 pri=high c=modoc m=72 NetBus Attack Dropped
+id=iumt sn=tsed time="2018/08/29 14:59:40" fw=10.249.120.78 pri=medium c=atuse m=34 Login screen timed out
+orsi id=tetura sn=imadmini time="2018/09/12 22:02:15" fw=10.46.192.198 pri=high c=uat m=96 Status
+id=dolorema sn=emagn time="2018-9-27 5:04:49" fw=10.200.86.116 pri=medium m= msg="orinrep" n=quiavolif=enp0s347ucastRx=ratvbcastRx=alorumbytesRx=5253ucastTx=talibcastTx=BCSbytesTx=3474
+id=culpaqui sn=tvolup time="2018/10/11 12:07:23" fw=10.116.146.114 pri=high c=red m=8 New Filter list loaded
+id=tatev sn=luptas time="2018/10/25 19:09:57" fw=10.138.124.174 pri=low c=inculp m=66 Unknown IPSec SPI
+id=iadese sn=nisiu time="2018/11/09 02:12:32" fw=10.101.178.146 pri=medium c=llit m=148 Primary received error signal from Active Backup: Primary going Active
+id=sitametc sn=onsequa time="2018/11/23 09:15:06" fw=10.8.53.182 pri=very-high c=riosa m=9 No new Filter list available
+id=pisc sn=urEx time="2018/12/07 16:17:40" fw=10.193.239.124 pri=low c=ercitat m=49 Failure to add data channel
+id=tnonproi sn=squira time="2018/12/21 23:20:14" fw=10.141.238.139 pri=medium c=uide m=144 Primary firewall has transitioned to Idle
+lmolesti id=meumfugi sn=tquas time="2019/01/05 06:22:49" fw=10.200.22.41 pri=medium c=iame m=83 msg="orroquis" n=aquio src=10.208.79.170:7616:enp0s4472 dst=10.101.163.40:7153:enp0s1370
+id=uisnostr sn=reetdol time="2019/01/19 13:25:23" fw=10.94.132.21 pri=very-high c=odi m=144 Primary firewall has transitioned to Idle
+id=runtmo sn=ore time="2019/02/02 20:27:57" fw=10.176.3.121 pri=very-high c=tas m=104 Retransmitting DHCP REQUEST (Verifying).
+id=mveleum sn=liq time="2019/02/17 03:30:32" fw=10.197.3.44 pri=low c=aali m=21 Cookie removed
+mdolors id=oremi sn=ugitsedq time="2019/03/03 10:33:06" fw=10.143.229.47 pri=medium c=nisiut m=710 msg="cancel" n=quira src=10.175.98.45:3633 dst=10.236.247.87:7360
+tvolup id=consecte sn=pteurs time="2019/03/17 17:35:40" fw=10.152.83.154 pri=high c=saqu m=155 Primary received heartbeat from wrong source
+id=unt sn=tass time="2019/04/01 00:38:14" fw=10.74.8.242 pri=very-high c=uid m=53 The cache is full; too many open connections; some will be dropped
+id=umdolo sn=rroqui time="2019/04/15 07:40:49" fw=10.76.122.196 pri=high c=epteur m=888 msg="malware;deny" n=iame src=10.81.33.64:22:enp0s2909:cta5467.www.localhost dst=10.22.244.71:1865:eth3249:iam7526.mail.test
+cepteur id=aer sn=osquira time="2019/04/29 14:43:23" fw=10.232.158.211 pri=high c=dolorem m=998 msg="sed" n=idata usr=sun src=10.205.21.166:236 dst=10.20.73.247:4228 note="sed"
+id=pernat sn=udan time="2019/05/13 21:45:57" fw=10.124.243.58 pri=high c=urQuis m=165 Backup going Active in preempt mode after reboot
+id=orum sn=Bonoru time="2019/05/28 04:48:31" fw=10.53.168.187 pri=medium c=emacc m=6 Log successfully sent via email
+id=lamcola sn=veli time="2019/06/11 11:51:06" fw=10.104.211.232 pri=high c=idolores m=11 Problem loading the Filter list; check your DNS server
+id=mmod sn=iti time="2019/06/25 18:53:40" fw=10.55.81.14 pri=medium c=asp m=19 Java blocked
+id=mag sn=gelitse time="2019/07/10 01:56:14" fw=10.195.58.44 pri=high c=radip m=413 msg="upta" n=tetura src=10.206.229.61:3467 dst=10.129.101.147:3606
+id=nostrud sn=cteturad time="2019/07/24 08:58:48" fw=10.150.163.151 pri=high c=veniam m=159 Diagnostic Code F
+id=ritati sn=iciade time="2019/08/07 16:01:23" fw=10.202.224.79 pri=low c=nevolupt m=441 msg="aco" n=apar
+id=vol sn=psumd time="2019/08/21 23:03:57" fw=10.103.29.178 pri=low c=rios m=355 msg="labo" n=lpaquiof src=10.78.29.246 dst=10.125.85.128
+enbyCi id=reetdo sn=tat time="2019/09/05 06:06:31" fw=10.164.207.42 pri=low c=hen m=101 Retransmitting DHCP REQUEST (Renewing).
+id=quunt sn=itasp time="2019/09/19 13:09:05" fw=10.210.181.12 pri=high c=met m=714 msg="volup" sess=ptate n=entsu src=10.44.198.184:5695:enp0s5214 dst= umwri 10.21.147.52:1816:eth2990 npcs=tur
+id=ita sn=amquaer time="2019/10/03 20:11:40" fw=10.47.1.90 pri=high c=lpa m=134 PPPoE starting PAP Authentication
+id=smod sn=idunt time="2019/10/18 03:14:14" fw=10.29.120.226 pri=very-high c=aparia m=69 Incompatible IPSec Security Association
+lore id=isci sn=Dui time="2019/11/01 10:16:48" fw=10.205.202.225 pri=high c=civelits m=137 Wan IP Changed
+id=olore sn=orumS time="2019/11/15 17:19:22" fw=10.25.93.121 pri=low c=rchitect m=35 Attempted administrator login from WAN
+umdolore id=dmi sn=tam time="2019/11/30 00:21:57" fw=10.151.170.207 pri=high c=dunt m=src src=10.243.170.64 dst=10.85.204.8 amquisno
+id=magnam sn=uinesc time="2019/12/14 07:24:31" fw=10.172.95.162 pri=very-high c=Bonorum m=105 Sending DHCP DISCOVER.

@@ -790,8 +790,8 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.46.158.31",
-            "10.117.146.33"
+            "10.117.146.33",
+            "10.46.158.31"
         ],
         "rsa.db.index": "dun",
         "rsa.internal.messageid": "kernel",
@@ -846,7 +846,7 @@
         "event.code": "maintenance",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "May 29 05:37:24 agna7678.internal.host maintenance[equa]: [mexercit] Logged out Sid = dtem ",
+        "event.original": "May 29 05:37:24 agna7678.internal.host maintenance[equa]: [mexercit] Logged out Sid = dtem",
         "fileset.name": "firepass",
         "input.type": "log",
         "log.offset": 3092,
@@ -856,8 +856,11 @@
         "related.user": [
             "mexercit"
         ],
-        "rsa.db.index": "Logged",
         "rsa.internal.messageid": "maintenance",
+        "rsa.investigations.ec_activity": "Logoff",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.misc.log_session_id": "dtem",
         "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "service.type": "f5",
         "tags": [
@@ -873,7 +876,7 @@
         "event.original": "firepass[rehe]: [ume] Logged out",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3184,
+        "log.offset": 3183,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -891,26 +894,33 @@
         "user.name": "ume"
     },
     {
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "/USR/SBIN/CRON",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "June 26 19:42:33 picia6119.mail.host /USR/SBIN/CRON[dit]: [sumquiad] (dexeaco) CMD (cancel) ",
+        "event.original": "June 26 19:42:33 picia6119.mail.host /USR/SBIN/CRON[dit]: [sumquiad] (dexeaco) CMD (cancel)",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 3217,
+        "log.offset": 3216,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "dexeaco"
+        ],
         "rsa.internal.messageid": "/USR/SBIN/CRON",
+        "rsa.misc.action": [
+            "cancel"
+        ],
         "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "dexeaco"
     },
     {
         "event.code": "snmp",
@@ -919,7 +929,7 @@
         "event.original": "July 11 02:45:07 inima5444.www5.lan snmp[nihi]: [Lor] [itecto] erc",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3310,
+        "log.offset": 3308,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -939,7 +949,7 @@
         "event.original": "kernel[olupt]: [modoco] kernel: cdrom: open failed.",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3377,
+        "log.offset": 3375,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -957,7 +967,7 @@
         "event.original": "August 8 16:50:15 imadmi5494.www.corp EndpointSecurity[eataev]: id[liquide]: uasia",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3429,
+        "log.offset": 3427,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -978,7 +988,7 @@
         "event.original": "August 22 23:52:50 ici3995.lan EndpointSecurity[vol]: [riat] [taut] id[oreseos]: uames",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3512,
+        "log.offset": 3510,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -999,7 +1009,7 @@
         "event.original": "Miscellaneous[iciatisu]: [rehender] Purge logs: auto started",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3599,
+        "log.offset": 3597,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1024,7 +1034,7 @@
         "event.original": "September 20 13:57:58 hil4828.domain NetworkAccess[iineavo]: [equatD] <<isno> Open Network Access Connection using remote IP address 10.192.18.42",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3660,
+        "log.offset": 3658,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1053,7 +1063,7 @@
         "event.original": "heartbeat[dolo]: [Loremip] [idolor] info: emeumfu",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3806,
+        "log.offset": 3804,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1072,7 +1082,7 @@
         "event.original": "October 19 04:03:07 psaquae7432.www.localdomain sshd[mporain]: [icons] Accepted publickey for amvolup from 10.86.63.253 port 2133 tio",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3856,
+        "log.offset": 3854,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1102,7 +1112,7 @@
         "event.original": "EndpointSecurity[rumetM]: [equi] id[agnaali]: \"gnam - Connectedtatfrom 10.145.225.93 itinvo\"",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 3990,
+        "log.offset": 3988,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1128,7 +1138,7 @@
         "event.original": "November 16 18:08:15 rQuisau6637.internal.domain run-crons[den]: [tutla] [olorema] iades returned siarchi",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4083,
+        "log.offset": 4081,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1148,7 +1158,7 @@
         "event.original": "httpd[mqu]: [apariat] scr_monitor: tlabore",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4189,
+        "log.offset": 4187,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1164,26 +1174,33 @@
         "user.name": "apariat"
     },
     {
+        "event.action": [
+            "deny"
+        ],
         "event.code": "/USR/SBIN/CRON",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "December 15 08:13:24 orev4810.api.localhost /USR/SBIN/CRON[samvolu]: [ittenbyC] (isc) CMD (deny) ",
+        "event.original": "December 15 08:13:24 orev4810.api.localhost /USR/SBIN/CRON[samvolu]: [ittenbyC] (isc) CMD (deny)",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 4232,
+        "log.offset": 4230,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "isc"
+        ],
         "rsa.internal.messageid": "/USR/SBIN/CRON",
+        "rsa.misc.action": [
+            "deny"
+        ],
         "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "isc"
     },
     {
         "event.code": "snmp",
@@ -1192,7 +1209,7 @@
         "event.original": "snmp[ationemu]: [ice] estiae",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4330,
+        "log.offset": 4327,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1214,7 +1231,7 @@
         "event.original": "January 12 22:18:32 iquipex4443.internal.home ntpdate[wri]: adjust time server 10.170.148.40 offset hitect",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4359,
+        "log.offset": 4356,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1234,22 +1251,24 @@
         "event.code": "maintenance",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "maintenance[etconse]: [tincu] ari ",
+        "event.original": "maintenance[etconse]: [tincu] ari",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 4466,
+        "log.offset": 4463,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "tincu"
+        ],
+        "rsa.db.index": "ari",
         "rsa.internal.messageid": "maintenance",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "tincu"
     },
     {
         "event.code": "heartbeat",
@@ -1258,7 +1277,7 @@
         "event.original": "February 10 12:23:41 sci5488.test heartbeat[occae]: [ctetura] [labore] info: texp",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4501,
+        "log.offset": 4497,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1278,7 +1297,7 @@
         "event.original": "Miscellaneous[emoe]: [eaq] Purge logs: not started. Next purge scheduled time amest is not exceeded",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4583,
+        "log.offset": 4579,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1300,7 +1319,7 @@
         "event.original": "EndpointSecurity[rehender]: [iae] id[dantiumt]: \"luptasn - Connectedequatfrom 10.77.137.72 ione\"",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4683,
+        "log.offset": 4679,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1326,7 +1345,7 @@
         "event.original": "EndpointSecurity[amre]: [rsita] id[niamqui]: \"uptat - Connecteduamfrom 10.140.136.44 fficiade\"",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4780,
+        "log.offset": 4776,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1352,7 +1371,7 @@
         "event.original": "April 8 16:33:58 vitaedi1318.corp sshd[temqu]: Accepted publickey for edol from 10.26.196.144 port 4677 quatD",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4875,
+        "log.offset": 4871,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1382,7 +1401,7 @@
         "event.original": "April 22 23:36:32 eabilloi6458.api.lan run-crons[tlab]: [volupt] osqui returned xerc",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 4985,
+        "log.offset": 4981,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1405,7 +1424,7 @@
         "event.original": "snmp[ents]: [liquide] SNMP handler started",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5070,
+        "log.offset": 5066,
         "network.protocol": "SNMP",
         "observer.product": "FirePass",
         "observer.type": "VPN",
@@ -1428,7 +1447,7 @@
         "event.original": "security[uun]: [sequine] [ectio] User dutper from 10.237.205.140 presented with challenge",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5113,
+        "log.offset": 5109,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1458,7 +1477,7 @@
         "event.original": "run-crons:  returned gel",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5203,
+        "log.offset": 5199,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1477,7 +1496,7 @@
         "event.original": "June 19 03:46:49 ris3314.mail.invalid heartbeat[liqui]: [quioffi] info: uptate",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5228,
+        "log.offset": 5224,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1497,7 +1516,7 @@
         "event.original": "July 3 10:49:23 uamei2493.www.test Miscellaneous[ate]: [aliquam] Purge logs: auto started",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5307,
+        "log.offset": 5303,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1521,7 +1540,7 @@
         "event.outcome": "Failure",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5397,
+        "log.offset": 5393,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1546,7 +1565,7 @@
         "event.outcome": "Failure",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5471,
+        "log.offset": 5467,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1570,7 +1589,7 @@
         "event.original": "httpd[dictasu]: [lorinre] scr_monitor: olorsita",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5526,
+        "log.offset": 5522,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1595,7 +1614,7 @@
         "event.original": "ntpdate[inculpa]: [abo] adjust time server 10.105.76.230 offset aliquide",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5574,
+        "log.offset": 5570,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1617,7 +1636,7 @@
         "event.original": "September 12 22:02:15 maven3758.www.invalid run-crons[labor]: [didunt] uptatema returned intocc",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5647,
+        "log.offset": 5643,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1637,7 +1656,7 @@
         "event.original": "ntpd[aturQui]: frequency initialized utlabor PPM from rau",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5743,
+        "log.offset": 5739,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1655,7 +1674,7 @@
         "event.original": "firepass[nisi]: [dant] shutting down for system reboot",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5801,
+        "log.offset": 5797,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1674,7 +1693,7 @@
         "event.original": "AppTunnel[tinvolu]: <<iurer> Error - Invalid session id",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5856,
+        "log.offset": 5852,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1695,7 +1714,7 @@
         "event.original": "November 9 02:12:32 quidolor5025.home run-crons:  returned rem",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5912,
+        "log.offset": 5908,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1715,7 +1734,7 @@
         "event.original": "run-crons[idolor]: [uisau] [eleum] sintoc returned volupt",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 5975,
+        "log.offset": 5971,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1734,7 +1753,7 @@
         "event.original": "heartbeat[uiinea]: info: Utenima",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6033,
+        "log.offset": 6029,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1756,7 +1775,7 @@
         "event.original": "December 21 23:20:14 oinBC6161.api.local ntpdate[spi]: [stquido] adjust time server 10.25.52.65 offset ese",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6066,
+        "log.offset": 6062,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1779,7 +1798,7 @@
         "event.original": "January 5 06:22:49 ptatemq95.api.host heartbeat[Nequepo]: [ipsumd] info: ntocc",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6173,
+        "log.offset": 6169,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1799,7 +1818,7 @@
         "event.original": "kernel: ionofdeF",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6252,
+        "log.offset": 6248,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1818,7 +1837,7 @@
         "event.original": "February 2 20:27:57 etcons7378.api.lan ntpd[ate]: [uiac] precision = epte",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6269,
+        "log.offset": 6265,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1838,7 +1857,7 @@
         "event.original": "AppTunnel[aper]: [santiumd] [turadip] <<uatD> Error - Invalid session id",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6343,
+        "log.offset": 6339,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1853,43 +1872,51 @@
         ]
     },
     {
+        "event.action": [
+            "deny"
+        ],
         "event.code": "/USR/SBIN/CRON",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "/USR/SBIN/CRON[nci]: [tev] [saute] (ntocca) CMD (deny) ",
+        "event.original": "/USR/SBIN/CRON[nci]: [tev] [saute] (ntocca) CMD (deny)",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 6416,
+        "log.offset": 6412,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "ntocca"
+        ],
         "rsa.internal.messageid": "/USR/SBIN/CRON",
+        "rsa.misc.action": [
+            "deny"
+        ],
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "ntocca"
     },
     {
         "event.code": "maintenance",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "March 17 17:35:40 ntN6179.test maintenance[qui]: [ntmollit] [tenatus] Trying connect to cipitlab on ipsumd6116.local:6980 ",
+        "event.original": "March 17 17:35:40 ntN6179.test maintenance[qui]: [ntmollit] [tenatus] Trying connect to cipitlab on ipsumd6116.local:6980",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6472,
+        "log.offset": 6467,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.user": [
             "ntmollit"
         ],
-        "rsa.db.index": "Trying",
         "rsa.internal.messageid": "maintenance",
+        "rsa.network.network_port": 6980,
         "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
+        "rsa.web.fqdn": "ipsumd6116.local",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1904,7 +1931,7 @@
         "event.original": "heartbeat[exe]: [imadmini] [sauteiru] info: mod",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6595,
+        "log.offset": 6589,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1917,25 +1944,32 @@
         ]
     },
     {
+        "event.action": [
+            "deny"
+        ],
         "event.code": "/USR/SBIN/CRON",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "/USR/SBIN/CRON[ataevi]: [com] (tnulapa) CMD (deny) ",
+        "event.original": "/USR/SBIN/CRON[ataevi]: [com] (tnulapa) CMD (deny)",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 6643,
+        "log.offset": 6637,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "tnulapa"
+        ],
         "rsa.internal.messageid": "/USR/SBIN/CRON",
+        "rsa.misc.action": [
+            "deny"
+        ],
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "tnulapa"
     },
     {
         "event.code": "httpd",
@@ -1944,7 +1978,7 @@
         "event.original": "httpd[eriti]: [litessec] scr_monitor: itas",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6695,
+        "log.offset": 6688,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1969,7 +2003,7 @@
         "event.original": "May 13 21:45:57 roid6604.www.test ntpdate[Nemoenim]: [squirati] [Sedutp] adjust time server 10.186.101.163 offset utlabor",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6738,
+        "log.offset": 6731,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -1993,7 +2027,7 @@
         "fileset.name": "firepass",
         "host.name": "eufugi2923.internal.host",
         "input.type": "log",
-        "log.offset": 6860,
+        "log.offset": 6853,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2022,7 +2056,7 @@
         "event.outcome": "Failure",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 6978,
+        "log.offset": 6971,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2046,7 +2080,7 @@
         "event.original": "June 25 18:53:40 archite2217.test NetworkAccess[psumquia]: [ven] <<con> Error - nisist",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7036,
+        "log.offset": 7029,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2067,26 +2101,33 @@
         "user.name": "ven"
     },
     {
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "/USR/SBIN/CRON",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "July 10 01:56:14 msequi5808.mail.test /USR/SBIN/CRON[ptasnu]: [rQu] [oremeu] (laudant) CMD (cancel) ",
+        "event.original": "July 10 01:56:14 msequi5808.mail.test /USR/SBIN/CRON[ptasnu]: [rQu] [oremeu] (laudant) CMD (cancel)",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
-        "log.offset": 7123,
+        "log.offset": 7116,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "laudant"
+        ],
         "rsa.internal.messageid": "/USR/SBIN/CRON",
+        "rsa.misc.action": [
+            "cancel"
+        ],
         "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
-        ]
+        ],
+        "user.name": "laudant"
     },
     {
         "event.code": "kernel",
@@ -2095,7 +2136,7 @@
         "event.original": "kernel[ncidi]: [eeufugia] [evit] kernel: PPP runtm",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7224,
+        "log.offset": 7216,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2114,7 +2155,7 @@
         "event.original": "August 7 16:01:23 velitse543.api.example heartbeat[torever]: info: oremi",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7275,
+        "log.offset": 7267,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2134,7 +2175,7 @@
         "event.original": "August 21 23:03:57 temUt631.www5.example heartbeat[npr]: info: mquelau",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7348,
+        "log.offset": 7340,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2154,7 +2195,7 @@
         "event.original": "September 5 06:06:31 amcol5625.internal.host run-crons[gitsed]: [tqu] [reprehen] trumexer returned idolo",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7419,
+        "log.offset": 7411,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2175,7 +2216,7 @@
         "event.outcome": "Failure",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7524,
+        "log.offset": 7516,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2202,7 +2243,7 @@
         "event.original": "heartbeat[iduntu]: [idestlab] info: rnatur",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7653,
+        "log.offset": 7645,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2221,7 +2262,7 @@
         "event.original": "run-crons[essequam]: acommo returned nturma",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7696,
+        "log.offset": 7688,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2234,20 +2275,33 @@
         ]
     },
     {
+        "destination.ip": [
+            "10.225.181.30"
+        ],
+        "destination.port": 5390,
         "event.code": "kernel",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
-        "event.original": "November 1 10:16:48 atemq7682.internal.localhost kernel[reetdol]: [totamre] [isnostr] kernel: GlobalFilter:umqu SRC=10.65.175.9 DST=10.225.181.30 uia PROTO=udp SPT=4412 DPT=5390 siut ",
+        "event.original": "November 1 10:16:48 atemq7682.internal.localhost kernel[reetdol]: [totamre] [isnostr] kernel: GlobalFilter:umqu SRC=10.65.175.9 DST=10.225.181.30 uia PROTO=udp SPT=4412 DPT=5390 siut",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7740,
+        "log.offset": 7732,
+        "network.protocol": "udp",
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
-        "rsa.db.index": "GlobalFilter:umqu SRC=10.65.175.9 DST=10.225.181.30 uia PROTO=udp SPT=4412 DPT=5390 siut",
+        "related.ip": [
+            "10.225.181.30",
+            "10.65.175.9"
+        ],
+        "rsa.db.index": "uia",
         "rsa.internal.messageid": "kernel",
         "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "f5",
+        "source.ip": [
+            "10.65.175.9"
+        ],
+        "source.port": 4412,
         "tags": [
             "f5.firepass",
             "forwarded"
@@ -2260,7 +2314,7 @@
         "event.original": "kernel[rpori]: [ice] kernel: cdrom: open failed.",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7924,
+        "log.offset": 7915,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2278,7 +2332,7 @@
         "event.original": "November 30 00:21:57 commodo6867.internal.example snmp: ",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 7973,
+        "log.offset": 7964,
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
@@ -2301,7 +2355,7 @@
         "event.original": "snmp[odoconse]: [quamqua] SNMP handler started",
         "fileset.name": "firepass",
         "input.type": "log",
-        "log.offset": 8030,
+        "log.offset": 8021,
         "network.protocol": "SNMP",
         "observer.product": "FirePass",
         "observer.type": "VPN",

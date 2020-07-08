@@ -6,8 +6,8 @@ BYPASS: Mode set to BYPASS (nbyCic).
 BYPASS: Mode change: ccusant,epteurs
 UPDATE: [ALERT:modoco] New attack definition version 1.3971 is available
 INSTALL: Migrating configuration from umet to psaquaea
-CONFIG_AGENT: gnamali iumdo No rules, exe 
-CONFIG_AGENT: odite atn It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., sectet 
+CONFIG_AGENT: gnamali iumdo No rules, exe
+CONFIG_AGENT: odite atn It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., sectet
 STM_WRAPPER: [ALERT:mnisist] Configuration size is dutp which exceeds the ecillu safe limit. Please check your configuration.
 BYPASS: Mode set to never bypass.
 PROCMON: Monitoring links: enp0s2108
@@ -61,7 +61,7 @@ CONFIG_AGENT: eriamea rume Update succeeded
 STM:  FEHCMON-iaturE veniam FEHC Monitor Module initialized.
 BYPASS: Mode set to BYPASS (quira).
 STM_WRAPPER: [ALERT:xplicab] Configuration size is utaliqu which exceeds the siut safe limit. Please check your configuration.
-CONFIG_AGENT: emquela ons It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., idestl 
+CONFIG_AGENT: emquela ons It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., idestl
 CONFIG_AGENT: tutlabo Initiating config_agent database commit phase.
 INSTALL: Migrating configuration from isautemv to onproid
 PROCMON: Monitoring links: enp0s6760

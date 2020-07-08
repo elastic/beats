@@ -187,53 +187,47 @@ var dup68 = match("MESSAGE#204:dhcpd:37", "nwparser.payload", "%{event_descripti
 	dup30,
 ]));
 
-var dup69 = match("MESSAGE#52:ntpd:02", "nwparser.payload", "%{event_description->} ", processor_chain([
-	dup12,
-	dup6,
-	dup8,
-]));
-
-var dup70 = linear_select([
+var dup69 = linear_select([
 	dup33,
 	dup34,
 ]);
 
-var dup71 = linear_select([
+var dup70 = linear_select([
 	dup37,
 	dup38,
 	dup39,
 ]);
 
-var dup72 = linear_select([
+var dup71 = linear_select([
 	dup42,
 	dup43,
 	dup44,
 ]);
 
-var dup73 = linear_select([
+var dup72 = linear_select([
 	dup51,
 	dup52,
 ]);
 
-var dup74 = match("MESSAGE#118:validate_dhcpd", "nwparser.payload", "%{event_description}", processor_chain([
+var dup73 = match("MESSAGE#118:validate_dhcpd", "nwparser.payload", "%{event_description}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var dup75 = match("MESSAGE#134:openvpn-member:01", "nwparser.payload", "%{action->} : %{event_description->} (code=%{resultcode})", processor_chain([
+var dup74 = match("MESSAGE#134:openvpn-member:01", "nwparser.payload", "%{action->} : %{event_description->} (code=%{resultcode})", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var dup76 = match("MESSAGE#137:openvpn-member:04", "nwparser.payload", "%{severity}: %{event_description}", processor_chain([
+var dup75 = match("MESSAGE#137:openvpn-member:04", "nwparser.payload", "%{severity}: %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var dup77 = match("MESSAGE#225:syslog", "nwparser.payload", "%{event_description->} ", processor_chain([
+var dup76 = match("MESSAGE#225:syslog", "nwparser.payload", "%{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -1194,7 +1188,7 @@ var part90 = match("MESSAGE#51:ntpd:01", "nwparser.payload", "%{process}: signal
 
 var msg66 = msg("ntpd:01", part90);
 
-var msg67 = msg("ntpd:02", dup69);
+var msg67 = msg("ntpd:02", dup64);
 
 var select15 = linear_select([
 	msg62,
@@ -1210,7 +1204,7 @@ var part91 = match("MESSAGE#53:named:16/0", "nwparser.payload", "client %{saddr}
 var all17 = all_match({
 	processors: [
 		part91,
-		dup70,
+		dup69,
 	],
 	on_success: processor_chain([
 		dup15,
@@ -1226,7 +1220,7 @@ var part92 = match("MESSAGE#54:named/0", "nwparser.payload", "client %{saddr}#%{
 var all18 = all_match({
 	processors: [
 		part92,
-		dup70,
+		dup69,
 	],
 	on_success: processor_chain([
 		dup15,
@@ -1243,7 +1237,7 @@ var part93 = match("MESSAGE#55:named:12/0", "nwparser.payload", "client %{saddr}
 var all19 = all_match({
 	processors: [
 		part93,
-		dup70,
+		dup69,
 	],
 	on_success: processor_chain([
 		dup15,
@@ -1270,7 +1264,7 @@ var all20 = all_match({
 		dup36,
 		select16,
 		part96,
-		dup70,
+		dup69,
 	],
 	on_success: processor_chain([
 		dup15,
@@ -1302,11 +1296,11 @@ var select18 = linear_select([
 var all21 = all_match({
 	processors: [
 		part97,
-		dup71,
+		dup70,
 		part98,
 		select17,
 		select18,
-		dup72,
+		dup71,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1368,11 +1362,11 @@ var select21 = linear_select([
 var all23 = all_match({
 	processors: [
 		part105,
-		dup71,
+		dup70,
 		part106,
 		select20,
 		select21,
-		dup72,
+		dup71,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1487,7 +1481,7 @@ var part120 = match("MESSAGE#67:named:63/2", "nwparser.p0", "%{sport->} (#%{fld5
 var all26 = all_match({
 	processors: [
 		dup50,
-		dup73,
+		dup72,
 		part120,
 	],
 	on_success: processor_chain([
@@ -1666,7 +1660,7 @@ var all31 = all_match({
 
 var msg89 = msg("named:10", all31);
 
-var part142 = match("MESSAGE#75:named:29", "nwparser.payload", "client %{saddr}#%{sport}: %{fld1}: received notify for zone '%{zone}' ", processor_chain([
+var part142 = match("MESSAGE#75:named:29", "nwparser.payload", "client %{saddr}#%{sport}: %{fld1}: received notify for zone '%{zone}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -1675,7 +1669,7 @@ var part142 = match("MESSAGE#75:named:29", "nwparser.payload", "client %{saddr}#
 
 var msg90 = msg("named:29", part142);
 
-var part143 = match("MESSAGE#76:named:08", "nwparser.payload", "client %{saddr}#%{sport}: received notify for zone '%{zone}' ", processor_chain([
+var part143 = match("MESSAGE#76:named:08", "nwparser.payload", "client %{saddr}#%{sport}: received notify for zone '%{zone}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -1752,13 +1746,11 @@ var select32 = linear_select([
 	part154,
 ]);
 
-var part155 = match("MESSAGE#80:named:06/2", "nwparser.p0", "%{event_description->} ");
-
 var all33 = all_match({
 	processors: [
 		part152,
 		select32,
-		part155,
+		dup46,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1770,7 +1762,7 @@ var all33 = all_match({
 
 var msg95 = msg("named:06", all33);
 
-var part156 = match("MESSAGE#81:named:20", "nwparser.payload", "REFUSED unexpected RCODE resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
+var part155 = match("MESSAGE#81:named:20", "nwparser.payload", "REFUSED unexpected RCODE resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
 	dup12,
 	dup49,
 	dup14,
@@ -1781,22 +1773,22 @@ var part156 = match("MESSAGE#81:named:20", "nwparser.payload", "REFUSED unexpect
 	dup55,
 ]));
 
-var msg96 = msg("named:20", part156);
+var msg96 = msg("named:20", part155);
 
-var part157 = match("MESSAGE#82:named:49/0", "nwparser.payload", "REFUSED unexpected RCODE resolving '%{zone}/%{dns_querytype}/IN': %{p0}");
+var part156 = match("MESSAGE#82:named:49/0", "nwparser.payload", "REFUSED unexpected RCODE resolving '%{zone}/%{dns_querytype}/IN': %{p0}");
 
-var part158 = match("MESSAGE#82:named:49/1_0", "nwparser.p0", "%{daddr}#%{dport}");
+var part157 = match("MESSAGE#82:named:49/1_0", "nwparser.p0", "%{daddr}#%{dport}");
 
-var part159 = match("MESSAGE#82:named:49/1_1", "nwparser.p0", "%{fld1}");
+var part158 = match("MESSAGE#82:named:49/1_1", "nwparser.p0", "%{fld1}");
 
 var select33 = linear_select([
+	part157,
 	part158,
-	part159,
 ]);
 
 var all34 = all_match({
 	processors: [
-		part157,
+		part156,
 		select33,
 	],
 	on_success: processor_chain([
@@ -1813,22 +1805,22 @@ var all34 = all_match({
 
 var msg97 = msg("named:49", all34);
 
-var part160 = match("MESSAGE#83:named:24/1_0", "nwparser.p0", "%{domain}): %{fld2}: zone transfer%{p0}");
+var part159 = match("MESSAGE#83:named:24/1_0", "nwparser.p0", "%{domain}): %{fld2}: zone transfer%{p0}");
 
-var part161 = match("MESSAGE#83:named:24/1_1", "nwparser.p0", "%{domain}): zone transfer%{p0}");
+var part160 = match("MESSAGE#83:named:24/1_1", "nwparser.p0", "%{domain}): zone transfer%{p0}");
 
 var select34 = linear_select([
+	part159,
 	part160,
-	part161,
 ]);
 
-var part162 = match("MESSAGE#83:named:24/2", "nwparser.p0", "%{}'%{zone}' %{action}");
+var part161 = match("MESSAGE#83:named:24/2", "nwparser.p0", "%{}'%{zone}' %{action}");
 
 var all35 = all_match({
 	processors: [
 		dup57,
 		select34,
-		part162,
+		part161,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1840,22 +1832,22 @@ var all35 = all_match({
 
 var msg98 = msg("named:24", all35);
 
-var part163 = match("MESSAGE#84:named:26/1_0", "nwparser.p0", "%{domain}): %{fld2}: no more recursive clients %{p0}");
+var part162 = match("MESSAGE#84:named:26/1_0", "nwparser.p0", "%{domain}): %{fld2}: no more recursive clients %{p0}");
 
-var part164 = match("MESSAGE#84:named:26/1_1", "nwparser.p0", "%{domain}): no more recursive clients%{p0}");
+var part163 = match("MESSAGE#84:named:26/1_1", "nwparser.p0", "%{domain}): no more recursive clients%{p0}");
 
 var select35 = linear_select([
+	part162,
 	part163,
-	part164,
 ]);
 
-var part165 = match("MESSAGE#84:named:26/2", "nwparser.p0", "%{}(%{fld3}) %{info}");
+var part164 = match("MESSAGE#84:named:26/2", "nwparser.p0", "%{}(%{fld3}) %{info}");
 
 var all36 = all_match({
 	processors: [
 		dup57,
 		select35,
-		part165,
+		part164,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1866,22 +1858,22 @@ var all36 = all_match({
 
 var msg99 = msg("named:26", all36);
 
-var part166 = match("MESSAGE#85:named:27/1_0", "nwparser.p0", "%{domain}): %{fld2->} : %{fld3->} response from Internet for %{p0}");
+var part165 = match("MESSAGE#85:named:27/1_0", "nwparser.p0", "%{domain}): %{fld2->} : %{fld3->} response from Internet for %{p0}");
 
-var part167 = match("MESSAGE#85:named:27/1_1", "nwparser.p0", "%{domain}): %{fld3->} response from Internet for %{p0}");
+var part166 = match("MESSAGE#85:named:27/1_1", "nwparser.p0", "%{domain}): %{fld3->} response from Internet for %{p0}");
 
 var select36 = linear_select([
+	part165,
 	part166,
-	part167,
 ]);
 
-var part168 = match("MESSAGE#85:named:27/2", "nwparser.p0", "%{fld4->} ");
+var part167 = match("MESSAGE#85:named:27/2", "nwparser.p0", "%{fld4}");
 
 var all37 = all_match({
 	processors: [
 		dup57,
 		select36,
-		part168,
+		part167,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -1892,33 +1884,33 @@ var all37 = all_match({
 
 var msg100 = msg("named:27", all37);
 
-var part169 = match("MESSAGE#86:named:38/2_0", "nwparser.p0", "%{sport}#%{fld5->} (%{fld6}):%{p0}");
+var part168 = match("MESSAGE#86:named:38/2_0", "nwparser.p0", "%{sport}#%{fld5->} (%{fld6}):%{p0}");
 
-var part170 = match("MESSAGE#86:named:38/2_1", "nwparser.p0", "%{sport->} (%{fld5}):%{p0}");
+var part169 = match("MESSAGE#86:named:38/2_1", "nwparser.p0", "%{sport->} (%{fld5}):%{p0}");
 
 var select37 = linear_select([
+	part168,
 	part169,
-	part170,
 	dup53,
 ]);
 
-var part171 = match("MESSAGE#86:named:38/3", "nwparser.p0", "%{}query%{p0}");
+var part170 = match("MESSAGE#86:named:38/3", "nwparser.p0", "%{}query%{p0}");
 
-var part172 = match("MESSAGE#86:named:38/4_0", "nwparser.p0", " (%{fld7}) '%{domain}/%{fld4}' %{result->} ");
+var part171 = match("MESSAGE#86:named:38/4_0", "nwparser.p0", " (%{fld7}) '%{domain}/%{fld4}' %{result}");
 
-var part173 = match("MESSAGE#86:named:38/4_1", "nwparser.p0", ": %{domain->} %{fld4->} (%{daddr}) ");
+var part172 = match("MESSAGE#86:named:38/4_1", "nwparser.p0", ": %{domain->} %{fld4->} (%{daddr})");
 
 var select38 = linear_select([
+	part171,
 	part172,
-	part173,
 ]);
 
 var all38 = all_match({
 	processors: [
 		dup50,
-		dup73,
+		dup72,
 		select37,
-		part171,
+		part170,
 		select38,
 	],
 	on_success: processor_chain([
@@ -1930,7 +1922,7 @@ var all38 = all_match({
 
 var msg101 = msg("named:38", all38);
 
-var part174 = match("MESSAGE#87:named:39", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3}: %{severity}: error (%{result}) resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
+var part173 = match("MESSAGE#87:named:39", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3}: %{severity}: error (%{result}) resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
 	dup12,
 	dup49,
 	dup14,
@@ -1939,64 +1931,64 @@ var part174 = match("MESSAGE#87:named:39", "nwparser.payload", "%{fld1->} %{fld2
 	dup54,
 ]));
 
-var msg102 = msg("named:39", part174);
+var msg102 = msg("named:39", part173);
 
-var part175 = match("MESSAGE#88:named:46", "nwparser.payload", "%{event_description}: Authorization denied for the operation (%{fld4}): %{fld5->} (data=\"%{hostip}\", source=\"%{hostname}\")", processor_chain([
+var part174 = match("MESSAGE#88:named:46", "nwparser.payload", "%{event_description}: Authorization denied for the operation (%{fld4}): %{fld5->} (data=\"%{hostip}\", source=\"%{hostname}\")", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg103 = msg("named:46", part175);
+var msg103 = msg("named:46", part174);
 
-var part176 = match("MESSAGE#89:named:64", "nwparser.payload", "client %{saddr}#%{sport}/%{fld1}: updating zone '%{zone}': deleting %{info->} at %{hostname->} %{dns_querytype}", processor_chain([
+var part175 = match("MESSAGE#89:named:64", "nwparser.payload", "client %{saddr}#%{sport}/%{fld1}: updating zone '%{zone}': deleting %{info->} at %{hostname->} %{dns_querytype}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg104 = msg("named:64", part176);
+var msg104 = msg("named:64", part175);
 
-var part177 = match("MESSAGE#90:named:45", "nwparser.payload", "client %{saddr}#%{sport}: updating zone '%{zone}': deleting %{info->} at %{hostname->} %{dns_querytype}", processor_chain([
+var part176 = match("MESSAGE#90:named:45", "nwparser.payload", "client %{saddr}#%{sport}: updating zone '%{zone}': deleting %{info->} at %{hostname->} %{dns_querytype}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup47,
 ]));
 
-var msg105 = msg("named:45", part177);
+var msg105 = msg("named:45", part176);
 
-var part178 = match("MESSAGE#91:named:44/0", "nwparser.payload", "client %{saddr}#%{sport}/key dhcp_updater_default: updating zone '%{p0}");
+var part177 = match("MESSAGE#91:named:44/0", "nwparser.payload", "client %{saddr}#%{sport}/key dhcp_updater_default: updating zone '%{p0}");
 
-var part179 = match("MESSAGE#91:named:44/1_0", "nwparser.p0", "%{domain}/IN'%{p0}");
+var part178 = match("MESSAGE#91:named:44/1_0", "nwparser.p0", "%{domain}/IN'%{p0}");
 
-var part180 = match("MESSAGE#91:named:44/1_1", "nwparser.p0", "%{domain}'%{p0}");
+var part179 = match("MESSAGE#91:named:44/1_1", "nwparser.p0", "%{domain}'%{p0}");
 
 var select39 = linear_select([
+	part178,
 	part179,
-	part180,
 ]);
 
-var part181 = match("MESSAGE#91:named:44/2", "nwparser.p0", ": %{p0}");
+var part180 = match("MESSAGE#91:named:44/2", "nwparser.p0", ": %{p0}");
 
-var part182 = match("MESSAGE#91:named:44/3_0", "nwparser.p0", "deleting an RR at %{daddr}.in-addr.arpa ");
+var part181 = match("MESSAGE#91:named:44/3_0", "nwparser.p0", "deleting an RR at %{daddr}.in-addr.arpa ");
 
-var part183 = match("MESSAGE#91:named:44/3_1", "nwparser.p0", "deleting an RR at %{daddr}.%{fld6->} ");
+var part182 = match("MESSAGE#91:named:44/3_1", "nwparser.p0", "deleting an RR at %{daddr}.%{fld6->} ");
 
-var part184 = match("MESSAGE#91:named:44/3_2", "nwparser.p0", "%{fld5}");
+var part183 = match("MESSAGE#91:named:44/3_2", "nwparser.p0", "%{fld5}");
 
 var select40 = linear_select([
+	part181,
 	part182,
 	part183,
-	part184,
 ]);
 
 var all39 = all_match({
 	processors: [
-		part178,
+		part177,
 		select39,
-		part181,
+		part180,
 		select40,
 	],
 	on_success: processor_chain([
@@ -2008,93 +2000,93 @@ var all39 = all_match({
 
 var msg106 = msg("named:44", all39);
 
-var part185 = match("MESSAGE#92:named:43", "nwparser.payload", "client %{saddr}#%{sport->} (%{domain}): query (%{fld3}) '%{fld4}/%{dns_querytype}/IN' %{result}", processor_chain([
+var part184 = match("MESSAGE#92:named:43", "nwparser.payload", "client %{saddr}#%{sport->} (%{domain}): query (%{fld3}) '%{fld4}/%{dns_querytype}/IN' %{result}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg107 = msg("named:43", part185);
+var msg107 = msg("named:43", part184);
 
-var part186 = match("MESSAGE#93:named:42", "nwparser.payload", "%{result->} resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
+var part185 = match("MESSAGE#93:named:42", "nwparser.payload", "%{result->} resolving '%{saddr}.in-addr.arpa/%{event_description}/IN': %{daddr}#%{dport}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup55,
 ]));
 
-var msg108 = msg("named:42", part186);
+var msg108 = msg("named:42", part185);
 
-var part187 = match("MESSAGE#94:named:41", "nwparser.payload", "%{fld1}: unable to find root NS '%{domain}'", processor_chain([
+var part186 = match("MESSAGE#94:named:41", "nwparser.payload", "%{fld1}: unable to find root NS '%{domain}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg109 = msg("named:41", part187);
+var msg109 = msg("named:41", part186);
 
-var part188 = match("MESSAGE#95:named:47", "nwparser.payload", "client %{saddr}#%{sport}: updating zone '%{zone}': update %{disposition}: %{event_description}", processor_chain([
+var part187 = match("MESSAGE#95:named:47", "nwparser.payload", "client %{saddr}#%{sport}: updating zone '%{zone}': update %{disposition}: %{event_description}", processor_chain([
 	setc("eventcategory","1502000000"),
 	dup6,
 	dup8,
 ]));
 
-var msg110 = msg("named:47", part188);
+var msg110 = msg("named:47", part187);
 
-var part189 = match("MESSAGE#96:named:48", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): query '%{zone}' %{result}", processor_chain([
+var part188 = match("MESSAGE#96:named:48", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): query '%{zone}' %{result}", processor_chain([
 	dup56,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg111 = msg("named:48", part189);
+var msg111 = msg("named:48", part188);
 
-var part190 = match("MESSAGE#97:named:62", "nwparser.payload", "client %{saddr}#%{sport}/%{fld1->} (%{hostname}): transfer of '%{zone}': %{info}", processor_chain([
+var part189 = match("MESSAGE#97:named:62", "nwparser.payload", "client %{saddr}#%{sport}/%{fld1->} (%{hostname}): transfer of '%{zone}': %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg112 = msg("named:62", part190);
+var msg112 = msg("named:62", part189);
 
-var part191 = match("MESSAGE#98:named:53", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): transfer of '%{zone}': %{info}", processor_chain([
+var part190 = match("MESSAGE#98:named:53", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): transfer of '%{zone}': %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg113 = msg("named:53", part191);
+var msg113 = msg("named:53", part190);
 
-var part192 = match("MESSAGE#99:named:77", "nwparser.payload", "client %{saddr}#%{sport->} (%{domain}): query failed (%{error}) for %{fld1}/IN/%{dns_querytype->} at %{filename}:%{fld2->} ", processor_chain([
+var part191 = match("MESSAGE#99:named:77", "nwparser.payload", "client %{saddr}#%{sport->} (%{domain}): query failed (%{error}) for %{fld1}/IN/%{dns_querytype->} at %{filename}:%{fld2}", processor_chain([
 	dup48,
 	dup6,
 	dup8,
 	setc("event_description"," query failed"),
 ]));
 
-var msg114 = msg("named:77", part192);
+var msg114 = msg("named:77", part191);
 
-var part193 = match("MESSAGE#100:named:52", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): %{info}", processor_chain([
+var part192 = match("MESSAGE#100:named:52", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): %{info}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup47,
 ]));
 
-var msg115 = msg("named:52", part193);
+var msg115 = msg("named:52", part192);
 
-var part194 = match("MESSAGE#101:named:50", "nwparser.payload", "%{fld1}: %{domain}/%{dns_querytype->} (%{saddr}) %{info}", processor_chain([
+var part193 = match("MESSAGE#101:named:50", "nwparser.payload", "%{fld1}: %{domain}/%{dns_querytype->} (%{saddr}) %{info}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 ]));
 
-var msg116 = msg("named:50", part194);
+var msg116 = msg("named:50", part193);
 
-var part195 = match("MESSAGE#102:named:51", "nwparser.payload", "%{fld1}: %{fld2}: REFUSED", processor_chain([
+var part194 = match("MESSAGE#102:named:51", "nwparser.payload", "%{fld1}: %{fld2}: REFUSED", processor_chain([
 	dup56,
 	dup6,
 	dup8,
@@ -2103,9 +2095,9 @@ var part195 = match("MESSAGE#102:named:51", "nwparser.payload", "%{fld1}: %{fld2
 	dup54,
 ]));
 
-var msg117 = msg("named:51", part195);
+var msg117 = msg("named:51", part194);
 
-var part196 = match("MESSAGE#103:named:54", "nwparser.payload", "%{hostip}#%{network_port}: GSS-TSIG authentication failed:%{event_description}", processor_chain([
+var part195 = match("MESSAGE#103:named:54", "nwparser.payload", "%{hostip}#%{network_port}: GSS-TSIG authentication failed:%{event_description}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
@@ -2114,22 +2106,22 @@ var part196 = match("MESSAGE#103:named:54", "nwparser.payload", "%{hostip}#%{net
 	dup30,
 ]));
 
-var msg118 = msg("named:54", part196);
+var msg118 = msg("named:54", part195);
 
-var part197 = match("MESSAGE#104:named:55/0", "nwparser.payload", "success resolving '%{domain}/%{dns_querytype}' (in '%{fld1}'?) %{p0}");
+var part196 = match("MESSAGE#104:named:55/0", "nwparser.payload", "success resolving '%{domain}/%{dns_querytype}' (in '%{fld1}'?) %{p0}");
 
-var part198 = match("MESSAGE#104:named:55/1_0", "nwparser.p0", "after disabling EDNS%{}");
+var part197 = match("MESSAGE#104:named:55/1_0", "nwparser.p0", "after disabling EDNS%{}");
 
-var part199 = match("MESSAGE#104:named:55/1_1", "nwparser.p0", "%{fld2}");
+var part198 = match("MESSAGE#104:named:55/1_1", "nwparser.p0", "%{fld2}");
 
 var select41 = linear_select([
+	part197,
 	part198,
-	part199,
 ]);
 
 var all40 = all_match({
 	processors: [
-		part197,
+		part196,
 		select41,
 	],
 	on_success: processor_chain([
@@ -2144,7 +2136,7 @@ var all40 = all_match({
 
 var msg119 = msg("named:55", all40);
 
-var part200 = match("MESSAGE#105:named:56", "nwparser.payload", "SERVFAIL unexpected RCODE resolving '%{domain}/%{dns_querytype}/IN':%{hostip}#%{network_port}", processor_chain([
+var part199 = match("MESSAGE#105:named:56", "nwparser.payload", "SERVFAIL unexpected RCODE resolving '%{domain}/%{dns_querytype}/IN':%{hostip}#%{network_port}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
@@ -2154,9 +2146,9 @@ var part200 = match("MESSAGE#105:named:56", "nwparser.payload", "SERVFAIL unexpe
 	dup59,
 ]));
 
-var msg120 = msg("named:56", part200);
+var msg120 = msg("named:56", part199);
 
-var part201 = match("MESSAGE#106:named:57", "nwparser.payload", "FORMERR resolving '%{domain}/%{dns_querytype}/IN':%{hostip}#%{network_port}", processor_chain([
+var part200 = match("MESSAGE#106:named:57", "nwparser.payload", "FORMERR resolving '%{domain}/%{dns_querytype}/IN':%{hostip}#%{network_port}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
@@ -2165,26 +2157,26 @@ var part201 = match("MESSAGE#106:named:57", "nwparser.payload", "FORMERR resolvi
 	dup59,
 ]));
 
-var msg121 = msg("named:57", part201);
+var msg121 = msg("named:57", part200);
 
-var part202 = match("MESSAGE#107:named:04/0", "nwparser.payload", "%{action->} on %{p0}");
+var part201 = match("MESSAGE#107:named:04/0", "nwparser.payload", "%{action->} on %{p0}");
 
-var part203 = match("MESSAGE#107:named:04/1_0", "nwparser.p0", "IPv4 interface %{sinterface}, %{saddr}#%{p0}");
+var part202 = match("MESSAGE#107:named:04/1_0", "nwparser.p0", "IPv4 interface %{sinterface}, %{saddr}#%{p0}");
 
-var part204 = match("MESSAGE#107:named:04/1_1", "nwparser.p0", "%{saddr}#%{p0}");
+var part203 = match("MESSAGE#107:named:04/1_1", "nwparser.p0", "%{saddr}#%{p0}");
 
 var select42 = linear_select([
+	part202,
 	part203,
-	part204,
 ]);
 
-var part205 = match("MESSAGE#107:named:04/2", "nwparser.p0", "%{sport}");
+var part204 = match("MESSAGE#107:named:04/2", "nwparser.p0", "%{sport}");
 
 var all41 = all_match({
 	processors: [
-		part202,
+		part201,
 		select42,
-		part205,
+		part204,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -2195,7 +2187,7 @@ var all41 = all_match({
 
 var msg122 = msg("named:04", all41);
 
-var part206 = match("MESSAGE#108:named:58", "nwparser.payload", "lame server resolving '%{domain}' (in '%{fld2}'?):%{hostip}#%{network_port}", processor_chain([
+var part205 = match("MESSAGE#108:named:58", "nwparser.payload", "lame server resolving '%{domain}' (in '%{fld2}'?):%{hostip}#%{network_port}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
@@ -2203,9 +2195,9 @@ var part206 = match("MESSAGE#108:named:58", "nwparser.payload", "lame server res
 	dup59,
 ]));
 
-var msg123 = msg("named:58", part206);
+var msg123 = msg("named:58", part205);
 
-var part207 = match("MESSAGE#109:named:59", "nwparser.payload", "exceeded max queries resolving '%{domain}/%{dns_querytype}'", processor_chain([
+var part206 = match("MESSAGE#109:named:59", "nwparser.payload", "exceeded max queries resolving '%{domain}/%{dns_querytype}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -2213,9 +2205,9 @@ var part207 = match("MESSAGE#109:named:59", "nwparser.payload", "exceeded max qu
 	dup59,
 ]));
 
-var msg124 = msg("named:59", part207);
+var msg124 = msg("named:59", part206);
 
-var part208 = match("MESSAGE#110:named:60", "nwparser.payload", "skipping nameserver '%{hostname}' because it is a CNAME, while resolving '%{domain}/%{dns_querytype}'", processor_chain([
+var part207 = match("MESSAGE#110:named:60", "nwparser.payload", "skipping nameserver '%{hostname}' because it is a CNAME, while resolving '%{domain}/%{dns_querytype}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -2224,18 +2216,18 @@ var part208 = match("MESSAGE#110:named:60", "nwparser.payload", "skipping namese
 	setc("event_description","skipping nameserver because it is a CNAME"),
 ]));
 
-var msg125 = msg("named:60", part208);
+var msg125 = msg("named:60", part207);
 
-var part209 = match("MESSAGE#111:named:61", "nwparser.payload", "loading configuration from '%{filename}'", processor_chain([
+var part208 = match("MESSAGE#111:named:61", "nwparser.payload", "loading configuration from '%{filename}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg126 = msg("named:61", part209);
+var msg126 = msg("named:61", part208);
 
-var part210 = match("MESSAGE#112:named:73", "nwparser.payload", "fetch: %{zone}/%{dns_querytype}", processor_chain([
+var part209 = match("MESSAGE#112:named:73", "nwparser.payload", "fetch: %{zone}/%{dns_querytype}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -2243,24 +2235,24 @@ var part210 = match("MESSAGE#112:named:73", "nwparser.payload", "fetch: %{zone}/
 	dup35,
 ]));
 
-var msg127 = msg("named:73", part210);
+var msg127 = msg("named:73", part209);
 
-var part211 = match("MESSAGE#113:named:74", "nwparser.payload", "decrement_reference: delete from rbt: %{fld1->} %{domain}", processor_chain([
+var part210 = match("MESSAGE#113:named:74", "nwparser.payload", "decrement_reference: delete from rbt: %{fld1->} %{domain}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg128 = msg("named:74", part211);
+var msg128 = msg("named:74", part210);
 
-var part212 = match("MESSAGE#114:named:07/0_0", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): view %{fld2}: query: %{web_query}");
+var part211 = match("MESSAGE#114:named:07/0_0", "nwparser.payload", "client %{saddr}#%{sport->} (%{hostname}): view %{fld2}: query: %{web_query}");
 
-var part213 = match("MESSAGE#114:named:07/0_1", "nwparser.payload", "%{event_description}");
+var part212 = match("MESSAGE#114:named:07/0_1", "nwparser.payload", "%{event_description}");
 
 var select43 = linear_select([
+	part211,
 	part212,
-	part213,
 ]);
 
 var all42 = all_match({
@@ -2342,38 +2334,38 @@ var select44 = linear_select([
 	msg129,
 ]);
 
-var part214 = match("MESSAGE#115:pidof:01", "nwparser.payload", "can't read sid from %{agent}", processor_chain([
+var part213 = match("MESSAGE#115:pidof:01", "nwparser.payload", "can't read sid from %{agent}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 	setc("event_description","can't read sid"),
 ]));
 
-var msg130 = msg("pidof:01", part214);
+var msg130 = msg("pidof:01", part213);
 
-var part215 = match("MESSAGE#116:pidof", "nwparser.payload", "can't get program name from %{agent}", processor_chain([
+var part214 = match("MESSAGE#116:pidof", "nwparser.payload", "can't get program name from %{agent}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg131 = msg("pidof", part215);
+var msg131 = msg("pidof", part214);
 
 var select45 = linear_select([
 	msg130,
 	msg131,
 ]);
 
-var part216 = match("MESSAGE#117:validate_dhcpd:01", "nwparser.payload", "Configured local-address not available as source address for DNS updates. %{result}", processor_chain([
+var part215 = match("MESSAGE#117:validate_dhcpd:01", "nwparser.payload", "Configured local-address not available as source address for DNS updates. %{result}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 	setc("event_description","Configured local-address not available as source address for DNS updates"),
 ]));
 
-var msg132 = msg("validate_dhcpd:01", part216);
+var msg132 = msg("validate_dhcpd:01", part215);
 
-var msg133 = msg("validate_dhcpd", dup74);
+var msg133 = msg("validate_dhcpd", dup73);
 
 var select46 = linear_select([
 	msg132,
@@ -2382,13 +2374,13 @@ var select46 = linear_select([
 
 var msg134 = msg("syslog-ng", dup64);
 
-var part217 = match("MESSAGE#120:kernel", "nwparser.payload", "Linux version %{version->} (%{from}) (%{fld1}) %{fld2}", processor_chain([
+var part216 = match("MESSAGE#120:kernel", "nwparser.payload", "Linux version %{version->} (%{from}) (%{fld1}) %{fld2}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg135 = msg("kernel", part217);
+var msg135 = msg("kernel", part216);
 
 var msg136 = msg("kernel:01", dup64);
 
@@ -2397,25 +2389,25 @@ var select47 = linear_select([
 	msg136,
 ]);
 
-var msg137 = msg("radiusd", dup69);
+var msg137 = msg("radiusd", dup64);
 
-var part218 = match("MESSAGE#123:rc", "nwparser.payload", "executing %{agent->} start", processor_chain([
+var part217 = match("MESSAGE#123:rc", "nwparser.payload", "executing %{agent->} start", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg138 = msg("rc", part218);
+var msg138 = msg("rc", part217);
 
 var msg139 = msg("rc3", dup64);
 
-var part219 = match("MESSAGE#125:rcsysinit", "nwparser.payload", "fsck from %{version}", processor_chain([
+var part218 = match("MESSAGE#125:rcsysinit", "nwparser.payload", "fsck from %{version}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg140 = msg("rcsysinit", part219);
+var msg140 = msg("rcsysinit", part218);
 
 var msg141 = msg("rcsysinit:01", dup64);
 
@@ -2424,37 +2416,37 @@ var select48 = linear_select([
 	msg141,
 ]);
 
-var part220 = match("MESSAGE#126:watchdog", "nwparser.payload", "opened %{filename}, with timeout = %{duration->} secs", processor_chain([
+var part219 = match("MESSAGE#126:watchdog", "nwparser.payload", "opened %{filename}, with timeout = %{duration->} secs", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg142 = msg("watchdog", part220);
+var msg142 = msg("watchdog", part219);
 
-var part221 = match("MESSAGE#127:watchdog:01", "nwparser.payload", "%{action}, pid = %{process_id}", processor_chain([
+var part220 = match("MESSAGE#127:watchdog:01", "nwparser.payload", "%{action}, pid = %{process_id}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg143 = msg("watchdog:01", part221);
+var msg143 = msg("watchdog:01", part220);
 
-var part222 = match("MESSAGE#128:watchdog:02", "nwparser.payload", "received %{fld1}, cancelling softdog and exiting...", processor_chain([
+var part221 = match("MESSAGE#128:watchdog:02", "nwparser.payload", "received %{fld1}, cancelling softdog and exiting...", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg144 = msg("watchdog:02", part222);
+var msg144 = msg("watchdog:02", part221);
 
-var part223 = match("MESSAGE#129:watchdog:03", "nwparser.payload", "%{filename->} could not be opened, errno = %{resultcode}", processor_chain([
+var part222 = match("MESSAGE#129:watchdog:03", "nwparser.payload", "%{filename->} could not be opened, errno = %{resultcode}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg145 = msg("watchdog:03", part223);
+var msg145 = msg("watchdog:03", part222);
 
 var msg146 = msg("watchdog:04", dup64);
 
@@ -2468,13 +2460,13 @@ var select49 = linear_select([
 
 var msg147 = msg("init", dup64);
 
-var part224 = match("MESSAGE#131:logger", "nwparser.payload", "%{action}: %{saddr}/%{mask->} to %{interface}", processor_chain([
+var part223 = match("MESSAGE#131:logger", "nwparser.payload", "%{action}: %{saddr}/%{mask->} to %{interface}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg148 = msg("logger", part224);
+var msg148 = msg("logger", part223);
 
 var msg149 = msg("logger:01", dup64);
 
@@ -2483,33 +2475,33 @@ var select50 = linear_select([
 	msg149,
 ]);
 
-var part225 = match("MESSAGE#133:openvpn-member", "nwparser.payload", "read %{protocol->} [%{info}] %{event_description->} (code=%{resultcode})", processor_chain([
+var part224 = match("MESSAGE#133:openvpn-member", "nwparser.payload", "read %{protocol->} [%{info}] %{event_description->} (code=%{resultcode})", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg150 = msg("openvpn-member", part225);
+var msg150 = msg("openvpn-member", part224);
 
-var msg151 = msg("openvpn-member:01", dup75);
+var msg151 = msg("openvpn-member:01", dup74);
 
-var part226 = match("MESSAGE#135:openvpn-member:02", "nwparser.payload", "Options error: %{event_description}", processor_chain([
+var part225 = match("MESSAGE#135:openvpn-member:02", "nwparser.payload", "Options error: %{event_description}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg152 = msg("openvpn-member:02", part226);
+var msg152 = msg("openvpn-member:02", part225);
 
-var part227 = match("MESSAGE#136:openvpn-member:03", "nwparser.payload", "OpenVPN %{version->} [%{protocol}] [%{fld2}] %{info}", processor_chain([
+var part226 = match("MESSAGE#136:openvpn-member:03", "nwparser.payload", "OpenVPN %{version->} [%{protocol}] [%{fld2}] %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg153 = msg("openvpn-member:03", part227);
+var msg153 = msg("openvpn-member:03", part226);
 
-var msg154 = msg("openvpn-member:04", dup76);
+var msg154 = msg("openvpn-member:04", dup75);
 
 var msg155 = msg("openvpn-member:05", dup64);
 
@@ -2522,32 +2514,32 @@ var select51 = linear_select([
 	msg155,
 ]);
 
-var part228 = match("MESSAGE#139:sshd", "nwparser.payload", "Server listening on %{hostip->} port %{network_port}.", processor_chain([
+var part227 = match("MESSAGE#139:sshd", "nwparser.payload", "Server listening on %{hostip->} port %{network_port}.", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg156 = msg("sshd", part228);
+var msg156 = msg("sshd", part227);
 
-var part229 = match("MESSAGE#140:sshd:01/0", "nwparser.payload", "Accepted password for %{p0}");
+var part228 = match("MESSAGE#140:sshd:01/0", "nwparser.payload", "Accepted password for %{p0}");
 
-var part230 = match("MESSAGE#140:sshd:01/1_0", "nwparser.p0", "root from %{p0}");
+var part229 = match("MESSAGE#140:sshd:01/1_0", "nwparser.p0", "root from %{p0}");
 
-var part231 = match("MESSAGE#140:sshd:01/1_1", "nwparser.p0", "%{username->} from %{p0}");
+var part230 = match("MESSAGE#140:sshd:01/1_1", "nwparser.p0", "%{username->} from %{p0}");
 
 var select52 = linear_select([
+	part229,
 	part230,
-	part231,
 ]);
 
-var part232 = match("MESSAGE#140:sshd:01/2", "nwparser.p0", "%{saddr->} port %{sport->} %{protocol}");
+var part231 = match("MESSAGE#140:sshd:01/2", "nwparser.p0", "%{saddr->} port %{sport->} %{protocol}");
 
 var all43 = all_match({
 	processors: [
-		part229,
+		part228,
 		select52,
-		part232,
+		part231,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -2558,31 +2550,31 @@ var all43 = all_match({
 
 var msg157 = msg("sshd:01", all43);
 
-var part233 = match("MESSAGE#141:sshd:02", "nwparser.payload", "Connection closed by %{hostip}", processor_chain([
+var part232 = match("MESSAGE#141:sshd:02", "nwparser.payload", "Connection closed by %{hostip}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg158 = msg("sshd:02", part233);
+var msg158 = msg("sshd:02", part232);
 
-var part234 = match("MESSAGE#142:sshd:03", "nwparser.payload", "%{severity}: Bind to port %{network_port->} on %{hostip->} %{result}: %{event_description}", processor_chain([
+var part233 = match("MESSAGE#142:sshd:03", "nwparser.payload", "%{severity}: Bind to port %{network_port->} on %{hostip->} %{result}: %{event_description}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg159 = msg("sshd:03", part234);
+var msg159 = msg("sshd:03", part233);
 
-var part235 = match("MESSAGE#143:sshd:04", "nwparser.payload", "%{severity}: Cannot bind any address.", processor_chain([
+var part234 = match("MESSAGE#143:sshd:04", "nwparser.payload", "%{severity}: Cannot bind any address.", processor_chain([
 	setc("eventcategory","1601000000"),
 	dup6,
 	dup8,
 ]));
 
-var msg160 = msg("sshd:04", part235);
+var msg160 = msg("sshd:04", part234);
 
-var part236 = match("MESSAGE#144:sshd:05", "nwparser.payload", "%{action}: logout() %{result->} ", processor_chain([
+var part235 = match("MESSAGE#144:sshd:05", "nwparser.payload", "%{action}: logout() %{result}", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -2592,27 +2584,27 @@ var part236 = match("MESSAGE#144:sshd:05", "nwparser.payload", "%{action}: logou
 	setc("event_description","logout"),
 ]));
 
-var msg161 = msg("sshd:05", part236);
+var msg161 = msg("sshd:05", part235);
 
-var part237 = match("MESSAGE#145:sshd:06", "nwparser.payload", "Did not receive identification string from %{saddr->} ", processor_chain([
+var part236 = match("MESSAGE#145:sshd:06", "nwparser.payload", "Did not receive identification string from %{saddr}", processor_chain([
 	dup15,
 	dup6,
 	setc("result","no identification string"),
 	setc("event_description","Did not receive identification string from peer"),
 ]));
 
-var msg162 = msg("sshd:06", part237);
+var msg162 = msg("sshd:06", part236);
 
-var part238 = match("MESSAGE#146:sshd:07", "nwparser.payload", "Sleep 60 seconds for slowing down ssh login%{}", processor_chain([
+var part237 = match("MESSAGE#146:sshd:07", "nwparser.payload", "Sleep 60 seconds for slowing down ssh login%{}", processor_chain([
 	dup12,
 	dup6,
 	setc("result","slowing down ssh login"),
 	setc("event_description","Sleep 60 seconds"),
 ]));
 
-var msg163 = msg("sshd:07", part238);
+var msg163 = msg("sshd:07", part237);
 
-var part239 = match("MESSAGE#147:sshd:08", "nwparser.payload", "%{authmethod->} authentication succeeded for user %{username}", processor_chain([
+var part238 = match("MESSAGE#147:sshd:08", "nwparser.payload", "%{authmethod->} authentication succeeded for user %{username}", processor_chain([
 	setc("eventcategory","1302010300"),
 	dup6,
 	setc("event_description","authentication succeeded"),
@@ -2620,9 +2612,9 @@ var part239 = match("MESSAGE#147:sshd:08", "nwparser.payload", "%{authmethod->} 
 	dup60,
 ]));
 
-var msg164 = msg("sshd:08", part239);
+var msg164 = msg("sshd:08", part238);
 
-var part240 = match("MESSAGE#148:sshd:09", "nwparser.payload", "User group = %{group}", processor_chain([
+var part239 = match("MESSAGE#148:sshd:09", "nwparser.payload", "User group = %{group}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -2630,9 +2622,9 @@ var part240 = match("MESSAGE#148:sshd:09", "nwparser.payload", "User group = %{g
 	dup60,
 ]));
 
-var msg165 = msg("sshd:09", part240);
+var msg165 = msg("sshd:09", part239);
 
-var part241 = match("MESSAGE#149:sshd:10", "nwparser.payload", "Bad protocol version identification '%{protocol_detail}' from %{saddr}", processor_chain([
+var part240 = match("MESSAGE#149:sshd:10", "nwparser.payload", "Bad protocol version identification '%{protocol_detail}' from %{saddr}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -2640,7 +2632,7 @@ var part241 = match("MESSAGE#149:sshd:10", "nwparser.payload", "Bad protocol ver
 	dup60,
 ]));
 
-var msg166 = msg("sshd:10", part241);
+var msg166 = msg("sshd:10", part240);
 
 var select53 = linear_select([
 	msg156,
@@ -2656,49 +2648,49 @@ var select53 = linear_select([
 	msg166,
 ]);
 
-var part242 = match("MESSAGE#150:openvpn-master", "nwparser.payload", "OpenVPN %{version->} [%{protocol}] [%{fld1}] %{info}", processor_chain([
+var part241 = match("MESSAGE#150:openvpn-master", "nwparser.payload", "OpenVPN %{version->} [%{protocol}] [%{fld1}] %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg167 = msg("openvpn-master", part242);
+var msg167 = msg("openvpn-master", part241);
 
-var part243 = match("MESSAGE#151:openvpn-master:01", "nwparser.payload", "read %{protocol->} [%{info}]: %{event_description->} (code=%{resultcode})", processor_chain([
+var part242 = match("MESSAGE#151:openvpn-master:01", "nwparser.payload", "read %{protocol->} [%{info}]: %{event_description->} (code=%{resultcode})", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg168 = msg("openvpn-master:01", part243);
+var msg168 = msg("openvpn-master:01", part242);
 
-var msg169 = msg("openvpn-master:02", dup75);
+var msg169 = msg("openvpn-master:02", dup74);
 
-var part244 = match("MESSAGE#153:openvpn-master:03", "nwparser.payload", "%{saddr}:%{sport->} TLS Error: TLS handshake failed", processor_chain([
+var part243 = match("MESSAGE#153:openvpn-master:03", "nwparser.payload", "%{saddr}:%{sport->} TLS Error: TLS handshake failed", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg170 = msg("openvpn-master:03", part244);
+var msg170 = msg("openvpn-master:03", part243);
 
-var part245 = match("MESSAGE#154:openvpn-master:04", "nwparser.payload", "%{fld1}/%{saddr}:%{sport->} [%{fld2}] %{event_description}", processor_chain([
+var part244 = match("MESSAGE#154:openvpn-master:04", "nwparser.payload", "%{fld1}/%{saddr}:%{sport->} [%{fld2}] %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg171 = msg("openvpn-master:04", part245);
+var msg171 = msg("openvpn-master:04", part244);
 
-var part246 = match("MESSAGE#155:openvpn-master:05", "nwparser.payload", "%{saddr}:%{sport->} [%{fld1}] %{event_description->} ", processor_chain([
+var part245 = match("MESSAGE#155:openvpn-master:05", "nwparser.payload", "%{saddr}:%{sport->} [%{fld1}] %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg172 = msg("openvpn-master:05", part246);
+var msg172 = msg("openvpn-master:05", part245);
 
-var msg173 = msg("openvpn-master:06", dup76);
+var msg173 = msg("openvpn-master:06", dup75);
 
 var msg174 = msg("openvpn-master:07", dup64);
 
@@ -2713,29 +2705,29 @@ var select54 = linear_select([
 	msg174,
 ]);
 
-var part247 = match("MESSAGE#158:INFOBLOX-Grid", "nwparser.payload", "Grid member at %{saddr->} %{event_description}", processor_chain([
+var part246 = match("MESSAGE#158:INFOBLOX-Grid", "nwparser.payload", "Grid member at %{saddr->} %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg175 = msg("INFOBLOX-Grid", part247);
+var msg175 = msg("INFOBLOX-Grid", part246);
 
-var part248 = match("MESSAGE#159:INFOBLOX-Grid:02/0_0", "nwparser.payload", "Started%{p0}");
+var part247 = match("MESSAGE#159:INFOBLOX-Grid:02/0_0", "nwparser.payload", "Started%{p0}");
 
-var part249 = match("MESSAGE#159:INFOBLOX-Grid:02/0_1", "nwparser.payload", "Completed%{p0}");
+var part248 = match("MESSAGE#159:INFOBLOX-Grid:02/0_1", "nwparser.payload", "Completed%{p0}");
 
 var select55 = linear_select([
+	part247,
 	part248,
-	part249,
 ]);
 
-var part250 = match("MESSAGE#159:INFOBLOX-Grid:02/1", "nwparser.p0", "%{}distribution on member with IP address %{saddr}");
+var part249 = match("MESSAGE#159:INFOBLOX-Grid:02/1", "nwparser.p0", "%{}distribution on member with IP address %{saddr}");
 
 var all44 = all_match({
 	processors: [
 		select55,
-		part250,
+		part249,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -2746,22 +2738,22 @@ var all44 = all_match({
 
 var msg176 = msg("INFOBLOX-Grid:02", all44);
 
-var part251 = match("MESSAGE#160:INFOBLOX-Grid:03", "nwparser.payload", "Upgrade Complete%{}", processor_chain([
+var part250 = match("MESSAGE#160:INFOBLOX-Grid:03", "nwparser.payload", "Upgrade Complete%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Upgrade Complete"),
 ]));
 
-var msg177 = msg("INFOBLOX-Grid:03", part251);
+var msg177 = msg("INFOBLOX-Grid:03", part250);
 
-var part252 = match("MESSAGE#161:INFOBLOX-Grid:04", "nwparser.payload", "Upgrade to %{fld1}", processor_chain([
+var part251 = match("MESSAGE#161:INFOBLOX-Grid:04", "nwparser.payload", "Upgrade to %{fld1}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg178 = msg("INFOBLOX-Grid:04", part252);
+var msg178 = msg("INFOBLOX-Grid:04", part251);
 
 var select56 = linear_select([
 	msg175,
@@ -2770,41 +2762,41 @@ var select56 = linear_select([
 	msg178,
 ]);
 
-var part253 = match("MESSAGE#162:db_jnld", "nwparser.payload", "Grid member at %{saddr->} is online.", processor_chain([
+var part252 = match("MESSAGE#162:db_jnld", "nwparser.payload", "Grid member at %{saddr->} is online.", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg179 = msg("db_jnld", part253);
+var msg179 = msg("db_jnld", part252);
 
-var part254 = match("MESSAGE#219:db_jnld:01/0", "nwparser.payload", "Resolved conflict for replicated delete of %{p0}");
+var part253 = match("MESSAGE#219:db_jnld:01/0", "nwparser.payload", "Resolved conflict for replicated delete of %{p0}");
 
-var part255 = match("MESSAGE#219:db_jnld:01/1_0", "nwparser.p0", "PTR %{p0}");
+var part254 = match("MESSAGE#219:db_jnld:01/1_0", "nwparser.p0", "PTR %{p0}");
 
-var part256 = match("MESSAGE#219:db_jnld:01/1_1", "nwparser.p0", "TXT %{p0}");
+var part255 = match("MESSAGE#219:db_jnld:01/1_1", "nwparser.p0", "TXT %{p0}");
 
-var part257 = match("MESSAGE#219:db_jnld:01/1_2", "nwparser.p0", "A %{p0}");
+var part256 = match("MESSAGE#219:db_jnld:01/1_2", "nwparser.p0", "A %{p0}");
 
-var part258 = match("MESSAGE#219:db_jnld:01/1_3", "nwparser.p0", "CNAME %{p0}");
+var part257 = match("MESSAGE#219:db_jnld:01/1_3", "nwparser.p0", "CNAME %{p0}");
 
-var part259 = match("MESSAGE#219:db_jnld:01/1_4", "nwparser.p0", "SRV %{p0}");
+var part258 = match("MESSAGE#219:db_jnld:01/1_4", "nwparser.p0", "SRV %{p0}");
 
 var select57 = linear_select([
+	part254,
 	part255,
 	part256,
 	part257,
 	part258,
-	part259,
 ]);
 
-var part260 = match("MESSAGE#219:db_jnld:01/2", "nwparser.p0", "%{}\"%{fld1}\" in zone \"%{zone}\"");
+var part259 = match("MESSAGE#219:db_jnld:01/2", "nwparser.p0", "%{}\"%{fld1}\" in zone \"%{zone}\"");
 
 var all45 = all_match({
 	processors: [
-		part254,
+		part253,
 		select57,
-		part260,
+		part259,
 	],
 	on_success: processor_chain([
 		dup12,
@@ -2820,20 +2812,20 @@ var select58 = linear_select([
 	msg180,
 ]);
 
-var part261 = match("MESSAGE#163:sSMTP/0", "nwparser.payload", "Sent mail for %{to->} (%{fld1}) %{p0}");
+var part260 = match("MESSAGE#163:sSMTP/0", "nwparser.payload", "Sent mail for %{to->} (%{fld1}) %{p0}");
 
-var part262 = match("MESSAGE#163:sSMTP/1_0", "nwparser.p0", "uid=%{uid->} username=%{username->} outbytes=%{sbytes->} ");
+var part261 = match("MESSAGE#163:sSMTP/1_0", "nwparser.p0", "uid=%{uid->} username=%{username->} outbytes=%{sbytes->} ");
 
-var part263 = match("MESSAGE#163:sSMTP/1_1", "nwparser.p0", "%{space->} ");
+var part262 = match("MESSAGE#163:sSMTP/1_1", "nwparser.p0", "%{space->} ");
 
 var select59 = linear_select([
+	part261,
 	part262,
-	part263,
 ]);
 
 var all46 = all_match({
 	processors: [
-		part261,
+		part260,
 		select59,
 	],
 	on_success: processor_chain([
@@ -2845,23 +2837,23 @@ var all46 = all_match({
 
 var msg181 = msg("sSMTP", all46);
 
-var part264 = match("MESSAGE#164:sSMTP:02", "nwparser.payload", "Cannot open %{hostname}:%{network_port}", processor_chain([
+var part263 = match("MESSAGE#164:sSMTP:02", "nwparser.payload", "Cannot open %{hostname}:%{network_port}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg182 = msg("sSMTP:02", part264);
+var msg182 = msg("sSMTP:02", part263);
 
-var part265 = match("MESSAGE#165:sSMTP:03", "nwparser.payload", "Unable to locate %{hostname}.", processor_chain([
+var part264 = match("MESSAGE#165:sSMTP:03", "nwparser.payload", "Unable to locate %{hostname}.", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var msg183 = msg("sSMTP:03", part265);
+var msg183 = msg("sSMTP:03", part264);
 
-var msg184 = msg("sSMTP:04", dup74);
+var msg184 = msg("sSMTP:04", dup73);
 
 var select60 = linear_select([
 	msg181,
@@ -2870,93 +2862,93 @@ var select60 = linear_select([
 	msg184,
 ]);
 
-var part266 = match("MESSAGE#167:scheduled_backups", "nwparser.payload", "Backup to %{device->} was successful - Backup file %{filename}", processor_chain([
+var part265 = match("MESSAGE#167:scheduled_backups", "nwparser.payload", "Backup to %{device->} was successful - Backup file %{filename}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg185 = msg("scheduled_backups", part266);
+var msg185 = msg("scheduled_backups", part265);
 
-var part267 = match("MESSAGE#168:scheduled_ftp_backups", "nwparser.payload", "Scheduled backup to the %{device->} was successful - Backup file %{filename}", processor_chain([
+var part266 = match("MESSAGE#168:scheduled_ftp_backups", "nwparser.payload", "Scheduled backup to the %{device->} was successful - Backup file %{filename}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Scheduled backup to the FTP server was successful"),
 ]));
 
-var msg186 = msg("scheduled_ftp_backups", part267);
+var msg186 = msg("scheduled_ftp_backups", part266);
 
-var part268 = match("MESSAGE#169:failed_scheduled_ftp_backups", "nwparser.payload", "Scheduled backup to the %{device->} failed - %{result}.", processor_chain([
+var part267 = match("MESSAGE#169:failed_scheduled_ftp_backups", "nwparser.payload", "Scheduled backup to the %{device->} failed - %{result}.", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 	setc("event_description","Scheduled backup to the FTP server failed"),
 ]));
 
-var msg187 = msg("failed_scheduled_ftp_backups", part268);
+var msg187 = msg("failed_scheduled_ftp_backups", part267);
 
 var select61 = linear_select([
 	msg186,
 	msg187,
 ]);
 
-var part269 = match("MESSAGE#170:scheduled_scp_backups", "nwparser.payload", "Scheduled backup to the %{device->} was successful - Backup file %{filename}", processor_chain([
+var part268 = match("MESSAGE#170:scheduled_scp_backups", "nwparser.payload", "Scheduled backup to the %{device->} was successful - Backup file %{filename}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Scheduled backup to the SCP server was successful"),
 ]));
 
-var msg188 = msg("scheduled_scp_backups", part269);
+var msg188 = msg("scheduled_scp_backups", part268);
 
-var part270 = match("MESSAGE#171:python", "nwparser.payload", "%{action->} even though zone '%{zone}' in view '%{fld1}' is locked.", processor_chain([
+var part269 = match("MESSAGE#171:python", "nwparser.payload", "%{action->} even though zone '%{zone}' in view '%{fld1}' is locked.", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg189 = msg("python", part270);
+var msg189 = msg("python", part269);
 
-var part271 = match("MESSAGE#172:python:01", "nwparser.payload", "%{action->} (algorithm=%{fld1}, key tag=%{fld2}, key size=%{fld3}): '%{hostname}' in view '%{fld4}'.", processor_chain([
+var part270 = match("MESSAGE#172:python:01", "nwparser.payload", "%{action->} (algorithm=%{fld1}, key tag=%{fld2}, key size=%{fld3}): '%{hostname}' in view '%{fld4}'.", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg190 = msg("python:01", part271);
+var msg190 = msg("python:01", part270);
 
-var part272 = match("MESSAGE#173:python:02", "nwparser.payload", "%{action}: '%{hostname}' in view '%{fld1}'.", processor_chain([
+var part271 = match("MESSAGE#173:python:02", "nwparser.payload", "%{action}: '%{hostname}' in view '%{fld1}'.", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg191 = msg("python:02", part272);
+var msg191 = msg("python:02", part271);
 
-var part273 = match("MESSAGE#174:python:03", "nwparser.payload", "%{action}: FQDN='%{domain}', ADDRESS='%{saddr}', View='%{fld1}'", processor_chain([
+var part272 = match("MESSAGE#174:python:03", "nwparser.payload", "%{action}: FQDN='%{domain}', ADDRESS='%{saddr}', View='%{fld1}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg192 = msg("python:03", part273);
+var msg192 = msg("python:03", part272);
 
-var part274 = match("MESSAGE#175:python:04", "nwparser.payload", "%{action}: FQDN='%{domain}', View='%{fld1}'", processor_chain([
+var part273 = match("MESSAGE#175:python:04", "nwparser.payload", "%{action}: FQDN='%{domain}', View='%{fld1}'", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg193 = msg("python:04", part274);
+var msg193 = msg("python:04", part273);
 
-var part275 = match("MESSAGE#176:python:05", "nwparser.payload", "%{fld1}: %{fld2}.%{fld3->} [%{username}]: Populated %{zone->} %{hostname->} DnsView=%{fld4}", processor_chain([
+var part274 = match("MESSAGE#176:python:05", "nwparser.payload", "%{fld1}: %{fld2}.%{fld3->} [%{username}]: Populated %{zone->} %{hostname->} DnsView=%{fld4}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg194 = msg("python:05", part275);
+var msg194 = msg("python:05", part274);
 
 var msg195 = msg("python:06", dup64);
 
@@ -2970,29 +2962,29 @@ var select62 = linear_select([
 	msg195,
 ]);
 
-var part276 = match("MESSAGE#178:monitor", "nwparser.payload", "Type: %{protocol}, State: %{event_state}, Event: %{event_description}.", processor_chain([
+var part275 = match("MESSAGE#178:monitor", "nwparser.payload", "Type: %{protocol}, State: %{event_state}, Event: %{event_description}.", processor_chain([
 	dup11,
 	dup6,
 	dup8,
 ]));
 
-var msg196 = msg("monitor", part276);
+var msg196 = msg("monitor", part275);
 
-var part277 = match("MESSAGE#179:snmptrapd", "nwparser.payload", "NET-SNMP version %{version->} %{event_description}", processor_chain([
+var part276 = match("MESSAGE#179:snmptrapd", "nwparser.payload", "NET-SNMP version %{version->} %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg197 = msg("snmptrapd", part277);
+var msg197 = msg("snmptrapd", part276);
 
-var part278 = match("MESSAGE#180:snmptrapd:01", "nwparser.payload", "lock in %{fld1->} sleeps more than %{duration->} milliseconds in %{fld2}", processor_chain([
+var part277 = match("MESSAGE#180:snmptrapd:01", "nwparser.payload", "lock in %{fld1->} sleeps more than %{duration->} milliseconds in %{fld2}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg198 = msg("snmptrapd:01", part278);
+var msg198 = msg("snmptrapd:01", part277);
 
 var msg199 = msg("snmptrapd:02", dup64);
 
@@ -3002,15 +2994,15 @@ var select63 = linear_select([
 	msg199,
 ]);
 
-var part279 = match("MESSAGE#182:ntpdate", "nwparser.payload", "adjust time server %{saddr->} offset %{duration->} sec", processor_chain([
+var part278 = match("MESSAGE#182:ntpdate", "nwparser.payload", "adjust time server %{saddr->} offset %{duration->} sec", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg200 = msg("ntpdate", part279);
+var msg200 = msg("ntpdate", part278);
 
-var msg201 = msg("ntpdate:01", dup74);
+var msg201 = msg("ntpdate:01", dup73);
 
 var select64 = linear_select([
 	msg200,
@@ -3019,15 +3011,15 @@ var select64 = linear_select([
 
 var msg202 = msg("phonehome", dup64);
 
-var part280 = match("MESSAGE#185:purge_scheduled_tasks", "nwparser.payload", "Scheduled tasks have been purged%{}", processor_chain([
+var part279 = match("MESSAGE#185:purge_scheduled_tasks", "nwparser.payload", "Scheduled tasks have been purged%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg203 = msg("purge_scheduled_tasks", part280);
+var msg203 = msg("purge_scheduled_tasks", part279);
 
-var part281 = match("MESSAGE#186:serial_console:04", "nwparser.payload", "%{fld20->} %{fld21}.%{fld22->} [%{domain}]: Login_Denied - - to=%{terminal->} apparently_via=%{info->} ip=%{saddr->} error=%{result}", processor_chain([
+var part280 = match("MESSAGE#186:serial_console:04", "nwparser.payload", "%{fld20->} %{fld21}.%{fld22->} [%{domain}]: Login_Denied - - to=%{terminal->} apparently_via=%{info->} ip=%{saddr->} error=%{result}", processor_chain([
 	dup13,
 	dup2,
 	dup3,
@@ -3045,9 +3037,9 @@ var part281 = match("MESSAGE#186:serial_console:04", "nwparser.payload", "%{fld2
 	setc("event_description","Login Denied"),
 ]));
 
-var msg204 = msg("serial_console:04", part281);
+var msg204 = msg("serial_console:04", part280);
 
-var part282 = match("MESSAGE#187:serial_console:03", "nwparser.payload", "No authentication methods succeeded for user %{username}", processor_chain([
+var part281 = match("MESSAGE#187:serial_console:03", "nwparser.payload", "No authentication methods succeeded for user %{username}", processor_chain([
 	dup13,
 	dup2,
 	dup3,
@@ -3058,9 +3050,9 @@ var part282 = match("MESSAGE#187:serial_console:03", "nwparser.payload", "No aut
 	setc("event_description","No authentication methods succeeded for user"),
 ]));
 
-var msg205 = msg("serial_console:03", part282);
+var msg205 = msg("serial_console:03", part281);
 
-var part283 = match("MESSAGE#188:serial_console", "nwparser.payload", "%{fld1->} %{fld2}.%{fld3->} [%{username}]: Login_Allowed - - to=%{terminal->} apparently_via=%{info->} auth=%{authmethod->} group=%{group}", processor_chain([
+var part282 = match("MESSAGE#188:serial_console", "nwparser.payload", "%{fld1->} %{fld2}.%{fld3->} [%{username}]: Login_Allowed - - to=%{terminal->} apparently_via=%{info->} auth=%{authmethod->} group=%{group}", processor_chain([
 	dup9,
 	dup2,
 	dup3,
@@ -3071,9 +3063,9 @@ var part283 = match("MESSAGE#188:serial_console", "nwparser.payload", "%{fld1->}
 	dup8,
 ]));
 
-var msg206 = msg("serial_console", part283);
+var msg206 = msg("serial_console", part282);
 
-var part284 = match("MESSAGE#189:serial_console:01", "nwparser.payload", "RADIUS authentication succeeded for user %{username}", processor_chain([
+var part283 = match("MESSAGE#189:serial_console:01", "nwparser.payload", "RADIUS authentication succeeded for user %{username}", processor_chain([
 	setc("eventcategory","1302010100"),
 	dup2,
 	dup3,
@@ -3084,34 +3076,34 @@ var part284 = match("MESSAGE#189:serial_console:01", "nwparser.payload", "RADIUS
 	setc("event_description","RADIUS authentication succeeded for user"),
 ]));
 
-var msg207 = msg("serial_console:01", part284);
+var msg207 = msg("serial_console:01", part283);
 
-var part285 = match("MESSAGE#190:serial_console:02", "nwparser.payload", "User group = %{group}", processor_chain([
+var part284 = match("MESSAGE#190:serial_console:02", "nwparser.payload", "User group = %{group}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","User group identification"),
 ]));
 
-var msg208 = msg("serial_console:02", part285);
+var msg208 = msg("serial_console:02", part284);
 
-var part286 = match("MESSAGE#205:serial_console:05", "nwparser.payload", "%{fld1->} [%{username}]: rebooted the system", processor_chain([
+var part285 = match("MESSAGE#205:serial_console:05", "nwparser.payload", "%{fld1->} [%{username}]: rebooted the system", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","system reboot"),
 ]));
 
-var msg209 = msg("serial_console:05", part286);
+var msg209 = msg("serial_console:05", part285);
 
-var part287 = match("MESSAGE#214:serial_console:06", "nwparser.payload", "Local authentication succeeded for user %{username}", processor_chain([
+var part286 = match("MESSAGE#214:serial_console:06", "nwparser.payload", "Local authentication succeeded for user %{username}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Local authentication succeeded for user"),
 ]));
 
-var msg210 = msg("serial_console:06", part287);
+var msg210 = msg("serial_console:06", part286);
 
 var select65 = linear_select([
 	msg204,
@@ -3129,99 +3121,99 @@ var msg212 = msg("acpid", dup64);
 
 var msg213 = msg("diskcheck", dup64);
 
-var part288 = match("MESSAGE#210:debug_mount", "nwparser.payload", "mount %{event_description}", processor_chain([
+var part287 = match("MESSAGE#210:debug_mount", "nwparser.payload", "mount %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg214 = msg("debug_mount", part288);
+var msg214 = msg("debug_mount", part287);
 
 var msg215 = msg("smart_check_io", dup64);
 
 var msg216 = msg("speedstep_control", dup64);
 
-var part289 = match("MESSAGE#215:controld", "nwparser.payload", "Distribution Started%{}", processor_chain([
+var part288 = match("MESSAGE#215:controld", "nwparser.payload", "Distribution Started%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Distribution Started"),
 ]));
 
-var msg217 = msg("controld", part289);
+var msg217 = msg("controld", part288);
 
-var part290 = match("MESSAGE#216:controld:02", "nwparser.payload", "Distribution Complete%{}", processor_chain([
+var part289 = match("MESSAGE#216:controld:02", "nwparser.payload", "Distribution Complete%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","Distribution Complete"),
 ]));
 
-var msg218 = msg("controld:02", part290);
+var msg218 = msg("controld:02", part289);
 
 var select66 = linear_select([
 	msg217,
 	msg218,
 ]);
 
-var part291 = match("MESSAGE#217:shutdown", "nwparser.payload", "shutting down for system reboot%{}", processor_chain([
+var part290 = match("MESSAGE#217:shutdown", "nwparser.payload", "shutting down for system reboot%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","shutting down for system reboot"),
 ]));
 
-var msg219 = msg("shutdown", part291);
+var msg219 = msg("shutdown", part290);
 
-var part292 = match("MESSAGE#218:ntpd_initres", "nwparser.payload", "ntpd exiting on signal 15%{}", processor_chain([
+var part291 = match("MESSAGE#218:ntpd_initres", "nwparser.payload", "ntpd exiting on signal 15%{}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	setc("event_description","ntpd exiting"),
 ]));
 
-var msg220 = msg("ntpd_initres", part292);
+var msg220 = msg("ntpd_initres", part291);
 
-var part293 = match("MESSAGE#220:rsyncd", "nwparser.payload", "name lookup failed for %{saddr}: %{info}", processor_chain([
+var part292 = match("MESSAGE#220:rsyncd", "nwparser.payload", "name lookup failed for %{saddr}: %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg221 = msg("rsyncd", part293);
+var msg221 = msg("rsyncd", part292);
 
-var part294 = match("MESSAGE#221:rsyncd:01", "nwparser.payload", "connect from %{shost->} (%{saddr})", processor_chain([
+var part293 = match("MESSAGE#221:rsyncd:01", "nwparser.payload", "connect from %{shost->} (%{saddr})", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg222 = msg("rsyncd:01", part294);
+var msg222 = msg("rsyncd:01", part293);
 
-var part295 = match("MESSAGE#222:rsyncd:02", "nwparser.payload", "rsync on %{filename->} from %{shost->} (%{saddr})", processor_chain([
+var part294 = match("MESSAGE#222:rsyncd:02", "nwparser.payload", "rsync on %{filename->} from %{shost->} (%{saddr})", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg223 = msg("rsyncd:02", part295);
+var msg223 = msg("rsyncd:02", part294);
 
-var part296 = match("MESSAGE#223:rsyncd:03", "nwparser.payload", "sent %{sbytes->} bytes received %{rbytes->} bytes total size %{fld1}", processor_chain([
+var part295 = match("MESSAGE#223:rsyncd:03", "nwparser.payload", "sent %{sbytes->} bytes received %{rbytes->} bytes total size %{fld1}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var msg224 = msg("rsyncd:03", part296);
+var msg224 = msg("rsyncd:03", part295);
 
-var part297 = match("MESSAGE#224:rsyncd:04", "nwparser.payload", "building file list%{}", processor_chain([
+var part296 = match("MESSAGE#224:rsyncd:04", "nwparser.payload", "building file list%{}", processor_chain([
 	dup12,
 	dup6,
 	setc("event_description","building file list"),
 	dup8,
 ]));
 
-var msg225 = msg("rsyncd:04", part297);
+var msg225 = msg("rsyncd:04", part296);
 
 var select67 = linear_select([
 	msg221,
@@ -3231,29 +3223,29 @@ var select67 = linear_select([
 	msg225,
 ]);
 
-var msg226 = msg("syslog", dup77);
+var msg226 = msg("syslog", dup76);
 
-var msg227 = msg("restarting", dup77);
+var msg227 = msg("restarting", dup76);
 
-var part298 = match("MESSAGE#227:ipmievd", "nwparser.payload", "%{fld1->} ", processor_chain([
+var part297 = match("MESSAGE#227:ipmievd", "nwparser.payload", "%{fld1}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup61,
 ]));
 
-var msg228 = msg("ipmievd", part298);
+var msg228 = msg("ipmievd", part297);
 
-var part299 = match("MESSAGE#228:netauto_discovery", "nwparser.payload", "%{agent}: Processing path%{fld1}, vnid [%{fld2}]", processor_chain([
+var part298 = match("MESSAGE#228:netauto_discovery", "nwparser.payload", "%{agent}: Processing path%{fld1}, vnid [%{fld2}]", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg229 = msg("netauto_discovery", part299);
+var msg229 = msg("netauto_discovery", part298);
 
-var part300 = match("MESSAGE#229:netauto_discovery:01", "nwparser.payload", "%{agent}:%{fld1}(%{fld2})%{hostip}/%{fld3}:%{product}ver%{version->} device does not answer to lldpRem OID requests, skipping LLDP Neighbors poll", processor_chain([
+var part299 = match("MESSAGE#229:netauto_discovery:01", "nwparser.payload", "%{agent}:%{fld1}(%{fld2})%{hostip}/%{fld3}:%{product}ver%{version->} device does not answer to lldpRem OID requests, skipping LLDP Neighbors poll", processor_chain([
 	dup58,
 	dup6,
 	dup8,
@@ -3261,18 +3253,18 @@ var part300 = match("MESSAGE#229:netauto_discovery:01", "nwparser.payload", "%{a
 	setc("event_description","device does not answer to lldpRem OID requests, skipping LLDP Neighbors poll"),
 ]));
 
-var msg230 = msg("netauto_discovery:01", part300);
+var msg230 = msg("netauto_discovery:01", part299);
 
-var part301 = match("MESSAGE#230:netauto_discovery:02", "nwparser.payload", "%{agent}:%{space}Static address already set with IP:%{hostip}, Processing%{fld1}", processor_chain([
+var part300 = match("MESSAGE#230:netauto_discovery:02", "nwparser.payload", "%{agent}:%{space}Static address already set with IP:%{hostip}, Processing%{fld1}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg231 = msg("netauto_discovery:02", part301);
+var msg231 = msg("netauto_discovery:02", part300);
 
-var part302 = match("MESSAGE#231:netauto_discovery:03", "nwparser.payload", "%{agent}:%{fld1}(%{fld2})%{hostip}/%{fld3}: SNMP Credentials: Failed to authenticate", processor_chain([
+var part301 = match("MESSAGE#231:netauto_discovery:03", "nwparser.payload", "%{agent}:%{fld1}(%{fld2})%{hostip}/%{fld3}: SNMP Credentials: Failed to authenticate", processor_chain([
 	dup62,
 	dup6,
 	dup8,
@@ -3280,7 +3272,7 @@ var part302 = match("MESSAGE#231:netauto_discovery:03", "nwparser.payload", "%{a
 	dup14,
 ]));
 
-var msg232 = msg("netauto_discovery:03", part302);
+var msg232 = msg("netauto_discovery:03", part301);
 
 var select68 = linear_select([
 	msg229,
@@ -3289,30 +3281,30 @@ var select68 = linear_select([
 	msg232,
 ]);
 
-var part303 = match("MESSAGE#232:netauto_core:01", "nwparser.payload", "%{agent}: Attempting CLI on device%{device}with interface not in table, ip%{hostip}", processor_chain([
+var part302 = match("MESSAGE#232:netauto_core:01", "nwparser.payload", "%{agent}: Attempting CLI on device%{device}with interface not in table, ip%{hostip}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg233 = msg("netauto_core:01", part303);
+var msg233 = msg("netauto_core:01", part302);
 
-var part304 = match("MESSAGE#233:netauto_core", "nwparser.payload", "netautoctl:%{event_description}", processor_chain([
+var part303 = match("MESSAGE#233:netauto_core", "nwparser.payload", "netautoctl:%{event_description}", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg234 = msg("netauto_core", part304);
+var msg234 = msg("netauto_core", part303);
 
 var select69 = linear_select([
 	msg233,
 	msg234,
 ]);
 
-var part305 = match("MESSAGE#234:captured_dns_uploader", "nwparser.payload", "%{event_description}", processor_chain([
+var part304 = match("MESSAGE#234:captured_dns_uploader", "nwparser.payload", "%{event_description}", processor_chain([
 	dup48,
 	dup6,
 	dup8,
@@ -3320,9 +3312,9 @@ var part305 = match("MESSAGE#234:captured_dns_uploader", "nwparser.payload", "%{
 	dup14,
 ]));
 
-var msg235 = msg("captured_dns_uploader", part305);
+var msg235 = msg("captured_dns_uploader", part304);
 
-var part306 = match("MESSAGE#235:DIS", "nwparser.payload", "%{fld1}:%{fld2}: Device%{device}/%{hostip}login failure%{result}", processor_chain([
+var part305 = match("MESSAGE#235:DIS", "nwparser.payload", "%{fld1}:%{fld2}: Device%{device}/%{hostip}login failure%{result}", processor_chain([
 	dup62,
 	dup6,
 	dup8,
@@ -3331,41 +3323,41 @@ var part306 = match("MESSAGE#235:DIS", "nwparser.payload", "%{fld1}:%{fld2}: Dev
 	dup14,
 ]));
 
-var msg236 = msg("DIS", part306);
+var msg236 = msg("DIS", part305);
 
-var part307 = match("MESSAGE#236:DIS:01", "nwparser.payload", "%{fld2}: %{fld3}: Attempting discover-now for %{hostip->} on %{fld4}, using session ID", processor_chain([
+var part306 = match("MESSAGE#236:DIS:01", "nwparser.payload", "%{fld2}: %{fld3}: Attempting discover-now for %{hostip->} on %{fld4}, using session ID", processor_chain([
 	dup58,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg237 = msg("DIS:01", part307);
+var msg237 = msg("DIS:01", part306);
 
 var select70 = linear_select([
 	msg236,
 	msg237,
 ]);
 
-var part308 = match("MESSAGE#237:ErrorMsg", "nwparser.payload", "%{result}", processor_chain([
+var part307 = match("MESSAGE#237:ErrorMsg", "nwparser.payload", "%{result}", processor_chain([
 	dup63,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg238 = msg("ErrorMsg", part308);
+var msg238 = msg("ErrorMsg", part307);
 
-var part309 = match("MESSAGE#238:tacacs_acct", "nwparser.payload", "%{fld1}: Server %{daddr->} port %{dport}: %{event_description}", processor_chain([
+var part308 = match("MESSAGE#238:tacacs_acct", "nwparser.payload", "%{fld1}: Server %{daddr->} port %{dport}: %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg239 = msg("tacacs_acct", part309);
+var msg239 = msg("tacacs_acct", part308);
 
-var part310 = match("MESSAGE#239:tacacs_acct:01", "nwparser.payload", "%{fld1}: Accounting request failed. %{fld2}Server is %{daddr}, port is %{dport}.", processor_chain([
+var part309 = match("MESSAGE#239:tacacs_acct:01", "nwparser.payload", "%{fld1}: Accounting request failed. %{fld2}Server is %{daddr}, port is %{dport}.", processor_chain([
 	dup63,
 	dup6,
 	dup8,
@@ -3373,16 +3365,16 @@ var part310 = match("MESSAGE#239:tacacs_acct:01", "nwparser.payload", "%{fld1}: 
 	setc("event_description","Accounting request failed."),
 ]));
 
-var msg240 = msg("tacacs_acct:01", part310);
+var msg240 = msg("tacacs_acct:01", part309);
 
-var part311 = match("MESSAGE#240:tacacs_acct:02", "nwparser.payload", "%{fld1}: Read %{fld2->} bytes from server %{daddr->} port %{dport}, expecting %{fld3}", processor_chain([
+var part310 = match("MESSAGE#240:tacacs_acct:02", "nwparser.payload", "%{fld1}: Read %{fld2->} bytes from server %{daddr->} port %{dport}, expecting %{fld3}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup60,
 ]));
 
-var msg241 = msg("tacacs_acct:02", part311);
+var msg241 = msg("tacacs_acct:02", part310);
 
 var select71 = linear_select([
 	msg239,
@@ -3390,7 +3382,7 @@ var select71 = linear_select([
 	msg241,
 ]);
 
-var part312 = match("MESSAGE#241:dhcpdv6", "nwparser.payload", "Relay-forward message from %{saddr_v6->} port %{sport}, link address %{fld1}, peer address %{daddr_v6}", processor_chain([
+var part311 = match("MESSAGE#241:dhcpdv6", "nwparser.payload", "Relay-forward message from %{saddr_v6->} port %{sport}, link address %{fld1}, peer address %{daddr_v6}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3398,9 +3390,9 @@ var part312 = match("MESSAGE#241:dhcpdv6", "nwparser.payload", "Relay-forward me
 	setc("event_description","Relay-forward message"),
 ]));
 
-var msg242 = msg("dhcpdv6", part312);
+var msg242 = msg("dhcpdv6", part311);
 
-var part313 = match("MESSAGE#242:dhcpdv6:01", "nwparser.payload", "Encapsulated Solicit message from %{saddr_v6->} port %{sport->} from client DUID %{fld1}, transaction ID %{id}", processor_chain([
+var part312 = match("MESSAGE#242:dhcpdv6:01", "nwparser.payload", "Encapsulated Solicit message from %{saddr_v6->} port %{sport->} from client DUID %{fld1}, transaction ID %{id}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3408,9 +3400,9 @@ var part313 = match("MESSAGE#242:dhcpdv6:01", "nwparser.payload", "Encapsulated 
 	setc("event_description","Encapsulated Solicit message"),
 ]));
 
-var msg243 = msg("dhcpdv6:01", part313);
+var msg243 = msg("dhcpdv6:01", part312);
 
-var part314 = match("MESSAGE#243:dhcpdv6:02", "nwparser.payload", "Client %{fld1}, IP '%{fld2}': No addresses available for this interface", processor_chain([
+var part313 = match("MESSAGE#243:dhcpdv6:02", "nwparser.payload", "Client %{fld1}, IP '%{fld2}': No addresses available for this interface", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3418,9 +3410,9 @@ var part314 = match("MESSAGE#243:dhcpdv6:02", "nwparser.payload", "Client %{fld1
 	setc("event_description","IP unknown - No addresses available for this interface"),
 ]));
 
-var msg244 = msg("dhcpdv6:02", part314);
+var msg244 = msg("dhcpdv6:02", part313);
 
-var part315 = match("MESSAGE#244:dhcpdv6:03", "nwparser.payload", "Encapsulating Advertise message to send to %{saddr_v6->} port %{sport}", processor_chain([
+var part314 = match("MESSAGE#244:dhcpdv6:03", "nwparser.payload", "Encapsulating Advertise message to send to %{saddr_v6->} port %{sport}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3428,9 +3420,9 @@ var part315 = match("MESSAGE#244:dhcpdv6:03", "nwparser.payload", "Encapsulating
 	setc("event_description","Encapsulating Advertise message"),
 ]));
 
-var msg245 = msg("dhcpdv6:03", part315);
+var msg245 = msg("dhcpdv6:03", part314);
 
-var part316 = match("MESSAGE#245:dhcpdv6:04", "nwparser.payload", "Sending Relay-reply message to %{saddr_v6->} port %{sport}", processor_chain([
+var part315 = match("MESSAGE#245:dhcpdv6:04", "nwparser.payload", "Sending Relay-reply message to %{saddr_v6->} port %{sport}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3438,9 +3430,9 @@ var part316 = match("MESSAGE#245:dhcpdv6:04", "nwparser.payload", "Sending Relay
 	setc("event_description","Sending Relay-reply message"),
 ]));
 
-var msg246 = msg("dhcpdv6:04", part316);
+var msg246 = msg("dhcpdv6:04", part315);
 
-var part317 = match("MESSAGE#246:dhcpdv6:05", "nwparser.payload", "Encapsulated Information-request message from %{saddr_v6->} port %{sport}, transaction ID %{id}", processor_chain([
+var part316 = match("MESSAGE#246:dhcpdv6:05", "nwparser.payload", "Encapsulated Information-request message from %{saddr_v6->} port %{sport}, transaction ID %{id}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3448,9 +3440,9 @@ var part317 = match("MESSAGE#246:dhcpdv6:05", "nwparser.payload", "Encapsulated 
 	setc("event_description","Encapsulated Information-request message"),
 ]));
 
-var msg247 = msg("dhcpdv6:05", part317);
+var msg247 = msg("dhcpdv6:05", part316);
 
-var part318 = match("MESSAGE#247:dhcpdv6:06", "nwparser.payload", "Encapsulating Reply message to send to %{saddr_v6->} port %{sport}", processor_chain([
+var part317 = match("MESSAGE#247:dhcpdv6:06", "nwparser.payload", "Encapsulating Reply message to send to %{saddr_v6->} port %{sport}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3458,9 +3450,9 @@ var part318 = match("MESSAGE#247:dhcpdv6:06", "nwparser.payload", "Encapsulating
 	setc("event_description","Encapsulating Reply message"),
 ]));
 
-var msg248 = msg("dhcpdv6:06", part318);
+var msg248 = msg("dhcpdv6:06", part317);
 
-var part319 = match("MESSAGE#248:dhcpdv6:07", "nwparser.payload", "Encapsulated Renew message from %{saddr_v6->} port %{sport->} from client DUID %{fld1}, transaction ID %{id}", processor_chain([
+var part318 = match("MESSAGE#248:dhcpdv6:07", "nwparser.payload", "Encapsulated Renew message from %{saddr_v6->} port %{sport->} from client DUID %{fld1}, transaction ID %{id}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3468,16 +3460,16 @@ var part319 = match("MESSAGE#248:dhcpdv6:07", "nwparser.payload", "Encapsulated 
 	setc("event_description","Encapsulated Renew message"),
 ]));
 
-var msg249 = msg("dhcpdv6:07", part319);
+var msg249 = msg("dhcpdv6:07", part318);
 
-var part320 = match("MESSAGE#249:dhcpdv6:08", "nwparser.payload", "Reply NA: address %{saddr_v6->} to client with duid %{fld1->} iaid = %{fld2->} static", processor_chain([
+var part319 = match("MESSAGE#249:dhcpdv6:08", "nwparser.payload", "Reply NA: address %{saddr_v6->} to client with duid %{fld1->} iaid = %{fld2->} static", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
 ]));
 
-var msg250 = msg("dhcpdv6:08", part320);
+var msg250 = msg("dhcpdv6:08", part319);
 
 var msg251 = msg("dhcpdv6:09", dup68);
 
@@ -3496,7 +3488,7 @@ var select72 = linear_select([
 
 var msg252 = msg("debug", dup68);
 
-var part321 = match("MESSAGE#252:cloud_api", "nwparser.payload", "proxying request to %{hostname}(%{hostip}) %{web_method->} %{url->} %{protocol->} %{info}", processor_chain([
+var part320 = match("MESSAGE#252:cloud_api", "nwparser.payload", "proxying request to %{hostname}(%{hostip}) %{web_method->} %{url->} %{protocol->} %{info}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3504,7 +3496,7 @@ var part321 = match("MESSAGE#252:cloud_api", "nwparser.payload", "proxying reque
 	setc("event_description","proxying request"),
 ]));
 
-var msg253 = msg("cloud_api", part321);
+var msg253 = msg("cloud_api", part320);
 
 var chain1 = processor_chain([
 	select3,
@@ -3566,61 +3558,61 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part322 = match("MESSAGE#19:dhcpd:18/0", "nwparser.payload", "%{} %{p0}");
+var part321 = match("MESSAGE#19:dhcpd:18/0", "nwparser.payload", "%{} %{p0}");
 
-var part323 = match("MESSAGE#19:dhcpd:18/1_0", "nwparser.p0", "Added %{p0}");
+var part322 = match("MESSAGE#19:dhcpd:18/1_0", "nwparser.p0", "Added %{p0}");
 
-var part324 = match("MESSAGE#19:dhcpd:18/1_1", "nwparser.p0", "added %{p0}");
+var part323 = match("MESSAGE#19:dhcpd:18/1_1", "nwparser.p0", "added %{p0}");
 
-var part325 = match("MESSAGE#25:dhcpd:03/1_0", "nwparser.p0", "%{dmacaddr->} (%{dhost}) via %{p0}");
+var part324 = match("MESSAGE#25:dhcpd:03/1_0", "nwparser.p0", "%{dmacaddr->} (%{dhost}) via %{p0}");
 
-var part326 = match("MESSAGE#25:dhcpd:03/1_1", "nwparser.p0", "%{dmacaddr->} via %{p0}");
+var part325 = match("MESSAGE#25:dhcpd:03/1_1", "nwparser.p0", "%{dmacaddr->} via %{p0}");
 
-var part327 = match("MESSAGE#28:dhcpd:09/0", "nwparser.payload", "DHCPREQUEST for %{saddr->} from %{p0}");
+var part326 = match("MESSAGE#28:dhcpd:09/0", "nwparser.payload", "DHCPREQUEST for %{saddr->} from %{p0}");
 
-var part328 = match("MESSAGE#28:dhcpd:09/1_0", "nwparser.p0", "%{smacaddr->} (%{shost}) via %{p0}");
+var part327 = match("MESSAGE#28:dhcpd:09/1_0", "nwparser.p0", "%{smacaddr->} (%{shost}) via %{p0}");
 
-var part329 = match("MESSAGE#28:dhcpd:09/1_1", "nwparser.p0", "%{smacaddr->} via %{p0}");
+var part328 = match("MESSAGE#28:dhcpd:09/1_1", "nwparser.p0", "%{smacaddr->} via %{p0}");
 
-var part330 = match("MESSAGE#31:dhcpd:11/2", "nwparser.p0", "%{} %{interface}");
+var part329 = match("MESSAGE#31:dhcpd:11/2", "nwparser.p0", "%{} %{interface}");
 
-var part331 = match("MESSAGE#38:dhcpd:14/2", "nwparser.p0", "%{} %{interface->} relay %{fld1->} lease-duration %{duration}");
+var part330 = match("MESSAGE#38:dhcpd:14/2", "nwparser.p0", "%{} %{interface->} relay %{fld1->} lease-duration %{duration}");
 
-var part332 = match("MESSAGE#53:named:16/1_0", "nwparser.p0", "approved %{}");
+var part331 = match("MESSAGE#53:named:16/1_0", "nwparser.p0", "approved %{}");
 
-var part333 = match("MESSAGE#53:named:16/1_1", "nwparser.p0", " denied%{}");
+var part332 = match("MESSAGE#53:named:16/1_1", "nwparser.p0", " denied%{}");
 
-var part334 = match("MESSAGE#56:named:01/0", "nwparser.payload", "client %{saddr}#%{p0}");
+var part333 = match("MESSAGE#56:named:01/0", "nwparser.payload", "client %{saddr}#%{p0}");
 
-var part335 = match("MESSAGE#57:named:17/1_0", "nwparser.p0", "IN%{p0}");
+var part334 = match("MESSAGE#57:named:17/1_0", "nwparser.p0", "IN%{p0}");
 
-var part336 = match("MESSAGE#57:named:17/1_1", "nwparser.p0", "CH%{p0}");
+var part335 = match("MESSAGE#57:named:17/1_1", "nwparser.p0", "CH%{p0}");
 
-var part337 = match("MESSAGE#57:named:17/1_2", "nwparser.p0", "HS%{p0}");
+var part336 = match("MESSAGE#57:named:17/1_2", "nwparser.p0", "HS%{p0}");
 
-var part338 = match("MESSAGE#57:named:17/3_1", "nwparser.p0", "%{action->} at '%{p0}");
+var part337 = match("MESSAGE#57:named:17/3_1", "nwparser.p0", "%{action->} at '%{p0}");
 
-var part339 = match("MESSAGE#57:named:17/4_0", "nwparser.p0", "%{hostip}.in-addr.arpa' %{p0}");
+var part338 = match("MESSAGE#57:named:17/4_0", "nwparser.p0", "%{hostip}.in-addr.arpa' %{p0}");
 
-var part340 = match("MESSAGE#57:named:17/5_0", "nwparser.p0", "%{dns_querytype->} \"%{fld3}\"");
+var part339 = match("MESSAGE#57:named:17/5_0", "nwparser.p0", "%{dns_querytype->} \"%{fld3}\"");
 
-var part341 = match("MESSAGE#57:named:17/5_1", "nwparser.p0", "%{dns_querytype->} %{hostip}");
+var part340 = match("MESSAGE#57:named:17/5_1", "nwparser.p0", "%{dns_querytype->} %{hostip}");
 
-var part342 = match("MESSAGE#57:named:17/5_2", "nwparser.p0", "%{dns_querytype}");
+var part341 = match("MESSAGE#57:named:17/5_2", "nwparser.p0", "%{dns_querytype}");
 
-var part343 = match("MESSAGE#60:named:19/2", "nwparser.p0", "%{event_description}");
+var part342 = match("MESSAGE#60:named:19/2", "nwparser.p0", "%{event_description}");
 
-var part344 = match("MESSAGE#67:named:63/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3}: %{severity}: client %{p0}");
+var part343 = match("MESSAGE#67:named:63/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3}: %{severity}: client %{p0}");
 
-var part345 = match("MESSAGE#67:named:63/1_0", "nwparser.p0", "%{fld9->} %{saddr}#%{p0}");
+var part344 = match("MESSAGE#67:named:63/1_0", "nwparser.p0", "%{fld9->} %{saddr}#%{p0}");
 
-var part346 = match("MESSAGE#67:named:63/1_1", "nwparser.p0", " %{saddr}#%{p0}");
+var part345 = match("MESSAGE#67:named:63/1_1", "nwparser.p0", " %{saddr}#%{p0}");
 
-var part347 = match("MESSAGE#74:named:10/1_3", "nwparser.p0", "%{sport}:%{p0}");
+var part346 = match("MESSAGE#74:named:10/1_3", "nwparser.p0", "%{sport}:%{p0}");
 
-var part348 = match("MESSAGE#83:named:24/0", "nwparser.payload", "client %{saddr}#%{sport->} (%{p0}");
+var part347 = match("MESSAGE#83:named:24/0", "nwparser.payload", "client %{saddr}#%{sport->} (%{p0}");
 
-var part349 = match("MESSAGE#7:httpd:06", "nwparser.payload", "%{event_description}", processor_chain([
+var part348 = match("MESSAGE#7:httpd:06", "nwparser.payload", "%{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
@@ -3641,17 +3633,11 @@ var select75 = linear_select([
 	dup26,
 ]);
 
-var part350 = match("MESSAGE#204:dhcpd:37", "nwparser.payload", "%{event_description}", processor_chain([
+var part349 = match("MESSAGE#204:dhcpd:37", "nwparser.payload", "%{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 	dup30,
-]));
-
-var part351 = match("MESSAGE#52:ntpd:02", "nwparser.payload", "%{event_description->} ", processor_chain([
-	dup12,
-	dup6,
-	dup8,
 ]));
 
 var select76 = linear_select([
@@ -3676,25 +3662,25 @@ var select79 = linear_select([
 	dup52,
 ]);
 
-var part352 = match("MESSAGE#118:validate_dhcpd", "nwparser.payload", "%{event_description}", processor_chain([
+var part350 = match("MESSAGE#118:validate_dhcpd", "nwparser.payload", "%{event_description}", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var part353 = match("MESSAGE#134:openvpn-member:01", "nwparser.payload", "%{action->} : %{event_description->} (code=%{resultcode})", processor_chain([
+var part351 = match("MESSAGE#134:openvpn-member:01", "nwparser.payload", "%{action->} : %{event_description->} (code=%{resultcode})", processor_chain([
 	dup15,
 	dup6,
 	dup8,
 ]));
 
-var part354 = match("MESSAGE#137:openvpn-member:04", "nwparser.payload", "%{severity}: %{event_description}", processor_chain([
+var part352 = match("MESSAGE#137:openvpn-member:04", "nwparser.payload", "%{severity}: %{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,
 ]));
 
-var part355 = match("MESSAGE#225:syslog", "nwparser.payload", "%{event_description->} ", processor_chain([
+var part353 = match("MESSAGE#225:syslog", "nwparser.payload", "%{event_description}", processor_chain([
 	dup12,
 	dup6,
 	dup8,

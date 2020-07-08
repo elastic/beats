@@ -703,14 +703,14 @@ var part52 = match("MESSAGE#51:CONFIG_AGENT:01", "nwparser.payload", "CONFIG_AGE
 
 var msg52 = msg("CONFIG_AGENT:01", part52);
 
-var part53 = match("MESSAGE#52:CONFIG_AGENT:02", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} Received put-tree command ", processor_chain([
+var part53 = match("MESSAGE#52:CONFIG_AGENT:02", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} Received put-tree command", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:Received put-tree command."),
 ]));
 
 var msg53 = msg("CONFIG_AGENT:02", part53);
 
-var part54 = match("MESSAGE#53:CONFIG_AGENT:03", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., %{fld3->} ", processor_chain([
+var part54 = match("MESSAGE#53:CONFIG_AGENT:03", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., %{fld3}", processor_chain([
 	dup4,
 	setc("event_description","It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time."),
 ]));
@@ -731,7 +731,7 @@ var part56 = match("MESSAGE#55:CONFIG_AGENT:05", "nwparser.payload", "CONFIG_AGE
 
 var msg56 = msg("CONFIG_AGENT:05", part56);
 
-var part57 = match("MESSAGE#56:CONFIG_AGENT:06", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} No rules, %{fld3->} ", processor_chain([
+var part57 = match("MESSAGE#56:CONFIG_AGENT:06", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} No rules, %{fld3}", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:No rules."),
 ]));

@@ -317,7 +317,7 @@ var part23 = match("MESSAGE#22:maintenance:01", "nwparser.payload", "Failed to u
 
 var msg23 = msg("maintenance:01", part23);
 
-var part24 = match("MESSAGE#23:maintenance:02", "nwparser.payload", "Logged out Sid = %{sessionid->} ", processor_chain([
+var part24 = match("MESSAGE#23:maintenance:02", "nwparser.payload", "Logged out Sid = %{sessionid}", processor_chain([
 	dup8,
 	dup12,
 	dup6,
@@ -328,7 +328,7 @@ var part24 = match("MESSAGE#23:maintenance:02", "nwparser.payload", "Logged out 
 
 var msg24 = msg("maintenance:02", part24);
 
-var part25 = match("MESSAGE#24:maintenance:03", "nwparser.payload", "Network Access: %{info->} ", processor_chain([
+var part25 = match("MESSAGE#24:maintenance:03", "nwparser.payload", "Network Access: %{info}", processor_chain([
 	dup8,
 	dup3,
 	dup4,
@@ -336,7 +336,7 @@ var part25 = match("MESSAGE#24:maintenance:03", "nwparser.payload", "Network Acc
 
 var msg25 = msg("maintenance:03", part25);
 
-var part26 = match("MESSAGE#25:maintenance:04", "nwparser.payload", "Trying connect to %{fld2->} on %{fqdn}:%{network_port->} ", processor_chain([
+var part26 = match("MESSAGE#25:maintenance:04", "nwparser.payload", "Trying connect to %{fld2->} on %{fqdn}:%{network_port}", processor_chain([
 	dup11,
 	dup3,
 	dup4,
@@ -344,7 +344,7 @@ var part26 = match("MESSAGE#25:maintenance:04", "nwparser.payload", "Trying conn
 
 var msg26 = msg("maintenance:04", part26);
 
-var part27 = match("MESSAGE#26:maintenance:05", "nwparser.payload", "%{info->} ", processor_chain([
+var part27 = match("MESSAGE#26:maintenance:05", "nwparser.payload", "%{info}", processor_chain([
 	dup11,
 	dup3,
 	dup4,
@@ -457,7 +457,7 @@ var all2 = all_match({
 
 var msg32 = msg("security:02", all2);
 
-var part39 = match("MESSAGE#32:security:03", "nwparser.payload", "Successful password update for user %{user_fullname}, username: %{username->} ", processor_chain([
+var part39 = match("MESSAGE#32:security:03", "nwparser.payload", "Successful password update for user %{user_fullname}, username: %{username}", processor_chain([
 	setc("eventcategory","1402040100"),
 	setc("ec_activity","Modify"),
 	setc("ec_theme","Password"),
@@ -632,7 +632,7 @@ var part56 = match("MESSAGE#49:kernel:04", "nwparser.payload", "kernel: cdrom: o
 
 var msg50 = msg("kernel:04", part56);
 
-var part57 = match("MESSAGE#50:kernel:06", "nwparser.payload", "kernel: GlobalFilter:%{fld1->} SRC=%{saddr->} DST=%{daddr->} %{info->} PROTO=%{protocol->} SPT=%{sport->} DPT=%{dport->} %{fld3->} ", processor_chain([
+var part57 = match("MESSAGE#50:kernel:06", "nwparser.payload", "kernel: GlobalFilter:%{fld1->} SRC=%{saddr->} DST=%{daddr->} %{info->} PROTO=%{protocol->} SPT=%{sport->} DPT=%{dport->} %{fld3}", processor_chain([
 	dup8,
 	dup3,
 ]));
@@ -772,7 +772,7 @@ var part70 = match("MESSAGE#63:run-crons", "nwparser.payload", "%{fld2->} return
 
 var msg64 = msg("run-crons", part70);
 
-var part71 = match("MESSAGE#64:/USR/SBIN/CRON", "nwparser.payload", "(%{username}) CMD (%{action}) ", processor_chain([
+var part71 = match("MESSAGE#64:/USR/SBIN/CRON", "nwparser.payload", "(%{username}) CMD (%{action})", processor_chain([
 	dup2,
 	dup3,
 ]));

@@ -789,7 +789,7 @@ var part70 = match("MESSAGE#60:sSMTP", "nwparser.payload", "%{fld1->} %{fld2->} 
 
 var msg61 = msg("sSMTP", part70);
 
-var part71 = match("MESSAGE#61:01420002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{agent}[%{process_id}]: %{fld5}: AUDIT - pid=%{parent_pid->} user=%{username->} folder=%{directory->} module=%{fld6->} status=%{result->} cmd_data=%{info->} ", processor_chain([
+var part71 = match("MESSAGE#61:01420002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{agent}[%{process_id}]: %{fld5}: AUDIT - pid=%{parent_pid->} user=%{username->} folder=%{directory->} module=%{fld6->} status=%{result->} cmd_data=%{info}", processor_chain([
 	dup16,
 	dup2,
 ]));

@@ -1381,7 +1381,7 @@ var part70 = match("MESSAGE#38:Web", "nwparser.payload", "Web server stopped%{}"
 
 var msg56 = msg("Web", part70);
 
-var part71 = match("MESSAGE#304:Web:02", "nwparser.payload", "Web %{info->} ", processor_chain([
+var part71 = match("MESSAGE#304:Web:02", "nwparser.payload", "Web %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1411,7 +1411,7 @@ var part72 = match("MESSAGE#39:Done", "nwparser.payload", "Done shutting down.%{
 
 var msg58 = msg("Done", part72);
 
-var part73 = match("MESSAGE#282:Done:02", "nwparser.payload", "Done with statistics generation [Started: %{fld1}] [Duration: %{fld2}]. ", processor_chain([
+var part73 = match("MESSAGE#282:Done:02", "nwparser.payload", "Done with statistics generation [Started: %{fld1}] [Duration: %{fld2}].", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2999,7 +2999,7 @@ var part169 = match("MESSAGE#165:Completed", "nwparser.payload", "Completed %{pr
 
 var msg193 = msg("Completed", part169);
 
-var part170 = match("MESSAGE#291:Completed:01", "nwparser.payload", "Completed %{info->} ", processor_chain([
+var part170 = match("MESSAGE#291:Completed:01", "nwparser.payload", "Completed %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3896,7 +3896,7 @@ var msg278 = msg("Invocation", dup61);
 
 var msg279 = msg("Using", dup61);
 
-var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1->} shutdown complete, %{event_description->} ", processor_chain([
+var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1->} shutdown complete, %{event_description}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3904,7 +3904,7 @@ var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1->
 
 var msg280 = msg("Route:01", part232);
 
-var part233 = match("MESSAGE#244:Route:02", "nwparser.payload", "Route: %{fld1->} started and consuming from: %{event_description->} ", processor_chain([
+var part233 = match("MESSAGE#244:Route:02", "nwparser.payload", "Route: %{fld1->} started and consuming from: %{event_description}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4005,7 +4005,7 @@ var part240 = match("MESSAGE#264:Current", "nwparser.payload", "Current director
 
 var msg299 = msg("Current", part240);
 
-var part241 = match("MESSAGE#308:Current:01", "nwparser.payload", "Current DB_VERSION = %{version->} ", processor_chain([
+var part241 = match("MESSAGE#308:Current:01", "nwparser.payload", "Current DB_VERSION = %{version}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4163,7 +4163,7 @@ var select61 = linear_select([
 	msg317,
 ]);
 
-var part258 = match("MESSAGE#283:Compiling", "nwparser.payload", "Compiling %{info->} ", processor_chain([
+var part258 = match("MESSAGE#283:Compiling", "nwparser.payload", "Compiling %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4171,7 +4171,7 @@ var part258 = match("MESSAGE#283:Compiling", "nwparser.payload", "Compiling %{in
 
 var msg318 = msg("Compiling", part258);
 
-var part259 = match("MESSAGE#284:Vulnerability", "nwparser.payload", "Vulnerability %{info->} ", processor_chain([
+var part259 = match("MESSAGE#284:Vulnerability", "nwparser.payload", "Vulnerability %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4179,7 +4179,7 @@ var part259 = match("MESSAGE#284:Vulnerability", "nwparser.payload", "Vulnerabil
 
 var msg319 = msg("Vulnerability", part259);
 
-var part260 = match("MESSAGE#285:Truncating", "nwparser.payload", "Truncating %{info->} ", processor_chain([
+var part260 = match("MESSAGE#285:Truncating", "nwparser.payload", "Truncating %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4187,7 +4187,7 @@ var part260 = match("MESSAGE#285:Truncating", "nwparser.payload", "Truncating %{
 
 var msg320 = msg("Truncating", part260);
 
-var part261 = match("MESSAGE#286:Synchronizing", "nwparser.payload", "Synchronizing %{info->} ", processor_chain([
+var part261 = match("MESSAGE#286:Synchronizing", "nwparser.payload", "Synchronizing %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4195,7 +4195,7 @@ var part261 = match("MESSAGE#286:Synchronizing", "nwparser.payload", "Synchroniz
 
 var msg321 = msg("Synchronizing", part261);
 
-var part262 = match("MESSAGE#287:Parsing", "nwparser.payload", "Parsing %{info->} ", processor_chain([
+var part262 = match("MESSAGE#287:Parsing", "nwparser.payload", "Parsing %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4203,7 +4203,7 @@ var part262 = match("MESSAGE#287:Parsing", "nwparser.payload", "Parsing %{info->
 
 var msg322 = msg("Parsing", part262);
 
-var part263 = match("MESSAGE#288:Remapping", "nwparser.payload", "Remapping %{info->} ", processor_chain([
+var part263 = match("MESSAGE#288:Remapping", "nwparser.payload", "Remapping %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4211,21 +4211,21 @@ var part263 = match("MESSAGE#288:Remapping", "nwparser.payload", "Remapping %{in
 
 var msg323 = msg("Remapping", part263);
 
-var part264 = match("MESSAGE#289:Remapped", "nwparser.payload", "Started: %{fld1}] [Duration: %{fld2}] Remapped %{info->} ", processor_chain([
+var part264 = match("MESSAGE#289:Remapped", "nwparser.payload", "Started: %{fld1}] [Duration: %{fld2}] Remapped %{info}", processor_chain([
 	dup20,
 	dup15,
 ]));
 
 var msg324 = msg("Remapped", part264);
 
-var part265 = match("MESSAGE#290:Database", "nwparser.payload", "Started: %{fld1}] [Duration: %{fld2}] Database %{info->} ", processor_chain([
+var part265 = match("MESSAGE#290:Database", "nwparser.payload", "Started: %{fld1}] [Duration: %{fld2}] Database %{info}", processor_chain([
 	dup20,
 	dup15,
 ]));
 
 var msg325 = msg("Database", part265);
 
-var part266 = match("MESSAGE#428:Database:01", "nwparser.payload", "Database %{info->} ", processor_chain([
+var part266 = match("MESSAGE#428:Database:01", "nwparser.payload", "Database %{info}", processor_chain([
 	dup20,
 	dup15,
 ]));
@@ -4237,7 +4237,7 @@ var select62 = linear_select([
 	msg326,
 ]);
 
-var part267 = match("MESSAGE#292:Accepting", "nwparser.payload", "Accepting %{info->} ", processor_chain([
+var part267 = match("MESSAGE#292:Accepting", "nwparser.payload", "Accepting %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4245,7 +4245,7 @@ var part267 = match("MESSAGE#292:Accepting", "nwparser.payload", "Accepting %{in
 
 var msg327 = msg("Accepting", part267);
 
-var part268 = match("MESSAGE#293:VERSION:03", "nwparser.payload", "VERSION %{info->} ", processor_chain([
+var part268 = match("MESSAGE#293:VERSION:03", "nwparser.payload", "VERSION %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4253,7 +4253,7 @@ var part268 = match("MESSAGE#293:VERSION:03", "nwparser.payload", "VERSION %{inf
 
 var msg328 = msg("VERSION:03", part268);
 
-var part269 = match("MESSAGE#294:Detected", "nwparser.payload", "Detected %{info->} ", processor_chain([
+var part269 = match("MESSAGE#294:Detected", "nwparser.payload", "Detected %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4261,7 +4261,7 @@ var part269 = match("MESSAGE#294:Detected", "nwparser.payload", "Detected %{info
 
 var msg329 = msg("Detected", part269);
 
-var part270 = match("MESSAGE#295:Telling", "nwparser.payload", "Telling %{info->} ", processor_chain([
+var part270 = match("MESSAGE#295:Telling", "nwparser.payload", "Telling %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4269,7 +4269,7 @@ var part270 = match("MESSAGE#295:Telling", "nwparser.payload", "Telling %{info->
 
 var msg330 = msg("Telling", part270);
 
-var part271 = match("MESSAGE#298:Stopping", "nwparser.payload", "Stopping %{info->} ", processor_chain([
+var part271 = match("MESSAGE#298:Stopping", "nwparser.payload", "Stopping %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4277,7 +4277,7 @@ var part271 = match("MESSAGE#298:Stopping", "nwparser.payload", "Stopping %{info
 
 var msg331 = msg("Stopping", part271);
 
-var part272 = match("MESSAGE#299:removing", "nwparser.payload", "removing %{info->} ", processor_chain([
+var part272 = match("MESSAGE#299:removing", "nwparser.payload", "removing %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4285,7 +4285,7 @@ var part272 = match("MESSAGE#299:removing", "nwparser.payload", "removing %{info
 
 var msg332 = msg("removing", part272);
 
-var part273 = match("MESSAGE#300:Enabling", "nwparser.payload", "Enabling %{info->} ", processor_chain([
+var part273 = match("MESSAGE#300:Enabling", "nwparser.payload", "Enabling %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4293,7 +4293,7 @@ var part273 = match("MESSAGE#300:Enabling", "nwparser.payload", "Enabling %{info
 
 var msg333 = msg("Enabling", part273);
 
-var part274 = match("MESSAGE#301:Granting", "nwparser.payload", "Granting %{info->} ", processor_chain([
+var part274 = match("MESSAGE#301:Granting", "nwparser.payload", "Granting %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4301,7 +4301,7 @@ var part274 = match("MESSAGE#301:Granting", "nwparser.payload", "Granting %{info
 
 var msg334 = msg("Granting", part274);
 
-var part275 = match("MESSAGE#302:Version", "nwparser.payload", "Version %{info->} ", processor_chain([
+var part275 = match("MESSAGE#302:Version", "nwparser.payload", "Version %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4309,7 +4309,7 @@ var part275 = match("MESSAGE#302:Version", "nwparser.payload", "Version %{info->
 
 var msg335 = msg("Version", part275);
 
-var part276 = match("MESSAGE#303:Configuring", "nwparser.payload", "Configuring %{info->} ", processor_chain([
+var part276 = match("MESSAGE#303:Configuring", "nwparser.payload", "Configuring %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4317,7 +4317,7 @@ var part276 = match("MESSAGE#303:Configuring", "nwparser.payload", "Configuring 
 
 var msg336 = msg("Configuring", part276);
 
-var part277 = match("MESSAGE#305:Scheduler", "nwparser.payload", "Scheduler %{info->} ", processor_chain([
+var part277 = match("MESSAGE#305:Scheduler", "nwparser.payload", "Scheduler %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4334,7 +4334,7 @@ var part278 = match("MESSAGE#341:Scheduler:01", "nwparser.payload", "Silo: %{fld
 
 var msg338 = msg("Scheduler:01", part278);
 
-var part279 = match("MESSAGE#429:Scheduler:02", "nwparser.payload", "%{fld1}: %{fld2}] Scheduler %{info->} ", processor_chain([
+var part279 = match("MESSAGE#429:Scheduler:02", "nwparser.payload", "%{fld1}: %{fld2}] Scheduler %{info}", processor_chain([
 	dup20,
 	dup15,
 ]));
@@ -4347,7 +4347,7 @@ var select63 = linear_select([
 	msg339,
 ]);
 
-var part280 = match("MESSAGE#306:PostgreSQL", "nwparser.payload", "PostgreSQL %{info->} ", processor_chain([
+var part280 = match("MESSAGE#306:PostgreSQL", "nwparser.payload", "PostgreSQL %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4355,7 +4355,7 @@ var part280 = match("MESSAGE#306:PostgreSQL", "nwparser.payload", "PostgreSQL %{
 
 var msg340 = msg("PostgreSQL", part280);
 
-var part281 = match("MESSAGE#307:Cleaning", "nwparser.payload", "Cleaning %{info->} ", processor_chain([
+var part281 = match("MESSAGE#307:Cleaning", "nwparser.payload", "Cleaning %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
