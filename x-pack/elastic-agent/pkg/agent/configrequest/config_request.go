@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package configrequest
 
 import (
 	"strings"
@@ -17,6 +17,15 @@ type configRequest struct {
 	id        string
 	createdAt time.Time
 	programs  []program.Program
+}
+
+// New created a new Request.
+func New(id string, createdAt time.Time, programs []program.Program) Request {
+	return &configRequest{
+		id:        id,
+		createdAt: createdAt,
+		programs:  programs,
+	}
 }
 
 func (c *configRequest) String() string {
