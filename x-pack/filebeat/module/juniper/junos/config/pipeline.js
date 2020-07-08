@@ -75,7 +75,7 @@ var dup14 = match("HEADER#15:0026.upd.a/1_2", "nwparser.p0", "RT_APPQOS - %{p0}"
 
 var dup15 = match("HEADER#15:0026.upd.a/1_3", "nwparser.p0", "%{hfld33->} - %{p0}");
 
-var dup16 = match("HEADER#15:0026.upd.a/2", "nwparser.p0", "%{messageid}[%{payload}");
+var dup16 = match("HEADER#15:0026.upd.a/2", "nwparser.p0", "%{messageid->} [%{payload}");
 
 var dup17 = match("HEADER#16:0026.upd.b/0", "message", "%{event_time->} %{hfld32->} %{hhostname->} %{p0}");
 
@@ -243,7 +243,7 @@ var dup84 = setc("event_description","excessive runtime time during action of mo
 
 var dup85 = setc("event_description","Reinitializing");
 
-var dup86 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/0", "nwparser.payload", "%{event_type}[junos@%{obj_name}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
+var dup86 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/0", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
 
 var dup87 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/1_0", "nwparser.p0", "%{dport}\" connection-tag=%{fld20->} service-name=\"%{p0}");
 
@@ -267,7 +267,7 @@ var dup96 = match("MESSAGE#490:RT_FLOW_SESSION_DENY:03/0_1", "nwparser.payload",
 
 var dup97 = setc("event_description","session denied");
 
-var dup98 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/0", "nwparser.payload", "%{event_type}[junos@%{obj_name}reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
+var dup98 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/0", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
 
 var dup99 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/2", "nwparser.p0", "%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{p0}");
 
@@ -405,7 +405,7 @@ var dup143 = linear_select([
 	dup76,
 ]);
 
-var dup144 = match("MESSAGE#310:MIB2D_IFD_IFINDEX_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP index assigned to %{uid}changed from %{dclass_counter1}to %{result}", processor_chain([
+var dup144 = match("MESSAGE#310:MIB2D_IFD_IFINDEX_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP index assigned to %{uid->} changed from %{dclass_counter1->} to %{result}", processor_chain([
 	dup29,
 	dup21,
 	dup78,
@@ -453,13 +453,13 @@ var dup151 = linear_select([
 	dup102,
 ]);
 
-var dup152 = match("MESSAGE#498:RT_SCREEN_TCP", "nwparser.payload", "%{event_type}[junos@%{obj_name}attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
+var dup152 = match("MESSAGE#498:RT_SCREEN_TCP", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup51,
 ]));
 
-var dup153 = match("MESSAGE#527:SSL_PROXY_SSL_SESSION_ALLOW", "nwparser.payload", "%{event_type}[junos@%{obj_name}logical-system-name=\"%{hostname}\" session-id=\"%{sessionid}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" profile-name=\"%{rulename}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" message=\"%{info}\"]", processor_chain([
+var dup153 = match("MESSAGE#527:SSL_PROXY_SSL_SESSION_ALLOW", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} logical-system-name=\"%{hostname}\" session-id=\"%{sessionid}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" profile-name=\"%{rulename}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" message=\"%{info}\"]", processor_chain([
 	dup26,
 	dup21,
 	dup51,
@@ -475,7 +475,7 @@ var dup155 = linear_select([
 	dup123,
 ]);
 
-var dup156 = match("MESSAGE#733:WEBFILTER_URL_PERMITTED", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3}CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url}OBJ=%{fld7}USERNAME=%{fld8}ROLES=%{fld9}", processor_chain([
+var dup156 = match("MESSAGE#733:WEBFILTER_URL_PERMITTED", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3->} CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url->} OBJ=%{fld7->} USERNAME=%{fld8->} ROLES=%{fld9}", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -501,20 +501,20 @@ var hdr1 = match("HEADER#0:0001", "message", "%{month->} %{day->} %{time->} %{me
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0002", "message", "%{month->} %{day->} %{time->} %{messageid}message repeated %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{month->} %{day->} %{time->} %{messageid->} message repeated %{payload}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("message repeated "),
+			constant(" message repeated "),
 			field("payload"),
 		],
 	}),
 ]));
 
-var hdr3 = match("HEADER#2:0003", "message", "%{month->} %{day->} %{time}ssb %{messageid}(%{hfld1}): %{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "%{month->} %{day->} %{time->} ssb %{messageid}(%{hfld1}): %{payload}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -622,14 +622,14 @@ var hdr5 = match("HEADER#6:0008", "message", "%{month->} %{day->} %{time->} %{hf
 	}),
 ]));
 
-var hdr6 = match("HEADER#7:0009", "message", "%{month->} %{day->} %{time->} %{hfld1->} %{hhost}: %{hfld2}IFP trace> %{messageid}: %{payload}", processor_chain([
+var hdr6 = match("HEADER#7:0009", "message", "%{month->} %{day->} %{time->} %{hfld1->} %{hhost}: %{hfld2->} IFP trace> %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0009"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("hfld2"),
-			constant("IFP trace> "),
+			constant(" IFP trace> "),
 			field("messageid"),
 			constant(": "),
 			field("payload"),
@@ -657,7 +657,7 @@ var hdr10 = match("HEADER#11:0011", "message", "%{month->} %{day->} %{time->} %{
 	dup9,
 ]));
 
-var hdr11 = match("HEADER#12:0027", "message", "%{month->} %{day->} %{time->} %{hhostname}RT_FLOW: %{messageid}: %{payload}", processor_chain([
+var hdr11 = match("HEADER#12:0027", "message", "%{month->} %{day->} %{time->} %{hhostname->} RT_FLOW: %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0027"),
 	dup11,
 ]));
@@ -667,14 +667,14 @@ var hdr12 = match("HEADER#13:0012", "message", "%{month->} %{day->} %{time->} %{
 	dup11,
 ]));
 
-var hdr13 = match("HEADER#14:0013", "message", "%{month->} %{day->} %{time->} %{hfld1->} %{hfld32->} %{hhostname}RT_FLOW - %{messageid}[%{payload}", processor_chain([
+var hdr13 = match("HEADER#14:0013", "message", "%{month->} %{day->} %{time->} %{hfld1->} %{hfld32->} %{hhostname->} RT_FLOW - %{messageid->} [%{payload}", processor_chain([
 	setc("header_id","0013"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("["),
+			constant(" ["),
 			field("payload"),
 		],
 	}),
@@ -786,7 +786,7 @@ var hdr21 = match("HEADER#24:0020", "message", "%{month->} %{day->} %{time->} %{
 	dup18,
 ]));
 
-var hdr22 = match("HEADER#25:0021", "message", "%{month->} %{day->} %{time}/%{messageid}: %{payload}", processor_chain([
+var hdr22 = match("HEADER#25:0021", "message", "%{month->} %{day->} %{time->} /%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0021"),
 	dup11,
 ]));
@@ -834,7 +834,7 @@ var hdr27 = match("HEADER#30:0031", "message", "%{month->} %{day->} %{time->} %{
 	}),
 ]));
 
-var hdr28 = match("HEADER#31:0032", "message", "%{month->} %{day->} %{time->} %{hostip}(%{hfld1}) %{hfld2->} %{messageid}[%{pid}]: %{payload}", processor_chain([
+var hdr28 = match("HEADER#31:0032", "message", "%{month->} %{day->} %{time->} %{hostip->} (%{hfld1}) %{hfld2->} %{messageid}[%{pid}]: %{payload}", processor_chain([
 	setc("header_id","0032"),
 	dup18,
 ]));
@@ -889,7 +889,7 @@ var hdr34 = match("HEADER#37:3338", "message", "%{month->} %{day->} %{time->} %{
 	setc("header_id","3338"),
 ]));
 
-var hdr35 = match("HEADER#38:3340/0", "message", "%{month->} %{day->} %{time->} %{hhost}node%{p0}");
+var hdr35 = match("HEADER#38:3340/0", "message", "%{month->} %{day->} %{time->} %{hhost->} node%{p0}");
 
 var part8 = match("HEADER#38:3340/1_0", "nwparser.p0", "%{hfld1}.fpc%{hfld2}.pic%{hfld3->} %{p0}");
 
@@ -954,7 +954,7 @@ var hdr39 = match("HEADER#40:9995", "message", "%{month->} %{day->} %{time->} %{
 	}),
 ]));
 
-var hdr40 = match("HEADER#41:9994", "message", "%{month->} %{day->} %{time->} %{hfld2->} %{hfld1}qsfp %{payload}", processor_chain([
+var hdr40 = match("HEADER#41:9994", "message", "%{month->} %{day->} %{time->} %{hfld2->} %{hfld1->} qsfp %{payload}", processor_chain([
 	setc("header_id","9994"),
 	setc("messageid","qsfp"),
 	call({
@@ -964,7 +964,7 @@ var hdr40 = match("HEADER#41:9994", "message", "%{month->} %{day->} %{time->} %{
 			field("hfld2"),
 			constant(" "),
 			field("hfld1"),
-			constant("qsfp "),
+			constant(" qsfp "),
 			field("payload"),
 		],
 	}),
@@ -1115,7 +1115,7 @@ var part18 = match("MESSAGE#6:bigpipe:01", "nwparser.payload", "%{process}: Begi
 
 var msg7 = msg("bigpipe:01", part18);
 
-var part19 = match("MESSAGE#7:bigpipe:02", "nwparser.payload", "%{process}: AUDIT -- Action %{action}User: %{username}", processor_chain([
+var part19 = match("MESSAGE#7:bigpipe:02", "nwparser.payload", "%{process}: AUDIT -- Action %{action->} User: %{username}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Audit"),
@@ -1157,7 +1157,7 @@ var part22 = match("MESSAGE#10:chassisd:01", "nwparser.payload", "%{process}[%{p
 
 var msg11 = msg("chassisd:01", part22);
 
-var part23 = match("MESSAGE#11:checkd", "nwparser.payload", "%{process}: AUDIT -- Action %{action}User: %{username}", processor_chain([
+var part23 = match("MESSAGE#11:checkd", "nwparser.payload", "%{process}: AUDIT -- Action %{action->} User: %{username}", processor_chain([
 	dup20,
 	dup21,
 	dup24,
@@ -1180,7 +1180,7 @@ var select8 = linear_select([
 	msg13,
 ]);
 
-var part25 = match("MESSAGE#13:cosd", "nwparser.payload", "%{process}[%{process_id}]: link protection %{dclass_counter1}for intf %{interface}", processor_chain([
+var part25 = match("MESSAGE#13:cosd", "nwparser.payload", "%{process}[%{process_id}]: link protection %{dclass_counter1->} for intf %{interface}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","link protection for interface"),
@@ -1246,7 +1246,7 @@ var all9 = all_match({
 
 var msg17 = msg("Cmerror", all9);
 
-var part32 = match("MESSAGE#17:cron", "nwparser.payload", "%{process}[%{process_id}]: (%{username}) %{action}(%{filename})", processor_chain([
+var part32 = match("MESSAGE#17:cron", "nwparser.payload", "%{process}[%{process_id}]: (%{username}) %{action->} (%{filename})", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","cron RELOAD"),
@@ -1278,7 +1278,7 @@ var select11 = linear_select([
 	msg20,
 ]);
 
-var part35 = match("MESSAGE#19:crond:01", "nwparser.payload", "%{process}[%{process_id}]: pam_unix(crond:session): session opened for user %{username}by (uid=%{uid})", processor_chain([
+var part35 = match("MESSAGE#19:crond:01", "nwparser.payload", "%{process}[%{process_id}]: pam_unix(crond:session): session opened for user %{username->} by (uid=%{uid})", processor_chain([
 	dup27,
 	dup21,
 	dup22,
@@ -1287,7 +1287,7 @@ var part35 = match("MESSAGE#19:crond:01", "nwparser.payload", "%{process}[%{proc
 
 var msg21 = msg("crond:01", part35);
 
-var part36 = match("MESSAGE#21:dcd", "nwparser.payload", "%{process}[%{process_id}]: %{result}Setting ignored, %{info}", processor_chain([
+var part36 = match("MESSAGE#21:dcd", "nwparser.payload", "%{process}[%{process_id}]: %{result->} Setting ignored, %{info}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Setting ignored"),
@@ -1296,7 +1296,7 @@ var part36 = match("MESSAGE#21:dcd", "nwparser.payload", "%{process}[%{process_i
 
 var msg22 = msg("dcd", part36);
 
-var part37 = match("MESSAGE#22:EVENT/0", "nwparser.payload", "%{process}[%{process_id}]: EVENT %{event_type->} %{interface}index %{resultcode->} %{p0}");
+var part37 = match("MESSAGE#22:EVENT/0", "nwparser.payload", "%{process}[%{process_id}]: EVENT %{event_type->} %{interface->} index %{resultcode->} %{p0}");
 
 var part38 = match("MESSAGE#22:EVENT/1_0", "nwparser.p0", "%{saddr->} -> %{daddr->} \u003c\u003c%{result}> ");
 
@@ -1322,7 +1322,7 @@ var all10 = all_match({
 
 var msg23 = msg("EVENT", all10);
 
-var part40 = match("MESSAGE#23:ftpd", "nwparser.payload", "%{process}[%{process_id}]: connection from %{saddr}(%{shost})", processor_chain([
+var part40 = match("MESSAGE#23:ftpd", "nwparser.payload", "%{process}[%{process_id}]: connection from %{saddr->} (%{shost})", processor_chain([
 	setc("eventcategory","1802000000"),
 	dup21,
 	setc("event_description","ftpd connection"),
@@ -1339,7 +1339,7 @@ var part41 = match("MESSAGE#24:ha_rto_stats_handler", "nwparser.payload", "%{hos
 
 var msg25 = msg("ha_rto_stats_handler", part41);
 
-var part42 = match("MESSAGE#25:hostinit", "nwparser.payload", "%{process}: %{obj_name}-- LDAP Connection not bound correctly. %{info}", processor_chain([
+var part42 = match("MESSAGE#25:hostinit", "nwparser.payload", "%{process}: %{obj_name->} -- LDAP Connection not bound correctly. %{info}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","LDAP Connection not bound correctly"),
@@ -1399,7 +1399,7 @@ var part47 = match("MESSAGE#30:ifp_ifl_config_event", "nwparser.payload", "%{nod
 
 var msg31 = msg("ifp_ifl_config_event", part47);
 
-var part48 = match("MESSAGE#31:ifp_ifl_ext_chg", "nwparser.payload", "%{node->} %{process}: ifp ext piid %{parent_pid}zone_id %{zone}", processor_chain([
+var part48 = match("MESSAGE#31:ifp_ifl_ext_chg", "nwparser.payload", "%{node->} %{process}: ifp ext piid %{parent_pid->} zone_id %{zone}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","ifp_ifl_ext_chg"),
@@ -1408,7 +1408,7 @@ var part48 = match("MESSAGE#31:ifp_ifl_ext_chg", "nwparser.payload", "%{node->} 
 
 var msg32 = msg("ifp_ifl_ext_chg", part48);
 
-var part49 = match("MESSAGE#32:inetd", "nwparser.payload", "%{process}[%{process_id}]: %{protocol}from %{saddr}exceeded counts/min (%{result})", processor_chain([
+var part49 = match("MESSAGE#32:inetd", "nwparser.payload", "%{process}[%{process_id}]: %{protocol->} from %{saddr->} exceeded counts/min (%{result})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","connection exceeded count limit"),
@@ -1431,7 +1431,7 @@ var select14 = linear_select([
 	msg34,
 ]);
 
-var part51 = match("MESSAGE#34:init:04", "nwparser.payload", "%{process}: %{event_type}current_mode=%{protocol}, requested_mode=%{result}, cmd=%{action}", processor_chain([
+var part51 = match("MESSAGE#34:init:04", "nwparser.payload", "%{process}: %{event_type->} current_mode=%{protocol}, requested_mode=%{result}, cmd=%{action}", processor_chain([
 	dup20,
 	dup21,
 	dup30,
@@ -1440,7 +1440,7 @@ var part51 = match("MESSAGE#34:init:04", "nwparser.payload", "%{process}: %{even
 
 var msg35 = msg("init:04", part51);
 
-var part52 = match("MESSAGE#35:init", "nwparser.payload", "%{process}: %{event_type}mode=%{protocol}cmd=%{action}master_mode=%{result}", processor_chain([
+var part52 = match("MESSAGE#35:init", "nwparser.payload", "%{process}: %{event_type->} mode=%{protocol->} cmd=%{action->} master_mode=%{result}", processor_chain([
 	dup20,
 	dup21,
 	dup30,
@@ -1467,7 +1467,7 @@ var part54 = match("MESSAGE#37:init:02", "nwparser.payload", "%{process}: ntp (P
 
 var msg38 = msg("init:02", part54);
 
-var part55 = match("MESSAGE#38:init:03", "nwparser.payload", "%{process}: product mask %{info}model %{dclass_counter1}", processor_chain([
+var part55 = match("MESSAGE#38:init:03", "nwparser.payload", "%{process}: product mask %{info->} model %{dclass_counter1}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","product mask and model info"),
@@ -1484,7 +1484,7 @@ var select15 = linear_select([
 	msg39,
 ]);
 
-var part56 = match("MESSAGE#39:ipc_msg_write", "nwparser.payload", "%{node->} %{process}: IPC message type: %{event_type}, subtype: %{resultcode}exceeds MTU, mtu %{dclass_counter1}, length %{dclass_counter2}", processor_chain([
+var part56 = match("MESSAGE#39:ipc_msg_write", "nwparser.payload", "%{node->} %{process}: IPC message type: %{event_type}, subtype: %{resultcode->} exceeds MTU, mtu %{dclass_counter1}, length %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","IPC message exceeds MTU"),
@@ -1493,7 +1493,7 @@ var part56 = match("MESSAGE#39:ipc_msg_write", "nwparser.payload", "%{node->} %{
 
 var msg40 = msg("ipc_msg_write", part56);
 
-var part57 = match("MESSAGE#40:connection_established", "nwparser.payload", "%{process}: %{service}: conn established: listener idx=%{dclass_counter1}tnpaddr=%{dclass_counter2}", processor_chain([
+var part57 = match("MESSAGE#40:connection_established", "nwparser.payload", "%{process}: %{service}: conn established: listener idx=%{dclass_counter1->} tnpaddr=%{dclass_counter2}", processor_chain([
 	dup27,
 	dup21,
 	setc("event_description","listener connection established"),
@@ -1537,7 +1537,7 @@ var part61 = match("MESSAGE#42:kernel", "nwparser.payload", "%{process}: %{inter
 
 var msg43 = msg("kernel", part61);
 
-var part62 = match("MESSAGE#43:kernel:01", "nwparser.payload", "%{process}: %{interface}down: %{result}.", processor_chain([
+var part62 = match("MESSAGE#43:kernel:01", "nwparser.payload", "%{process}: %{interface->} down: %{result}.", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","interface down"),
@@ -1564,7 +1564,7 @@ var part64 = match("MESSAGE#45:kernel:03", "nwparser.payload", "%{process}: %{se
 
 var msg46 = msg("kernel:03", part64);
 
-var part65 = match("MESSAGE#46:kernel:04", "nwparser.payload", "%{process}: %{service}!VALID(state 4)->%{result}", processor_chain([
+var part65 = match("MESSAGE#46:kernel:04", "nwparser.payload", "%{process}: %{service->} !VALID(state 4)->%{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","pfe_peer_alloc state 4"),
@@ -1573,7 +1573,7 @@ var part65 = match("MESSAGE#46:kernel:04", "nwparser.payload", "%{process}: %{se
 
 var msg47 = msg("kernel:04", part65);
 
-var part66 = match("MESSAGE#47:kernel:05", "nwparser.payload", "%{fld1->} %{hostip}(%{fld2}) %{fld3->} %{process}[%{process_id}]: NTP Server %{result}", processor_chain([
+var part66 = match("MESSAGE#47:kernel:05", "nwparser.payload", "%{fld1->} %{hostip->} (%{fld2}) %{fld3->} %{process}[%{process_id}]: NTP Server %{result}", processor_chain([
 	dup20,
 	dup21,
 	dup31,
@@ -1603,7 +1603,7 @@ var select17 = linear_select([
 	msg49,
 ]);
 
-var part68 = match("MESSAGE#49:successful_login", "nwparser.payload", "%{process}: login from %{saddr}on %{interface}as %{username}", processor_chain([
+var part68 = match("MESSAGE#49:successful_login", "nwparser.payload", "%{process}: login from %{saddr->} on %{interface->} as %{username}", processor_chain([
 	dup32,
 	dup33,
 	dup34,
@@ -1616,7 +1616,7 @@ var part68 = match("MESSAGE#49:successful_login", "nwparser.payload", "%{process
 
 var msg50 = msg("successful_login", part68);
 
-var part69 = match("MESSAGE#50:login_attempt", "nwparser.payload", "%{process}: Login attempt for user %{username}from host %{hostip}", processor_chain([
+var part69 = match("MESSAGE#50:login_attempt", "nwparser.payload", "%{process}: Login attempt for user %{username->} from host %{hostip}", processor_chain([
 	dup32,
 	dup33,
 	dup34,
@@ -1628,7 +1628,7 @@ var part69 = match("MESSAGE#50:login_attempt", "nwparser.payload", "%{process}: 
 
 var msg51 = msg("login_attempt", part69);
 
-var part70 = match("MESSAGE#51:login", "nwparser.payload", "%{process}: PAM module %{dclass_counter1}returned: %{space}[%{resultcode}]%{result}", processor_chain([
+var part70 = match("MESSAGE#51:login", "nwparser.payload", "%{process}: PAM module %{dclass_counter1->} returned: %{space}[%{resultcode}]%{result}", processor_chain([
 	dup32,
 	dup33,
 	dup36,
@@ -1758,7 +1758,7 @@ var part82 = match("MESSAGE#62:Resolve", "nwparser.payload", "Resolve request ca
 
 var msg63 = msg("Resolve", part82);
 
-var part83 = match("MESSAGE#63:respawn", "nwparser.payload", "%{process}: %{service}exited with status = %{resultcode}", processor_chain([
+var part83 = match("MESSAGE#63:respawn", "nwparser.payload", "%{process}: %{service->} exited with status = %{resultcode}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","service exited with status"),
@@ -1776,7 +1776,7 @@ var part84 = match("MESSAGE#64:root", "nwparser.payload", "%{process}: %{node}: 
 
 var msg65 = msg("root", part84);
 
-var part85 = match("MESSAGE#65:rpd", "nwparser.payload", "%{process}[%{process_id}]: Received %{result}for intf device %{interface}; mc_ae_id %{dclass_counter1}, status %{resultcode}", processor_chain([
+var part85 = match("MESSAGE#65:rpd", "nwparser.payload", "%{process}[%{process_id}]: Received %{result->} for intf device %{interface}; mc_ae_id %{dclass_counter1}, status %{resultcode}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Received data for interface"),
@@ -1785,7 +1785,7 @@ var part85 = match("MESSAGE#65:rpd", "nwparser.payload", "%{process}[%{process_i
 
 var msg66 = msg("rpd", part85);
 
-var part86 = match("MESSAGE#66:rpd:01", "nwparser.payload", "%{process}[%{process_id}]: RSVP neighbor %{daddr}up on interface %{interface}", processor_chain([
+var part86 = match("MESSAGE#66:rpd:01", "nwparser.payload", "%{process}[%{process_id}]: RSVP neighbor %{daddr->} up on interface %{interface}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","RSVP neighbor up on interface "),
@@ -1794,7 +1794,7 @@ var part86 = match("MESSAGE#66:rpd:01", "nwparser.payload", "%{process}[%{proces
 
 var msg67 = msg("rpd:01", part86);
 
-var part87 = match("MESSAGE#67:rpd:02", "nwparser.payload", "%{process}[%{process_id}]: %{saddr}(%{shost}): reseting pending active connection", processor_chain([
+var part87 = match("MESSAGE#67:rpd:02", "nwparser.payload", "%{process}[%{process_id}]: %{saddr->} (%{shost}): reseting pending active connection", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","reseting pending active connection"),
@@ -1819,7 +1819,7 @@ var select20 = linear_select([
 	msg69,
 ]);
 
-var part89 = match("MESSAGE#69:rshd", "nwparser.payload", "%{process}[%{process_id}]: %{username}as root: cmd='%{action}' ", processor_chain([
+var part89 = match("MESSAGE#69:rshd", "nwparser.payload", "%{process}[%{process_id}]: %{username->} as root: cmd='%{action}' ", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","user issuing command as root"),
@@ -1837,7 +1837,7 @@ var part90 = match("MESSAGE#70:sfd", "nwparser.payload", "%{process}: Waiting on
 
 var msg71 = msg("sfd", part90);
 
-var part91 = match("MESSAGE#71:sshd", "nwparser.payload", "%{process}[%{process_id}]: Accepted password for %{username}from %{saddr}port %{sport->} %{protocol}", processor_chain([
+var part91 = match("MESSAGE#71:sshd", "nwparser.payload", "%{process}[%{process_id}]: Accepted password for %{username->} from %{saddr->} port %{sport->} %{protocol}", processor_chain([
 	dup32,
 	dup33,
 	dup34,
@@ -1926,7 +1926,7 @@ var all14 = all_match({
 
 var msg78 = msg("sshd:07", all14);
 
-var part98 = match("MESSAGE#79:sshd:08", "nwparser.payload", "%{process}[%{process_id}]: %{result}: %{space}[%{resultcode}]authentication error", processor_chain([
+var part98 = match("MESSAGE#79:sshd:08", "nwparser.payload", "%{process}[%{process_id}]: %{result}: %{space->} [%{resultcode}]authentication error", processor_chain([
 	setc("eventcategory","1301020000"),
 	dup33,
 	dup42,
@@ -1946,7 +1946,7 @@ var part99 = match("MESSAGE#80:sshd:09", "nwparser.payload", "%{process}[%{proce
 
 var msg80 = msg("sshd:09", part99);
 
-var part100 = match("MESSAGE#81:sshd:10", "nwparser.payload", "%{process}: PAM module %{dclass_counter1}returned: %{space}[%{resultcode}]%{result}", processor_chain([
+var part100 = match("MESSAGE#81:sshd:10", "nwparser.payload", "%{process}: PAM module %{dclass_counter1->} returned: %{space}[%{resultcode}]%{result}", processor_chain([
 	dup43,
 	dup33,
 	dup42,
@@ -2004,7 +2004,7 @@ var part105 = match("MESSAGE#86:sshd:15", "nwparser.payload", "%{process}: Movin
 
 var msg86 = msg("sshd:15", part105);
 
-var part106 = match("MESSAGE#87:sshd:16", "nwparser.payload", "%{fld1}sshd: SSHD_LOGIN_FAILED: Login failed for user '%{username}' from host '%{hostip}'.", processor_chain([
+var part106 = match("MESSAGE#87:sshd:16", "nwparser.payload", "%{fld1->} sshd: SSHD_LOGIN_FAILED: Login failed for user '%{username}' from host '%{hostip}'.", processor_chain([
 	dup43,
 	dup33,
 	dup42,
@@ -2046,7 +2046,7 @@ var select22 = linear_select([
 	dup44,
 ]);
 
-var part110 = match("MESSAGE#72:Failed:05/2", "nwparser.p0", "%{} %{username}from %{saddr}port %{sport->} %{protocol}");
+var part110 = match("MESSAGE#72:Failed:05/2", "nwparser.p0", "%{} %{username->} from %{saddr->} port %{sport->} %{protocol}");
 
 var all15 = all_match({
 	processors: [
@@ -2144,7 +2144,7 @@ var part118 = match("MESSAGE#88:syslogd", "nwparser.payload", "%{process}: resta
 
 var msg92 = msg("syslogd", part118);
 
-var part119 = match("MESSAGE#89:ucd-snmp", "nwparser.payload", "%{process}[%{process_id}]: AUDIT -- Action %{action}User: %{username}", processor_chain([
+var part119 = match("MESSAGE#89:ucd-snmp", "nwparser.payload", "%{process}[%{process_id}]: AUDIT -- Action %{action->} User: %{username}", processor_chain([
 	dup20,
 	dup21,
 	dup24,
@@ -2167,7 +2167,7 @@ var select26 = linear_select([
 	msg94,
 ]);
 
-var part121 = match("MESSAGE#91:usp_ipc_client_reconnect", "nwparser.payload", "%{node->} %{process}: failed to connect to the server: %{result}(%{resultcode})", processor_chain([
+var part121 = match("MESSAGE#91:usp_ipc_client_reconnect", "nwparser.payload", "%{node->} %{process}: failed to connect to the server: %{result->} (%{resultcode})", processor_chain([
 	dup26,
 	dup21,
 	setc("event_description","failed to connect to the server"),
@@ -2203,7 +2203,7 @@ var part124 = match("MESSAGE#94:uspinfo", "nwparser.payload", "%{process}: flow_
 
 var msg98 = msg("uspinfo", part124);
 
-var part125 = match("MESSAGE#95:Version", "nwparser.payload", "Version %{version}by builder on %{event_time_string}", processor_chain([
+var part125 = match("MESSAGE#95:Version", "nwparser.payload", "Version %{version->} by builder on %{event_time_string}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Version build date"),
@@ -2212,7 +2212,7 @@ var part125 = match("MESSAGE#95:Version", "nwparser.payload", "Version %{version
 
 var msg99 = msg("Version", part125);
 
-var part126 = match("MESSAGE#96:xntpd", "nwparser.payload", "%{process}[%{process_id}]: frequency initialized %{result}from %{filename}", processor_chain([
+var part126 = match("MESSAGE#96:xntpd", "nwparser.payload", "%{process}[%{process_id}]: frequency initialized %{result->} from %{filename}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","frequency initialized from file"),
@@ -2221,7 +2221,7 @@ var part126 = match("MESSAGE#96:xntpd", "nwparser.payload", "%{process}[%{proces
 
 var msg100 = msg("xntpd", part126);
 
-var part127 = match("MESSAGE#97:xntpd:01", "nwparser.payload", "%{process}[%{process_id}]: ntpd %{version->} %{event_time_string}(%{resultcode})", processor_chain([
+var part127 = match("MESSAGE#97:xntpd:01", "nwparser.payload", "%{process}[%{process_id}]: ntpd %{version->} %{event_time_string->} (%{resultcode})", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","nptd version build"),
@@ -2255,7 +2255,7 @@ var select27 = linear_select([
 	msg103,
 ]);
 
-var part130 = match("MESSAGE#100:last", "nwparser.payload", "last message repeated %{dclass_counter1}times", processor_chain([
+var part130 = match("MESSAGE#100:last", "nwparser.payload", "last message repeated %{dclass_counter1->} times", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","last message repeated"),
@@ -2264,7 +2264,7 @@ var part130 = match("MESSAGE#100:last", "nwparser.payload", "last message repeat
 
 var msg104 = msg("last", part130);
 
-var part131 = match("MESSAGE#739:last:01", "nwparser.payload", "message repeated %{dclass_counter1}times", processor_chain([
+var part131 = match("MESSAGE#739:last:01", "nwparser.payload", "message repeated %{dclass_counter1->} times", processor_chain([
 	dup47,
 	dup46,
 	dup22,
@@ -2351,7 +2351,7 @@ var part139 = match("MESSAGE#108:SSB", "nwparser.payload", "%{process}(%{fld1}):
 
 var msg113 = msg("SSB", part139);
 
-var part140 = match("MESSAGE#109:ACCT_ACCOUNTING_FERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected error %{result}from file %{filename}", processor_chain([
+var part140 = match("MESSAGE#109:ACCT_ACCOUNTING_FERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected error %{result->} from file %{filename}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Unexpected error"),
@@ -2369,7 +2369,7 @@ var part141 = match("MESSAGE#110:ACCT_ACCOUNTING_FOPEN_ERROR", "nwparser.payload
 
 var msg115 = msg("ACCT_ACCOUNTING_FOPEN_ERROR", part141);
 
-var part142 = match("MESSAGE#111:ACCT_ACCOUNTING_SMALL_FILE_SIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File %{filename}size (%{dclass_counter1}) is smaller than record size (%{dclass_counter2})", processor_chain([
+var part142 = match("MESSAGE#111:ACCT_ACCOUNTING_SMALL_FILE_SIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File %{filename->} size (%{dclass_counter1}) is smaller than record size (%{dclass_counter2})", processor_chain([
 	dup48,
 	dup21,
 	setc("event_description","File size mismatch"),
@@ -2387,7 +2387,7 @@ var part143 = match("MESSAGE#112:ACCT_BAD_RECORD_FORMAT", "nwparser.payload", "%
 
 var msg117 = msg("ACCT_BAD_RECORD_FORMAT", part143);
 
-var part144 = match("MESSAGE#113:ACCT_CU_RTSLIB_error", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename}getting class usage statistics for interface %{interface}: %{result}", processor_chain([
+var part144 = match("MESSAGE#113:ACCT_CU_RTSLIB_error", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename->} getting class usage statistics for interface %{interface}: %{result}", processor_chain([
 	dup48,
 	dup21,
 	setc("event_description","Class usage statistics error for interface"),
@@ -2432,7 +2432,7 @@ var part148 = match("MESSAGE#115:ACCT_MALLOC_FAILURE", "nwparser.payload", "%{pr
 
 var msg120 = msg("ACCT_MALLOC_FAILURE", part148);
 
-var part149 = match("MESSAGE#116:ACCT_UNDEFINED_COUNTER_NAME", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename}in accounting profile %{dclass_counter1}is not defined in a firewall using this filter profile", processor_chain([
+var part149 = match("MESSAGE#116:ACCT_UNDEFINED_COUNTER_NAME", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename->} in accounting profile %{dclass_counter1->} is not defined in a firewall using this filter profile", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Accounting profile counter not defined in firewall"),
@@ -2459,7 +2459,7 @@ var part151 = match("MESSAGE#118:ACCT_XFER_POPEN_FAIL", "nwparser.payload", "%{p
 
 var msg123 = msg("ACCT_XFER_POPEN_FAIL", part151);
 
-var part152 = match("MESSAGE#119:APPQOS_LOG_EVENT", "nwparser.payload", "%{event_type}[junos@%{obj_name}timestamp=\"%{result}\" message-type=\"%{info}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-name=\"%{protocol}\" application-name=\"%{application}\" rule-set-name=\"%{rule_group}\" rule-name=\"%{rulename}\" action=\"%{action}\" argument=\"%{fld2}\" argument1=\"%{fld3}\"]", processor_chain([
+var part152 = match("MESSAGE#119:APPQOS_LOG_EVENT", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} timestamp=\"%{result}\" message-type=\"%{info}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-name=\"%{protocol}\" application-name=\"%{application}\" rule-set-name=\"%{rule_group}\" rule-name=\"%{rulename}\" action=\"%{action}\" argument=\"%{fld2}\" argument1=\"%{fld3}\"]", processor_chain([
 	dup27,
 	dup21,
 	dup51,
@@ -2478,7 +2478,7 @@ var part153 = match("MESSAGE#120:APPTRACK_SESSION_CREATE", "nwparser.payload", "
 
 var msg125 = msg("APPTRACK_SESSION_CREATE", part153);
 
-var part154 = match("MESSAGE#121:APPTRACK_SESSION_CLOSE", "nwparser.payload", "%{event_type}[junos@%{obj_name}reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" service-name=\"%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" src-nat-rule-name=\"%{rulename}\" dst-nat-rule-name=\"%{rule_template}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" session-id-32=\"%{sessionid}\" packets-from-client=\"%{packets}\" bytes-from-client=\"%{rbytes}\" packets-from-server=\"%{dclass_counter1}\" bytes-from-server=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
+var part154 = match("MESSAGE#121:APPTRACK_SESSION_CLOSE", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" service-name=\"%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" src-nat-rule-name=\"%{rulename}\" dst-nat-rule-name=\"%{rule_template}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" session-id-32=\"%{sessionid}\" packets-from-client=\"%{packets}\" bytes-from-client=\"%{rbytes}\" packets-from-server=\"%{dclass_counter1}\" bytes-from-server=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
 	dup27,
 	dup52,
 	dup54,
@@ -2503,7 +2503,7 @@ var select30 = linear_select([
 	msg127,
 ]);
 
-var part156 = match("MESSAGE#123:APPTRACK_SESSION_VOL_UPDATE", "nwparser.payload", "%{event_type}[junos@%{obj_name}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" service-name=\"%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" src-nat-rule-name=\"%{rulename}\" dst-nat-rule-name=\"%{rule_template}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" session-id-32=\"%{sessionid}\" packets-from-client=\"%{packets}\" bytes-from-client=\"%{rbytes}\" packets-from-server=\"%{dclass_counter1}\" bytes-from-server=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
+var part156 = match("MESSAGE#123:APPTRACK_SESSION_VOL_UPDATE", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" service-name=\"%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" src-nat-rule-name=\"%{rulename}\" dst-nat-rule-name=\"%{rule_template}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" session-id-32=\"%{sessionid}\" packets-from-client=\"%{packets}\" bytes-from-client=\"%{rbytes}\" packets-from-server=\"%{dclass_counter1}\" bytes-from-server=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
 	dup27,
 	dup52,
 	dup21,
@@ -2530,7 +2530,7 @@ var msg130 = msg("BFDD_TRAP_STATE_DOWN", dup136);
 
 var msg131 = msg("BFDD_TRAP_STATE_UP", dup136);
 
-var part158 = match("MESSAGE#127:bgp_connect_start", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: connect %{saddr}(%{shost}): %{result->} ", processor_chain([
+var part158 = match("MESSAGE#127:bgp_connect_start", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: connect %{saddr->} (%{shost}): %{result->} ", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","bgp connect error"),
@@ -2539,7 +2539,7 @@ var part158 = match("MESSAGE#127:bgp_connect_start", "nwparser.payload", "%{proc
 
 var msg132 = msg("bgp_connect_start", part158);
 
-var part159 = match("MESSAGE#128:bgp_event", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr}(%{dhost}) old state %{change_old}event %{action}new state %{change_new->} ", processor_chain([
+var part159 = match("MESSAGE#128:bgp_event", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr->} (%{dhost}) old state %{change_old->} event %{action->} new state %{change_new->} ", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","bgp peer state change"),
@@ -2566,7 +2566,7 @@ var part161 = match("MESSAGE#130:bgp_listen_reset", "nwparser.payload", "%{proce
 
 var msg135 = msg("bgp_listen_reset", part161);
 
-var part162 = match("MESSAGE#131:bgp_nexthop_sanity", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr}(%{dhost}) next hop %{saddr}local, %{result}", processor_chain([
+var part162 = match("MESSAGE#131:bgp_nexthop_sanity", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr->} (%{dhost}) next hop %{saddr->} local, %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","peer next hop local"),
@@ -2575,7 +2575,7 @@ var part162 = match("MESSAGE#131:bgp_nexthop_sanity", "nwparser.payload", "%{pro
 
 var msg136 = msg("bgp_nexthop_sanity", part162);
 
-var part163 = match("MESSAGE#132:bgp_process_caps", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NOTIFICATION sent to %{daddr}(%{dhost}): code %{severity}(%{action}) subcode %{version}(%{result}) value %{disposition}", processor_chain([
+var part163 = match("MESSAGE#132:bgp_process_caps", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NOTIFICATION sent to %{daddr->} (%{dhost}): code %{severity->} (%{action}) subcode %{version->} (%{result}) value %{disposition}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","code RED error NOTIFICATION sent"),
@@ -2584,7 +2584,7 @@ var part163 = match("MESSAGE#132:bgp_process_caps", "nwparser.payload", "%{proce
 
 var msg137 = msg("bgp_process_caps", part163);
 
-var part164 = match("MESSAGE#133:bgp_process_caps:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: mismatch NLRI with %{hostip}(%{hostname}): peer: %{daddr}us: %{saddr}", processor_chain([
+var part164 = match("MESSAGE#133:bgp_process_caps:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: mismatch NLRI with %{hostip->} (%{hostname}): peer: %{daddr->} us: %{saddr}", processor_chain([
 	dup29,
 	dup21,
 	dup56,
@@ -2598,7 +2598,7 @@ var select32 = linear_select([
 	msg138,
 ]);
 
-var part165 = match("MESSAGE#134:bgp_pp_recv", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: dropping %{daddr}(%{dhost}), %{info}(%{protocol})", processor_chain([
+var part165 = match("MESSAGE#134:bgp_pp_recv", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: dropping %{daddr->} (%{dhost}), %{info->} (%{protocol})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","connection collision"),
@@ -2608,7 +2608,7 @@ var part165 = match("MESSAGE#134:bgp_pp_recv", "nwparser.payload", "%{process}[%
 
 var msg139 = msg("bgp_pp_recv", part165);
 
-var part166 = match("MESSAGE#135:bgp_pp_recv:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr}(%{dhost}): received unexpected EOF", processor_chain([
+var part166 = match("MESSAGE#135:bgp_pp_recv:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: peer %{daddr->} (%{dhost}): received unexpected EOF", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","peer received unexpected EOF"),
@@ -2622,7 +2622,7 @@ var select33 = linear_select([
 	msg140,
 ]);
 
-var part167 = match("MESSAGE#136:bgp_send", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: sending %{sbytes}bytes to %{daddr}(%{dhost}) blocked (%{disposition}): %{result->} ", processor_chain([
+var part167 = match("MESSAGE#136:bgp_send", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: sending %{sbytes->} bytes to %{daddr->} (%{dhost}) blocked (%{disposition}): %{result->} ", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","bgp send blocked error"),
@@ -2631,7 +2631,7 @@ var part167 = match("MESSAGE#136:bgp_send", "nwparser.payload", "%{process}[%{pr
 
 var msg141 = msg("bgp_send", part167);
 
-var part168 = match("MESSAGE#137:bgp_traffic_timeout", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NOTIFICATION sent to %{daddr}(%{dhost}): code %{resultcode}(%{action}), Reason: %{result->} ", processor_chain([
+var part168 = match("MESSAGE#137:bgp_traffic_timeout", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NOTIFICATION sent to %{daddr->} (%{dhost}): code %{resultcode->} (%{action}), Reason: %{result->} ", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","bgp timeout NOTIFICATION sent"),
@@ -2703,7 +2703,7 @@ var part175 = match("MESSAGE#144:BOOTPD_DUP_SLOT", "nwparser.payload", "%{proces
 
 var msg149 = msg("BOOTPD_DUP_SLOT", part175);
 
-var part176 = match("MESSAGE#145:BOOTPD_MODEL_CHK", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected ID %{id}for model %{dclass_counter1}", processor_chain([
+var part176 = match("MESSAGE#145:BOOTPD_MODEL_CHK", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected ID %{id->} for model %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Unexpected ID for model"),
@@ -2775,7 +2775,7 @@ var part183 = match("MESSAGE#152:BOOTPD_SELECT_ERR", "nwparser.payload", "%{proc
 
 var msg157 = msg("BOOTPD_SELECT_ERR", part183);
 
-var part184 = match("MESSAGE#153:BOOTPD_TIMEOUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Timeout %{result}unreasonable", processor_chain([
+var part184 = match("MESSAGE#153:BOOTPD_TIMEOUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Timeout %{result->} unreasonable", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","timeout unreasonable"),
@@ -2784,7 +2784,7 @@ var part184 = match("MESSAGE#153:BOOTPD_TIMEOUT", "nwparser.payload", "%{process
 
 var msg158 = msg("BOOTPD_TIMEOUT", part184);
 
-var part185 = match("MESSAGE#154:BOOTPD_VERSION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Version: %{version}built by builder on %{event_time_string->} ", processor_chain([
+var part185 = match("MESSAGE#154:BOOTPD_VERSION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Version: %{version->} built by builder on %{event_time_string->} ", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","boot version built"),
@@ -2793,7 +2793,7 @@ var part185 = match("MESSAGE#154:BOOTPD_VERSION", "nwparser.payload", "%{process
 
 var msg159 = msg("BOOTPD_VERSION", part185);
 
-var part186 = match("MESSAGE#155:CHASSISD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type->} %{version}built by builder on %{event_time_string}", processor_chain([
+var part186 = match("MESSAGE#155:CHASSISD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type->} %{version->} built by builder on %{event_time_string}", processor_chain([
 	dup57,
 	dup21,
 	setc("event_description","CHASSISD release built"),
@@ -2829,7 +2829,7 @@ var part189 = match("MESSAGE#158:CHASSISD_BLOWERS_SPEED_FULL", "nwparser.payload
 
 var msg163 = msg("CHASSISD_BLOWERS_SPEED_FULL", part189);
 
-var part190 = match("MESSAGE#159:CHASSISD_CB_READ", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{result}reading midplane ID EEPROM, %{dclass_counter1->} %{dclass_counter2}", processor_chain([
+var part190 = match("MESSAGE#159:CHASSISD_CB_READ", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{result->} reading midplane ID EEPROM, %{dclass_counter1->} %{dclass_counter2}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","reading midplane ID EEPROM"),
@@ -2838,7 +2838,7 @@ var part190 = match("MESSAGE#159:CHASSISD_CB_READ", "nwparser.payload", "%{proce
 
 var msg164 = msg("CHASSISD_CB_READ", part190);
 
-var part191 = match("MESSAGE#160:CHASSISD_COMMAND_ACK_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{device}online ack code %{dclass_counter1}- - %{result}, %{interface}", processor_chain([
+var part191 = match("MESSAGE#160:CHASSISD_COMMAND_ACK_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{device->} online ack code %{dclass_counter1->} - - %{result}, %{interface}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHASSISD COMMAND ACK ERROR"),
@@ -2847,7 +2847,7 @@ var part191 = match("MESSAGE#160:CHASSISD_COMMAND_ACK_ERROR", "nwparser.payload"
 
 var msg165 = msg("CHASSISD_COMMAND_ACK_ERROR", part191);
 
-var part192 = match("MESSAGE#161:CHASSISD_COMMAND_ACK_SF_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{disposition}- %{result}, code %{resultcode}, SFM %{dclass_counter1}, FPC %{dclass_counter2}", processor_chain([
+var part192 = match("MESSAGE#161:CHASSISD_COMMAND_ACK_SF_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{disposition->} - %{result}, code %{resultcode}, SFM %{dclass_counter1}, FPC %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHASSISD COMMAND ACK SF ERROR"),
@@ -2856,7 +2856,7 @@ var part192 = match("MESSAGE#161:CHASSISD_COMMAND_ACK_SF_ERROR", "nwparser.paylo
 
 var msg166 = msg("CHASSISD_COMMAND_ACK_SF_ERROR", part192);
 
-var part193 = match("MESSAGE#162:CHASSISD_CONCAT_MODE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Cannot set no-concatenated mode for FPC %{dclass_counter2}PIC %{dclass_counter1}", processor_chain([
+var part193 = match("MESSAGE#162:CHASSISD_CONCAT_MODE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Cannot set no-concatenated mode for FPC %{dclass_counter2->} PIC %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Cannot set no-concatenated mode for FPC"),
@@ -2901,7 +2901,7 @@ var part197 = match("MESSAGE#166:CHASSISD_EXISTS_TERM_OTHER", "nwparser.payload"
 
 var msg171 = msg("CHASSISD_EXISTS_TERM_OTHER", part197);
 
-var part198 = match("MESSAGE#167:CHASSISD_FILE_OPEN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File open: %{filename}, error: %{resultcode}- - %{dclass_counter1}", processor_chain([
+var part198 = match("MESSAGE#167:CHASSISD_FILE_OPEN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File open: %{filename}, error: %{resultcode->} - - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","file open error"),
@@ -2910,7 +2910,7 @@ var part198 = match("MESSAGE#167:CHASSISD_FILE_OPEN", "nwparser.payload", "%{pro
 
 var msg172 = msg("CHASSISD_FILE_OPEN", part198);
 
-var part199 = match("MESSAGE#168:CHASSISD_FILE_STAT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File stat: %{filename}, error: %{resultcode}- - %{dclass_counter1}", processor_chain([
+var part199 = match("MESSAGE#168:CHASSISD_FILE_STAT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: File stat: %{filename}, error: %{resultcode->} - - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHASSISD file statistics error"),
@@ -2928,7 +2928,7 @@ var part200 = match("MESSAGE#169:CHASSISD_FRU_EVENT", "nwparser.payload", "%{pro
 
 var msg174 = msg("CHASSISD_FRU_EVENT", part200);
 
-var part201 = match("MESSAGE#170:CHASSISD_FRU_IPC_WRITE_ERROR_EXT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}FRU %{filename}#%{resultcode}, %{result->} %{dclass_counter1}, %{dclass_counter2}", processor_chain([
+var part201 = match("MESSAGE#170:CHASSISD_FRU_IPC_WRITE_ERROR_EXT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} FRU %{filename}#%{resultcode}, %{result->} %{dclass_counter1}, %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHASSISD restart WRITE_ERROR"),
@@ -2937,7 +2937,7 @@ var part201 = match("MESSAGE#170:CHASSISD_FRU_IPC_WRITE_ERROR_EXT", "nwparser.pa
 
 var msg175 = msg("CHASSISD_FRU_IPC_WRITE_ERROR_EXT", part201);
 
-var part202 = match("MESSAGE#171:CHASSISD_FRU_STEP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename->} %{resultcode}at step %{dclass_counter1}", processor_chain([
+var part202 = match("MESSAGE#171:CHASSISD_FRU_STEP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{filename->} %{resultcode->} at step %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHASSISD FRU STEP ERROR"),
@@ -2946,7 +2946,7 @@ var part202 = match("MESSAGE#171:CHASSISD_FRU_STEP_ERROR", "nwparser.payload", "
 
 var msg176 = msg("CHASSISD_FRU_STEP_ERROR", part202);
 
-var part203 = match("MESSAGE#172:CHASSISD_GETTIMEOFDAY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected error from gettimeofday: %{resultcode}- %{dclass_counter1}", processor_chain([
+var part203 = match("MESSAGE#172:CHASSISD_GETTIMEOFDAY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unexpected error from gettimeofday: %{resultcode->} - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Unexpected error from gettimeofday"),
@@ -2955,7 +2955,7 @@ var part203 = match("MESSAGE#172:CHASSISD_GETTIMEOFDAY", "nwparser.payload", "%{
 
 var msg177 = msg("CHASSISD_GETTIMEOFDAY", part203);
 
-var part204 = match("MESSAGE#173:CHASSISD_HOST_TEMP_READ", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{result}reading host temperature sensor", processor_chain([
+var part204 = match("MESSAGE#173:CHASSISD_HOST_TEMP_READ", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{result->} reading host temperature sensor", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","reading host temperature sensor"),
@@ -3009,7 +3009,7 @@ var part209 = match("MESSAGE#178:CHASSISD_IFDEV_DETACH_TLV_ERROR", "nwparser.pay
 
 var msg183 = msg("CHASSISD_IFDEV_DETACH_TLV_ERROR", part209);
 
-var part210 = match("MESSAGE#179:CHASSISD_IFDEV_GET_BY_INDEX_FAIL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}: rtslib_ifdm_get_by_index failed: %{resultcode}- %{dclass_counter1}", processor_chain([
+var part210 = match("MESSAGE#179:CHASSISD_IFDEV_GET_BY_INDEX_FAIL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}: rtslib_ifdm_get_by_index failed: %{resultcode->} - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","rtslib_ifdm_get_by_index failed"),
@@ -3126,7 +3126,7 @@ var part222 = match("MESSAGE#191:CHASSISD_PIPE_WRITE_ERROR", "nwparser.payload",
 
 var msg196 = msg("CHASSISD_PIPE_WRITE_ERROR", part222);
 
-var part223 = match("MESSAGE#192:CHASSISD_POWER_CHECK", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{device->} %{dclass_counter1}not powering up", processor_chain([
+var part223 = match("MESSAGE#192:CHASSISD_POWER_CHECK", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{device->} %{dclass_counter1->} not powering up", processor_chain([
 	dup58,
 	dup21,
 	setc("event_description","device not powering up"),
@@ -3171,7 +3171,7 @@ var part227 = match("MESSAGE#196:CHASSISD_ROOT_MOUNT_ERROR", "nwparser.payload",
 
 var msg201 = msg("CHASSISD_ROOT_MOUNT_ERROR", part227);
 
-var part228 = match("MESSAGE#197:CHASSISD_RTS_SEQ_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifmsg sequence gap %{resultcode}- - %{dclass_counter1}", processor_chain([
+var part228 = match("MESSAGE#197:CHASSISD_RTS_SEQ_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifmsg sequence gap %{resultcode->} - - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","ifmsg sequence gap"),
@@ -3189,7 +3189,7 @@ var part229 = match("MESSAGE#198:CHASSISD_SBOARD_VERSION_MISMATCH", "nwparser.pa
 
 var msg203 = msg("CHASSISD_SBOARD_VERSION_MISMATCH", part229);
 
-var part230 = match("MESSAGE#199:CHASSISD_SERIAL_ID", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Serial ID read error: %{resultcode}- - %{dclass_counter1}", processor_chain([
+var part230 = match("MESSAGE#199:CHASSISD_SERIAL_ID", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Serial ID read error: %{resultcode->} - - %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Serial ID read error"),
@@ -3207,7 +3207,7 @@ var part231 = match("MESSAGE#200:CHASSISD_SMB_ERROR", "nwparser.payload", "%{pro
 
 var msg205 = msg("CHASSISD_SMB_ERROR", part231);
 
-var part232 = match("MESSAGE#201:CHASSISD_SNMP_TRAP6", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP trap generated: %{result}(%{info})", processor_chain([
+var part232 = match("MESSAGE#201:CHASSISD_SNMP_TRAP6", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP trap generated: %{result->} (%{info})", processor_chain([
 	dup57,
 	dup21,
 	setc("event_description","SNMP Trap6 generated"),
@@ -3252,7 +3252,7 @@ var part236 = match("MESSAGE#205:CHASSISD_TRACE_PIC_OFFLINE", "nwparser.payload"
 
 var msg210 = msg("CHASSISD_TRACE_PIC_OFFLINE", part236);
 
-var part237 = match("MESSAGE#206:CHASSISD_UNEXPECTED_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}returned %{resultcode}: %{dclass_counter1}", processor_chain([
+var part237 = match("MESSAGE#206:CHASSISD_UNEXPECTED_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service->} returned %{resultcode}: %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","UNEXPECTED EXIT"),
@@ -3261,7 +3261,7 @@ var part237 = match("MESSAGE#206:CHASSISD_UNEXPECTED_EXIT", "nwparser.payload", 
 
 var msg211 = msg("CHASSISD_UNEXPECTED_EXIT", part237);
 
-var part238 = match("MESSAGE#207:CHASSISD_UNSUPPORTED_MODEL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Model %{dclass_counter1}unsupported with this version of chassisd", processor_chain([
+var part238 = match("MESSAGE#207:CHASSISD_UNSUPPORTED_MODEL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Model %{dclass_counter1->} unsupported with this version of chassisd", processor_chain([
 	dup58,
 	dup21,
 	setc("event_description","Model number unsupported with this version of chassisd"),
@@ -3279,7 +3279,7 @@ var part239 = match("MESSAGE#208:CHASSISD_VERSION_MISMATCH", "nwparser.payload",
 
 var msg213 = msg("CHASSISD_VERSION_MISMATCH", part239);
 
-var part240 = match("MESSAGE#209:CHASSISD_HIGH_TEMP_CONDITION", "nwparser.payload", "%{process->} %{process_id->} %{event_type}[junos@%{obj_name}temperature=\"%{fld2}\" message=\"%{info}\"]", processor_chain([
+var part240 = match("MESSAGE#209:CHASSISD_HIGH_TEMP_CONDITION", "nwparser.payload", "%{process->} %{process_id->} %{event_type->} [junos@%{obj_name->} temperature=\"%{fld2}\" message=\"%{info}\"]", processor_chain([
 	dup58,
 	dup21,
 	setc("event_description","CHASSISD HIGH TEMP CONDITION"),
@@ -3289,7 +3289,7 @@ var part240 = match("MESSAGE#209:CHASSISD_HIGH_TEMP_CONDITION", "nwparser.payloa
 
 var msg214 = msg("CHASSISD_HIGH_TEMP_CONDITION", part240);
 
-var part241 = match("MESSAGE#210:clean_process", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: process %{agent}RESTART mode %{event_state}new master=%{obj_name}old failover=%{change_old}new failover = %{change_new}", processor_chain([
+var part241 = match("MESSAGE#210:clean_process", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: process %{agent->} RESTART mode %{event_state->} new master=%{obj_name->} old failover=%{change_old->} new failover = %{change_new}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","process RESTART mode"),
@@ -3298,7 +3298,7 @@ var part241 = match("MESSAGE#210:clean_process", "nwparser.payload", "%{process}
 
 var msg215 = msg("clean_process", part241);
 
-var part242 = match("MESSAGE#211:CM_JAVA", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Chassis %{group}Linklocal MAC:%{macaddr}", processor_chain([
+var part242 = match("MESSAGE#211:CM_JAVA", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Chassis %{group->} Linklocal MAC:%{macaddr}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Chassis Linklocal to MAC"),
@@ -3372,7 +3372,7 @@ var part249 = match("MESSAGE#219:DCD_POLICER_PARSE_EMERGENCY", "nwparser.payload
 
 var msg224 = msg("DCD_POLICER_PARSE_EMERGENCY", part249);
 
-var part250 = match("MESSAGE#220:DCD_PULL_LOG_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Failed to pull file %{filename}after %{dclass_counter1}retries last error=%{resultcode}", processor_chain([
+var part250 = match("MESSAGE#220:DCD_PULL_LOG_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Failed to pull file %{filename->} after %{dclass_counter1->} retries last error=%{resultcode}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Failed to pull file"),
@@ -3392,7 +3392,7 @@ var msg226 = msg("DFWD_ARGUMENT_ERROR", part251);
 
 var msg227 = msg("DFWD_MALLOC_FAILED_INIT", dup137);
 
-var part252 = match("MESSAGE#223:DFWD_PARSE_FILTER_EMERGENCY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}encountered errors while parsing filter index file", processor_chain([
+var part252 = match("MESSAGE#223:DFWD_PARSE_FILTER_EMERGENCY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service->} encountered errors while parsing filter index file", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","errors encountered while parsing filter index file"),
@@ -3401,7 +3401,7 @@ var part252 = match("MESSAGE#223:DFWD_PARSE_FILTER_EMERGENCY", "nwparser.payload
 
 var msg228 = msg("DFWD_PARSE_FILTER_EMERGENCY", part252);
 
-var part253 = match("MESSAGE#224:DFWD_PARSE_STATE_EMERGENCY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}encountered unhandled state while parsing interface", processor_chain([
+var part253 = match("MESSAGE#224:DFWD_PARSE_STATE_EMERGENCY", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service->} encountered unhandled state while parsing interface", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","encountered unhandled state while parsing interface"),
@@ -3481,7 +3481,7 @@ var part260 = match("MESSAGE#235:ECCD_usage", "nwparser.payload", "%{process}[%{
 
 var msg240 = msg("ECCD_usage", part260);
 
-var part261 = match("MESSAGE#236:EVENTD_AUDIT_SHOW", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username}viewed security audit log with arguments: %{param}", processor_chain([
+var part261 = match("MESSAGE#236:EVENTD_AUDIT_SHOW", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username->} viewed security audit log with arguments: %{param}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","User viewed security audit log with arguments"),
@@ -3490,7 +3490,7 @@ var part261 = match("MESSAGE#236:EVENTD_AUDIT_SHOW", "nwparser.payload", "%{proc
 
 var msg241 = msg("EVENTD_AUDIT_SHOW", part261);
 
-var part262 = match("MESSAGE#237:FLOW_REASSEMBLE_SUCCEED", "nwparser.payload", "%{event_type}: Packet merged source %{saddr}destination %{daddr}ipid %{fld11}succeed", processor_chain([
+var part262 = match("MESSAGE#237:FLOW_REASSEMBLE_SUCCEED", "nwparser.payload", "%{event_type}: Packet merged source %{saddr->} destination %{daddr->} ipid %{fld11->} succeed", processor_chain([
 	dup20,
 	dup21,
 	dup22,
@@ -3534,7 +3534,7 @@ var part266 = match("MESSAGE#241:FSAD_FAILED", "nwparser.payload", "%{process}[%
 
 var msg246 = msg("FSAD_FAILED", part266);
 
-var part267 = match("MESSAGE#242:FSAD_FETCHTIMEDOUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Fetch to server %{hostname}for file `%{filename}' timed out", processor_chain([
+var part267 = match("MESSAGE#242:FSAD_FETCHTIMEDOUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Fetch to server %{hostname->} for file `%{filename}' timed out", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Fetch to server to get file timed out"),
@@ -3570,7 +3570,7 @@ var part270 = match("MESSAGE#245:FSAD_FILE_RENAME", "nwparser.payload", "%{proce
 
 var msg250 = msg("FSAD_FILE_RENAME", part270);
 
-var part271 = match("MESSAGE#246:FSAD_FILE_STAT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}failed for file pathname %{filename}: %{result}", processor_chain([
+var part271 = match("MESSAGE#246:FSAD_FILE_STAT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service->} failed for file pathname %{filename}: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","stat failed for file"),
@@ -3597,7 +3597,7 @@ var part273 = match("MESSAGE#248:FSAD_MAXCONN", "nwparser.payload", "%{process}[
 
 var msg253 = msg("FSAD_MAXCONN", part273);
 
-var part274 = match("MESSAGE#249:FSAD_MEMORYALLOC_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}failed in the function %{action}(%{resultcode})", processor_chain([
+var part274 = match("MESSAGE#249:FSAD_MEMORYALLOC_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service->} failed in the function %{action->} (%{resultcode})", processor_chain([
 	dup50,
 	dup21,
 	setc("event_description","FSAD MEMORYALLOC FAILED"),
@@ -3642,7 +3642,7 @@ var part278 = match("MESSAGE#253:FSAD_PATH_IS_SPECIAL", "nwparser.payload", "%{p
 
 var msg258 = msg("FSAD_PATH_IS_SPECIAL", part278);
 
-var part279 = match("MESSAGE#254:FSAD_RECVERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: fsad received error message from client having request type %{obj_type}at (%{saddr}, %{sport})", processor_chain([
+var part279 = match("MESSAGE#254:FSAD_RECVERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: fsad received error message from client having request type %{obj_type->} at (%{saddr}, %{sport})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","fsad received error message from client"),
@@ -3735,7 +3735,7 @@ var part288 = match("MESSAGE#263:JADE_EXEC_ERROR", "nwparser.payload", "%{proces
 
 var msg268 = msg("JADE_EXEC_ERROR", part288);
 
-var part289 = match("MESSAGE#264:JADE_NO_LOCAL_USER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Local user %{username}does not exist", processor_chain([
+var part289 = match("MESSAGE#264:JADE_NO_LOCAL_USER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Local user %{username->} does not exist", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Local user does not exist"),
@@ -3762,7 +3762,7 @@ var part291 = match("MESSAGE#266:JADE_PAM_NO_LOCAL_USER", "nwparser.payload", "%
 
 var msg271 = msg("JADE_PAM_NO_LOCAL_USER", part291);
 
-var part292 = match("MESSAGE#267:KERN_ARP_ADDR_CHANGE", "nwparser.payload", "%{process}: %{event_type}: arp info overwritten for %{saddr}from %{smacaddr}to %{dmacaddr}", processor_chain([
+var part292 = match("MESSAGE#267:KERN_ARP_ADDR_CHANGE", "nwparser.payload", "%{process}: %{event_type}: arp info overwritten for %{saddr->} from %{smacaddr->} to %{dmacaddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","arp info overwritten"),
@@ -3864,7 +3864,7 @@ var part302 = match("MESSAGE#278:LIBJNX_REPLICATE_RCP_EXEC_FAILED", "nwparser.pa
 
 var msg283 = msg("LIBJNX_REPLICATE_RCP_EXEC_FAILED", part302);
 
-var part303 = match("MESSAGE#279:LIBJNX_ROTATE_COMPRESS_EXEC_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{resultcode->} %{dclass_counter1}-f %{action}: %{result}", processor_chain([
+var part303 = match("MESSAGE#279:LIBJNX_ROTATE_COMPRESS_EXEC_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{resultcode->} %{dclass_counter1->} -f %{action}: %{result}", processor_chain([
 	dup72,
 	dup21,
 	setc("event_description","ROTATE COMPRESS EXEC FAILED"),
@@ -3909,7 +3909,7 @@ var part307 = match("MESSAGE#283:LIBSERVICED_SOCKET_BIND", "nwparser.payload", "
 
 var msg288 = msg("LIBSERVICED_SOCKET_BIND", part307);
 
-var part308 = match("MESSAGE#284:LIBSERVICED_SOCKET_PRIVATIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to attach socket %{ssid}to management routing instance: %{result}", processor_chain([
+var part308 = match("MESSAGE#284:LIBSERVICED_SOCKET_PRIVATIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to attach socket %{ssid->} to management routing instance: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Unable to attach socket to management routing instance"),
@@ -3954,7 +3954,7 @@ var part312 = match("MESSAGE#288:LOGIN_ABORTED", "nwparser.payload", "%{process}
 
 var msg293 = msg("LOGIN_ABORTED", part312);
 
-var part313 = match("MESSAGE#289:LOGIN_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login failed for user %{username}from host %{dhost}", processor_chain([
+var part313 = match("MESSAGE#289:LOGIN_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login failed for user %{username->} from host %{dhost}", processor_chain([
 	dup43,
 	dup33,
 	dup34,
@@ -4025,7 +4025,7 @@ var msg298 = msg("LOGIN_HOSTNAME_UNRESOLVED", part317);
 
 var part318 = match("MESSAGE#294:LOGIN_INFORMATION/2", "nwparser.p0", "%{} %{event_type}: %{p0}");
 
-var part319 = match("MESSAGE#294:LOGIN_INFORMATION/4", "nwparser.p0", "%{} %{username}logged in from host %{dhost}on %{p0}");
+var part319 = match("MESSAGE#294:LOGIN_INFORMATION/4", "nwparser.p0", "%{} %{username->} logged in from host %{dhost->} on %{p0}");
 
 var part320 = match("MESSAGE#294:LOGIN_INFORMATION/5_0", "nwparser.p0", "device %{p0}");
 
@@ -4148,7 +4148,7 @@ var part328 = match("MESSAGE#299:LOGIN_PAM_MAX_RETRIES", "nwparser.payload", "%{
 
 var msg304 = msg("LOGIN_PAM_MAX_RETRIES", part328);
 
-var part329 = match("MESSAGE#300:LOGIN_PAM_NONLOCAL_USER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username}authenticated but has no local login ID", processor_chain([
+var part329 = match("MESSAGE#300:LOGIN_PAM_NONLOCAL_USER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username->} authenticated but has no local login ID", processor_chain([
 	dup43,
 	dup33,
 	dup34,
@@ -4201,7 +4201,7 @@ var part332 = match("MESSAGE#303:LOGIN_PASSWORD_EXPIRED", "nwparser.payload", "%
 
 var msg308 = msg("LOGIN_PASSWORD_EXPIRED", part332);
 
-var part333 = match("MESSAGE#304:LOGIN_REFUSED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login of user %{username}from host %{shost}on %{terminal}was refused: %{info}", processor_chain([
+var part333 = match("MESSAGE#304:LOGIN_REFUSED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login of user %{username->} from host %{shost->} on %{terminal->} was refused: %{info}", processor_chain([
 	dup43,
 	dup33,
 	dup34,
@@ -4215,7 +4215,7 @@ var part333 = match("MESSAGE#304:LOGIN_REFUSED", "nwparser.payload", "%{process}
 
 var msg309 = msg("LOGIN_REFUSED", part333);
 
-var part334 = match("MESSAGE#305:LOGIN_ROOT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username}logged in as root from host %{shost}on %{terminal}", processor_chain([
+var part334 = match("MESSAGE#305:LOGIN_ROOT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username->} logged in as root from host %{shost->} on %{terminal}", processor_chain([
 	dup32,
 	dup33,
 	dup34,
@@ -4229,7 +4229,7 @@ var part334 = match("MESSAGE#305:LOGIN_ROOT", "nwparser.payload", "%{process}[%{
 
 var msg310 = msg("LOGIN_ROOT", part334);
 
-var part335 = match("MESSAGE#306:LOGIN_TIMED_OUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login attempt timed out after %{dclass_counter1}seconds", processor_chain([
+var part335 = match("MESSAGE#306:LOGIN_TIMED_OUT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Login attempt timed out after %{dclass_counter1->} seconds", processor_chain([
 	dup43,
 	dup33,
 	dup35,
@@ -4291,7 +4291,7 @@ var part340 = match("MESSAGE#313:MIB2D_KVM_FAILURE", "nwparser.payload", "%{proc
 
 var msg318 = msg("MIB2D_KVM_FAILURE", part340);
 
-var part341 = match("MESSAGE#314:MIB2D_RTSLIB_READ_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}: failed in %{dclass_counter1->} %{dclass_counter2}index (%{result})", processor_chain([
+var part341 = match("MESSAGE#314:MIB2D_RTSLIB_READ_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{service}: failed in %{dclass_counter1->} %{dclass_counter2->} index (%{result})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","MIB2D RTSLIB READ FAILURE"),
@@ -4336,7 +4336,7 @@ var part345 = match("MESSAGE#318:MIB2D_TRAP_SEND_FAILURE", "nwparser.payload", "
 
 var msg323 = msg("MIB2D_TRAP_SEND_FAILURE", part345);
 
-var part346 = match("MESSAGE#319:Multiuser", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: old requested_transition==%{change_new}sighupped=%{result}", processor_chain([
+var part346 = match("MESSAGE#319:Multiuser", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: old requested_transition==%{change_new->} sighupped=%{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","user sighupped"),
@@ -4374,7 +4374,7 @@ var part349 = match("MESSAGE#322:NASD_CHAP_GETHOSTNAME_FAILED", "nwparser.payloa
 
 var msg327 = msg("NASD_CHAP_GETHOSTNAME_FAILED", part349);
 
-var part350 = match("MESSAGE#323:NASD_CHAP_INVALID_CHAP_IDENTIFIER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{interface}: received %{filename}expected CHAP ID: %{resultcode}", processor_chain([
+var part350 = match("MESSAGE#323:NASD_CHAP_INVALID_CHAP_IDENTIFIER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{interface}: received %{filename->} expected CHAP ID: %{resultcode}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHAP INVALID_CHAP IDENTIFIER"),
@@ -4450,7 +4450,7 @@ var msg336 = msg("NASD_DB_TABLE_CREATE_FAILURE", part357);
 
 var msg337 = msg("NASD_DUPLICATE", dup139);
 
-var part358 = match("MESSAGE#333:NASD_EVLIB_CREATE_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}with: %{result}", processor_chain([
+var part358 = match("MESSAGE#333:NASD_EVLIB_CREATE_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} with: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","EVLIB CREATE FAILURE"),
@@ -4459,7 +4459,7 @@ var part358 = match("MESSAGE#333:NASD_EVLIB_CREATE_FAILURE", "nwparser.payload",
 
 var msg338 = msg("NASD_EVLIB_CREATE_FAILURE", part358);
 
-var part359 = match("MESSAGE#334:NASD_EVLIB_EXIT_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}value: %{result}, error: %{resultcode}", processor_chain([
+var part359 = match("MESSAGE#334:NASD_EVLIB_EXIT_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} value: %{result}, error: %{resultcode}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","EVLIB EXIT FAILURE"),
@@ -4535,7 +4535,7 @@ var part366 = match("MESSAGE#343:NASD_PPP_UNRECOGNIZED", "nwparser.payload", "%{
 
 var msg348 = msg("NASD_PPP_UNRECOGNIZED", part366);
 
-var part367 = match("MESSAGE#344:NASD_RADIUS_ALLOCATE_PASSWORD_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}when allocating password for RADIUS: %{result}", processor_chain([
+var part367 = match("MESSAGE#344:NASD_RADIUS_ALLOCATE_PASSWORD_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} when allocating password for RADIUS: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","RADIUS password allocation failure"),
@@ -4642,7 +4642,7 @@ var part378 = match("MESSAGE#355:NOTICE", "nwparser.payload", "%{agent}: %{event
 
 var msg360 = msg("NOTICE", part378);
 
-var part379 = match("MESSAGE#356:PFE_FW_SYSLOG_IP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: FW: %{smacaddr->} %{fld10->} %{protocol->} %{saddr->} %{daddr->} %{sport->} %{dport}(%{packets}packets) ", processor_chain([
+var part379 = match("MESSAGE#356:PFE_FW_SYSLOG_IP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: FW: %{smacaddr->} %{fld10->} %{protocol->} %{saddr->} %{daddr->} %{sport->} %{dport->} (%{packets->} packets) ", processor_chain([
 	dup20,
 	dup21,
 	dup81,
@@ -4651,7 +4651,7 @@ var part379 = match("MESSAGE#356:PFE_FW_SYSLOG_IP", "nwparser.payload", "%{proce
 
 var msg361 = msg("PFE_FW_SYSLOG_IP", part379);
 
-var part380 = match("MESSAGE#357:PFE_FW_SYSLOG_IP:01", "nwparser.payload", "%{hostip->} %{hostname->} %{event_type}: FW: %{smacaddr->} %{fld10->} %{protocol->} %{saddr->} %{daddr->} %{sport->} %{dport}(%{packets}packets) ", processor_chain([
+var part380 = match("MESSAGE#357:PFE_FW_SYSLOG_IP:01", "nwparser.payload", "%{hostip->} %{hostname->} %{event_type}: FW: %{smacaddr->} %{fld10->} %{protocol->} %{saddr->} %{daddr->} %{sport->} %{dport->} (%{packets->} packets) ", processor_chain([
 	dup20,
 	dup21,
 	dup81,
@@ -4665,7 +4665,7 @@ var select36 = linear_select([
 	msg362,
 ]);
 
-var part381 = match("MESSAGE#358:PFE_NH_RESOLVE_THROTTLED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Next-hop resolution requests from interface %{interface}throttled", processor_chain([
+var part381 = match("MESSAGE#358:PFE_NH_RESOLVE_THROTTLED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Next-hop resolution requests from interface %{interface->} throttled", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Next-hop resolution requests throttled"),
@@ -4703,7 +4703,7 @@ var select37 = linear_select([
 	part386,
 ]);
 
-var part387 = match("MESSAGE#361:process_mode/4", "nwparser.p0", "%{}mode=%{protocol}cmd=%{action}master_mode=%{result}");
+var part387 = match("MESSAGE#361:process_mode/4", "nwparser.p0", "%{}mode=%{protocol->} cmd=%{action->} master_mode=%{result}");
 
 var all21 = all_match({
 	processors: [
@@ -4737,7 +4737,7 @@ var select38 = linear_select([
 	msg367,
 ]);
 
-var part389 = match("MESSAGE#363:PWC_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}exiting with status %{result}", processor_chain([
+var part389 = match("MESSAGE#363:PWC_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} exiting with status %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","process exit with status"),
@@ -4746,7 +4746,7 @@ var part389 = match("MESSAGE#363:PWC_EXIT", "nwparser.payload", "%{process}[%{pr
 
 var msg368 = msg("PWC_EXIT", part389);
 
-var part390 = match("MESSAGE#364:PWC_HOLD_RELEASE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}released child %{child_pid}from %{dclass_counter1}state", processor_chain([
+var part390 = match("MESSAGE#364:PWC_HOLD_RELEASE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} released child %{child_pid->} from %{dclass_counter1->} state", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Process released child from state"),
@@ -4773,7 +4773,7 @@ var part392 = match("MESSAGE#366:PWC_INVALID_TIMEOUT_ARGUMENT", "nwparser.payloa
 
 var msg371 = msg("PWC_INVALID_TIMEOUT_ARGUMENT", part392);
 
-var part393 = match("MESSAGE#367:PWC_KILLED_BY_SIGNAL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc process %{agent}received terminating signal", processor_chain([
+var part393 = match("MESSAGE#367:PWC_KILLED_BY_SIGNAL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc process %{agent->} received terminating signal", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","pwc process received terminating signal"),
@@ -4782,7 +4782,7 @@ var part393 = match("MESSAGE#367:PWC_KILLED_BY_SIGNAL", "nwparser.payload", "%{p
 
 var msg372 = msg("PWC_KILLED_BY_SIGNAL", part393);
 
-var part394 = match("MESSAGE#368:PWC_KILL_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc is sending %{resultcode}to child %{child_pid}", processor_chain([
+var part394 = match("MESSAGE#368:PWC_KILL_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc is sending %{resultcode->} to child %{child_pid}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","pwc is sending kill event to child"),
@@ -4818,7 +4818,7 @@ var part397 = match("MESSAGE#371:PWC_KQUEUE_INIT", "nwparser.payload", "%{proces
 
 var msg376 = msg("PWC_KQUEUE_INIT", part397);
 
-var part398 = match("MESSAGE#372:PWC_KQUEUE_REGISTER_FILTER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Failed to register kqueue filter: %{agent}for purpose: %{result}", processor_chain([
+var part398 = match("MESSAGE#372:PWC_KQUEUE_REGISTER_FILTER", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Failed to register kqueue filter: %{agent->} for purpose: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Failed to register kqueue filter"),
@@ -4872,7 +4872,7 @@ var part403 = match("MESSAGE#377:PWC_NO_PROCESS", "nwparser.payload", "%{process
 
 var msg382 = msg("PWC_NO_PROCESS", part403);
 
-var part404 = match("MESSAGE#378:PWC_PROCESS_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc process %{agent}child %{child_pid}exited with status %{result}", processor_chain([
+var part404 = match("MESSAGE#378:PWC_PROCESS_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: pwc process %{agent->} child %{child_pid->} exited with status %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","pwc process exited with status"),
@@ -4881,7 +4881,7 @@ var part404 = match("MESSAGE#378:PWC_PROCESS_EXIT", "nwparser.payload", "%{proce
 
 var msg383 = msg("PWC_PROCESS_EXIT", part404);
 
-var part405 = match("MESSAGE#379:PWC_PROCESS_FORCED_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}forcing hold down of child %{child_pid}until signal", processor_chain([
+var part405 = match("MESSAGE#379:PWC_PROCESS_FORCED_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} forcing hold down of child %{child_pid->} until signal", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Process forcing hold down of child until signalled"),
@@ -4890,7 +4890,7 @@ var part405 = match("MESSAGE#379:PWC_PROCESS_FORCED_HOLD", "nwparser.payload", "
 
 var msg384 = msg("PWC_PROCESS_FORCED_HOLD", part405);
 
-var part406 = match("MESSAGE#380:PWC_PROCESS_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}holding down child %{child_pid}until signal", processor_chain([
+var part406 = match("MESSAGE#380:PWC_PROCESS_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} holding down child %{child_pid->} until signal", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Process holding down child until signalled"),
@@ -4899,7 +4899,7 @@ var part406 = match("MESSAGE#380:PWC_PROCESS_HOLD", "nwparser.payload", "%{proce
 
 var msg385 = msg("PWC_PROCESS_HOLD", part406);
 
-var part407 = match("MESSAGE#381:PWC_PROCESS_HOLD_SKIPPED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}will not down child %{child_pid}because of %{result}", processor_chain([
+var part407 = match("MESSAGE#381:PWC_PROCESS_HOLD_SKIPPED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} will not down child %{child_pid->} because of %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Process not holding down child"),
@@ -4917,7 +4917,7 @@ var part408 = match("MESSAGE#382:PWC_PROCESS_OPEN", "nwparser.payload", "%{proce
 
 var msg387 = msg("PWC_PROCESS_OPEN", part408);
 
-var part409 = match("MESSAGE#383:PWC_PROCESS_TIMED_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent}holding down child %{child_pid->} %{result}", processor_chain([
+var part409 = match("MESSAGE#383:PWC_PROCESS_TIMED_HOLD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Process %{agent->} holding down child %{child_pid->} %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Process holding down child"),
@@ -5126,7 +5126,7 @@ var part431 = match("MESSAGE#406:RMOPD_usage", "nwparser.payload", "%{process}[%
 
 var msg411 = msg("RMOPD_usage", part431);
 
-var part432 = match("MESSAGE#407:RPD_ABORT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}version built by builder on %{dclass_counter1}: %{result}", processor_chain([
+var part432 = match("MESSAGE#407:RPD_ABORT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} version built by builder on %{dclass_counter1}: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","RPD ABORT"),
@@ -5162,7 +5162,7 @@ var part435 = match("MESSAGE#410:RPD_ASSERT_SOFT", "nwparser.payload", "%{proces
 
 var msg415 = msg("RPD_ASSERT_SOFT", part435);
 
-var part436 = match("MESSAGE#411:RPD_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}version built by builder on %{dclass_counter1}", processor_chain([
+var part436 = match("MESSAGE#411:RPD_EXIT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} version built by builder on %{dclass_counter1}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","RPD EXIT"),
@@ -5175,7 +5175,7 @@ var msg417 = msg("RPD_IFL_INDEXCOLLISION", dup145);
 
 var msg418 = msg("RPD_IFL_NAMECOLLISION", dup145);
 
-var part437 = match("MESSAGE#414:RPD_ISIS_ADJDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS lost %{dclass_counter1}adjacency to %{dclass_counter2}on %{interface}, %{result}", processor_chain([
+var part437 = match("MESSAGE#414:RPD_ISIS_ADJDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS lost %{dclass_counter1->} adjacency to %{dclass_counter2->} on %{interface}, %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","IS-IS lost adjacency"),
@@ -5184,7 +5184,7 @@ var part437 = match("MESSAGE#414:RPD_ISIS_ADJDOWN", "nwparser.payload", "%{proce
 
 var msg419 = msg("RPD_ISIS_ADJDOWN", part437);
 
-var part438 = match("MESSAGE#415:RPD_ISIS_ADJUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS new %{dclass_counter1}adjacency to %{dclass_counter2->} %{interface}", processor_chain([
+var part438 = match("MESSAGE#415:RPD_ISIS_ADJUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS new %{dclass_counter1->} adjacency to %{dclass_counter2->} %{interface}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","IS-IS new adjacency"),
@@ -5193,7 +5193,7 @@ var part438 = match("MESSAGE#415:RPD_ISIS_ADJUP", "nwparser.payload", "%{process
 
 var msg420 = msg("RPD_ISIS_ADJUP", part438);
 
-var part439 = match("MESSAGE#416:RPD_ISIS_ADJUPNOIP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS new %{dclass_counter1}adjacency to %{dclass_counter2->} %{interface}without an address", processor_chain([
+var part439 = match("MESSAGE#416:RPD_ISIS_ADJUPNOIP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS new %{dclass_counter1->} adjacency to %{dclass_counter2->} %{interface->} without an address", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","IS-IS new adjacency without an address"),
@@ -5202,7 +5202,7 @@ var part439 = match("MESSAGE#416:RPD_ISIS_ADJUPNOIP", "nwparser.payload", "%{pro
 
 var msg421 = msg("RPD_ISIS_ADJUPNOIP", part439);
 
-var part440 = match("MESSAGE#417:RPD_ISIS_LSPCKSUM", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS %{dclass_counter1}LSP checksum error, interface %{interface}, LSP id %{id}, sequence %{dclass_counter2}, checksum %{resultcode}, lifetime %{fld2}", processor_chain([
+var part440 = match("MESSAGE#417:RPD_ISIS_LSPCKSUM", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: IS-IS %{dclass_counter1->} LSP checksum error, interface %{interface}, LSP id %{id}, sequence %{dclass_counter2}, checksum %{resultcode}, lifetime %{fld2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","IS-IS LSP checksum error on iterface"),
@@ -5220,7 +5220,7 @@ var part441 = match("MESSAGE#418:RPD_ISIS_OVERLOAD", "nwparser.payload", "%{proc
 
 var msg423 = msg("RPD_ISIS_OVERLOAD", part441);
 
-var part442 = match("MESSAGE#419:RPD_KRT_AFUNSUPRT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{resultcode}: received %{agent}message with unsupported address family %{dclass_counter1}", processor_chain([
+var part442 = match("MESSAGE#419:RPD_KRT_AFUNSUPRT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{resultcode}: received %{agent->} message with unsupported address family %{dclass_counter1}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","message with unsupported address family received"),
@@ -5238,7 +5238,7 @@ var part443 = match("MESSAGE#420:RPD_KRT_CCC_IFL_MODIFY", "nwparser.payload", "%
 
 var msg425 = msg("RPD_KRT_CCC_IFL_MODIFY", part443);
 
-var part444 = match("MESSAGE#421:RPD_KRT_DELETED_RTT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: received deleted routing table from the kernel for family %{dclass_counter1}table ID %{dclass_counter2}", processor_chain([
+var part444 = match("MESSAGE#421:RPD_KRT_DELETED_RTT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: received deleted routing table from the kernel for family %{dclass_counter1->} table ID %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","received deleted routing table from kernel"),
@@ -5256,7 +5256,7 @@ var part445 = match("MESSAGE#422:RPD_KRT_IFA_GENERATION", "nwparser.payload", "%
 
 var msg427 = msg("RPD_KRT_IFA_GENERATION", part445);
 
-var part446 = match("MESSAGE#423:RPD_KRT_IFDCHANGE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}CHANGE for ifd %{interface}failed, error \"%{result}\"", processor_chain([
+var part446 = match("MESSAGE#423:RPD_KRT_IFDCHANGE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} CHANGE for ifd %{interface->} failed, error \"%{result}\"", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","CHANGE for ifd failed"),
@@ -5265,7 +5265,7 @@ var part446 = match("MESSAGE#423:RPD_KRT_IFDCHANGE", "nwparser.payload", "%{proc
 
 var msg428 = msg("RPD_KRT_IFDCHANGE", part446);
 
-var part447 = match("MESSAGE#424:RPD_KRT_IFDEST_GET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}SERVICE: %{service}for ifd %{interface}failed, error \"%{result}\"", processor_chain([
+var part447 = match("MESSAGE#424:RPD_KRT_IFDEST_GET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type->} SERVICE: %{service->} for ifd %{interface->} failed, error \"%{result}\"", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","GET SERVICE failure on interface"),
@@ -5274,7 +5274,7 @@ var part447 = match("MESSAGE#424:RPD_KRT_IFDEST_GET", "nwparser.payload", "%{pro
 
 var msg429 = msg("RPD_KRT_IFDEST_GET", part447);
 
-var part448 = match("MESSAGE#425:RPD_KRT_IFDGET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}GET index for ifd interface failed, error \"%{result}\"", processor_chain([
+var part448 = match("MESSAGE#425:RPD_KRT_IFDGET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} GET index for ifd interface failed, error \"%{result}\"", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","GET index for ifd interface failed"),
@@ -5283,7 +5283,7 @@ var part448 = match("MESSAGE#425:RPD_KRT_IFDGET", "nwparser.payload", "%{process
 
 var msg430 = msg("RPD_KRT_IFDGET", part448);
 
-var part449 = match("MESSAGE#426:RPD_KRT_IFD_GENERATION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifd %{dclass_counter1}generation mismatch -- %{result}", processor_chain([
+var part449 = match("MESSAGE#426:RPD_KRT_IFD_GENERATION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifd %{dclass_counter1->} generation mismatch -- %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","ifd generation mismatch"),
@@ -5310,7 +5310,7 @@ var part451 = match("MESSAGE#428:RPD_KRT_IFL_CELL_RELAY_MODE_UNSPECIFIED", "nwpa
 
 var msg433 = msg("RPD_KRT_IFL_CELL_RELAY_MODE_UNSPECIFIED", part451);
 
-var part452 = match("MESSAGE#429:RPD_KRT_IFL_GENERATION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifl %{interface}generation mismatch -- %{result}", processor_chain([
+var part452 = match("MESSAGE#429:RPD_KRT_IFL_GENERATION", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ifl %{interface->} generation mismatch -- %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","ifl generation mismatch"),
@@ -5319,7 +5319,7 @@ var part452 = match("MESSAGE#429:RPD_KRT_IFL_GENERATION", "nwparser.payload", "%
 
 var msg434 = msg("RPD_KRT_IFL_GENERATION", part452);
 
-var part453 = match("MESSAGE#430:RPD_KRT_KERNEL_BAD_ROUTE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: lost %{interface->} %{dclass_counter1}for route %{dclass_counter2}", processor_chain([
+var part453 = match("MESSAGE#430:RPD_KRT_KERNEL_BAD_ROUTE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: lost %{interface->} %{dclass_counter1->} for route %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","lost interface for route"),
@@ -5337,7 +5337,7 @@ var part454 = match("MESSAGE#431:RPD_KRT_NEXTHOP_OVERFLOW", "nwparser.payload", 
 
 var msg436 = msg("RPD_KRT_NEXTHOP_OVERFLOW", part454);
 
-var part455 = match("MESSAGE#432:RPD_KRT_NOIFD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: No device %{dclass_counter1}for interface %{interface}", processor_chain([
+var part455 = match("MESSAGE#432:RPD_KRT_NOIFD", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: No device %{dclass_counter1->} for interface %{interface}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","No device for interface"),
@@ -5364,7 +5364,7 @@ var part457 = match("MESSAGE#434:RPD_KRT_VERSION", "nwparser.payload", "%{proces
 
 var msg439 = msg("RPD_KRT_VERSION", part457);
 
-var part458 = match("MESSAGE#435:RPD_KRT_VERSIONNONE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Routing socket message type %{agent}'s version is not supported by kernel, %{info}-- %{result}", processor_chain([
+var part458 = match("MESSAGE#435:RPD_KRT_VERSIONNONE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Routing socket message type %{agent}'s version is not supported by kernel, %{info->} -- %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Routing socket message type not supported by kernel"),
@@ -5391,7 +5391,7 @@ var part460 = match("MESSAGE#437:RPD_LDP_INTF_BLOCKED", "nwparser.payload", "%{p
 
 var msg442 = msg("RPD_LDP_INTF_BLOCKED", part460);
 
-var part461 = match("MESSAGE#438:RPD_LDP_INTF_UNBLOCKED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP interface %{interface}is now %{result}", processor_chain([
+var part461 = match("MESSAGE#438:RPD_LDP_INTF_UNBLOCKED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP interface %{interface->} is now %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","LDP interface now unblocked"),
@@ -5400,7 +5400,7 @@ var part461 = match("MESSAGE#438:RPD_LDP_INTF_UNBLOCKED", "nwparser.payload", "%
 
 var msg443 = msg("RPD_LDP_INTF_UNBLOCKED", part461);
 
-var part462 = match("MESSAGE#439:RPD_LDP_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP neighbor %{daddr}(%{interface}) is %{result}", processor_chain([
+var part462 = match("MESSAGE#439:RPD_LDP_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP neighbor %{daddr->} (%{interface}) is %{result}", processor_chain([
 	setc("eventcategory","1603030000"),
 	dup21,
 	setc("event_description","LDP neighbor down"),
@@ -5409,7 +5409,7 @@ var part462 = match("MESSAGE#439:RPD_LDP_NBRDOWN", "nwparser.payload", "%{proces
 
 var msg444 = msg("RPD_LDP_NBRDOWN", part462);
 
-var part463 = match("MESSAGE#440:RPD_LDP_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP neighbor %{daddr}(%{interface}) is %{result}", processor_chain([
+var part463 = match("MESSAGE#440:RPD_LDP_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP neighbor %{daddr->} (%{interface}) is %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","LDP neighbor up"),
@@ -5418,7 +5418,7 @@ var part463 = match("MESSAGE#440:RPD_LDP_NBRUP", "nwparser.payload", "%{process}
 
 var msg445 = msg("RPD_LDP_NBRUP", part463);
 
-var part464 = match("MESSAGE#441:RPD_LDP_SESSIONDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP session %{daddr}is down, %{result}", processor_chain([
+var part464 = match("MESSAGE#441:RPD_LDP_SESSIONDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP session %{daddr->} is down, %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","LDP session down"),
@@ -5427,7 +5427,7 @@ var part464 = match("MESSAGE#441:RPD_LDP_SESSIONDOWN", "nwparser.payload", "%{pr
 
 var msg446 = msg("RPD_LDP_SESSIONDOWN", part464);
 
-var part465 = match("MESSAGE#442:RPD_LDP_SESSIONUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP session %{daddr}is up", processor_chain([
+var part465 = match("MESSAGE#442:RPD_LDP_SESSIONUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: LDP session %{daddr->} is up", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","LDP session up"),
@@ -5454,7 +5454,7 @@ var part467 = match("MESSAGE#444:RPD_LOCK_LOCKED", "nwparser.payload", "%{proces
 
 var msg449 = msg("RPD_LOCK_LOCKED", part467);
 
-var part468 = match("MESSAGE#445:RPD_MPLS_LSP_CHANGE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: MPLS LSP %{interface->} %{result}Route %{info}", processor_chain([
+var part468 = match("MESSAGE#445:RPD_MPLS_LSP_CHANGE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: MPLS LSP %{interface->} %{result->} Route %{info}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","MPLS LSP CHANGE"),
@@ -5481,7 +5481,7 @@ var part470 = match("MESSAGE#447:RPD_MPLS_LSP_SWITCH", "nwparser.payload", "%{pr
 
 var msg452 = msg("RPD_MPLS_LSP_SWITCH", part470);
 
-var part471 = match("MESSAGE#448:RPD_MPLS_LSP_UP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: MPLS LSP %{interface->} %{result}Route %{info->} ", processor_chain([
+var part471 = match("MESSAGE#448:RPD_MPLS_LSP_UP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: MPLS LSP %{interface->} %{result->} Route %{info->} ", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","MPLS LSP UP"),
@@ -5508,7 +5508,7 @@ var part473 = match("MESSAGE#450:RPD_MSDP_PEER_UP", "nwparser.payload", "%{proce
 
 var msg455 = msg("RPD_MSDP_PEER_UP", part473);
 
-var part474 = match("MESSAGE#451:RPD_OSPF_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: OSPF neighbor %{daddr}(%{interface}) %{disposition}due to %{result}", processor_chain([
+var part474 = match("MESSAGE#451:RPD_OSPF_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: OSPF neighbor %{daddr->} (%{interface}) %{disposition->} due to %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","OSPF neighbor down"),
@@ -5517,7 +5517,7 @@ var part474 = match("MESSAGE#451:RPD_OSPF_NBRDOWN", "nwparser.payload", "%{proce
 
 var msg456 = msg("RPD_OSPF_NBRDOWN", part474);
 
-var part475 = match("MESSAGE#452:RPD_OSPF_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: OSPF neighbor %{daddr}(%{interface}) %{disposition}due to %{result}", processor_chain([
+var part475 = match("MESSAGE#452:RPD_OSPF_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: OSPF neighbor %{daddr->} (%{interface}) %{disposition->} due to %{result}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","OSPF neighbor up"),
@@ -5526,7 +5526,7 @@ var part475 = match("MESSAGE#452:RPD_OSPF_NBRUP", "nwparser.payload", "%{process
 
 var msg457 = msg("RPD_OSPF_NBRUP", part475);
 
-var part476 = match("MESSAGE#453:RPD_OS_MEMHIGH", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Using %{dclass_counter1}KB of memory, %{info}", processor_chain([
+var part476 = match("MESSAGE#453:RPD_OS_MEMHIGH", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Using %{dclass_counter1->} KB of memory, %{info}", processor_chain([
 	dup50,
 	dup21,
 	setc("event_description","OS MEMHIGH"),
@@ -5535,7 +5535,7 @@ var part476 = match("MESSAGE#453:RPD_OS_MEMHIGH", "nwparser.payload", "%{process
 
 var msg458 = msg("RPD_OS_MEMHIGH", part476);
 
-var part477 = match("MESSAGE#454:RPD_PIM_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: PIM neighbor %{daddr}timeout interface %{interface}", processor_chain([
+var part477 = match("MESSAGE#454:RPD_PIM_NBRDOWN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: PIM neighbor %{daddr->} timeout interface %{interface}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","PIM neighbor down"),
@@ -5545,7 +5545,7 @@ var part477 = match("MESSAGE#454:RPD_PIM_NBRDOWN", "nwparser.payload", "%{proces
 
 var msg459 = msg("RPD_PIM_NBRDOWN", part477);
 
-var part478 = match("MESSAGE#455:RPD_PIM_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: PIM new neighbor %{daddr}interface %{interface}", processor_chain([
+var part478 = match("MESSAGE#455:RPD_PIM_NBRUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: PIM new neighbor %{daddr->} interface %{interface}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","PIM neighbor up"),
@@ -5554,7 +5554,7 @@ var part478 = match("MESSAGE#455:RPD_PIM_NBRUP", "nwparser.payload", "%{process}
 
 var msg460 = msg("RPD_PIM_NBRUP", part478);
 
-var part479 = match("MESSAGE#456:RPD_RDISC_CKSUM", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Bad checksum for router solicitation from %{saddr}to %{daddr}", processor_chain([
+var part479 = match("MESSAGE#456:RPD_RDISC_CKSUM", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Bad checksum for router solicitation from %{saddr->} to %{daddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Bad checksum for router solicitation"),
@@ -5563,7 +5563,7 @@ var part479 = match("MESSAGE#456:RPD_RDISC_CKSUM", "nwparser.payload", "%{proces
 
 var msg461 = msg("RPD_RDISC_CKSUM", part479);
 
-var part480 = match("MESSAGE#457:RPD_RDISC_NOMULTI", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Ignoring interface %{dclass_counter1}on %{interface}-- %{result}", processor_chain([
+var part480 = match("MESSAGE#457:RPD_RDISC_NOMULTI", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Ignoring interface %{dclass_counter1->} on %{interface->} -- %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Ignoring interface"),
@@ -5572,7 +5572,7 @@ var part480 = match("MESSAGE#457:RPD_RDISC_NOMULTI", "nwparser.payload", "%{proc
 
 var msg462 = msg("RPD_RDISC_NOMULTI", part480);
 
-var part481 = match("MESSAGE#458:RPD_RDISC_NORECVIF", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to locate interface for router solicitation from %{saddr}to %{daddr}", processor_chain([
+var part481 = match("MESSAGE#458:RPD_RDISC_NORECVIF", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to locate interface for router solicitation from %{saddr->} to %{daddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Unable to locate interface for router"),
@@ -5581,7 +5581,7 @@ var part481 = match("MESSAGE#458:RPD_RDISC_NORECVIF", "nwparser.payload", "%{pro
 
 var msg463 = msg("RPD_RDISC_NORECVIF", part481);
 
-var part482 = match("MESSAGE#459:RPD_RDISC_SOLICITADDR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Expected multicast (%{dclass_counter1}) for router solicitation from %{saddr}to %{daddr}", processor_chain([
+var part482 = match("MESSAGE#459:RPD_RDISC_SOLICITADDR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Expected multicast (%{dclass_counter1}) for router solicitation from %{saddr->} to %{daddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Expected multicast for router solicitation"),
@@ -5590,7 +5590,7 @@ var part482 = match("MESSAGE#459:RPD_RDISC_SOLICITADDR", "nwparser.payload", "%{
 
 var msg464 = msg("RPD_RDISC_SOLICITADDR", part482);
 
-var part483 = match("MESSAGE#460:RPD_RDISC_SOLICITICMP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Nonzero ICMP code (%{resultcode}) for router solicitation from %{saddr}to %{daddr}", processor_chain([
+var part483 = match("MESSAGE#460:RPD_RDISC_SOLICITICMP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Nonzero ICMP code (%{resultcode}) for router solicitation from %{saddr->} to %{daddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Nonzero ICMP code for router solicitation"),
@@ -5599,7 +5599,7 @@ var part483 = match("MESSAGE#460:RPD_RDISC_SOLICITICMP", "nwparser.payload", "%{
 
 var msg465 = msg("RPD_RDISC_SOLICITICMP", part483);
 
-var part484 = match("MESSAGE#461:RPD_RDISC_SOLICITLEN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Insufficient length (%{dclass_counter1}) for router solicitation from %{saddr}to %{daddr}", processor_chain([
+var part484 = match("MESSAGE#461:RPD_RDISC_SOLICITLEN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Insufficient length (%{dclass_counter1}) for router solicitation from %{saddr->} to %{daddr}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Insufficient length for router solicitation"),
@@ -5608,7 +5608,7 @@ var part484 = match("MESSAGE#461:RPD_RDISC_SOLICITLEN", "nwparser.payload", "%{p
 
 var msg466 = msg("RPD_RDISC_SOLICITLEN", part484);
 
-var part485 = match("MESSAGE#462:RPD_RIP_AUTH", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Update with invalid authentication from %{saddr}(%{interface})", processor_chain([
+var part485 = match("MESSAGE#462:RPD_RIP_AUTH", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Update with invalid authentication from %{saddr->} (%{interface})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","RIP update with invalid authentication"),
@@ -5635,7 +5635,7 @@ var part487 = match("MESSAGE#464:RPD_RIP_JOIN_MULTICAST", "nwparser.payload", "%
 
 var msg469 = msg("RPD_RIP_JOIN_MULTICAST", part487);
 
-var part488 = match("MESSAGE#465:RPD_RT_IFUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: UP route for interface %{interface}index %{dclass_counter1->} %{saddr}/%{dclass_counter2}", processor_chain([
+var part488 = match("MESSAGE#465:RPD_RT_IFUP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: UP route for interface %{interface->} index %{dclass_counter1->} %{saddr}/%{dclass_counter2}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","RIP interface up"),
@@ -5657,7 +5657,7 @@ var msg472 = msg("RPD_SCHED_CUMULATIVE_LONGRUNTIME", part489);
 
 var msg473 = msg("RPD_SCHED_MODULE_LONGRUNTIME", dup146);
 
-var part490 = match("MESSAGE#469:RPD_SCHED_TASK_LONGRUNTIME", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}ran for %{dclass_counter1}(%{dclass_counter2})", processor_chain([
+var part490 = match("MESSAGE#469:RPD_SCHED_TASK_LONGRUNTIME", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} ran for %{dclass_counter1}(%{dclass_counter2})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","task extended runtime"),
@@ -5666,7 +5666,7 @@ var part490 = match("MESSAGE#469:RPD_SCHED_TASK_LONGRUNTIME", "nwparser.payload"
 
 var msg474 = msg("RPD_SCHED_TASK_LONGRUNTIME", part490);
 
-var part491 = match("MESSAGE#470:RPD_SIGNAL_TERMINATE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}termination signal received", processor_chain([
+var part491 = match("MESSAGE#470:RPD_SIGNAL_TERMINATE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} termination signal received", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","termination signal received for service"),
@@ -5675,7 +5675,7 @@ var part491 = match("MESSAGE#470:RPD_SIGNAL_TERMINATE", "nwparser.payload", "%{p
 
 var msg475 = msg("RPD_SIGNAL_TERMINATE", part491);
 
-var part492 = match("MESSAGE#471:RPD_START", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Start %{dclass_counter1}version version built %{dclass_counter2}", processor_chain([
+var part492 = match("MESSAGE#471:RPD_START", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Start %{dclass_counter1->} version version built %{dclass_counter2}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","version built"),
@@ -5693,7 +5693,7 @@ var part493 = match("MESSAGE#472:RPD_SYSTEM", "nwparser.payload", "%{process}[%{
 
 var msg477 = msg("RPD_SYSTEM", part493);
 
-var part494 = match("MESSAGE#473:RPD_TASK_BEGIN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Commencing routing updates, version %{dclass_counter1}, built %{dclass_counter2}by builder", processor_chain([
+var part494 = match("MESSAGE#473:RPD_TASK_BEGIN", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Commencing routing updates, version %{dclass_counter1}, built %{dclass_counter2->} by builder", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Commencing routing updates"),
@@ -5785,7 +5785,7 @@ var part503 = match("MESSAGE#483:RPD_TASK_SIGNALIGNORE", "nwparser.payload", "%{
 
 var msg488 = msg("RPD_TASK_SIGNALIGNORE", part503);
 
-var part504 = match("MESSAGE#484:RT_COS", "nwparser.payload", "%{process}: %{event_type}: COS IPC op %{dclass_counter1}(%{agent}) failed, err %{resultcode}(%{result})", processor_chain([
+var part504 = match("MESSAGE#484:RT_COS", "nwparser.payload", "%{process}: %{event_type}: COS IPC op %{dclass_counter1->} (%{agent}) failed, err %{resultcode->} (%{result})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","COS IPC op failed"),
@@ -5956,7 +5956,7 @@ var all25 = all_match({
 
 var msg493 = msg("RT_FLOW_SESSION_DENY:02", all25);
 
-var part525 = match("MESSAGE#489:RT_FLOW_SESSION_DENY", "nwparser.payload", "%{event_type}[junos@%{obj_name}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" icmp-type=\"%{obj_type}\" policy-name=\"%{policyname}\"]", processor_chain([
+var part525 = match("MESSAGE#489:RT_FLOW_SESSION_DENY", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" icmp-type=\"%{obj_type}\" policy-name=\"%{policyname}\"]", processor_chain([
 	dup93,
 	dup52,
 	dup94,
@@ -5966,7 +5966,7 @@ var part525 = match("MESSAGE#489:RT_FLOW_SESSION_DENY", "nwparser.payload", "%{e
 
 var msg494 = msg("RT_FLOW_SESSION_DENY", part525);
 
-var part526 = match("MESSAGE#490:RT_FLOW_SESSION_DENY:03/1", "nwparser.p0", "%{} %{saddr}/%{sport}->%{daddr}/%{dport->} %{fld20->} %{fld1->} %{result->} %{src_zone->} %{dst_zone}HTTP %{info}");
+var part526 = match("MESSAGE#490:RT_FLOW_SESSION_DENY:03/1", "nwparser.p0", "%{} %{saddr}/%{sport}->%{daddr}/%{dport->} %{fld20->} %{fld1->} %{result->} %{src_zone->} %{dst_zone->} HTTP %{info}");
 
 var all26 = all_match({
 	processors: [
@@ -6046,7 +6046,7 @@ var all28 = all_match({
 
 var msg497 = msg("RT_FLOW_SESSION_CLOSE:01", all28);
 
-var part531 = match("MESSAGE#493:RT_FLOW_SESSION_CLOSE", "nwparser.payload", "%{event_type}[junos@%{obj_name}reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" inbound-packets=\"%{packets}\" inbound-bytes=\"%{rbytes}\" outbound-packets=\"%{dclass_counter1}\" outbound-bytes=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
+var part531 = match("MESSAGE#493:RT_FLOW_SESSION_CLOSE", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" policy-name=\"%{policyname}\" inbound-packets=\"%{packets}\" inbound-bytes=\"%{rbytes}\" outbound-packets=\"%{dclass_counter1}\" outbound-bytes=\"%{sbytes}\" elapsed-time=\"%{duration}\"]", processor_chain([
 	dup26,
 	dup52,
 	dup54,
@@ -6141,7 +6141,7 @@ var part540 = match("MESSAGE#496:RT_SCREEN_IP", "nwparser.payload", "%{process}:
 
 var msg501 = msg("RT_SCREEN_IP", part540);
 
-var part541 = match("MESSAGE#497:RT_SCREEN_IP:01", "nwparser.payload", "%{event_type}[junos@%{obj_name}attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" protocol-id=\"%{protocol}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
+var part541 = match("MESSAGE#497:RT_SCREEN_IP:01", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" protocol-id=\"%{protocol}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -6156,7 +6156,7 @@ var select52 = linear_select([
 
 var msg503 = msg("RT_SCREEN_TCP", dup152);
 
-var part542 = match("MESSAGE#499:RT_SCREEN_SESSION_LIMIT", "nwparser.payload", "%{event_type}[junos@%{obj_name}attack-name=\"%{threat_name}\" message=\"%{info}\" ip-address=\"%{hostip}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
+var part542 = match("MESSAGE#499:RT_SCREEN_SESSION_LIMIT", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} attack-name=\"%{threat_name}\" message=\"%{info}\" ip-address=\"%{hostip}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -6229,7 +6229,7 @@ var part549 = match("MESSAGE#507:SERVICED_CONFIG_ERROR", "nwparser.payload", "%{
 
 var msg512 = msg("SERVICED_CONFIG_ERROR", part549);
 
-var part550 = match("MESSAGE#508:SERVICED_CONFIG_FILE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2}failed to read path with error: %{result}", processor_chain([
+var part550 = match("MESSAGE#508:SERVICED_CONFIG_FILE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2->} failed to read path with error: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","service failed to read path"),
@@ -6258,7 +6258,7 @@ var msg515 = msg("SERVICED_DISABLED_GGSN", part552);
 
 var msg516 = msg("SERVICED_DUPLICATE", dup139);
 
-var part553 = match("MESSAGE#512:SERVICED_EVENT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: event function %{dclass_counter2}failed with error: %{result}", processor_chain([
+var part553 = match("MESSAGE#512:SERVICED_EVENT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: event function %{dclass_counter2->} failed with error: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","event function failed"),
@@ -6276,7 +6276,7 @@ var part554 = match("MESSAGE#513:SERVICED_INIT_FAILED", "nwparser.payload", "%{p
 
 var msg518 = msg("SERVICED_INIT_FAILED", part554);
 
-var part555 = match("MESSAGE#514:SERVICED_MALLOC_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: failed to allocate [%{dclass_counter2}] object [%{dclass_counter1}bytes %{bytes}]: %{result}", processor_chain([
+var part555 = match("MESSAGE#514:SERVICED_MALLOC_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: failed to allocate [%{dclass_counter2}] object [%{dclass_counter1->} bytes %{bytes}]: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","memory allocation failure"),
@@ -6285,7 +6285,7 @@ var part555 = match("MESSAGE#514:SERVICED_MALLOC_FAILURE", "nwparser.payload", "
 
 var msg519 = msg("SERVICED_MALLOC_FAILURE", part555);
 
-var part556 = match("MESSAGE#515:SERVICED_NETWORK_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2}had error: %{result}", processor_chain([
+var part556 = match("MESSAGE#515:SERVICED_NETWORK_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2->} had error: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","NETWORK FAILURE"),
@@ -6334,7 +6334,7 @@ var part560 = match("MESSAGE#521:SERVICED_SOCKET_CREATE", "nwparser.payload", "%
 
 var msg526 = msg("SERVICED_SOCKET_CREATE", part560);
 
-var part561 = match("MESSAGE#522:SERVICED_SOCKET_IO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: socket function %{dclass_counter2}failed with error: %{result}", processor_chain([
+var part561 = match("MESSAGE#522:SERVICED_SOCKET_IO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: socket function %{dclass_counter2->} failed with error: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","socket function failed"),
@@ -6352,7 +6352,7 @@ var part562 = match("MESSAGE#523:SERVICED_SOCKET_OPTION", "nwparser.payload", "%
 
 var msg528 = msg("SERVICED_SOCKET_OPTION", part562);
 
-var part563 = match("MESSAGE#524:SERVICED_STDLIB_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2}had error: %{result}", processor_chain([
+var part563 = match("MESSAGE#524:SERVICED_STDLIB_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{dclass_counter2->} had error: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","STDLIB FAILURE"),
@@ -6385,7 +6385,7 @@ var msg533 = msg("SSL_PROXY_SSL_SESSION_DROP", dup153);
 
 var msg534 = msg("SSL_PROXY_SESSION_IGNORE", dup153);
 
-var part566 = match("MESSAGE#530:SNMP_NS_LOG_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NET-SNMP version %{version}AgentX subagent connected", processor_chain([
+var part566 = match("MESSAGE#530:SNMP_NS_LOG_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: NET-SNMP version %{version->} AgentX subagent connected", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","AgentX subagent connected"),
@@ -6395,7 +6395,7 @@ var part566 = match("MESSAGE#530:SNMP_NS_LOG_INFO", "nwparser.payload", "%{proce
 
 var msg535 = msg("SNMP_NS_LOG_INFO", part566);
 
-var part567 = match("MESSAGE#531:SNMP_SUBAGENT_IPC_REG_ROWS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ns_subagent_register_mibs: registering %{dclass_counter1}rows", processor_chain([
+var part567 = match("MESSAGE#531:SNMP_SUBAGENT_IPC_REG_ROWS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: ns_subagent_register_mibs: registering %{dclass_counter1->} rows", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","ns_subagent registering rows"),
@@ -6405,7 +6405,7 @@ var part567 = match("MESSAGE#531:SNMP_SUBAGENT_IPC_REG_ROWS", "nwparser.payload"
 
 var msg536 = msg("SNMP_SUBAGENT_IPC_REG_ROWS", part567);
 
-var part568 = match("MESSAGE#532:SNMPD_ACCESS_GROUP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result}in %{dclass_counter1}access group %{group}", processor_chain([
+var part568 = match("MESSAGE#532:SNMPD_ACCESS_GROUP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result->} in %{dclass_counter1->} access group %{group}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD ACCESS GROUP ERROR"),
@@ -6414,7 +6414,7 @@ var part568 = match("MESSAGE#532:SNMPD_ACCESS_GROUP_ERROR", "nwparser.payload", 
 
 var msg537 = msg("SNMPD_ACCESS_GROUP_ERROR", part568);
 
-var part569 = match("MESSAGE#533:SNMPD_AUTH_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unauthorized SNMP community from %{daddr}to unknown community name (%{pool_name})", processor_chain([
+var part569 = match("MESSAGE#533:SNMPD_AUTH_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unauthorized SNMP community from %{daddr->} to unknown community name (%{pool_name})", processor_chain([
 	dup29,
 	dup21,
 	dup104,
@@ -6424,7 +6424,7 @@ var part569 = match("MESSAGE#533:SNMPD_AUTH_FAILURE", "nwparser.payload", "%{pro
 
 var msg538 = msg("SNMPD_AUTH_FAILURE", part569);
 
-var part570 = match("MESSAGE#534:SNMPD_AUTH_FAILURE:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: failed input interface authorization from %{daddr}to unknown (%{pool_name})", processor_chain([
+var part570 = match("MESSAGE#534:SNMPD_AUTH_FAILURE:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: failed input interface authorization from %{daddr->} to unknown (%{pool_name})", processor_chain([
 	dup29,
 	dup21,
 	dup104,
@@ -6434,7 +6434,7 @@ var part570 = match("MESSAGE#534:SNMPD_AUTH_FAILURE:01", "nwparser.payload", "%{
 
 var msg539 = msg("SNMPD_AUTH_FAILURE:01", part570);
 
-var part571 = match("MESSAGE#535:SNMPD_AUTH_FAILURE:02", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unauthorized SNMP community from %{daddr}to %{saddr}(%{pool_name})", processor_chain([
+var part571 = match("MESSAGE#535:SNMPD_AUTH_FAILURE:02", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unauthorized SNMP community from %{daddr->} to %{saddr->} (%{pool_name})", processor_chain([
 	dup29,
 	dup21,
 	dup104,
@@ -6444,7 +6444,7 @@ var part571 = match("MESSAGE#535:SNMPD_AUTH_FAILURE:02", "nwparser.payload", "%{
 
 var msg540 = msg("SNMPD_AUTH_FAILURE:02", part571);
 
-var part572 = match("MESSAGE#595:SNMPD_AUTH_FAILURE:03", "nwparser.payload", "%{process->} %{process_id->} %{event_type}[junos@%{obj_name}function-name=\"%{fld1}\" message=\"%{info}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" index1=\"%{fld4}\"]", processor_chain([
+var part572 = match("MESSAGE#595:SNMPD_AUTH_FAILURE:03", "nwparser.payload", "%{process->} %{process_id->} %{event_type->} [junos@%{obj_name->} function-name=\"%{fld1}\" message=\"%{info}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" index1=\"%{fld4}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup104,
@@ -6470,7 +6470,7 @@ var part573 = match("MESSAGE#536:SNMPD_AUTH_PRIVILEGES_EXCEEDED", "nwparser.payl
 
 var msg542 = msg("SNMPD_AUTH_PRIVILEGES_EXCEEDED", part573);
 
-var part574 = match("MESSAGE#537:SNMPD_AUTH_RESTRICTED_ADDRESS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: request from address %{daddr}not allowed", processor_chain([
+var part574 = match("MESSAGE#537:SNMPD_AUTH_RESTRICTED_ADDRESS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: request from address %{daddr->} not allowed", processor_chain([
 	dup47,
 	dup21,
 	setc("event_description","SNMPD AUTH RESTRICTED ADDRESS"),
@@ -6498,7 +6498,7 @@ var part576 = match("MESSAGE#539:SNMPD_CONFIG_ERROR", "nwparser.payload", "%{pro
 
 var msg545 = msg("SNMPD_CONFIG_ERROR", part576);
 
-var part577 = match("MESSAGE#540:SNMPD_CONTEXT_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result}in %{dclass_counter1}context %{dclass_counter2}", processor_chain([
+var part577 = match("MESSAGE#540:SNMPD_CONTEXT_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result->} in %{dclass_counter1->} context %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD CONTEXT ERROR"),
@@ -6534,7 +6534,7 @@ var part580 = match("MESSAGE#543:SNMPD_FILE_FAILURE", "nwparser.payload", "%{pro
 
 var msg549 = msg("SNMPD_FILE_FAILURE", part580);
 
-var part581 = match("MESSAGE#544:SNMPD_GROUP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result}in %{dclass_counter1}group: '%{group}' user '%{username}' model '%{version}'", processor_chain([
+var part581 = match("MESSAGE#544:SNMPD_GROUP_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result->} in %{dclass_counter1->} group: '%{group}' user '%{username}' model '%{version}'", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD GROUP ERROR"),
@@ -6588,7 +6588,7 @@ var part586 = match("MESSAGE#549:SNMPD_RADIX_FAILURE", "nwparser.payload", "%{pr
 
 var msg555 = msg("SNMPD_RADIX_FAILURE", part586);
 
-var part587 = match("MESSAGE#550:SNMPD_RECEIVE_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: receive %{dclass_counter1}failure: %{result}", processor_chain([
+var part587 = match("MESSAGE#550:SNMPD_RECEIVE_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: receive %{dclass_counter1->} failure: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD RECEIVE FAILURE"),
@@ -6728,7 +6728,7 @@ var part601 = match("MESSAGE#564:SNMPD_TRAP_COLD_START", "nwparser.payload", "%{
 
 var msg570 = msg("SNMPD_TRAP_COLD_START", part601);
 
-var part602 = match("MESSAGE#565:SNMPD_TRAP_GEN_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{resultcode}(%{result})", processor_chain([
+var part602 = match("MESSAGE#565:SNMPD_TRAP_GEN_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{resultcode->} (%{result})", processor_chain([
 	dup29,
 	dup21,
 	dup106,
@@ -6746,7 +6746,7 @@ var part603 = match("MESSAGE#566:SNMPD_TRAP_GEN_FAILURE2", "nwparser.payload", "
 
 var msg572 = msg("SNMPD_TRAP_GEN_FAILURE2", part603);
 
-var part604 = match("MESSAGE#567:SNMPD_TRAP_INVALID_DATA", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{result}(%{dclass_counter2}) received", processor_chain([
+var part604 = match("MESSAGE#567:SNMPD_TRAP_INVALID_DATA", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{result->} (%{dclass_counter2}) received", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD TRAP INVALID DATA"),
@@ -6755,7 +6755,7 @@ var part604 = match("MESSAGE#567:SNMPD_TRAP_INVALID_DATA", "nwparser.payload", "
 
 var msg573 = msg("SNMPD_TRAP_INVALID_DATA", part604);
 
-var part605 = match("MESSAGE#568:SNMPD_TRAP_NOT_ENOUGH_VARBINDS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{info}(%{result})", processor_chain([
+var part605 = match("MESSAGE#568:SNMPD_TRAP_NOT_ENOUGH_VARBINDS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: %{info->} (%{result})", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD TRAP ERROR"),
@@ -6764,7 +6764,7 @@ var part605 = match("MESSAGE#568:SNMPD_TRAP_NOT_ENOUGH_VARBINDS", "nwparser.payl
 
 var msg574 = msg("SNMPD_TRAP_NOT_ENOUGH_VARBINDS", part605);
 
-var part606 = match("MESSAGE#569:SNMPD_TRAP_QUEUED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Adding trap to %{dclass_counter2}to %{obj_name}queue, %{dclass_counter1}traps in queue", processor_chain([
+var part606 = match("MESSAGE#569:SNMPD_TRAP_QUEUED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Adding trap to %{dclass_counter2->} to %{obj_name->} queue, %{dclass_counter1->} traps in queue", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Adding trap to queue"),
@@ -6773,7 +6773,7 @@ var part606 = match("MESSAGE#569:SNMPD_TRAP_QUEUED", "nwparser.payload", "%{proc
 
 var msg575 = msg("SNMPD_TRAP_QUEUED", part606);
 
-var part607 = match("MESSAGE#570:SNMPD_TRAP_QUEUE_DRAINED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: traps queued to %{obj_name}sent successfully", processor_chain([
+var part607 = match("MESSAGE#570:SNMPD_TRAP_QUEUE_DRAINED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: traps queued to %{obj_name->} sent successfully", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","traps queued - sent successfully"),
@@ -6782,7 +6782,7 @@ var part607 = match("MESSAGE#570:SNMPD_TRAP_QUEUE_DRAINED", "nwparser.payload", 
 
 var msg576 = msg("SNMPD_TRAP_QUEUE_DRAINED", part607);
 
-var part608 = match("MESSAGE#571:SNMPD_TRAP_QUEUE_MAX_ATTEMPTS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: after %{dclass_counter1}attempts, deleting %{dclass_counter2}traps queued to %{obj_name}", processor_chain([
+var part608 = match("MESSAGE#571:SNMPD_TRAP_QUEUE_MAX_ATTEMPTS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: after %{dclass_counter1->} attempts, deleting %{dclass_counter2->} traps queued to %{obj_name}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD TRAP QUEUE MAX_ATTEMPTS - deleting some traps"),
@@ -6791,7 +6791,7 @@ var part608 = match("MESSAGE#571:SNMPD_TRAP_QUEUE_MAX_ATTEMPTS", "nwparser.paylo
 
 var msg577 = msg("SNMPD_TRAP_QUEUE_MAX_ATTEMPTS", part608);
 
-var part609 = match("MESSAGE#572:SNMPD_TRAP_QUEUE_MAX_SIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: maximum queue size exceeded (%{dclass_counter1}), discarding trap to %{dclass_counter2}from %{obj_name}queue", processor_chain([
+var part609 = match("MESSAGE#572:SNMPD_TRAP_QUEUE_MAX_SIZE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: maximum queue size exceeded (%{dclass_counter1}), discarding trap to %{dclass_counter2->} from %{obj_name->} queue", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","SNMP TRAP maximum queue size exceeded"),
@@ -6800,7 +6800,7 @@ var part609 = match("MESSAGE#572:SNMPD_TRAP_QUEUE_MAX_SIZE", "nwparser.payload",
 
 var msg578 = msg("SNMPD_TRAP_QUEUE_MAX_SIZE", part609);
 
-var part610 = match("MESSAGE#573:SNMPD_TRAP_THROTTLED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: traps throttled after %{dclass_counter1}traps", processor_chain([
+var part610 = match("MESSAGE#573:SNMPD_TRAP_THROTTLED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: traps throttled after %{dclass_counter1->} traps", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","SNMP traps throttled"),
@@ -6809,7 +6809,7 @@ var part610 = match("MESSAGE#573:SNMPD_TRAP_THROTTLED", "nwparser.payload", "%{p
 
 var msg579 = msg("SNMPD_TRAP_THROTTLED", part610);
 
-var part611 = match("MESSAGE#574:SNMPD_TRAP_TYPE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unknown trap type requested (%{obj_type})", processor_chain([
+var part611 = match("MESSAGE#574:SNMPD_TRAP_TYPE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: unknown trap type requested (%{obj_type->} )", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","unknown SNMP trap type requested"),
@@ -6818,7 +6818,7 @@ var part611 = match("MESSAGE#574:SNMPD_TRAP_TYPE_ERROR", "nwparser.payload", "%{
 
 var msg580 = msg("SNMPD_TRAP_TYPE_ERROR", part611);
 
-var part612 = match("MESSAGE#575:SNMPD_TRAP_VARBIND_TYPE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: expecting %{dclass_counter1}varbind to be VT_NUMBER (%{resultcode})", processor_chain([
+var part612 = match("MESSAGE#575:SNMPD_TRAP_VARBIND_TYPE_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: SNMP trap error: expecting %{dclass_counter1->} varbind to be VT_NUMBER (%{resultcode->} )", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD TRAP VARBIND TYPE ERROR"),
@@ -6845,7 +6845,7 @@ var part614 = match("MESSAGE#577:SNMPD_TRAP_WARM_START", "nwparser.payload", "%{
 
 var msg583 = msg("SNMPD_TRAP_WARM_START", part614);
 
-var part615 = match("MESSAGE#578:SNMPD_USER_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result}in %{dclass_counter1}user '%{username}' %{dclass_counter2}", processor_chain([
+var part615 = match("MESSAGE#578:SNMPD_USER_ERROR", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result->} in %{dclass_counter1->} user '%{username}' %{dclass_counter2}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMPD USER ERROR"),
@@ -6863,7 +6863,7 @@ var part616 = match("MESSAGE#579:SNMPD_VIEW_DELETE", "nwparser.payload", "%{proc
 
 var msg585 = msg("SNMPD_VIEW_DELETE", part616);
 
-var part617 = match("MESSAGE#580:SNMPD_VIEW_INSTALL_DEFAULT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result}installing default %{dclass_counter1}view %{dclass_counter2}", processor_chain([
+var part617 = match("MESSAGE#580:SNMPD_VIEW_INSTALL_DEFAULT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: %{result->} installing default %{dclass_counter1->} view %{dclass_counter2}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","installing default SNMP view"),
@@ -6872,7 +6872,7 @@ var part617 = match("MESSAGE#580:SNMPD_VIEW_INSTALL_DEFAULT", "nwparser.payload"
 
 var msg586 = msg("SNMPD_VIEW_INSTALL_DEFAULT", part617);
 
-var part618 = match("MESSAGE#581:SNMPD_VIEW_OID_PARSE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: oid parsing failed for view %{dclass_counter2}oid %{result}", processor_chain([
+var part618 = match("MESSAGE#581:SNMPD_VIEW_OID_PARSE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent}: oid parsing failed for view %{dclass_counter2->} oid %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","oid parsing failed for SNMP view"),
@@ -6881,7 +6881,7 @@ var part618 = match("MESSAGE#581:SNMPD_VIEW_OID_PARSE", "nwparser.payload", "%{p
 
 var msg587 = msg("SNMPD_VIEW_OID_PARSE", part618);
 
-var part619 = match("MESSAGE#582:SNMP_GET_ERROR1", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1}failed for %{dclass_counter2}: %{result}", processor_chain([
+var part619 = match("MESSAGE#582:SNMP_GET_ERROR1", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1->} failed for %{dclass_counter2->} : %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMP_GET_ERROR 1"),
@@ -6890,7 +6890,7 @@ var part619 = match("MESSAGE#582:SNMP_GET_ERROR1", "nwparser.payload", "%{proces
 
 var msg588 = msg("SNMP_GET_ERROR1", part619);
 
-var part620 = match("MESSAGE#583:SNMP_GET_ERROR2", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1}failed for %{dclass_counter2}: %{result}", processor_chain([
+var part620 = match("MESSAGE#583:SNMP_GET_ERROR2", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1->} failed for %{dclass_counter2->} : %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMP GET ERROR 2"),
@@ -6899,7 +6899,7 @@ var part620 = match("MESSAGE#583:SNMP_GET_ERROR2", "nwparser.payload", "%{proces
 
 var msg589 = msg("SNMP_GET_ERROR2", part620);
 
-var part621 = match("MESSAGE#584:SNMP_GET_ERROR3", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1}failed for %{dclass_counter2}: %{result}", processor_chain([
+var part621 = match("MESSAGE#584:SNMP_GET_ERROR3", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1->} failed for %{dclass_counter2->} : %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMP GET ERROR 3"),
@@ -6908,7 +6908,7 @@ var part621 = match("MESSAGE#584:SNMP_GET_ERROR3", "nwparser.payload", "%{proces
 
 var msg590 = msg("SNMP_GET_ERROR3", part621);
 
-var part622 = match("MESSAGE#585:SNMP_GET_ERROR4", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1}failed for %{dclass_counter2}: %{result}", processor_chain([
+var part622 = match("MESSAGE#585:SNMP_GET_ERROR4", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{agent->} %{dclass_counter1->} failed for %{dclass_counter2->} : %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","SNMP GET ERROR 4"),
@@ -6935,7 +6935,7 @@ var part624 = match("MESSAGE#587:SNMP_TRAP_LINK_DOWN", "nwparser.payload", "%{pr
 
 var msg593 = msg("SNMP_TRAP_LINK_DOWN", part624);
 
-var part625 = match("MESSAGE#596:SNMP_TRAP_LINK_DOWN:01", "nwparser.payload", "%{process->} %{process_id->} %{event_type}[junos@%{obj_name}snmp-interface-index=\"%{fld1}\" admin-status=\"%{fld3}\" operational-status=\"%{fld2}\" interface-name=\"%{interface}\"]", processor_chain([
+var part625 = match("MESSAGE#596:SNMP_TRAP_LINK_DOWN:01", "nwparser.payload", "%{process->} %{process_id->} %{event_type->} [junos@%{obj_name->} snmp-interface-index=\"%{fld1}\" admin-status=\"%{fld3}\" operational-status=\"%{fld2}\" interface-name=\"%{interface}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup107,
@@ -6959,7 +6959,7 @@ var part626 = match("MESSAGE#588:SNMP_TRAP_LINK_UP", "nwparser.payload", "%{proc
 
 var msg595 = msg("SNMP_TRAP_LINK_UP", part626);
 
-var part627 = match("MESSAGE#597:SNMP_TRAP_LINK_UP:01", "nwparser.payload", "%{process->} %{process_id->} %{event_type}[junos@%{obj_name}snmp-interface-index=\"%{fld1}\" admin-status=\"%{fld3}\" operational-status=\"%{event_state}\" interface-name=\"%{interface}\"]", processor_chain([
+var part627 = match("MESSAGE#597:SNMP_TRAP_LINK_UP:01", "nwparser.payload", "%{process->} %{process_id->} %{event_type->} [junos@%{obj_name->} snmp-interface-index=\"%{fld1}\" admin-status=\"%{fld3}\" operational-status=\"%{event_state}\" interface-name=\"%{interface}\"]", processor_chain([
 	dup20,
 	dup21,
 	dup108,
@@ -7041,7 +7041,7 @@ var part634 = match("MESSAGE#598:SSHD_LOGIN_FAILED", "nwparser.payload", "%{proc
 
 var msg603 = msg("SSHD_LOGIN_FAILED", part634);
 
-var part635 = match("MESSAGE#599:SSHD_LOGIN_FAILED:01", "nwparser.payload", "%{event_type}[junos@%{obj_name}username=\"%{username}\" source-address=\"%{saddr}\"]", processor_chain([
+var part635 = match("MESSAGE#599:SSHD_LOGIN_FAILED:01", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} username=\"%{username}\" source-address=\"%{saddr}\"]", processor_chain([
 	dup43,
 	dup33,
 	dup34,
@@ -7061,7 +7061,7 @@ var select57 = linear_select([
 	msg604,
 ]);
 
-var part636 = match("MESSAGE#600:task_connect", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: task %{agent}addr %{daddr}+%{dport}: %{result}", processor_chain([
+var part636 = match("MESSAGE#600:task_connect", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: task %{agent->} addr %{daddr}+%{dport}: %{result}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","task connect failure"),
@@ -7099,7 +7099,7 @@ var part639 = match("MESSAGE#604:TFTPD_CONNECT_ERR", "nwparser.payload", "%{proc
 
 var msg609 = msg("TFTPD_CONNECT_ERR", part639);
 
-var part640 = match("MESSAGE#605:TFTPD_CONNECT_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: TFTP %{protocol}from address %{daddr}port %{dport}file %{filename}", processor_chain([
+var part640 = match("MESSAGE#605:TFTPD_CONNECT_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: TFTP %{protocol->} from address %{daddr->} port %{dport->} file %{filename}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","TFTPD CONNECT INFO"),
@@ -7153,7 +7153,7 @@ var part645 = match("MESSAGE#610:TFTPD_OPEN_ERR", "nwparser.payload", "%{process
 
 var msg615 = msg("TFTPD_OPEN_ERR", part645);
 
-var part646 = match("MESSAGE#611:TFTPD_RECVCOMPLETE_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Received %{dclass_counter1}blocks of %{dclass_counter2}size for file '%{filename}'", processor_chain([
+var part646 = match("MESSAGE#611:TFTPD_RECVCOMPLETE_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Received %{dclass_counter1->} blocks of %{dclass_counter2->} size for file '%{filename}'", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","TFTPD RECVCOMPLETE INFO"),
@@ -7180,7 +7180,7 @@ var part648 = match("MESSAGE#613:TFTPD_RECV_ERR", "nwparser.payload", "%{process
 
 var msg618 = msg("TFTPD_RECV_ERR", part648);
 
-var part649 = match("MESSAGE#614:TFTPD_SENDCOMPLETE_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Sent %{dclass_counter1}blocks of %{dclass_counter2}and %{info}for file '%{filename}'", processor_chain([
+var part649 = match("MESSAGE#614:TFTPD_SENDCOMPLETE_INFO", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Sent %{dclass_counter1->} blocks of %{dclass_counter2->} and %{info->} for file '%{filename}'", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","TFTPD SENDCOMPLETE INFO"),
@@ -7216,7 +7216,7 @@ var part652 = match("MESSAGE#617:TFTPD_STATFS_ERR", "nwparser.payload", "%{proce
 
 var msg622 = msg("TFTPD_STATFS_ERR", part652);
 
-var part653 = match("MESSAGE#618:TNP", "nwparser.payload", "%{process}: %{event_type}: adding neighbor %{dclass_counter1}to interface %{interface}", processor_chain([
+var part653 = match("MESSAGE#618:TNP", "nwparser.payload", "%{process}: %{event_type}: adding neighbor %{dclass_counter1->} to interface %{interface}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","adding neighbor to interface"),
@@ -7225,7 +7225,7 @@ var part653 = match("MESSAGE#618:TNP", "nwparser.payload", "%{process}: %{event_
 
 var msg623 = msg("TNP", part653);
 
-var part654 = match("MESSAGE#619:trace_on", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: tracing to %{fld33}started", processor_chain([
+var part654 = match("MESSAGE#619:trace_on", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: tracing to %{fld33->} started", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","tracing to file"),
@@ -7298,7 +7298,7 @@ var part660 = match("MESSAGE#625:UI_BOOTTIME_FAILED", "nwparser.payload", "%{pro
 
 var msg630 = msg("UI_BOOTTIME_FAILED", part660);
 
-var part661 = match("MESSAGE#626:UI_CFG_AUDIT_NEW", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: user '%{username}' %{dclass_counter2}path unknown", processor_chain([
+var part661 = match("MESSAGE#626:UI_CFG_AUDIT_NEW", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: user '%{username}' %{dclass_counter2->} path unknown", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","user path unknown"),
@@ -7307,7 +7307,7 @@ var part661 = match("MESSAGE#626:UI_CFG_AUDIT_NEW", "nwparser.payload", "%{proce
 
 var msg631 = msg("UI_CFG_AUDIT_NEW", part661);
 
-var part662 = match("MESSAGE#627:UI_CFG_AUDIT_NEW:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' insert: [edit-config config %{filename}security policies %{policyname}] %{info}", processor_chain([
+var part662 = match("MESSAGE#627:UI_CFG_AUDIT_NEW:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' insert: [edit-config config %{filename->} security policies %{policyname}] %{info}", processor_chain([
 	dup41,
 	dup21,
 	setc("event_description"," user Inserted Security Policies in config"),
@@ -7362,7 +7362,7 @@ var all31 = all_match({
 
 var msg635 = msg("UI_CFG_AUDIT_OTHER:02", all31);
 
-var part666 = match("MESSAGE#631:UI_CFG_AUDIT_OTHER:03", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' replace: [edit-config config %{filename}applications %{info}]", processor_chain([
+var part666 = match("MESSAGE#631:UI_CFG_AUDIT_OTHER:03", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' replace: [edit-config config %{filename->} applications %{info}]", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","User config replace"),
@@ -7447,7 +7447,7 @@ var all33 = all_match({
 
 var msg640 = msg("UI_CFG_AUDIT_SET:02", all33);
 
-var part671 = match("MESSAGE#636:UI_CFG_AUDIT_SET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' replace: [edit-config config %{filename}applications %{info}] \u003c\u003c%{disposition}> -> \"%{agent}\"", processor_chain([
+var part671 = match("MESSAGE#636:UI_CFG_AUDIT_SET", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' replace: [edit-config config %{filename->} applications %{info}] \u003c\u003c%{disposition}> -> \"%{agent}\"", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","User replace config application(s)"),
@@ -7462,7 +7462,7 @@ var select63 = linear_select([
 	msg641,
 ]);
 
-var part672 = match("MESSAGE#637:UI_CFG_AUDIT_SET_SECRET:01/2", "nwparser.p0", ": [groups %{info}secret]");
+var part672 = match("MESSAGE#637:UI_CFG_AUDIT_SET_SECRET:01/2", "nwparser.p0", ": [groups %{info->} secret]");
 
 var all34 = all_match({
 	processors: [
@@ -7577,7 +7577,7 @@ var part681 = match("MESSAGE#646:UI_CHILD_SIGNALED", "nwparser.payload", "%{proc
 
 var msg651 = msg("UI_CHILD_SIGNALED", part681);
 
-var part682 = match("MESSAGE#647:UI_CHILD_STOPPED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Child stopped: PID %{child_pid}, signal=%{resultcode}command='%{action}')", processor_chain([
+var part682 = match("MESSAGE#647:UI_CHILD_STOPPED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Child stopped: PID %{child_pid}, signal=%{resultcode->} command='%{action}')", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Child stopped"),
@@ -8070,7 +8070,7 @@ var part732 = match("MESSAGE#689:UI_DBASE_OPEN_FAILED", "nwparser.payload", "%{p
 
 var msg694 = msg("UI_DBASE_OPEN_FAILED", part732);
 
-var part733 = match("MESSAGE#690:UI_DBASE_REBUILD_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username}Automatic rebuild of the database '%{filename}' failed", processor_chain([
+var part733 = match("MESSAGE#690:UI_DBASE_REBUILD_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User %{username->} Automatic rebuild of the database '%{filename}' failed", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","DBASE REBUILD FAILED"),
@@ -8095,7 +8095,7 @@ var select70 = linear_select([
 	part735,
 ]);
 
-var part736 = match("MESSAGE#692:UI_DBASE_REBUILD_STARTED/2", "nwparser.p0", "%{} %{username}rebuild/rollback of the database '%{filename}' started");
+var part736 = match("MESSAGE#692:UI_DBASE_REBUILD_STARTED/2", "nwparser.p0", "%{} %{username->} rebuild/rollback of the database '%{filename}' started");
 
 var all43 = all_match({
 	processors: [
@@ -8131,7 +8131,7 @@ var part738 = match("MESSAGE#694:UI_DBASE_REOPEN_FAILED", "nwparser.payload", "%
 
 var msg699 = msg("UI_DBASE_REOPEN_FAILED", part738);
 
-var part739 = match("MESSAGE#695:UI_DUPLICATE_UID", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Users %{username}have the same UID %{uid}", processor_chain([
+var part739 = match("MESSAGE#695:UI_DUPLICATE_UID", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Users %{username->} have the same UID %{uid}", processor_chain([
 	dup29,
 	dup21,
 	setc("event_description","Users have the same UID"),
@@ -8176,7 +8176,7 @@ var part743 = match("MESSAGE#699:UI_LOAD_JUNOS_DEFAULT_FILE_EVENT", "nwparser.pa
 
 var msg704 = msg("UI_LOAD_JUNOS_DEFAULT_FILE_EVENT", part743);
 
-var part744 = match("MESSAGE#700:UI_LOGIN_EVENT:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' login, class '%{group}' [%{fld01}], %{info}'%{saddr->} %{sport->} %{daddr->} %{dport}', client-mode '%{fld02}'", processor_chain([
+var part744 = match("MESSAGE#700:UI_LOGIN_EVENT:01", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: User '%{username}' login, class '%{group}' [%{fld01}], %{info->} '%{saddr->} %{sport->} %{daddr->} %{dport}', client-mode '%{fld02}'", processor_chain([
 	dup32,
 	dup33,
 	dup34,
@@ -8230,7 +8230,7 @@ var part747 = match("MESSAGE#703:UI_LOST_CONN", "nwparser.payload", "%{process}[
 
 var msg708 = msg("UI_LOST_CONN", part747);
 
-var part748 = match("MESSAGE#704:UI_MASTERSHIP_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action}by '%{username}'", processor_chain([
+var part748 = match("MESSAGE#704:UI_MASTERSHIP_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: %{action->} by '%{username}'", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","MASTERSHIP EVENT"),
@@ -8275,7 +8275,7 @@ var part752 = match("MESSAGE#708:UI_READ_TIMEOUT", "nwparser.payload", "%{proces
 
 var msg713 = msg("UI_READ_TIMEOUT", part752);
 
-var part753 = match("MESSAGE#709:UI_REBOOT_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: System %{action}by '%{username}'", processor_chain([
+var part753 = match("MESSAGE#709:UI_REBOOT_EVENT", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: System %{action->} by '%{username}'", processor_chain([
 	dup59,
 	dup21,
 	setc("event_description","System reboot or halt"),
@@ -8374,7 +8374,7 @@ var part763 = match("MESSAGE#719:UI_WRITE_RECONNECT", "nwparser.payload", "%{pro
 
 var msg724 = msg("UI_WRITE_RECONNECT", part763);
 
-var part764 = match("MESSAGE#720:VRRPD_NEWMASTER_TRAP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Interface %{interface}(local addr: %{saddr}) is now master for %{username}", processor_chain([
+var part764 = match("MESSAGE#720:VRRPD_NEWMASTER_TRAP", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Interface %{interface->} (local addr: %{saddr}) is now master for %{username}", processor_chain([
 	dup20,
 	dup21,
 	setc("event_description","Interface new master for User"),
@@ -8383,7 +8383,7 @@ var part764 = match("MESSAGE#720:VRRPD_NEWMASTER_TRAP", "nwparser.payload", "%{p
 
 var msg725 = msg("VRRPD_NEWMASTER_TRAP", part764);
 
-var part765 = match("MESSAGE#721:WEB_AUTH_FAIL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to authenticate %{obj_name}(username %{c_username})", processor_chain([
+var part765 = match("MESSAGE#721:WEB_AUTH_FAIL", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Unable to authenticate %{obj_name->} (username %{c_username})", processor_chain([
 	dup68,
 	dup33,
 	dup34,
@@ -8395,7 +8395,7 @@ var part765 = match("MESSAGE#721:WEB_AUTH_FAIL", "nwparser.payload", "%{process}
 
 var msg726 = msg("WEB_AUTH_FAIL", part765);
 
-var part766 = match("MESSAGE#722:WEB_AUTH_SUCCESS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Authenticated %{agent}client (username %{c_username})", processor_chain([
+var part766 = match("MESSAGE#722:WEB_AUTH_SUCCESS", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: Authenticated %{agent->} client (username %{c_username})", processor_chain([
 	dup79,
 	dup33,
 	dup34,
@@ -8434,7 +8434,7 @@ var part769 = match("MESSAGE#725:WEBFILTER_REQUEST_NOT_CHECKED", "nwparser.paylo
 
 var msg730 = msg("WEBFILTER_REQUEST_NOT_CHECKED", part769);
 
-var part770 = match("MESSAGE#726:FLOW_REASSEMBLE_FAIL", "nwparser.payload", "%{event_type}[junos@%{obj_name}source-address=\"%{saddr}\" destination-address=\"%{daddr}\" assembly-id=\"%{fld1}\"]", processor_chain([
+var part770 = match("MESSAGE#726:FLOW_REASSEMBLE_FAIL", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} source-address=\"%{saddr}\" destination-address=\"%{daddr}\" assembly-id=\"%{fld1}\"]", processor_chain([
 	dup73,
 	dup52,
 	dup42,
@@ -8453,7 +8453,7 @@ var part771 = match("MESSAGE#727:eswd", "nwparser.payload", "%{process}[%{proces
 
 var msg732 = msg("eswd", part771);
 
-var part772 = match("MESSAGE#728:eswd:01", "nwparser.payload", "%{process}[%{process_id}]: %{info}: STP state for interface %{interface}context id %{id}changed from %{fld3}", processor_chain([
+var part772 = match("MESSAGE#728:eswd:01", "nwparser.payload", "%{process}[%{process_id}]: %{info}: STP state for interface %{interface->} context id %{id->} changed from %{fld3}", processor_chain([
 	dup28,
 	dup21,
 	setc("event_description","ESWD STP State Change Info"),
@@ -8511,7 +8511,7 @@ var select73 = linear_select([
 
 var msg738 = msg("WEBFILTER_URL_PERMITTED", dup156);
 
-var part777 = match("MESSAGE#734:WEBFILTER_URL_PERMITTED:01", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3}CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url}OBJ=%{fld7}", processor_chain([
+var part777 = match("MESSAGE#734:WEBFILTER_URL_PERMITTED:01", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3->} CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url->} OBJ=%{fld7}", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -8519,7 +8519,7 @@ var part777 = match("MESSAGE#734:WEBFILTER_URL_PERMITTED:01", "nwparser.payload"
 
 var msg739 = msg("WEBFILTER_URL_PERMITTED:01", part777);
 
-var part778 = match("MESSAGE#735:WEBFILTER_URL_PERMITTED:03", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3}CATEGORY=\"%{category}\" REASON=%{fld4}", processor_chain([
+var part778 = match("MESSAGE#735:WEBFILTER_URL_PERMITTED:03", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3->} CATEGORY=\"%{category}\" REASON=%{fld4}", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -8527,7 +8527,7 @@ var part778 = match("MESSAGE#735:WEBFILTER_URL_PERMITTED:03", "nwparser.payload"
 
 var msg740 = msg("WEBFILTER_URL_PERMITTED:03", part778);
 
-var part779 = match("MESSAGE#736:WEBFILTER_URL_PERMITTED:02", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=%{url}", processor_chain([
+var part779 = match("MESSAGE#736:WEBFILTER_URL_PERMITTED:02", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=%{url}", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -8544,7 +8544,7 @@ var select74 = linear_select([
 
 var msg742 = msg("WEBFILTER_URL_BLOCKED", dup156);
 
-var part780 = match("MESSAGE#738:WEBFILTER_URL_BLOCKED:01", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3}CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url}", processor_chain([
+var part780 = match("MESSAGE#738:WEBFILTER_URL_BLOCKED:01", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3->} CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url}", processor_chain([
 	dup29,
 	dup21,
 	dup51,
@@ -8557,7 +8557,7 @@ var select75 = linear_select([
 	msg743,
 ]);
 
-var part781 = match("MESSAGE#740:SECINTEL_NETWORK_CONNECT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{id}: \u003c\u003c%{fld12}> Access url %{url}on port %{network_port}failed\u003c\u003c%{result}>.", processor_chain([
+var part781 = match("MESSAGE#740:SECINTEL_NETWORK_CONNECT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{id}: \u003c\u003c%{fld12}> Access url %{url->} on port %{network_port->} failed\u003c\u003c%{result}>.", processor_chain([
 	dup45,
 	dup46,
 	dup22,
@@ -8567,7 +8567,7 @@ var part781 = match("MESSAGE#740:SECINTEL_NETWORK_CONNECT_FAILED", "nwparser.pay
 
 var msg744 = msg("SECINTEL_NETWORK_CONNECT_FAILED", part781);
 
-var part782 = match("MESSAGE#741:AAMWD_NETWORK_CONNECT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{id}: \u003c\u003c%{fld12}> Access host %{hostname}on ip %{hostip}port %{network_port->} %{result}.", processor_chain([
+var part782 = match("MESSAGE#741:AAMWD_NETWORK_CONNECT_FAILED", "nwparser.payload", "%{process}[%{process_id}]: %{id}: \u003c\u003c%{fld12}> Access host %{hostname->} on ip %{hostip->} port %{network_port->} %{result}.", processor_chain([
 	dup45,
 	dup46,
 	dup22,
@@ -8623,7 +8623,7 @@ var msg752 = msg("idpinfo", dup157);
 
 var msg753 = msg("kmd", dup157);
 
-var part787 = match("MESSAGE#751:node:01", "nwparser.payload", "%{hostname->} %{node}Next-hop resolution requests from interface %{interface}throttled", processor_chain([
+var part787 = match("MESSAGE#751:node:01", "nwparser.payload", "%{hostname->} %{node->} Next-hop resolution requests from interface %{interface->} throttled", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8647,7 +8647,7 @@ var part789 = match("MESSAGE#753:node:03", "nwparser.payload", "%{hostname->} %{
 
 var msg756 = msg("node:03", part789);
 
-var part790 = match("MESSAGE#754:node:04", "nwparser.payload", "%{hostname->} %{node->} %{fld1}key %{fld2->} %{fld3}port priority %{fld6->} %{fld4}port %{portname->} %{fld5}state %{resultcode}", processor_chain([
+var part790 = match("MESSAGE#754:node:04", "nwparser.payload", "%{hostname->} %{node->} %{fld1->} key %{fld2->} %{fld3->} port priority %{fld6->} %{fld4->} port %{portname->} %{fld5->} state %{resultcode}", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8709,7 +8709,7 @@ var all45 = all_match({
 
 var msg759 = msg("node:06", all45);
 
-var part795 = match("MESSAGE#757:node:07", "nwparser.payload", "%{hostname->} %{node->} %{process}: interface %{interface}trigger reth_scan", processor_chain([
+var part795 = match("MESSAGE#757:node:07", "nwparser.payload", "%{hostname->} %{node->} %{process}: interface %{interface->} trigger reth_scan", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8745,7 +8745,7 @@ var select79 = linear_select([
 	msg762,
 ]);
 
-var part798 = match("MESSAGE#760:(FPC:01", "nwparser.payload", "%{fld1}) %{node}kernel: %{event_type}: deleting active remote neighbor entry %{fld2}from interface %{interface}.", processor_chain([
+var part798 = match("MESSAGE#760:(FPC:01", "nwparser.payload", "%{fld1}) %{node->} kernel: %{event_type}: deleting active remote neighbor entry %{fld2->} from interface %{interface}.", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8754,7 +8754,7 @@ var part798 = match("MESSAGE#760:(FPC:01", "nwparser.payload", "%{fld1}) %{node}
 
 var msg763 = msg("(FPC:01", part798);
 
-var part799 = match("MESSAGE#761:(FPC:02", "nwparser.payload", "%{fld1}) %{node}kernel: %{event_type}deleting nb %{fld2}on ifd %{interface}for cid %{fld3}from active neighbor table", processor_chain([
+var part799 = match("MESSAGE#761:(FPC:02", "nwparser.payload", "%{fld1}) %{node->} kernel: %{event_type->} deleting nb %{fld2->} on ifd %{interface->} for cid %{fld3->} from active neighbor table", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8763,7 +8763,7 @@ var part799 = match("MESSAGE#761:(FPC:02", "nwparser.payload", "%{fld1}) %{node}
 
 var msg764 = msg("(FPC:02", part799);
 
-var part800 = match("MESSAGE#762:(FPC:03/0", "nwparser.payload", "%{fld1}) %{node}kernel: %{event_type}: M%{p0}");
+var part800 = match("MESSAGE#762:(FPC:03/0", "nwparser.payload", "%{fld1}) %{node->} kernel: %{event_type}: M%{p0}");
 
 var part801 = match("MESSAGE#762:(FPC:03/1_0", "nwparser.p0", "DOWN %{p0}");
 
@@ -8792,7 +8792,7 @@ var all46 = all_match({
 
 var msg765 = msg("(FPC:03", all46);
 
-var part804 = match("MESSAGE#763:(FPC:04", "nwparser.payload", "%{fld1}) %{node}kernel: %{event_type}: ifd=%{interface}, ifd flags=%{fld2}", processor_chain([
+var part804 = match("MESSAGE#763:(FPC:04", "nwparser.payload", "%{fld1}) %{node->} kernel: %{event_type}: ifd=%{interface}, ifd flags=%{fld2}", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8801,7 +8801,7 @@ var part804 = match("MESSAGE#763:(FPC:04", "nwparser.payload", "%{fld1}) %{node}
 
 var msg766 = msg("(FPC:04", part804);
 
-var part805 = match("MESSAGE#764:(FPC:05", "nwparser.payload", "%{fld1}) %{node}kernel: rdp keepalive expired, connection dropped - src %{fld3}:%{fld2}dest %{fld4}:%{fld5}", processor_chain([
+var part805 = match("MESSAGE#764:(FPC:05", "nwparser.payload", "%{fld1}) %{node->} kernel: rdp keepalive expired, connection dropped - src %{fld3}:%{fld2->} dest %{fld4}:%{fld5}", processor_chain([
 	dup20,
 	dup22,
 	dup21,
@@ -8837,7 +8837,7 @@ var part807 = match("MESSAGE#766:tnp.bootpd", "nwparser.payload", "%{process}[%{
 
 var msg769 = msg("tnp.bootpd", part807);
 
-var part808 = match("MESSAGE#769:AAMW_ACTION_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32}hostname=\"%{hostname}\" file-category=\"%{fld9}\" verdict-number=\"%{fld10}\" action=\"%{action}\" list-hit=\"%{fld19}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" application=\"%{fld6}\" nested-application=\"%{fld7}\" policy-name=\"%{policyname}\" username=\"%{username}\" roles=\"%{user_role}\" session-id-32=\"%{sessionid}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" url=\"%{url}\"] %{fld27}", processor_chain([
+var part808 = match("MESSAGE#769:AAMW_ACTION_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32->} hostname=\"%{hostname}\" file-category=\"%{fld9}\" verdict-number=\"%{fld10}\" action=\"%{action}\" list-hit=\"%{fld19}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" application=\"%{fld6}\" nested-application=\"%{fld7}\" policy-name=\"%{policyname}\" username=\"%{username}\" roles=\"%{user_role}\" session-id-32=\"%{sessionid}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\" url=\"%{url}\"] %{fld27}", processor_chain([
 	dup47,
 	dup51,
 	dup21,
@@ -8846,7 +8846,7 @@ var part808 = match("MESSAGE#769:AAMW_ACTION_LOG", "nwparser.payload", "%{event_
 
 var msg770 = msg("AAMW_ACTION_LOG", part808);
 
-var part809 = match("MESSAGE#770:AAMW_HOST_INFECTED_EVENT_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32}timestamp=\"%{fld30}\" tenant-id=\"%{fld1}\" client-ip-str=\"%{hostip}\" hostname=\"%{hostname}\" status=\"%{fld13}\" policy-name=\"%{policyname}\" verdict-number=\"%{fld15}\" state=\"%{fld16}\" reason=\"%{result}\" message=\"%{info}\" %{fld3}", processor_chain([
+var part809 = match("MESSAGE#770:AAMW_HOST_INFECTED_EVENT_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32->} timestamp=\"%{fld30}\" tenant-id=\"%{fld1}\" client-ip-str=\"%{hostip}\" hostname=\"%{hostname}\" status=\"%{fld13}\" policy-name=\"%{policyname}\" verdict-number=\"%{fld15}\" state=\"%{fld16}\" reason=\"%{result}\" message=\"%{info}\" %{fld3}", processor_chain([
 	dup132,
 	dup51,
 	dup21,
@@ -8855,7 +8855,7 @@ var part809 = match("MESSAGE#770:AAMW_HOST_INFECTED_EVENT_LOG", "nwparser.payloa
 
 var msg771 = msg("AAMW_HOST_INFECTED_EVENT_LOG", part809);
 
-var part810 = match("MESSAGE#771:AAMW_MALWARE_EVENT_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32}timestamp=\"%{fld30}\" tenant-id=\"%{fld1}\" sample-sha256=\"%{checksum}\" client-ip-str=\"%{hostip}\" verdict-number=\"%{fld26}\" malware-info=\"%{threat_name}\" username=\"%{username}\" hostname=\"%{hostname}\" %{fld3}", processor_chain([
+var part810 = match("MESSAGE#771:AAMW_MALWARE_EVENT_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32->} timestamp=\"%{fld30}\" tenant-id=\"%{fld1}\" sample-sha256=\"%{checksum}\" client-ip-str=\"%{hostip}\" verdict-number=\"%{fld26}\" malware-info=\"%{threat_name}\" username=\"%{username}\" hostname=\"%{hostname}\" %{fld3}", processor_chain([
 	dup132,
 	dup51,
 	dup21,
@@ -8863,7 +8863,7 @@ var part810 = match("MESSAGE#771:AAMW_MALWARE_EVENT_LOG", "nwparser.payload", "%
 
 var msg772 = msg("AAMW_MALWARE_EVENT_LOG", part810);
 
-var part811 = match("MESSAGE#772:IDP_ATTACK_LOG_EVENT", "nwparser.payload", "%{event_type}[junos@%{fld32}epoch-time=\"%{fld1}\" message-type=\"%{info}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-name=\"%{protocol}\" service-name=\"%{service}\" application-name=\"%{application}\" rule-name=\"%{fld5}\" rulebase-name=\"%{rulename}\" policy-name=\"%{policyname}\" export-id=\"%{fld6}\" repeat-count=\"%{fld7}\" action=\"%{action}\" threat-severity=\"%{severity}\" attack-name=\"%{threat_name}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" elapsed-time=%{fld8}inbound-bytes=\"%{rbytes}\" outbound-bytes=\"%{sbytes}\" inbound-packets=\"%{packets}\" outbound-packets=\"%{dclass_counter1}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" packet-log-id=\"%{fld9}\" alert=\"%{fld19}\" username=\"%{username}\" roles=\"%{fld15}\" message=\"%{fld28}\" %{fld3}", processor_chain([
+var part811 = match("MESSAGE#772:IDP_ATTACK_LOG_EVENT", "nwparser.payload", "%{event_type}[junos@%{fld32->} epoch-time=\"%{fld1}\" message-type=\"%{info}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-name=\"%{protocol}\" service-name=\"%{service}\" application-name=\"%{application}\" rule-name=\"%{fld5}\" rulebase-name=\"%{rulename}\" policy-name=\"%{policyname}\" export-id=\"%{fld6}\" repeat-count=\"%{fld7}\" action=\"%{action}\" threat-severity=\"%{severity}\" attack-name=\"%{threat_name}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" elapsed-time=%{fld8->} inbound-bytes=\"%{rbytes}\" outbound-bytes=\"%{sbytes}\" inbound-packets=\"%{packets}\" outbound-packets=\"%{dclass_counter1}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" packet-log-id=\"%{fld9}\" alert=\"%{fld19}\" username=\"%{username}\" roles=\"%{fld15}\" message=\"%{fld28}\" %{fld3}", processor_chain([
 	dup80,
 	dup51,
 	dup21,
@@ -8872,7 +8872,7 @@ var part811 = match("MESSAGE#772:IDP_ATTACK_LOG_EVENT", "nwparser.payload", "%{e
 
 var msg773 = msg("IDP_ATTACK_LOG_EVENT", part811);
 
-var part812 = match("MESSAGE#773:RT_SCREEN_ICMP", "nwparser.payload", "%{event_type}[junos@%{fld32}attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"] %{fld23}", processor_chain([
+var part812 = match("MESSAGE#773:RT_SCREEN_ICMP", "nwparser.payload", "%{event_type}[junos@%{fld32->} attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" destination-address=\"%{daddr}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"] %{fld23}", processor_chain([
 	dup80,
 	dup51,
 	dup21,
@@ -8881,7 +8881,7 @@ var part812 = match("MESSAGE#773:RT_SCREEN_ICMP", "nwparser.payload", "%{event_t
 
 var msg774 = msg("RT_SCREEN_ICMP", part812);
 
-var part813 = match("MESSAGE#774:SECINTEL_ACTION_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32}category=\"%{fld1}\" sub-category=\"%{fld2}\" action=\"%{action}\" action-detail=\"%{fld4}\" http-host=\"%{fld17}\" threat-severity=\"%{severity}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" application=\"%{fld5}\" nested-application=\"%{fld6}\" feed-name=\"%{fld18}\" policy-name=\"%{policyname}\" profile-name=\"%{rulename}\" username=\"%{username}\" roles=\"%{user_role}\" session-id-32=\"%{sessionid}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\"]%{fld10}", processor_chain([
+var part813 = match("MESSAGE#774:SECINTEL_ACTION_LOG", "nwparser.payload", "%{event_type}[junos@%{fld32->} category=\"%{fld1}\" sub-category=\"%{fld2}\" action=\"%{action}\" action-detail=\"%{fld4}\" http-host=\"%{fld17}\" threat-severity=\"%{severity}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" protocol-id=\"%{protocol}\" application=\"%{fld5}\" nested-application=\"%{fld6}\" feed-name=\"%{fld18}\" policy-name=\"%{policyname}\" profile-name=\"%{rulename}\" username=\"%{username}\" roles=\"%{user_role}\" session-id-32=\"%{sessionid}\" source-zone-name=\"%{src_zone}\" destination-zone-name=\"%{dst_zone}\"]%{fld10}", processor_chain([
 	dup45,
 	dup51,
 	dup21,
@@ -8949,7 +8949,7 @@ var part820 = match("MESSAGE#778:JUNOSROUTER_GENERIC:05", "nwparser.payload", "%
 
 var msg779 = msg("JUNOSROUTER_GENERIC:05", part820);
 
-var part821 = match("MESSAGE#779:JUNOSROUTER_GENERIC:06", "nwparser.payload", "%{event_type}: mismatch NLRI with %{hostip}(%{hostname}): peer: %{daddr}us: %{saddr}", processor_chain([
+var part821 = match("MESSAGE#779:JUNOSROUTER_GENERIC:06", "nwparser.payload", "%{event_type}: mismatch NLRI with %{hostip->} (%{hostname}): peer: %{daddr->} us: %{saddr}", processor_chain([
 	dup29,
 	dup21,
 	dup56,
@@ -8958,7 +8958,7 @@ var part821 = match("MESSAGE#779:JUNOSROUTER_GENERIC:06", "nwparser.payload", "%
 
 var msg780 = msg("JUNOSROUTER_GENERIC:06", part821);
 
-var part822 = match("MESSAGE#780:JUNOSROUTER_GENERIC:07", "nwparser.payload", "%{event_type}: NOTIFICATION sent to %{daddr}(%{dhost}): code %{resultcode}(%{action}), Reason: %{result->} ", processor_chain([
+var part822 = match("MESSAGE#780:JUNOSROUTER_GENERIC:07", "nwparser.payload", "%{event_type}: NOTIFICATION sent to %{daddr->} (%{dhost}): code %{resultcode->} (%{action}), Reason: %{result->} ", processor_chain([
 	dup20,
 	dup21,
 	dup37,
@@ -9001,7 +9001,7 @@ var part826 = match("MESSAGE#782:JUNOSROUTER_GENERIC:09", "nwparser.payload", "%
 
 var msg783 = msg("JUNOSROUTER_GENERIC:09", part826);
 
-var part827 = match("MESSAGE#783:JUNOSROUTER_GENERIC:01", "nwparser.payload", "%{event_type}Interface Monitor failed %{fld1}", processor_chain([
+var part827 = match("MESSAGE#783:JUNOSROUTER_GENERIC:01", "nwparser.payload", "%{event_type->} Interface Monitor failed %{fld1}", processor_chain([
 	dup133,
 	dup22,
 	dup21,
@@ -9011,7 +9011,7 @@ var part827 = match("MESSAGE#783:JUNOSROUTER_GENERIC:01", "nwparser.payload", "%
 
 var msg784 = msg("JUNOSROUTER_GENERIC:01", part827);
 
-var part828 = match("MESSAGE#784:JUNOSROUTER_GENERIC:02", "nwparser.payload", "%{event_type}Interface Monitor failure recovered %{fld1}", processor_chain([
+var part828 = match("MESSAGE#784:JUNOSROUTER_GENERIC:02", "nwparser.payload", "%{event_type->} Interface Monitor failure recovered %{fld1}", processor_chain([
 	dup133,
 	dup22,
 	dup21,
@@ -9749,7 +9749,7 @@ var part839 = match("HEADER#15:0026.upd.a/1_2", "nwparser.p0", "RT_APPQOS - %{p0
 
 var part840 = match("HEADER#15:0026.upd.a/1_3", "nwparser.p0", "%{hfld33->} - %{p0}");
 
-var part841 = match("HEADER#15:0026.upd.a/2", "nwparser.p0", "%{messageid}[%{payload}");
+var part841 = match("HEADER#15:0026.upd.a/2", "nwparser.p0", "%{messageid->} [%{payload}");
 
 var hdr44 = match("HEADER#16:0026.upd.b/0", "message", "%{event_time->} %{hfld32->} %{hhostname->} %{p0}");
 
@@ -9767,7 +9767,7 @@ var part847 = match("MESSAGE#294:LOGIN_INFORMATION/3_0", "nwparser.p0", "User %{
 
 var part848 = match("MESSAGE#294:LOGIN_INFORMATION/3_1", "nwparser.p0", "user %{p0}");
 
-var part849 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/0", "nwparser.payload", "%{event_type}[junos@%{obj_name}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
+var part849 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/0", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
 
 var part850 = match("MESSAGE#485:RT_FLOW_SESSION_CREATE:02/1_0", "nwparser.p0", "%{dport}\" connection-tag=%{fld20->} service-name=\"%{p0}");
 
@@ -9785,7 +9785,7 @@ var part856 = match("MESSAGE#490:RT_FLOW_SESSION_DENY:03/0_0", "nwparser.payload
 
 var part857 = match("MESSAGE#490:RT_FLOW_SESSION_DENY:03/0_1", "nwparser.payload", "%{event_type}: session denied%{p0}");
 
-var part858 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/0", "nwparser.payload", "%{event_type}[junos@%{obj_name}reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
+var part858 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/0", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} reason=\"%{result}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{p0}");
 
 var part859 = match("MESSAGE#492:RT_FLOW_SESSION_CLOSE:01/2", "nwparser.p0", "%{service}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{p0}");
 
@@ -9885,7 +9885,7 @@ var select87 = linear_select([
 	dup76,
 ]);
 
-var part882 = match("MESSAGE#310:MIB2D_IFD_IFINDEX_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP index assigned to %{uid}changed from %{dclass_counter1}to %{result}", processor_chain([
+var part882 = match("MESSAGE#310:MIB2D_IFD_IFINDEX_FAILURE", "nwparser.payload", "%{process}[%{process_id}]: %{event_type}: SNMP index assigned to %{uid->} changed from %{dclass_counter1->} to %{result}", processor_chain([
 	dup29,
 	dup21,
 	dup78,
@@ -9933,13 +9933,13 @@ var select91 = linear_select([
 	dup102,
 ]);
 
-var part886 = match("MESSAGE#498:RT_SCREEN_TCP", "nwparser.payload", "%{event_type}[junos@%{obj_name}attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
+var part886 = match("MESSAGE#498:RT_SCREEN_TCP", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} attack-name=\"%{threat_name}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" source-zone-name=\"%{src_zone}\" interface-name=\"%{interface}\" action=\"%{action}\"]", processor_chain([
 	dup29,
 	dup21,
 	dup51,
 ]));
 
-var part887 = match("MESSAGE#527:SSL_PROXY_SSL_SESSION_ALLOW", "nwparser.payload", "%{event_type}[junos@%{obj_name}logical-system-name=\"%{hostname}\" session-id=\"%{sessionid}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" profile-name=\"%{rulename}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" message=\"%{info}\"]", processor_chain([
+var part887 = match("MESSAGE#527:SSL_PROXY_SSL_SESSION_ALLOW", "nwparser.payload", "%{event_type->} [junos@%{obj_name->} logical-system-name=\"%{hostname}\" session-id=\"%{sessionid}\" source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" nat-source-address=\"%{hostip}\" nat-source-port=\"%{network_port}\" nat-destination-address=\"%{dtransaddr}\" nat-destination-port=\"%{dtransport}\" profile-name=\"%{rulename}\" source-zone-name=\"%{src_zone}\" source-interface-name=\"%{sinterface}\" destination-zone-name=\"%{dst_zone}\" destination-interface-name=\"%{dinterface}\" message=\"%{info}\"]", processor_chain([
 	dup26,
 	dup21,
 	dup51,
@@ -9955,7 +9955,7 @@ var select93 = linear_select([
 	dup123,
 ]);
 
-var part888 = match("MESSAGE#733:WEBFILTER_URL_PERMITTED", "nwparser.payload", "%{event_type}[junos@%{fld21}source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3}CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url}OBJ=%{fld7}USERNAME=%{fld8}ROLES=%{fld9}", processor_chain([
+var part888 = match("MESSAGE#733:WEBFILTER_URL_PERMITTED", "nwparser.payload", "%{event_type->} [junos@%{fld21->} source-address=\"%{saddr}\" source-port=\"%{sport}\" destination-address=\"%{daddr}\" destination-port=\"%{dport}\" name=\"%{info}\" error-message=\"%{result}\" profile-name=\"%{profile}\" object-name=\"%{obj_name}\" pathname=\"%{directory}\" username=\"%{username}\" roles=\"%{user_role}\"] WebFilter: ACTION=\"%{action}\" %{fld2}->%{fld3->} CATEGORY=\"%{category}\" REASON=\"%{fld4}\" PROFILE=\"%{fld6}\" URL=%{url->} OBJ=%{fld7->} USERNAME=%{fld8->} ROLES=%{fld9}", processor_chain([
 	dup29,
 	dup21,
 	dup51,

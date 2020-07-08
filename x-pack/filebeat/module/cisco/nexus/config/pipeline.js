@@ -139,7 +139,7 @@ var dup58 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/11_0", "nwparser.p0", "Proto
 
 var dup59 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/11_1", "nwparser.p0", "protocol: %{p0}");
 
-var dup60 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/12", "nwparser.p0", "%{}\"%{protocol}\"(%{protocol_detail}),%{space}Hit-count = %{dclass_counter1}");
+var dup60 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/12", "nwparser.p0", "%{}\"%{protocol}\"(%{protocol_detail}),%{space->} Hit-count = %{dclass_counter1}");
 
 var dup61 = setc("dclass_counter1_string","Hit Count");
 
@@ -207,28 +207,28 @@ var dup88 = match("MESSAGE#32:NEIGHBOR_UPDATE_AUTOCOPY", "nwparser.payload", "%{
 	dup4,
 ]));
 
-var dup89 = match("MESSAGE#35:IF_DOWN_ADMIN_DOWN", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var dup89 = match("MESSAGE#35:IF_DOWN_ADMIN_DOWN", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var dup90 = match("MESSAGE#36:IF_DOWN_ADMIN_DOWN:01", "nwparser.payload", "%{fld43}Interface %{interface}is down (%{result})", processor_chain([
+var dup90 = match("MESSAGE#36:IF_DOWN_ADMIN_DOWN:01", "nwparser.payload", "%{fld43->} Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var dup91 = match("MESSAGE#37:IF_DOWN_CHANNEL_MEMBERSHIP_UPDATE_IN_PROGRESS", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var dup91 = match("MESSAGE#37:IF_DOWN_CHANNEL_MEMBERSHIP_UPDATE_IN_PROGRESS", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var dup92 = match("MESSAGE#38:IF_DOWN_INTERFACE_REMOVED", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var dup92 = match("MESSAGE#38:IF_DOWN_INTERFACE_REMOVED", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -254,14 +254,14 @@ var dup95 = match("MESSAGE#88:PFM_VEM_REMOVE_NO_HB", "nwparser.payload", "%{even
 	dup4,
 ]));
 
-var dup96 = match("MESSAGE#108:IF_DOWN_INITIALIZING:01", "nwparser.payload", "%{fld43}Interface %{interface}is down (%{result}) ", processor_chain([
+var dup96 = match("MESSAGE#108:IF_DOWN_INITIALIZING:01", "nwparser.payload", "%{fld43->} Interface %{interface->} is down (%{result}) ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var dup97 = match("MESSAGE#110:IF_DOWN_NONE:01", "nwparser.payload", "%{fld52}Interface %{interface}is down (%{result})", processor_chain([
+var dup97 = match("MESSAGE#110:IF_DOWN_NONE:01", "nwparser.payload", "%{fld52->} Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup35,
 	dup36,
@@ -322,7 +322,7 @@ var dup106 = match("MESSAGE#224:IF_SFP_WARNING", "nwparser.payload", "Interface 
 	dup4,
 ]));
 
-var dup107 = match("MESSAGE#225:IF_DOWN_TCP_MAX_RETRANSMIT", "nwparser.payload", "%{fld43}Interface %{interface}is down%{info}", processor_chain([
+var dup107 = match("MESSAGE#225:IF_DOWN_TCP_MAX_RETRANSMIT", "nwparser.payload", "%{fld43->} Interface %{interface->} is down%{info}", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -349,7 +349,7 @@ var hdr2 = match("HEADER#1:0007", "message", "%{hfld14->} %{hfld15->} %{hfld16->
 	setc("header_id","0007"),
 ]));
 
-var hdr3 = match("HEADER#2:0005", "message", "%{hfld4->} %{hfld5->} %{hfld6->} %{hfld7}: %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0005", "message", "%{hfld4->} %{hfld5->} %{hfld6->} %{hfld7->} : %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
 	setc("header_id","0005"),
 ]));
 
@@ -406,7 +406,7 @@ var select1 = linear_select([
 
 var msg1 = msg("LOG-7-SYSTEM_MSG", dup87);
 
-var part1 = match("MESSAGE#1:SYSTEM_MSG", "nwparser.payload", "error: PAM: Authentication failure for illegal user %{username}from %{saddr}- %{agent}[%{process_id}] ", processor_chain([
+var part1 = match("MESSAGE#1:SYSTEM_MSG", "nwparser.payload", "error: PAM: Authentication failure for illegal user %{username->} from %{saddr->} - %{agent}[%{process_id}] ", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -416,7 +416,7 @@ var part1 = match("MESSAGE#1:SYSTEM_MSG", "nwparser.payload", "error: PAM: Authe
 
 var msg2 = msg("SYSTEM_MSG", part1);
 
-var part2 = match("MESSAGE#2:SYSTEM_MSG:12", "nwparser.payload", "error: PAM: Authentication failure for illegal user %{username}from %{shost}", processor_chain([
+var part2 = match("MESSAGE#2:SYSTEM_MSG:12", "nwparser.payload", "error: PAM: Authentication failure for illegal user %{username->} from %{shost}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -426,7 +426,7 @@ var part2 = match("MESSAGE#2:SYSTEM_MSG:12", "nwparser.payload", "error: PAM: Au
 
 var msg3 = msg("SYSTEM_MSG:12", part2);
 
-var part3 = match("MESSAGE#3:SYSTEM_MSG:01", "nwparser.payload", "error: PAM: Authentication failure for %{username}from %{saddr}- %{agent}[%{process_id}] ", processor_chain([
+var part3 = match("MESSAGE#3:SYSTEM_MSG:01", "nwparser.payload", "error: PAM: Authentication failure for %{username->} from %{saddr->} - %{agent}[%{process_id}] ", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -436,7 +436,7 @@ var part3 = match("MESSAGE#3:SYSTEM_MSG:01", "nwparser.payload", "error: PAM: Au
 
 var msg4 = msg("SYSTEM_MSG:01", part3);
 
-var part4 = match("MESSAGE#4:SYSTEM_MSG:11", "nwparser.payload", "error: PAM: Authentication failure for %{username}from %{shost->} ", processor_chain([
+var part4 = match("MESSAGE#4:SYSTEM_MSG:11", "nwparser.payload", "error: PAM: Authentication failure for %{username->} from %{shost->} ", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -457,7 +457,7 @@ var select2 = linear_select([
 	part7,
 ]);
 
-var part8 = match("MESSAGE#5:SYSTEM_MSG:19/2", "nwparser.p0", "%{saddr}port %{sport->} %{protocol}- %{agent}[%{process_id}]");
+var part8 = match("MESSAGE#5:SYSTEM_MSG:19/2", "nwparser.p0", "%{saddr->} port %{sport->} %{protocol->} - %{agent}[%{process_id}]");
 
 var all1 = all_match({
 	processors: [
@@ -493,7 +493,7 @@ var select3 = linear_select([
 	part11,
 ]);
 
-var part12 = match("MESSAGE#7:SYSTEM_MSG:03/1", "nwparser.p0", "%{}authentication failure; logname=%{fld20}uid=%{fld21}euid=%{fld22}tty=%{terminal}ruser=%{fld24}rhost=%{p0}");
+var part12 = match("MESSAGE#7:SYSTEM_MSG:03/1", "nwparser.p0", "%{}authentication failure; logname=%{fld20->} uid=%{fld21->} euid=%{fld22->} tty=%{terminal->} ruser=%{fld24->} rhost=%{p0}");
 
 var part13 = match("MESSAGE#7:SYSTEM_MSG:03/2_0", "nwparser.p0", "%{fld25->} user=%{username->} - %{p0}");
 
@@ -543,7 +543,7 @@ var select5 = linear_select([
 	part19,
 ]);
 
-var part20 = match("MESSAGE#9:SYSTEM_MSG:05/2", "nwparser.p0", "%{} %{saddr}- %{agent}[%{process_id}]");
+var part20 = match("MESSAGE#9:SYSTEM_MSG:05/2", "nwparser.p0", "%{} %{saddr->} - %{agent}[%{process_id}]");
 
 var all3 = all_match({
 	processors: [
@@ -561,7 +561,7 @@ var all3 = all_match({
 
 var msg10 = msg("SYSTEM_MSG:05", all3);
 
-var part21 = match("MESSAGE#10:SYSTEM_MSG:06", "nwparser.payload", "FAILED LOGIN (%{fld20}) on %{fld21}FOR %{username}, Authentication failure - login[%{process_id}]", processor_chain([
+var part21 = match("MESSAGE#10:SYSTEM_MSG:06", "nwparser.payload", "FAILED LOGIN (%{fld20}) on %{fld21->} FOR %{username}, Authentication failure - login[%{process_id}]", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -579,7 +579,7 @@ var part22 = match("MESSAGE#11:SYSTEM_MSG:07", "nwparser.payload", "fatal:%{even
 
 var msg12 = msg("SYSTEM_MSG:07", part22);
 
-var part23 = match("MESSAGE#12:SYSTEM_MSG:09", "nwparser.payload", "%{fld1}: Host name is set %{hostname}- kernel", processor_chain([
+var part23 = match("MESSAGE#12:SYSTEM_MSG:09", "nwparser.payload", "%{fld1}: Host name is set %{hostname->} - kernel", processor_chain([
 	dup9,
 	dup2,
 	dup3,
@@ -597,7 +597,7 @@ var part24 = match("MESSAGE#13:SYSTEM_MSG:10", "nwparser.payload", "Unauthorized
 
 var msg14 = msg("SYSTEM_MSG:10", part24);
 
-var part25 = match("MESSAGE#14:SYSTEM_MSG:13", "nwparser.payload", "%{fld43}: SNMP UDP authentication failed for %{saddr}.", processor_chain([
+var part25 = match("MESSAGE#14:SYSTEM_MSG:13", "nwparser.payload", "%{fld43->} : SNMP UDP authentication failed for %{saddr}.", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -606,7 +606,7 @@ var part25 = match("MESSAGE#14:SYSTEM_MSG:13", "nwparser.payload", "%{fld43}: SN
 
 var msg15 = msg("SYSTEM_MSG:13", part25);
 
-var part26 = match("MESSAGE#15:SYSTEM_MSG:14", "nwparser.payload", "%{fld43}: Subsequent authentication success for user (%{username}) failed.", processor_chain([
+var part26 = match("MESSAGE#15:SYSTEM_MSG:14", "nwparser.payload", "%{fld43->} : Subsequent authentication success for user (%{username}) failed.", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -615,7 +615,7 @@ var part26 = match("MESSAGE#15:SYSTEM_MSG:14", "nwparser.payload", "%{fld43}: Su
 
 var msg16 = msg("SYSTEM_MSG:14", part26);
 
-var part27 = match("MESSAGE#16:SYSTEM_MSG:15", "nwparser.payload", "%{fld1}: TTY=%{terminal}; PWD=%{directory}; USER=%{username}; COMMAND=%{param}", processor_chain([
+var part27 = match("MESSAGE#16:SYSTEM_MSG:15", "nwparser.payload", "%{fld1->} : TTY=%{terminal->} ; PWD=%{directory->} ; USER=%{username->} ; COMMAND=%{param}", processor_chain([
 	dup10,
 	dup2,
 	dup3,
@@ -626,7 +626,7 @@ var part27 = match("MESSAGE#16:SYSTEM_MSG:15", "nwparser.payload", "%{fld1}: TTY
 
 var msg17 = msg("SYSTEM_MSG:15", part27);
 
-var part28 = match("MESSAGE#17:SYSTEM_MSG:16", "nwparser.payload", "Login failed for user %{username}- %{agent}[%{process_id}]", processor_chain([
+var part28 = match("MESSAGE#17:SYSTEM_MSG:16", "nwparser.payload", "Login failed for user %{username->} - %{agent}[%{process_id}]", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -668,7 +668,7 @@ var all4 = all_match({
 
 var msg19 = msg("SYSTEM_MSG:17", all4);
 
-var part33 = match("MESSAGE#19:SYSTEM_MSG:20", "nwparser.payload", "New user added with username %{username}- %{agent}", processor_chain([
+var part33 = match("MESSAGE#19:SYSTEM_MSG:20", "nwparser.payload", "New user added with username %{username->} - %{agent}", processor_chain([
 	dup10,
 	dup2,
 	dup3,
@@ -678,7 +678,7 @@ var part33 = match("MESSAGE#19:SYSTEM_MSG:20", "nwparser.payload", "New user add
 
 var msg20 = msg("SYSTEM_MSG:20", part33);
 
-var part34 = match("MESSAGE#20:SYSTEM_MSG:21", "nwparser.payload", "pam_unix(%{fld1}:%{fld2}): password changed for %{username}- %{agent}", processor_chain([
+var part34 = match("MESSAGE#20:SYSTEM_MSG:21", "nwparser.payload", "pam_unix(%{fld1}:%{fld2}): password changed for %{username->} - %{agent}", processor_chain([
 	dup10,
 	dup2,
 	dup3,
@@ -691,7 +691,7 @@ var part34 = match("MESSAGE#20:SYSTEM_MSG:21", "nwparser.payload", "pam_unix(%{f
 
 var msg21 = msg("SYSTEM_MSG:21", part34);
 
-var part35 = match("MESSAGE#21:SYSTEM_MSG:22", "nwparser.payload", "pam_unix(%{fld1}:%{fld2}): check pass; user %{username}- %{agent}", processor_chain([
+var part35 = match("MESSAGE#21:SYSTEM_MSG:22", "nwparser.payload", "pam_unix(%{fld1}:%{fld2}): check pass; user %{username->} - %{agent}", processor_chain([
 	dup10,
 	dup2,
 	dup3,
@@ -701,7 +701,7 @@ var part35 = match("MESSAGE#21:SYSTEM_MSG:22", "nwparser.payload", "pam_unix(%{f
 
 var msg22 = msg("SYSTEM_MSG:22", part35);
 
-var part36 = match("MESSAGE#22:SYSTEM_MSG:23", "nwparser.payload", "new user: name=%{username}, uid=%{uid}, gid=%{fld1}, home=%{directory}, shell=%{fld2}- %{agent}[%{process_id}]", processor_chain([
+var part36 = match("MESSAGE#22:SYSTEM_MSG:23", "nwparser.payload", "new user: name=%{username}, uid=%{uid}, gid=%{fld1}, home=%{directory}, shell=%{fld2->} - %{agent}[%{process_id}]", processor_chain([
 	dup18,
 	dup2,
 	dup3,
@@ -792,7 +792,7 @@ var select9 = linear_select([
 	msg25,
 ]);
 
-var part42 = match("MESSAGE#25:VDC_HOSTNAME_CHANGE", "nwparser.payload", "%{fld1}hostname changed to %{hostname}", processor_chain([
+var part42 = match("MESSAGE#25:VDC_HOSTNAME_CHANGE", "nwparser.payload", "%{fld1->} hostname changed to %{hostname}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -801,7 +801,7 @@ var part42 = match("MESSAGE#25:VDC_HOSTNAME_CHANGE", "nwparser.payload", "%{fld1
 
 var msg26 = msg("VDC_HOSTNAME_CHANGE", part42);
 
-var part43 = match("MESSAGE#26:POLICY_ACTIVATE_EVENT", "nwparser.payload", "Policy %{policyname}is activated by profile %{username}", processor_chain([
+var part43 = match("MESSAGE#26:POLICY_ACTIVATE_EVENT", "nwparser.payload", "Policy %{policyname->} is activated by profile %{username}", processor_chain([
 	dup23,
 	dup2,
 	dup3,
@@ -821,7 +821,7 @@ var part44 = match("MESSAGE#27:POLICY_COMMIT_EVENT", "nwparser.payload", "Commit
 
 var msg28 = msg("POLICY_COMMIT_EVENT", part44);
 
-var part45 = match("MESSAGE#28:POLICY_DEACTIVATE_EVENT", "nwparser.payload", "Policy %{policyname}is de-activated by last referring profile %{username}", processor_chain([
+var part45 = match("MESSAGE#28:POLICY_DEACTIVATE_EVENT", "nwparser.payload", "Policy %{policyname->} is de-activated by last referring profile %{username}", processor_chain([
 	setc("eventcategory","1701070000"),
 	dup2,
 	dup3,
@@ -832,7 +832,7 @@ var part45 = match("MESSAGE#28:POLICY_DEACTIVATE_EVENT", "nwparser.payload", "Po
 
 var msg29 = msg("POLICY_DEACTIVATE_EVENT", part45);
 
-var part46 = match("MESSAGE#29:POLICY_LOOKUP_EVENT:01", "nwparser.payload", "policy=%{policyname}rule=%{rulename}action=%{action}direction=%{direction}src.net.ip-address=%{saddr}src.net.port=%{sport}dst.net.ip-address=%{daddr}dst.net.port=%{dport}net.protocol=%{protocol}net.ethertype=%{fld2}dst.zone.name=%{dst_zone}src.zone.name=%{src_zone->} ", processor_chain([
+var part46 = match("MESSAGE#29:POLICY_LOOKUP_EVENT:01", "nwparser.payload", "policy=%{policyname->} rule=%{rulename->} action=%{action->} direction=%{direction->} src.net.ip-address=%{saddr->} src.net.port=%{sport->} dst.net.ip-address=%{daddr->} dst.net.port=%{dport->} net.protocol=%{protocol->} net.ethertype=%{fld2->} dst.zone.name=%{dst_zone->} src.zone.name=%{src_zone->} ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -841,7 +841,7 @@ var part46 = match("MESSAGE#29:POLICY_LOOKUP_EVENT:01", "nwparser.payload", "pol
 
 var msg30 = msg("POLICY_LOOKUP_EVENT:01", part46);
 
-var part47 = match("MESSAGE#30:POLICY_LOOKUP_EVENT", "nwparser.payload", "policy=%{policyname}rule=%{rulename}action=%{action}direction=%{direction}src.net.ip-address=%{saddr}src.net.port=%{sport}dst.net.ip-address=%{daddr}dst.net.port=%{dport}net.protocol=%{protocol}net.ethertype=%{fld2}", processor_chain([
+var part47 = match("MESSAGE#30:POLICY_LOOKUP_EVENT", "nwparser.payload", "policy=%{policyname->} rule=%{rulename->} action=%{action->} direction=%{direction->} src.net.ip-address=%{saddr->} src.net.port=%{sport->} dst.net.ip-address=%{daddr->} dst.net.port=%{dport->} net.protocol=%{protocol->} net.ethertype=%{fld2}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -850,7 +850,7 @@ var part47 = match("MESSAGE#30:POLICY_LOOKUP_EVENT", "nwparser.payload", "policy
 
 var msg31 = msg("POLICY_LOOKUP_EVENT", part47);
 
-var part48 = match("MESSAGE#31:POLICY_LOOKUP_EVENT:02", "nwparser.payload", "policy=%{policyname}rule=%{rulename}action=%{action}direction=%{direction}net.ethertype=%{fld2}", processor_chain([
+var part48 = match("MESSAGE#31:POLICY_LOOKUP_EVENT:02", "nwparser.payload", "policy=%{policyname->} rule=%{rulename->} action=%{action->} direction=%{direction->} net.ethertype=%{fld2}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -869,7 +869,7 @@ var msg33 = msg("NEIGHBOR_UPDATE_AUTOCOPY", dup88);
 
 var msg34 = msg("MTSERROR", dup87);
 
-var part49 = match("MESSAGE#34:IF_DOWN_ERROR_DISABLED", "nwparser.payload", "Interface %{interface}is down (Error disabled. Reason:%{result})", processor_chain([
+var part49 = match("MESSAGE#34:IF_DOWN_ERROR_DISABLED", "nwparser.payload", "Interface %{interface->} is down (Error disabled. Reason:%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -891,7 +891,7 @@ var msg38 = msg("IF_DOWN_CHANNEL_MEMBERSHIP_UPDATE_IN_PROGRESS", dup91);
 
 var msg39 = msg("IF_DOWN_INTERFACE_REMOVED", dup92);
 
-var part50 = match("MESSAGE#39:IF_DOWN_LINK_FAILURE", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part50 = match("MESSAGE#39:IF_DOWN_LINK_FAILURE", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -969,7 +969,7 @@ var all8 = all_match({
 
 var msg47 = msg("IF_TX_FLOW_CONTROL", all8);
 
-var part55 = match("MESSAGE#47:IF_UP", "nwparser.payload", "%{fld43}Interface %{sinterface}is up in mode %{result}", processor_chain([
+var part55 = match("MESSAGE#47:IF_UP", "nwparser.payload", "%{fld43->} Interface %{sinterface->} is up in mode %{result}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -979,7 +979,7 @@ var part55 = match("MESSAGE#47:IF_UP", "nwparser.payload", "%{fld43}Interface %{
 
 var msg48 = msg("IF_UP", part55);
 
-var part56 = match("MESSAGE#48:IF_UP:01", "nwparser.payload", "Interface %{sinterface}is up", processor_chain([
+var part56 = match("MESSAGE#48:IF_UP:01", "nwparser.payload", "Interface %{sinterface->} is up", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1004,7 +1004,7 @@ var part57 = match("MESSAGE#49:SPEED", "nwparser.payload", "Interface %{interfac
 
 var msg50 = msg("SPEED", part57);
 
-var part58 = match("MESSAGE#50:CREATED", "nwparser.payload", "%{group_object}created", processor_chain([
+var part58 = match("MESSAGE#50:CREATED", "nwparser.payload", "%{group_object->} created", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -1013,7 +1013,7 @@ var part58 = match("MESSAGE#50:CREATED", "nwparser.payload", "%{group_object}cre
 
 var msg51 = msg("CREATED", part58);
 
-var part59 = match("MESSAGE#51:FOP_CHANGED", "nwparser.payload", "%{group_object}: first operational port changed from %{change_old}to %{change_new}", processor_chain([
+var part59 = match("MESSAGE#51:FOP_CHANGED", "nwparser.payload", "%{group_object}: first operational port changed from %{change_old->} to %{change_new}", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -1022,7 +1022,7 @@ var part59 = match("MESSAGE#51:FOP_CHANGED", "nwparser.payload", "%{group_object
 
 var msg52 = msg("FOP_CHANGED", part59);
 
-var part60 = match("MESSAGE#52:PORT_DOWN", "nwparser.payload", "%{group_object}: %{interface}is down", processor_chain([
+var part60 = match("MESSAGE#52:PORT_DOWN", "nwparser.payload", "%{group_object}: %{interface->} is down", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1031,7 +1031,7 @@ var part60 = match("MESSAGE#52:PORT_DOWN", "nwparser.payload", "%{group_object}:
 
 var msg53 = msg("PORT_DOWN", part60);
 
-var part61 = match("MESSAGE#53:PORT_UP", "nwparser.payload", "%{group_object}: %{interface}is up", processor_chain([
+var part61 = match("MESSAGE#53:PORT_UP", "nwparser.payload", "%{group_object}: %{interface->} is up", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1040,7 +1040,7 @@ var part61 = match("MESSAGE#53:PORT_UP", "nwparser.payload", "%{group_object}: %
 
 var msg54 = msg("PORT_UP", part61);
 
-var part62 = match("MESSAGE#54:SUBGROUP_ID_PORT_ADDED", "nwparser.payload", "Interface %{interface}is added to %{group_object}with subgroup id %{fld20}", processor_chain([
+var part62 = match("MESSAGE#54:SUBGROUP_ID_PORT_ADDED", "nwparser.payload", "Interface %{interface->} is added to %{group_object->} with subgroup id %{fld20}", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -1049,7 +1049,7 @@ var part62 = match("MESSAGE#54:SUBGROUP_ID_PORT_ADDED", "nwparser.payload", "Int
 
 var msg55 = msg("SUBGROUP_ID_PORT_ADDED", part62);
 
-var part63 = match("MESSAGE#55:SUBGROUP_ID_PORT_REMOVED", "nwparser.payload", "Interface %{interface}is removed from %{group_object}with subgroup id %{fld20}", processor_chain([
+var part63 = match("MESSAGE#55:SUBGROUP_ID_PORT_REMOVED", "nwparser.payload", "Interface %{interface->} is removed from %{group_object->} with subgroup id %{fld20}", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1085,7 +1085,7 @@ var msg65 = msg("PORT_SOFTWARE_FAILURE", part64);
 
 var msg66 = msg("MSM_CRIT", dup94);
 
-var part65 = match("MESSAGE#66:LOG_CMP_AAA_FAILURE", "nwparser.payload", "Authentication failed for a login from %{shost}(%{result})", processor_chain([
+var part65 = match("MESSAGE#66:LOG_CMP_AAA_FAILURE", "nwparser.payload", "Authentication failed for a login from %{shost->} (%{result})", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -1097,7 +1097,7 @@ var msg67 = msg("LOG_CMP_AAA_FAILURE", part65);
 
 var msg68 = msg("LOG_LIC_N1K_EXPIRY_WARNING", dup88);
 
-var part66 = match("MESSAGE#68:MOD_FAIL", "nwparser.payload", "Initialization of module %{fld20}(serial: %{serial_number}) failed", processor_chain([
+var part66 = match("MESSAGE#68:MOD_FAIL", "nwparser.payload", "Initialization of module %{fld20->} (serial: %{serial_number}) failed", processor_chain([
 	dup33,
 	dup2,
 	dup3,
@@ -1106,7 +1106,7 @@ var part66 = match("MESSAGE#68:MOD_FAIL", "nwparser.payload", "Initialization of
 
 var msg69 = msg("MOD_FAIL", part66);
 
-var part67 = match("MESSAGE#69:MOD_MAJORSWFAIL", "nwparser.payload", "Module %{fld20}(serial: %{serial_number}) reported a critical failure in service %{fld22}", processor_chain([
+var part67 = match("MESSAGE#69:MOD_MAJORSWFAIL", "nwparser.payload", "Module %{fld20->} (serial: %{serial_number}) reported a critical failure in service %{fld22}", processor_chain([
 	dup34,
 	dup2,
 	dup3,
@@ -1115,7 +1115,7 @@ var part67 = match("MESSAGE#69:MOD_MAJORSWFAIL", "nwparser.payload", "Module %{f
 
 var msg70 = msg("MOD_MAJORSWFAIL", part67);
 
-var part68 = match("MESSAGE#70:MOD_SRG_NOT_COMPATIBLE", "nwparser.payload", "Module %{fld20}(serial: %{serial_number}) firmware is not compatible with supervisor, downloading new image", processor_chain([
+var part68 = match("MESSAGE#70:MOD_SRG_NOT_COMPATIBLE", "nwparser.payload", "Module %{fld20->} (serial: %{serial_number}) firmware is not compatible with supervisor, downloading new image", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1124,7 +1124,7 @@ var part68 = match("MESSAGE#70:MOD_SRG_NOT_COMPATIBLE", "nwparser.payload", "Mod
 
 var msg71 = msg("MOD_SRG_NOT_COMPATIBLE", part68);
 
-var part69 = match("MESSAGE#71:MOD_WARNING:01", "nwparser.payload", "Module %{fld20}(serial: %{serial_number}) reported warnings on %{info}due to %{result}in device %{fld23}(device error %{fld22})", processor_chain([
+var part69 = match("MESSAGE#71:MOD_WARNING:01", "nwparser.payload", "Module %{fld20->} (serial: %{serial_number}) reported warnings on %{info->} due to %{result->} in device %{fld23->} (device error %{fld22})", processor_chain([
 	dup33,
 	dup2,
 	dup3,
@@ -1133,7 +1133,7 @@ var part69 = match("MESSAGE#71:MOD_WARNING:01", "nwparser.payload", "Module %{fl
 
 var msg72 = msg("MOD_WARNING:01", part69);
 
-var part70 = match("MESSAGE#72:MOD_WARNING", "nwparser.payload", "Module %{fld20}(serial: %{serial_number}) reported warning %{info}due to %{result}in device %{fld23}(device error %{fld22})", processor_chain([
+var part70 = match("MESSAGE#72:MOD_WARNING", "nwparser.payload", "Module %{fld20->} (serial: %{serial_number}) reported warning %{info->} due to %{result->} in device %{fld23->} (device error %{fld22})", processor_chain([
 	dup33,
 	dup2,
 	dup3,
@@ -1147,7 +1147,7 @@ var select14 = linear_select([
 	msg73,
 ]);
 
-var part71 = match("MESSAGE#73:ACTIVE_SUP_OK", "nwparser.payload", "Supervisor %{fld20}is active (serial: %{serial_number})", processor_chain([
+var part71 = match("MESSAGE#73:ACTIVE_SUP_OK", "nwparser.payload", "Supervisor %{fld20->} is active (serial: %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1156,7 +1156,7 @@ var part71 = match("MESSAGE#73:ACTIVE_SUP_OK", "nwparser.payload", "Supervisor %
 
 var msg74 = msg("ACTIVE_SUP_OK", part71);
 
-var part72 = match("MESSAGE#74:MOD_OK", "nwparser.payload", "Module %{fld20}is online (serial: %{serial_number})", processor_chain([
+var part72 = match("MESSAGE#74:MOD_OK", "nwparser.payload", "Module %{fld20->} is online (serial: %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1165,7 +1165,7 @@ var part72 = match("MESSAGE#74:MOD_OK", "nwparser.payload", "Module %{fld20}is o
 
 var msg75 = msg("MOD_OK", part72);
 
-var part73 = match("MESSAGE#75:MOD_RESTART", "nwparser.payload", "Module %{fld20}is restarting after image download", processor_chain([
+var part73 = match("MESSAGE#75:MOD_RESTART", "nwparser.payload", "Module %{fld20->} is restarting after image download", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1174,7 +1174,7 @@ var part73 = match("MESSAGE#75:MOD_RESTART", "nwparser.payload", "Module %{fld20
 
 var msg76 = msg("MOD_RESTART", part73);
 
-var part74 = match("MESSAGE#76:DISPUTE_CLEARED", "nwparser.payload", "Dispute resolved for port %{portname}on %{vlan}", processor_chain([
+var part74 = match("MESSAGE#76:DISPUTE_CLEARED", "nwparser.payload", "Dispute resolved for port %{portname->} on %{vlan}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -1184,7 +1184,7 @@ var part74 = match("MESSAGE#76:DISPUTE_CLEARED", "nwparser.payload", "Dispute re
 
 var msg77 = msg("DISPUTE_CLEARED", part74);
 
-var part75 = match("MESSAGE#77:DISPUTE_DETECTED", "nwparser.payload", "Dispute detected on port %{portname}on %{vlan}", processor_chain([
+var part75 = match("MESSAGE#77:DISPUTE_DETECTED", "nwparser.payload", "Dispute detected on port %{portname->} on %{vlan}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -1202,7 +1202,7 @@ var msg81 = msg("CHASSIS_CLKSRC", dup88);
 
 var msg82 = msg("FAN_OK", dup88);
 
-var part76 = match("MESSAGE#82:MOD_DETECT", "nwparser.payload", "Module %{fld19}detected (Serial number %{serial_number}) Module-Type %{fld20}Model %{fld21}", processor_chain([
+var part76 = match("MESSAGE#82:MOD_DETECT", "nwparser.payload", "Module %{fld19->} detected (Serial number %{serial_number}) Module-Type %{fld20->} Model %{fld21}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1211,7 +1211,7 @@ var part76 = match("MESSAGE#82:MOD_DETECT", "nwparser.payload", "Module %{fld19}
 
 var msg83 = msg("MOD_DETECT", part76);
 
-var part77 = match("MESSAGE#83:MOD_PWRDN", "nwparser.payload", "Module %{fld19}powered down (Serial number %{serial_number})", processor_chain([
+var part77 = match("MESSAGE#83:MOD_PWRDN", "nwparser.payload", "Module %{fld19->} powered down (Serial number %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1220,7 +1220,7 @@ var part77 = match("MESSAGE#83:MOD_PWRDN", "nwparser.payload", "Module %{fld19}p
 
 var msg84 = msg("MOD_PWRDN", part77);
 
-var part78 = match("MESSAGE#84:MOD_PWRUP", "nwparser.payload", "Module %{fld19}powered up (Serial number %{serial_number})", processor_chain([
+var part78 = match("MESSAGE#84:MOD_PWRUP", "nwparser.payload", "Module %{fld19->} powered up (Serial number %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1229,7 +1229,7 @@ var part78 = match("MESSAGE#84:MOD_PWRUP", "nwparser.payload", "Module %{fld19}p
 
 var msg85 = msg("MOD_PWRUP", part78);
 
-var part79 = match("MESSAGE#85:MOD_REMOVE", "nwparser.payload", "Module %{fld19}removed (Serial number %{serial_number})", processor_chain([
+var part79 = match("MESSAGE#85:MOD_REMOVE", "nwparser.payload", "Module %{fld19->} removed (Serial number %{serial_number})", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1254,7 +1254,7 @@ var msg93 = msg("PFM_VEM_UNLICENSED", dup88);
 
 var msg94 = msg("PS_FANOK", dup88);
 
-var part80 = match("MESSAGE#94:PS_OK", "nwparser.payload", "Power supply %{fld19}ok (Serial number %{serial_number})", processor_chain([
+var part80 = match("MESSAGE#94:PS_OK", "nwparser.payload", "Power supply %{fld19->} ok (Serial number %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1272,7 +1272,7 @@ var part81 = match("MESSAGE#95:MOD_BRINGUP_MULTI_LIMIT", "nwparser.payload", "%{
 
 var msg96 = msg("MOD_BRINGUP_MULTI_LIMIT", part81);
 
-var part82 = match("MESSAGE#96:FAN_DETECT", "nwparser.payload", "Fan module %{fld19}(Serial number %{serial_number}) %{fld20}detected", processor_chain([
+var part82 = match("MESSAGE#96:FAN_DETECT", "nwparser.payload", "Fan module %{fld19->} (Serial number %{serial_number}) %{fld20->} detected", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1283,7 +1283,7 @@ var msg97 = msg("FAN_DETECT", part82);
 
 var msg98 = msg("MOD_STATUS", dup88);
 
-var part83 = match("MESSAGE#98:PEER_VPC_CFGD_VLANS_CHANGED", "nwparser.payload", "Peer vPC %{obj_name}configured vlans changed", processor_chain([
+var part83 = match("MESSAGE#98:PEER_VPC_CFGD_VLANS_CHANGED", "nwparser.payload", "Peer vPC %{obj_name->} configured vlans changed", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1293,7 +1293,7 @@ var part83 = match("MESSAGE#98:PEER_VPC_CFGD_VLANS_CHANGED", "nwparser.payload",
 
 var msg99 = msg("PEER_VPC_CFGD_VLANS_CHANGED", part83);
 
-var part84 = match("MESSAGE#99:PEER_VPC_DELETED", "nwparser.payload", "Peer vPC %{obj_name}deleted", processor_chain([
+var part84 = match("MESSAGE#99:PEER_VPC_DELETED", "nwparser.payload", "Peer vPC %{obj_name->} deleted", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1304,7 +1304,7 @@ var msg100 = msg("PEER_VPC_DELETED", part84);
 
 var msg101 = msg("PFM_VEM_DETECTED", dup88);
 
-var part85 = match("MESSAGE#101:PS_FOUND", "nwparser.payload", "Power supply %{fld19}found (Serial number %{serial_number})", processor_chain([
+var part85 = match("MESSAGE#101:PS_FOUND", "nwparser.payload", "Power supply %{fld19->} found (Serial number %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1335,7 +1335,7 @@ var all9 = all_match({
 
 var msg103 = msg("PS_STATUS", all9);
 
-var part87 = match("MESSAGE#103:PS_CAPACITY_CHANGE:01", "nwparser.payload", "Power supply %{fld1}changed its capacity. possibly due to On/Off or power cable removal/insertion (Serial number %{serial_number})", processor_chain([
+var part87 = match("MESSAGE#103:PS_CAPACITY_CHANGE:01", "nwparser.payload", "Power supply %{fld1->} changed its capacity. possibly due to On/Off or power cable removal/insertion (Serial number %{serial_number})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1360,7 +1360,7 @@ var select17 = linear_select([
 	msg107,
 ]);
 
-var part88 = match("MESSAGE#107:IF_DOWN_INITIALIZING", "nwparser.payload", "Interface %{interface}is down (%{result}) ", processor_chain([
+var part88 = match("MESSAGE#107:IF_DOWN_INITIALIZING", "nwparser.payload", "Interface %{interface->} is down (%{result}) ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1376,7 +1376,7 @@ var select18 = linear_select([
 	msg109,
 ]);
 
-var part89 = match("MESSAGE#109:IF_DOWN_NONE", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part89 = match("MESSAGE#109:IF_DOWN_NONE", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup35,
 	dup36,
@@ -1408,7 +1408,7 @@ var msg114 = msg("IF_DOWN_OFFLINE", dup89);
 
 var msg115 = msg("IF_DOWN_OLS_RCVD", dup89);
 
-var part90 = match("MESSAGE#115:IF_DOWN_SOFTWARE_FAILURE", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part90 = match("MESSAGE#115:IF_DOWN_SOFTWARE_FAILURE", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup32,
 	dup2,
 	dup3,
@@ -1419,7 +1419,7 @@ var msg116 = msg("IF_DOWN_SOFTWARE_FAILURE", part90);
 
 var msg117 = msg("IF_DOWN_SRC_PORT_NOT_BOUND", dup91);
 
-var part91 = match("MESSAGE#117:IF_TRUNK_DOWN", "nwparser.payload", "Interface %{interface}, vsan %{fld20}is down (%{info}) ", processor_chain([
+var part91 = match("MESSAGE#117:IF_TRUNK_DOWN", "nwparser.payload", "Interface %{interface}, vsan %{fld20->} is down (%{info}) ", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1428,7 +1428,7 @@ var part91 = match("MESSAGE#117:IF_TRUNK_DOWN", "nwparser.payload", "Interface %
 
 var msg118 = msg("IF_TRUNK_DOWN", part91);
 
-var part92 = match("MESSAGE#118:IF_TRUNK_DOWN:01", "nwparser.payload", "Interface %{interface}, vlan %{vlan}down", processor_chain([
+var part92 = match("MESSAGE#118:IF_TRUNK_DOWN:01", "nwparser.payload", "Interface %{interface}, vlan %{vlan->} down", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1437,7 +1437,7 @@ var part92 = match("MESSAGE#118:IF_TRUNK_DOWN:01", "nwparser.payload", "Interfac
 
 var msg119 = msg("IF_TRUNK_DOWN:01", part92);
 
-var part93 = match("MESSAGE#119:IF_TRUNK_DOWN:02", "nwparser.payload", "%{fld43}Interface %{interface}, vsan %{vlan}is down %{info}", processor_chain([
+var part93 = match("MESSAGE#119:IF_TRUNK_DOWN:02", "nwparser.payload", "%{fld43->} Interface %{interface}, vsan %{vlan->} is down %{info}", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1452,7 +1452,7 @@ var select21 = linear_select([
 	msg120,
 ]);
 
-var part94 = match("MESSAGE#120:IF_TRUNK_UP", "nwparser.payload", "Interface %{interface}, vsan %{fld20}is up", processor_chain([
+var part94 = match("MESSAGE#120:IF_TRUNK_UP", "nwparser.payload", "Interface %{interface}, vsan %{fld20->} is up", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1461,7 +1461,7 @@ var part94 = match("MESSAGE#120:IF_TRUNK_UP", "nwparser.payload", "Interface %{i
 
 var msg121 = msg("IF_TRUNK_UP", part94);
 
-var part95 = match("MESSAGE#121:IF_TRUNK_UP:01", "nwparser.payload", "Interface %{interface}, vlan %{vlan}up", processor_chain([
+var part95 = match("MESSAGE#121:IF_TRUNK_UP:01", "nwparser.payload", "Interface %{interface}, vlan %{vlan->} up", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1470,7 +1470,7 @@ var part95 = match("MESSAGE#121:IF_TRUNK_UP:01", "nwparser.payload", "Interface 
 
 var msg122 = msg("IF_TRUNK_UP:01", part95);
 
-var part96 = match("MESSAGE#122:IF_TRUNK_UP:02", "nwparser.payload", "%{fld43}Interface %{interface}, vsan %{vlan}is up %{info}", processor_chain([
+var part96 = match("MESSAGE#122:IF_TRUNK_UP:02", "nwparser.payload", "%{fld43->} Interface %{interface}, vsan %{vlan->} is up %{info}", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1487,7 +1487,7 @@ var select22 = linear_select([
 
 var msg124 = msg("PORT_PROFILE_CHANGE_VERIFY_REQ_FAILURE", dup98);
 
-var part97 = match("MESSAGE#124:IF_PORTPROFILE_ATTACHED", "nwparser.payload", "Interface %{interface}is inheriting port-profile %{fld20}", processor_chain([
+var part97 = match("MESSAGE#124:IF_PORTPROFILE_ATTACHED", "nwparser.payload", "Interface %{interface->} is inheriting port-profile %{fld20}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1498,7 +1498,7 @@ var msg125 = msg("IF_PORTPROFILE_ATTACHED", part97);
 
 var msg126 = msg("STANDBY_SUP_OK", dup88);
 
-var part98 = match("MESSAGE#126:STM_LOOP_DETECT", "nwparser.payload", "Loops detected in the network among ports %{portname}and %{info}vlan %{vlan}- %{result}", processor_chain([
+var part98 = match("MESSAGE#126:STM_LOOP_DETECT", "nwparser.payload", "Loops detected in the network among ports %{portname->} and %{info->} vlan %{vlan->} - %{result}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1581,7 +1581,7 @@ var msg138 = msg("IF_ATTACHED", dup88);
 
 var msg139 = msg("IF_DELETE_AUTO", dup95);
 
-var part105 = match("MESSAGE#139:IF_DETACHED", "nwparser.payload", "Interface %{interface}is detached", processor_chain([
+var part105 = match("MESSAGE#139:IF_DETACHED", "nwparser.payload", "Interface %{interface->} is detached", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1596,7 +1596,7 @@ var msg142 = msg("IF_DOWN_INACTIVE", dup89);
 
 var msg143 = msg("IF_DOWN_NON_PARTICIPATING", dup89);
 
-var part106 = match("MESSAGE#143:IF_DOWN_VEM_UNLICENSED", "nwparser.payload", "Interface %{interface}is down", processor_chain([
+var part106 = match("MESSAGE#143:IF_DOWN_VEM_UNLICENSED", "nwparser.payload", "Interface %{interface->} is down", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1605,7 +1605,7 @@ var part106 = match("MESSAGE#143:IF_DOWN_VEM_UNLICENSED", "nwparser.payload", "I
 
 var msg144 = msg("IF_DOWN_VEM_UNLICENSED", part106);
 
-var part107 = match("MESSAGE#144:CONN_CONNECT", "nwparser.payload", "Connection %{hostname}connected to the vCenter Server.", processor_chain([
+var part107 = match("MESSAGE#144:CONN_CONNECT", "nwparser.payload", "Connection %{hostname->} connected to the vCenter Server.", processor_chain([
 	dup37,
 	dup2,
 	dup3,
@@ -1614,7 +1614,7 @@ var part107 = match("MESSAGE#144:CONN_CONNECT", "nwparser.payload", "Connection 
 
 var msg145 = msg("CONN_CONNECT", part107);
 
-var part108 = match("MESSAGE#145:CONN_DISCONNECT", "nwparser.payload", "Connection %{hostname}disconnected from the vCenter Server.", processor_chain([
+var part108 = match("MESSAGE#145:CONN_DISCONNECT", "nwparser.payload", "Connection %{hostname->} disconnected from the vCenter Server.", processor_chain([
 	setc("eventcategory","1801030000"),
 	dup2,
 	dup3,
@@ -1623,7 +1623,7 @@ var part108 = match("MESSAGE#145:CONN_DISCONNECT", "nwparser.payload", "Connecti
 
 var msg146 = msg("CONN_DISCONNECT", part108);
 
-var part109 = match("MESSAGE#146:DVPG_CREATE", "nwparser.payload", "created port-group %{info}on the vCenter Server.", processor_chain([
+var part109 = match("MESSAGE#146:DVPG_CREATE", "nwparser.payload", "created port-group %{info->} on the vCenter Server.", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -1632,7 +1632,7 @@ var part109 = match("MESSAGE#146:DVPG_CREATE", "nwparser.payload", "created port
 
 var msg147 = msg("DVPG_CREATE", part109);
 
-var part110 = match("MESSAGE#147:DVPG_DELETE", "nwparser.payload", "deleted port-group %{info}from the vCenter Server.", processor_chain([
+var part110 = match("MESSAGE#147:DVPG_DELETE", "nwparser.payload", "deleted port-group %{info->} from the vCenter Server.", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1643,7 +1643,7 @@ var msg148 = msg("DVPG_DELETE", part110);
 
 var msg149 = msg("DVS_HOSTMEMBER_INFO", dup88);
 
-var part111 = match("MESSAGE#149:DVS_NAME_CHANGE", "nwparser.payload", "Changed dvswitch name to %{info}on the vCenter Server.", processor_chain([
+var part111 = match("MESSAGE#149:DVS_NAME_CHANGE", "nwparser.payload", "Changed dvswitch name to %{info->} on the vCenter Server.", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1654,7 +1654,7 @@ var msg150 = msg("DVS_NAME_CHANGE", part111);
 
 var msg151 = msg("VMS_PPM_SYNC_COMPLETE", dup88);
 
-var part112 = match("MESSAGE#151:VPC_DELETED", "nwparser.payload", "vPC %{obj_name}is deleted", processor_chain([
+var part112 = match("MESSAGE#151:VPC_DELETED", "nwparser.payload", "vPC %{obj_name->} is deleted", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1663,7 +1663,7 @@ var part112 = match("MESSAGE#151:VPC_DELETED", "nwparser.payload", "vPC %{obj_na
 
 var msg152 = msg("VPC_DELETED", part112);
 
-var part113 = match("MESSAGE#152:VPC_UP", "nwparser.payload", "vPC %{obj_name}is up", processor_chain([
+var part113 = match("MESSAGE#152:VPC_UP", "nwparser.payload", "vPC %{obj_name->} is up", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -1673,7 +1673,7 @@ var part113 = match("MESSAGE#152:VPC_UP", "nwparser.payload", "vPC %{obj_name}is
 
 var msg153 = msg("VPC_UP", part113);
 
-var part114 = match("MESSAGE#153:VSHD_SYSLOG_CONFIG_I/0", "nwparser.payload", "Configured from vty by %{username}on %{p0}");
+var part114 = match("MESSAGE#153:VSHD_SYSLOG_CONFIG_I/0", "nwparser.payload", "Configured from vty by %{username->} on %{p0}");
 
 var part115 = match("MESSAGE#153:VSHD_SYSLOG_CONFIG_I/1_0", "nwparser.p0", "%{saddr}@%{terminal}");
 
@@ -1713,7 +1713,7 @@ var select25 = linear_select([
 	msg155,
 ]);
 
-var part118 = match("MESSAGE#155:AAA_ACCOUNTING_MESSAGE:18", "nwparser.payload", "update:%{saddr}@%{terminal}:%{username}:%{event_description}; feature %{protocol}(%{result})", processor_chain([
+var part118 = match("MESSAGE#155:AAA_ACCOUNTING_MESSAGE:18", "nwparser.payload", "update:%{saddr}@%{terminal}:%{username}:%{event_description}; feature %{protocol->} (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -1791,7 +1791,7 @@ var part125 = match("MESSAGE#162:AAA_ACCOUNTING_MESSAGE:23", "nwparser.payload",
 
 var msg163 = msg("AAA_ACCOUNTING_MESSAGE:23", part125);
 
-var part126 = match("MESSAGE#163:AAA_ACCOUNTING_MESSAGE:11", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:target (name:%{dhost}address:%{daddr}:%{dport}) deleted", processor_chain([
+var part126 = match("MESSAGE#163:AAA_ACCOUNTING_MESSAGE:11", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:target (name:%{dhost->} address:%{daddr}:%{dport}) deleted", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1800,7 +1800,7 @@ var part126 = match("MESSAGE#163:AAA_ACCOUNTING_MESSAGE:11", "nwparser.payload",
 
 var msg164 = msg("AAA_ACCOUNTING_MESSAGE:11", part126);
 
-var part127 = match("MESSAGE#164:AAA_ACCOUNTING_MESSAGE:12", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:target (name:%{dhost}address:%{daddr}:%{dport}timeout:%{fld44}retry:%{fld45}tagList:trap params:%{fld46}) added", processor_chain([
+var part127 = match("MESSAGE#164:AAA_ACCOUNTING_MESSAGE:12", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:target (name:%{dhost->} address:%{daddr}:%{dport->} timeout:%{fld44->} retry:%{fld45->} tagList:trap params:%{fld46}) added", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1809,7 +1809,7 @@ var part127 = match("MESSAGE#164:AAA_ACCOUNTING_MESSAGE:12", "nwparser.payload",
 
 var msg165 = msg("AAA_ACCOUNTING_MESSAGE:12", part127);
 
-var part128 = match("MESSAGE#165:AAA_ACCOUNTING_MESSAGE:13", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:Interface %{interface}state updated to up", processor_chain([
+var part128 = match("MESSAGE#165:AAA_ACCOUNTING_MESSAGE:13", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:Interface %{interface->} state updated to up", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1818,7 +1818,7 @@ var part128 = match("MESSAGE#165:AAA_ACCOUNTING_MESSAGE:13", "nwparser.payload",
 
 var msg166 = msg("AAA_ACCOUNTING_MESSAGE:13", part128);
 
-var part129 = match("MESSAGE#166:AAA_ACCOUNTING_MESSAGE:14", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:Interface %{interface}state updated to down", processor_chain([
+var part129 = match("MESSAGE#166:AAA_ACCOUNTING_MESSAGE:14", "nwparser.payload", "update:snmp_%{fld43}_%{saddr}:%{username}:Interface %{interface->} state updated to down", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1836,7 +1836,7 @@ var part130 = match("MESSAGE#167:AAA_ACCOUNTING_MESSAGE:15", "nwparser.payload",
 
 var msg168 = msg("AAA_ACCOUNTING_MESSAGE:15", part130);
 
-var part131 = match("MESSAGE#168:AAA_ACCOUNTING_MESSAGE:16", "nwparser.payload", "update:%{saddr}@%{application}:%{username}:terminal length %{dclass_counter1}(%{result}) ", processor_chain([
+var part131 = match("MESSAGE#168:AAA_ACCOUNTING_MESSAGE:16", "nwparser.payload", "update:%{saddr}@%{application}:%{username}:terminal length %{dclass_counter1->} (%{result}) ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1855,7 +1855,7 @@ var part132 = match("MESSAGE#169:AAA_ACCOUNTING_MESSAGE:04", "nwparser.payload",
 
 var msg170 = msg("AAA_ACCOUNTING_MESSAGE:04", part132);
 
-var part133 = match("MESSAGE#170:AAA_ACCOUNTING_MESSAGE:01", "nwparser.payload", "update:%{saddr}@%{terminal}:%{application}:terminal width %{dclass_counter1}(%{result})", processor_chain([
+var part133 = match("MESSAGE#170:AAA_ACCOUNTING_MESSAGE:01", "nwparser.payload", "update:%{saddr}@%{terminal}:%{application}:terminal width %{dclass_counter1->} (%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -1917,7 +1917,7 @@ var all13 = all_match({
 
 var msg173 = msg("AAA_ACCOUNTING_MESSAGE:28", all13);
 
-var part138 = match("MESSAGE#173:AAA_ACCOUNTING_MESSAGE:20", "nwparser.payload", "update:%{saddr}@%{terminal}:%{username}:%{info}(%{result})", processor_chain([
+var part138 = match("MESSAGE#173:AAA_ACCOUNTING_MESSAGE:20", "nwparser.payload", "update:%{saddr}@%{terminal}:%{username}:%{info->} (%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2105,7 +2105,7 @@ var all14 = all_match({
 
 var msg187 = msg("ACLLOG_FLOW_INTERVAL", all14);
 
-var part151 = match("MESSAGE#187:ACLLOG_MAXFLOW_REACHED", "nwparser.payload", "Maximum limit %{fld3}reached for number of flows", processor_chain([
+var part151 = match("MESSAGE#187:ACLLOG_MAXFLOW_REACHED", "nwparser.payload", "Maximum limit %{fld3->} reached for number of flows", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2142,7 +2142,7 @@ var all15 = all_match({
 
 var msg189 = msg("ACLLOG_NEW_FLOW", all15);
 
-var part152 = match("MESSAGE#189:DUP_VADDR_SRC_IP", "nwparser.payload", "%{process}[%{process_id}] Source address of packet received from %{smacaddr}on %{vlan}(%{interface}) is duplicate of local virtual ip, %{saddr}", processor_chain([
+var part152 = match("MESSAGE#189:DUP_VADDR_SRC_IP", "nwparser.payload", "%{process->} [%{process_id}] Source address of packet received from %{smacaddr->} on %{vlan}(%{interface}) is duplicate of local virtual ip, %{saddr}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -2152,7 +2152,7 @@ var part152 = match("MESSAGE#189:DUP_VADDR_SRC_IP", "nwparser.payload", "%{proce
 
 var msg190 = msg("DUP_VADDR_SRC_IP", part152);
 
-var part153 = match("MESSAGE#190:IF_ERROR_VLANS_REMOVED", "nwparser.payload", "VLANs %{vlan}on Interface %{sinterface}are removed from suspended state.", processor_chain([
+var part153 = match("MESSAGE#190:IF_ERROR_VLANS_REMOVED", "nwparser.payload", "VLANs %{vlan->} on Interface %{sinterface->} are removed from suspended state.", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2161,7 +2161,7 @@ var part153 = match("MESSAGE#190:IF_ERROR_VLANS_REMOVED", "nwparser.payload", "V
 
 var msg191 = msg("IF_ERROR_VLANS_REMOVED", part153);
 
-var part154 = match("MESSAGE#191:IF_ERROR_VLANS_SUSPENDED", "nwparser.payload", "VLANs %{vlan}on Interface %{sinterface}are being suspended. (Reason: %{info})", processor_chain([
+var part154 = match("MESSAGE#191:IF_ERROR_VLANS_SUSPENDED", "nwparser.payload", "VLANs %{vlan->} on Interface %{sinterface->} are being suspended. (Reason: %{info})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2170,7 +2170,7 @@ var part154 = match("MESSAGE#191:IF_ERROR_VLANS_SUSPENDED", "nwparser.payload", 
 
 var msg192 = msg("IF_ERROR_VLANS_SUSPENDED", part154);
 
-var part155 = match("MESSAGE#192:IF_DOWN_CFG_CHANGE", "nwparser.payload", "Interface %{sinterface}is down(%{result})", processor_chain([
+var part155 = match("MESSAGE#192:IF_DOWN_CFG_CHANGE", "nwparser.payload", "Interface %{sinterface->} is down(%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2188,7 +2188,7 @@ var part156 = match("MESSAGE#193:PFM_CLOCK_CHANGE", "nwparser.payload", "Clock s
 
 var msg194 = msg("PFM_CLOCK_CHANGE", part156);
 
-var part157 = match("MESSAGE#194:SYNC_FAILURE_STANDBY_RESET", "nwparser.payload", "Failure in syncing messages to standby for vdc %{fld3}causing standby to reset.", processor_chain([
+var part157 = match("MESSAGE#194:SYNC_FAILURE_STANDBY_RESET", "nwparser.payload", "Failure in syncing messages to standby for vdc %{fld3->} causing standby to reset.", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2231,7 +2231,7 @@ var msg198 = msg("CFGWRITE_USER_ABORT", part160);
 
 var msg199 = msg("IF_DOWN_BIT_ERR_RT_THRES_EXCEEDED", dup96);
 
-var part161 = match("MESSAGE#199:last", "nwparser.payload", "message repeated %{dclass_counter1}time ", processor_chain([
+var part161 = match("MESSAGE#199:last", "nwparser.payload", "message repeated %{dclass_counter1->} time ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2242,7 +2242,7 @@ var part161 = match("MESSAGE#199:last", "nwparser.payload", "message repeated %{
 
 var msg200 = msg("last", part161);
 
-var part162 = match("MESSAGE#200:SERVICE_CRASHED", "nwparser.payload", "Service %{service}(PID %{parent_pid}) hasn't caught signal %{fld43}(%{result}).", processor_chain([
+var part162 = match("MESSAGE#200:SERVICE_CRASHED", "nwparser.payload", "Service %{service->} (PID %{parent_pid}) hasn't caught signal %{fld43->} (%{result}).", processor_chain([
 	dup33,
 	dup2,
 	dup3,
@@ -2251,7 +2251,7 @@ var part162 = match("MESSAGE#200:SERVICE_CRASHED", "nwparser.payload", "Service 
 
 var msg201 = msg("SERVICE_CRASHED", part162);
 
-var part163 = match("MESSAGE#201:SERVICELOST", "nwparser.payload", "Service %{service}lost on WCCP Client %{saddr}", processor_chain([
+var part163 = match("MESSAGE#201:SERVICELOST", "nwparser.payload", "Service %{service->} lost on WCCP Client %{saddr}", processor_chain([
 	dup62,
 	dup2,
 	dup3,
@@ -2261,7 +2261,7 @@ var part163 = match("MESSAGE#201:SERVICELOST", "nwparser.payload", "Service %{se
 
 var msg202 = msg("SERVICELOST", part163);
 
-var part164 = match("MESSAGE#202:IF_BRINGUP_ALLOWED_FCOT_CHECKSUM_ERR", "nwparser.payload", "Interface %{interface}is allowed to come up even with SFP checksum error", processor_chain([
+var part164 = match("MESSAGE#202:IF_BRINGUP_ALLOWED_FCOT_CHECKSUM_ERR", "nwparser.payload", "Interface %{interface->} is allowed to come up even with SFP checksum error", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -2270,7 +2270,7 @@ var part164 = match("MESSAGE#202:IF_BRINGUP_ALLOWED_FCOT_CHECKSUM_ERR", "nwparse
 
 var msg203 = msg("IF_BRINGUP_ALLOWED_FCOT_CHECKSUM_ERR", part164);
 
-var part165 = match("MESSAGE#203:PS_FAIL/0", "nwparser.payload", "Power supply %{fld43}failed or shut%{p0}");
+var part165 = match("MESSAGE#203:PS_FAIL/0", "nwparser.payload", "Power supply %{fld43->} failed or shut%{p0}");
 
 var part166 = match("MESSAGE#203:PS_FAIL/1_0", "nwparser.p0", " down %{p0}");
 
@@ -2312,7 +2312,7 @@ var part169 = match("MESSAGE#206:NATIVE_VLAN_MISMATCH", "nwparser.payload", "Nat
 
 var msg207 = msg("NATIVE_VLAN_MISMATCH", part169);
 
-var part170 = match("MESSAGE#207:NEIGHBOR_ADDED", "nwparser.payload", "Device %{fld22}discovered of type %{fld23}with port %{fld24}on incoming port %{interface}with ip addr %{fld25}and mgmt ip %{hostip}", processor_chain([
+var part170 = match("MESSAGE#207:NEIGHBOR_ADDED", "nwparser.payload", "Device %{fld22->} discovered of type %{fld23->} with port %{fld24->} on incoming port %{interface->} with ip addr %{fld25->} and mgmt ip %{hostip}", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -2321,7 +2321,7 @@ var part170 = match("MESSAGE#207:NEIGHBOR_ADDED", "nwparser.payload", "Device %{
 
 var msg208 = msg("NEIGHBOR_ADDED", part170);
 
-var part171 = match("MESSAGE#208:NEIGHBOR_REMOVED", "nwparser.payload", "CDP Neighbor %{fld22}on port %{interface}has been removed", processor_chain([
+var part171 = match("MESSAGE#208:NEIGHBOR_REMOVED", "nwparser.payload", "CDP Neighbor %{fld22->} on port %{interface->} has been removed", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -2339,7 +2339,7 @@ var part172 = match("MESSAGE#209:IF_BANDWIDTH_CHANGE", "nwparser.payload", "Inte
 
 var msg210 = msg("IF_BANDWIDTH_CHANGE", part172);
 
-var part173 = match("MESSAGE#210:IF_DOWN_PARENT_ADMIN_DOWN", "nwparser.payload", "Interface %{interface}is down (Parent interface down)", processor_chain([
+var part173 = match("MESSAGE#210:IF_DOWN_PARENT_ADMIN_DOWN", "nwparser.payload", "Interface %{interface->} is down (Parent interface down)", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -2348,7 +2348,7 @@ var part173 = match("MESSAGE#210:IF_DOWN_PARENT_ADMIN_DOWN", "nwparser.payload",
 
 var msg211 = msg("IF_DOWN_PARENT_ADMIN_DOWN", part173);
 
-var part174 = match("MESSAGE#211:PORT_INDIVIDUAL_DOWN", "nwparser.payload", "individual port %{interface}is down", processor_chain([
+var part174 = match("MESSAGE#211:PORT_INDIVIDUAL_DOWN", "nwparser.payload", "individual port %{interface->} is down", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -2357,7 +2357,7 @@ var part174 = match("MESSAGE#211:PORT_INDIVIDUAL_DOWN", "nwparser.payload", "ind
 
 var msg212 = msg("PORT_INDIVIDUAL_DOWN", part174);
 
-var part175 = match("MESSAGE#212:PORT_SUSPENDED", "nwparser.payload", "%{fld22}: %{interface}is suspended", processor_chain([
+var part175 = match("MESSAGE#212:PORT_SUSPENDED", "nwparser.payload", "%{fld22}: %{interface->} is suspended", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -2366,7 +2366,7 @@ var part175 = match("MESSAGE#212:PORT_SUSPENDED", "nwparser.payload", "%{fld22}:
 
 var msg213 = msg("PORT_SUSPENDED", part175);
 
-var part176 = match("MESSAGE#213:FEX_PORT_STATUS_NOTI", "nwparser.payload", "Uplink-ID %{fld22}of Fex %{fld23}that is connected with %{interface}changed its status from %{change_old}to %{change_new}", processor_chain([
+var part176 = match("MESSAGE#213:FEX_PORT_STATUS_NOTI", "nwparser.payload", "Uplink-ID %{fld22->} of Fex %{fld23->} that is connected with %{interface->} changed its status from %{change_old->} to %{change_new}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2382,7 +2382,7 @@ var msg216 = msg("NOHMS_DIAG_ERR_PS_RECOVERED", dup88);
 
 var msg217 = msg("ADJCHANGE", dup88);
 
-var part177 = match("MESSAGE#217:PORT_ADDED", "nwparser.payload", "Interface %{interface}, added to VLAN%{vlan}with role %{fld22}, state %{disposition}, %{info}", processor_chain([
+var part177 = match("MESSAGE#217:PORT_ADDED", "nwparser.payload", "Interface %{interface}, added to VLAN%{vlan->} with role %{fld22}, state %{disposition}, %{info}", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -2400,7 +2400,7 @@ var part178 = match("MESSAGE#218:PORT_DELETED", "nwparser.payload", "Interface %
 
 var msg219 = msg("PORT_DELETED", part178);
 
-var part179 = match("MESSAGE#219:PORT_ROLE", "nwparser.payload", "Port %{interface}instance VLAN%{vlan}role changed to %{fld22}", processor_chain([
+var part179 = match("MESSAGE#219:PORT_ROLE", "nwparser.payload", "Port %{interface->} instance VLAN%{vlan->} role changed to %{fld22}", processor_chain([
 	dup63,
 	dup2,
 	dup3,
@@ -2409,7 +2409,7 @@ var part179 = match("MESSAGE#219:PORT_ROLE", "nwparser.payload", "Port %{interfa
 
 var msg220 = msg("PORT_ROLE", part179);
 
-var part180 = match("MESSAGE#220:PORT_STATE", "nwparser.payload", "Port %{interface}instance VLAN%{vlan}moving from %{change_old}to %{change_new}", processor_chain([
+var part180 = match("MESSAGE#220:PORT_STATE", "nwparser.payload", "Port %{interface->} instance VLAN%{vlan->} moving from %{change_old->} to %{change_new}", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2419,7 +2419,7 @@ var part180 = match("MESSAGE#220:PORT_STATE", "nwparser.payload", "Port %{interf
 
 var msg221 = msg("PORT_STATE", part180);
 
-var part181 = match("MESSAGE#221:TACACS_ACCOUNTING_MESSAGE", "nwparser.payload", "update: %{saddr}@%{terminal}: %{username}: %{event_description}; feature %{protocol}(%{result}) %{info}", processor_chain([
+var part181 = match("MESSAGE#221:TACACS_ACCOUNTING_MESSAGE", "nwparser.payload", "update: %{saddr}@%{terminal}: %{username}: %{event_description}; feature %{protocol->} (%{result}) %{info}", processor_chain([
 	dup24,
 	dup2,
 	dup3,
@@ -2442,7 +2442,7 @@ var part182 = match("MESSAGE#222:TACACS_ACCOUNTING_MESSAGE:01", "nwparser.payloa
 
 var msg223 = msg("TACACS_ACCOUNTING_MESSAGE:01", part182);
 
-var part183 = match("MESSAGE#368:TACACS_ACCOUNTING_MESSAGE:04", "nwparser.payload", "%{action}: %{saddr}@%{terminal}: %{username}: configure terminal ; ntp source-interface %{sinterface}(%{result})%{info}", processor_chain([
+var part183 = match("MESSAGE#368:TACACS_ACCOUNTING_MESSAGE:04", "nwparser.payload", "%{action}: %{saddr}@%{terminal}: %{username}: configure terminal ; ntp source-interface %{sinterface->} (%{result})%{info}", processor_chain([
 	dup64,
 	dup2,
 	dup4,
@@ -2478,7 +2478,7 @@ var all17 = all_match({
 
 var msg225 = msg("TACACS_ACCOUNTING_MESSAGE:05", all17);
 
-var part188 = match("MESSAGE#370:TACACS_ACCOUNTING_MESSAGE:06", "nwparser.payload", "%{action}: %{saddr}@%{terminal}: %{username}: clock set %{event_time_string}(%{result})%{info}", processor_chain([
+var part188 = match("MESSAGE#370:TACACS_ACCOUNTING_MESSAGE:06", "nwparser.payload", "%{action}: %{saddr}@%{terminal}: %{username}: clock set %{event_time_string->} (%{result})%{info}", processor_chain([
 	dup64,
 	dup2,
 	dup4,
@@ -2555,7 +2555,7 @@ var msg234 = msg("IF_DOWN_PEER_CLOSE", dup107);
 
 var msg235 = msg("IF_DOWN_PEER_RESET", dup107);
 
-var part192 = match("MESSAGE#229:INTF_CONSISTENCY_FAILED", "nwparser.payload", "In domain %{domain}, VPC %{obj_name}configuration is not consistent (%{result})", processor_chain([
+var part192 = match("MESSAGE#229:INTF_CONSISTENCY_FAILED", "nwparser.payload", "In domain %{domain}, VPC %{obj_name->} configuration is not consistent (%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -2565,7 +2565,7 @@ var part192 = match("MESSAGE#229:INTF_CONSISTENCY_FAILED", "nwparser.payload", "
 
 var msg236 = msg("INTF_CONSISTENCY_FAILED", part192);
 
-var part193 = match("MESSAGE#230:INTF_CONSISTENCY_SUCCESS", "nwparser.payload", "In domain %{domain}, vPC %{obj_name}configuration is consistent", processor_chain([
+var part193 = match("MESSAGE#230:INTF_CONSISTENCY_SUCCESS", "nwparser.payload", "In domain %{domain}, vPC %{obj_name->} configuration is consistent", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -2714,7 +2714,7 @@ var all23 = all_match({
 
 var msg254 = msg("SOHMS_DIAG_ERROR", all23);
 
-var part202 = match("MESSAGE#248:SOHMS_DIAG_ERROR:01", "nwparser.payload", "%{device}System minor alarm on power supply %{fld42}: %{result->} ", processor_chain([
+var part202 = match("MESSAGE#248:SOHMS_DIAG_ERROR:01", "nwparser.payload", "%{device->} System minor alarm on power supply %{fld42}: %{result->} ", processor_chain([
 	dup62,
 	dup39,
 	dup73,
@@ -2743,7 +2743,7 @@ var select37 = linear_select([
 	msg256,
 ]);
 
-var part204 = match("MESSAGE#250:M2FIB_MAC_TBL_PRGMING", "nwparser.payload", "Failed to program the mac table on %{device}for group: %{fld1}, (%{fld2}(%{fld3}), %{fld4}, %{hostip}). Error: %{result}. %{info}", processor_chain([
+var part204 = match("MESSAGE#250:M2FIB_MAC_TBL_PRGMING", "nwparser.payload", "Failed to program the mac table on %{device->} for group: %{fld1}, (%{fld2->} (%{fld3}), %{fld4}, %{hostip}). Error: %{result}. %{info}", processor_chain([
 	dup74,
 	dup35,
 	dup39,
@@ -2769,7 +2769,7 @@ var part205 = match("MESSAGE#251:DELETE_STALE_USER_ACCOUNT", "nwparser.payload",
 
 var msg258 = msg("DELETE_STALE_USER_ACCOUNT", part205);
 
-var part206 = match("MESSAGE#252:IF_ADMIN_UP", "nwparser.payload", "Interface %{interface}is admin up", processor_chain([
+var part206 = match("MESSAGE#252:IF_ADMIN_UP", "nwparser.payload", "Interface %{interface->} is admin up", processor_chain([
 	dup31,
 	dup35,
 	dup39,
@@ -2782,7 +2782,7 @@ var part206 = match("MESSAGE#252:IF_ADMIN_UP", "nwparser.payload", "Interface %{
 
 var msg259 = msg("IF_ADMIN_UP", part206);
 
-var part207 = match("MESSAGE#253:VPC_CFGD", "nwparser.payload", "vPC %{obj_name}is configured", processor_chain([
+var part207 = match("MESSAGE#253:VPC_CFGD", "nwparser.payload", "vPC %{obj_name->} is configured", processor_chain([
 	dup31,
 	dup35,
 	dup39,
@@ -2820,7 +2820,7 @@ var part209 = match("MESSAGE#255:BIOS_DAEMON_LC_PRI_BOOT", "nwparser.payload", "
 
 var msg262 = msg("BIOS_DAEMON_LC_PRI_BOOT", part209);
 
-var part210 = match("MESSAGE#256:PEER_VPC_DOWN", "nwparser.payload", "Peer %{obj_name}is down ()", processor_chain([
+var part210 = match("MESSAGE#256:PEER_VPC_DOWN", "nwparser.payload", "Peer %{obj_name->} is down ()", processor_chain([
 	dup78,
 	dup35,
 	dup39,
@@ -2946,7 +2946,7 @@ var part222 = match("MESSAGE#262:PEER_KEEP_ALIVE_STATUS", "nwparser.payload", "I
 
 var msg269 = msg("PEER_KEEP_ALIVE_STATUS", part222);
 
-var part223 = match("MESSAGE#263:EJECTOR_STAT_CHANGED", "nwparser.payload", "Ejectors' status in slot %{fld47}has changed, %{info}", processor_chain([
+var part223 = match("MESSAGE#263:EJECTOR_STAT_CHANGED", "nwparser.payload", "Ejectors' status in slot %{fld47->} has changed, %{info}", processor_chain([
 	dup31,
 	dup16,
 	dup39,
@@ -2958,7 +2958,7 @@ var part223 = match("MESSAGE#263:EJECTOR_STAT_CHANGED", "nwparser.payload", "Eje
 
 var msg270 = msg("EJECTOR_STAT_CHANGED", part223);
 
-var part224 = match("MESSAGE#264:XBAR_DETECT", "nwparser.payload", "Xbar %{fld41}detected (Serial number %{fld42})", processor_chain([
+var part224 = match("MESSAGE#264:XBAR_DETECT", "nwparser.payload", "Xbar %{fld41->} detected (Serial number %{fld42})", processor_chain([
 	dup30,
 	setc("ec_activity","Detect"),
 	dup39,
@@ -2970,7 +2970,7 @@ var part224 = match("MESSAGE#264:XBAR_DETECT", "nwparser.payload", "Xbar %{fld41
 
 var msg271 = msg("XBAR_DETECT", part224);
 
-var part225 = match("MESSAGE#265:XBAR_PWRUP", "nwparser.payload", "Xbar %{fld41}powered up (Serial number %{fld42})", processor_chain([
+var part225 = match("MESSAGE#265:XBAR_PWRUP", "nwparser.payload", "Xbar %{fld41->} powered up (Serial number %{fld42})", processor_chain([
 	dup15,
 	dup76,
 	dup77,
@@ -2982,7 +2982,7 @@ var part225 = match("MESSAGE#265:XBAR_PWRUP", "nwparser.payload", "Xbar %{fld41}
 
 var msg272 = msg("XBAR_PWRUP", part225);
 
-var part226 = match("MESSAGE#266:XBAR_PWRDN", "nwparser.payload", "Xbar %{fld41}powered down (Serial number %{fld42})", processor_chain([
+var part226 = match("MESSAGE#266:XBAR_PWRDN", "nwparser.payload", "Xbar %{fld41->} powered down (Serial number %{fld42})", processor_chain([
 	dup15,
 	dup76,
 	setc("ec_activity","Stop"),
@@ -2994,7 +2994,7 @@ var part226 = match("MESSAGE#266:XBAR_PWRDN", "nwparser.payload", "Xbar %{fld41}
 
 var msg273 = msg("XBAR_PWRDN", part226);
 
-var part227 = match("MESSAGE#267:XBAR_OK", "nwparser.payload", "Xbar %{fld41}is online (serial: %{fld42})", processor_chain([
+var part227 = match("MESSAGE#267:XBAR_OK", "nwparser.payload", "Xbar %{fld41->} is online (serial: %{fld42})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
@@ -3024,7 +3024,7 @@ var part229 = match("MESSAGE#269:VPC_ISSU_END", "nwparser.payload", "Peer vPC sw
 
 var msg276 = msg("VPC_ISSU_END", part229);
 
-var part230 = match("MESSAGE#270:PORT_RANGE_ROLE", "nwparser.payload", "new_role=%{obj_name}interface=%{interface}mst=%{fld42}", processor_chain([
+var part230 = match("MESSAGE#270:PORT_RANGE_ROLE", "nwparser.payload", "new_role=%{obj_name->} interface=%{interface->} mst=%{fld42}", processor_chain([
 	dup63,
 	dup2,
 	dup3,
@@ -3034,7 +3034,7 @@ var part230 = match("MESSAGE#270:PORT_RANGE_ROLE", "nwparser.payload", "new_role
 
 var msg277 = msg("PORT_RANGE_ROLE", part230);
 
-var part231 = match("MESSAGE#271:PORT_RANGE_STATE", "nwparser.payload", "new_state=%{obj_name}interface=%{interface}mst=%{fld42}", processor_chain([
+var part231 = match("MESSAGE#271:PORT_RANGE_STATE", "nwparser.payload", "new_state=%{obj_name->} interface=%{interface->} mst=%{fld42}", processor_chain([
 	dup63,
 	dup2,
 	dup3,
@@ -3044,7 +3044,7 @@ var part231 = match("MESSAGE#271:PORT_RANGE_STATE", "nwparser.payload", "new_sta
 
 var msg278 = msg("PORT_RANGE_STATE", part231);
 
-var part232 = match("MESSAGE#272:PORT_RANGE_DELETED", "nwparser.payload", "Interface %{interface}removed from mst=%{fld42}", processor_chain([
+var part232 = match("MESSAGE#272:PORT_RANGE_DELETED", "nwparser.payload", "Interface %{interface->} removed from mst=%{fld42}", processor_chain([
 	dup25,
 	dup35,
 	dup20,
@@ -3057,7 +3057,7 @@ var part232 = match("MESSAGE#272:PORT_RANGE_DELETED", "nwparser.payload", "Inter
 
 var msg279 = msg("PORT_RANGE_DELETED", part232);
 
-var part233 = match("MESSAGE#273:PORT_RANGE_ADDED", "nwparser.payload", "Interface %{interface}added to mst=%{fld42}with %{info}", processor_chain([
+var part233 = match("MESSAGE#273:PORT_RANGE_ADDED", "nwparser.payload", "Interface %{interface->} added to mst=%{fld42->} with %{info}", processor_chain([
 	dup30,
 	dup35,
 	dup81,
@@ -3070,7 +3070,7 @@ var part233 = match("MESSAGE#273:PORT_RANGE_ADDED", "nwparser.payload", "Interfa
 
 var msg280 = msg("PORT_RANGE_ADDED", part233);
 
-var part234 = match("MESSAGE#274:MST_PORT_BOUNDARY", "nwparser.payload", "Port %{portname}removed as MST Boundary port", processor_chain([
+var part234 = match("MESSAGE#274:MST_PORT_BOUNDARY", "nwparser.payload", "Port %{portname->} removed as MST Boundary port", processor_chain([
 	dup25,
 	dup35,
 	dup20,
@@ -3093,7 +3093,7 @@ var part235 = match("MESSAGE#275:PIXM_SYSLOG_MESSAGE_TYPE_CRIT", "nwparser.paylo
 
 var msg282 = msg("PIXM_SYSLOG_MESSAGE_TYPE_CRIT", part235);
 
-var part236 = match("MESSAGE#276:IM_INTF_STATE", "nwparser.payload", "%{interface}is %{obj_name}in vdc %{fld43->} ", processor_chain([
+var part236 = match("MESSAGE#276:IM_INTF_STATE", "nwparser.payload", "%{interface->} is %{obj_name->} in vdc %{fld43->} ", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -3103,7 +3103,7 @@ var part236 = match("MESSAGE#276:IM_INTF_STATE", "nwparser.payload", "%{interfac
 
 var msg283 = msg("IM_INTF_STATE", part236);
 
-var part237 = match("MESSAGE#277:VDC_STATE_CHANGE", "nwparser.payload", "vdc %{fld43}state changed to %{obj_name->} ", processor_chain([
+var part237 = match("MESSAGE#277:VDC_STATE_CHANGE", "nwparser.payload", "vdc %{fld43->} state changed to %{obj_name->} ", processor_chain([
 	dup63,
 	dup35,
 	dup16,
@@ -3140,7 +3140,7 @@ var part239 = match("MESSAGE#279:VDC_MODULETYPE", "nwparser.payload", "%{process
 
 var msg286 = msg("VDC_MODULETYPE", part239);
 
-var part240 = match("MESSAGE#280:HASEQNO_SYNC_FAILED", "nwparser.payload", "Unable to sync HA sequence number %{fld44}for service \"%{service}\" (PID %{process_id}): %{result}.", processor_chain([
+var part240 = match("MESSAGE#280:HASEQNO_SYNC_FAILED", "nwparser.payload", "Unable to sync HA sequence number %{fld44->} for service \"%{service}\" (PID %{process_id}): %{result}.", processor_chain([
 	dup78,
 	dup35,
 	dup36,
@@ -3191,7 +3191,7 @@ var part243 = match("MESSAGE#283:L2FMC_NL_MTS_SEND_FAILURE", "nwparser.payload",
 
 var msg290 = msg("L2FMC_NL_MTS_SEND_FAILURE", part243);
 
-var part244 = match("MESSAGE#284:SERVER_ADDED", "nwparser.payload", "Server with Chassis ID %{id}Port ID %{fld45}management address %{fld46}discovered on local port %{portname}in vlan %{vlan->} %{info}", processor_chain([
+var part244 = match("MESSAGE#284:SERVER_ADDED", "nwparser.payload", "Server with Chassis ID %{id->} Port ID %{fld45->} management address %{fld46->} discovered on local port %{portname->} in vlan %{vlan->} %{info}", processor_chain([
 	dup30,
 	dup81,
 	dup39,
@@ -3203,7 +3203,7 @@ var part244 = match("MESSAGE#284:SERVER_ADDED", "nwparser.payload", "Server with
 
 var msg291 = msg("SERVER_ADDED", part244);
 
-var part245 = match("MESSAGE#285:SERVER_REMOVED", "nwparser.payload", "Server with Chassis ID %{id}Port ID %{fld45}on local port %{portname}has been removed", processor_chain([
+var part245 = match("MESSAGE#285:SERVER_REMOVED", "nwparser.payload", "Server with Chassis ID %{id->} Port ID %{fld45->} on local port %{portname->} has been removed", processor_chain([
 	dup25,
 	dup20,
 	dup39,
@@ -3215,7 +3215,7 @@ var part245 = match("MESSAGE#285:SERVER_REMOVED", "nwparser.payload", "Server wi
 
 var msg292 = msg("SERVER_REMOVED", part245);
 
-var part246 = match("MESSAGE#286:IF_DOWN_SUSPENDED_BY_SPEED", "nwparser.payload", "Interface %{interface}is down %{info}", processor_chain([
+var part246 = match("MESSAGE#286:IF_DOWN_SUSPENDED_BY_SPEED", "nwparser.payload", "Interface %{interface->} is down %{info}", processor_chain([
 	dup24,
 	dup35,
 	dup73,
@@ -3227,7 +3227,7 @@ var part246 = match("MESSAGE#286:IF_DOWN_SUSPENDED_BY_SPEED", "nwparser.payload"
 
 var msg293 = msg("IF_DOWN_SUSPENDED_BY_SPEED", part246);
 
-var part247 = match("MESSAGE#287:PORT_INDIVIDUAL", "nwparser.payload", "port %{portname}is operationally individual", processor_chain([
+var part247 = match("MESSAGE#287:PORT_INDIVIDUAL", "nwparser.payload", "port %{portname->} is operationally individual", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -3237,7 +3237,7 @@ var part247 = match("MESSAGE#287:PORT_INDIVIDUAL", "nwparser.payload", "port %{p
 
 var msg294 = msg("PORT_INDIVIDUAL", part247);
 
-var part248 = match("MESSAGE#288:IF_DOWN_CHANNEL_ADMIN_DOWN", "nwparser.payload", "Interface %{interface}is down %{info}", processor_chain([
+var part248 = match("MESSAGE#288:IF_DOWN_CHANNEL_ADMIN_DOWN", "nwparser.payload", "Interface %{interface->} is down %{info}", processor_chain([
 	dup24,
 	dup35,
 	dup39,
@@ -3250,7 +3250,7 @@ var part248 = match("MESSAGE#288:IF_DOWN_CHANNEL_ADMIN_DOWN", "nwparser.payload"
 
 var msg295 = msg("IF_DOWN_CHANNEL_ADMIN_DOWN", part248);
 
-var part249 = match("MESSAGE#289:IF_ERRDIS_RECOVERY", "nwparser.payload", "Interface %{interface}is being recovered from error disabled state %{info}", processor_chain([
+var part249 = match("MESSAGE#289:IF_ERRDIS_RECOVERY", "nwparser.payload", "Interface %{interface->} is being recovered from error disabled state %{info}", processor_chain([
 	dup23,
 	dup2,
 	dup3,
@@ -3260,7 +3260,7 @@ var part249 = match("MESSAGE#289:IF_ERRDIS_RECOVERY", "nwparser.payload", "Inter
 
 var msg296 = msg("IF_ERRDIS_RECOVERY", part249);
 
-var part250 = match("MESSAGE#290:IF_NON_CISCO_TRANSCEIVER", "nwparser.payload", "Non-Cisco transceiver on interface %{interface}is detected", processor_chain([
+var part250 = match("MESSAGE#290:IF_NON_CISCO_TRANSCEIVER", "nwparser.payload", "Non-Cisco transceiver on interface %{interface->} is detected", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3270,7 +3270,7 @@ var part250 = match("MESSAGE#290:IF_NON_CISCO_TRANSCEIVER", "nwparser.payload", 
 
 var msg297 = msg("IF_NON_CISCO_TRANSCEIVER", part250);
 
-var part251 = match("MESSAGE#291:ACTIVE_LOWER_MEM_THAN_STANDBY", "nwparser.payload", "Active supervisor in slot %{fld47}is running with less memory than standby supervisor in slot %{fld48}.", processor_chain([
+var part251 = match("MESSAGE#291:ACTIVE_LOWER_MEM_THAN_STANDBY", "nwparser.payload", "Active supervisor in slot %{fld47->} is running with less memory than standby supervisor in slot %{fld48}.", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3292,7 +3292,7 @@ var part252 = match("MESSAGE#292:READCONF_STARTED", "nwparser.payload", "Configu
 
 var msg299 = msg("READCONF_STARTED", part252);
 
-var part253 = match("MESSAGE#293:SUP_POWERDOWN", "nwparser.payload", "Supervisor in slot %{fld47}is running with less memory than active supervisor in slot %{fld48}", processor_chain([
+var part253 = match("MESSAGE#293:SUP_POWERDOWN", "nwparser.payload", "Supervisor in slot %{fld47->} is running with less memory than active supervisor in slot %{fld48}", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3346,7 +3346,7 @@ var part257 = match("MESSAGE#297:RUNTIME_DB_RESTORE_SUCCESS", "nwparser.payload"
 
 var msg304 = msg("RUNTIME_DB_RESTORE_SUCCESS", part257);
 
-var part258 = match("MESSAGE#298:LCM_MODULE_UPGRADE_START", "nwparser.payload", "Upgrade of module %{fld49}started", processor_chain([
+var part258 = match("MESSAGE#298:LCM_MODULE_UPGRADE_START", "nwparser.payload", "Upgrade of module %{fld49->} started", processor_chain([
 	dup31,
 	dup16,
 	dup39,
@@ -3358,7 +3358,7 @@ var part258 = match("MESSAGE#298:LCM_MODULE_UPGRADE_START", "nwparser.payload", 
 
 var msg305 = msg("LCM_MODULE_UPGRADE_START", part258);
 
-var part259 = match("MESSAGE#299:LCM_MODULE_UPGRADE_END", "nwparser.payload", "Upgrade of module %{fld49}ended", processor_chain([
+var part259 = match("MESSAGE#299:LCM_MODULE_UPGRADE_END", "nwparser.payload", "Upgrade of module %{fld49->} ended", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3381,7 +3381,7 @@ var part260 = match("MESSAGE#300:FIPS_POST_INFO_MSG", "nwparser.payload", "Recie
 
 var msg307 = msg("FIPS_POST_INFO_MSG", part260);
 
-var part261 = match("MESSAGE#301:PEER_VPC_CFGD", "nwparser.payload", "peer vPC %{obj_name}is configured", processor_chain([
+var part261 = match("MESSAGE#301:PEER_VPC_CFGD", "nwparser.payload", "peer vPC %{obj_name->} is configured", processor_chain([
 	dup31,
 	dup35,
 	dup39,
@@ -3408,7 +3408,7 @@ var part262 = match("MESSAGE#302:SYN_COLL_DIS_EN", "nwparser.payload", "%{info}:
 
 var msg309 = msg("SYN_COLL_DIS_EN", part262);
 
-var part263 = match("MESSAGE#303:NOHMS_ENV_FEX_OFFLINE", "nwparser.payload", "%{device}Off-line (Serial Number %{fld42})", processor_chain([
+var part263 = match("MESSAGE#303:NOHMS_ENV_FEX_OFFLINE", "nwparser.payload", "%{device->} Off-line (Serial Number %{fld42})", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3418,7 +3418,7 @@ var part263 = match("MESSAGE#303:NOHMS_ENV_FEX_OFFLINE", "nwparser.payload", "%{
 
 var msg310 = msg("NOHMS_ENV_FEX_OFFLINE", part263);
 
-var part264 = match("MESSAGE#304:NOHMS_ENV_FEX_ONLINE", "nwparser.payload", "%{device}On-line", processor_chain([
+var part264 = match("MESSAGE#304:NOHMS_ENV_FEX_ONLINE", "nwparser.payload", "%{device->} On-line", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3428,7 +3428,7 @@ var part264 = match("MESSAGE#304:NOHMS_ENV_FEX_ONLINE", "nwparser.payload", "%{d
 
 var msg311 = msg("NOHMS_ENV_FEX_ONLINE", part264);
 
-var part265 = match("MESSAGE#305:FEX_STATUS_online", "nwparser.payload", "%{device}is online", processor_chain([
+var part265 = match("MESSAGE#305:FEX_STATUS_online", "nwparser.payload", "%{device->} is online", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3438,7 +3438,7 @@ var part265 = match("MESSAGE#305:FEX_STATUS_online", "nwparser.payload", "%{devi
 
 var msg312 = msg("FEX_STATUS_online", part265);
 
-var part266 = match("MESSAGE#306:FEX_STATUS_offline", "nwparser.payload", "%{device}is offline", processor_chain([
+var part266 = match("MESSAGE#306:FEX_STATUS_offline", "nwparser.payload", "%{device->} is offline", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3453,7 +3453,7 @@ var select40 = linear_select([
 	msg313,
 ]);
 
-var part267 = match("MESSAGE#307:PS_PWR_INPUT_MISSING", "nwparser.payload", "Power supply %{fld41}present but all AC/DC inputs are not connected, power redundancy might be affected ", processor_chain([
+var part267 = match("MESSAGE#307:PS_PWR_INPUT_MISSING", "nwparser.payload", "Power supply %{fld41->} present but all AC/DC inputs are not connected, power redundancy might be affected ", processor_chain([
 	dup74,
 	dup39,
 	dup73,
@@ -3478,7 +3478,7 @@ var part268 = match("MESSAGE#308:PS_RED_MODE_RESTORED", "nwparser.payload", "Pow
 
 var msg315 = msg("PS_RED_MODE_RESTORED", part268);
 
-var part269 = match("MESSAGE#309:MOD_PWRFAIL_EJECTORS_OPEN", "nwparser.payload", "All ejectors open, Module %{fld41}will not be powered up (Serial number %{fld42})", processor_chain([
+var part269 = match("MESSAGE#309:MOD_PWRFAIL_EJECTORS_OPEN", "nwparser.payload", "All ejectors open, Module %{fld41->} will not be powered up (Serial number %{fld42})", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -3488,7 +3488,7 @@ var part269 = match("MESSAGE#309:MOD_PWRFAIL_EJECTORS_OPEN", "nwparser.payload",
 
 var msg316 = msg("MOD_PWRFAIL_EJECTORS_OPEN", part269);
 
-var part270 = match("MESSAGE#310:PINNING_CHANGED", "nwparser.payload", "%{device}pinning information is changed", processor_chain([
+var part270 = match("MESSAGE#310:PINNING_CHANGED", "nwparser.payload", "%{device->} pinning information is changed", processor_chain([
 	dup31,
 	dup16,
 	dup39,
@@ -3500,7 +3500,7 @@ var part270 = match("MESSAGE#310:PINNING_CHANGED", "nwparser.payload", "%{device
 
 var msg317 = msg("PINNING_CHANGED", part270);
 
-var part271 = match("MESSAGE#311:SATCTRL", "nwparser.payload", "%{device}Module %{fld41}: Cold boot", processor_chain([
+var part271 = match("MESSAGE#311:SATCTRL", "nwparser.payload", "%{device->} Module %{fld41}: Cold boot", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3510,7 +3510,7 @@ var part271 = match("MESSAGE#311:SATCTRL", "nwparser.payload", "%{device}Module 
 
 var msg318 = msg("SATCTRL", part271);
 
-var part272 = match("MESSAGE#312:DUP_REGISTER", "nwparser.payload", "%{fld51}[%{fld52}] Client %{fld43}register more than once with same pid%{info}", processor_chain([
+var part272 = match("MESSAGE#312:DUP_REGISTER", "nwparser.payload", "%{fld51->} [%{fld52}] Client %{fld43->} register more than once with same pid%{info}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -3520,7 +3520,7 @@ var part272 = match("MESSAGE#312:DUP_REGISTER", "nwparser.payload", "%{fld51}[%{
 
 var msg319 = msg("DUP_REGISTER", part272);
 
-var part273 = match("MESSAGE#313:UNKNOWN_MTYPE", "nwparser.payload", "%{fld51}[%{fld52}] Unknown mtype: %{info}", processor_chain([
+var part273 = match("MESSAGE#313:UNKNOWN_MTYPE", "nwparser.payload", "%{fld51->} [%{fld52}] Unknown mtype: %{info}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -3541,7 +3541,7 @@ var part274 = match("MESSAGE#314:SATCTRL_IMAGE", "nwparser.payload", "%{fld51->}
 
 var msg321 = msg("SATCTRL_IMAGE", part274);
 
-var part275 = match("MESSAGE#315:API_FAILED", "nwparser.payload", "%{fld51}[%{fld52}] %{event_description}", processor_chain([
+var part275 = match("MESSAGE#315:API_FAILED", "nwparser.payload", "%{fld51->} [%{fld52}] %{event_description}", processor_chain([
 	dup1,
 	setc("ec_subject","Process"),
 	dup14,
@@ -3561,7 +3561,7 @@ var part276 = match("MESSAGE#316:SENSOR_MSG1", "nwparser.payload", "%{event_desc
 
 var msg323 = msg("SENSOR_MSG1", part276);
 
-var part277 = match("MESSAGE#317:API_INIT_SEM_CLEAR", "nwparser.payload", "%{fld51}[%{fld52}] %{event_description}", processor_chain([
+var part277 = match("MESSAGE#317:API_INIT_SEM_CLEAR", "nwparser.payload", "%{fld51->} [%{fld52}] %{event_description}", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3570,7 +3570,7 @@ var part277 = match("MESSAGE#317:API_INIT_SEM_CLEAR", "nwparser.payload", "%{fld
 
 var msg324 = msg("API_INIT_SEM_CLEAR", part277);
 
-var part278 = match("MESSAGE#318:VDC_ONLINE", "nwparser.payload", "vdc %{fld51}has come online", processor_chain([
+var part278 = match("MESSAGE#318:VDC_ONLINE", "nwparser.payload", "vdc %{fld51->} has come online", processor_chain([
 	dup31,
 	dup2,
 	dup3,
@@ -3580,7 +3580,7 @@ var part278 = match("MESSAGE#318:VDC_ONLINE", "nwparser.payload", "vdc %{fld51}h
 
 var msg325 = msg("VDC_ONLINE", part278);
 
-var part279 = match("MESSAGE#319:LACP_SUSPEND_INDIVIDUAL", "nwparser.payload", "LACP port %{portname}of port-channel %{interface}not receiving any LACP BPDUs %{result}", processor_chain([
+var part279 = match("MESSAGE#319:LACP_SUSPEND_INDIVIDUAL", "nwparser.payload", "LACP port %{portname->} of port-channel %{interface->} not receiving any LACP BPDUs %{result}", processor_chain([
 	dup78,
 	dup35,
 	dup79,
@@ -3603,7 +3603,7 @@ var part280 = match("MESSAGE#320:dstats", "nwparser.payload", "%{process}: %{inf
 
 var msg327 = msg("dstats", part280);
 
-var part281 = match("MESSAGE#321:MSG_PORT_LOGGED_OUT", "nwparser.payload", "%{fld52}[VSAN %{fld51}, Interface %{interface}: %{fld53}Nx Port %{portname}logged OUT.", processor_chain([
+var part281 = match("MESSAGE#321:MSG_PORT_LOGGED_OUT", "nwparser.payload", "%{fld52->} [VSAN %{fld51}, Interface %{interface}: %{fld53->} Nx Port %{portname->} logged OUT.", processor_chain([
 	dup78,
 	dup35,
 	setc("ec_activity","Logoff"),
@@ -3615,7 +3615,7 @@ var part281 = match("MESSAGE#321:MSG_PORT_LOGGED_OUT", "nwparser.payload", "%{fl
 
 var msg328 = msg("MSG_PORT_LOGGED_OUT", part281);
 
-var part282 = match("MESSAGE#322:MSG_PORT_LOGGED_IN", "nwparser.payload", "%{fld52}[VSAN %{fld51}, Interface %{interface}: %{fld53}Nx Port %{portname}with FCID %{fld54}logged IN.", processor_chain([
+var part282 = match("MESSAGE#322:MSG_PORT_LOGGED_IN", "nwparser.payload", "%{fld52->} [VSAN %{fld51}, Interface %{interface}: %{fld53->} Nx Port %{portname->} with FCID %{fld54->} logged IN.", processor_chain([
 	dup78,
 	dup35,
 	dup13,
@@ -3629,7 +3629,7 @@ var msg329 = msg("MSG_PORT_LOGGED_IN", part282);
 
 var msg330 = msg("IF_DOWN_ELP_FAILURE_ISOLATION", dup97);
 
-var part283 = match("MESSAGE#324:ZS_MERGE_FAILED", "nwparser.payload", "%{fld52}Zone merge failure, isolating interface %{interface}reason: %{result}:[%{resultcode}]", processor_chain([
+var part283 = match("MESSAGE#324:ZS_MERGE_FAILED", "nwparser.payload", "%{fld52->} Zone merge failure, isolating interface %{interface->} reason: %{result}:[%{resultcode}]", processor_chain([
 	dup24,
 	dup35,
 	dup36,
@@ -3643,7 +3643,7 @@ var msg331 = msg("ZS_MERGE_FAILED", part283);
 
 var msg332 = msg("IF_DOWN_ZONE_MERGE_FAILURE_ISOLATION", dup97);
 
-var part284 = match("MESSAGE#326:MAC_MOVE_NOTIFICATION", "nwparser.payload", "Host %{hostname}in vlan %{vlan}is flapping between port %{change_old}and port %{change_new->} ", processor_chain([
+var part284 = match("MESSAGE#326:MAC_MOVE_NOTIFICATION", "nwparser.payload", "Host %{hostname->} in vlan %{vlan->} is flapping between port %{change_old->} and port %{change_new->} ", processor_chain([
 	dup24,
 	dup35,
 	dup36,
@@ -3676,7 +3676,7 @@ var part286 = match("MESSAGE#328:ERROR", "nwparser.payload", "%{event_descriptio
 
 var msg335 = msg("ERROR", part286);
 
-var part287 = match("MESSAGE#329:INVAL_IP", "nwparser.payload", "%{agent}[%{process_id}] Received packet with invalid destination IP address (%{daddr}) from %{smacaddr}on %{interface}", processor_chain([
+var part287 = match("MESSAGE#329:INVAL_IP", "nwparser.payload", "%{agent->} [%{process_id}] Received packet with invalid destination IP address (%{daddr}) from %{smacaddr->} on %{interface}", processor_chain([
 	dup78,
 	dup35,
 	dup79,
@@ -3689,7 +3689,7 @@ var part287 = match("MESSAGE#329:INVAL_IP", "nwparser.payload", "%{agent}[%{proc
 
 var msg336 = msg("INVAL_IP", part287);
 
-var part288 = match("MESSAGE#330:SYSLOG_SL_MSG_WARNING", "nwparser.payload", "%{process}: message repeated %{dclass_counter1}times in last %{duration}", processor_chain([
+var part288 = match("MESSAGE#330:SYSLOG_SL_MSG_WARNING", "nwparser.payload", "%{process}: message repeated %{dclass_counter1->} times in last %{duration}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -3802,7 +3802,7 @@ var part298 = match("MESSAGE#340:PFM_ALERT", "nwparser.payload", "%{event_descri
 
 var msg347 = msg("PFM_ALERT", part298);
 
-var part299 = match("MESSAGE#341:SERVICEFOUND", "nwparser.payload", "Service %{service}acquired on WCCP Client %{saddr}", processor_chain([
+var part299 = match("MESSAGE#341:SERVICEFOUND", "nwparser.payload", "Service %{service->} acquired on WCCP Client %{saddr}", processor_chain([
 	dup62,
 	dup2,
 	dup3,
@@ -3812,7 +3812,7 @@ var part299 = match("MESSAGE#341:SERVICEFOUND", "nwparser.payload", "Service %{s
 
 var msg348 = msg("SERVICEFOUND", part299);
 
-var part300 = match("MESSAGE#342:ROUTERFOUND", "nwparser.payload", "Service %{service}acquired on WCCP Router %{saddr}", processor_chain([
+var part300 = match("MESSAGE#342:ROUTERFOUND", "nwparser.payload", "Service %{service->} acquired on WCCP Router %{saddr}", processor_chain([
 	dup62,
 	dup2,
 	dup3,
@@ -3822,7 +3822,7 @@ var part300 = match("MESSAGE#342:ROUTERFOUND", "nwparser.payload", "Service %{se
 
 var msg349 = msg("ROUTERFOUND", part300);
 
-var part301 = match("MESSAGE#343:%AUTHPRIV-3-SYSTEM_MSG", "nwparser.payload", "pam_aaa:Authentication failed from %{shost}- %{agent}", processor_chain([
+var part301 = match("MESSAGE#343:%AUTHPRIV-3-SYSTEM_MSG", "nwparser.payload", "pam_aaa:Authentication failed from %{shost->} - %{agent}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -3832,7 +3832,7 @@ var part301 = match("MESSAGE#343:%AUTHPRIV-3-SYSTEM_MSG", "nwparser.payload", "p
 
 var msg350 = msg("%AUTHPRIV-3-SYSTEM_MSG", part301);
 
-var part302 = match("MESSAGE#344:%AUTHPRIV-5-SYSTEM_MSG", "nwparser.payload", "New user added with username %{username}- %{agent}", processor_chain([
+var part302 = match("MESSAGE#344:%AUTHPRIV-5-SYSTEM_MSG", "nwparser.payload", "New user added with username %{username->} - %{agent}", processor_chain([
 	dup18,
 	dup2,
 	dup12,
@@ -3843,7 +3843,7 @@ var part302 = match("MESSAGE#344:%AUTHPRIV-5-SYSTEM_MSG", "nwparser.payload", "N
 
 var msg351 = msg("%AUTHPRIV-5-SYSTEM_MSG", part302);
 
-var part303 = match("MESSAGE#345:%AUTHPRIV-6-SYSTEM_MSG:01", "nwparser.payload", "%{action}: %{service}pid=%{process_id}from=::ffff:%{saddr}- %{agent}", processor_chain([
+var part303 = match("MESSAGE#345:%AUTHPRIV-6-SYSTEM_MSG:01", "nwparser.payload", "%{action}: %{service->} pid=%{process_id->} from=::ffff:%{saddr->} - %{agent}", processor_chain([
 	dup10,
 	dup2,
 	dup12,
@@ -3853,7 +3853,7 @@ var part303 = match("MESSAGE#345:%AUTHPRIV-6-SYSTEM_MSG:01", "nwparser.payload",
 
 var msg352 = msg("%AUTHPRIV-6-SYSTEM_MSG:01", part303);
 
-var part304 = match("MESSAGE#346:%AUTHPRIV-6-SYSTEM_MSG", "nwparser.payload", "pam_unix(%{fld1}:session): session opened for user %{username}by (uid=%{uid}) - %{agent}", processor_chain([
+var part304 = match("MESSAGE#346:%AUTHPRIV-6-SYSTEM_MSG", "nwparser.payload", "pam_unix(%{fld1}:session): session opened for user %{username->} by (uid=%{uid}) - %{agent}", processor_chain([
 	dup10,
 	dup2,
 	dup12,
@@ -3878,7 +3878,7 @@ var part305 = match("MESSAGE#347:%USER-3-SYSTEM_MSG", "nwparser.payload", "error
 
 var msg354 = msg("%USER-3-SYSTEM_MSG", part305);
 
-var part306 = match("MESSAGE#348:%USER-6-SYSTEM_MSG", "nwparser.payload", "Invalid user %{username}from %{saddr}- %{agent}", processor_chain([
+var part306 = match("MESSAGE#348:%USER-6-SYSTEM_MSG", "nwparser.payload", "Invalid user %{username->} from %{saddr->} - %{agent}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -3888,7 +3888,7 @@ var part306 = match("MESSAGE#348:%USER-6-SYSTEM_MSG", "nwparser.payload", "Inval
 
 var msg355 = msg("%USER-6-SYSTEM_MSG", part306);
 
-var part307 = match("MESSAGE#349:%USER-6-SYSTEM_MSG:01", "nwparser.payload", "input_userauth_request: invalid user %{username}- %{agent}", processor_chain([
+var part307 = match("MESSAGE#349:%USER-6-SYSTEM_MSG:01", "nwparser.payload", "input_userauth_request: invalid user %{username->} - %{agent}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -3898,7 +3898,7 @@ var part307 = match("MESSAGE#349:%USER-6-SYSTEM_MSG:01", "nwparser.payload", "in
 
 var msg356 = msg("%USER-6-SYSTEM_MSG:01", part307);
 
-var part308 = match("MESSAGE#350:%USER-6-SYSTEM_MSG:02", "nwparser.payload", "Failed none for invalid user %{username}from %{saddr}port %{sport->} %{protocol}- %{agent}", processor_chain([
+var part308 = match("MESSAGE#350:%USER-6-SYSTEM_MSG:02", "nwparser.payload", "Failed none for invalid user %{username->} from %{saddr->} port %{sport->} %{protocol->} - %{agent}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -3908,7 +3908,7 @@ var part308 = match("MESSAGE#350:%USER-6-SYSTEM_MSG:02", "nwparser.payload", "Fa
 
 var msg357 = msg("%USER-6-SYSTEM_MSG:02", part308);
 
-var part309 = match("MESSAGE#351:%USER-6-SYSTEM_MSG:03", "nwparser.payload", "Accepted password for %{username}from %{saddr}port %{sport->} %{protocol}- %{agent}", processor_chain([
+var part309 = match("MESSAGE#351:%USER-6-SYSTEM_MSG:03", "nwparser.payload", "Accepted password for %{username->} from %{saddr->} port %{sport->} %{protocol->} - %{agent}", processor_chain([
 	dup84,
 	dup2,
 	dup3,
@@ -3928,7 +3928,7 @@ var part310 = match("MESSAGE#352:%USER-6-SYSTEM_MSG:04", "nwparser.payload", "la
 
 var msg359 = msg("%USER-6-SYSTEM_MSG:04", part310);
 
-var part311 = match("MESSAGE#353:%USER-6-SYSTEM_MSG:05", "nwparser.payload", "Could not load host key: %{encryption_type}- %{agent}", processor_chain([
+var part311 = match("MESSAGE#353:%USER-6-SYSTEM_MSG:05", "nwparser.payload", "Could not load host key: %{encryption_type->} - %{agent}", processor_chain([
 	dup84,
 	dup2,
 	dup3,
@@ -3938,7 +3938,7 @@ var part311 = match("MESSAGE#353:%USER-6-SYSTEM_MSG:05", "nwparser.payload", "Co
 
 var msg360 = msg("%USER-6-SYSTEM_MSG:05", part311);
 
-var part312 = match("MESSAGE#354:%USER-6-SYSTEM_MSG:06", "nwparser.payload", "%{event_description}- %{agent}", processor_chain([
+var part312 = match("MESSAGE#354:%USER-6-SYSTEM_MSG:06", "nwparser.payload", "%{event_description->} - %{agent}", processor_chain([
 	dup84,
 	dup2,
 	dup3,
@@ -3957,7 +3957,7 @@ var select43 = linear_select([
 	msg361,
 ]);
 
-var part313 = match("MESSAGE#355:L2FM_MAC_FLAP_DISABLE_LEARN", "nwparser.payload", "Disabling learning in vlan %{vlan}for %{duration}s due to too many mac moves", processor_chain([
+var part313 = match("MESSAGE#355:L2FM_MAC_FLAP_DISABLE_LEARN", "nwparser.payload", "Disabling learning in vlan %{vlan->} for %{duration}s due to too many mac moves", processor_chain([
 	dup31,
 	dup2,
 	dup4,
@@ -3975,7 +3975,7 @@ var part314 = match("MESSAGE#356:L2FM_MAC_FLAP_RE_ENABLE_LEARN", "nwparser.paylo
 
 var msg363 = msg("L2FM_MAC_FLAP_RE_ENABLE_LEARN", part314);
 
-var part315 = match("MESSAGE#357:PS_ABSENT", "nwparser.payload", "Power supply %{fld1}is %{disposition}, ps-redundancy might be affected", processor_chain([
+var part315 = match("MESSAGE#357:PS_ABSENT", "nwparser.payload", "Power supply %{fld1->} is %{disposition}, ps-redundancy might be affected", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -3983,7 +3983,7 @@ var part315 = match("MESSAGE#357:PS_ABSENT", "nwparser.payload", "Power supply %
 
 var msg364 = msg("PS_ABSENT", part315);
 
-var part316 = match("MESSAGE#358:PS_DETECT", "nwparser.payload", "Power supply %{fld1}detected but %{disposition}(Serial number %{serial_number})", processor_chain([
+var part316 = match("MESSAGE#358:PS_DETECT", "nwparser.payload", "Power supply %{fld1->} detected but %{disposition->} (Serial number %{serial_number})", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -3991,7 +3991,7 @@ var part316 = match("MESSAGE#358:PS_DETECT", "nwparser.payload", "Power supply %
 
 var msg365 = msg("PS_DETECT", part316);
 
-var part317 = match("MESSAGE#359:SUBPROC_TERMINATED", "nwparser.payload", "\"System Manager (configuration controller)\" (PID %{process_id}) has finished with error code %{result}(%{resultcode}).", processor_chain([
+var part317 = match("MESSAGE#359:SUBPROC_TERMINATED", "nwparser.payload", "\"System Manager (configuration controller)\" (PID %{process_id}) has finished with error code %{result->} (%{resultcode}).", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -3999,7 +3999,7 @@ var part317 = match("MESSAGE#359:SUBPROC_TERMINATED", "nwparser.payload", "\"Sys
 
 var msg366 = msg("SUBPROC_TERMINATED", part317);
 
-var part318 = match("MESSAGE#360:SUBPROC_SUCCESS_EXIT", "nwparser.payload", "\"%{service}\" (PID %{process_id}) has successfully exited with exit code %{result}(%{resultcode}).", processor_chain([
+var part318 = match("MESSAGE#360:SUBPROC_SUCCESS_EXIT", "nwparser.payload", "\"%{service}\" (PID %{process_id}) has successfully exited with exit code %{result->} (%{resultcode}).", processor_chain([
 	dup15,
 	dup2,
 	dup4,
@@ -4017,7 +4017,7 @@ var part319 = match("MESSAGE#361:UPDOWN", "nwparser.payload", "Line Protocol on 
 
 var msg368 = msg("UPDOWN", part319);
 
-var part320 = match("MESSAGE#362:L2FM_MAC_MOVE2", "nwparser.payload", "Mac %{smacaddr}in vlan %{vlan}has moved between %{change_old}to %{change_new}", processor_chain([
+var part320 = match("MESSAGE#362:L2FM_MAC_MOVE2", "nwparser.payload", "Mac %{smacaddr->} in vlan %{vlan->} has moved between %{change_old->} to %{change_new}", processor_chain([
 	dup31,
 	dup2,
 	dup4,
@@ -4044,7 +4044,7 @@ var part322 = match("MESSAGE#364:PS_RED_MODE_CHG", "nwparser.payload", "Power su
 
 var msg371 = msg("PS_RED_MODE_CHG", part322);
 
-var part323 = match("MESSAGE#365:INVAL_MAC", "nwparser.payload", "%{agent}[%{process_id}] Received packet with invalid source MAC address (%{smacaddr}) from %{saddr}on %{vlan}", processor_chain([
+var part323 = match("MESSAGE#365:INVAL_MAC", "nwparser.payload", "%{agent->} [%{process_id}] Received packet with invalid source MAC address (%{smacaddr}) from %{saddr->} on %{vlan}", processor_chain([
 	dup64,
 	dup2,
 	dup4,
@@ -4052,7 +4052,7 @@ var part323 = match("MESSAGE#365:INVAL_MAC", "nwparser.payload", "%{agent}[%{pro
 
 var msg372 = msg("INVAL_MAC", part323);
 
-var part324 = match("MESSAGE#366:SRVSTATE_CHANGED", "nwparser.payload", "State for service \"%{service}\" changed from %{change_old}to %{change_new}in vdc %{fld1}.", processor_chain([
+var part324 = match("MESSAGE#366:SRVSTATE_CHANGED", "nwparser.payload", "State for service \"%{service}\" changed from %{change_old->} to %{change_new->} in vdc %{fld1}.", processor_chain([
 	dup15,
 	dup2,
 	dup4,
@@ -4069,7 +4069,7 @@ var part325 = match("MESSAGE#367:INFO", "nwparser.payload", "%{event_description
 
 var msg374 = msg("INFO", part325);
 
-var part326 = match("MESSAGE#374:SERVICE_STARTED", "nwparser.payload", "Service \"%{service}\" in vdc %{fld1}started with PID(%{process_id}).", processor_chain([
+var part326 = match("MESSAGE#374:SERVICE_STARTED", "nwparser.payload", "Service \"%{service}\" in vdc %{fld1->} started with PID(%{process_id}).", processor_chain([
 	dup15,
 	dup2,
 	dup4,
@@ -4080,7 +4080,7 @@ var part326 = match("MESSAGE#374:SERVICE_STARTED", "nwparser.payload", "Service 
 
 var msg375 = msg("SERVICE_STARTED", part326);
 
-var part327 = match("MESSAGE#375:DUP_VADDR_SRCIP_PROBE", "nwparser.payload", "%{process}[%{process_id}] Duplicate address Detected. Probe packet received from %{smacaddr}on %{vlan}with destination set to our local Virtual ip, %{saddr}", processor_chain([
+var part327 = match("MESSAGE#375:DUP_VADDR_SRCIP_PROBE", "nwparser.payload", "%{process->} [%{process_id}] Duplicate address Detected. Probe packet received from %{smacaddr->} on %{vlan->} with destination set to our local Virtual ip, %{saddr}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -4090,7 +4090,7 @@ var part327 = match("MESSAGE#375:DUP_VADDR_SRCIP_PROBE", "nwparser.payload", "%{
 
 var msg376 = msg("DUP_VADDR_SRCIP_PROBE", part327);
 
-var part328 = match("MESSAGE#376:DUP_SRCIP_PROBE", "nwparser.payload", "%{process}[%{process_id}] Duplicate address Detected. Probe packet received from %{smacaddr}on %{vlan}with destination set to our local ip, %{saddr}", processor_chain([
+var part328 = match("MESSAGE#376:DUP_SRCIP_PROBE", "nwparser.payload", "%{process->} [%{process_id}] Duplicate address Detected. Probe packet received from %{smacaddr->} on %{vlan->} with destination set to our local ip, %{saddr}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -4431,7 +4431,7 @@ var part348 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/11_0", "nwparser.p0", "Pro
 
 var part349 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/11_1", "nwparser.p0", "protocol: %{p0}");
 
-var part350 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/12", "nwparser.p0", "%{}\"%{protocol}\"(%{protocol_detail}),%{space}Hit-count = %{dclass_counter1}");
+var part350 = match("MESSAGE#186:ACLLOG_FLOW_INTERVAL/12", "nwparser.p0", "%{}\"%{protocol}\"(%{protocol_detail}),%{space->} Hit-count = %{dclass_counter1}");
 
 var part351 = match("MESSAGE#372:TACACS_ACCOUNTING_MESSAGE:09/0", "nwparser.payload", "%{action}: %{p0}");
 
@@ -4463,28 +4463,28 @@ var part360 = match("MESSAGE#32:NEIGHBOR_UPDATE_AUTOCOPY", "nwparser.payload", "
 	dup4,
 ]));
 
-var part361 = match("MESSAGE#35:IF_DOWN_ADMIN_DOWN", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part361 = match("MESSAGE#35:IF_DOWN_ADMIN_DOWN", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var part362 = match("MESSAGE#36:IF_DOWN_ADMIN_DOWN:01", "nwparser.payload", "%{fld43}Interface %{interface}is down (%{result})", processor_chain([
+var part362 = match("MESSAGE#36:IF_DOWN_ADMIN_DOWN:01", "nwparser.payload", "%{fld43->} Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var part363 = match("MESSAGE#37:IF_DOWN_CHANNEL_MEMBERSHIP_UPDATE_IN_PROGRESS", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part363 = match("MESSAGE#37:IF_DOWN_CHANNEL_MEMBERSHIP_UPDATE_IN_PROGRESS", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup15,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var part364 = match("MESSAGE#38:IF_DOWN_INTERFACE_REMOVED", "nwparser.payload", "Interface %{interface}is down (%{result})", processor_chain([
+var part364 = match("MESSAGE#38:IF_DOWN_INTERFACE_REMOVED", "nwparser.payload", "Interface %{interface->} is down (%{result})", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -4510,14 +4510,14 @@ var part366 = match("MESSAGE#88:PFM_VEM_REMOVE_NO_HB", "nwparser.payload", "%{ev
 	dup4,
 ]));
 
-var part367 = match("MESSAGE#108:IF_DOWN_INITIALIZING:01", "nwparser.payload", "%{fld43}Interface %{interface}is down (%{result}) ", processor_chain([
+var part367 = match("MESSAGE#108:IF_DOWN_INITIALIZING:01", "nwparser.payload", "%{fld43->} Interface %{interface->} is down (%{result}) ", processor_chain([
 	dup15,
 	dup2,
 	dup3,
 	dup4,
 ]));
 
-var part368 = match("MESSAGE#110:IF_DOWN_NONE:01", "nwparser.payload", "%{fld52}Interface %{interface}is down (%{result})", processor_chain([
+var part368 = match("MESSAGE#110:IF_DOWN_NONE:01", "nwparser.payload", "%{fld52->} Interface %{interface->} is down (%{result})", processor_chain([
 	dup24,
 	dup35,
 	dup36,
@@ -4578,7 +4578,7 @@ var part371 = match("MESSAGE#224:IF_SFP_WARNING", "nwparser.payload", "Interface
 	dup4,
 ]));
 
-var part372 = match("MESSAGE#225:IF_DOWN_TCP_MAX_RETRANSMIT", "nwparser.payload", "%{fld43}Interface %{interface}is down%{info}", processor_chain([
+var part372 = match("MESSAGE#225:IF_DOWN_TCP_MAX_RETRANSMIT", "nwparser.payload", "%{fld43->} Interface %{interface->} is down%{info}", processor_chain([
 	dup24,
 	dup2,
 	dup3,

@@ -15,7 +15,7 @@ function DeviceProcessor() {
 	}
 }
 
-var dup1 = match("MESSAGE#0:Intrusions:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category}\"%{event_type}\" %{protocol->} %{p0}");
+var dup1 = match("MESSAGE#0:Intrusions:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category->} \"%{event_type}\" %{protocol->} %{p0}");
 
 var dup2 = match("MESSAGE#0:Intrusions:01/1_0", "nwparser.p0", "%{saddr}:%{sport->} %{p0}");
 
@@ -25,7 +25,7 @@ var dup4 = match("MESSAGE#0:Intrusions:01/2_0", "nwparser.p0", "%{daddr}:%{dport
 
 var dup5 = match("MESSAGE#0:Intrusions:01/2_1", "nwparser.p0", "%{daddr->} %{dport->} %{p0}");
 
-var dup6 = match("MESSAGE#0:Intrusions:01/3", "nwparser.p0", "%{interface->} %{context}\"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
+var dup6 = match("MESSAGE#0:Intrusions:01/3", "nwparser.p0", "%{interface->} %{context->} \"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
 
 var dup7 = match("MESSAGE#0:Intrusions:01/4_0", "nwparser.p0", "%{action->} %{sigid_string}");
 
@@ -47,9 +47,9 @@ var dup12 = date_time({
 
 var dup13 = setc("dclass_counter1_string","Bandwidth in Kbps");
 
-var dup14 = match("MESSAGE#1:Intrusions:02/0", "nwparser.payload", "%{id->} %{category}\\\"%{event_type}\\\" %{protocol->} %{p0}");
+var dup14 = match("MESSAGE#1:Intrusions:02/0", "nwparser.payload", "%{id->} %{category->} \\\"%{event_type}\\\" %{protocol->} %{p0}");
 
-var dup15 = match("MESSAGE#1:Intrusions:02/3", "nwparser.p0", "%{interface->} %{context}\\\"%{policyname}\\\" %{event_state->} %{packets->} %{dclass_counter1->} %{fld1->} %{risk->} %{action->} %{vlan->} %{fld15->} %{fld16->} %{direction}");
+var dup15 = match("MESSAGE#1:Intrusions:02/3", "nwparser.p0", "%{interface->} %{context->} \\\"%{policyname}\\\" %{event_state->} %{packets->} %{dclass_counter1->} %{fld1->} %{risk->} %{action->} %{vlan->} %{fld15->} %{fld16->} %{direction}");
 
 var dup16 = setc("eventcategory","1002000000");
 
@@ -73,7 +73,7 @@ var dup25 = match("MESSAGE#22:Login:04/1_0", "nwparser.p0", "for user%{p0}");
 
 var dup26 = match("MESSAGE#22:Login:04/1_1", "nwparser.p0", "user%{p0}");
 
-var dup27 = match("MESSAGE#22:Login:04/2", "nwparser.p0", "%{} %{username}via %{network_service}(IP: %{saddr})%{p0}");
+var dup27 = match("MESSAGE#22:Login:04/2", "nwparser.p0", "%{} %{username->} via %{network_service->} (IP: %{saddr})%{p0}");
 
 var dup28 = match("MESSAGE#22:Login:04/3_0", "nwparser.p0", ": %{result}");
 
@@ -190,7 +190,7 @@ var dup49 = all_match({
 	]),
 });
 
-var hdr1 = match("HEADER#0:0001", "message", "%DefensePro %{hfld1->} %{hfld2->} %{hfld3->} %{messageid}\\\"%{hfld4}\\\" %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%DefensePro %{hfld1->} %{hfld2->} %{hfld3->} %{messageid->} \\\"%{hfld4}\\\" %{payload}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -199,7 +199,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%DefensePro %{hfld1->} %{hfld2->} 
 			field("hfld3"),
 			constant(" "),
 			field("messageid"),
-			constant("\\\""),
+			constant(" \\\""),
 			field("hfld4"),
 			constant("\\\" "),
 			field("payload"),
@@ -220,7 +220,7 @@ var hdr2 = match("HEADER#1:0002", "message", "%DefensePro %{messageid->} %{paylo
 	}),
 ]));
 
-var hdr3 = match("HEADER#2:0003", "message", "DefensePro: %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid}\"%{hfld3}\" %{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "DefensePro: %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{messageid->} \"%{hfld3}\" %{payload}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -235,7 +235,7 @@ var hdr3 = match("HEADER#2:0003", "message", "DefensePro: %{hdate->} %{htime->} 
 			field("hfld2"),
 			constant(" "),
 			field("messageid"),
-			constant("\""),
+			constant(" \""),
 			field("hfld3"),
 			constant("\" "),
 			field("payload"),
@@ -387,7 +387,7 @@ var select8 = linear_select([
 	msg15,
 ]);
 
-var part1 = match("MESSAGE#15:COMMAND:", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}COMMAND: \"%{action}\" by user %{username}via %{network_service}, source IP %{saddr}", processor_chain([
+var part1 = match("MESSAGE#15:COMMAND:", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} COMMAND: \"%{action}\" by user %{username->} via %{network_service}, source IP %{saddr}", processor_chain([
 	dup19,
 	dup20,
 	setc("ec_activity","Execute"),
@@ -398,7 +398,7 @@ var part1 = match("MESSAGE#15:COMMAND:", "nwparser.payload", "%{fld1->} %{fld2->
 
 var msg16 = msg("COMMAND:", part1);
 
-var part2 = match("MESSAGE#16:Configuration:01", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{event_description}set %{change_new}, Old Values: %{change_old}, ACTION: %{action}by user %{username}via %{network_service}source IP %{saddr}", processor_chain([
+var part2 = match("MESSAGE#16:Configuration:01", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{event_description->} set %{change_new}, Old Values: %{change_old}, ACTION: %{action->} by user %{username->} via %{network_service->} source IP %{saddr}", processor_chain([
 	dup19,
 	dup20,
 	dup22,
@@ -409,7 +409,7 @@ var part2 = match("MESSAGE#16:Configuration:01", "nwparser.payload", "%{fld1->} 
 
 var msg17 = msg("Configuration:01", part2);
 
-var part3 = match("MESSAGE#17:Configuration:02", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{event_description}, ACTION: %{action}by user %{username}via %{network_service}source IP %{saddr}", processor_chain([
+var part3 = match("MESSAGE#17:Configuration:02", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{event_description}, ACTION: %{action->} by user %{username->} via %{network_service->} source IP %{saddr}", processor_chain([
 	dup19,
 	dup20,
 	dup23,
@@ -419,7 +419,7 @@ var part3 = match("MESSAGE#17:Configuration:02", "nwparser.payload", "%{fld1->} 
 
 var msg18 = msg("Configuration:02", part3);
 
-var part4 = match("MESSAGE#18:Configuration:03", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Configuration File downloaded from device by user %{username}via %{network_service}, source IP %{saddr}", processor_chain([
+var part4 = match("MESSAGE#18:Configuration:03", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Configuration File downloaded from device by user %{username->} via %{network_service}, source IP %{saddr}", processor_chain([
 	dup19,
 	dup20,
 	dup23,
@@ -430,7 +430,7 @@ var part4 = match("MESSAGE#18:Configuration:03", "nwparser.payload", "%{fld1->} 
 
 var msg19 = msg("Configuration:03", part4);
 
-var part5 = match("MESSAGE#19:Configuration:04", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Configuration Upload has been completed", processor_chain([
+var part5 = match("MESSAGE#19:Configuration:04", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Configuration Upload has been completed", processor_chain([
 	dup24,
 	dup23,
 	dup11,
@@ -440,7 +440,7 @@ var part5 = match("MESSAGE#19:Configuration:04", "nwparser.payload", "%{fld1->} 
 
 var msg20 = msg("Configuration:04", part5);
 
-var part6 = match("MESSAGE#20:Configuration:05", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Configuration Download has been completed", processor_chain([
+var part6 = match("MESSAGE#20:Configuration:05", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Configuration Download has been completed", processor_chain([
 	dup24,
 	dup23,
 	dup11,
@@ -450,7 +450,7 @@ var part6 = match("MESSAGE#20:Configuration:05", "nwparser.payload", "%{fld1->} 
 
 var msg21 = msg("Configuration:05", part6);
 
-var part7 = match("MESSAGE#21:Configuration:06", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Configuration file has been modified. Device may fail to load configuration file!", processor_chain([
+var part7 = match("MESSAGE#21:Configuration:06", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Configuration file has been modified. Device may fail to load configuration file!", processor_chain([
 	dup24,
 	dup22,
 	dup23,
@@ -492,7 +492,7 @@ var all4 = all_match({
 
 var msg23 = msg("Login:04", all4);
 
-var part9 = match("MESSAGE#23:Login:05", "nwparser.payload", "Login locked user %{username}(IP: %{saddr}): %{result}", processor_chain([
+var part9 = match("MESSAGE#23:Login:05", "nwparser.payload", "Login locked user %{username->} (IP: %{saddr}): %{result}", processor_chain([
 	dup30,
 	dup20,
 	dup31,
@@ -504,7 +504,7 @@ var part9 = match("MESSAGE#23:Login:05", "nwparser.payload", "Login locked user 
 
 var msg24 = msg("Login:05", part9);
 
-var part10 = match("MESSAGE#24:Login:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Login failed %{p0}");
+var part10 = match("MESSAGE#24:Login:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Login failed %{p0}");
 
 var all5 = all_match({
 	processors: [
@@ -527,7 +527,7 @@ var all5 = all_match({
 
 var msg25 = msg("Login:01", all5);
 
-var part11 = match("MESSAGE#25:Login:02", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Login failed via %{network_service}(IP: %{saddr}): %{result}", processor_chain([
+var part11 = match("MESSAGE#25:Login:02", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Login failed via %{network_service->} (IP: %{saddr}): %{result}", processor_chain([
 	dup30,
 	dup20,
 	dup31,
@@ -540,7 +540,7 @@ var part11 = match("MESSAGE#25:Login:02", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg26 = msg("Login:02", part11);
 
-var part12 = match("MESSAGE#26:Login:03", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Login locked user %{username}(IP: %{saddr}): %{result}", processor_chain([
+var part12 = match("MESSAGE#26:Login:03", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Login locked user %{username->} (IP: %{saddr}): %{result}", processor_chain([
 	dup30,
 	dup20,
 	dup31,
@@ -561,7 +561,7 @@ var select10 = linear_select([
 	msg27,
 ]);
 
-var part13 = match("MESSAGE#27:Connection", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Connection to NTP server timed out", processor_chain([
+var part13 = match("MESSAGE#27:Connection", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Connection to NTP server timed out", processor_chain([
 	dup36,
 	dup21,
 	dup11,
@@ -571,7 +571,7 @@ var part13 = match("MESSAGE#27:Connection", "nwparser.payload", "%{fld1->} %{fld
 
 var msg28 = msg("Connection", part13);
 
-var part14 = match("MESSAGE#28:Device", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Device was rebooted by user %{username}via %{network_service}, source IP %{saddr}", processor_chain([
+var part14 = match("MESSAGE#28:Device", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Device was rebooted by user %{username->} via %{network_service}, source IP %{saddr}", processor_chain([
 	dup19,
 	dup20,
 	dup21,
@@ -582,7 +582,7 @@ var part14 = match("MESSAGE#28:Device", "nwparser.payload", "%{fld1->} %{fld2->}
 
 var msg29 = msg("Device", part14);
 
-var part15 = match("MESSAGE#29:Power", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Power supply fully operational", processor_chain([
+var part15 = match("MESSAGE#29:Power", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Power supply fully operational", processor_chain([
 	dup24,
 	dup21,
 	dup11,
@@ -592,7 +592,7 @@ var part15 = match("MESSAGE#29:Power", "nwparser.payload", "%{fld1->} %{fld2->} 
 
 var msg30 = msg("Power", part15);
 
-var part16 = match("MESSAGE#30:Cold", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Cold Start", processor_chain([
+var part16 = match("MESSAGE#30:Cold", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Cold Start", processor_chain([
 	dup24,
 	setc("ec_activity","Start"),
 	dup21,
@@ -603,7 +603,7 @@ var part16 = match("MESSAGE#30:Cold", "nwparser.payload", "%{fld1->} %{fld2->} %
 
 var msg31 = msg("Cold", part16);
 
-var part17 = match("MESSAGE#31:Port/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Port %{interface->} %{p0}");
+var part17 = match("MESSAGE#31:Port/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Port %{interface->} %{p0}");
 
 var part18 = match("MESSAGE#31:Port/1_0", "nwparser.p0", "Down%{}");
 
@@ -630,7 +630,7 @@ var all6 = all_match({
 
 var msg32 = msg("Port", all6);
 
-var part20 = match("MESSAGE#32:DefensePro", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}DefensePro was powered off", processor_chain([
+var part20 = match("MESSAGE#32:DefensePro", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} DefensePro was powered off", processor_chain([
 	dup24,
 	dup21,
 	dup11,
@@ -640,7 +640,7 @@ var part20 = match("MESSAGE#32:DefensePro", "nwparser.payload", "%{fld1->} %{fld
 
 var msg33 = msg("DefensePro", part20);
 
-var part21 = match("MESSAGE#33:Access:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category}\"%{event_type}\" %{protocol->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{interface->} %{context}\"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
+var part21 = match("MESSAGE#33:Access:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category->} \"%{event_type}\" %{protocol->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{interface->} %{context->} \"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
 
 var all7 = all_match({
 	processors: [
@@ -657,7 +657,7 @@ var all7 = all_match({
 
 var msg34 = msg("Access:01", all7);
 
-var part22 = match("MESSAGE#34:Access", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Access attempted by unauthorized NMS, Community: %{fld3}, IP: \"%{saddr}\"", processor_chain([
+var part22 = match("MESSAGE#34:Access", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Access attempted by unauthorized NMS, Community: %{fld3}, IP: \"%{saddr}\"", processor_chain([
 	dup36,
 	dup37,
 	dup11,
@@ -672,7 +672,7 @@ var select12 = linear_select([
 	msg35,
 ]);
 
-var part23 = match("MESSAGE#35:Please", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Please reboot the device for the latest changes to take effect", processor_chain([
+var part23 = match("MESSAGE#35:Please", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Please reboot the device for the latest changes to take effect", processor_chain([
 	dup19,
 	dup21,
 	dup11,
@@ -682,7 +682,7 @@ var part23 = match("MESSAGE#35:Please", "nwparser.payload", "%{fld1->} %{fld2->}
 
 var msg36 = msg("Please", part23);
 
-var part24 = match("MESSAGE#36:User:01", "nwparser.payload", "User %{username}logged in via %{network_service}(IP: %{saddr})", processor_chain([
+var part24 = match("MESSAGE#36:User:01", "nwparser.payload", "User %{username->} logged in via %{network_service->} (IP: %{saddr})", processor_chain([
 	dup38,
 	dup20,
 	dup31,
@@ -694,7 +694,7 @@ var part24 = match("MESSAGE#36:User:01", "nwparser.payload", "User %{username}lo
 
 var msg37 = msg("User:01", part24);
 
-var part25 = match("MESSAGE#37:User", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}User %{username}logged in via %{network_service}(IP: %{saddr})", processor_chain([
+var part25 = match("MESSAGE#37:User", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} User %{username->} logged in via %{network_service->} (IP: %{saddr})", processor_chain([
 	dup38,
 	dup20,
 	dup31,
@@ -712,7 +712,7 @@ var select13 = linear_select([
 	msg38,
 ]);
 
-var part26 = match("MESSAGE#38:Certificate", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Certificate named %{fld3}expired on %{fld4->} %{fld5}", processor_chain([
+var part26 = match("MESSAGE#38:Certificate", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Certificate named %{fld3->} expired on %{fld4->} %{fld5}", processor_chain([
 	dup19,
 	dup11,
 	setc("event_description","Certificate expired"),
@@ -728,7 +728,7 @@ var part26 = match("MESSAGE#38:Certificate", "nwparser.payload", "%{fld1->} %{fl
 
 var msg39 = msg("Certificate", part26);
 
-var part27 = match("MESSAGE#39:Vision", "nwparser.payload", "%{fld1->} %{fld2->} %{severity}Vision %{event_description}by user %{username}via %{network_service}, source IP %{saddr}", processor_chain([
+var part27 = match("MESSAGE#39:Vision", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} Vision %{event_description->} by user %{username->} via %{network_service}, source IP %{saddr}", processor_chain([
 	dup19,
 	dup11,
 	dup12,
@@ -785,7 +785,7 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part30 = match("MESSAGE#0:Intrusions:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category}\"%{event_type}\" %{protocol->} %{p0}");
+var part30 = match("MESSAGE#0:Intrusions:01/0", "nwparser.payload", "%{fld1->} %{fld2->} %{severity->} %{id->} %{category->} \"%{event_type}\" %{protocol->} %{p0}");
 
 var part31 = match("MESSAGE#0:Intrusions:01/1_0", "nwparser.p0", "%{saddr}:%{sport->} %{p0}");
 
@@ -795,21 +795,21 @@ var part33 = match("MESSAGE#0:Intrusions:01/2_0", "nwparser.p0", "%{daddr}:%{dpo
 
 var part34 = match("MESSAGE#0:Intrusions:01/2_1", "nwparser.p0", "%{daddr->} %{dport->} %{p0}");
 
-var part35 = match("MESSAGE#0:Intrusions:01/3", "nwparser.p0", "%{interface->} %{context}\"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
+var part35 = match("MESSAGE#0:Intrusions:01/3", "nwparser.p0", "%{interface->} %{context->} \"%{policyname}\" %{event_state->} %{packets->} %{dclass_counter1->} %{vlan->} %{fld15->} %{fld16->} %{risk->} %{p0}");
 
 var part36 = match("MESSAGE#0:Intrusions:01/4_0", "nwparser.p0", "%{action->} %{sigid_string}");
 
 var part37 = match("MESSAGE#0:Intrusions:01/4_1", "nwparser.p0", "%{action}");
 
-var part38 = match("MESSAGE#1:Intrusions:02/0", "nwparser.payload", "%{id->} %{category}\\\"%{event_type}\\\" %{protocol->} %{p0}");
+var part38 = match("MESSAGE#1:Intrusions:02/0", "nwparser.payload", "%{id->} %{category->} \\\"%{event_type}\\\" %{protocol->} %{p0}");
 
-var part39 = match("MESSAGE#1:Intrusions:02/3", "nwparser.p0", "%{interface->} %{context}\\\"%{policyname}\\\" %{event_state->} %{packets->} %{dclass_counter1->} %{fld1->} %{risk->} %{action->} %{vlan->} %{fld15->} %{fld16->} %{direction}");
+var part39 = match("MESSAGE#1:Intrusions:02/3", "nwparser.p0", "%{interface->} %{context->} \\\"%{policyname}\\\" %{event_state->} %{packets->} %{dclass_counter1->} %{fld1->} %{risk->} %{action->} %{vlan->} %{fld15->} %{fld16->} %{direction}");
 
 var part40 = match("MESSAGE#22:Login:04/1_0", "nwparser.p0", "for user%{p0}");
 
 var part41 = match("MESSAGE#22:Login:04/1_1", "nwparser.p0", "user%{p0}");
 
-var part42 = match("MESSAGE#22:Login:04/2", "nwparser.p0", "%{} %{username}via %{network_service}(IP: %{saddr})%{p0}");
+var part42 = match("MESSAGE#22:Login:04/2", "nwparser.p0", "%{} %{username->} via %{network_service->} (IP: %{saddr})%{p0}");
 
 var part43 = match("MESSAGE#22:Login:04/3_0", "nwparser.p0", ": %{result}");
 

@@ -178,8 +178,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.255.173.170",
-            "10.139.108.194"
+            "10.139.108.194",
+            "10.255.173.170"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1259,8 +1259,8 @@
         "rsa.internal.messageid": "anomaly",
         "rsa.misc.category": "aera",
         "rsa.misc.disposition": "uamei",
-        "rsa.misc.event_id": "id 6f3fd2c5",
-        "rsa.misc.policy_name": "ncid",
+        "rsa.misc.event_id": "6f3fd2c5",
+        "rsa.misc.policy_name": "ncidid",
         "rsa.misc.severity": "very-high",
         "rsa.time.duration_time": 50.929,
         "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
@@ -1602,8 +1602,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.239.19.5",
-            "10.135.82.97"
+            "10.135.82.97",
+            "10.239.19.5"
         ],
         "rsa.internal.messageid": "anomaly",
         "rsa.misc.category": "gitsedqu impact borios",
@@ -1925,8 +1925,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.193.30.192",
-            "10.237.45.67"
+            "10.237.45.67",
+            "10.193.30.192"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2194,7 +2194,7 @@
         ]
     },
     {
-        "@timestamp": "2019-07-10T03:56:14.000Z",
+        "@timestamp": "2020-07-10T03:56:14.000Z",
         "destination.ip": [
             "10.179.210.218"
         ],
@@ -2216,7 +2216,7 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
+        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.44.47.27"

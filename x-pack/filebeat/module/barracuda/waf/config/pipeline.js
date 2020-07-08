@@ -71,9 +71,9 @@ var dup13 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_0", "nwparser.p0", "\"[%{r
 
 var dup14 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_1", "nwparser.p0", "[%{result}] %{p0}");
 
-var dup15 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol}- %{stransaddr->} %{stransport->} %{web_referer}");
+var dup15 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
 
-var dup16 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
+var dup16 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
 
 var dup17 = setc("eventcategory","1204000000");
 
@@ -92,7 +92,7 @@ var dup23 = linear_select([
 	dup14,
 ]);
 
-var dup24 = match("MESSAGE#103:NO_DOMAIN_MATCH_IN_PROFILE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context}[%{result}] %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
+var dup24 = match("MESSAGE#103:NO_DOMAIN_MATCH_IN_PROFILE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context->} [%{result}] %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
 	dup17,
 	dup8,
 ]));
@@ -139,7 +139,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%{messageid}:%{payload}", processo
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0005", "message", "time=%{hfld1->} %{hfld2->} %{timezone}Unit=%{messageid->} %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0005", "message", "time=%{hfld1->} %{hfld2->} %{timezone->} Unit=%{messageid->} %{payload}", processor_chain([
 	setc("header_id","0005"),
 ]));
 
@@ -153,7 +153,7 @@ var hdr4 = match("HEADER#3:0002", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 	dup1,
 ]));
 
-var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3}TR %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} TR %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
 	setc("header_id","0009"),
 	dup2,
 	call({
@@ -167,7 +167,7 @@ var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			field("hfld2"),
 			constant(" "),
 			field("hfld3"),
-			constant("TR "),
+			constant(" TR "),
 			field("hfld5"),
 			constant(" "),
 			field("hfld6"),
@@ -179,7 +179,7 @@ var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 	}),
 ]));
 
-var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3}AUDIT %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} AUDIT %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
 	setc("header_id","0007"),
 	dup2,
 	call({
@@ -193,7 +193,7 @@ var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			field("hfld2"),
 			constant(" "),
 			field("hfld3"),
-			constant("AUDIT "),
+			constant(" AUDIT "),
 			field("hfld5"),
 			constant(" "),
 			field("hfld6"),
@@ -205,7 +205,7 @@ var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 	}),
 ]));
 
-var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3}WF %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} WF %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
 	setc("header_id","0008"),
 	dup2,
 	call({
@@ -219,7 +219,7 @@ var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			field("hfld2"),
 			constant(" "),
 			field("hfld3"),
-			constant("WF "),
+			constant(" WF "),
 			field("hfld5"),
 			constant(" "),
 			field("hfld6"),
@@ -231,7 +231,7 @@ var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 	}),
 ]));
 
-var hdr8 = match("HEADER#7:0006", "message", "%{hmonth->} %{hday->} %{htime}BARRACUDAWAF %{hhost->} %{hdate->} %{htime->} %{htimezone->} %{messageid->} %{payload}", processor_chain([
+var hdr8 = match("HEADER#7:0006", "message", "%{hmonth->} %{hday->} %{htime->} BARRACUDAWAF %{hhost->} %{hdate->} %{htime->} %{htimezone->} %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0006"),
 	call({
 		dest: "nwparser.payload",
@@ -283,112 +283,112 @@ var select1 = linear_select([
 	hdr9,
 ]);
 
-var part1 = match("MESSAGE#0:UPDATE", "nwparser.payload", "UPDATE: [ALERT:%{fld3}] New attack definition version %{version}is available", processor_chain([
+var part1 = match("MESSAGE#0:UPDATE", "nwparser.payload", "UPDATE: [ALERT:%{fld3}] New attack definition version %{version->} is available", processor_chain([
 	setc("eventcategory","1502030000"),
 	setc("event_description","UPDATE: ALERT New attack definition version is available"),
 ]));
 
 var msg1 = msg("UPDATE", part1);
 
-var part2 = match("MESSAGE#1:STM:01", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}[ALERT:%{id}] Server %{daddr}:%{dport}is disabled by out of band monitor ( new mode out_of_service_all ) Reason:%{result}", processor_chain([
+var part2 = match("MESSAGE#1:STM:01", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} [ALERT:%{id}] Server %{daddr}:%{dport->} is disabled by out of band monitor ( new mode out_of_service_all ) Reason:%{result}", processor_chain([
 	setc("eventcategory","1603000000"),
 	setc("event_description","STM: LB Server disabled by out of band monitor"),
 ]));
 
 var msg2 = msg("STM:01", part2);
 
-var part3 = match("MESSAGE#2:STM:02", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}Server %{saddr}is created.", processor_chain([
+var part3 = match("MESSAGE#2:STM:02", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} Server %{saddr->} is created.", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Server created."),
 ]));
 
 var msg3 = msg("STM:02", part3);
 
-var part4 = match("MESSAGE#3:STM:03", "nwparser.payload", "STM: SSKey-%{fld1->} %{fld2}Cookie Encryption Key has already expired", processor_chain([
+var part4 = match("MESSAGE#3:STM:03", "nwparser.payload", "STM: SSKey-%{fld1->} %{fld2->} Cookie Encryption Key has already expired", processor_chain([
 	setc("eventcategory","1613030100"),
 	setc("event_description","STM: SSKEY Cookie Encryption Key has already expired."),
 ]));
 
 var msg4 = msg("STM:03", part4);
 
-var part5 = match("MESSAGE#4:STM:04", "nwparser.payload", "STM: FAILOVE-%{fld1->} %{fld2}Module CookieKey registered with Stateful Failover module.", processor_chain([
+var part5 = match("MESSAGE#4:STM:04", "nwparser.payload", "STM: FAILOVE-%{fld1->} %{fld2->} Module CookieKey registered with Stateful Failover module.", processor_chain([
 	dup4,
 	setc("event_description","STM:FAILOVE Module CookieKey registered with Stateful Failover module."),
 ]));
 
 var msg5 = msg("STM:04", part5);
 
-var part6 = match("MESSAGE#5:STM:05", "nwparser.payload", "STM: FEHCMON-%{fld1->} %{fld2}FEHC Monitor Module initialized.", processor_chain([
+var part6 = match("MESSAGE#5:STM:05", "nwparser.payload", "STM: FEHCMON-%{fld1->} %{fld2->} FEHC Monitor Module initialized.", processor_chain([
 	dup3,
 	setc("event_description","STM:FECHMON FEHC Monitor Module initialized."),
 ]));
 
 var msg6 = msg("STM:05", part6);
 
-var part7 = match("MESSAGE#6:STM:06", "nwparser.payload", "STM: FAILOVE-%{fld1->} %{fld2}Stateful Failover Module initialized.", processor_chain([
+var part7 = match("MESSAGE#6:STM:06", "nwparser.payload", "STM: FAILOVE-%{fld1->} %{fld2->} Stateful Failover Module initialized.", processor_chain([
 	dup3,
 	setc("event_description","STM: FAILOVE Stateful Failover Module initialized."),
 ]));
 
 var msg7 = msg("STM:06", part7);
 
-var part8 = match("MESSAGE#7:STM:07", "nwparser.payload", "STM: SERVICE-%{fld1->} %{fld3}[%{fld2}] New Service (ID %{fld4}) Created at %{saddr}:%{sport}", processor_chain([
+var part8 = match("MESSAGE#7:STM:07", "nwparser.payload", "STM: SERVICE-%{fld1->} %{fld3->} [%{fld2}] New Service (ID %{fld4}) Created at %{saddr}:%{sport}", processor_chain([
 	dup3,
 	setc("event_description","STM: SERVICE New Service created."),
 ]));
 
 var msg8 = msg("STM:07", part8);
 
-var part9 = match("MESSAGE#8:STM:08", "nwparser.payload", "STM: SSL-%{fld1->} %{fld2}Ssl Initialization", processor_chain([
+var part9 = match("MESSAGE#8:STM:08", "nwparser.payload", "STM: SSL-%{fld1->} %{fld2->} Ssl Initialization", processor_chain([
 	dup4,
 	setc("event_description","STM: SSL Initialization."),
 ]));
 
 var msg9 = msg("STM:08", part9);
 
-var part10 = match("MESSAGE#9:STM:09", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}LookupServerCtx = %{fld3}", processor_chain([
+var part10 = match("MESSAGE#9:STM:09", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} LookupServerCtx = %{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB-LookupServerCtx."),
 ]));
 
 var msg10 = msg("STM:09", part10);
 
-var part11 = match("MESSAGE#10:STM:10", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}ParamProtectionClonePatterns: Old:%{change_old}, New:%{change_new}, PatternsNode:%{fld4}", processor_chain([
+var part11 = match("MESSAGE#10:STM:10", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} ParamProtectionClonePatterns: Old:%{change_old}, New:%{change_new}, PatternsNode:%{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps ParamProtectionClonePatterns values changed."),
 ]));
 
 var msg11 = msg("STM:10", part11);
 
-var part12 = match("MESSAGE#11:STM:11", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} %{obj_name}SapCtx %{fld3}, SapId %{fld4}", processor_chain([
+var part12 = match("MESSAGE#11:STM:11", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} %{obj_name->} SapCtx %{fld3}, SapId %{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps SapCtx log."),
 ]));
 
 var msg12 = msg("STM:11", part12);
 
-var part13 = match("MESSAGE#12:STM:12", "nwparser.payload", "STM: CACHE-%{fld1->} %{fld2->} %{obj_name}SapCtx %{fld3}, SapId %{fld4}, Return Code %{result}", processor_chain([
+var part13 = match("MESSAGE#12:STM:12", "nwparser.payload", "STM: CACHE-%{fld1->} %{fld2->} %{obj_name->} SapCtx %{fld3}, SapId %{fld4}, Return Code %{result}", processor_chain([
 	dup3,
 	setc("event_description","STM: CACHE SapCtx log."),
 ]));
 
 var msg13 = msg("STM:12", part13);
 
-var part14 = match("MESSAGE#13:STM:13", "nwparser.payload", "STM: FTPSVC-%{fld1->} %{fld2}Ftp proxy initialized %{info}", processor_chain([
+var part14 = match("MESSAGE#13:STM:13", "nwparser.payload", "STM: FTPSVC-%{fld1->} %{fld2->} Ftp proxy initialized %{info}", processor_chain([
 	dup3,
 	setc("event_description","STM: FTPSVC Ftp proxy initialized."),
 ]));
 
 var msg14 = msg("STM:13", part14);
 
-var part15 = match("MESSAGE#14:STM:14", "nwparser.payload", "STM: STM-%{fld1->} %{fld2}Secure Traffic Manager Initialization complete: %{info}", processor_chain([
+var part15 = match("MESSAGE#14:STM:14", "nwparser.payload", "STM: STM-%{fld1->} %{fld2->} Secure Traffic Manager Initialization complete: %{info}", processor_chain([
 	dup3,
 	setc("event_description","STM: STM Secure Traffic Manager Initialization complete."),
 ]));
 
 var msg15 = msg("STM:14", part15);
 
-var part16 = match("MESSAGE#15:STM:15", "nwparser.payload", "STM: COOKIE-%{fld1->} %{fld2->} %{obj_name}= %{info}", processor_chain([
+var part16 = match("MESSAGE#15:STM:15", "nwparser.payload", "STM: COOKIE-%{fld1->} %{fld2->} %{obj_name->} = %{info}", processor_chain([
 	dup3,
 	setc("event_description","STM: COOKIE Cookie parameters set."),
 ]));
@@ -402,189 +402,189 @@ var part17 = match("MESSAGE#16:STM:16", "nwparser.payload", "STM: WebLog-%{fld1-
 
 var msg17 = msg("STM:16", part17);
 
-var part18 = match("MESSAGE#17:STM:17", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}AddIpsPatternGroup SapCtx : %{fld3}, grp_id : %{fld4}, type : %{fld5}grp: %{info}", processor_chain([
+var part18 = match("MESSAGE#17:STM:17", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} AddIpsPatternGroup SapCtx : %{fld3}, grp_id : %{fld4}, type : %{fld5->} grp: %{info}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps Set AddIpsPatternGroup."),
 ]));
 
 var msg18 = msg("STM:17", part18);
 
-var part19 = match("MESSAGE#18:STM:18", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}AddPCInfoKeyWordMeta: Info:%{fld3}, Table:%{fld4}", processor_chain([
+var part19 = match("MESSAGE#18:STM:18", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} AddPCInfoKeyWordMeta: Info:%{fld3}, Table:%{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps AddPCInfoKeyWordMeta."),
 ]));
 
 var msg19 = msg("STM:18", part19);
 
-var part20 = match("MESSAGE#19:STM:19", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}AddParamClass: %{fld3}: KeyWords:%{fld4}", processor_chain([
+var part20 = match("MESSAGE#19:STM:19", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} AddParamClass: %{fld3}: KeyWords:%{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps AddParamClass."),
 ]));
 
 var msg20 = msg("STM:19", part20);
 
-var part21 = match("MESSAGE#20:STM:20", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetParamClassPatternsAndDFA: Ctx:%{fld3}, type:%{fld4}, dfaId %{fld5}", processor_chain([
+var part21 = match("MESSAGE#20:STM:20", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetParamClassPatternsAndDFA: Ctx:%{fld3}, type:%{fld4}, dfaId %{fld5}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps AddParamClassPatternsAndDFA."),
 ]));
 
 var msg21 = msg("STM:20", part21);
 
-var part22 = match("MESSAGE#21:STM:21", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}ParamClassClonePatternsInfo: Old:%{fld3}, New:%{fld4}, PatternsNode:%{fld5}", processor_chain([
+var part22 = match("MESSAGE#21:STM:21", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} ParamClassClonePatternsInfo: Old:%{fld3}, New:%{fld4}, PatternsNode:%{fld5}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps AddParamClassClonePatternsInfo."),
 ]));
 
 var msg22 = msg("STM:21", part22);
 
-var part23 = match("MESSAGE#22:STM:22", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsLogIntrusionOn SapCtx %{fld3}, Return Code %{fld4}", processor_chain([
+var part23 = match("MESSAGE#22:STM:22", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsLogIntrusionOn SapCtx %{fld3}, Return Code %{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps SetIpsLogIntrusionOn."),
 ]));
 
 var msg23 = msg("STM:22", part23);
 
-var part24 = match("MESSAGE#23:STM:23", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}AddIpsCloakFilterRespHeader [%{fld3}] Ret %{fld4}, SapCtx %{fld5}, sapId %{fld6}", processor_chain([
+var part24 = match("MESSAGE#23:STM:23", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} AddIpsCloakFilterRespHeader [%{fld3}] Ret %{fld4}, SapCtx %{fld5}, sapId %{fld6}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps AddIpsCloakFilterRespHeader."),
 ]));
 
 var msg24 = msg("STM:23", part24);
 
-var part25 = match("MESSAGE#24:STM:24", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsTheftPolicy SapCtx %{fld3}, Policy %{fld4}, Return %{fld5}", processor_chain([
+var part25 = match("MESSAGE#24:STM:24", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsTheftPolicy SapCtx %{fld3}, Policy %{fld4}, Return %{fld5}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps SetIpsTheftPolicy."),
 ]));
 
 var msg25 = msg("STM:24", part25);
 
-var part26 = match("MESSAGE#25:STM:25", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsTheftPolicyDfa SapCtx %{fld3}, Policy %{fld4}, mode %{fld5}, bytes %{fld6}, Return %{fld7}", processor_chain([
+var part26 = match("MESSAGE#25:STM:25", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsTheftPolicyDfa SapCtx %{fld3}, Policy %{fld4}, mode %{fld5}, bytes %{fld6}, Return %{fld7}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps SetIpsTheftPolicyDfa."),
 ]));
 
 var msg26 = msg("STM:25", part26);
 
-var part27 = match("MESSAGE#26:STM:26", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsLimitPolicy Return Code %{fld3}", processor_chain([
+var part27 = match("MESSAGE#26:STM:26", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsLimitPolicy Return Code %{fld3}", processor_chain([
 	dup3,
 	dup5,
 ]));
 
 var msg27 = msg("STM:26", part27);
 
-var part28 = match("MESSAGE#27:STM:27", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}CreateRC: RC Add policy Success", processor_chain([
+var part28 = match("MESSAGE#27:STM:27", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} CreateRC: RC Add policy Success", processor_chain([
 	dup3,
 	setc("event_description","STM: aps CreateRC: RC Add policy Success."),
 ]));
 
 var msg28 = msg("STM:27", part28);
 
-var part29 = match("MESSAGE#28:STM:28", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}SetSap%{info}=%{fld3}", processor_chain([
+var part29 = match("MESSAGE#28:STM:28", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} SetSap%{info}=%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Set Sap command."),
 ]));
 
 var msg29 = msg("STM:28", part29);
 
-var part30 = match("MESSAGE#29:STM:29", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}SetServer%{info}=%{fld3}", processor_chain([
+var part30 = match("MESSAGE#29:STM:29", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} SetServer%{info}=%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Set Server command."),
 ]));
 
 var msg30 = msg("STM:29", part30);
 
-var part31 = match("MESSAGE#30:STM:30", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}AddServer%{info}=%{fld3}", processor_chain([
+var part31 = match("MESSAGE#30:STM:30", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} AddServer%{info}=%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Add Server command."),
 ]));
 
 var msg31 = msg("STM:30", part31);
 
-var part32 = match("MESSAGE#31:STM:31", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}CreateServer =%{fld3}", processor_chain([
+var part32 = match("MESSAGE#31:STM:31", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} CreateServer =%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Create Server command."),
 ]));
 
 var msg32 = msg("STM:31", part32);
 
-var part33 = match("MESSAGE#32:STM:32", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}EnableServer =%{fld3}", processor_chain([
+var part33 = match("MESSAGE#32:STM:32", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} EnableServer =%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Enable Server command."),
 ]));
 
 var msg33 = msg("STM:32", part33);
 
-var part34 = match("MESSAGE#33:STM:33", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}ActiveServerOutOfBandMonitorAttr =%{fld3}", processor_chain([
+var part34 = match("MESSAGE#33:STM:33", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} ActiveServerOutOfBandMonitorAttr =%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB ActiveServerOutOfBandMonitorAttr command."),
 ]));
 
 var msg34 = msg("STM:33", part34);
 
-var part35 = match("MESSAGE#34:STM:34", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}BindServerToSap =%{fld3}", processor_chain([
+var part35 = match("MESSAGE#34:STM:34", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} BindServerToSap =%{fld3}", processor_chain([
 	dup3,
 	setc("event_description","STM: LB BindServerToSap command."),
 ]));
 
 var msg35 = msg("STM:34", part35);
 
-var part36 = match("MESSAGE#35:STM:35", "nwparser.payload", "STM: LB-%{fld1->} %{fld2}[ALERT:%{fld3}] Server %{saddr}:%{sport}is enabled by out of band monitor. Reason:out of band monitor", processor_chain([
+var part36 = match("MESSAGE#35:STM:35", "nwparser.payload", "STM: LB-%{fld1->} %{fld2->} [ALERT:%{fld3}] Server %{saddr}:%{sport->} is enabled by out of band monitor. Reason:out of band monitor", processor_chain([
 	dup3,
 	setc("event_description","STM: LB Server is enabled by out of band monitor Reason out of band monitor"),
 ]));
 
 var msg36 = msg("STM:35", part36);
 
-var part37 = match("MESSAGE#36:STM:36", "nwparser.payload", "STM: SERVICE-%{fld1->} %{fld2}[%{saddr}:%{sport}] Service Started %{fld3}:%{fld4}", processor_chain([
+var part37 = match("MESSAGE#36:STM:36", "nwparser.payload", "STM: SERVICE-%{fld1->} %{fld2->} [%{saddr}:%{sport}] Service Started %{fld3}:%{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: SERVICE Server service started command."),
 ]));
 
 var msg37 = msg("STM:36", part37);
 
-var part38 = match("MESSAGE#37:STM:37", "nwparser.payload", "STM: RespPage-%{fld1->} %{fld2}CreateRP: Response Page %{fld3}created successfully", processor_chain([
+var part38 = match("MESSAGE#37:STM:37", "nwparser.payload", "STM: RespPage-%{fld1->} %{fld2->} CreateRP: Response Page %{fld3->} created successfully", processor_chain([
 	dup3,
 	setc("event_description","STM: RespPage Response Page created successfully."),
 ]));
 
 var msg38 = msg("STM:37", part38);
 
-var part39 = match("MESSAGE#38:STM:38", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2}AddWATReqRewriteRule AclName [%{fld3}] Ret %{fld4}SapCtx %{fld5}, SapId %{fld6}", processor_chain([
+var part39 = match("MESSAGE#38:STM:38", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2->} AddWATReqRewriteRule AclName [%{fld3}] Ret %{fld4->} SapCtx %{fld5}, SapId %{fld6}", processor_chain([
 	dup3,
 	setc("event_description","STM: AddWATReqRewriteRule AclName."),
 ]));
 
 var msg39 = msg("STM:38", part39);
 
-var part40 = match("MESSAGE#39:STM:39", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2}SetWATReqRewriteRuleNameWithKe AclName [%{fld3}] Ret %{fld4}SapCtx %{fld5}, SapId %{fld6}", processor_chain([
+var part40 = match("MESSAGE#39:STM:39", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2->} SetWATReqRewriteRuleNameWithKe AclName [%{fld3}] Ret %{fld4->} SapCtx %{fld5}, SapId %{fld6}", processor_chain([
 	dup3,
 	setc("event_description","STM: SetWATReqRewriteRuleNameWithKe AclName."),
 ]));
 
 var msg40 = msg("STM:39", part40);
 
-var part41 = match("MESSAGE#40:STM:40", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2}SetWATReqRewritePolicyOn - %{fld6}Ret %{fld3}SapCtx %{fld4}, SapId %{fld5}", processor_chain([
+var part41 = match("MESSAGE#40:STM:40", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2->} SetWATReqRewritePolicyOn - %{fld6->} Ret %{fld3->} SapCtx %{fld4}, SapId %{fld5}", processor_chain([
 	dup3,
 	setc("event_description","STM: SetWATReqRewritePolicyOn."),
 ]));
 
 var msg41 = msg("STM:40", part41);
 
-var part42 = match("MESSAGE#41:STM:41", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsOn SapCtx %{fld3}, Return Code %{fld4}", processor_chain([
+var part42 = match("MESSAGE#41:STM:41", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsOn SapCtx %{fld3}, Return Code %{fld4}", processor_chain([
 	dup3,
 	setc("event_description","STM: aps SetIpsOn."),
 ]));
 
 var msg42 = msg("STM:41", part42);
 
-var part43 = match("MESSAGE#42:STM:42", "nwparser.payload", "STM: aps-%{fld1->} %{fld2}SetIpsLimitPolicyOn Return Code %{fld3}", processor_chain([
+var part43 = match("MESSAGE#42:STM:42", "nwparser.payload", "STM: aps-%{fld1->} %{fld2->} SetIpsLimitPolicyOn Return Code %{fld3}", processor_chain([
 	dup3,
 	dup5,
 ]));
 
 var msg43 = msg("STM:42", part43);
 
-var part44 = match("MESSAGE#43:STM:43", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2}SetWATRespRewritePolicyOn - %{fld6}Ret %{fld3}SapCtx %{fld4}, SapId %{fld5}", processor_chain([
+var part44 = match("MESSAGE#43:STM:43", "nwparser.payload", "STM: WATRewr-%{fld1->} %{fld2->} SetWATRespRewritePolicyOn - %{fld6->} Ret %{fld3->} SapCtx %{fld4}, SapId %{fld5}", processor_chain([
 	dup3,
 	setc("event_description","STM: SetWATRespRewritePolicyOn."),
 ]));
@@ -644,7 +644,7 @@ var part45 = match("MESSAGE#44:STM_WRAPPER:01", "nwparser.payload", "STM_WRAPPER
 
 var msg45 = msg("STM_WRAPPER:01", part45);
 
-var part46 = match("MESSAGE#45:STM_WRAPPER:02", "nwparser.payload", "STM_WRAPPER: [ALERT:%{fld1}] Configuration size is %{fld2}which exceeds the %{fld3}safe limit. Please check your configuration.", processor_chain([
+var part46 = match("MESSAGE#45:STM_WRAPPER:02", "nwparser.payload", "STM_WRAPPER: [ALERT:%{fld1}] Configuration size is %{fld2->} which exceeds the %{fld3->} safe limit. Please check your configuration.", processor_chain([
 	dup6,
 	setc("event_description","STM_WRAPPER: ALERT Configuration size exceeds the safe memory limit."),
 ]));
@@ -696,42 +696,42 @@ var select3 = linear_select([
 	msg51,
 ]);
 
-var part52 = match("MESSAGE#51:CONFIG_AGENT:01", "nwparser.payload", "CONFIG_AGENT: %{fld1}RPC Name =%{fld2}, RPC Result: %{fld3}", processor_chain([
+var part52 = match("MESSAGE#51:CONFIG_AGENT:01", "nwparser.payload", "CONFIG_AGENT: %{fld1->} RPC Name =%{fld2}, RPC Result: %{fld3}", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT: RPC information."),
 ]));
 
 var msg52 = msg("CONFIG_AGENT:01", part52);
 
-var part53 = match("MESSAGE#52:CONFIG_AGENT:02", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2}Received put-tree command ", processor_chain([
+var part53 = match("MESSAGE#52:CONFIG_AGENT:02", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} Received put-tree command ", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:Received put-tree command."),
 ]));
 
 var msg53 = msg("CONFIG_AGENT:02", part53);
 
-var part54 = match("MESSAGE#53:CONFIG_AGENT:03", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2}It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., %{fld3->} ", processor_chain([
+var part54 = match("MESSAGE#53:CONFIG_AGENT:03", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., %{fld3->} ", processor_chain([
 	dup4,
 	setc("event_description","It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time."),
 ]));
 
 var msg54 = msg("CONFIG_AGENT:03", part54);
 
-var part55 = match("MESSAGE#54:CONFIG_AGENT:04", "nwparser.payload", "CONFIG_AGENT: %{fld1}Initiating config_agent database commit phase.", processor_chain([
+var part55 = match("MESSAGE#54:CONFIG_AGENT:04", "nwparser.payload", "CONFIG_AGENT: %{fld1->} Initiating config_agent database commit phase.", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:Initiating config_agent database commit phase."),
 ]));
 
 var msg55 = msg("CONFIG_AGENT:04", part55);
 
-var part56 = match("MESSAGE#55:CONFIG_AGENT:05", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2}Update succeeded", processor_chain([
+var part56 = match("MESSAGE#55:CONFIG_AGENT:05", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} Update succeeded", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:Update succeded."),
 ]));
 
 var msg56 = msg("CONFIG_AGENT:05", part56);
 
-var part57 = match("MESSAGE#56:CONFIG_AGENT:06", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2}No rules, %{fld3->} ", processor_chain([
+var part57 = match("MESSAGE#56:CONFIG_AGENT:06", "nwparser.payload", "CONFIG_AGENT: %{fld1->} %{fld2->} No rules, %{fld3->} ", processor_chain([
 	dup3,
 	setc("event_description","CONFIG_AGENT:No rules."),
 ]));
@@ -833,14 +833,14 @@ var select6 = linear_select([
 	msg67,
 ]);
 
-var part68 = match("MESSAGE#67:INSTALL:01", "nwparser.payload", "INSTALL: Migrating configuration from %{fld2}to %{fld3}", processor_chain([
+var part68 = match("MESSAGE#67:INSTALL:01", "nwparser.payload", "INSTALL: Migrating configuration from %{fld2->} to %{fld3}", processor_chain([
 	dup3,
 	setc("event_description"," INSTALL: migrating configuration."),
 ]));
 
 var msg68 = msg("INSTALL:01", part68);
 
-var part69 = match("MESSAGE#68:INSTALL:02", "nwparser.payload", "INSTALL: Loading the snapshot for %{fld2}release.", processor_chain([
+var part69 = match("MESSAGE#68:INSTALL:02", "nwparser.payload", "INSTALL: Loading the snapshot for %{fld2->} release.", processor_chain([
 	dup3,
 	setc("event_description"," INSTALL: Loading snapshot from previous version."),
 ]));
@@ -871,7 +871,7 @@ var select8 = linear_select([
 	msg71,
 ]);
 
-var part72 = match("MESSAGE#71:CONFIG", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part72 = match("MESSAGE#71:CONFIG", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup7,
 	setc("event_description"," Configuration changes made."),
 	dup8,
@@ -879,7 +879,7 @@ var part72 = match("MESSAGE#71:CONFIG", "nwparser.payload", "%{fld88->} %{fld89-
 
 var msg72 = msg("CONFIG", part72);
 
-var part73 = match("MESSAGE#72:LOGIN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part73 = match("MESSAGE#72:LOGIN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	setc("eventcategory","1401060000"),
 	setc("event_description"," Login."),
 	dup8,
@@ -887,7 +887,7 @@ var part73 = match("MESSAGE#72:LOGIN", "nwparser.payload", "%{fld88->} %{fld89->
 
 var msg73 = msg("LOGIN", part73);
 
-var part74 = match("MESSAGE#73:SESSION_TIMEOUT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part74 = match("MESSAGE#73:SESSION_TIMEOUT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup9,
 	setc("event_description"," Session timeout."),
 	dup8,
@@ -895,7 +895,7 @@ var part74 = match("MESSAGE#73:SESSION_TIMEOUT", "nwparser.payload", "%{fld88->}
 
 var msg74 = msg("SESSION_TIMEOUT", part74);
 
-var part75 = match("MESSAGE#74:LOGOUT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part75 = match("MESSAGE#74:LOGOUT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup9,
 	setc("ec_subject","User"),
 	setc("ec_activity","Logoff"),
@@ -907,7 +907,7 @@ var part75 = match("MESSAGE#74:LOGOUT", "nwparser.payload", "%{fld88->} %{fld89-
 
 var msg75 = msg("LOGOUT", part75);
 
-var part76 = match("MESSAGE#75:UNSUCCESSFUL_LOGIN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part76 = match("MESSAGE#75:UNSUCCESSFUL_LOGIN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	setc("eventcategory","1401030000"),
 	setc("event_description"," Unsuccessful login."),
 	dup8,
@@ -915,7 +915,7 @@ var part76 = match("MESSAGE#75:UNSUCCESSFUL_LOGIN", "nwparser.payload", "%{fld88
 
 var msg76 = msg("UNSUCCESSFUL_LOGIN", part76);
 
-var part77 = match("MESSAGE#76:TRANSPARENT_MODE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part77 = match("MESSAGE#76:TRANSPARENT_MODE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," Operating in Transport Mode"),
 	dup8,
@@ -923,7 +923,7 @@ var part77 = match("MESSAGE#76:TRANSPARENT_MODE", "nwparser.payload", "%{fld88->
 
 var msg77 = msg("TRANSPARENT_MODE", part77);
 
-var part78 = match("MESSAGE#77:SUPPORT_TUNNEL_OPEN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part78 = match("MESSAGE#77:SUPPORT_TUNNEL_OPEN", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," Support Tunnel Opened"),
 	dup8,
@@ -931,7 +931,7 @@ var part78 = match("MESSAGE#77:SUPPORT_TUNNEL_OPEN", "nwparser.payload", "%{fld8
 
 var msg78 = msg("SUPPORT_TUNNEL_OPEN", part78);
 
-var part79 = match("MESSAGE#78:FIRMWARE_UPDATE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part79 = match("MESSAGE#78:FIRMWARE_UPDATE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," Firmware Update"),
 	dup8,
@@ -939,7 +939,7 @@ var part79 = match("MESSAGE#78:FIRMWARE_UPDATE", "nwparser.payload", "%{fld88->}
 
 var msg79 = msg("FIRMWARE_UPDATE", part79);
 
-var part80 = match("MESSAGE#79:FIRMWARE_REVERT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part80 = match("MESSAGE#79:FIRMWARE_REVERT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," Firmware Revert."),
 	dup8,
@@ -947,7 +947,7 @@ var part80 = match("MESSAGE#79:FIRMWARE_REVERT", "nwparser.payload", "%{fld88->}
 
 var msg80 = msg("FIRMWARE_REVERT", part80);
 
-var part81 = match("MESSAGE#80:REBOOT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part81 = match("MESSAGE#80:REBOOT", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," System Reboot."),
 	dup8,
@@ -955,7 +955,7 @@ var part81 = match("MESSAGE#80:REBOOT", "nwparser.payload", "%{fld88->} %{fld89-
 
 var msg81 = msg("REBOOT", part81);
 
-var part82 = match("MESSAGE#81:ROLLBACK", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part82 = match("MESSAGE#81:ROLLBACK", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup10,
 	setc("event_description"," System ROLLBACK."),
 	dup8,
@@ -963,14 +963,14 @@ var part82 = match("MESSAGE#81:ROLLBACK", "nwparser.payload", "%{fld88->} %{fld8
 
 var msg82 = msg("ROLLBACK", part82);
 
-var part83 = match("MESSAGE#82:HEADER_COUNT_EXCEEDED:01", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context}\"[%{result}]\" %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
+var part83 = match("MESSAGE#82:HEADER_COUNT_EXCEEDED:01", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context->} \"[%{result}]\" %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
 	dup11,
 	dup8,
 ]));
 
 var msg83 = msg("HEADER_COUNT_EXCEEDED:01", part83);
 
-var part84 = match("MESSAGE#83:HEADER_COUNT_EXCEEDED:02", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context}[%{result}] %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
+var part84 = match("MESSAGE#83:HEADER_COUNT_EXCEEDED:02", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context->} [%{result}] %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
 	dup11,
 	dup8,
 ]));
@@ -1131,7 +1131,7 @@ var part86 = match("MESSAGE#114:SYS", "nwparser.payload", "%{fld9->} %{fld10->} 
 
 var msg115 = msg("SYS", part86);
 
-var part87 = match("MESSAGE#115:BARRACUDAWAF", "nwparser.payload", "Log=%{event_log}Severity=%{severity}Protocol=%{protocol}SourceIP=%{saddr}SourcePort=%{sport}DestIP=%{daddr}DestPort=%{dport}Action=%{action}AdminName=%{administrator}Details=%{info}", processor_chain([
+var part87 = match("MESSAGE#115:BARRACUDAWAF", "nwparser.payload", "Log=%{event_log->} Severity=%{severity->} Protocol=%{protocol->} SourceIP=%{saddr->} SourcePort=%{sport->} DestIP=%{daddr->} DestPort=%{dport->} Action=%{action->} AdminName=%{administrator->} Details=%{info}", processor_chain([
 	dup17,
 	date_time({
 		dest: "event_time",
@@ -1144,7 +1144,7 @@ var part87 = match("MESSAGE#115:BARRACUDAWAF", "nwparser.payload", "Log=%{event_
 
 var msg116 = msg("BARRACUDAWAF", part87);
 
-var part88 = match("MESSAGE#116:Audit_Logs", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}AUDIT %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name}\"%{change_old}\" \"%{change_new}\"", processor_chain([
+var part88 = match("MESSAGE#116:Audit_Logs", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} AUDIT %{operation_id->} %{administrator->} %{action->} %{content_type->} %{hostip->} %{fld8->} %{info->} %{obj_type->} %{fld11->} %{obj_name->} \"%{change_old}\" \"%{change_new}\"", processor_chain([
 	dup7,
 	dup8,
 	setc("category","AUDIT"),
@@ -1153,7 +1153,7 @@ var part88 = match("MESSAGE#116:Audit_Logs", "nwparser.payload", "%{fld88->} %{f
 
 var msg117 = msg("Audit_Logs", part88);
 
-var part89 = match("MESSAGE#117:WF", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}WF %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context}[%{result}] %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
+var part89 = match("MESSAGE#117:WF", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} WF %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context->} [%{result}] %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
 	dup17,
 	dup8,
 	setc("category","WF"),
@@ -1162,7 +1162,7 @@ var part89 = match("MESSAGE#117:WF", "nwparser.payload", "%{fld88->} %{fld89->} 
 
 var msg118 = msg("WF", part89);
 
-var part90 = match("MESSAGE#118:TR_Logs:01/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes}\"-\" \"-\" \"%{user_agent}\" %{stransaddr->} %{p0}");
+var part90 = match("MESSAGE#118:TR_Logs:01/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} \"-\" \"-\" \"%{user_agent}\" %{stransaddr->} %{p0}");
 
 var all2 = all_match({
 	processors: [
@@ -1180,7 +1180,7 @@ var all2 = all_match({
 
 var msg119 = msg("TR_Logs:01", all2);
 
-var part91 = match("MESSAGE#119:TR_Logs:02/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} %{web_query}\"-\" \"%{user_agent}\" %{stransaddr->} %{p0}");
+var part91 = match("MESSAGE#119:TR_Logs:02/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} %{web_query->} \"-\" \"%{user_agent}\" %{stransaddr->} %{p0}");
 
 var all3 = all_match({
 	processors: [
@@ -1198,7 +1198,7 @@ var all3 = all_match({
 
 var msg120 = msg("TR_Logs:02", all3);
 
-var part92 = match("MESSAGE#120:TR_Logs:03/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes}\"-\" %{web_cookie}\"%{user_agent}\" %{stransaddr->} %{p0}");
+var part92 = match("MESSAGE#120:TR_Logs:03/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} \"-\" %{web_cookie->} \"%{user_agent}\" %{stransaddr->} %{p0}");
 
 var all4 = all_match({
 	processors: [
@@ -1216,7 +1216,7 @@ var all4 = all_match({
 
 var msg121 = msg("TR_Logs:03", all4);
 
-var part93 = match("MESSAGE#121:TR_Logs/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone}TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} %{web_query->} %{web_cookie}\"%{user_agent}\" %{stransaddr->} %{p0}");
+var part93 = match("MESSAGE#121:TR_Logs/0", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} TR %{operation_id->} %{protocol->} %{web_method->} %{saddr->} %{sport->} %{daddr->} %{dport->} %{url->} %{cert_username->} %{logon_id->} %{web_host->} %{web_referer->} %{resultcode->} %{sbytes->} %{rbytes->} %{web_query->} %{web_cookie->} \"%{user_agent}\" %{stransaddr->} %{p0}");
 
 var all5 = all_match({
 	processors: [
@@ -1296,9 +1296,9 @@ var part95 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_0", "nwparser.p0", "\"[%{
 
 var part96 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_1", "nwparser.p0", "[%{result}] %{p0}");
 
-var part97 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol}- %{stransaddr->} %{stransport->} %{web_referer}");
+var part97 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
 
-var part98 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
+var part98 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
 
 var part99 = match("MESSAGE#118:TR_Logs:01/1_0", "nwparser.p0", "%{stransport->} %{content_type->} ");
 
@@ -1309,7 +1309,7 @@ var select23 = linear_select([
 	dup14,
 ]);
 
-var part101 = match("MESSAGE#103:NO_DOMAIN_MATCH_IN_PROFILE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context}[%{result}] %{web_method->} %{url->} %{protocol}\"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
+var part101 = match("MESSAGE#103:NO_DOMAIN_MATCH_IN_PROFILE", "nwparser.payload", "%{fld88->} %{fld89->} %{timezone->} %{category->} %{operation_id->} %{severity->} %{event_type->} %{saddr->} %{sport->} %{rulename->} %{rule_group->} %{action->} %{context->} [%{result}] %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}", processor_chain([
 	dup17,
 	dup8,
 ]));

@@ -15,7 +15,7 @@ function DeviceProcessor() {
 	}
 }
 
-var dup1 = match("HEADER#1:0022/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{p0}");
+var dup1 = match("HEADER#1:0022/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{p0}");
 
 var dup2 = match("HEADER#1:0022/1_1", "nwparser.p0", "%{hpriority}][%{p0}");
 
@@ -41,7 +41,7 @@ var dup5 = call({
 	],
 });
 
-var dup6 = match("HEADER#18:0034/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}]%{p0}");
+var dup6 = match("HEADER#18:0034/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}]%{p0}");
 
 var dup7 = match("HEADER#18:0034/1_0", "nwparser.p0", " [%{p0}");
 
@@ -240,7 +240,7 @@ var dup69 = match("MESSAGE#435:ConsoleProductInfoProvider", "nwparser.payload", 
 	dup59,
 ]));
 
-var hdr1 = match("HEADER#0:0031", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] %{hfld39}[Thread: %{messageid}] [Started: %{hfld40}] [Duration: %{hfld41}] %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0031", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] %{hfld39}[Thread: %{messageid}] [Started: %{hfld40}] [Duration: %{hfld41}] %{payload}", processor_chain([
 	setc("header_id","0031"),
 ]));
 
@@ -265,55 +265,55 @@ var all1 = all_match({
 	]),
 });
 
-var hdr2 = match("HEADER#2:0028", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{messageid}: %{payload}", processor_chain([
+var hdr2 = match("HEADER#2:0028", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0028"),
 	dup4,
 ]));
 
-var hdr3 = match("HEADER#3:0017", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{messageid->} %{payload}", processor_chain([
+var hdr3 = match("HEADER#3:0017", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0017"),
 	dup5,
 ]));
 
-var hdr4 = match("HEADER#4:0024", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{hfld41->} %{messageid}completed %{payload}", processor_chain([
+var hdr4 = match("HEADER#4:0024", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] %{hfld41->} %{messageid->} completed %{payload}", processor_chain([
 	setc("header_id","0024"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("completed "),
+			constant(" completed "),
 			field("payload"),
 		],
 	}),
 ]));
 
-var hdr5 = match("HEADER#5:0018", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}:%{hsport}/%{hprotocol}] %{messageid->} %{payload}", processor_chain([
+var hdr5 = match("HEADER#5:0018", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}:%{hsport}/%{hprotocol}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0018"),
 	dup5,
 ]));
 
-var hdr6 = match("HEADER#6:0029", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Silo ID: %{hfld22}] [Site: %{hsite}] [Site ID: %{hinfo}] %{messageid->} %{payload}", processor_chain([
+var hdr6 = match("HEADER#6:0029", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Silo ID: %{hfld22}] [Site: %{hsite}] [Site ID: %{hinfo}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0029"),
 	dup5,
 ]));
 
-var hdr7 = match("HEADER#7:0019", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] %{messageid->} %{payload}", processor_chain([
+var hdr7 = match("HEADER#7:0019", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0019"),
 	dup5,
 ]));
 
-var hdr8 = match("HEADER#8:0020", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}:%{hsport}/%{hprotocol}] [%{hinfo}] %{messageid->} %{payload}", processor_chain([
+var hdr8 = match("HEADER#8:0020", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}:%{hsport}/%{hprotocol}] [%{hinfo}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0020"),
 	dup5,
 ]));
 
-var hdr9 = match("HEADER#9:0021", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] [%{hinfo}] %{messageid->} %{payload}", processor_chain([
+var hdr9 = match("HEADER#9:0021", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] [%{hinfo}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0021"),
 	dup5,
 ]));
 
-var hdr10 = match("HEADER#10:0023", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] [%{hinfo}]: %{messageid->} %{payload}", processor_chain([
+var hdr10 = match("HEADER#10:0023", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Site: %{hsite}] [%{hshost}] [%{hinfo}]: %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0023"),
 	dup5,
 ]));
@@ -333,11 +333,11 @@ var hdr11 = match("HEADER#11:0036", "message", "%NEXPOSE-%{hfld49}: %{hfld1}: %{
 	}),
 ]));
 
-var hdr12 = match("HEADER#12:0001", "message", "%NEXPOSE-%{hfld49}: %{messageid->} %{hdate}T%{htime}[%{hobj_name}] %{payload}", processor_chain([
+var hdr12 = match("HEADER#12:0001", "message", "%NEXPOSE-%{hfld49}: %{messageid->} %{hdate}T%{htime->} [%{hobj_name}] %{payload}", processor_chain([
 	setc("header_id","0001"),
 ]));
 
-var hdr13 = match("HEADER#13:0037", "message", "%NEXPOSE-%{hfld49}: %{messageid->} %{hfld1}'%{hfld2}' - %{hfld1->} %{payload}", processor_chain([
+var hdr13 = match("HEADER#13:0037", "message", "%NEXPOSE-%{hfld49}: %{messageid->} %{hfld1->} '%{hfld2}' - %{hfld1->} %{payload}", processor_chain([
 	setc("header_id","0037"),
 	call({
 		dest: "nwparser.payload",
@@ -346,7 +346,7 @@ var hdr13 = match("HEADER#13:0037", "message", "%NEXPOSE-%{hfld49}: %{messageid-
 			field("messageid"),
 			constant(" "),
 			field("hfld1"),
-			constant("'"),
+			constant(" '"),
 			field("hfld2"),
 			constant("' - "),
 			field("hfld1"),
@@ -360,17 +360,17 @@ var hdr14 = match("HEADER#14:0002", "message", "%NEXPOSE-%{hfld49}: %{messageid-
 	setc("header_id","0002"),
 ]));
 
-var hdr15 = match("HEADER#15:0003", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] (%{hfld41}) %{messageid->} %{payload}", processor_chain([
+var hdr15 = match("HEADER#15:0003", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] (%{hfld41}) %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0003"),
 	dup5,
 ]));
 
-var hdr16 = match("HEADER#16:0030", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] %{messageid}: %{payload}", processor_chain([
+var hdr16 = match("HEADER#16:0030", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0030"),
 	dup4,
 ]));
 
-var hdr17 = match("HEADER#17:0040", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}] [Thread: %{hfld17}] [Principal: %{username}] [%{messageid}: %{payload}", processor_chain([
+var hdr17 = match("HEADER#17:0040", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}] [Thread: %{hfld17}] [Principal: %{username}] [%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0040"),
 ]));
 
@@ -408,12 +408,12 @@ var all3 = all_match({
 	]),
 });
 
-var hdr18 = match("HEADER#20:0004", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{messageid->} %{payload}", processor_chain([
+var hdr18 = match("HEADER#20:0004", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0004"),
 	dup5,
 ]));
 
-var part6 = match("HEADER#21:0032/2", "nwparser.p0", "Thread: %{hfld17}] [Silo ID: %{hfld18}] [Report: %{hobj_name}] [%{messageid}Config ID: %{hfld19}] %{payload}");
+var part6 = match("HEADER#21:0032/2", "nwparser.p0", "Thread: %{hfld17}] [Silo ID: %{hfld18}] [Report: %{hobj_name}] [%{messageid->} Config ID: %{hfld19}] %{payload}");
 
 var all4 = all_match({
 	processors: [
@@ -436,12 +436,12 @@ var hdr20 = match("HEADER#23:0039", "message", "%NEXPOSE-%{hfld49}: %{messageid}
 	dup9,
 ]));
 
-var hdr21 = match("HEADER#24:0005", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{hfld48->} %{hfld41->} %{messageid->} %{payload}", processor_chain([
+var hdr21 = match("HEADER#24:0005", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{hfld48->} %{hfld41->} %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0005"),
 	dup5,
 ]));
 
-var hdr22 = match("HEADER#25:0006", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] [%{messageid}] %{payload}", processor_chain([
+var hdr22 = match("HEADER#25:0006", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] [%{messageid}] %{payload}", processor_chain([
 	setc("header_id","0006"),
 ]));
 
@@ -479,11 +479,11 @@ var hdr23 = match("HEADER#27:0007", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	dup5,
 ]));
 
-var hdr24 = match("HEADER#28:0008", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] (%{messageid}) %{payload}", processor_chain([
+var hdr24 = match("HEADER#28:0008", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] (%{messageid}) %{payload}", processor_chain([
 	setc("header_id","0008"),
 ]));
 
-var hdr25 = match("HEADER#29:0009", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{fld41->} %{messageid->} %{payload}", processor_chain([
+var hdr25 = match("HEADER#29:0009", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{fld41->} %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0009"),
 	call({
 		dest: "nwparser.payload",
@@ -498,7 +498,7 @@ var hdr25 = match("HEADER#29:0009", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	}),
 ]));
 
-var hdr26 = match("HEADER#30:0010", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{messageid}: %{payload}", processor_chain([
+var hdr26 = match("HEADER#30:0010", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0010"),
 	dup4,
 ]));
@@ -512,7 +512,7 @@ var hdr28 = match("HEADER#32:0012", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	dup5,
 ]));
 
-var hdr29 = match("HEADER#33:0013", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{hfld45}(%{hfld46}) - %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{payload}", processor_chain([
+var hdr29 = match("HEADER#33:0013", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{hfld45->} (%{hfld46}) - %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{payload}", processor_chain([
 	setc("header_id","0013"),
 	call({
 		dest: "nwparser.messageid",
@@ -530,7 +530,7 @@ var hdr29 = match("HEADER#33:0013", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 		fn: STRCAT,
 		args: [
 			field("hfld45"),
-			constant("("),
+			constant(" ("),
 			field("hfld46"),
 			constant(") - "),
 			field("msgIdPart1"),
@@ -544,7 +544,7 @@ var hdr29 = match("HEADER#33:0013", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	}),
 ]));
 
-var hdr30 = match("HEADER#34:0014", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{hfld45}(%{hfld46}) - %{msgIdPart1->} %{msgIdPart2->} %{payload}", processor_chain([
+var hdr30 = match("HEADER#34:0014", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{hfld45->} (%{hfld46}) - %{msgIdPart1->} %{msgIdPart2->} %{payload}", processor_chain([
 	setc("header_id","0014"),
 	dup10,
 	call({
@@ -552,7 +552,7 @@ var hdr30 = match("HEADER#34:0014", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 		fn: STRCAT,
 		args: [
 			field("hfld45"),
-			constant("("),
+			constant(" ("),
 			field("hfld46"),
 			constant(") - "),
 			field("msgIdPart1"),
@@ -564,14 +564,14 @@ var hdr30 = match("HEADER#34:0014", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	}),
 ]));
 
-var hdr31 = match("HEADER#35:0015", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{hfld45}(%{hfld46}) - %{messageid->} %{payload}", processor_chain([
+var hdr31 = match("HEADER#35:0015", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{hfld45->} (%{hfld46}) - %{messageid->} %{payload}", processor_chain([
 	setc("header_id","0015"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("hfld45"),
-			constant("("),
+			constant(" ("),
 			field("hfld46"),
 			constant(") - "),
 			field("messageid"),
@@ -581,7 +581,7 @@ var hdr31 = match("HEADER#35:0015", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	}),
 ]));
 
-var hdr32 = match("HEADER#36:0016", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime}[%{hobj_name}] %{hfld45}(%{hfld46}) - %{msgIdPart1->} %{msgIdPart2}(U) %{payload}", processor_chain([
+var hdr32 = match("HEADER#36:0016", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} %{hdate}T%{htime->} [%{hobj_name}] %{hfld45->} (%{hfld46}) - %{msgIdPart1->} %{msgIdPart2}(U) %{payload}", processor_chain([
 	setc("header_id","0016"),
 	dup10,
 	call({
@@ -589,7 +589,7 @@ var hdr32 = match("HEADER#36:0016", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 		fn: STRCAT,
 		args: [
 			field("hfld45"),
-			constant("("),
+			constant(" ("),
 			field("hfld46"),
 			constant(") - "),
 			field("msgIdPart1"),
@@ -601,40 +601,40 @@ var hdr32 = match("HEADER#36:0016", "message", "%NEXPOSE-%{hfld49}: %{hfld40->} 
 	}),
 ]));
 
-var hdr33 = match("HEADER#37:0026", "message", "%NEXPOSE-%{hfld49}: %{messageid}Constructor threw %{payload}", processor_chain([
+var hdr33 = match("HEADER#37:0026", "message", "%NEXPOSE-%{hfld49}: %{messageid->} Constructor threw %{payload}", processor_chain([
 	setc("header_id","0026"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("Constructor threw "),
+			constant(" Constructor threw "),
 			field("payload"),
 		],
 	}),
 ]));
 
-var hdr34 = match("HEADER#38:0027", "message", "%NEXPOSE-%{hfld49}: %{messageid}Called method %{payload}", processor_chain([
+var hdr34 = match("HEADER#38:0027", "message", "%NEXPOSE-%{hfld49}: %{messageid->} Called method %{payload}", processor_chain([
 	setc("header_id","0027"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("Called method "),
+			constant(" Called method "),
 			field("payload"),
 		],
 	}),
 ]));
 
-var hdr35 = match("HEADER#39:0025", "message", "%NEXPOSE-%{hfld49}: %{hfld41->} %{hfld42->} %{messageid}frames %{payload}", processor_chain([
+var hdr35 = match("HEADER#39:0025", "message", "%NEXPOSE-%{hfld49}: %{hfld41->} %{hfld42->} %{messageid->} frames %{payload}", processor_chain([
 	setc("header_id","0025"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("messageid"),
-			constant("frames "),
+			constant(" frames "),
 			field("payload"),
 		],
 	}),
@@ -689,7 +689,7 @@ var select4 = linear_select([
 	hdr36,
 ]);
 
-var part12 = match("MESSAGE#0:NOT_VULNERABLE_VERSION", "nwparser.payload", "%{signame}- NOT VULNERABLE VERSION .", processor_chain([
+var part12 = match("MESSAGE#0:NOT_VULNERABLE_VERSION", "nwparser.payload", "%{signame->} - NOT VULNERABLE VERSION .", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -701,7 +701,7 @@ var part12 = match("MESSAGE#0:NOT_VULNERABLE_VERSION", "nwparser.payload", "%{si
 
 var msg1 = msg("NOT_VULNERABLE_VERSION", part12);
 
-var part13 = match("MESSAGE#1:VULNERABLE_VERSION", "nwparser.payload", "%{signame}- VULNERABLE VERSION .", processor_chain([
+var part13 = match("MESSAGE#1:VULNERABLE_VERSION", "nwparser.payload", "%{signame->} - VULNERABLE VERSION .", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -713,7 +713,7 @@ var part13 = match("MESSAGE#1:VULNERABLE_VERSION", "nwparser.payload", "%{signam
 
 var msg2 = msg("VULNERABLE_VERSION", part13);
 
-var part14 = match("MESSAGE#2:NOT_VULNERABLE", "nwparser.payload", "%{signame}- NOT VULNERABLE [UNIQUE ID: %{fld45}]", processor_chain([
+var part14 = match("MESSAGE#2:NOT_VULNERABLE", "nwparser.payload", "%{signame->} - NOT VULNERABLE [UNIQUE ID: %{fld45}]", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -725,7 +725,7 @@ var part14 = match("MESSAGE#2:NOT_VULNERABLE", "nwparser.payload", "%{signame}- 
 
 var msg3 = msg("NOT_VULNERABLE", part14);
 
-var part15 = match("MESSAGE#3:NOT_VULNERABLE:01", "nwparser.payload", "%{signame}- NOT VULNERABLE(U) [UNIQUE ID: %{fld45}]", processor_chain([
+var part15 = match("MESSAGE#3:NOT_VULNERABLE:01", "nwparser.payload", "%{signame->} - NOT VULNERABLE(U) [UNIQUE ID: %{fld45}]", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -737,7 +737,7 @@ var part15 = match("MESSAGE#3:NOT_VULNERABLE:01", "nwparser.payload", "%{signame
 
 var msg4 = msg("NOT_VULNERABLE:01", part15);
 
-var part16 = match("MESSAGE#4:NOT_VULNERABLE:02", "nwparser.payload", "%{signame}- NOT VULNERABLE .", processor_chain([
+var part16 = match("MESSAGE#4:NOT_VULNERABLE:02", "nwparser.payload", "%{signame->} - NOT VULNERABLE .", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -755,7 +755,7 @@ var select5 = linear_select([
 	msg5,
 ]);
 
-var part17 = match("MESSAGE#5:VULNERABLE", "nwparser.payload", "%{signame}- VULNERABLE [UNIQUE ID: %{fld45}]", processor_chain([
+var part17 = match("MESSAGE#5:VULNERABLE", "nwparser.payload", "%{signame->} - VULNERABLE [UNIQUE ID: %{fld45}]", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -767,7 +767,7 @@ var part17 = match("MESSAGE#5:VULNERABLE", "nwparser.payload", "%{signame}- VULN
 
 var msg6 = msg("VULNERABLE", part17);
 
-var part18 = match("MESSAGE#6:VULNERABLE:01", "nwparser.payload", "%{signame}- VULNERABLE .", processor_chain([
+var part18 = match("MESSAGE#6:VULNERABLE:01", "nwparser.payload", "%{signame->} - VULNERABLE .", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -784,7 +784,7 @@ var select6 = linear_select([
 	msg7,
 ]);
 
-var part19 = match("MESSAGE#7:ERROR", "nwparser.payload", "%{signame}- ERROR [UNIQUE ID: %{fld45}] - %{context}", processor_chain([
+var part19 = match("MESSAGE#7:ERROR", "nwparser.payload", "%{signame->} - ERROR [UNIQUE ID: %{fld45}] - %{context}", processor_chain([
 	dup18,
 	dup12,
 	dup13,
@@ -797,7 +797,7 @@ var part19 = match("MESSAGE#7:ERROR", "nwparser.payload", "%{signame}- ERROR [UN
 
 var msg8 = msg("ERROR", part19);
 
-var part20 = match("MESSAGE#8:ERROR:01", "nwparser.payload", "%{signame}- ERROR - %{context}", processor_chain([
+var part20 = match("MESSAGE#8:ERROR:01", "nwparser.payload", "%{signame->} - ERROR - %{context}", processor_chain([
 	dup18,
 	dup12,
 	dup13,
@@ -890,7 +890,7 @@ var part26 = match("MESSAGE#14:ScanMgr:01", "nwparser.payload", "shutting down..
 
 var msg15 = msg("ScanMgr:01", part26);
 
-var part27 = match("MESSAGE#15:ScanMgr:02", "nwparser.payload", "Scan %{fld30}is being stopped.", processor_chain([
+var part27 = match("MESSAGE#15:ScanMgr:02", "nwparser.payload", "Scan %{fld30->} is being stopped.", processor_chain([
 	dup20,
 	dup12,
 	dup13,
@@ -1118,7 +1118,7 @@ var part47 = match("MESSAGE#31:Nexpose:02", "nwparser.payload", "starting %{fld3
 
 var msg34 = msg("Nexpose:02", part47);
 
-var part48 = match("MESSAGE#32:Nexpose:03", "nwparser.payload", "%{fld31}nodes completed, %{fld32}active, %{fld33}pending.", processor_chain([
+var part48 = match("MESSAGE#32:Nexpose:03", "nwparser.payload", "%{fld31->} nodes completed, %{fld32->} active, %{fld33->} pending.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1135,7 +1135,7 @@ var part49 = match("MESSAGE#373:Backup_completed", "nwparser.payload", "Nexpose 
 
 var msg36 = msg("Backup_completed", part49);
 
-var part50 = match("MESSAGE#408:Nexpose:04", "nwparser.payload", "Nexpose is changing the database port number from %{change_old}to %{change_new}. DONE.", processor_chain([
+var part50 = match("MESSAGE#408:Nexpose:04", "nwparser.payload", "Nexpose is changing the database port number from %{change_old->} to %{change_new}. DONE.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1145,7 +1145,7 @@ var part50 = match("MESSAGE#408:Nexpose:04", "nwparser.payload", "Nexpose is cha
 
 var msg37 = msg("Nexpose:04", part50);
 
-var part51 = match("MESSAGE#409:Nexpose:05", "nwparser.payload", "Nexpose is changing the database port number from %{change_old}to %{change_new}.", processor_chain([
+var part51 = match("MESSAGE#409:Nexpose:05", "nwparser.payload", "Nexpose is changing the database port number from %{change_old->} to %{change_new}.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1154,7 +1154,7 @@ var part51 = match("MESSAGE#409:Nexpose:05", "nwparser.payload", "Nexpose is cha
 
 var msg38 = msg("Nexpose:05", part51);
 
-var part52 = match("MESSAGE#410:Nexpose:06", "nwparser.payload", "Nexpose is executing the data transfer process from %{change_old}to %{change_new}DONE.", processor_chain([
+var part52 = match("MESSAGE#410:Nexpose:06", "nwparser.payload", "Nexpose is executing the data transfer process from %{change_old->} to %{change_new->} DONE.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1164,7 +1164,7 @@ var part52 = match("MESSAGE#410:Nexpose:06", "nwparser.payload", "Nexpose is exe
 
 var msg39 = msg("Nexpose:06", part52);
 
-var part53 = match("MESSAGE#411:Nexpose:07", "nwparser.payload", "Nexpose is executing the data transfer process from %{change_old}to %{change_new}", processor_chain([
+var part53 = match("MESSAGE#411:Nexpose:07", "nwparser.payload", "Nexpose is executing the data transfer process from %{change_old->} to %{change_new}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1173,7 +1173,7 @@ var part53 = match("MESSAGE#411:Nexpose:07", "nwparser.payload", "Nexpose is exe
 
 var msg40 = msg("Nexpose:07", part53);
 
-var part54 = match("MESSAGE#412:Nexpose:08", "nwparser.payload", "Nexpose is installing the %{db_name}database. DONE.", processor_chain([
+var part54 = match("MESSAGE#412:Nexpose:08", "nwparser.payload", "Nexpose is installing the %{db_name->} database. DONE.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1183,7 +1183,7 @@ var part54 = match("MESSAGE#412:Nexpose:08", "nwparser.payload", "Nexpose is ins
 
 var msg41 = msg("Nexpose:08", part54);
 
-var part55 = match("MESSAGE#413:Nexpose:09", "nwparser.payload", "Nexpose is installing the %{db_name}database to %{directory}using PostgreSQL binaries from package %{filename}.%{fld1}.", processor_chain([
+var part55 = match("MESSAGE#413:Nexpose:09", "nwparser.payload", "Nexpose is installing the %{db_name->} database to %{directory->} using PostgreSQL binaries from package %{filename}.%{fld1}.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1192,7 +1192,7 @@ var part55 = match("MESSAGE#413:Nexpose:09", "nwparser.payload", "Nexpose is ins
 
 var msg42 = msg("Nexpose:09", part55);
 
-var part56 = match("MESSAGE#414:Nexpose:10", "nwparser.payload", "Nexpose is moving %{change_old}to %{change_new}.", processor_chain([
+var part56 = match("MESSAGE#414:Nexpose:10", "nwparser.payload", "Nexpose is moving %{change_old->} to %{change_new}.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1201,7 +1201,7 @@ var part56 = match("MESSAGE#414:Nexpose:10", "nwparser.payload", "Nexpose is mov
 
 var msg43 = msg("Nexpose:10", part56);
 
-var part57 = match("MESSAGE#415:Nexpose:11", "nwparser.payload", "%{event_description}DONE.", processor_chain([
+var part57 = match("MESSAGE#415:Nexpose:11", "nwparser.payload", "%{event_description->} DONE.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1424,7 +1424,7 @@ var select17 = linear_select([
 	msg59,
 ]);
 
-var part74 = match("MESSAGE#40:Queueing:01", "nwparser.payload", "Queueing %{protocol}port scan", processor_chain([
+var part74 = match("MESSAGE#40:Queueing:01", "nwparser.payload", "Queueing %{protocol->} port scan", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -1505,7 +1505,7 @@ var select20 = linear_select([
 	msg63,
 ]);
 
-var part81 = match("MESSAGE#44:Trying", "nwparser.payload", "Trying %{fld30}injection %{fld31}", processor_chain([
+var part81 = match("MESSAGE#44:Trying", "nwparser.payload", "Trying %{fld30->} injection %{fld31}", processor_chain([
 	dup20,
 	dup12,
 	dup13,
@@ -1555,7 +1555,7 @@ var part84 = match("MESSAGE#49:Scan:01", "nwparser.payload", "Scan [%{fld35}] co
 
 var msg69 = msg("Scan:01", part84);
 
-var part85 = match("MESSAGE#50:Scan:03", "nwparser.payload", "Scan for site %{fld11}started by Schedule[%{info}].", processor_chain([
+var part85 = match("MESSAGE#50:Scan:03", "nwparser.payload", "Scan for site %{fld11->} started by Schedule[%{info}].", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -1571,7 +1571,7 @@ var part85 = match("MESSAGE#50:Scan:03", "nwparser.payload", "Scan for site %{fl
 
 var msg70 = msg("Scan:03", part85);
 
-var part86 = match("MESSAGE#51:Scan:04", "nwparser.payload", "Scan startup took %{fld24}seconds", processor_chain([
+var part86 = match("MESSAGE#51:Scan:04", "nwparser.payload", "Scan startup took %{fld24->} seconds", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -1587,7 +1587,7 @@ var part86 = match("MESSAGE#51:Scan:04", "nwparser.payload", "Scan startup took 
 
 var msg71 = msg("Scan:04", part86);
 
-var part87 = match("MESSAGE#52:Scan:06/2", "nwparser.p0", "] %{fld12}(%{info}) - VULNERABLE VERSION");
+var part87 = match("MESSAGE#52:Scan:06/2", "nwparser.p0", "] %{fld12->} (%{info}) - VULNERABLE VERSION");
 
 var all9 = all_match({
 	processors: [
@@ -1612,7 +1612,7 @@ var all9 = all_match({
 
 var msg72 = msg("Scan:06", all9);
 
-var part88 = match("MESSAGE#53:Scan:05/2", "nwparser.p0", "] %{fld12}(%{info}) - VULNERABLE");
+var part88 = match("MESSAGE#53:Scan:05/2", "nwparser.p0", "] %{fld12->} (%{info}) - VULNERABLE");
 
 var all10 = all_match({
 	processors: [
@@ -1637,7 +1637,7 @@ var all10 = all_match({
 
 var msg73 = msg("Scan:05", all10);
 
-var part89 = match("MESSAGE#54:Scan:07/2", "nwparser.p0", "] %{fld12}(%{info}) - NOT VULNERABLE VERSION");
+var part89 = match("MESSAGE#54:Scan:07/2", "nwparser.p0", "] %{fld12->} (%{info}) - NOT VULNERABLE VERSION");
 
 var all11 = all_match({
 	processors: [
@@ -1662,7 +1662,7 @@ var all11 = all_match({
 
 var msg74 = msg("Scan:07", all11);
 
-var part90 = match("MESSAGE#55:Scan:09/2", "nwparser.p0", "] %{fld12}(%{info}) - NOT VULNERABLE [UNIQUE ID: %{fld13}]");
+var part90 = match("MESSAGE#55:Scan:09/2", "nwparser.p0", "] %{fld12->} (%{info}) - NOT VULNERABLE [UNIQUE ID: %{fld13}]");
 
 var all12 = all_match({
 	processors: [
@@ -1687,7 +1687,7 @@ var all12 = all_match({
 
 var msg75 = msg("Scan:09", all12);
 
-var part91 = match("MESSAGE#56:Scan:08/2", "nwparser.p0", "] %{fld12}(%{info}) - NOT VULNERABLE");
+var part91 = match("MESSAGE#56:Scan:08/2", "nwparser.p0", "] %{fld12->} (%{info}) - NOT VULNERABLE");
 
 var all13 = all_match({
 	processors: [
@@ -1712,7 +1712,7 @@ var all13 = all_match({
 
 var msg76 = msg("Scan:08", all13);
 
-var part92 = match("MESSAGE#57:Scan:10", "nwparser.payload", "Scan for site %{fld12}started by \"%{username}\".", processor_chain([
+var part92 = match("MESSAGE#57:Scan:10", "nwparser.payload", "Scan for site %{fld12->} started by \"%{username}\".", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -1774,7 +1774,7 @@ var part95 = match("MESSAGE#60:Scan:13", "nwparser.payload", "Scan ID: %{fld1}] 
 
 var msg80 = msg("Scan:13", part95);
 
-var part96 = match("MESSAGE#62:Scan:15/0", "nwparser.payload", "Silo ID: %{fld1}] [Scan ID: %{fld2}] Scan for site %{audit_object}- %{p0}");
+var part96 = match("MESSAGE#62:Scan:15/0", "nwparser.payload", "Silo ID: %{fld1}] [Scan ID: %{fld2}] Scan for site %{audit_object->} - %{p0}");
 
 var part97 = match("MESSAGE#62:Scan:15/1_0", "nwparser.p0", "Non-Windows Systems Audit%{p0}");
 
@@ -2039,7 +2039,7 @@ var msg100 = msg("j_username", dup62);
 
 var msg101 = msg("osspi_defaultTargetLocation", dup62);
 
-var part111 = match("MESSAGE#81:spider-parse-robot-exclusions", "nwparser.payload", "spider-parse-robot-exclusions: %{fld40}Malformed HTTP %{fld41}", processor_chain([
+var part111 = match("MESSAGE#81:spider-parse-robot-exclusions", "nwparser.payload", "spider-parse-robot-exclusions: %{fld40->} Malformed HTTP %{fld41}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2061,7 +2061,7 @@ var msg107 = msg("main", dup62);
 
 var msg108 = msg("SystemFingerprint", dup62);
 
-var part112 = match("MESSAGE#88:Searching", "nwparser.payload", "Searching for %{service}domain %{fld11}...", processor_chain([
+var part112 = match("MESSAGE#88:Searching", "nwparser.payload", "Searching for %{service->} domain %{fld11}...", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2099,7 +2099,7 @@ var part114 = match("MESSAGE#91:Failed", "nwparser.payload", "%{event_descriptio
 
 var msg112 = msg("Failed", part114);
 
-var part115 = match("MESSAGE#92:Attempting:01", "nwparser.payload", "Attempting to authenticate user %{username}from %{saddr}.", processor_chain([
+var part115 = match("MESSAGE#92:Attempting:01", "nwparser.payload", "Attempting to authenticate user %{username->} from %{saddr}.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2214,7 +2214,7 @@ var part121 = match("MESSAGE#106:Asserting:01", "nwparser.payload", "Asserting r
 
 var msg127 = msg("Asserting:01", part121);
 
-var part122 = match("MESSAGE#107:Asserting:02", "nwparser.payload", "Asserting network interface: %{sinterface}with IP: %{saddr}and netmask: %{fld12}", processor_chain([
+var part122 = match("MESSAGE#107:Asserting:02", "nwparser.payload", "Asserting network interface: %{sinterface->} with IP: %{saddr->} and netmask: %{fld12}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2254,7 +2254,7 @@ var select28 = linear_select([
 	msg130,
 ]);
 
-var part124 = match("MESSAGE#110:Determining:01", "nwparser.payload", "Determining version of file %{filename}(%{application})", processor_chain([
+var part124 = match("MESSAGE#110:Determining:01", "nwparser.payload", "Determining version of file %{filename->} (%{application})", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2304,7 +2304,7 @@ var part126 = match("MESSAGE#113:Running:02", "nwparser.payload", "Running unres
 
 var msg134 = msg("Running:02", part126);
 
-var part127 = match("MESSAGE#114:Running:01", "nwparser.payload", "Running %{protocol}service %{service}", processor_chain([
+var part127 = match("MESSAGE#114:Running:01", "nwparser.payload", "Running %{protocol->} service %{service}", processor_chain([
 	dup20,
 	dup35,
 	dup14,
@@ -2369,7 +2369,7 @@ var part132 = match("MESSAGE#117:path:01", "nwparser.payload", "Service path is 
 
 var msg138 = msg("path:01", part132);
 
-var part133 = match("MESSAGE#118:Service", "nwparser.payload", "Service %{service->} %{action}on Provider: %{fld2}", processor_chain([
+var part133 = match("MESSAGE#118:Service", "nwparser.payload", "Service %{service->} %{action->} on Provider: %{fld2}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2520,7 +2520,7 @@ var part141 = match("MESSAGE#129:Starting:02", "nwparser.payload", "Starting Off
 
 var msg150 = msg("Starting:02", part141);
 
-var part142 = match("MESSAGE#130:Starting:01", "nwparser.payload", "Starting scan against %{fld11}(%{fld12}) with scan template: %{fld13}.", processor_chain([
+var part142 = match("MESSAGE#130:Starting:01", "nwparser.payload", "Starting scan against %{fld11->} (%{fld12}) with scan template: %{fld13}.", processor_chain([
 	dup20,
 	dup12,
 	dup13,
@@ -2620,7 +2620,7 @@ var part147 = match("MESSAGE#139:No:01", "nwparser.payload", "No credentials ava
 
 var msg160 = msg("No:01", part147);
 
-var part148 = match("MESSAGE#140:No:02", "nwparser.payload", "No access to %{directory}with %{service}[%{info}]", processor_chain([
+var part148 = match("MESSAGE#140:No:02", "nwparser.payload", "No access to %{directory->} with %{service}[%{info}]", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2676,7 +2676,7 @@ var part150 = match("MESSAGE#142:Applying", "nwparser.payload", "Applying update
 
 var msg164 = msg("Applying", part150);
 
-var part151 = match("MESSAGE#143:Update", "nwparser.payload", "Update ID %{fld12}applied successfully.", processor_chain([
+var part151 = match("MESSAGE#143:Update", "nwparser.payload", "Update ID %{fld12->} applied successfully.", processor_chain([
 	dup44,
 	dup52,
 	dup14,
@@ -2740,7 +2740,7 @@ var part154 = match("MESSAGE#145:Installing:01", "nwparser.payload", "Installing
 
 var msg169 = msg("Installing:01", part154);
 
-var part155 = match("MESSAGE#405:Installing:02", "nwparser.payload", "Installing Postgres files into %{directory}from %{info}", processor_chain([
+var part155 = match("MESSAGE#405:Installing:02", "nwparser.payload", "Installing Postgres files into %{directory->} from %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2786,7 +2786,7 @@ var part157 = match("MESSAGE#147:DNS", "nwparser.payload", "DNS name: %{obj_name
 
 var msg172 = msg("DNS", part157);
 
-var part158 = match("MESSAGE#148:Scanning", "nwparser.payload", "Scanning %{fld23->} %{protocol}ports", processor_chain([
+var part158 = match("MESSAGE#148:Scanning", "nwparser.payload", "Scanning %{fld23->} %{protocol->} ports", processor_chain([
 	dup11,
 	dup12,
 	dup13,
@@ -2805,7 +2805,7 @@ var msg173 = msg("Scanning", part158);
 
 var msg174 = msg("param:", dup64);
 
-var part159 = match("MESSAGE#150:Windows", "nwparser.payload", "Windows %{obj_name}dir is: '%{directory}'", processor_chain([
+var part159 = match("MESSAGE#150:Windows", "nwparser.payload", "Windows %{obj_name->} dir is: '%{directory}'", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2845,7 +2845,7 @@ var select38 = linear_select([
 
 var msg178 = msg("Parsed", dup64);
 
-var part161 = match("MESSAGE#153:JRE", "nwparser.payload", "JRE version %{version}is installed", processor_chain([
+var part161 = match("MESSAGE#153:JRE", "nwparser.payload", "JRE version %{version->} is installed", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -2896,7 +2896,7 @@ var msg183 = msg("Flash", dup64);
 
 var msg184 = msg("Skipping", dup64);
 
-var part164 = match("MESSAGE#159:Closing", "nwparser.payload", "Closing service: %{service}(source: %{info})", processor_chain([
+var part164 = match("MESSAGE#159:Closing", "nwparser.payload", "Closing service: %{service->} (source: %{info})", processor_chain([
 	dup20,
 	dup35,
 	dup24,
@@ -2980,7 +2980,7 @@ var msg191 = msg("Version:", part168);
 
 var msg192 = msg("IE", dup64);
 
-var part169 = match("MESSAGE#165:Completed", "nwparser.payload", "Completed %{protocol}port scan (%{dclass_counter1}open ports): %{fld11}seconds", processor_chain([
+var part169 = match("MESSAGE#165:Completed", "nwparser.payload", "Completed %{protocol->} port scan (%{dclass_counter1->} open ports): %{fld11->} seconds", processor_chain([
 	dup20,
 	dup12,
 	dup13,
@@ -3086,7 +3086,7 @@ var select40 = linear_select([
 	msg201,
 ]);
 
-var part178 = match("MESSAGE#166:Retrieved", "nwparser.payload", "Retrieved XML version %{version}for file %{filename}", processor_chain([
+var part178 = match("MESSAGE#166:Retrieved", "nwparser.payload", "Retrieved XML version %{version->} for file %{filename}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3271,7 +3271,7 @@ var select42 = linear_select([
 	msg216,
 ]);
 
-var part190 = match("MESSAGE#179:Advertising", "nwparser.payload", "Advertising %{service}service", processor_chain([
+var part190 = match("MESSAGE#179:Advertising", "nwparser.payload", "Advertising %{service->} service", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3336,7 +3336,7 @@ var select43 = linear_select([
 	msg220,
 ]);
 
-var part194 = match("MESSAGE#183:Updated", "nwparser.payload", "Updated risk scores for %{dclass_counter1}vulnerabilities in %{fld12}", processor_chain([
+var part194 = match("MESSAGE#183:Updated", "nwparser.payload", "Updated risk scores for %{dclass_counter1->} vulnerabilities in %{fld12}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3352,7 +3352,7 @@ var part194 = match("MESSAGE#183:Updated", "nwparser.payload", "Updated risk sco
 
 var msg221 = msg("Updated", part194);
 
-var part195 = match("MESSAGE#184:Updated:01", "nwparser.payload", "Updated risk scores for %{dclass_counter1}assets in %{fld12}", processor_chain([
+var part195 = match("MESSAGE#184:Updated:01", "nwparser.payload", "Updated risk scores for %{dclass_counter1->} assets in %{fld12}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3368,7 +3368,7 @@ var part195 = match("MESSAGE#184:Updated:01", "nwparser.payload", "Updated risk 
 
 var msg222 = msg("Updated:01", part195);
 
-var part196 = match("MESSAGE#185:Updated:02", "nwparser.payload", "Updated risk scores for %{dclass_counter1}sites in %{fld12}", processor_chain([
+var part196 = match("MESSAGE#185:Updated:02", "nwparser.payload", "Updated risk scores for %{dclass_counter1->} sites in %{fld12}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3384,7 +3384,7 @@ var part196 = match("MESSAGE#185:Updated:02", "nwparser.payload", "Updated risk 
 
 var msg223 = msg("Updated:02", part196);
 
-var part197 = match("MESSAGE#186:Updated:03", "nwparser.payload", "Updated risk scores for %{dclass_counter1}groups in %{fld12}", processor_chain([
+var part197 = match("MESSAGE#186:Updated:03", "nwparser.payload", "Updated risk scores for %{dclass_counter1->} groups in %{fld12}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3523,7 +3523,7 @@ var part209 = match("MESSAGE#189:Executing:01", "nwparser.payload", "Executing j
 
 var msg231 = msg("Executing:01", part209);
 
-var part210 = match("MESSAGE#190:Executing:02", "nwparser.payload", "Executing job JobID[%{info}] %{fld1}retention updater-default", processor_chain([
+var part210 = match("MESSAGE#190:Executing:02", "nwparser.payload", "Executing job JobID[%{info}] %{fld1->} retention updater-default", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3593,7 +3593,7 @@ var part214 = match("MESSAGE#193:Administrative:01", "nwparser.payload", "Admini
 
 var msg236 = msg("Administrative:01", part214);
 
-var part215 = match("MESSAGE#194:Administrative", "nwparser.payload", "Administrative credentials for %{service}will be used.", processor_chain([
+var part215 = match("MESSAGE#194:Administrative", "nwparser.payload", "Administrative credentials for %{service->} will be used.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3664,7 +3664,7 @@ var msg240 = msg("Creating", dup64);
 
 var msg241 = msg("Loading", dup64);
 
-var part220 = match("MESSAGE#199:Loaded", "nwparser.payload", "Loaded %{dclass_counter1}policy checks for scan.", processor_chain([
+var part220 = match("MESSAGE#199:Loaded", "nwparser.payload", "Loaded %{dclass_counter1->} policy checks for scan.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3687,7 +3687,7 @@ var select52 = linear_select([
 	msg243,
 ]);
 
-var part221 = match("MESSAGE#200:Finished", "nwparser.payload", "Finished locating %{dclass_counter1}live nodes. [Started: %{fld11}] [Duration: %{fld12}]", processor_chain([
+var part221 = match("MESSAGE#200:Finished", "nwparser.payload", "Finished locating %{dclass_counter1->} live nodes. [Started: %{fld11}] [Duration: %{fld12}]", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3824,7 +3824,7 @@ var select54 = linear_select([
 	msg256,
 ]);
 
-var part229 = match("MESSAGE#211:Seeing", "nwparser.payload", "Seeing if %{saddr}is a valid network node", processor_chain([
+var part229 = match("MESSAGE#211:Seeing", "nwparser.payload", "Seeing if %{saddr->} is a valid network node", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3896,7 +3896,7 @@ var msg278 = msg("Invocation", dup61);
 
 var msg279 = msg("Using", dup61);
 
-var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1}shutdown complete, %{event_description->} ", processor_chain([
+var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1->} shutdown complete, %{event_description->} ", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3904,7 +3904,7 @@ var part232 = match("MESSAGE#243:Route:01", "nwparser.payload", "Route: %{fld1}s
 
 var msg280 = msg("Route:01", part232);
 
-var part233 = match("MESSAGE#244:Route:02", "nwparser.payload", "Route: %{fld1}started and consuming from: %{event_description->} ", processor_chain([
+var part233 = match("MESSAGE#244:Route:02", "nwparser.payload", "Route: %{fld1->} started and consuming from: %{event_description->} ", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -3947,7 +3947,7 @@ var part234 = match("MESSAGE#257:Freeing", "nwparser.payload", "Freeing session 
 
 var msg293 = msg("Freeing", part234);
 
-var part235 = match("MESSAGE#258:Freeing:01", "nwparser.payload", "Freeing %{dclass_counter1}current sessions.", processor_chain([
+var part235 = match("MESSAGE#258:Freeing:01", "nwparser.payload", "Freeing %{dclass_counter1->} current sessions.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4066,7 +4066,7 @@ var part247 = match("MESSAGE#273:Total", "nwparser.payload", "Total %{fld1}: %{f
 
 var msg306 = msg("Total", part247);
 
-var part248 = match("MESSAGE#320:Total:02", "nwparser.payload", "Total %{dclass_counter1}routes, of which %{dclass_counter2}is started.", processor_chain([
+var part248 = match("MESSAGE#320:Total:02", "nwparser.payload", "Total %{dclass_counter1->} routes, of which %{dclass_counter2->} is started.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4110,7 +4110,7 @@ var part252 = match("MESSAGE#277:Pausing", "nwparser.payload", "Pausing Protocol
 
 var msg311 = msg("Pausing", part252);
 
-var part253 = match("MESSAGE#278:Policy", "nwparser.payload", "Policy %{policyname}replaces %{fld1}", processor_chain([
+var part253 = match("MESSAGE#278:Policy", "nwparser.payload", "Policy %{policyname->} replaces %{fld1}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4118,7 +4118,7 @@ var part253 = match("MESSAGE#278:Policy", "nwparser.payload", "Policy %{policyna
 
 var msg312 = msg("Policy", part253);
 
-var part254 = match("MESSAGE#420:Policy:01", "nwparser.payload", "Policy benchmark %{policyname}in %{info}with hash %{fld1}is not valid builtin content and will not load.", processor_chain([
+var part254 = match("MESSAGE#420:Policy:01", "nwparser.payload", "Policy benchmark %{policyname->} in %{info->} with hash %{fld1->} is not valid builtin content and will not load.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4148,7 +4148,7 @@ var part256 = match("MESSAGE#280:Importing", "nwparser.payload", "%{action->} %{
 
 var msg315 = msg("Importing", part256);
 
-var part257 = match("MESSAGE#281:Imported", "nwparser.payload", "%{action->} %{dclass_counter1}new categories, categorized %{fld1}vulnerabilities and %{fld2}tags.", processor_chain([
+var part257 = match("MESSAGE#281:Imported", "nwparser.payload", "%{action->} %{dclass_counter1->} new categories, categorized %{fld1->} vulnerabilities and %{fld2->} tags.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4428,7 +4428,7 @@ var msg348 = msg("JMX", dup66);
 
 var msg349 = msg("AllowUseOriginalMessage", dup66);
 
-var part289 = match("MESSAGE#321:Initialized", "nwparser.payload", "Initialized PolicyCheckService with %{dclass_counter1}benchmarks, containing %{fld1}policies. The total check count is %{dclass_counter2}", processor_chain([
+var part289 = match("MESSAGE#321:Initialized", "nwparser.payload", "Initialized PolicyCheckService with %{dclass_counter1->} benchmarks, containing %{fld1->} policies. The total check count is %{dclass_counter2}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4436,7 +4436,7 @@ var part289 = match("MESSAGE#321:Initialized", "nwparser.payload", "Initialized 
 
 var msg350 = msg("Initialized", part289);
 
-var part290 = match("MESSAGE#322:Initialized:01", "nwparser.payload", "Initialized %{dclass_counter1}policy benchmarks in total.", processor_chain([
+var part290 = match("MESSAGE#322:Initialized:01", "nwparser.payload", "Initialized %{dclass_counter1->} policy benchmarks in total.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4461,7 +4461,7 @@ var select66 = linear_select([
 
 var msg353 = msg("Error", dup66);
 
-var part292 = match("MESSAGE#324:Graceful", "nwparser.payload", "Graceful shutdown of %{dclass_counter1}routes completed in %{dclass_counter2}seconds", processor_chain([
+var part292 = match("MESSAGE#324:Graceful", "nwparser.payload", "Graceful shutdown of %{dclass_counter1->} routes completed in %{dclass_counter2->} seconds", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4778,7 +4778,7 @@ var part325 = match("MESSAGE#369:Not_configured:17", "nwparser.payload", "com.ra
 
 var msg390 = msg("Not_configured:17", part325);
 
-var part326 = match("MESSAGE#370:Delivered", "nwparser.payload", "Delivered mail to %{to}: %{fld1->} %{fld2->} %{mail_id}[InternalId=%{fld3}] Queued mail for delivery", processor_chain([
+var part326 = match("MESSAGE#370:Delivered", "nwparser.payload", "Delivered mail to %{to}: %{fld1->} %{fld2->} %{mail_id->} [InternalId=%{fld3}] Queued mail for delivery", processor_chain([
 	dup56,
 	dup14,
 	dup15,
@@ -4796,7 +4796,7 @@ var part327 = match("MESSAGE#371:Engine_update", "nwparser.payload", "Engine upd
 
 var msg392 = msg("Engine_update", part327);
 
-var part328 = match("MESSAGE#372:Freed_triggers", "nwparser.payload", "Freed %{fld1}triggers from 'acquired' / 'blocked' state.", processor_chain([
+var part328 = match("MESSAGE#372:Freed_triggers", "nwparser.payload", "Freed %{fld1->} triggers from 'acquired' / 'blocked' state.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4845,7 +4845,7 @@ var part332 = match("MESSAGE#377:Context_loader", "nwparser.payload", "Context l
 
 var msg397 = msg("Context_loader", part332);
 
-var part333 = match("MESSAGE#378:Copied_file", "nwparser.payload", "Copied %{filename}file from %{directory}to %{info}", processor_chain([
+var part333 = match("MESSAGE#378:Copied_file", "nwparser.payload", "Copied %{filename->} file from %{directory->} to %{info}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4862,7 +4862,7 @@ var part334 = match("MESSAGE#380:Java", "nwparser.payload", "Java HotSpot(TM) %{
 
 var msg399 = msg("Java", part334);
 
-var part335 = match("MESSAGE#381:Changing", "nwparser.payload", "Changing permissions of %{obj_type}'%{obj_name}' to %{change_new}", processor_chain([
+var part335 = match("MESSAGE#381:Changing", "nwparser.payload", "Changing permissions of %{obj_type->} '%{obj_name}' to %{change_new}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4912,7 +4912,7 @@ var part339 = match("MESSAGE#385:Initialized:03", "nwparser.payload", "Quartz sc
 
 var msg404 = msg("Initialized:03", part339);
 
-var part340 = match("MESSAGE#386:Created:03", "nwparser.payload", "Quartz Scheduler %{version}created.", processor_chain([
+var part340 = match("MESSAGE#386:Created:03", "nwparser.payload", "Quartz Scheduler %{version->} created.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4954,7 +4954,7 @@ var part343 = match("MESSAGE#389:Recovery", "nwparser.payload", "Recovery comple
 
 var msg408 = msg("Recovery", part343);
 
-var part344 = match("MESSAGE#390:Removed", "nwparser.payload", "Removed %{fld1}'complete' triggers.", processor_chain([
+var part344 = match("MESSAGE#390:Removed", "nwparser.payload", "Removed %{fld1->} 'complete' triggers.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -4963,7 +4963,7 @@ var part344 = match("MESSAGE#390:Removed", "nwparser.payload", "Removed %{fld1}'
 
 var msg409 = msg("Removed", part344);
 
-var part345 = match("MESSAGE#391:Removed:01", "nwparser.payload", "Removed %{fld1}stale fired job entries.", processor_chain([
+var part345 = match("MESSAGE#391:Removed:01", "nwparser.payload", "Removed %{fld1->} stale fired job entries.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5014,7 +5014,7 @@ var part349 = match("MESSAGE#395:Failure", "nwparser.payload", "Failure communic
 
 var msg414 = msg("Failure", part349);
 
-var part350 = match("MESSAGE#396:Renamed", "nwparser.payload", "Renamed %{filename}to %{info}", processor_chain([
+var part350 = match("MESSAGE#396:Renamed", "nwparser.payload", "Renamed %{filename->} to %{info}", processor_chain([
 	dup20,
 	dup57,
 	dup22,
@@ -5035,7 +5035,7 @@ var part351 = match("MESSAGE#397:Reinitializing", "nwparser.payload", "Reinitial
 
 var msg416 = msg("Reinitializing", part351);
 
-var part352 = match("MESSAGE#398:Replaced", "nwparser.payload", "Replaced %{change_old}values from %{filename}file with new auth method: %{change_new}.", processor_chain([
+var part352 = match("MESSAGE#398:Replaced", "nwparser.payload", "Replaced %{change_old->} values from %{filename->} file with new auth method: %{change_new}.", processor_chain([
 	dup20,
 	dup57,
 	dup22,
@@ -5046,7 +5046,7 @@ var part352 = match("MESSAGE#398:Replaced", "nwparser.payload", "Replaced %{chan
 
 var msg417 = msg("Replaced", part352);
 
-var part353 = match("MESSAGE#399:Replaced:01", "nwparser.payload", "Replaced %{change_old}values from %{filename}with new setting values", processor_chain([
+var part353 = match("MESSAGE#399:Replaced:01", "nwparser.payload", "Replaced %{change_old->} values from %{filename->} with new setting values", processor_chain([
 	dup20,
 	dup57,
 	dup22,
@@ -5106,7 +5106,7 @@ var part357 = match("MESSAGE#403:Connection", "nwparser.payload", "Connection to
 
 var msg422 = msg("Connection", part357);
 
-var part358 = match("MESSAGE#404:Handling", "nwparser.payload", "Handling %{fld1}trigger(s) that missed their scheduled fire-time.", processor_chain([
+var part358 = match("MESSAGE#404:Handling", "nwparser.payload", "Handling %{fld1->} trigger(s) that missed their scheduled fire-time.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5148,7 +5148,7 @@ var part361 = match("MESSAGE#421:Postgres:01", "nwparser.payload", "%{event_desc
 
 var msg429 = msg("Postgres:01", part361);
 
-var part362 = match("MESSAGE#422:Succesfully", "nwparser.payload", "Succesfully %{event_description}to %{dport}", processor_chain([
+var part362 = match("MESSAGE#422:Succesfully", "nwparser.payload", "Succesfully %{event_description->} to %{dport}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5156,7 +5156,7 @@ var part362 = match("MESSAGE#422:Succesfully", "nwparser.payload", "Succesfully 
 
 var msg430 = msg("Succesfully", part362);
 
-var part363 = match("MESSAGE#423:Unzipped", "nwparser.payload", "%{action->} %{fld1}bytes into %{directory}", processor_chain([
+var part363 = match("MESSAGE#423:Unzipped", "nwparser.payload", "%{action->} %{fld1->} bytes into %{directory}", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5164,7 +5164,7 @@ var part363 = match("MESSAGE#423:Unzipped", "nwparser.payload", "%{action->} %{f
 
 var msg431 = msg("Unzipped", part363);
 
-var part364 = match("MESSAGE#424:vacuumdb", "nwparser.payload", "%{process}executed with a return value of %{resultcode}.", processor_chain([
+var part364 = match("MESSAGE#424:vacuumdb", "nwparser.payload", "%{process->} executed with a return value of %{resultcode}.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5172,7 +5172,7 @@ var part364 = match("MESSAGE#424:vacuumdb", "nwparser.payload", "%{process}execu
 
 var msg432 = msg("vacuumdb", part364);
 
-var part365 = match("MESSAGE#425:Processed_vuln", "nwparser.payload", "Started: %{fld2}T%{fld3}] [Duration: %{fld4}] Processed vuln check types for %{fld5}vuln checks.", processor_chain([
+var part365 = match("MESSAGE#425:Processed_vuln", "nwparser.payload", "Started: %{fld2}T%{fld3}] [Duration: %{fld4}] Processed vuln check types for %{fld5->} vuln checks.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5327,7 +5327,7 @@ var part380 = match("MESSAGE#454:Not_configured:27", "nwparser.payload", "com.ra
 
 var msg458 = msg("Not_configured:27", part380);
 
-var part381 = match("MESSAGE#455:Spring", "nwparser.payload", "%{process}detected on classpath: [%{fld2}]", processor_chain([
+var part381 = match("MESSAGE#455:Spring", "nwparser.payload", "%{process->} detected on classpath: [%{fld2}]", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5345,7 +5345,7 @@ var part382 = match("MESSAGE#456:Storing", "nwparser.payload", "%{fld1}] [%{fld2
 
 var msg460 = msg("Storing", part382);
 
-var part383 = match("MESSAGE#457:Clearing", "nwparser.payload", "Clearing object tracker after %{dclass_counter1}hits and %{dclass_counter2}misses.", processor_chain([
+var part383 = match("MESSAGE#457:Clearing", "nwparser.payload", "Clearing object tracker after %{dclass_counter1->} hits and %{dclass_counter2->} misses.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5363,7 +5363,7 @@ var part384 = match("MESSAGE#458:All", "nwparser.payload", "%{fld1}] [%{fld2}] A
 
 var msg462 = msg("All", part384);
 
-var part385 = match("MESSAGE#459:New", "nwparser.payload", "New Provider %{audit_object}discovered.", processor_chain([
+var part385 = match("MESSAGE#459:New", "nwparser.payload", "New Provider %{audit_object->} discovered.", processor_chain([
 	dup20,
 	dup14,
 	dup15,
@@ -5803,13 +5803,13 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var hdr37 = match("HEADER#1:0022/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{p0}");
+var hdr37 = match("HEADER#1:0022/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{p0}");
 
 var part395 = match("HEADER#1:0022/1_1", "nwparser.p0", "%{hpriority}][%{p0}");
 
 var part396 = match("HEADER#1:0022/1_2", "nwparser.p0", "%{hpriority}[%{p0}");
 
-var hdr38 = match("HEADER#18:0034/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime}[%{hpriority}]%{p0}");
+var hdr38 = match("HEADER#18:0034/0", "message", "%NEXPOSE-%{hfld49}: %{hdate}T%{htime->} [%{hpriority}]%{p0}");
 
 var part397 = match("HEADER#18:0034/1_0", "nwparser.p0", " [%{p0}");
 

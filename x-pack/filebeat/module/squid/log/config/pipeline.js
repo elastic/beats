@@ -55,7 +55,7 @@ var dup13 = date_time({
 
 var dup14 = page("webpage","url");
 
-var dup15 = match("MESSAGE#0:GET", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var dup15 = match("MESSAGE#0:GET", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -83,7 +83,7 @@ var dup16 = match("MESSAGE#19:GET:01", "nwparser.payload", "%{event_time_string}
 	dup12,
 ]));
 
-var dup17 = match("MESSAGE#2:POST", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var dup17 = match("MESSAGE#2:POST", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -109,7 +109,7 @@ var dup18 = match("MESSAGE#21:POST:01", "nwparser.payload", "%{event_time_string
 	dup12,
 ]));
 
-var dup19 = match("MESSAGE#3:PUT", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var dup19 = match("MESSAGE#3:PUT", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup5,
 	dup6,
@@ -131,7 +131,7 @@ var dup20 = match("MESSAGE#22:PUT:01", "nwparser.payload", "%{event_time_string}
 	dup12,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport}[%{fld20->} %{fld21}] \"%{messageid->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport->} [%{fld20->} %{fld21}] \"%{messageid->} %{payload}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -140,7 +140,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport}[%{fld20->} %
 			field("hsaddr"),
 			constant(" "),
 			field("hsport"),
-			constant("["),
+			constant(" ["),
 			field("fld20"),
 			constant(" "),
 			field("fld21"),
@@ -184,7 +184,7 @@ var select1 = linear_select([
 
 var msg1 = msg("GET", dup15);
 
-var part1 = match("MESSAGE#18:GET:02", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{resultcode->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action->} %{daddr->} %{content_type->} %{duration}", processor_chain([
+var part1 = match("MESSAGE#18:GET:02", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{resultcode->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action->} %{daddr->} %{content_type->} %{duration}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -386,7 +386,7 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part2 = match("MESSAGE#0:GET", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var part2 = match("MESSAGE#0:GET", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -414,7 +414,7 @@ var part3 = match("MESSAGE#19:GET:01", "nwparser.payload", "%{event_time_string}
 	dup12,
 ]));
 
-var part4 = match("MESSAGE#2:POST", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var part4 = match("MESSAGE#2:POST", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -440,7 +440,7 @@ var part5 = match("MESSAGE#21:POST:01", "nwparser.payload", "%{event_time_string
 	dup12,
 ]));
 
-var part6 = match("MESSAGE#3:PUT", "nwparser.payload", "%{saddr->} %{sport}[%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username}\"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes}\"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
+var part6 = match("MESSAGE#3:PUT", "nwparser.payload", "%{saddr->} %{sport->} [%{fld20->} %{fld21}] \"%{web_method->} %{url->} %{network_service}\" %{daddr->} %{fld1->} %{username->} \"%{webpage}\" %{resultcode->} %{content_type->} %{sbytes->} \"%{web_referer}\" \"%{user_agent}\" %{action}", processor_chain([
 	dup1,
 	dup5,
 	dup6,

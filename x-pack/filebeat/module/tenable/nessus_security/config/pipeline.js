@@ -66,7 +66,7 @@ var dup16 = match("MESSAGE#45:Could", "nwparser.payload", "%{event_description}"
 	dup4,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hfld1}%NESSUSVS-%{messageid}: %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hfld1->} %NESSUSVS-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -139,14 +139,14 @@ var hdr5 = match("HEADER#4:0005", "message", "%NESSUSVS-%{hfld49}: [%{hfld20->} 
 	}),
 ]));
 
-var hdr6 = match("HEADER#5:0006", "message", "%NESSUSVS-%{hfld49}: [%{hfld20->} %{hfld21->} %{hfld22->} %{hfld23->} %{hfld24}][%{hfld2}.%{hfld3}] %{hfld4}(%{messageid->} %{hfld5}) %{hfld6->} %{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0006", "message", "%NESSUSVS-%{hfld49}: [%{hfld20->} %{hfld21->} %{hfld22->} %{hfld23->} %{hfld24}][%{hfld2}.%{hfld3}] %{hfld4->} (%{messageid->} %{hfld5}) %{hfld6->} %{payload}", processor_chain([
 	setc("header_id","0006"),
 	call({
 		dest: "nwparser.payload",
 		fn: STRCAT,
 		args: [
 			field("hfld4"),
-			constant("("),
+			constant(" ("),
 			field("messageid"),
 			constant(" "),
 			field("hfld5"),
@@ -238,7 +238,7 @@ var part7 = match("MESSAGE#6:finished", "nwparser.payload", "%{event_description
 
 var msg7 = msg("finished", part7);
 
-var part8 = match("MESSAGE#7:user", "nwparser.payload", "user %{username}: test complete", processor_chain([
+var part8 = match("MESSAGE#7:user", "nwparser.payload", "user %{username->} : test complete", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -247,7 +247,7 @@ var part8 = match("MESSAGE#7:user", "nwparser.payload", "user %{username}: test 
 
 var msg8 = msg("user", part8);
 
-var part9 = match("MESSAGE#8:user:01", "nwparser.payload", "user %{username}: testing %{hostname}(%{hostip}) %{fld1}", processor_chain([
+var part9 = match("MESSAGE#8:user:01", "nwparser.payload", "user %{username->} : testing %{hostname->} (%{hostip}) %{fld1}", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -256,7 +256,7 @@ var part9 = match("MESSAGE#8:user:01", "nwparser.payload", "user %{username}: te
 
 var msg9 = msg("user:01", part9);
 
-var part10 = match("MESSAGE#21:user:02", "nwparser.payload", "user %{username}starts a new scan. Target(s) : %{hostname}, %{info}", processor_chain([
+var part10 = match("MESSAGE#21:user:02", "nwparser.payload", "user %{username->} starts a new scan. Target(s) : %{hostname}, %{info}", processor_chain([
 	dup5,
 	dup2,
 	dup4,
@@ -265,7 +265,7 @@ var part10 = match("MESSAGE#21:user:02", "nwparser.payload", "user %{username}st
 
 var msg10 = msg("user:02", part10);
 
-var part11 = match("MESSAGE#26:user_launching", "nwparser.payload", "user %{username}: launching %{rulename}against %{url}[%{process_id}]", processor_chain([
+var part11 = match("MESSAGE#26:user_launching", "nwparser.payload", "user %{username->} : launching %{rulename->} against %{url->} [%{process_id}]", processor_chain([
 	setc("eventcategory","1401000000"),
 	dup2,
 	dup4,
@@ -274,7 +274,7 @@ var part11 = match("MESSAGE#26:user_launching", "nwparser.payload", "user %{user
 
 var msg11 = msg("user_launching", part11);
 
-var part12 = match("MESSAGE#27:user_not_launching", "nwparser.payload", "user %{username}: Not launching %{rulename}against %{url->} %{reason}", processor_chain([
+var part12 = match("MESSAGE#27:user_not_launching", "nwparser.payload", "user %{username->} : Not launching %{rulename->} against %{url->} %{reason}", processor_chain([
 	dup7,
 	dup2,
 	dup4,
@@ -314,7 +314,7 @@ var part14 = match("MESSAGE#13:failed", "nwparser.payload", "%{event_description
 
 var msg17 = msg("failed", part14);
 
-var part15 = match("MESSAGE#14:Nessus", "nwparser.payload", "%{event_description}(pid=%{process_id})", processor_chain([
+var part15 = match("MESSAGE#14:Nessus", "nwparser.payload", "%{event_description->} (pid=%{process_id})", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -376,7 +376,7 @@ var part20 = match("MESSAGE#25:User", "nwparser.payload", "User '%{username}' %{
 
 var msg28 = msg("User", part20);
 
-var part21 = match("MESSAGE#32:User:01", "nwparser.payload", "User %{username}starts a new scan (%{fld25})", processor_chain([
+var part21 = match("MESSAGE#32:User:01", "nwparser.payload", "User %{username->} starts a new scan (%{fld25})", processor_chain([
 	dup5,
 	dup2,
 	dup4,
@@ -399,7 +399,7 @@ var part22 = match("MESSAGE#28:Plugins", "nwparser.payload", "%{event_descriptio
 
 var msg30 = msg("Plugins", part22);
 
-var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulename}(process %{process_id}) finished its job in %{duration}seconds ", processor_chain([
+var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulename->} (process %{process_id}) finished its job in %{duration->} seconds ", processor_chain([
 	dup1,
 	dup12,
 	setc("ec_outcome","Success"),
@@ -410,7 +410,7 @@ var part23 = match("MESSAGE#29:process_finished", "nwparser.payload", "%{rulenam
 
 var msg31 = msg("process_finished", part23);
 
-var part24 = match("MESSAGE#30:process_notfinished_killed", "nwparser.payload", "%{rulename}(pid %{process_id}) is slow to finish - killing it ", processor_chain([
+var part24 = match("MESSAGE#30:process_notfinished_killed", "nwparser.payload", "%{rulename->} (pid %{process_id}) is slow to finish - killing it ", processor_chain([
 	dup7,
 	dup12,
 	dup11,
@@ -421,7 +421,7 @@ var part24 = match("MESSAGE#30:process_notfinished_killed", "nwparser.payload", 
 
 var msg32 = msg("process_notfinished_killed", part24);
 
-var part25 = match("MESSAGE#31:TCP", "nwparser.payload", "%{fld1}TCP sessions in parallel", processor_chain([
+var part25 = match("MESSAGE#31:TCP", "nwparser.payload", "%{fld1->} TCP sessions in parallel", processor_chain([
 	dup1,
 	dup2,
 	dup4,
@@ -440,7 +440,7 @@ var msg37 = msg("started.", dup15);
 
 var msg38 = msg("scanner", dup14);
 
-var part26 = match("MESSAGE#38:Another", "nwparser.payload", "%{event_description}(pid %{process_id})", processor_chain([
+var part26 = match("MESSAGE#38:Another", "nwparser.payload", "%{event_description->} (pid %{process_id})", processor_chain([
 	dup1,
 	dup2,
 	dup4,

@@ -1886,14 +1886,12 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "rsa.db.index": "The Device: reetdo was auto assigned to the Zone: IP Address: Fake Devices",
-        "rsa.identity.firstname": "",
-        "rsa.identity.lastname": "",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.investigations.event_vcat": "AuditLog",
         "rsa.misc.event_type": "ZoneAddDevice",
-        "rsa.misc.mail_id": "ever",
+        "rsa.misc.node": "reetdo",
         "rsa.network.alias_host": [
             "serrorsi1096.www5.localdomain"
         ],
@@ -2895,20 +2893,24 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.59.232.97"
+        ],
         "rsa.db.index": "The Device: dolor was auto assigned to the Zone: IP Address: 10.59.232.97",
-        "rsa.identity.firstname": "",
-        "rsa.identity.lastname": "",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
-        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.investigations.event_vcat": "AuditLog",
         "rsa.misc.event_type": "ThreatUpdated",
-        "rsa.misc.mail_id": "niam",
+        "rsa.misc.node": "dolor",
         "rsa.network.alias_host": [
             "dolo6230.mail.invalid"
         ],
         "rsa.time.event_time": "2019-05-13T11:45:57.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.59.232.97"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -3396,20 +3398,24 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.ip": [
+            "10.138.85.233"
+        ],
         "rsa.db.index": "The Device: datatno was auto assigned to the Zone: IP Address: 10.138.85.233",
-        "rsa.identity.firstname": "",
-        "rsa.identity.lastname": "",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1502000000,
         "rsa.investigations.event_cat_name": "Policies.Rules",
-        "rsa.investigations.event_vcat": " AuditLog",
+        "rsa.investigations.event_vcat": "AuditLog",
         "rsa.misc.event_type": "Device Policy Assigned",
-        "rsa.misc.mail_id": "orisnis",
+        "rsa.misc.node": "datatno",
         "rsa.network.alias_host": [
             "perna6751.internal.home"
         ],
         "rsa.time.event_time": "2019-11-30T14:21:57.000Z",
         "service.type": "cylance",
+        "source.ip": [
+            "10.138.85.233"
+        ],
         "tags": [
             "cylance.protect",
             "forwarded"

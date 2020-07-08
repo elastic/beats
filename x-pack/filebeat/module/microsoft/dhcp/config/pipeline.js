@@ -85,7 +85,7 @@ var select1 = linear_select([
 	hdr1,
 ]);
 
-var part1 = match("MESSAGE#0:00/0", "nwparser.payload", "00,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part1 = match("MESSAGE#0:00/0", "nwparser.payload", "00,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all1 = all_match({
 	processors: [
@@ -103,7 +103,7 @@ var all1 = all_match({
 
 var msg1 = msg("00", all1);
 
-var part2 = match("MESSAGE#1:01/0", "nwparser.payload", "01,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part2 = match("MESSAGE#1:01/0", "nwparser.payload", "01,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all2 = all_match({
 	processors: [
@@ -121,7 +121,7 @@ var all2 = all_match({
 
 var msg2 = msg("01", all2);
 
-var part3 = match("MESSAGE#2:02/0", "nwparser.payload", "02,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part3 = match("MESSAGE#2:02/0", "nwparser.payload", "02,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all3 = all_match({
 	processors: [
@@ -137,7 +137,7 @@ var all3 = all_match({
 
 var msg3 = msg("02", all3);
 
-var part4 = match("MESSAGE#3:10/0", "nwparser.payload", "10,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part4 = match("MESSAGE#3:10/0", "nwparser.payload", "10,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all4 = all_match({
 	processors: [
@@ -153,7 +153,7 @@ var all4 = all_match({
 
 var msg4 = msg("10", all4);
 
-var part5 = match("MESSAGE#4:11/0", "nwparser.payload", "11,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part5 = match("MESSAGE#4:11/0", "nwparser.payload", "11,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all5 = all_match({
 	processors: [
@@ -171,7 +171,7 @@ var all5 = all_match({
 
 var msg5 = msg("11", all5);
 
-var part6 = match("MESSAGE#5:12/0", "nwparser.payload", "12,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part6 = match("MESSAGE#5:12/0", "nwparser.payload", "12,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all6 = all_match({
 	processors: [
@@ -187,7 +187,7 @@ var all6 = all_match({
 
 var msg6 = msg("12", all6);
 
-var part7 = match("MESSAGE#6:13/0", "nwparser.payload", "13,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part7 = match("MESSAGE#6:13/0", "nwparser.payload", "13,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all7 = all_match({
 	processors: [
@@ -203,7 +203,7 @@ var all7 = all_match({
 
 var msg7 = msg("13", all7);
 
-var part8 = match("MESSAGE#7:14/0", "nwparser.payload", "14,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part8 = match("MESSAGE#7:14/0", "nwparser.payload", "14,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all8 = all_match({
 	processors: [
@@ -219,7 +219,7 @@ var all8 = all_match({
 
 var msg8 = msg("14", all8);
 
-var part9 = match("MESSAGE#8:15/0", "nwparser.payload", "15,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part9 = match("MESSAGE#8:15/0", "nwparser.payload", "15,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all9 = all_match({
 	processors: [
@@ -235,7 +235,7 @@ var all9 = all_match({
 
 var msg9 = msg("15", all9);
 
-var part10 = match("MESSAGE#9:16/0", "nwparser.payload", "16,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part10 = match("MESSAGE#9:16/0", "nwparser.payload", "16,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all10 = all_match({
 	processors: [
@@ -253,7 +253,7 @@ var all10 = all_match({
 
 var msg10 = msg("16", all10);
 
-var part11 = match("MESSAGE#10:17/0", "nwparser.payload", "17,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part11 = match("MESSAGE#10:17/0", "nwparser.payload", "17,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all11 = all_match({
 	processors: [
@@ -269,7 +269,7 @@ var all11 = all_match({
 
 var msg11 = msg("17", all11);
 
-var part12 = match("MESSAGE#11:18/0", "nwparser.payload", "18,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part12 = match("MESSAGE#11:18/0", "nwparser.payload", "18,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all12 = all_match({
 	processors: [
@@ -285,7 +285,7 @@ var all12 = all_match({
 
 var msg12 = msg("18", all12);
 
-var part13 = match("MESSAGE#12:20/0", "nwparser.payload", "20,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part13 = match("MESSAGE#12:20/0", "nwparser.payload", "20,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all13 = all_match({
 	processors: [
@@ -301,7 +301,7 @@ var all13 = all_match({
 
 var msg13 = msg("20", all13);
 
-var part14 = match("MESSAGE#13:21/0", "nwparser.payload", "21,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part14 = match("MESSAGE#13:21/0", "nwparser.payload", "21,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all14 = all_match({
 	processors: [
@@ -317,7 +317,7 @@ var all14 = all_match({
 
 var msg14 = msg("21", all14);
 
-var part15 = match("MESSAGE#14:22/0", "nwparser.payload", "22,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part15 = match("MESSAGE#14:22/0", "nwparser.payload", "22,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all15 = all_match({
 	processors: [
@@ -333,7 +333,7 @@ var all15 = all_match({
 
 var msg15 = msg("22", all15);
 
-var part16 = match("MESSAGE#15:23/0", "nwparser.payload", "23,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part16 = match("MESSAGE#15:23/0", "nwparser.payload", "23,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all16 = all_match({
 	processors: [
@@ -349,7 +349,7 @@ var all16 = all_match({
 
 var msg16 = msg("23", all16);
 
-var part17 = match("MESSAGE#16:24/0", "nwparser.payload", "24,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part17 = match("MESSAGE#16:24/0", "nwparser.payload", "24,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all17 = all_match({
 	processors: [
@@ -365,7 +365,7 @@ var all17 = all_match({
 
 var msg17 = msg("24", all17);
 
-var part18 = match("MESSAGE#17:25/0", "nwparser.payload", "25,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part18 = match("MESSAGE#17:25/0", "nwparser.payload", "25,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all18 = all_match({
 	processors: [
@@ -381,7 +381,7 @@ var all18 = all_match({
 
 var msg18 = msg("25", all18);
 
-var part19 = match("MESSAGE#18:30/0", "nwparser.payload", "30,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part19 = match("MESSAGE#18:30/0", "nwparser.payload", "30,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all19 = all_match({
 	processors: [
@@ -399,7 +399,7 @@ var all19 = all_match({
 
 var msg19 = msg("30", all19);
 
-var part20 = match("MESSAGE#19:31/0", "nwparser.payload", "31,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part20 = match("MESSAGE#19:31/0", "nwparser.payload", "31,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all20 = all_match({
 	processors: [
@@ -417,7 +417,7 @@ var all20 = all_match({
 
 var msg20 = msg("31", all20);
 
-var part21 = match("MESSAGE#20:32/0", "nwparser.payload", "32,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part21 = match("MESSAGE#20:32/0", "nwparser.payload", "32,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all21 = all_match({
 	processors: [
@@ -435,7 +435,7 @@ var all21 = all_match({
 
 var msg21 = msg("32", all21);
 
-var part22 = match("MESSAGE#21:33/0", "nwparser.payload", "33,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part22 = match("MESSAGE#21:33/0", "nwparser.payload", "33,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all22 = all_match({
 	processors: [
@@ -453,7 +453,7 @@ var all22 = all_match({
 
 var msg22 = msg("33", all22);
 
-var part23 = match("MESSAGE#22:36/0", "nwparser.payload", "36,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part23 = match("MESSAGE#22:36/0", "nwparser.payload", "36,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all23 = all_match({
 	processors: [
@@ -469,7 +469,7 @@ var all23 = all_match({
 
 var msg23 = msg("36", all23);
 
-var part24 = match("MESSAGE#23:50/0", "nwparser.payload", "50,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part24 = match("MESSAGE#23:50/0", "nwparser.payload", "50,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all24 = all_match({
 	processors: [
@@ -485,7 +485,7 @@ var all24 = all_match({
 
 var msg24 = msg("50", all24);
 
-var part25 = match("MESSAGE#24:51/0", "nwparser.payload", "51,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part25 = match("MESSAGE#24:51/0", "nwparser.payload", "51,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all25 = all_match({
 	processors: [
@@ -503,7 +503,7 @@ var all25 = all_match({
 
 var msg25 = msg("51", all25);
 
-var part26 = match("MESSAGE#25:52/0", "nwparser.payload", "52,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part26 = match("MESSAGE#25:52/0", "nwparser.payload", "52,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all26 = all_match({
 	processors: [
@@ -519,7 +519,7 @@ var all26 = all_match({
 
 var msg26 = msg("52", all26);
 
-var part27 = match("MESSAGE#26:53/0", "nwparser.payload", "53,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part27 = match("MESSAGE#26:53/0", "nwparser.payload", "53,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all27 = all_match({
 	processors: [
@@ -535,7 +535,7 @@ var all27 = all_match({
 
 var msg27 = msg("53", all27);
 
-var part28 = match("MESSAGE#27:54/0", "nwparser.payload", "54,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part28 = match("MESSAGE#27:54/0", "nwparser.payload", "54,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all28 = all_match({
 	processors: [
@@ -553,7 +553,7 @@ var all28 = all_match({
 
 var msg28 = msg("54", all28);
 
-var part29 = match("MESSAGE#28:55/0", "nwparser.payload", "55,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part29 = match("MESSAGE#28:55/0", "nwparser.payload", "55,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all29 = all_match({
 	processors: [
@@ -569,7 +569,7 @@ var all29 = all_match({
 
 var msg29 = msg("55", all29);
 
-var part30 = match("MESSAGE#29:56/0", "nwparser.payload", "56,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part30 = match("MESSAGE#29:56/0", "nwparser.payload", "56,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all30 = all_match({
 	processors: [
@@ -587,7 +587,7 @@ var all30 = all_match({
 
 var msg30 = msg("56", all30);
 
-var part31 = match("MESSAGE#30:57/0", "nwparser.payload", "57,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part31 = match("MESSAGE#30:57/0", "nwparser.payload", "57,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all31 = all_match({
 	processors: [
@@ -603,7 +603,7 @@ var all31 = all_match({
 
 var msg31 = msg("57", all31);
 
-var part32 = match("MESSAGE#31:58/0", "nwparser.payload", "58,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part32 = match("MESSAGE#31:58/0", "nwparser.payload", "58,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all32 = all_match({
 	processors: [
@@ -621,7 +621,7 @@ var all32 = all_match({
 
 var msg32 = msg("58", all32);
 
-var part33 = match("MESSAGE#32:59/0", "nwparser.payload", "59,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part33 = match("MESSAGE#32:59/0", "nwparser.payload", "59,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all33 = all_match({
 	processors: [
@@ -639,7 +639,7 @@ var all33 = all_match({
 
 var msg33 = msg("59", all33);
 
-var part34 = match("MESSAGE#33:60/0", "nwparser.payload", "60,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part34 = match("MESSAGE#33:60/0", "nwparser.payload", "60,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all34 = all_match({
 	processors: [
@@ -655,7 +655,7 @@ var all34 = all_match({
 
 var msg34 = msg("60", all34);
 
-var part35 = match("MESSAGE#34:61/0", "nwparser.payload", "61,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part35 = match("MESSAGE#34:61/0", "nwparser.payload", "61,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all35 = all_match({
 	processors: [
@@ -671,7 +671,7 @@ var all35 = all_match({
 
 var msg35 = msg("61", all35);
 
-var part36 = match("MESSAGE#35:62/0", "nwparser.payload", "62,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part36 = match("MESSAGE#35:62/0", "nwparser.payload", "62,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all36 = all_match({
 	processors: [
@@ -687,7 +687,7 @@ var all36 = all_match({
 
 var msg36 = msg("62", all36);
 
-var part37 = match("MESSAGE#36:63/0", "nwparser.payload", "63,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part37 = match("MESSAGE#36:63/0", "nwparser.payload", "63,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all37 = all_match({
 	processors: [
@@ -703,7 +703,7 @@ var all37 = all_match({
 
 var msg37 = msg("63", all37);
 
-var part38 = match("MESSAGE#37:64/0", "nwparser.payload", "64,%{fld12},%{fld1},%{event_description},%{saddr},%{shost},%{p0}");
+var part38 = match("MESSAGE#37:64/0", "nwparser.payload", "64,%{fld12},%{fld1},%{event_description},%{saddr},%{shost->} ,%{p0}");
 
 var all38 = all_match({
 	processors: [

@@ -22,7 +22,7 @@ var map_getEventCategoryActivity = {
 	},
 };
 
-var hdr1 = match("HEADER#0:0001", "message", "%{data}ZSCALERNSS: time=%{hfld2->} %{hmonth->} %{hday->} %{hhour}:%{hmin}:%{hsec->} %{hyear}^^timezone=%{timezone}^^%{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{data->} ZSCALERNSS: time=%{hfld2->} %{hmonth->} %{hday->} %{hhour}:%{hmin}:%{hsec->} %{hyear}^^timezone=%{timezone}^^%{payload}", processor_chain([
 	setc("header_id","0001"),
 	setc("messageid","ZSCALERNSS_1"),
 ]));

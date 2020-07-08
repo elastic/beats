@@ -31,7 +31,7 @@ var dup7 = setc("action","deny");
 
 var dup8 = setc("dclass_counter1_string","block_count");
 
-var dup9 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname}proto=%{protocol}service=%{network_service}status=deny src=%{saddr}dst=%{daddr}src_port=%{sport}dst_port=%{dport}server_app=%{fld12}pid=%{process_id}app_name=%{fld14}traff_direct=%{direction}block_count=%{dclass_counter1}logon_user=%{username}@%{domain}msg=%{result}", processor_chain([
+var dup9 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} proto=%{protocol->} service=%{network_service->} status=deny src=%{saddr->} dst=%{daddr->} src_port=%{sport->} dst_port=%{dport->} server_app=%{fld12->} pid=%{process_id->} app_name=%{fld14->} traff_direct=%{direction->} block_count=%{dclass_counter1->} logon_user=%{username}@%{domain->} msg=%{result}", processor_chain([
 	dup3,
 	dup4,
 	dup5,
@@ -41,7 +41,7 @@ var dup9 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld
 	dup8,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{hdate->} %{hhostname}proto=%{hprotocol}service=%{messageid}status=%{haction}src=%{hsaddr}dst=%{hdaddr}src_port=%{hsport}dst_port=%{hdport->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} proto=%{hprotocol->} service=%{messageid->} status=%{haction->} src=%{hsaddr->} dst=%{hdaddr->} src_port=%{hsport->} dst_port=%{hdport->} %{payload}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -51,22 +51,22 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{hdate->} %
 			constant(" "),
 			field("hday"),
 			constant(" "),
-			field("hdate"),
+			field("htime"),
 			constant(" "),
 			field("hhostname"),
-			constant("proto="),
+			constant(" proto="),
 			field("hprotocol"),
-			constant("service="),
+			constant(" service="),
 			field("messageid"),
-			constant("status="),
+			constant(" status="),
 			field("haction"),
-			constant("src="),
+			constant(" src="),
 			field("hsaddr"),
-			constant("dst="),
+			constant(" dst="),
 			field("hdaddr"),
-			constant("src_port="),
+			constant(" src_port="),
 			field("hsport"),
-			constant("dst_port="),
+			constant(" dst_port="),
 			field("hdport"),
 			constant(" "),
 			field("payload"),
@@ -74,7 +74,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{hdate->} %
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{hdate->} %{hhostname}(%{messageid->} %{hfld5}times in last %{hfld6}) %{hfld7->} %{hfld8}::%{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} (%{messageid->} %{hfld5->} times in last %{hfld6}) %{hfld7->} %{hfld8}::%{payload}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -84,14 +84,14 @@ var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{hdate->} %
 			constant(" "),
 			field("hday"),
 			constant(" "),
-			field("hdate"),
+			field("htime"),
 			constant(" "),
 			field("hhostname"),
-			constant("("),
+			constant(" ("),
 			field("messageid"),
 			constant(" "),
 			field("hfld5"),
-			constant("times in last "),
+			constant(" times in last "),
 			field("hfld6"),
 			constant(") "),
 			field("hfld7"),
@@ -103,7 +103,7 @@ var hdr2 = match("HEADER#1:0003", "message", "%{hmonth->} %{hday->} %{hdate->} %
 	}),
 ]));
 
-var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{hdate->} %{hhostname->} %{messageid->} %{hfld5}::%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hhostname->} %{messageid->} %{hfld5}::%{payload}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
@@ -113,7 +113,7 @@ var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{hdate->} %
 			constant(" "),
 			field("hday"),
 			constant(" "),
-			field("hdate"),
+			field("htime"),
 			constant(" "),
 			field("hhostname"),
 			constant(" "),
@@ -132,14 +132,14 @@ var select1 = linear_select([
 	hdr3,
 ]);
 
-var part1 = match("MESSAGE#0:enter", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname}enter %{info}", processor_chain([
+var part1 = match("MESSAGE#0:enter", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} enter %{info}", processor_chain([
 	dup1,
 	dup2,
 ]));
 
 var msg1 = msg("enter", part1);
 
-var part2 = match("MESSAGE#1:repeated", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname}(repeated %{fld5}times in last %{fld6}) enter %{info}", processor_chain([
+var part2 = match("MESSAGE#1:repeated", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} (repeated %{fld5->} times in last %{fld6}) enter %{info}", processor_chain([
 	dup1,
 	dup2,
 ]));
@@ -169,7 +169,7 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part3 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname}proto=%{protocol}service=%{network_service}status=deny src=%{saddr}dst=%{daddr}src_port=%{sport}dst_port=%{dport}server_app=%{fld12}pid=%{process_id}app_name=%{fld14}traff_direct=%{direction}block_count=%{dclass_counter1}logon_user=%{username}@%{domain}msg=%{result}", processor_chain([
+var part3 = match("MESSAGE#2:ms-wbt-server", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} proto=%{protocol->} service=%{network_service->} status=deny src=%{saddr->} dst=%{daddr->} src_port=%{sport->} dst_port=%{dport->} server_app=%{fld12->} pid=%{process_id->} app_name=%{fld14->} traff_direct=%{direction->} block_count=%{dclass_counter1->} logon_user=%{username}@%{domain->} msg=%{result}", processor_chain([
 	dup3,
 	dup4,
 	dup5,

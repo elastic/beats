@@ -520,7 +520,7 @@ var all3 = all_match({
 
 var msg54 = msg("HTTP:Object_Scanned_And_Clean", all3);
 
-var part15 = match("MESSAGE#54:HTTP:Object_Not_Scanned_01/2", "nwparser.p0", "%{}'%{obj_name}' has not been scanned as defined by the policy as %{policyname->} %{fld17}( %{p0}");
+var part15 = match("MESSAGE#54:HTTP:Object_Not_Scanned_01/2", "nwparser.p0", "%{}'%{obj_name}' has not been scanned as defined by the policy as %{policyname->} %{fld17->} ( %{p0}");
 
 var all4 = all_match({
 	processors: [
@@ -657,7 +657,7 @@ var part21 = match("MESSAGE#79:KLSRV_UPD_BASES_UPDATED", "nwparser.payload", "%{
 
 var msg80 = msg("KLSRV_UPD_BASES_UPDATED", part21);
 
-var part22 = match("MESSAGE#80:FSEE_AKPLUGIN_OBJECT_NOT_PROCESSED", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_type}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Object not scanned. Reason: %{event_description}Object name: %{filename}^^%{context}^^%{product}^^%{version}^^%{fld15}^^%{fld16}^^%{fld17}^^%{fld18}^^%{fld19}^^%{fld20}^^%{fld21}", processor_chain([
+var part22 = match("MESSAGE#80:FSEE_AKPLUGIN_OBJECT_NOT_PROCESSED", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_type}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Object not scanned. Reason: %{event_description->} Object name: %{filename}^^%{context}^^%{product}^^%{version}^^%{fld15}^^%{fld16}^^%{fld17}^^%{fld18}^^%{fld19}^^%{fld20}^^%{fld21}", processor_chain([
 	dup1,
 	dup2,
 	dup22,
@@ -673,7 +673,7 @@ var part23 = match("MESSAGE#81:KLNAG_EV_INV_APP_INSTALLED", "nwparser.payload", 
 
 var msg82 = msg("KLNAG_EV_INV_APP_INSTALLED", part23);
 
-var part24 = match("MESSAGE#82:GNRL_EV_LICENSE_EXPIRATION", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_type}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}User: %{username}Component: %{fld5}Result\\Description: %{event_description}^^%{context}^^%{product}^^%{version}^^%{fld15}^^", processor_chain([
+var part24 = match("MESSAGE#82:GNRL_EV_LICENSE_EXPIRATION", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_type}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info->} User: %{username->} Component: %{fld5}Result\\Description: %{event_description}^^%{context}^^%{product}^^%{version}^^%{fld15}^^", processor_chain([
 	dup1,
 	dup2,
 	dup22,
@@ -689,7 +689,7 @@ var part25 = match("MESSAGE#83:KSNPROXY_STARTED_CON_CHK_FAILED", "nwparser.paylo
 
 var msg84 = msg("KSNPROXY_STARTED_CON_CHK_FAILED", part25);
 
-var part26 = match("MESSAGE#84:000003f8", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_description}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Event type:%{event_type}Result: %{fld23}Object: %{obj_name}Object\\Path: %{url}User:%{username}Update ID: %{fld51}^^%{context}^^%{product}^^%{version}^^%{fld15}^^%{fld16}^^%{fld17}^^%{fld18}^^%{fld19}^^%{fld21}^^%{fld22}", processor_chain([
+var part26 = match("MESSAGE#84:000003f8", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_description}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Event type:%{event_type->} Result: %{fld23->} Object: %{obj_name->} Object\\Path: %{url->} User:%{username->} Update ID: %{fld51}^^%{context}^^%{product}^^%{version}^^%{fld15}^^%{fld16}^^%{fld17}^^%{fld18}^^%{fld19}^^%{fld21}^^%{fld22}", processor_chain([
 	dup1,
 	dup2,
 	dup22,
@@ -716,7 +716,7 @@ var part28 = match("MESSAGE#87:0000014d", "nwparser.payload", "%{fld1}^^%{fld2->
 
 var msg88 = msg("0000014d", part28);
 
-var part29 = match("MESSAGE#88:000003f7/0", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_description}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Event type:%{event_type}Result: %{result->} %{p0}");
+var part29 = match("MESSAGE#88:000003f7/0", "nwparser.payload", "%{fld1}^^%{fld2->} %{fld3}.%{fld4}^^%{event_description}^^%{fld6}^^%{hostip}^^%{hostname}^^%{group_object}^^%{info}^^Event type:%{event_type->} Result: %{result->} %{p0}");
 
 var part30 = match("MESSAGE#88:000003f7/1_0", "nwparser.p0", "Object: %{obj_name->} Object\\Path: %{url->} User:%{username}(%{privilege})%{p0}");
 

@@ -46,7 +46,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%APACHETOMCAT-%{level}-%{messageid
 	setc("header_id","0001"),
 ]));
 
-var hdr2 = match("HEADER#1:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hostname}%APACHETOMCAT- %{messageid}: %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hostname->} %APACHETOMCAT- %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0002"),
 ]));
 

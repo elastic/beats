@@ -201,7 +201,7 @@ var hdr5 = match("HEADER#4:0005", "message", "%{hmonth->} %{hdate->} %{htime->} 
 	}),
 ]));
 
-var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid}/%{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} %{hfld1->} %{hfld2->} %{hfld3}[%{hfld4}]: %{messageid->} /%{payload}", processor_chain([
 	setc("header_id","0006"),
 	call({
 		dest: "nwparser.payload",
@@ -222,7 +222,7 @@ var hdr6 = match("HEADER#5:0006", "message", "%{hmonth->} %{hdate->} %{htime->} 
 			field("hfld4"),
 			constant("]: "),
 			field("messageid"),
-			constant("/"),
+			constant(" /"),
 			field("payload"),
 		],
 	}),
@@ -351,21 +351,21 @@ var part14 = match("MESSAGE#12:01490102", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg13 = msg("01490102", part14);
 
-var part15 = match("MESSAGE#13:01490000:02", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: %{authmethod}authentication for user %{username}using config %{fld8}", processor_chain([
+var part15 = match("MESSAGE#13:01490000:02", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: %{authmethod->} authentication for user %{username->} using config %{fld8}", processor_chain([
 	dup5,
 	dup2,
 ]));
 
 var msg14 = msg("01490000:02", part15);
 
-var part16 = match("MESSAGE#14:01490000:01", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: found HTTP %{resultcode}in response header", processor_chain([
+var part16 = match("MESSAGE#14:01490000:01", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: found HTTP %{resultcode->} in response header", processor_chain([
 	dup6,
 	dup2,
 ]));
 
 var msg15 = msg("01490000:01", part16);
 
-var part17 = match("MESSAGE#15:01490000", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{filename}func: \"%{action}\" line: %{fld8}Msg: %{result}", processor_chain([
+var part17 = match("MESSAGE#15:01490000", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{filename->} func: \"%{action}\" line: %{fld8->} Msg: %{result}", processor_chain([
 	dup5,
 	dup2,
 ]));
@@ -402,7 +402,7 @@ var select5 = linear_select([
 	part21,
 ]);
 
-var part22 = match("MESSAGE#18:01490500/2", "nwparser.p0", "%{saddr}(ST=%{location_state}/CC=%{location_country}/C=%{location_city}) at VIP %{p0}");
+var part22 = match("MESSAGE#18:01490500/2", "nwparser.p0", "%{saddr->} (ST=%{location_state}/CC=%{location_country}/C=%{location_city}) at VIP %{p0}");
 
 var part23 = match("MESSAGE#18:01490500/3_0", "nwparser.p0", "%{daddr->} Listener %{fld8->} (Reputation=%{category})");
 
@@ -431,14 +431,14 @@ var all2 = all_match({
 
 var msg19 = msg("01490500", all2);
 
-var part26 = match("MESSAGE#19:01490005", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{fld8}from item %{fld9}to ending %{fld10}", processor_chain([
+var part26 = match("MESSAGE#19:01490005", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{fld8->} from item %{fld9->} to ending %{fld10}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg20 = msg("01490005", part26);
 
-var part27 = match("MESSAGE#20:01490006", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{fld8}from item '%{fld9}' to item '%{fld10}'", processor_chain([
+var part27 = match("MESSAGE#20:01490006", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{fld8->} from item '%{fld9}' to item '%{fld10}'", processor_chain([
 	dup7,
 	dup2,
 ]));
@@ -452,7 +452,7 @@ var part28 = match("MESSAGE#21:01490007", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg22 = msg("01490007", part28);
 
-var part29 = match("MESSAGE#22:01490008", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Connectivity resource %{application}assigned", processor_chain([
+var part29 = match("MESSAGE#22:01490008", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Connectivity resource %{application->} assigned", processor_chain([
 	dup3,
 	dup2,
 ]));
@@ -484,7 +484,7 @@ var part32 = match("MESSAGE#27:01490142", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg28 = msg("01490142", part32);
 
-var part33 = match("MESSAGE#28:01490504", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: %{fqdn}can not be resolved.", processor_chain([
+var part33 = match("MESSAGE#28:01490504", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: %{fqdn->} can not be resolved.", processor_chain([
 	dup8,
 	dup2,
 ]));
@@ -564,14 +564,14 @@ var select9 = linear_select([
 	msg35,
 ]);
 
-var part43 = match("MESSAGE#35:01490128", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Webtop %{application}assigned", processor_chain([
+var part43 = match("MESSAGE#35:01490128", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Webtop %{application->} assigned", processor_chain([
 	dup5,
 	dup2,
 ]));
 
 var msg36 = msg("01490128", part43);
 
-var part44 = match("MESSAGE#36:01490101", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Access profile: %{fld8}configuration has been applied. Newly active generation count is: %{dclass_counter1}", processor_chain([
+var part44 = match("MESSAGE#36:01490101", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Access profile: %{fld8->} configuration has been applied. Newly active generation count is: %{dclass_counter1}", processor_chain([
 	dup10,
 	dup2,
 	setc("dclass_counter1_string","Newly active generation count"),
@@ -586,7 +586,7 @@ var part45 = match("MESSAGE#37:01490103", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg38 = msg("01490103", part45);
 
-var part46 = match("MESSAGE#38:01490115", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{rulename}from item %{fld9}to terminalout %{fld10}", processor_chain([
+var part46 = match("MESSAGE#38:01490115", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Following rule %{rulename->} from item %{fld9->} to terminalout %{fld10}", processor_chain([
 	dup7,
 	dup2,
 ]));
@@ -638,7 +638,7 @@ var part51 = match("MESSAGE#43:01490544", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg44 = msg("01490544", part51);
 
-var part52 = match("MESSAGE#44:01490511", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Initializing Access profile %{fld8}with max concurrent user sessions limit: %{dclass_counter1}", processor_chain([
+var part52 = match("MESSAGE#44:01490511", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Initializing Access profile %{fld8->} with max concurrent user sessions limit: %{dclass_counter1}", processor_chain([
 	dup7,
 	dup2,
 	setc("dclass_counter1_string"," Max Concurrent User Sessions Limit"),
@@ -646,7 +646,7 @@ var part52 = match("MESSAGE#44:01490511", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg45 = msg("01490511", part52);
 
-var part53 = match("MESSAGE#45:014d0002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: %{sessionid}: SSOv2 Logon succeeded, config %{fld8}form %{fld9}", processor_chain([
+var part53 = match("MESSAGE#45:014d0002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: %{sessionid}: SSOv2 Logon succeeded, config %{fld8->} form %{fld9}", processor_chain([
 	dup7,
 	dup2,
 	setc("disposition","Succeeded"),
@@ -654,7 +654,7 @@ var part53 = match("MESSAGE#45:014d0002", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg46 = msg("014d0002", part53);
 
-var part54 = match("MESSAGE#46:014d0002:01", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: %{sessionid}: SSOv2 Logon failed, config %{fld8}form %{fld9}", processor_chain([
+var part54 = match("MESSAGE#46:014d0002:01", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: %{sessionid}: SSOv2 Logon failed, config %{fld8->} form %{fld9}", processor_chain([
 	dup7,
 	dup2,
 	setc("disposition","Failed"),
@@ -674,49 +674,49 @@ var part55 = match("MESSAGE#47:01490079", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg48 = msg("01490079", part55);
 
-var part56 = match("MESSAGE#48:01490165", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Access profile: %{fld8}initialized with configuration snapshot catalog: %{fld9}", processor_chain([
+var part56 = match("MESSAGE#48:01490165", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Access profile: %{fld8->} initialized with configuration snapshot catalog: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg49 = msg("01490165", part56);
 
-var part57 = match("MESSAGE#49:01490166", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Current snapshot ID: %{fld8}retrieved from session db for access profile: %{fld9}", processor_chain([
+var part57 = match("MESSAGE#49:01490166", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Current snapshot ID: %{fld8->} retrieved from session db for access profile: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg50 = msg("01490166", part57);
 
-var part58 = match("MESSAGE#50:01490167", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Current snapshot ID: %{fld8}updated inside session db for access profile: %{fld9}", processor_chain([
+var part58 = match("MESSAGE#50:01490167", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Current snapshot ID: %{fld8->} updated inside session db for access profile: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg51 = msg("01490167", part58);
 
-var part59 = match("MESSAGE#51:01490169", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Snapshot catalog entry: %{fld8}added for access profile: %{fld9}", processor_chain([
+var part59 = match("MESSAGE#51:01490169", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Snapshot catalog entry: %{fld8->} added for access profile: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg52 = msg("01490169", part59);
 
-var part60 = match("MESSAGE#52:0149016a", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Initiating snapshot creation: %{fld8}for access profile: %{fld9}", processor_chain([
+var part60 = match("MESSAGE#52:0149016a", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Initiating snapshot creation: %{fld8->} for access profile: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg53 = msg("0149016a", part60);
 
-var part61 = match("MESSAGE#53:0149016b", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Completed snapshot creation: %{fld8}for access profile: %{fld9}", processor_chain([
+var part61 = match("MESSAGE#53:0149016b", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: %{fld7}:%{fld6}: Completed snapshot creation: %{fld8->} for access profile: %{fld9}", processor_chain([
 	dup7,
 	dup2,
 ]));
 
 var msg54 = msg("0149016b", part61);
 
-var part62 = match("MESSAGE#54:ssl_acc/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}] %{saddr}- %{p0}");
+var part62 = match("MESSAGE#54:ssl_acc/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}] %{saddr->} - %{p0}");
 
 var part63 = match("MESSAGE#54:ssl_acc/1_0", "nwparser.p0", "- %{p0}");
 
@@ -744,7 +744,7 @@ var all4 = all_match({
 
 var msg55 = msg("ssl_acc", all4);
 
-var part66 = match("MESSAGE#55:ssl_req", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}]%{space}[%{fld20->} %{timezone}] %{saddr->} %{protocol->} %{encryption_type}\"%{url}\" %{rbytes}", processor_chain([
+var part66 = match("MESSAGE#55:ssl_req", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}]%{space}[%{fld20->} %{timezone}] %{saddr->} %{protocol->} %{encryption_type->} \"%{url}\" %{rbytes}", processor_chain([
 	dup13,
 	dup14,
 	dup2,
@@ -752,7 +752,7 @@ var part66 = match("MESSAGE#55:ssl_req", "nwparser.payload", "%{fld1->} %{fld2->
 
 var msg56 = msg("ssl_req", part66);
 
-var part67 = match("MESSAGE#56:acc", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}]%{space}[%{fld20->} %{timezone}] \"%{web_method->} %{url->} %{version}\" %{resultcode->} %{rbytes}\"%{fld7}\" \"%{user_agent}\"", processor_chain([
+var part67 = match("MESSAGE#56:acc", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}: [%{event_type}]%{space}[%{fld20->} %{timezone}] \"%{web_method->} %{url->} %{version}\" %{resultcode->} %{rbytes->} \"%{fld7}\" \"%{user_agent}\"", processor_chain([
 	dup13,
 	dup14,
 	dup2,
@@ -789,7 +789,7 @@ var part70 = match("MESSAGE#60:sSMTP", "nwparser.payload", "%{fld1->} %{fld2->} 
 
 var msg61 = msg("sSMTP", part70);
 
-var part71 = match("MESSAGE#61:01420002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{agent}[%{process_id}]: %{fld5}: AUDIT - pid=%{parent_pid}user=%{username}folder=%{directory}module=%{fld6}status=%{result}cmd_data=%{info->} ", processor_chain([
+var part71 = match("MESSAGE#61:01420002", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{agent}[%{process_id}]: %{fld5}: AUDIT - pid=%{parent_pid->} user=%{username->} folder=%{directory->} module=%{fld6->} status=%{result->} cmd_data=%{info->} ", processor_chain([
 	dup16,
 	dup2,
 ]));
@@ -822,7 +822,7 @@ var part74 = match("MESSAGE#64:auditd", "nwparser.payload", "%{fld1->} %{fld2->}
 
 var msg65 = msg("auditd", part74);
 
-var part75 = match("MESSAGE#65:014d0001", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: ssoMethod: %{authmethod}usernameSource: %{fld9}passwordSource: %{fld10}ntlmdomain: %{c_domain}", processor_chain([
+var part75 = match("MESSAGE#65:014d0001", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: ssoMethod: %{authmethod->} usernameSource: %{fld9->} passwordSource: %{fld10->} ntlmdomain: %{c_domain}", processor_chain([
 	dup5,
 	dup2,
 ]));
@@ -866,7 +866,7 @@ var select16 = linear_select([
 
 var msg69 = msg("014d0044", dup20);
 
-var part80 = match("MESSAGE#69:01490549/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Assigned PPP Dynamic IPv4: %{stransaddr}Tunnel Type: %{group->} %{fld8}Resource: %{rulename}Client IP: %{p0}");
+var part80 = match("MESSAGE#69:01490549/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{sessionid}: Assigned PPP Dynamic IPv4: %{stransaddr->} Tunnel Type: %{group->} %{fld8->} Resource: %{rulename->} Client IP: %{p0}");
 
 var part81 = match("MESSAGE#69:01490549/1_0", "nwparser.p0", "%{saddr->} - %{fld9->} ");
 
@@ -890,7 +890,7 @@ var all6 = all_match({
 
 var msg70 = msg("01490549", all6);
 
-var part83 = match("MESSAGE#70:01490547", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: Access Profile %{rulename}: %{result}for %{saddr}", processor_chain([
+var part83 = match("MESSAGE#70:01490547", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: Access Profile %{rulename}: %{result->} for %{saddr}", processor_chain([
 	dup3,
 	dup2,
 ]));
@@ -904,14 +904,14 @@ var part84 = match("MESSAGE#71:01490517", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg72 = msg("01490517", part84);
 
-var part85 = match("MESSAGE#72:011f0005", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{result}(Client side: vip=%{url}profile=%{protocol}pool=%{fld8}client_ip=%{saddr})", processor_chain([
+var part85 = match("MESSAGE#72:011f0005", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7}:%{fld6}: %{result->} (Client side: vip=%{url->} profile=%{protocol->} pool=%{fld8->} client_ip=%{saddr})", processor_chain([
 	dup3,
 	dup2,
 ]));
 
 var msg73 = msg("011f0005", part85);
 
-var part86 = match("MESSAGE#73:014d0048", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7->} %{rulename}\u003c\u003c%{event_description}>: APM_EVENT=%{action}| %{username}| %{fld8}***%{result}***", processor_chain([
+var part86 = match("MESSAGE#73:014d0048", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{fld4->} %{severity->} %{fld5}[%{process_id}]: %{fld7->} %{rulename->} \u003c\u003c%{event_description}>: APM_EVENT=%{action->} | %{username->} | %{fld8->} ***%{result}***", processor_chain([
 	dup3,
 	dup2,
 ]));
@@ -934,7 +934,7 @@ var part88 = match("MESSAGE#76:01260009", "nwparser.payload", "%{fld1->} %{fld2-
 
 var msg77 = msg("01260009", part88);
 
-var part89 = match("MESSAGE#77:apmd:04", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4}/Common/home_agent_tca:Common:%{fld5}: %{fld6}- Hostname: %{shost}Type: %{fld7}Version: %{version}Platform: %{os}CPU: %{fld8}Mode:%{fld9}", processor_chain([
+var part89 = match("MESSAGE#77:apmd:04", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4->} /Common/home_agent_tca:Common:%{fld5}: %{fld6->} - Hostname: %{shost->} Type: %{fld7->} Version: %{version->} Platform: %{os->} CPU: %{fld8->} Mode:%{fld9}", processor_chain([
 	dup15,
 	dup2,
 	dup17,
@@ -942,7 +942,7 @@ var part89 = match("MESSAGE#77:apmd:04", "nwparser.payload", "%{fld1->} %{fld2->
 
 var msg78 = msg("apmd:04", part89);
 
-var part90 = match("MESSAGE#78:apmd:03", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4}/Common/home_agent_tca:Common:%{fld5}: RADIUS module: parseResponse(): Access-Reject packet from host %{saddr}:%{sport->} %{fld7}", processor_chain([
+var part90 = match("MESSAGE#78:apmd:03", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4->} /Common/home_agent_tca:Common:%{fld5}: RADIUS module: parseResponse(): Access-Reject packet from host %{saddr}:%{sport->} %{fld7}", processor_chain([
 	dup9,
 	dup2,
 	dup17,
@@ -950,7 +950,7 @@ var part90 = match("MESSAGE#78:apmd:03", "nwparser.payload", "%{fld1->} %{fld2->
 
 var msg79 = msg("apmd:03", part90);
 
-var part91 = match("MESSAGE#79:apmd:02/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4}/Common/home_agent_tca:Common:%{fld5}: RADIUS module: authentication with '%{username}' failed: %{p0}");
+var part91 = match("MESSAGE#79:apmd:02/0", "nwparser.payload", "%{fld1->} %{fld2->} %{fld3->} %{hostname->} %{severity->} %{agent}[%{process_id}]: %{fld4->} /Common/home_agent_tca:Common:%{fld5}: RADIUS module: authentication with '%{username}' failed: %{p0}");
 
 var part92 = match("MESSAGE#79:apmd:02/1_0", "nwparser.p0", "%{fld6->} from host %{saddr}:%{sport->} %{fld7}");
 
