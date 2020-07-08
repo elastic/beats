@@ -284,9 +284,7 @@
     },
     {
         "@timestamp": "2016-07-04T13:38:16.000Z",
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "01490514",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -315,9 +313,7 @@
     },
     {
         "@timestamp": "2016-07-18T20:40:50.000Z",
-        "event.action": [
-            "cancel"
-        ],
+        "event.action": "cancel",
         "event.code": "CROND",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -711,9 +707,7 @@
     },
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
-        "event.action": [
-            "allow"
-        ],
+        "event.action": "allow",
         "event.code": "01490106",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -907,9 +901,7 @@
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
-        "event.action": [
-            "accept"
-        ],
+        "event.action": "accept",
         "event.code": "01490514",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -982,8 +974,8 @@
         "observer.vendor": "F5",
         "process.pid": 4318,
         "related.ip": [
-            "10.169.101.161",
-            "10.122.204.151"
+            "10.122.204.151",
+            "10.169.101.161"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "snulap",
@@ -1562,8 +1554,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.47.99.72",
-            "10.187.64.126"
+            "10.187.64.126",
+            "10.47.99.72"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",
@@ -1994,9 +1986,7 @@
     },
     {
         "@timestamp": "2019-01-19T15:25:23.000Z",
-        "event.action": [
-            "block"
-        ],
+        "event.action": "block",
         "event.code": "crond",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2182,9 +2172,7 @@
     },
     {
         "@timestamp": "2019-04-29T16:43:23.000Z",
-        "event.action": [
-            "cancel"
-        ],
+        "event.action": "cancel",
         "event.code": "CROND",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2495,9 +2483,7 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "Rule",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2610,9 +2596,7 @@
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
-        "event.action": [
-            "allow"
-        ],
+        "event.action": "allow",
         "event.code": "01490106",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",

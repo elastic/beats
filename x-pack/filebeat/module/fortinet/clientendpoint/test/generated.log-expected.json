@@ -5,9 +5,7 @@
             "10.102.123.34"
         ],
         "destination.port": 3994,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -64,9 +62,7 @@
             "10.102.218.31"
         ],
         "destination.port": 3376,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -83,8 +79,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6183,
         "related.ip": [
-            "10.22.119.124",
-            "10.102.218.31"
+            "10.102.218.31",
+            "10.22.119.124"
         ],
         "related.user": [
             "itamet"
@@ -123,9 +119,7 @@
             "10.26.46.95"
         ],
         "destination.port": 7599,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -182,9 +176,7 @@
             "10.202.204.154"
         ],
         "destination.port": 3587,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -241,9 +233,7 @@
             "10.131.115.96"
         ],
         "destination.port": 1890,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -300,9 +290,7 @@
             "10.11.200.161"
         ],
         "destination.port": 4665,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -319,8 +307,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4243,
         "related.ip": [
-            "10.11.200.161",
-            "10.183.202.41"
+            "10.183.202.41",
+            "10.11.200.161"
         ],
         "related.user": [
             "iusmodt"
@@ -359,9 +347,7 @@
             "10.214.225.125"
         ],
         "destination.port": 2121,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -378,8 +364,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5722,
         "related.ip": [
-            "10.12.44.169",
-            "10.214.225.125"
+            "10.214.225.125",
+            "10.12.44.169"
         ],
         "related.user": [
             "uam"
@@ -418,9 +404,7 @@
             "10.233.127.83"
         ],
         "destination.port": 3676,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -477,9 +461,7 @@
             "10.69.20.77"
         ],
         "destination.port": 7579,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -496,8 +478,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 776,
         "related.ip": [
-            "10.69.20.77",
-            "10.178.244.31"
+            "10.178.244.31",
+            "10.69.20.77"
         ],
         "related.user": [
             "moll"
@@ -536,9 +518,7 @@
             "10.10.65.154"
         ],
         "destination.port": 7572,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -555,8 +535,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3592,
         "related.ip": [
-            "10.197.5.210",
-            "10.10.65.154"
+            "10.10.65.154",
+            "10.197.5.210"
         ],
         "related.user": [
             "olo"
@@ -595,9 +575,7 @@
             "10.177.124.147"
         ],
         "destination.port": 4173,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -654,9 +632,7 @@
             "10.157.213.15"
         ],
         "destination.port": 600,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -713,9 +689,7 @@
             "10.124.100.32"
         ],
         "destination.port": 7699,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -732,8 +706,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5376,
         "related.ip": [
-            "10.208.134.60",
-            "10.124.100.32"
+            "10.124.100.32",
+            "10.208.134.60"
         ],
         "related.user": [
             "admi"
@@ -772,9 +746,7 @@
             "10.55.77.49"
         ],
         "destination.port": 4683,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -791,8 +763,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1577,
         "related.ip": [
-            "10.75.148.116",
-            "10.55.77.49"
+            "10.55.77.49",
+            "10.75.148.116"
         ],
         "related.user": [
             "tdolorem"
@@ -831,9 +803,7 @@
             "10.21.92.218"
         ],
         "destination.port": 5716,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -890,9 +860,7 @@
             "10.84.105.75"
         ],
         "destination.port": 98,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -909,8 +877,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 499,
         "related.ip": [
-            "10.78.151.178",
-            "10.84.105.75"
+            "10.84.105.75",
+            "10.78.151.178"
         ],
         "related.user": [
             "deFinibu"
@@ -949,9 +917,7 @@
             "10.76.229.163"
         ],
         "destination.port": 6387,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1008,9 +974,7 @@
             "10.104.134.200"
         ],
         "destination.port": 2508,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1067,9 +1031,7 @@
             "10.252.122.195"
         ],
         "destination.port": 2807,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1126,9 +1088,7 @@
             "10.31.95.218"
         ],
         "destination.port": 7042,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1145,8 +1105,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2374,
         "related.ip": [
-            "10.195.36.51",
-            "10.31.95.218"
+            "10.31.95.218",
+            "10.195.36.51"
         ],
         "related.user": [
             "laborum"
@@ -1185,9 +1145,7 @@
             "10.170.148.40"
         ],
         "destination.port": 6371,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1244,9 +1202,7 @@
             "10.233.171.118"
         ],
         "destination.port": 7410,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1303,9 +1259,7 @@
             "10.134.148.219"
         ],
         "destination.port": 4430,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1362,9 +1316,7 @@
             "10.177.238.183"
         ],
         "destination.port": 6458,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1381,8 +1333,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5251,
         "related.ip": [
-            "10.59.122.242",
-            "10.177.238.183"
+            "10.177.238.183",
+            "10.59.122.242"
         ],
         "related.user": [
             "xerc"
@@ -1421,9 +1373,7 @@
             "10.10.27.73"
         ],
         "destination.port": 2574,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1440,8 +1390,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6106,
         "related.ip": [
-            "10.74.33.75",
-            "10.10.27.73"
+            "10.10.27.73",
+            "10.74.33.75"
         ],
         "related.user": [
             "quaturve"
@@ -1480,9 +1430,7 @@
             "10.32.239.1"
         ],
         "destination.port": 3128,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1499,8 +1447,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3022,
         "related.ip": [
-            "10.32.239.1",
-            "10.241.65.49"
+            "10.241.65.49",
+            "10.32.239.1"
         ],
         "related.user": [
             "asia"
@@ -1539,9 +1487,7 @@
             "10.14.36.202"
         ],
         "destination.port": 6036,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1598,9 +1544,7 @@
             "10.164.39.248"
         ],
         "destination.port": 5194,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1657,9 +1601,7 @@
             "10.135.187.104"
         ],
         "destination.port": 4708,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1676,8 +1618,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5919,
         "related.ip": [
-            "10.208.14.185",
-            "10.135.187.104"
+            "10.135.187.104",
+            "10.208.14.185"
         ],
         "related.user": [
             "rcitati"
@@ -1716,9 +1658,7 @@
             "10.248.101.25"
         ],
         "destination.port": 5740,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1775,9 +1715,7 @@
             "10.145.26.181"
         ],
         "destination.port": 6088,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1794,8 +1732,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3471,
         "related.ip": [
-            "10.46.49.26",
-            "10.145.26.181"
+            "10.145.26.181",
+            "10.46.49.26"
         ],
         "related.user": [
             "cons"
@@ -1834,9 +1772,7 @@
             "10.66.2.232"
         ],
         "destination.port": 5764,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1853,8 +1789,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3470,
         "related.ip": [
-            "10.66.2.232",
-            "10.27.14.168"
+            "10.27.14.168",
+            "10.66.2.232"
         ],
         "related.user": [
             "evolu"
@@ -1893,9 +1829,7 @@
             "10.201.238.90"
         ],
         "destination.port": 7130,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1952,9 +1886,7 @@
             "10.105.91.31"
         ],
         "destination.port": 5987,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1971,8 +1903,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 853,
         "related.ip": [
-            "10.217.150.196",
-            "10.105.91.31"
+            "10.105.91.31",
+            "10.217.150.196"
         ],
         "related.user": [
             "siutali"
@@ -2011,9 +1943,7 @@
             "10.226.83.168"
         ],
         "destination.port": 4153,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2070,9 +2000,7 @@
             "10.113.95.59"
         ],
         "destination.port": 4367,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2129,9 +2057,7 @@
             "10.43.226.231"
         ],
         "destination.port": 2778,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2148,8 +2074,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 829,
         "related.ip": [
-            "10.43.226.231",
-            "10.173.136.186"
+            "10.173.136.186",
+            "10.43.226.231"
         ],
         "related.user": [
             "uscipitl"
@@ -2188,9 +2114,7 @@
             "10.54.37.86"
         ],
         "destination.port": 5089,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2207,8 +2131,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6867,
         "related.ip": [
-            "10.58.64.108",
-            "10.54.37.86"
+            "10.54.37.86",
+            "10.58.64.108"
         ],
         "related.user": [
             "dolorsit"
@@ -2247,9 +2171,7 @@
             "10.159.119.34"
         ],
         "destination.port": 6197,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2306,9 +2228,7 @@
             "10.29.133.28"
         ],
         "destination.port": 1085,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2325,8 +2245,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5433,
         "related.ip": [
-            "10.29.133.28",
-            "10.163.93.20"
+            "10.163.93.20",
+            "10.29.133.28"
         ],
         "related.user": [
             "tpersp"
@@ -2365,9 +2285,7 @@
             "10.50.0.61"
         ],
         "destination.port": 5905,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2424,9 +2342,7 @@
             "10.30.47.165"
         ],
         "destination.port": 3801,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2483,9 +2399,7 @@
             "10.36.112.145"
         ],
         "destination.port": 7122,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2542,9 +2456,7 @@
             "10.162.114.217"
         ],
         "destination.port": 7503,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2601,9 +2513,7 @@
             "10.140.7.83"
         ],
         "destination.port": 3298,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2620,8 +2530,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2189,
         "related.ip": [
-            "10.229.71.175",
-            "10.140.7.83"
+            "10.140.7.83",
+            "10.229.71.175"
         ],
         "related.user": [
             "eseru"
@@ -2660,9 +2570,7 @@
             "10.149.13.76"
         ],
         "destination.port": 2000,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2679,8 +2587,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1478,
         "related.ip": [
-            "10.149.13.76",
-            "10.232.254.65"
+            "10.232.254.65",
+            "10.149.13.76"
         ],
         "related.user": [
             "itesseq"
@@ -2719,9 +2627,7 @@
             "10.90.33.138"
         ],
         "destination.port": 7876,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2778,9 +2684,7 @@
             "10.243.237.151"
         ],
         "destination.port": 6296,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2837,9 +2741,7 @@
             "10.28.84.106"
         ],
         "destination.port": 4844,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2856,8 +2758,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1609,
         "related.ip": [
-            "10.193.233.229",
-            "10.28.84.106"
+            "10.28.84.106",
+            "10.193.233.229"
         ],
         "related.user": [
             "luptatem"
@@ -2896,9 +2798,7 @@
             "10.85.185.13"
         ],
         "destination.port": 7793,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2915,8 +2815,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7224,
         "related.ip": [
-            "10.180.195.43",
-            "10.85.185.13"
+            "10.85.185.13",
+            "10.180.195.43"
         ],
         "related.user": [
             "atione"
@@ -2955,9 +2855,7 @@
             "10.201.237.233"
         ],
         "destination.port": 3023,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3014,9 +2912,7 @@
             "10.196.206.130"
         ],
         "destination.port": 1725,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3033,8 +2929,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7867,
         "related.ip": [
-            "10.239.80.120",
-            "10.196.206.130"
+            "10.196.206.130",
+            "10.239.80.120"
         ],
         "related.user": [
             "isn"
@@ -3073,9 +2969,7 @@
             "10.47.24.77"
         ],
         "destination.port": 1919,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3132,9 +3026,7 @@
             "10.139.127.232"
         ],
         "destination.port": 1812,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3191,9 +3083,7 @@
             "10.40.35.49"
         ],
         "destination.port": 3071,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3210,8 +3100,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3178,
         "related.ip": [
-            "10.40.35.49",
-            "10.130.241.232"
+            "10.130.241.232",
+            "10.40.35.49"
         ],
         "related.user": [
             "aturQu"
@@ -3250,9 +3140,7 @@
             "10.167.252.183"
         ],
         "destination.port": 5107,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3309,9 +3197,7 @@
             "10.46.56.204"
         ],
         "destination.port": 5070,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3328,8 +3214,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7079,
         "related.ip": [
-            "10.97.149.97",
-            "10.46.56.204"
+            "10.46.56.204",
+            "10.97.149.97"
         ],
         "related.user": [
             "esseq"
@@ -3368,9 +3254,7 @@
             "10.151.129.181"
         ],
         "destination.port": 5773,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3387,8 +3271,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5026,
         "related.ip": [
-            "10.28.105.124",
-            "10.151.129.181"
+            "10.151.129.181",
+            "10.28.105.124"
         ],
         "related.user": [
             "nesciun"
@@ -3427,9 +3311,7 @@
             "10.145.101.26"
         ],
         "destination.port": 2559,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3446,8 +3328,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3992,
         "related.ip": [
-            "10.128.63.143",
-            "10.145.101.26"
+            "10.145.101.26",
+            "10.128.63.143"
         ],
         "related.user": [
             "ssusci"
@@ -3486,9 +3368,7 @@
             "10.62.229.89"
         ],
         "destination.port": 5348,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3545,9 +3425,7 @@
             "10.54.83.119"
         ],
         "destination.port": 338,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3564,8 +3442,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 315,
         "related.ip": [
-            "10.250.19.146",
-            "10.54.83.119"
+            "10.54.83.119",
+            "10.250.19.146"
         ],
         "related.user": [
             "radi"
@@ -3604,9 +3482,7 @@
             "10.1.96.93"
         ],
         "destination.port": 428,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3623,8 +3499,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5398,
         "related.ip": [
-            "10.54.73.158",
-            "10.1.96.93"
+            "10.1.96.93",
+            "10.54.73.158"
         ],
         "related.user": [
             "snos"
@@ -3663,9 +3539,7 @@
             "10.94.114.83"
         ],
         "destination.port": 4803,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3722,9 +3596,7 @@
             "10.38.28.151"
         ],
         "destination.port": 347,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3741,8 +3613,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2649,
         "related.ip": [
-            "10.206.165.83",
-            "10.38.28.151"
+            "10.38.28.151",
+            "10.206.165.83"
         ],
         "related.user": [
             "erspi"
@@ -3781,9 +3653,7 @@
             "10.77.229.168"
         ],
         "destination.port": 3777,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3840,9 +3710,7 @@
             "10.57.85.98"
         ],
         "destination.port": 1444,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3899,9 +3767,7 @@
             "10.193.66.155"
         ],
         "destination.port": 4965,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3918,8 +3784,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2913,
         "related.ip": [
-            "10.7.43.184",
-            "10.193.66.155"
+            "10.193.66.155",
+            "10.7.43.184"
         ],
         "related.user": [
             "tobeatae"
@@ -3958,9 +3824,7 @@
             "10.81.234.34"
         ],
         "destination.port": 1710,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3977,8 +3841,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1526,
         "related.ip": [
-            "10.196.96.162",
-            "10.81.234.34"
+            "10.81.234.34",
+            "10.196.96.162"
         ],
         "related.user": [
             "aliqui"
@@ -4017,9 +3881,7 @@
             "10.77.78.180"
         ],
         "destination.port": 5380,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4076,9 +3938,7 @@
             "10.108.45.59"
         ],
         "destination.port": 7229,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4135,9 +3995,7 @@
             "10.170.252.219"
         ],
         "destination.port": 2454,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4194,9 +4052,7 @@
             "10.83.119.181"
         ],
         "destination.port": 5693,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4253,9 +4109,7 @@
             "10.141.143.56"
         ],
         "destination.port": 2442,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4272,8 +4126,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3628,
         "related.ip": [
-            "10.225.255.211",
-            "10.141.143.56"
+            "10.141.143.56",
+            "10.225.255.211"
         ],
         "related.user": [
             "aaliq"
@@ -4312,9 +4166,7 @@
             "10.219.1.151"
         ],
         "destination.port": 4323,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4331,8 +4183,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6311,
         "related.ip": [
-            "10.250.81.189",
-            "10.219.1.151"
+            "10.219.1.151",
+            "10.250.81.189"
         ],
         "related.user": [
             "olup"
@@ -4371,9 +4223,7 @@
             "10.189.42.62"
         ],
         "destination.port": 4262,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4430,9 +4280,7 @@
             "10.202.132.214"
         ],
         "destination.port": 3392,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4489,9 +4337,7 @@
             "10.169.98.165"
         ],
         "destination.port": 6084,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4508,8 +4354,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2280,
         "related.ip": [
-            "10.169.98.165",
-            "10.51.221.217"
+            "10.51.221.217",
+            "10.169.98.165"
         ],
         "related.user": [
             "metco"
@@ -4548,9 +4394,7 @@
             "10.85.104.146"
         ],
         "destination.port": 4438,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4607,9 +4451,7 @@
             "10.30.246.132"
         ],
         "destination.port": 388,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4666,9 +4508,7 @@
             "10.167.9.200"
         ],
         "destination.port": 4568,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4685,8 +4525,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2068,
         "related.ip": [
-            "10.167.9.200",
-            "10.37.174.58"
+            "10.37.174.58",
+            "10.167.9.200"
         ],
         "related.user": [
             "tvol"
@@ -4725,9 +4565,7 @@
             "10.251.29.244"
         ],
         "destination.port": 919,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4784,9 +4622,7 @@
             "10.189.82.19"
         ],
         "destination.port": 4057,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4803,8 +4639,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1816,
         "related.ip": [
-            "10.198.143.216",
-            "10.189.82.19"
+            "10.189.82.19",
+            "10.198.143.216"
         ],
         "related.user": [
             "iamqui"
@@ -4843,9 +4679,7 @@
             "10.70.29.203"
         ],
         "destination.port": 6317,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4862,8 +4696,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4386,
         "related.ip": [
-            "10.141.216.14",
-            "10.70.29.203"
+            "10.70.29.203",
+            "10.141.216.14"
         ],
         "related.user": [
             "dese"
@@ -4902,9 +4736,7 @@
             "10.137.85.123"
         ],
         "destination.port": 7073,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4921,8 +4753,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2313,
         "related.ip": [
-            "10.137.85.123",
-            "10.183.243.246"
+            "10.183.243.246",
+            "10.137.85.123"
         ],
         "related.user": [
             "idatat"
@@ -4961,9 +4793,7 @@
             "10.158.54.131"
         ],
         "destination.port": 1585,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5020,9 +4850,7 @@
             "10.187.170.23"
         ],
         "destination.port": 3220,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5079,9 +4907,7 @@
             "10.125.166.198"
         ],
         "destination.port": 6301,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5098,8 +4924,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6537,
         "related.ip": [
-            "10.114.211.238",
-            "10.125.166.198"
+            "10.125.166.198",
+            "10.114.211.238"
         ],
         "related.user": [
             "sumquiad"
@@ -5138,9 +4964,7 @@
             "10.209.239.122"
         ],
         "destination.port": 1450,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5197,9 +5021,7 @@
             "10.146.57.23"
         ],
         "destination.port": 5483,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5216,8 +5038,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5772,
         "related.ip": [
-            "10.146.57.23",
-            "10.144.109.148"
+            "10.144.109.148",
+            "10.146.57.23"
         ],
         "related.user": [
             "xerc"
@@ -5256,9 +5078,7 @@
             "10.11.2.200"
         ],
         "destination.port": 7541,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5275,8 +5095,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4542,
         "related.ip": [
-            "10.69.230.223",
-            "10.11.2.200"
+            "10.11.2.200",
+            "10.69.230.223"
         ],
         "related.user": [
             "uatu"
@@ -5315,9 +5135,7 @@
             "10.120.148.241"
         ],
         "destination.port": 1655,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5374,9 +5192,7 @@
             "10.90.50.149"
         ],
         "destination.port": 7260,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5433,9 +5249,7 @@
             "10.117.190.234"
         ],
         "destination.port": 7475,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5452,8 +5266,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5792,
         "related.ip": [
-            "10.117.190.234",
-            "10.230.130.3"
+            "10.230.130.3",
+            "10.117.190.234"
         ],
         "related.user": [
             "ttenb"
@@ -5492,9 +5306,7 @@
             "10.203.117.6"
         ],
         "destination.port": 2510,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5511,8 +5323,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3142,
         "related.ip": [
-            "10.55.103.200",
-            "10.203.117.6"
+            "10.203.117.6",
+            "10.55.103.200"
         ],
         "related.user": [
             "enbyCic"
@@ -5551,9 +5363,7 @@
             "10.75.122.228"
         ],
         "destination.port": 5,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5570,8 +5380,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 730,
         "related.ip": [
-            "10.75.122.228",
-            "10.244.52.142"
+            "10.244.52.142",
+            "10.75.122.228"
         ],
         "related.user": [
             "isciv"
@@ -5610,9 +5420,7 @@
             "10.119.143.168"
         ],
         "destination.port": 4131,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5669,9 +5477,7 @@
             "10.252.146.103"
         ],
         "destination.port": 5995,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5728,9 +5534,7 @@
             "10.213.41.210"
         ],
         "destination.port": 3626,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5787,9 +5591,7 @@
             "10.190.36.112"
         ],
         "destination.port": 4829,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5846,9 +5648,7 @@
             "10.19.21.239"
         ],
         "destination.port": 6995,
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5865,8 +5665,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5985,
         "related.ip": [
-            "10.19.21.239",
-            "10.175.181.138"
+            "10.175.181.138",
+            "10.19.21.239"
         ],
         "related.user": [
             "aliqu"

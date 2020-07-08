@@ -280,9 +280,7 @@
     },
     {
         "@timestamp": "2020-07-04T13:38:16.000Z",
-        "event.action": [
-            "Fault Occured"
-        ],
+        "event.action": "Fault Occured",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -739,9 +737,7 @@
     },
     {
         "@timestamp": "2020-03-18T20:24:33.000Z",
-        "event.action": [
-            "Script mitigation"
-        ],
+        "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -832,8 +828,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.28.127.218",
-            "10.233.107.138"
+            "10.233.107.138",
+            "10.28.127.218"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -932,8 +928,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.244.114.61",
-            "10.198.19.111"
+            "10.198.19.111",
+            "10.244.114.61"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1114,9 +1110,7 @@
     },
     {
         "@timestamp": "2019-09-20T15:57:58.000Z",
-        "event.action": [
-            "Script mitigation"
-        ],
+        "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1652,9 +1646,7 @@
     },
     {
         "@timestamp": "2019-07-17T19:51:58.000Z",
-        "event.action": [
-            "Fault Cleared"
-        ],
+        "event.action": "Fault Cleared",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1728,9 +1720,7 @@
     },
     {
         "@timestamp": "2019-08-29T16:59:40.000Z",
-        "event.action": [
-            "Fault Cleared"
-        ],
+        "event.action": "Fault Cleared",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1770,8 +1760,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.83.130.226",
-            "10.80.101.72"
+            "10.80.101.72",
+            "10.83.130.226"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1789,9 +1779,7 @@
     },
     {
         "@timestamp": "2019-09-27T07:04:49.000Z",
-        "event.action": [
-            "Fault Occured"
-        ],
+        "event.action": "Fault Occured",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2040,9 +2028,7 @@
     },
     {
         "@timestamp": "2020-02-17T05:30:32.000Z",
-        "event.action": [
-            "Script mitigation"
-        ],
+        "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2068,9 +2054,7 @@
     },
     {
         "@timestamp": "2020-03-03T12:33:06.000Z",
-        "event.action": [
-            "Fault Cleared"
-        ],
+        "event.action": "Fault Cleared",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2230,8 +2214,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.44.47.27",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.44.47.27"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2422,9 +2406,7 @@
     },
     {
         "@timestamp": "2019-09-19T15:09:05.000Z",
-        "event.action": [
-            "Script mitigation"
-        ],
+        "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2484,9 +2466,7 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.action": [
-            "Fault Cleared"
-        ],
+        "event.action": "Fault Cleared",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",

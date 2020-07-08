@@ -5,9 +5,7 @@
         "destination.ip": [
             "10.206.191.17"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "litesse",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -25,8 +23,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.176.10.114",
-            "10.206.191.17"
+            "10.206.191.17",
+            "10.176.10.114"
         ],
         "related.user": [
             "sumdo"
@@ -78,9 +76,7 @@
         "destination.ip": [
             "10.173.22.152"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "byC",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -98,8 +94,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.26.46.95",
-            "10.173.22.152"
+            "10.173.22.152",
+            "10.26.46.95"
         ],
         "related.user": [
             "eataevi"
@@ -153,9 +149,7 @@
         "destination.ip": [
             "10.204.86.149"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "laboreet",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -188,8 +182,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uptassi",
         "rsa.misc.action": [
-            "Blocked",
-            "giatq"
+            "giatq",
+            "Blocked"
         ],
         "rsa.misc.category": "llu",
         "rsa.misc.filter": "tconsec",
@@ -228,9 +222,7 @@
         "destination.ip": [
             "10.103.246.190"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "suntinc",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -263,8 +255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ima",
         "rsa.misc.action": [
-            "Allowed",
-            "llam"
+            "llam",
+            "Allowed"
         ],
         "rsa.misc.category": "aboris",
         "rsa.misc.filter": "atatnonp",
@@ -303,9 +295,7 @@
         "destination.ip": [
             "10.61.78.108"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "umdolore",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -323,8 +313,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.61.78.108",
-            "10.136.153.149"
+            "10.136.153.149",
+            "10.61.78.108"
         ],
         "related.user": [
             "ercit"
@@ -338,8 +328,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inim",
         "rsa.misc.action": [
-            "reetdolo",
-            "Blocked"
+            "Blocked",
+            "reetdolo"
         ],
         "rsa.misc.category": "osquir",
         "rsa.misc.filter": "ipit",
@@ -378,9 +368,7 @@
         "destination.ip": [
             "10.183.16.166"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "remipsum",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -413,8 +401,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "avol",
         "rsa.misc.action": [
-            "ist",
-            "Allowed"
+            "Allowed",
+            "ist"
         ],
         "rsa.misc.category": "lorema",
         "rsa.misc.filter": "sun",
@@ -453,9 +441,7 @@
         "destination.ip": [
             "10.243.224.205"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "lpa",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -528,9 +514,7 @@
         "destination.ip": [
             "10.119.185.63"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "amqu",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -563,8 +547,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tame",
         "rsa.misc.action": [
-            "Blocked",
-            "nsec"
+            "nsec",
+            "Blocked"
         ],
         "rsa.misc.category": "emaperi",
         "rsa.misc.filter": "rehe",
@@ -603,9 +587,7 @@
         "destination.ip": [
             "10.78.151.178"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "mporain",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -638,8 +620,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atquovo",
         "rsa.misc.action": [
-            "Allowed",
-            "amvolup"
+            "amvolup",
+            "Allowed"
         ],
         "rsa.misc.category": "hil",
         "rsa.misc.filter": "deFinibu",
@@ -678,9 +660,7 @@
         "destination.ip": [
             "10.71.170.37"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "umexerci",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -713,8 +693,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ihilm",
         "rsa.misc.action": [
-            "psaquae",
-            "Allowed"
+            "Allowed",
+            "psaquae"
         ],
         "rsa.misc.category": "eFinib",
         "rsa.misc.filter": "inesci",
@@ -753,9 +733,7 @@
         "destination.ip": [
             "10.223.247.86"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "lup",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -773,8 +751,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.223.247.86",
-            "10.19.145.131"
+            "10.19.145.131",
+            "10.223.247.86"
         ],
         "related.user": [
             "tNequepo"
@@ -788,8 +766,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "sci",
         "rsa.misc.action": [
-            "Allowed",
-            "emseq"
+            "emseq",
+            "Allowed"
         ],
         "rsa.misc.category": "exercit",
         "rsa.misc.filter": "taevit",
@@ -828,9 +806,7 @@
         "destination.ip": [
             "10.2.53.125"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "radi",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -848,8 +824,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.2.53.125",
-            "10.181.80.139"
+            "10.181.80.139",
+            "10.2.53.125"
         ],
         "related.user": [
             "ihilmo"
@@ -903,9 +879,7 @@
         "destination.ip": [
             "10.31.240.6"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "olup",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -923,8 +897,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.167.98.76",
-            "10.31.240.6"
+            "10.31.240.6",
+            "10.167.98.76"
         ],
         "related.user": [
             "ratvolu"
@@ -978,9 +952,7 @@
         "destination.ip": [
             "10.0.55.9"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "rcitati",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1013,8 +985,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iurer",
         "rsa.misc.action": [
-            "ionevo",
-            "Allowed"
+            "Allowed",
+            "ionevo"
         ],
         "rsa.misc.category": "tinvolu",
         "rsa.misc.filter": "idex",
@@ -1053,9 +1025,7 @@
         "destination.ip": [
             "10.63.250.128"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ntocca",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1073,8 +1043,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.63.250.128",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.63.250.128"
         ],
         "related.user": [
             "saute"
@@ -1088,8 +1058,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nnum",
         "rsa.misc.action": [
-            "ntoccae",
-            "Allowed"
+            "Allowed",
+            "ntoccae"
         ],
         "rsa.misc.category": "tium",
         "rsa.misc.filter": "uteirure",
@@ -1128,9 +1098,7 @@
         "destination.ip": [
             "10.5.126.127"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "eprehen",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1148,8 +1116,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.5.126.127",
-            "10.252.124.150"
+            "10.252.124.150",
+            "10.5.126.127"
         ],
         "related.user": [
             "inibusB"
@@ -1163,8 +1131,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mod",
         "rsa.misc.action": [
-            "Allowed",
-            "xeacomm"
+            "xeacomm",
+            "Allowed"
         ],
         "rsa.misc.category": "sauteiru",
         "rsa.misc.filter": "antiu",
@@ -1203,9 +1171,7 @@
         "destination.ip": [
             "10.201.171.120"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ris",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1278,9 +1244,7 @@
         "destination.ip": [
             "10.135.82.97"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "iat",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1298,8 +1262,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.107.251.87",
-            "10.135.82.97"
+            "10.135.82.97",
+            "10.107.251.87"
         ],
         "related.user": [
             "str"
@@ -1353,9 +1317,7 @@
         "destination.ip": [
             "10.31.198.58"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ditemp",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1428,9 +1390,7 @@
         "destination.ip": [
             "10.29.155.171"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "aboreetd",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1503,9 +1463,7 @@
         "destination.ip": [
             "10.129.192.145"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "oraincid",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1523,8 +1481,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.161.148.64",
-            "10.129.192.145"
+            "10.129.192.145",
+            "10.161.148.64"
         ],
         "related.user": [
             "lor"
@@ -1538,8 +1496,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uaUten",
         "rsa.misc.action": [
-            "Blocked",
-            "amcorp"
+            "amcorp",
+            "Blocked"
         ],
         "rsa.misc.category": "umdolor",
         "rsa.misc.filter": "velillu",
@@ -1578,9 +1536,7 @@
         "destination.ip": [
             "10.7.200.140"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "tpersp",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1653,9 +1609,7 @@
         "destination.ip": [
             "10.86.22.67"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "mquae",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1688,8 +1642,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iutali",
         "rsa.misc.action": [
-            "Blocked",
-            "atcupi"
+            "atcupi",
+            "Blocked"
         ],
         "rsa.misc.category": "isetq",
         "rsa.misc.filter": "equinesc",
@@ -1728,9 +1682,7 @@
         "destination.ip": [
             "10.39.31.115"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "labo",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1763,8 +1715,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ulpa",
         "rsa.misc.action": [
-            "Allowed",
-            "gnaal"
+            "gnaal",
+            "Allowed"
         ],
         "rsa.misc.category": "nte",
         "rsa.misc.filter": "pid",
@@ -1803,9 +1755,7 @@
         "destination.ip": [
             "10.179.210.218"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "undeom",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1823,8 +1773,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.32.39.220",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.32.39.220"
         ],
         "related.user": [
             "boreetdo"
@@ -1878,9 +1828,7 @@
         "destination.ip": [
             "10.128.173.19"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "tlaboree",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1953,9 +1901,7 @@
         "destination.ip": [
             "10.130.241.232"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "redol",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -1988,8 +1934,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mnisiut",
         "rsa.misc.action": [
-            "mod",
-            "Allowed"
+            "Allowed",
+            "mod"
         ],
         "rsa.misc.category": "uiinea",
         "rsa.misc.filter": "aturQu",
@@ -2028,9 +1974,7 @@
         "destination.ip": [
             "10.115.53.31"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "olorema",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2048,8 +1992,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.115.53.31",
-            "10.2.67.127"
+            "10.2.67.127",
+            "10.115.53.31"
         ],
         "related.user": [
             "Cic"
@@ -2103,9 +2047,7 @@
         "destination.ip": [
             "10.204.214.251"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "scipitl",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2178,9 +2120,7 @@
         "destination.ip": [
             "10.18.226.72"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "dquiaco",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2198,8 +2138,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.18.226.72",
-            "10.101.85.169"
+            "10.101.85.169",
+            "10.18.226.72"
         ],
         "related.user": [
             "rroqu"
@@ -2213,8 +2153,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "moles",
         "rsa.misc.action": [
-            "Allowed",
-            "vitaed"
+            "vitaed",
+            "Allowed"
         ],
         "rsa.misc.category": "billoi",
         "rsa.misc.filter": "suntex",
@@ -2253,9 +2193,7 @@
         "destination.ip": [
             "10.87.100.240"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "equep",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2273,8 +2211,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.242.182.193",
-            "10.87.100.240"
+            "10.87.100.240",
+            "10.242.182.193"
         ],
         "related.user": [
             "stenatus"
@@ -2328,9 +2266,7 @@
         "destination.ip": [
             "10.229.242.223"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "dexe",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2363,8 +2299,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdolore",
         "rsa.misc.action": [
-            "onproide",
-            "Blocked"
+            "Blocked",
+            "onproide"
         ],
         "rsa.misc.category": "tvolup",
         "rsa.misc.filter": "niam",
@@ -2403,9 +2339,7 @@
         "destination.ip": [
             "10.193.66.155"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "enim",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2478,9 +2412,7 @@
         "destination.ip": [
             "10.236.230.136"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "quira",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2553,9 +2485,7 @@
         "destination.ip": [
             "10.49.242.174"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "rroqui",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2588,8 +2518,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tvolup",
         "rsa.misc.action": [
-            "Allowed",
-            "utemvel"
+            "utemvel",
+            "Allowed"
         ],
         "rsa.misc.category": "untutlab",
         "rsa.misc.filter": "dol",
@@ -2628,9 +2558,7 @@
         "destination.ip": [
             "10.142.120.198"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ido",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2663,8 +2591,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ende",
         "rsa.misc.action": [
-            "Blocked",
-            "doconse"
+            "doconse",
+            "Blocked"
         ],
         "rsa.misc.category": "uovolupt",
         "rsa.misc.filter": "litesse",
@@ -2703,9 +2631,7 @@
         "destination.ip": [
             "10.138.188.201"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "rsitvol",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2723,8 +2649,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.128.184.241",
-            "10.138.188.201"
+            "10.138.188.201",
+            "10.128.184.241"
         ],
         "related.user": [
             "etur"
@@ -2738,8 +2664,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issu",
         "rsa.misc.action": [
-            "Allowed",
-            "sed"
+            "sed",
+            "Allowed"
         ],
         "rsa.misc.category": "atur",
         "rsa.misc.filter": "iciadese",
@@ -2778,9 +2704,7 @@
         "destination.ip": [
             "10.53.101.131"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "itinvol",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2798,8 +2722,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.213.57.165",
-            "10.53.101.131"
+            "10.53.101.131",
+            "10.213.57.165"
         ],
         "related.user": [
             "isau"
@@ -2813,8 +2737,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ese",
         "rsa.misc.action": [
-            "litanim",
-            "Allowed"
+            "Allowed",
+            "litanim"
         ],
         "rsa.misc.category": "idata",
         "rsa.misc.filter": "urerepre",
@@ -2853,9 +2777,7 @@
         "destination.ip": [
             "10.243.6.41"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ainc",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -2873,8 +2795,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.243.6.41",
-            "10.55.81.14"
+            "10.55.81.14",
+            "10.243.6.41"
         ],
         "related.user": [
             "eiusmo"
@@ -2888,8 +2810,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "idolores",
         "rsa.misc.action": [
-            "Blocked",
-            "lestia"
+            "lestia",
+            "Blocked"
         ],
         "rsa.misc.category": "risni",
         "rsa.misc.filter": "emacc",
@@ -2928,9 +2850,7 @@
         "destination.ip": [
             "10.33.144.10"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "labo",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3003,9 +2923,7 @@
         "destination.ip": [
             "10.158.18.51"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "exerci",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3023,8 +2941,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.158.18.51",
-            "10.20.124.138"
+            "10.20.124.138",
+            "10.158.18.51"
         ],
         "related.user": [
             "CSe"
@@ -3078,9 +2996,7 @@
         "destination.ip": [
             "10.134.128.27"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "olore",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3098,8 +3014,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.118.177.136",
-            "10.134.128.27"
+            "10.134.128.27",
+            "10.118.177.136"
         ],
         "related.user": [
             "Utenima"
@@ -3153,9 +3069,7 @@
         "destination.ip": [
             "10.68.8.143"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "lorem",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3173,8 +3087,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.125.120.97",
-            "10.68.8.143"
+            "10.68.8.143",
+            "10.125.120.97"
         ],
         "related.user": [
             "reet"
@@ -3228,9 +3142,7 @@
         "destination.ip": [
             "10.143.0.78"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "atems",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3303,9 +3215,7 @@
         "destination.ip": [
             "10.30.87.51"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "rchit",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3323,8 +3233,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.156.177.53",
-            "10.30.87.51"
+            "10.30.87.51",
+            "10.156.177.53"
         ],
         "related.user": [
             "psaquaea"
@@ -3338,8 +3248,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatno",
         "rsa.misc.action": [
-            "ptatev",
-            "Blocked"
+            "Blocked",
+            "ptatev"
         ],
         "rsa.misc.category": "udexerc",
         "rsa.misc.filter": "ptatemse",
@@ -3378,9 +3288,7 @@
         "destination.ip": [
             "10.83.138.34"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "inea",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3398,8 +3306,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.83.138.34",
-            "10.111.249.184"
+            "10.111.249.184",
+            "10.83.138.34"
         ],
         "related.user": [
             "dentsunt"
@@ -3413,8 +3321,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "Blocked",
-            "upta"
+            "upta",
+            "Blocked"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3453,9 +3361,7 @@
         "destination.ip": [
             "10.141.195.13"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "tautfugi",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3473,8 +3379,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.180.150.47",
-            "10.141.195.13"
+            "10.141.195.13",
+            "10.180.150.47"
         ],
         "related.user": [
             "taliq"
@@ -3528,9 +3434,7 @@
         "destination.ip": [
             "10.166.195.20"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ceroinB",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3548,8 +3452,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.255.40.12",
-            "10.166.195.20"
+            "10.166.195.20",
+            "10.255.40.12"
         ],
         "related.user": [
             "lamcolab"
@@ -3601,9 +3505,7 @@
         "destination.ip": [
             "10.22.122.43"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "mexer",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3676,9 +3578,7 @@
         "destination.ip": [
             "10.119.53.68"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "illum",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3696,8 +3596,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.121.9.5",
-            "10.119.53.68"
+            "10.119.53.68",
+            "10.121.9.5"
         ],
         "related.user": [
             "ssec"
@@ -3751,9 +3651,7 @@
         "destination.ip": [
             "10.237.0.173"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "periam",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3771,8 +3669,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.31.153.177",
-            "10.237.0.173"
+            "10.237.0.173",
+            "10.31.153.177"
         ],
         "related.user": [
             "sci"
@@ -3786,8 +3684,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "eritqui",
         "rsa.misc.action": [
-            "dolor",
-            "Blocked"
+            "Blocked",
+            "dolor"
         ],
         "rsa.misc.category": "taspe",
         "rsa.misc.filter": "oremipsu",
@@ -3824,9 +3722,7 @@
         "destination.ip": [
             "10.243.182.229"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "emporin",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3895,9 +3791,7 @@
         "destination.ip": [
             "10.39.46.155"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "BCSe",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3915,8 +3809,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.39.46.155",
-            "10.120.138.109"
+            "10.120.138.109",
+            "10.39.46.155"
         ],
         "related.user": [
             "picia"
@@ -3970,9 +3864,7 @@
         "destination.ip": [
             "10.53.191.49"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "idestl",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -3990,8 +3882,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.53.191.49",
-            "10.133.102.57"
+            "10.133.102.57",
+            "10.53.191.49"
         ],
         "related.user": [
             "onsec"
@@ -4045,9 +3937,7 @@
         "destination.ip": [
             "10.91.2.225"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "tcu",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4120,9 +4010,7 @@
         "destination.ip": [
             "10.221.20.165"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "velites",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4140,8 +4028,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.221.20.165",
-            "10.7.18.226"
+            "10.7.18.226",
+            "10.221.20.165"
         ],
         "related.user": [
             "uasiarch"
@@ -4195,9 +4083,7 @@
         "destination.ip": [
             "10.178.148.188"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "rit",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4215,8 +4101,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.155.252.123",
-            "10.178.148.188"
+            "10.178.148.188",
+            "10.155.252.123"
         ],
         "related.user": [
             "inrepreh"
@@ -4270,9 +4156,7 @@
         "destination.ip": [
             "10.190.42.245"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "aeab",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4290,8 +4174,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.220.1.249",
-            "10.190.42.245"
+            "10.190.42.245",
+            "10.220.1.249"
         ],
         "related.user": [
             "olup"
@@ -4305,8 +4189,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uamquaer",
         "rsa.misc.action": [
-            "Blocked",
-            "aerat"
+            "aerat",
+            "Blocked"
         ],
         "rsa.misc.category": "quela",
         "rsa.misc.filter": "qui",
@@ -4343,9 +4227,7 @@
         "destination.ip": [
             "10.112.190.154"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "lab",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4363,8 +4245,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.112.190.154",
-            "10.55.38.153"
+            "10.55.38.153",
+            "10.112.190.154"
         ],
         "related.user": [
             "oremeu"
@@ -4418,9 +4300,7 @@
         "destination.ip": [
             "10.195.153.42"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "rsit",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4438,8 +4318,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.250.48.82",
-            "10.195.153.42"
+            "10.195.153.42",
+            "10.250.48.82"
         ],
         "related.user": [
             "tsedquia"
@@ -4453,8 +4333,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tDuisaut",
         "rsa.misc.action": [
-            "Allowed",
-            "upidatat"
+            "upidatat",
+            "Allowed"
         ],
         "rsa.misc.category": "aliquide",
         "rsa.misc.filter": "deriti",
@@ -4493,9 +4373,7 @@
         "destination.ip": [
             "10.252.164.230"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "iumtota",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4513,8 +4391,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.252.164.230",
-            "10.60.52.219"
+            "10.60.52.219",
+            "10.252.164.230"
         ],
         "related.user": [
             "gnamali"
@@ -4528,8 +4406,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rroq",
         "rsa.misc.action": [
-            "Blocked",
-            "fdeFin"
+            "fdeFin",
+            "Blocked"
         ],
         "rsa.misc.category": "diduntut",
         "rsa.misc.filter": "ano",
@@ -4564,9 +4442,7 @@
         "destination.ip": [
             "10.187.16.73"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ptate",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4584,8 +4460,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.122.102.156",
-            "10.187.16.73"
+            "10.187.16.73",
+            "10.122.102.156"
         ],
         "related.user": [
             "emoen"
@@ -4599,8 +4475,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dipisc",
         "rsa.misc.action": [
-            "Allowed",
-            "turad"
+            "turad",
+            "Allowed"
         ],
         "rsa.misc.category": "ulpaquio",
         "rsa.misc.filter": "ngelits",
@@ -4639,9 +4515,7 @@
         "destination.ip": [
             "10.120.215.174"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ntexplic",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4674,8 +4548,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rema",
         "rsa.misc.action": [
-            "uatDu",
-            "Allowed"
+            "Allowed",
+            "uatDu"
         ],
         "rsa.misc.category": "ent",
         "rsa.misc.filter": "iscivel",
@@ -4712,9 +4586,7 @@
         "destination.ip": [
             "10.51.161.245"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "suntex",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4747,8 +4619,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "modit",
         "rsa.misc.action": [
-            "Allowed",
-            "uteiru"
+            "uteiru",
+            "Allowed"
         ],
         "rsa.misc.category": "qua",
         "rsa.misc.filter": "saute",
@@ -4787,9 +4659,7 @@
         "destination.ip": [
             "10.7.152.238"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "scipi",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4822,8 +4692,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vento",
         "rsa.misc.action": [
-            "reh",
-            "Blocked"
+            "Blocked",
+            "reh"
         ],
         "rsa.misc.category": "atev",
         "rsa.misc.filter": "umq",
@@ -4862,9 +4732,7 @@
         "destination.ip": [
             "10.29.162.157"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "remquela",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4882,8 +4750,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.185.107.27",
-            "10.29.162.157"
+            "10.29.162.157",
+            "10.185.107.27"
         ],
         "related.user": [
             "evelite"
@@ -4937,9 +4805,7 @@
         "destination.ip": [
             "10.215.63.248"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "dantium",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -4972,8 +4838,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "dqu",
-            "Blocked"
+            "Blocked",
+            "dqu"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -5012,9 +4878,7 @@
         "destination.ip": [
             "10.26.115.88"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "edictas",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5087,9 +4951,7 @@
         "destination.ip": [
             "10.193.152.42"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "nost",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5107,8 +4969,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.91.20.27",
-            "10.193.152.42"
+            "10.193.152.42",
+            "10.91.20.27"
         ],
         "related.user": [
             "edict"
@@ -5122,8 +4984,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "plicab",
         "rsa.misc.action": [
-            "Blocked",
-            "umq"
+            "umq",
+            "Blocked"
         ],
         "rsa.misc.category": "eruntmol",
         "rsa.misc.filter": "labore",
@@ -5162,9 +5024,7 @@
         "destination.ip": [
             "10.146.69.38"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "Exce",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5197,8 +5057,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnisi",
         "rsa.misc.action": [
-            "Allowed",
-            "userro"
+            "userro",
+            "Allowed"
         ],
         "rsa.misc.category": "etd",
         "rsa.misc.filter": "loremeum",
@@ -5237,9 +5097,7 @@
         "destination.ip": [
             "10.249.1.143"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ntutlab",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5272,8 +5130,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Utenim",
         "rsa.misc.action": [
-            "onevo",
-            "Allowed"
+            "Allowed",
+            "onevo"
         ],
         "rsa.misc.category": "tdolore",
         "rsa.misc.filter": "ptasn",
@@ -5312,9 +5170,7 @@
         "destination.ip": [
             "10.167.176.220"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ione",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5387,9 +5243,7 @@
         "destination.ip": [
             "10.200.74.101"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ntmo",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5462,9 +5316,7 @@
         "destination.ip": [
             "10.162.78.48"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "tect",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5497,8 +5349,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ereprehe",
         "rsa.misc.action": [
-            "Blocked",
-            "tutl"
+            "tutl",
+            "Blocked"
         ],
         "rsa.misc.category": "mip",
         "rsa.misc.filter": "umSecti",
@@ -5537,9 +5389,7 @@
         "destination.ip": [
             "10.55.151.53"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "commod",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5557,8 +5407,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.55.151.53",
-            "10.211.66.68"
+            "10.211.66.68",
+            "10.55.151.53"
         ],
         "related.user": [
             "squir"
@@ -5612,9 +5462,7 @@
         "destination.ip": [
             "10.110.16.169"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "labori",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5632,8 +5480,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.209.203.156",
-            "10.110.16.169"
+            "10.110.16.169",
+            "10.209.203.156"
         ],
         "related.user": [
             "mes"
@@ -5687,9 +5535,7 @@
         "destination.ip": [
             "10.84.9.150"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "nsecte",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5707,8 +5553,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.107.68.114",
-            "10.84.9.150"
+            "10.84.9.150",
+            "10.107.68.114"
         ],
         "related.user": [
             "sequatDu"
@@ -5722,8 +5568,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnis",
         "rsa.misc.action": [
-            "Allowed",
-            "uianonnu"
+            "uianonnu",
+            "Allowed"
         ],
         "rsa.misc.category": "Excepteu",
         "rsa.misc.filter": "enimadmi",
@@ -5762,9 +5608,7 @@
         "destination.ip": [
             "10.26.222.144"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "sintoc",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5782,8 +5626,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.26.222.144",
-            "10.124.119.48"
+            "10.124.119.48",
+            "10.26.222.144"
         ],
         "related.user": [
             "nre"
@@ -5837,9 +5681,7 @@
         "destination.ip": [
             "10.164.190.2"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "datatno",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5912,9 +5754,7 @@
         "destination.ip": [
             "10.14.37.8"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "olor",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -5947,8 +5787,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedic",
         "rsa.misc.action": [
-            "rinc",
-            "Blocked"
+            "Blocked",
+            "rinc"
         ],
         "rsa.misc.category": "prehende",
         "rsa.misc.filter": "rume",
@@ -5987,9 +5827,7 @@
         "destination.ip": [
             "10.90.20.202"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ostrude",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6007,8 +5845,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.10.93.133",
-            "10.90.20.202"
+            "10.90.20.202",
+            "10.10.93.133"
         ],
         "related.user": [
             "evita"
@@ -6022,8 +5860,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tat",
         "rsa.misc.action": [
-            "nia",
-            "Blocked"
+            "Blocked",
+            "nia"
         ],
         "rsa.misc.category": "turQuis",
         "rsa.misc.filter": "nonp",
@@ -6062,9 +5900,7 @@
         "destination.ip": [
             "10.34.98.144"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "pariatu",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6097,8 +5933,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Exce",
         "rsa.misc.action": [
-            "ulapa",
-            "Allowed"
+            "Allowed",
+            "ulapa"
         ],
         "rsa.misc.category": "reprehen",
         "rsa.misc.filter": "itsedqui",
@@ -6137,9 +5973,7 @@
         "destination.ip": [
             "10.176.233.249"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ntin",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6157,8 +5991,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.75.144.118",
-            "10.176.233.249"
+            "10.176.233.249",
+            "10.75.144.118"
         ],
         "related.user": [
             "isnos"
@@ -6172,8 +6006,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "essequa",
         "rsa.misc.action": [
-            "odic",
-            "Blocked"
+            "Blocked",
+            "odic"
         ],
         "rsa.misc.category": "cto",
         "rsa.misc.filter": "odite",
@@ -6212,9 +6046,7 @@
         "destination.ip": [
             "10.149.6.107"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "mveleu",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6287,9 +6119,7 @@
         "destination.ip": [
             "10.97.202.149"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "itte",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6362,9 +6192,7 @@
         "destination.ip": [
             "10.141.66.163"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "iduntut",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6397,8 +6225,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itautf",
         "rsa.misc.action": [
-            "mini",
-            "Blocked"
+            "Blocked",
+            "mini"
         ],
         "rsa.misc.category": "gna",
         "rsa.misc.filter": "usmo",
@@ -6437,9 +6265,7 @@
         "destination.ip": [
             "10.10.25.145"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "nrepre",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6457,8 +6283,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.10.25.145",
-            "10.224.249.228"
+            "10.224.249.228",
+            "10.10.25.145"
         ],
         "related.user": [
             "mnisiuta"
@@ -6472,8 +6298,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issuscip",
         "rsa.misc.action": [
-            "remap",
-            "Blocked"
+            "Blocked",
+            "remap"
         ],
         "rsa.misc.category": "eetdolo",
         "rsa.misc.filter": "rsitam",
@@ -6512,9 +6338,7 @@
         "destination.ip": [
             "10.234.34.40"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "dolori",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6587,9 +6411,7 @@
         "destination.ip": [
             "10.124.81.20"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "piciatis",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6622,8 +6444,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ilmoles",
         "rsa.misc.action": [
-            "Blocked",
-            "tatisetq"
+            "tatisetq",
+            "Blocked"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "liquide",
@@ -6662,9 +6484,7 @@
         "destination.ip": [
             "10.166.205.159"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "siutal",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6682,8 +6502,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.166.205.159",
-            "10.154.188.132"
+            "10.154.188.132",
+            "10.166.205.159"
         ],
         "related.user": [
             "uptat"
@@ -6733,9 +6553,7 @@
         "destination.ip": [
             "10.46.71.46"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "ugiat",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6768,8 +6586,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "upta",
         "rsa.misc.action": [
-            "uovolup",
-            "Allowed"
+            "Allowed",
+            "uovolup"
         ],
         "rsa.misc.category": "todit",
         "rsa.misc.filter": "atisetq",
@@ -6804,9 +6622,7 @@
         "destination.ip": [
             "10.254.119.31"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "uunturma",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6879,9 +6695,7 @@
         "destination.ip": [
             "10.195.62.230"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "sequat",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6954,9 +6768,7 @@
         "destination.ip": [
             "10.144.93.186"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "adminim",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -6974,8 +6786,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.144.93.186",
-            "10.84.140.5"
+            "10.84.140.5",
+            "10.144.93.186"
         ],
         "related.user": [
             "eroi"
@@ -7029,9 +6841,7 @@
         "destination.ip": [
             "10.31.58.6"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "volu",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7049,8 +6859,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.31.58.6",
-            "10.198.84.190"
+            "10.198.84.190",
+            "10.31.58.6"
         ],
         "related.user": [
             "unt"
@@ -7064,8 +6874,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tquovo",
         "rsa.misc.action": [
-            "Allowed",
-            "qua"
+            "qua",
+            "Allowed"
         ],
         "rsa.misc.category": "ectet",
         "rsa.misc.filter": "lites",
@@ -7104,9 +6914,7 @@
         "destination.ip": [
             "10.139.90.218"
         ],
-        "event.action": [
-            "Allowed"
-        ],
+        "event.action": "Allowed",
         "event.code": "umdol",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7179,9 +6987,7 @@
         "destination.ip": [
             "10.128.43.71"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "ssequa",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7254,9 +7060,7 @@
         "destination.ip": [
             "10.26.149.221"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "umquidol",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7274,8 +7078,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.217.193.148",
-            "10.26.149.221"
+            "10.26.149.221",
+            "10.217.193.148"
         ],
         "related.user": [
             "uisa"
@@ -7329,9 +7133,7 @@
         "destination.ip": [
             "10.109.192.53"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "rehen",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7364,8 +7166,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "temUte",
         "rsa.misc.action": [
-            "Blocked",
-            "tassit"
+            "tassit",
+            "Blocked"
         ],
         "rsa.misc.category": "ita",
         "rsa.misc.filter": "scive",
@@ -7404,9 +7206,7 @@
         "destination.ip": [
             "10.119.106.108"
         ],
-        "event.action": [
-            "Blocked"
-        ],
+        "event.action": "Blocked",
         "event.code": "iatisund",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -7424,8 +7224,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.135.38.213",
-            "10.119.106.108"
+            "10.119.106.108",
+            "10.135.38.213"
         ],
         "related.user": [
             "ore"

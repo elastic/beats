@@ -1,9 +1,7 @@
 [
     {
         "@timestamp": "2012-09-28T22:11:35.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -25,8 +23,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -51,9 +49,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:11:38.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -75,8 +71,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -101,9 +97,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:11:56.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -125,8 +119,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -151,9 +145,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:01.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -175,8 +167,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -201,9 +193,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:05.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -253,9 +243,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:06.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -305,9 +293,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:06.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -357,9 +343,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:07.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -383,8 +367,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -409,9 +393,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:07.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -461,9 +443,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:07.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -513,9 +493,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:07.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -538,8 +516,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -564,9 +542,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:12:26.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -588,8 +564,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -614,9 +590,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:13:24.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -664,9 +638,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:16:03.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -714,9 +686,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:16:24.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -738,8 +708,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -764,9 +734,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:17:33.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -788,8 +756,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -814,9 +782,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:18:09.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -864,9 +830,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:19:32.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -916,9 +880,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:21:09.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -940,8 +902,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -966,9 +928,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:27.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -992,8 +952,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1018,9 +978,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:27.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1044,8 +1002,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1070,9 +1028,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:29.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1096,8 +1052,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1122,9 +1078,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:29.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1148,8 +1102,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1174,9 +1128,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:30.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1200,8 +1152,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1226,9 +1178,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:22:54.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1250,8 +1200,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "404",
@@ -1276,9 +1226,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:24:48.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1301,8 +1249,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1327,9 +1275,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:25:02.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1378,9 +1324,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:25:59.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1428,9 +1372,7 @@
     },
     {
         "@timestamp": "2012-09-28T22:26:00.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1453,8 +1395,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "503",
@@ -1488,9 +1430,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1502,8 +1442,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.131.147",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.131.147"
         ],
         "related.user": [
             "-"
@@ -1549,9 +1489,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1611,9 +1549,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1626,8 +1562,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.131.147"
+            "74.125.131.147",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -1638,8 +1574,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -1673,9 +1609,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1688,8 +1622,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.131.147",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.131.147"
         ],
         "related.user": [
             "-"
@@ -1735,9 +1669,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1762,8 +1694,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "204",
@@ -1797,9 +1729,7 @@
         "destination.ip": [
             "74.125.228.3"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1857,9 +1787,7 @@
         "destination.ip": [
             "74.125.228.3"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1871,68 +1799,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.3"
-        ],
-        "related.user": [
-            "-"
-        ],
-        "rsa.internal.hcode": "DIRECT",
-        "rsa.internal.messageid": "CONNECT",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
-        ],
-        "rsa.misc.content_type": "-",
-        "rsa.misc.result_code": "200",
-        "rsa.network.domain": "encrypted.google.com",
-        "rsa.time.duration_time": 62,
-        "rsa.time.event_time": "2012-09-28T22:26:35.000Z",
-        "rsa.time.event_time_str": "1348871195",
-        "rsa.web.alias_host": "encrypted.google.com",
-        "server.domain": "encrypted.google.com",
-        "service.type": "squid",
-        "source.bytes": 2536,
-        "source.ip": [
+            "74.125.228.3",
             "192.168.0.35"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "encrypted.google.com",
-        "url.original": "encrypted.google.com:443",
-        "user.name": "-"
-    },
-    {
-        "@timestamp": "2012-09-28T22:26:35.000Z",
-        "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "74.125.228.3"
-        ],
-        "event.action": [
-            "TCP_MISS"
-        ],
-        "event.code": "CONNECT",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1348871195.223     62 192.168.0.35 TCP_MISS/200 2536 CONNECT encrypted.google.com:443 - DIRECT/74.125.228.3 -",
-        "fileset.name": "log",
-        "input.type": "log",
-        "log.offset": 4188,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
-        "related.ip": [
-            "192.168.0.35",
-            "74.125.228.3"
         ],
         "related.user": [
             "-"
@@ -1967,6 +1835,64 @@
         "user.name": "-"
     },
     {
+        "@timestamp": "2012-09-28T22:26:35.000Z",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": [
+            "74.125.228.3"
+        ],
+        "event.action": "TCP_MISS",
+        "event.code": "CONNECT",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1348871195.223     62 192.168.0.35 TCP_MISS/200 2536 CONNECT encrypted.google.com:443 - DIRECT/74.125.228.3 -",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 4188,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.ip": [
+            "74.125.228.3",
+            "192.168.0.35"
+        ],
+        "related.user": [
+            "-"
+        ],
+        "rsa.internal.hcode": "DIRECT",
+        "rsa.internal.messageid": "CONNECT",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "CONNECT",
+            "TCP_MISS"
+        ],
+        "rsa.misc.content_type": "-",
+        "rsa.misc.result_code": "200",
+        "rsa.network.domain": "encrypted.google.com",
+        "rsa.time.duration_time": 62,
+        "rsa.time.event_time": "2012-09-28T22:26:35.000Z",
+        "rsa.time.event_time_str": "1348871195",
+        "rsa.web.alias_host": "encrypted.google.com",
+        "server.domain": "encrypted.google.com",
+        "service.type": "squid",
+        "source.bytes": 2536,
+        "source.ip": [
+            "192.168.0.35"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "encrypted.google.com",
+        "url.original": "encrypted.google.com:443",
+        "user.name": "-"
+    },
+    {
         "@timestamp": "2012-09-28T22:26:43.000Z",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
@@ -1977,9 +1903,7 @@
         "destination.ip": [
             "74.125.228.6"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1991,8 +1915,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.6"
+            "74.125.228.6",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2037,9 +1961,7 @@
         "destination.ip": [
             "74.125.228.3"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2097,9 +2019,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2111,8 +2031,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2122,8 +2042,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2157,9 +2077,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2171,8 +2089,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.14",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.14"
         ],
         "related.user": [
             "-"
@@ -2217,9 +2135,7 @@
         "destination.ip": [
             "74.125.131.147"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2231,8 +2147,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.131.147",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.131.147"
         ],
         "related.user": [
             "-"
@@ -2277,9 +2193,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2337,9 +2251,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2351,8 +2263,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2362,8 +2274,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2397,9 +2309,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2411,8 +2321,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2422,8 +2332,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2457,9 +2367,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2482,8 +2390,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2517,9 +2425,7 @@
         "destination.ip": [
             "74.125.228.14"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2531,8 +2437,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2577,9 +2483,7 @@
         "destination.ip": [
             "74.125.228.97"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2592,8 +2496,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.97"
+            "74.125.228.97",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2639,9 +2543,7 @@
         "destination.ip": [
             "23.11.236.224"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2653,8 +2555,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "23.11.236.224"
+            "23.11.236.224",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2664,8 +2566,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2699,9 +2601,7 @@
         "destination.ip": [
             "23.11.236.224"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2713,8 +2613,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "23.11.236.224",
-            "192.168.0.35"
+            "192.168.0.35",
+            "23.11.236.224"
         ],
         "related.user": [
             "-"
@@ -2759,9 +2659,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2773,8 +2671,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -2784,8 +2682,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2819,9 +2717,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2844,8 +2740,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2879,9 +2775,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2939,9 +2833,7 @@
         "destination.ip": [
             "173.194.73.104"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2953,8 +2845,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.73.104",
-            "192.168.0.35"
+            "192.168.0.35",
+            "173.194.73.104"
         ],
         "related.user": [
             "-"
@@ -2999,9 +2891,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3013,8 +2903,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -3059,9 +2949,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3073,8 +2961,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -3084,8 +2972,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3119,9 +3007,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3144,8 +3030,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3179,9 +3065,7 @@
         "destination.ip": [
             "208.44.23.184"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3206,8 +3090,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-apple-plist",
         "rsa.misc.result_code": "200",
@@ -3241,9 +3125,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3303,9 +3185,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3365,9 +3245,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3392,8 +3270,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3427,9 +3305,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3489,9 +3365,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3551,9 +3425,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3613,9 +3485,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3628,8 +3498,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3640,8 +3510,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -3675,9 +3545,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3737,9 +3605,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3752,8 +3618,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3799,9 +3665,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3814,8 +3678,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3826,8 +3690,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3861,9 +3725,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3876,8 +3738,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -3923,9 +3785,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3950,8 +3810,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3985,9 +3845,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4012,8 +3870,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4047,9 +3905,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4062,8 +3918,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4109,9 +3965,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4136,8 +3990,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4171,9 +4025,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4186,8 +4038,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4233,9 +4085,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4248,8 +4098,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4260,8 +4110,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -4295,9 +4145,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4322,8 +4170,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4357,9 +4205,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4372,8 +4218,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4419,9 +4265,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4434,8 +4278,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4481,9 +4325,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4496,8 +4338,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4543,9 +4385,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4558,8 +4398,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4605,9 +4445,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4667,9 +4505,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4729,9 +4565,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4756,8 +4590,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4791,9 +4625,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4806,8 +4638,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4853,9 +4685,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4880,8 +4710,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4915,9 +4745,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4942,8 +4770,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4977,9 +4805,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5039,9 +4865,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5101,9 +4925,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5163,9 +4985,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5178,8 +4998,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -5225,9 +5045,7 @@
         "destination.ip": [
             "208.44.23.185"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5287,9 +5105,7 @@
         "destination.ip": [
             "173.194.73.104"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5301,8 +5117,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.73.104",
-            "192.168.0.35"
+            "192.168.0.35",
+            "173.194.73.104"
         ],
         "related.user": [
             "-"
@@ -5347,9 +5163,7 @@
         "destination.ip": [
             "74.125.228.100"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5361,8 +5175,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -5407,9 +5221,7 @@
         "destination.ip": [
             "74.125.228.96"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5421,8 +5233,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.96",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.96"
         ],
         "related.user": [
             "-"
@@ -5467,9 +5279,7 @@
         "destination.ip": [
             "74.125.228.101"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5481,8 +5291,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.101",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.101"
         ],
         "related.user": [
             "-"
@@ -5527,9 +5337,7 @@
         "destination.ip": [
             "74.125.228.102"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5587,9 +5395,7 @@
         "destination.ip": [
             "69.171.228.74"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5613,8 +5419,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -5648,9 +5454,7 @@
         "destination.ip": [
             "23.62.194.110"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5708,9 +5512,7 @@
         "destination.ip": [
             "69.171.228.74"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5722,8 +5524,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "69.171.228.74",
-            "192.168.0.35"
+            "192.168.0.35",
+            "69.171.228.74"
         ],
         "related.user": [
             "-"
@@ -5768,9 +5570,7 @@
         "destination.ip": [
             "69.171.228.74"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",

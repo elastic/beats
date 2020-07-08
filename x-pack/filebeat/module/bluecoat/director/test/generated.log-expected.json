@@ -105,9 +105,7 @@
         ]
     },
     {
-        "event.action": [
-            "accept"
-        ],
+        "event.action": "accept",
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -351,9 +349,7 @@
         ]
     },
     {
-        "event.action": [
-            "accept"
-        ],
+        "event.action": "accept",
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -444,9 +440,7 @@
         ]
     },
     {
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -644,9 +638,7 @@
         ]
     },
     {
-        "event.action": [
-            "allow"
-        ],
+        "event.action": "allow",
         "event.code": "runner",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -737,9 +729,7 @@
         ]
     },
     {
-        "event.action": [
-            "cancel"
-        ],
+        "event.action": "cancel",
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -1215,9 +1205,7 @@
         ]
     },
     {
-        "event.action": [
-            "accept"
-        ],
+        "event.action": "accept",
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -1313,9 +1301,7 @@
         ]
     },
     {
-        "event.action": [
-            "accept"
-        ],
+        "event.action": "accept",
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -1688,9 +1674,7 @@
         ]
     },
     {
-        "event.action": [
-            "cancel"
-        ],
+        "event.action": "cancel",
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -2045,9 +2029,7 @@
         ]
     },
     {
-        "event.action": [
-            "block"
-        ],
+        "event.action": "block",
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",

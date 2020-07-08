@@ -41,9 +41,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:07.000Z",
-        "event.action": [
-            "Administrator login denied due to bad credentials"
-        ],
+        "event.action": "Administrator login denied due to bad credentials",
         "event.code": "30",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -110,9 +108,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:07.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -139,9 +135,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:08.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -168,9 +162,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:10.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -197,9 +189,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:10.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -266,9 +256,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:10.000Z",
-        "event.action": [
-            "Administrator login denied due to bad credentials"
-        ],
+        "event.action": "Administrator login denied due to bad credentials",
         "event.code": "30",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -372,9 +360,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:14.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -551,9 +537,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:18.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",
@@ -580,9 +564,7 @@
     },
     {
         "@timestamp": "2007-01-03T16:48:20.000Z",
-        "event.action": [
-            "Connection Closed"
-        ],
+        "event.action": "Connection Closed",
         "event.code": "537",
         "event.dataset": "sonicwall.firewall",
         "event.module": "sonicwall",

@@ -1,9 +1,7 @@
 [
     {
         "@timestamp": "2017-06-23T17:16:42.000Z",
-        "event.action": [
-            "<action>"
-        ],
+        "event.action": "<action>",
         "event.code": "<id>",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",

@@ -1,9 +1,7 @@
 [
     {
         "@timestamp": "2002-10-23T10:25:29.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -59,9 +57,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:30.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -85,8 +81,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -117,9 +113,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:31.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -175,9 +169,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -201,8 +193,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "304",
@@ -233,9 +225,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -291,9 +281,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -349,9 +337,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -375,8 +361,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -407,9 +393,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -433,8 +417,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -465,9 +449,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -491,8 +473,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -523,9 +505,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_REFRESH_MISS"
-        ],
+        "event.action": "TCP_REFRESH_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -581,9 +561,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -607,8 +585,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -639,9 +617,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -665,8 +641,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -697,9 +673,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -755,9 +729,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -781,8 +753,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -813,9 +785,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -839,8 +809,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -871,9 +841,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -929,9 +897,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -955,8 +921,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -987,9 +953,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1045,9 +1009,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1071,8 +1033,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1103,9 +1065,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1129,8 +1089,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -1161,9 +1121,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1187,8 +1145,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -1219,9 +1177,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1245,8 +1201,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -1277,9 +1233,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1335,9 +1289,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1393,9 +1345,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1451,9 +1401,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1508,9 +1456,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1566,9 +1512,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1624,9 +1568,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1682,9 +1624,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1708,8 +1648,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1740,9 +1680,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1798,9 +1736,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1856,9 +1792,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1882,8 +1816,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1914,9 +1848,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1940,8 +1872,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1972,9 +1904,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1998,8 +1928,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2030,9 +1960,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2056,8 +1984,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2088,9 +2016,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2146,9 +2072,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:37.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2172,8 +2096,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2204,9 +2128,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:38.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2230,8 +2152,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2262,9 +2184,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:39.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2288,8 +2208,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2320,9 +2240,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:39.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2346,8 +2264,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2378,9 +2296,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:40.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2404,8 +2320,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2436,9 +2352,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:41.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2462,8 +2376,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2494,9 +2408,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2520,8 +2432,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2552,9 +2464,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2610,9 +2520,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2668,9 +2576,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2694,8 +2600,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2726,9 +2632,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:43.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2752,8 +2656,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2784,9 +2688,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2810,8 +2712,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -2842,9 +2744,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2868,8 +2768,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2900,9 +2800,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": [
-            "TCP_IMS_HIT"
-        ],
+        "event.action": "TCP_IMS_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2926,8 +2824,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -2958,9 +2856,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2984,8 +2880,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3016,9 +2912,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3074,9 +2968,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3100,8 +2992,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3132,9 +3024,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3190,9 +3080,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3248,9 +3136,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3306,9 +3192,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3364,9 +3248,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3390,8 +3272,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3422,9 +3304,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3448,8 +3328,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3480,9 +3360,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3538,9 +3416,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3564,8 +3440,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3596,9 +3472,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3654,9 +3528,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3680,8 +3552,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3712,9 +3584,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3738,8 +3608,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3770,9 +3640,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:51.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3796,8 +3664,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3828,9 +3696,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:52.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3854,8 +3720,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3886,9 +3752,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3912,8 +3776,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3944,9 +3808,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4002,9 +3864,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4028,8 +3888,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4060,9 +3920,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4118,9 +3976,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4176,9 +4032,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4234,9 +4088,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4292,9 +4144,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4318,8 +4168,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4350,9 +4200,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:57.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4408,9 +4256,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:57.000Z",
-        "event.action": [
-            "TCP_MEM_HIT"
-        ],
+        "event.action": "TCP_MEM_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4434,8 +4280,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MEM_HIT",
-            "GET"
+            "GET",
+            "TCP_MEM_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4466,9 +4312,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:58.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4523,9 +4367,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:25:59.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4581,9 +4423,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:01.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4639,9 +4479,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:01.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4697,9 +4535,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:09.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4754,9 +4590,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:13.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4780,8 +4614,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4812,9 +4646,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:13.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4838,8 +4670,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4879,9 +4711,7 @@
         "destination.ip": [
             "80.69.64.224"
         ],
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4906,8 +4736,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4938,9 +4768,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:14.000Z",
-        "event.action": [
-            "TCP_REFRESH_MISS"
-        ],
+        "event.action": "TCP_REFRESH_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4964,8 +4792,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_MISS"
+            "TCP_REFRESH_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4996,9 +4824,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5053,9 +4879,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5111,9 +4935,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5169,9 +4991,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5227,9 +5047,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5285,9 +5103,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5343,9 +5159,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5401,9 +5215,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5459,9 +5271,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": [
-            "TCP_REFRESH_HIT"
-        ],
+        "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5485,8 +5295,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5517,9 +5327,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": [
-            "TCP_DENIED"
-        ],
+        "event.action": "TCP_DENIED",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5578,9 +5386,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5636,9 +5442,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5694,9 +5498,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:18.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5751,9 +5553,7 @@
     },
     {
         "@timestamp": "2002-10-23T10:26:18.000Z",
-        "event.action": [
-            "TCP_MISS"
-        ],
+        "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5777,8 +5577,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",

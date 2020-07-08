@@ -1039,9 +1039,7 @@
         ]
     },
     {
-        "event.action": [
-            "deny"
-        ],
+        "event.action": "deny",
         "event.code": "watchdog",
         "event.dataset": "infoblox.nios",
         "event.module": "infoblox",
