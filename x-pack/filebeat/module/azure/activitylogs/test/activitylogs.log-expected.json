@@ -2,6 +2,7 @@
     {
         "@timestamp": "2019-10-24T00:13:46.355Z",
         "azure.activitylogs.category": "Action",
+        "azure.activitylogs.event_category": "Administrative",
         "azure.activitylogs.identity.authorization.action": "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action",
         "azure.activitylogs.identity.authorization.evidence.principal_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "azure.activitylogs.identity.authorization.evidence.principal_type": "ServicePrincipal",
@@ -26,6 +27,7 @@
         "azure.activitylogs.identity.claims.ver": "1.0",
         "azure.activitylogs.operation_name": "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
         "azure.activitylogs.result_signature": "Started.",
+        "azure.activitylogs.result_type": "Start",
         "azure.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "azure.resource.authorization_rule": "ROOTMANAGESHAREDACCESSKEY",
         "azure.resource.group": "SA-HEMA",
@@ -34,11 +36,14 @@
         "azure.resource.provider": "MICROSOFT.EVENTHUB",
         "azure.subscription_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "cloud.provider": "azure",
-        "event.category": "Administrative",
+        "event.action": "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
         "event.dataset": "azure.activitylogs",
-        "event.duration": 0.0,
+        "event.duration": 0,
+        "event.kind": "event",
         "event.module": "azure",
-        "event.outcome": "Start",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "activitylogs",
         "geo.continent_name": "Europe",
         "geo.country_iso_code": "GB",
@@ -48,6 +53,10 @@
         "log.level": "Information",
         "log.offset": 0,
         "service.type": "azure",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.location.lat": 51.4964,
+        "source.geo.location.lon": -0.1224,
         "source.ip": "51.251.141.41",
         "tags": [
             "forwarded"
