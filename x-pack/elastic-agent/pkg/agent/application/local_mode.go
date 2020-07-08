@@ -26,6 +26,7 @@ type emitterFunc func(*config.Config) error
 // ConfigHandler is capable of handling config, perform actions at it, shutdown any long running process.
 type ConfigHandler interface {
 	HandleConfig(configrequest.Request) error
+	Close() error
 	Shutdown()
 }
 
