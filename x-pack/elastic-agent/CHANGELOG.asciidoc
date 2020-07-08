@@ -46,6 +46,7 @@
 - Fix install service script for windows {pull}18814[18814]
 - Properly stops subprocess on shutdown {pull}19567[19567]
 - Forward revision number of the configuration to the endpoint. {pull}19759[19759]
+- Remove support for logs type and use logfile {pull}19761[19761]
 
 ==== New features
 
