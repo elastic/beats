@@ -182,7 +182,7 @@ func (p *Input) loadStates(states []file.State) error {
 			// and remove outdated state
 			newId, identifierName := p.fileStateIdentifier.GenerateID(state)
 			if state.IdentifierName != identifierName {
-				p.removeState(state)
+				state.PrevId = state.Id
 				state.Id = newId
 				state.IdentifierName = identifierName
 			}
@@ -733,8 +733,26 @@ func (p *Input) updateState(state file.State) error {
 		state.Meta = nil
 	}
 
+	err := p.doUpdate(state)
+	if err != nil {
+		return err
+	}
+
+	if state.PrevId != "" {
+		stateToRemove := file.State{Id: state.PrevId, TTL: 0, Finished: true, Meta: nil}
+		err := p.doUpdate(stateToRemove)
+		if err != nil {
+			return fmt.Errorf("failed to remove outdated states based on prev_id: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *Input) doUpdate(state file.State) error {
 	// Update first internal state
 	p.states.Update(state)
+
 	ok := p.outlet.OnEvent(beat.Event{
 		Private: state,
 	})
@@ -742,7 +760,6 @@ func (p *Input) updateState(state file.State) error {
 		logp.Info("input outlet closed")
 		return errors.New("input outlet closed")
 	}
-
 	return nil
 }
 

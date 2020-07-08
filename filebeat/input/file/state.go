@@ -27,6 +27,7 @@ import (
 // State is used to communicate the reading state of a file
 type State struct {
 	Id             string            `json:"id" struct:"id"`
+	PrevId         string            `json:"prev_id" struct:"prev_id"`
 	Finished       bool              `json:"-" struct:"-"` // harvester state
 	Fileinfo       os.FileInfo       `json:"-" struct:"-"` // the file info
 	Source         string            `json:"source" struct:"source"`
