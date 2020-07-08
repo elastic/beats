@@ -15772,6 +15772,15 @@ Elasticsearch module
 
 
 
+*`cluster_uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.id
+
+--
+
 [float]
 === elasticsearch
 
@@ -15808,6 +15817,7 @@ type: keyword
 
 --
 
+
 *`elasticsearch.node.id`*::
 +
 --
@@ -15825,6 +15835,26 @@ Node name.
 
 
 type: keyword
+
+--
+
+*`elasticsearch.node.master`*::
++
+--
+Is the node the master node?
+
+
+type: boolean
+
+--
+
+*`elasticsearch.node.mlockall`*::
++
+--
+Is mlockall enabled on the node?
+
+
+type: boolean
 
 --
 
@@ -16781,8 +16811,9 @@ type: long
 
 --
 
+
 [float]
-=== fs.summary
+=== summary
 
 File system summary
 
@@ -16818,6 +16849,43 @@ format: bytes
 type: long
 
 format: bytes
+
+--
+
+
+
+*`elasticsearch.node.stats.fs.io_stats.total.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.read.kb`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.read.operations.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.write.kb`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.io_stats.total.write.operations.count`*::
++
+--
+type: long
 
 --
 

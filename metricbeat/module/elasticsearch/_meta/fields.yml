@@ -6,6 +6,10 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: cluster_uuid
+      type: alias
+      path: elasticsearch.cluster.id
+      
     - name: elasticsearch
       type: group
       description: >
@@ -25,12 +29,25 @@
           description: >
             Elasticsearch state id.
 
-        - name: node.id
-          type: keyword
-          description: >
-            Node ID
+        - name: node
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                Node ID
 
-        - name: node.name
-          type: keyword
-          description: >
-            Node name.
+            - name: name
+              type: keyword
+              description: >
+                Node name.
+
+            - name: master
+              type: boolean
+              description: >
+                Is the node the master node?
+
+            - name: mlockall
+              type: boolean
+              description: >
+                Is mlockall enabled on the node?

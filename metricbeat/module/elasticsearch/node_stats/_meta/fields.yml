@@ -139,20 +139,39 @@
               type: long
               description: >
 
-    - name: fs.summary
+    - name: fs
       type: group
-      description: >
-        File system summary
       fields:
-        - name: total.bytes
-          type: long
-          format: bytes
+        - name: summary
+          type: group
           description: >
-        - name: free.bytes
-          type: long
-          format: bytes
-          description: >
-        - name: available.bytes
-          type: long
-          format: bytes
-          description: >
+            File system summary
+          fields:
+            - name: total.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: free.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: available.bytes
+              type: long
+              format: bytes
+              description: >
+        - name: io_stats
+          type: group
+          fields:
+            - name: total
+              type: group
+              fields:
+                - name: operations.count
+                  type: long
+                - name: read.kb
+                  type: long
+                - name: read.operations.count
+                  type: long
+                - name: write.kb
+                  type: long
+                - name: write.operations.count
+                  type: long
