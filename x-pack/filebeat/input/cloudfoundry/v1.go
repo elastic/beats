@@ -24,9 +24,10 @@ func configureV1(config cloudfoundry.Config) (*inputV1, error) {
 
 func (i *inputV1) Name() string { return "cloudfoundry-v1" }
 
-func (i *inputV1) Test(_ v2.TestContext) error {
-	// XXX: try to connect, but don't consume
-	return nil
+func (i *inputV1) Test(ctx v2.TestContext) error {
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", ctx.Logger)
+	_, err := hub.Client()
+	return err
 }
 
 func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
@@ -50,11 +51,13 @@ func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
 		return errors.Wrapf(err, "initializing doppler consumer")
 	}
 
-	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
-		consumer.Stop()
+	stopCtx, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+		// wait stops the consumer and waits for all internal go-routines to be stopped.
+		consumer.Wait()
 	})
 	defer cancel()
 
 	consumer.Run()
+	<-stopCtx.Done()
 	return nil
 }

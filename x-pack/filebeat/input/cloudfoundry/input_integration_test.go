@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
@@ -38,8 +37,6 @@ func TestInput(t *testing.T) {
 }
 
 func testInput(t *testing.T, version string) {
-	defer resources.NewGoroutinesChecker().Check(t)
-
 	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
 	config.SetString("version", -1, version)
 
