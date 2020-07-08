@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/features/input/default-inputs"
+	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
 
 type filebeatStore struct {
