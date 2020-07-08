@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if m.XPack {
+	if m.XPack && false { // ignoring xpack.enabled: true for POC
 		err = eventsMappingXPack(r, m, *info, content)
 		if err != nil {
 			// Since this is an x-pack code path, we log the error but don't
