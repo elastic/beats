@@ -109,8 +109,7 @@ class Test(BaseTest):
 
         # Make sure state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Wait until error shows up on windows
@@ -595,10 +594,9 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # Make sure state is written
+        # Make sure some state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Make sure symlink is skipped

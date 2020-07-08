@@ -40,7 +40,7 @@ class Test(BaseTest):
         testfile.close()
 
         filebeat = self.start_beat()
-        count = self.log_contains_count("states written")
+        count = self.log_contains_count("Registry file updated")
 
         self.wait_until(
             lambda: self.output_has(lines=5),
@@ -48,7 +48,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("states written") > count,
+            lambda: self.log_contains("Registry file updated") > count,
             max_timeout=10)
 
         # wait until the registry file exist. Needed to avoid a race between
@@ -68,7 +68,7 @@ class Test(BaseTest):
             "offset": iterations * line_len,
         }, record)
         self.assertTrue("FileStateOS" in record)
-        self.assertIsNone(record["meta"])
+        self.assertTrue("meta" not in record)
         file_state_os = record["FileStateOS"]
 
         if os.name == "nt":
@@ -150,10 +150,10 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: self.has_registry("a/b/c/registry/filebeat/data.json"),
+            lambda: self.has_registry("a/b/c/registry/filebeat"),
             max_timeout=1)
         filebeat.check_kill_and_wait()
-        assert self.has_registry("a/b/c/registry/filebeat/data.json")
+        assert self.has_registry("a/b/c/registry/filebeat")
 
     def test_registry_file_default_permissions(self):
         """
@@ -166,7 +166,7 @@ class Test(BaseTest):
             raise SkipTest
 
         registry_home = "a/b/c/registry"
-        registry_file = os.path.join(registry_home, "filebeat/data.json")
+        registry_path = os.path.join(registry_home, "filebeat")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -183,11 +183,11 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: self.has_registry(registry_file),
+            lambda: self.has_registry(registry_path),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0o600")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o600")
 
     def test_registry_file_custom_permissions(self):
         """
@@ -200,7 +200,7 @@ class Test(BaseTest):
             raise SkipTest
 
         registry_home = "a/b/c/registry"
-        registry_file = os.path.join(registry_home, "filebeat/data.json")
+        registry_path = os.path.join(registry_home, "filebeat")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -218,11 +218,11 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: self.has_registry(registry_file),
+            lambda: self.has_registry(registry_path),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0o640")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
     def test_registry_file_update_permissions(self):
         """
@@ -235,7 +235,7 @@ class Test(BaseTest):
             raise SkipTest
 
         registry_home = "a/b/c/registry_x"
-        registry_file = os.path.join(registry_home, "filebeat/data.json")
+        registry_path = os.path.join(registry_home, "filebeat")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -252,11 +252,11 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: self.has_registry(registry_file),
+            lambda: self.has_registry(registry_path),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0o600")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o600")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -271,7 +271,7 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: self.has_registry(registry_file),
+            lambda: self.has_registry(registry_path),
             max_timeout=1)
 
         # Wait a moment to make sure registry is completely written
@@ -279,7 +279,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0o640")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
     def test_rotating_file(self):
         """
@@ -380,7 +380,7 @@ class Test(BaseTest):
         # Wait until rotation is detected
         self.wait_until(
             lambda: self.log_contains_count(
-                "Registry file updated. 1 states written") >= 1,
+                "Registry file updated. 1 active states") >= 1,
             max_timeout=10)
 
         data = self.get_registry()
@@ -476,7 +476,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         # Store first registry file
-        registry_file = "registry/filebeat/data.json"
+        registry_file = "registry/filebeat/log.json"
         shutil.copyfile(
             self.working_dir + "/" + registry_file,
             self.working_dir + "/registry.first",
@@ -577,7 +577,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         # Store first registry file
-        registry_file = "registry/filebeat/data.json"
+        registry_file = "registry/filebeat/log.json"
         shutil.copyfile(
             self.working_dir + "/" + registry_file,
             self.working_dir + "/registry.first",
@@ -680,7 +680,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains_count(
-                "Registry file updated. 2 states written.") >= 1,
+                "Registry file updated. 2 active states.") >= 1,
             max_timeout=15)
 
         time.sleep(1)
@@ -756,7 +756,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains_count(
-                "Registry file updated. 2 states written.") >= 1,
+                "Registry file updated. 2 active states.") >= 1,
             max_timeout=15)
 
         # Wait a moment to make sure registry is completely written
@@ -858,15 +858,11 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=3), max_timeout=10)
 
         # Make sure all states are cleaned up
-        self.wait_until(self.logs.nextCheck(re.compile("Registrar.*After: 1")))
-
+        self.wait_until(lambda: self.registry.count() == 1)
         filebeat.check_kill_and_wait()
 
-        # Check that the first to files were removed from the registry
-        data = self.registry.load()
-        assert len(data) == 1
-
         # Make sure the last file in the registry is the correct one and has the correct offset
+        data = self.registry.load()
         assert data[0]["offset"] == self.input_logs.size(file2)
 
     @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/10606')
@@ -899,12 +895,7 @@ class Test(BaseTest):
 
         # Wait until registry file is created
         self.wait_until(
-            self.logs.nextCheck("Registry file updated. 2 states written."),
-            max_timeout=15)
-
-        count = self.registry.count()
-        print("registry size: {}".format(count))
-        assert count == 2
+            lambda: len(self.get_registry()) == 2, max_timeout=10)
 
         self.input_logs.remove(file1)
 
@@ -918,10 +909,8 @@ class Test(BaseTest):
 
         # wait until next gc and until registry file has been updated
         self.wait_until(self.logs.check("Before: 1, After: 1, Pending: 1"))
-        self.wait_until(self.logs.nextCheck("Registry file updated. 1 states written."))
-        count = self.registry.count()
-        print("registry size after remove: {}".format(count))
-        assert count == 1
+        self.wait_until(
+            lambda: len(self.get_registry()) == 1, max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -931,71 +920,6 @@ class Test(BaseTest):
 
         # Make sure the last file in the registry is the correct one and has the correct offset
         assert data[0]["offset"] == self.input_logs.size(file2)
-
-    def test_symlink_failure(self):
-        """
-        Test that filebeat does not start if a symlink is set as registry file
-        """
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*",
-        )
-        os.mkdir(self.working_dir + "/log/")
-
-        testfile_path = self.working_dir + "/log/test.log"
-        with open(testfile_path, 'w') as testfile:
-            testfile.write("Hello World\n")
-
-        registry_file = self.working_dir + "/registry/filebeat/data.json"
-        link_to_file = self.working_dir + "registry.data"
-        os.makedirs(self.working_dir + "/registry/filebeat")
-
-        with open(link_to_file, 'w') as f:
-            f.write("[]")
-
-        if os.name == "nt":
-            import win32file  # pylint: disable=import-error
-            win32file.CreateSymbolicLink(registry_file, link_to_file, 0)
-        else:
-            os.symlink(link_to_file, registry_file)
-
-        filebeat = self.start_beat()
-
-        # Make sure states written appears one more time
-        self.wait_until(
-            lambda: self.log_contains("Exiting: Registry file path is not a regular file"),
-            max_timeout=10)
-
-        filebeat.check_kill_and_wait(exit_code=1)
-
-    def test_invalid_state(self):
-        """
-        Test that filebeat fails starting if invalid state in registry
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*",
-        )
-        os.mkdir(self.working_dir + "/log/")
-        registry_file = self.working_dir + "/registry"
-
-        testfile_path = self.working_dir + "/log/test.log"
-        with open(testfile_path, 'w') as testfile:
-            testfile.write("Hello World\n")
-
-        registry_file_path = self.working_dir + "/registry"
-        with open(registry_file_path, 'w') as registry_file:
-            # Write invalid state
-            registry_file.write("Hello World")
-
-        filebeat = self.start_beat()
-
-        # Make sure states written appears one more time
-        self.wait_until(
-            lambda: self.log_contains(
-                "Exiting: Could not start registrar: Error loading state"),
-            max_timeout=10)
-
-        filebeat.check_kill_and_wait(exit_code=1)
 
     def test_restart_state(self):
         """
@@ -1122,15 +1046,12 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=30)
 
-        self.wait_until(
-            lambda: self.log_contains("Registry file updated. 1 states written.",
-                                      logfile="filebeat.log"), max_timeout=10)
+        self.wait_until(lambda: self.registry.count() == 1, max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
         # Check that ttl > 0 was set because of clean_inactive
         data = self.get_registry()
-        assert len(data) == 1
         assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
         # New config file which does not match the existing clean_inactive
@@ -1180,16 +1101,12 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=1),
             max_timeout=30)
-
-        self.wait_until(
-            lambda: self.log_contains("Registry file updated. 1 states written.",
-                                      logfile="filebeat.log"), max_timeout=10)
+        self.wait_until(lambda: self.registry.count() == 1)
 
         filebeat.check_kill_and_wait()
 
         # Check that ttl > 0 was set because of clean_inactive
         data = self.get_registry()
-        assert len(data) == 1
         assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
         # new config file with other clean_inactive
@@ -1297,8 +1214,7 @@ class Test(BaseTest):
 
         # Make sure state is written
         self.wait_until(
-            lambda: self.log_contains("Registry file updated. 1 states written."),
-            max_timeout=10)
+            lambda: len(self.get_registry()) == 1, max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -1347,8 +1263,7 @@ class Test(BaseTest):
 
         # Make sure state is written
         self.wait_until(
-            lambda: self.log_contains("Registry file updated. 0 states written."),
-            max_timeout=10)
+            lambda: len(self.get_registry()) == 0, max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
