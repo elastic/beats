@@ -22,20 +22,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
 
-// ClientLogger is an instance of a pipeline logger client meant for reading from a single log stream
-// There's a many-to-one relationship between clients and pipelines.
-// Each container with the same config will get its own client to the same pipeline.
+// ClientLogger collects logs for a docker container logging to stdout and stderr, using the FIFO provided by the docker daemon.
+// Each log line is written to a local log file for retrieval via "docker logs", and forwarded to the beats publisher pipeline.
+// The local log storage is based on the docker json-file logger and supports the same settings. If "max-size" is not configured, we will rotate the log file every 10MB.
 type ClientLogger struct {
+	// pipelineHash is a hash of the libbeat publisher pipeline config
+	pipelineHash uint64
+	// logger is the internal error message logger
+	logger *logp.Logger
+	// ContainerMeta is the metadata object for the container we get from docker
+	ContainerMeta logger.Info
 	// logFile is the FIFO reader that reads from the docker container stdio
 	logFile *pipereader.PipeReader
 	// client is the libbeat client object that sends logs upstream
 	client beat.Client
-	// pipelineHash is a hash of the libbeat publisher pipeline config
-	pipelineHash uint64
-	// ContainerMeta is the metadata object for the container we get from docker
-	ContainerMeta logger.Info
-	// logger is an error message logger
-	logger *logp.Logger
 	// localLog manages the local JSON logs for containers
 	localLog logger.Logger
 }
@@ -88,7 +88,6 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
-			// don't log anything on EOF
 			if err == io.EOF {
 				return
 			}

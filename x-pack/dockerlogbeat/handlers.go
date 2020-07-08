@@ -118,11 +118,11 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 			http.Error(w, errors.Wrap(err, "error creating log reader").Error(), http.StatusBadRequest)
 			return
 		}
+		defer stream.Close()
 		w.Header().Set("Content-Type", "application/x-json-stream")
 		wf := ioutils.NewWriteFlusher(w)
+		defer wf.Close()
 		io.Copy(wf, stream)
-		stream.Close()
-		wf.Close()
 
 	} //end func
 }
