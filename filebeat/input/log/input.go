@@ -179,8 +179,10 @@ func (p *Input) loadStates(states []file.State) error {
 			}
 
 			// Convert state to current identifier if different
+			// and remove outdated state
 			newId, identifierName := p.fileStateIdentifier.GenerateID(state)
 			if state.IdentifierName != identifierName {
+				p.removeState(state)
 				state.Id = newId
 				state.IdentifierName = identifierName
 			}
