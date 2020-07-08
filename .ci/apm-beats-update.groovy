@@ -38,7 +38,7 @@ pipeline {
           def ret = isCommentTrigger() || isUserTrigger()
           if(!ret){
             currentBuild.result = 'NOT_BUILT'
-            currentBuild.description = "Build Skipped"
+            currentBuild.description = "The build has been skipped"
             currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
           }
           return ret
