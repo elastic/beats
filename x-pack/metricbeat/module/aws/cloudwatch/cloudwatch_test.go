@@ -834,6 +834,60 @@ func TestCompareAWSDimensions(t *testing.T) {
 			[]cloudwatch.Dimension{},
 			false,
 		},
+		{
+			"compare with wildcard dimension value, one same name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, one different name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("IDx"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, two same name dimensions",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, different length, case1",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, different length, case2",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
 	}
 
 	for _, c := range cases {
@@ -1407,10 +1461,14 @@ func TestInsertTags(t *testing.T) {
 	tagValue1 := "engineering"
 	tagKey2 := "owner"
 	tagValue2 := "foo"
+	identifierContainsArn := "arn:aws:ec2:ap-northeast-1:111111111111:eip-allocation/eipalloc-0123456789abcdef,SYNFlood"
+	tagKey3 := "env"
+	tagValue3 := "dev"
 
 	events := map[string]mb.Event{}
 	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
 	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
@@ -1423,6 +1481,12 @@ func TestInsertTags(t *testing.T) {
 		{
 			Key:   awssdk.String(tagKey2),
 			Value: awssdk.String(tagValue2),
+		},
+	}
+	resourceTagMap["eipalloc-0123456789abcdef"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey3),
+			Value: awssdk.String(tagValue3),
 		},
 	}
 
@@ -1444,6 +1508,12 @@ func TestInsertTags(t *testing.T) {
 			"aws.tags.owner",
 			tagValue2,
 		},
+		{
+			"test identifier with arn value",
+			identifierContainsArn,
+			"aws.tags.env",
+			tagValue3,
+		},
 	}
 
 	for _, c := range cases {
@@ -1452,6 +1522,50 @@ func TestInsertTags(t *testing.T) {
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expectedTagValue, value)
+		})
+	}
+}
+
+func TestConfigDimensionValueContainsWildcard(t *testing.T) {
+	cases := []struct {
+		title          string
+		dimensions     []Dimension
+		expectedResult bool
+	}{
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: "i-2222",
+				},
+			},
+			false,
+		},
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: dimensionValueWildcard,
+				},
+			},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			result := configDimensionValueContainsWildcard(c.dimensions)
+			assert.Equal(t, c.expectedResult, result)
 		})
 	}
 }
