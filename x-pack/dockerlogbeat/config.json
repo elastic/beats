@@ -18,7 +18,7 @@
       "name": "LOG_DIR",
       "description": "Mount for local log cache",
       "destination": "/var/log/docker",
-      "source": "/var/log",
+      "source": "/var/lib/docker",
       "type": "none",
       "options": [
         "rw",

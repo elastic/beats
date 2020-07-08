@@ -121,6 +121,7 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 		w.Header().Set("Content-Type", "application/x-json-stream")
 		wf := ioutils.NewWriteFlusher(w)
 		io.Copy(wf, stream)
+		stream.Close()
 		wf.Close()
 
 	} //end func

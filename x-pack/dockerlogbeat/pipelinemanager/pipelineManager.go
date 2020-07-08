@@ -53,16 +53,19 @@ type PipelineManager struct {
 	clientLogger map[string]logger.Logger
 	// logDirectory is the bindmount for local container logsd
 	logDirectory string
+	// destroyLogsOnStop indicates for the client to remove log files when a container stops
+	destroyLogsOnStop bool
 }
 
 // NewPipelineManager creates a new Pipeline map
-func NewPipelineManager(logCfg *common.Config) *PipelineManager {
+func NewPipelineManager(logDestroy bool) *PipelineManager {
 	return &PipelineManager{
-		Logger:       logp.NewLogger("PipelineManager"),
-		pipelines:    make(map[uint64]*Pipeline),
-		clients:      make(map[string]*ClientLogger),
-		clientLogger: make(map[string]logger.Logger),
-		logDirectory: "/var/log/docker/containers",
+		Logger:            logp.NewLogger("PipelineManager"),
+		pipelines:         make(map[uint64]*Pipeline),
+		clients:           make(map[string]*ClientLogger),
+		clientLogger:      make(map[string]logger.Logger),
+		logDirectory:      "/var/log/docker/containers",
+		destroyLogsOnStop: logDestroy,
 	}
 }
 
@@ -111,11 +114,19 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 
 	// Why is this empty by default? What should be here? Who knows!
 	if info.LogPath == "" {
-		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID)
+		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID, fmt.Sprintf("%s-json.log", info.ContainerID))
 	}
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating directory for local logs")
+	}
+	// set a default log size
+	if _, ok := info.Config["max-size"]; !ok {
+		info.Config["max-size"] = "10M"
+	}
+	// set a default log count
+	if _, ok := info.Config["max-file"]; !ok {
+		info.Config["max-file"] = "5"
 	}
 
 	localLog, err := jsonfilelog.New(info)
@@ -264,7 +275,7 @@ func (pm *PipelineManager) removeLogger(info logger.Info) {
 	}
 	logger.Close()
 	delete(pm.clientLogger, info.ContainerID)
-	if os.Getenv("DESTROY_LOGS_ON_STOP") == "true" {
+	if pm.destroyLogsOnStop {
 		pm.removeLogFile(info.ContainerID)
 	}
 }

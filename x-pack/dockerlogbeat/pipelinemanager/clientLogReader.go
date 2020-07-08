@@ -25,13 +25,18 @@ import (
 // There's a many-to-one relationship between clients and pipelines.
 // Each container with the same config will get its own client to the same pipeline.
 type ClientLogger struct {
-	logFile       *pipereader.PipeReader
-	client        beat.Client
-	pipelineHash  uint64
-	closer        chan struct{}
+	// logFile is the FIFO reader that reads from the docker container stdio
+	logFile *pipereader.PipeReader
+	// client is the libbeat client object that sends logs upstream
+	client beat.Client
+	// pipelineHash is a hash of the libbeat publisher pipeline config
+	pipelineHash uint64
+	// ContainerMeta is the metadata object for the container we get from docker
 	ContainerMeta logger.Info
-	logger        *logp.Logger
-	logSpool      logger.Logger
+	// logger is an error message logger
+	logger *logp.Logger
+	// localLog manages the local JSON logs for containers
+	localLog logger.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
@@ -55,9 +60,8 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 	return &ClientLogger{logFile: inputFile,
 		client:        client,
 		pipelineHash:  hash,
-		closer:        make(chan struct{}),
 		ContainerMeta: info,
-		logSpool:      localLog,
+		localLog:      localLog,
 		logger:        clientLogger}, nil
 }
 
@@ -107,7 +111,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			return
 		}
 
-		cl.logSpool.Log(constructLogSpoolMsg(entry))
+		cl.localLog.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
 		cl.client.Publish(beat.Event{
