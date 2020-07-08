@@ -73,7 +73,7 @@ type Reload struct {
 // of new Runners
 type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
-	Create(p beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.PipelineConnector, config *common.Config) (Runner, error)
 
 	// CheckConfig tests if a confiugation can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must
@@ -97,7 +97,7 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	config   DynamicConfig
 	path     string
 	done     chan struct{}
@@ -105,7 +105,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.PipelineConnector, cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 

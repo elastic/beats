@@ -66,6 +66,13 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 	return nil
 }
 
+// Close disables monitoring
+func (b *Monitor) Close() {
+	b.config.Enabled = false
+	b.config.MonitorMetrics = false
+	b.config.MonitorLogs = false
+}
+
 // IsMonitoringEnabled returns true if monitoring is enabled.
 func (b *Monitor) IsMonitoringEnabled() bool { return b.config.Enabled }
 

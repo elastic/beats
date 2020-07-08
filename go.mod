@@ -59,6 +59,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
+	github.com/elastic/go-concert v0.0.3
 	github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
 	github.com/elastic/go-licenser v0.3.1
 	github.com/elastic/go-lookslike v0.3.0
@@ -141,6 +142,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
+	github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/apm v1.7.2
@@ -153,7 +155,7 @@ require (
 	go.uber.org/multierr v1.3.0
 	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
-	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
+	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
@@ -176,7 +178,7 @@ require (
 
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.24.1-elastic.0.20200519143807-cbc80333a91e
+	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20200629123429-0e7b69039eec
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f

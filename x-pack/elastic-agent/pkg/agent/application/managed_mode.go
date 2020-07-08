@@ -50,7 +50,9 @@ type Managed struct {
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     *fleetGateway
+	router      *router
 	srv         *server.Server
+	as          *actionStore
 }
 
 func newManaged(
@@ -144,6 +146,7 @@ func newManaged(
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
+	managedApplication.router = router
 
 	emit := emitter(
 		log,
@@ -166,6 +169,7 @@ func newManaged(
 	if err != nil {
 		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
 	}
+	managedApplication.as = actionStore
 	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
 
 	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
@@ -182,12 +186,23 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionUnenroll{},
+		&handlerUnenroll{
+			log:        log,
+			emitter:    emit,
+			dispatcher: router,
+			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)
 
 	actions := actionStore.Actions()
-	if len(actions) > 0 {
+
+	if len(actions) > 0 && !managedApplication.wasUnenrolled() {
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
 		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
 		// But at the moment this is not possible because the policy change was acked.
@@ -217,6 +232,11 @@ func newManaged(
 // Start starts a managed elastic-agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
+	if m.wasUnenrolled() {
+		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
+		return nil
+	}
+
 	m.gateway.Start()
 	return nil
 }
@@ -225,6 +245,7 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
+	m.router.Shutdown()
 	m.srv.Stop()
 	return nil
 }
@@ -232,4 +253,15 @@ func (m *Managed) Stop() error {
 // AgentInfo retrieves elastic-agent information.
 func (m *Managed) AgentInfo() *info.AgentInfo {
 	return m.agentInfo
+}
+
+func (m *Managed) wasUnenrolled() bool {
+	actions := m.as.Actions()
+	for _, a := range actions {
+		if a.Type() == "UNENROLL" {
+			return true
+		}
+	}
+
+	return false
 }

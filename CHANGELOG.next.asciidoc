@@ -159,6 +159,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
+- Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
 
 *Auditbeat*
 
@@ -308,6 +309,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
+- Fix k8s scheduler compatibility issue. {pull}19699[19699]
 
 *Packetbeat*
 
@@ -502,6 +505,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add awscloudwatch input. {pull}19025[19025]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
+- Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 
 *Heartbeat*
 
@@ -603,7 +607,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
+- Add support for named ports in autodiscover. {pull}19398[19398]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
+- The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
 
 *Packetbeat*
 
