@@ -37,8 +37,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.95.245.65",
-            "10.13.70.213"
+            "10.13.70.213",
+            "10.95.245.65"
         ],
         "rsa.internal.messageid": "372",
         "rsa.internal.msg": "llu",
@@ -90,8 +90,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.163.217.10",
-            "10.214.225.125"
+            "10.214.225.125",
+            "10.163.217.10"
         ],
         "rsa.internal.messageid": "413",
         "rsa.internal.msg": "uiano",
@@ -129,8 +129,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.202.66.28",
-            "10.64.155.245"
+            "10.64.155.245",
+            "10.202.66.28"
         ],
         "rsa.internal.messageid": "14",
         "rsa.internal.msg": "nibusBon",
@@ -361,8 +361,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.30.196.102",
-            "10.241.178.107"
+            "10.241.178.107",
+            "10.30.196.102"
         ],
         "rsa.internal.messageid": "353",
         "rsa.internal.msg": "onproide",
@@ -481,8 +481,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.170.120.4",
-            "10.193.192.62"
+            "10.193.192.62",
+            "10.170.120.4"
         ],
         "rsa.internal.messageid": "264",
         "rsa.internal.msg": "utali",
@@ -622,8 +622,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.240.242.122",
-            "10.144.97.172"
+            "10.144.97.172",
+            "10.240.242.122"
         ],
         "rsa.internal.messageid": "346",
         "rsa.internal.msg": "aera",
@@ -740,8 +740,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.112.75.76",
-            "10.25.39.99"
+            "10.25.39.99",
+            "10.112.75.76"
         ],
         "rsa.db.index": "mveleu",
         "rsa.internal.messageid": "882",
@@ -1073,8 +1073,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.148.161.250",
-            "10.226.27.132"
+            "10.226.27.132",
+            "10.148.161.250"
         ],
         "rsa.internal.event_desc": "tinv",
         "rsa.internal.messageid": "534",
@@ -1109,8 +1109,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.64.50.66",
-            "10.149.0.64"
+            "10.149.0.64",
+            "10.64.50.66"
         ],
         "rsa.db.index": "atevelit",
         "rsa.internal.messageid": "83",
@@ -1170,8 +1170,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.97.124.211",
-            "10.53.113.23"
+            "10.53.113.23",
+            "10.97.124.211"
         ],
         "rsa.identity.user_sid_dst": "iumdol",
         "rsa.internal.messageid": "1154",
@@ -1227,8 +1227,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.96.97.81",
-            "10.161.148.64"
+            "10.161.148.64",
+            "10.96.97.81"
         ],
         "rsa.internal.messageid": "350",
         "rsa.internal.msg": "mve",
@@ -1446,9 +1446,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
+            "10.113.100.237",
             "10.251.248.228",
-            "10.108.84.24",
-            "10.113.100.237"
+            "10.108.84.24"
         ],
         "rsa.internal.event_desc": "volupt",
         "rsa.internal.messageid": "606",
@@ -1497,9 +1497,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.229.229.42",
             "10.103.117.31",
-            "10.207.211.230"
+            "10.207.211.230",
+            "10.229.229.42"
         ],
         "rsa.internal.event_desc": "orin",
         "rsa.internal.messageid": "428",
@@ -1657,8 +1657,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.11.83.126",
-            "10.134.237.235"
+            "10.134.237.235",
+            "10.11.83.126"
         ],
         "rsa.internal.messageid": "372",
         "rsa.internal.msg": "obeataev",
@@ -1771,8 +1771,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.99.248.145",
-            "10.115.53.31"
+            "10.115.53.31",
+            "10.99.248.145"
         ],
         "rsa.internal.event_desc": "molestia",
         "rsa.internal.messageid": "412",
@@ -1804,8 +1804,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.143.228.97",
-            "10.168.208.169"
+            "10.168.208.169",
+            "10.143.228.97"
         ],
         "rsa.internal.messageid": "616",
         "rsa.misc.action": [
@@ -1841,8 +1841,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.236.56.233",
-            "10.43.16.73"
+            "10.43.16.73",
+            "10.236.56.233"
         ],
         "rsa.internal.messageid": "373",
         "rsa.misc.action": [
@@ -1874,8 +1874,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.184.254.143",
-            "10.222.251.114"
+            "10.222.251.114",
+            "10.184.254.143"
         ],
         "rsa.internal.event_desc": "illu",
         "rsa.internal.messageid": "412",
@@ -2232,8 +2232,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.236.247.87",
-            "10.175.98.45"
+            "10.175.98.45",
+            "10.236.247.87"
         ],
         "rsa.internal.messageid": "710",
         "rsa.misc.action": [
@@ -2353,8 +2353,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.205.21.166",
-            "10.20.73.247"
+            "10.20.73.247",
+            "10.205.21.166"
         ],
         "rsa.internal.event_desc": "sed",
         "rsa.internal.messageid": "998",

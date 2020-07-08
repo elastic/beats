@@ -79,8 +79,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -193,16 +193,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.102"
+            "173.194.123.102",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -250,8 +250,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.97",
-            "::1"
+            "::1",
+            "173.194.123.97"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -307,8 +307,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -372,8 +372,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -421,8 +421,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.96",
-            "::1"
+            "::1",
+            "173.194.123.96"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -478,16 +478,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.96"
+            "173.194.123.96",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -535,16 +535,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.96"
+            "173.194.123.96",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -595,16 +595,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.237"
+            "216.58.219.237",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -660,8 +660,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -717,8 +717,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -832,8 +832,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -881,8 +881,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.96",
-            "::1"
+            "::1",
+            "173.194.123.96"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -995,8 +995,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1223,16 +1223,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1288,8 +1288,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1345,8 +1345,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1459,8 +1459,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1516,8 +1516,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1565,8 +1565,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1630,8 +1630,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1679,8 +1679,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1744,8 +1744,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1793,16 +1793,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.67",
-            "::1"
+            "::1",
+            "173.194.123.67"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1858,8 +1858,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1907,8 +1907,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1964,8 +1964,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2021,8 +2021,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2192,16 +2192,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2257,8 +2257,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2314,8 +2314,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2363,8 +2363,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2477,8 +2477,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.101"
+            "173.194.123.101",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2591,8 +2591,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2713,8 +2713,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2762,8 +2762,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "74.125.226.83"
+            "74.125.226.83",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2821,8 +2821,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.40"
+            "173.194.123.40",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -2943,8 +2943,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3004,8 +3004,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -3057,16 +3057,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.174",
-            "::1"
+            "::1",
+            "216.58.219.174"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -3125,8 +3125,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3177,8 +3177,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.174",
-            "::1"
+            "::1",
+            "216.58.219.174"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3245,8 +3245,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3297,16 +3297,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.174"
+            "216.58.219.174",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3357,16 +3357,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.132",
-            "::1"
+            "::1",
+            "216.58.219.132"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3417,8 +3417,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.132",
-            "::1"
+            "::1",
+            "216.58.219.132"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3485,8 +3485,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3537,16 +3537,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.142",
-            "::1"
+            "::1",
+            "216.58.219.142"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3657,8 +3657,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.142",
-            "::1"
+            "::1",
+            "216.58.219.142"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3717,16 +3717,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.132"
+            "216.58.219.132",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3774,8 +3774,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "74.125.141.189"
+            "74.125.141.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3831,8 +3831,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "74.125.141.189"
+            "74.125.141.189",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3888,16 +3888,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.141.189",
-            "::1"
+            "::1",
+            "74.125.141.189"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3948,8 +3948,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.133"
+            "216.58.219.133",
+            "::1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4008,8 +4008,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.228"
+            "216.58.219.228",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4068,8 +4068,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.238",
-            "10.100.0.1"
+            "10.100.0.1",
+            "216.58.219.238"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4134,8 +4134,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "301",
@@ -4184,16 +4184,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.6.238",
-            "10.100.0.1"
+            "10.100.0.1",
+            "172.217.6.238"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -4303,16 +4303,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.238"
+            "216.58.219.238",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -4364,16 +4364,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.238"
+            "216.58.219.238",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -4479,16 +4479,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.10.14",
-            "10.100.2.85"
+            "10.100.2.85",
+            "172.217.10.14"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4536,16 +4536,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.10.14",
-            "10.100.2.85"
+            "10.100.2.85",
+            "172.217.10.14"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4658,8 +4658,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4715,8 +4715,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4764,8 +4764,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.10.14",
-            "10.100.2.85"
+            "10.100.2.85",
+            "172.217.10.14"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4886,8 +4886,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4935,16 +4935,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.204.156",
-            "10.100.2.85"
+            "10.100.2.85",
+            "173.194.204.156"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4992,8 +4992,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.12.174",
-            "10.100.2.85"
+            "10.100.2.85",
+            "172.217.12.174"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5049,16 +5049,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "172.217.12.174"
+            "172.217.12.174",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5163,8 +5163,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "172.217.12.174"
+            "172.217.12.174",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5220,8 +5220,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.12.174",
-            "10.100.0.1"
+            "10.100.0.1",
+            "172.217.12.174"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5285,8 +5285,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5337,16 +5337,16 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.206"
+            "216.58.219.206",
+            "10.100.0.1"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5405,8 +5405,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5525,8 +5525,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5585,8 +5585,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5642,8 +5642,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5702,8 +5702,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
