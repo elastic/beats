@@ -20,7 +20,8 @@ iam:ListAccountAliases
 For example, AWS/EC2, AWS/S3. If wildcard * is given for namespace, metrics
 from all namespaces will be collected automatically.
 * *name*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
-* *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
+* *dimensions*: The dimensions to filter against. For example, InstanceId=i-123. Dimension value
+could be wildcard `*` to match any value.
 * *tags.resource_type_filter*: The constraints on the resources that you want returned.
 The format of each resource type is service[:resourceType].
 For example, specifying a resource type of ec2 returns all Amazon EC2 resources
@@ -157,4 +158,27 @@ metric(average) from EC2 instance i-456.
         - name: InstanceId
           value: i-456
       statistic: ["Average"]
+----
+
+
+With the configuration below, user can filter out only `LoadBalacer` and `TargetGroup` dimension
+metircs with the metric name `UnHealthyHostCount`, `LoadBalacer` and `TargetGroup` value could
+be any.
+
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: AWS/ApplicationELB
+      statistic: ['Maximum']
+      name: ['UnHealthyHostCount']
+      dimensions:
+        - name: LoadBalancer
+          value: "*"
+        - name: TargetGroup
+          value: "*"
+      tags.resource_type_filter: elasticloadbalancing
 ----
