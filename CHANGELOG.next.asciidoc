@@ -437,6 +437,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed the panw module to pass through (rather than drop) message types other than threat and traffic. {issue}16815[16815] {pull}19375[19375]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
+- Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
 
 *Heartbeat*
 
