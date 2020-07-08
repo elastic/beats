@@ -16,6 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test; see ")
 	service := compose.EnsureUpWithTimeout(t, 570, "appsearch")
 
 	config := getConfig("stats", service.Host())
@@ -30,6 +31,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	t.Skip("flaky test; see https://github.com/elastic/beats/issues/19739")
 	service := compose.EnsureUp(t, "appsearch")
 
 	config := getConfig("stats", service.Host())
