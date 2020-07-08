@@ -1901,12 +1901,8 @@ function alternate_datetime(evt) {
         for (var f=0; f<dtc.fmts.length; f++) {
             var pos = date_time_try_pattern_at_pos(dtc.fmts[f], value, 0, container);
             if (pos !== undefined) {
-                console.debug("XXX parsealt ok " + dtc.field + "='" + value + "' = " + JSON.stringify(container));
                 break;
             }
-        }
-        if (pos === undefined) {
-            console.debug("XXX parsealt FAIL " + dtc.field + "='" + value + "' = " + JSON.stringify(container));
         }
     }
     var date = container.toDate();

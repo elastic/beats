@@ -25,19 +25,17 @@ var dup4 = setc("eventcategory","1603060000");
 
 var dup5 = setc("eventcategory","1603000000");
 
-var dup6 = match("MESSAGE#13:14/0", "nwparser.payload", "%{} %{p0}");
+var dup6 = setc("eventcategory","1204020000");
 
-var dup7 = setc("eventcategory","1204020000");
+var dup7 = match("MESSAGE#14:14:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var dup8 = match("MESSAGE#14:14:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var dup8 = match("MESSAGE#14:14:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
 
-var dup9 = match("MESSAGE#14:14:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
+var dup9 = match("MESSAGE#14:14:01/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var dup10 = match("MESSAGE#14:14:01/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var dup10 = match("MESSAGE#14:14:01/2", "nwparser.p0", "%{} %{p0}");
 
-var dup11 = match("MESSAGE#14:14:01/2", "nwparser.p0", "%{} %{p0}");
-
-var dup12 = date_time({
+var dup11 = date_time({
 	dest: "event_time",
 	args: ["hdate","htime"],
 	fmts: [
@@ -45,29 +43,29 @@ var dup12 = date_time({
 	],
 });
 
-var dup13 = setc("eventcategory","1502010000");
+var dup12 = setc("eventcategory","1502010000");
 
-var dup14 = setc("eventcategory","1502020000");
+var dup13 = setc("eventcategory","1502020000");
 
-var dup15 = setc("eventcategory","1002010000");
+var dup14 = setc("eventcategory","1002010000");
 
-var dup16 = match("MESSAGE#28:23:01/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} %{p0}");
+var dup15 = match("MESSAGE#28:23:01/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} %{p0}");
 
-var dup17 = match("MESSAGE#28:23:01/1_1", "nwparser.p0", "%{daddr->} %{p0}");
+var dup16 = match("MESSAGE#28:23:01/1_1", "nwparser.p0", "%{daddr->} %{p0}");
 
-var dup18 = setf("hostip","hhostip");
+var dup17 = setf("hostip","hhostip");
 
-var dup19 = setf("id","hid");
+var dup18 = setf("id","hid");
 
-var dup20 = setf("serial_number","hserial_number");
+var dup19 = setf("serial_number","hserial_number");
 
-var dup21 = setf("category","hcategory");
+var dup20 = setf("category","hcategory");
 
-var dup22 = setf("severity","hseverity");
+var dup21 = setf("severity","hseverity");
 
-var dup23 = setc("eventcategory","1805010000");
+var dup22 = setc("eventcategory","1805010000");
 
-var dup24 = call({
+var dup23 = call({
 	dest: "nwparser.msg",
 	fn: RMQ,
 	args: [
@@ -75,23 +73,25 @@ var dup24 = call({
 	],
 });
 
-var dup25 = setc("eventcategory","1302000000");
+var dup24 = setc("eventcategory","1302000000");
 
-var dup26 = match("MESSAGE#38:29:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var dup25 = match("MESSAGE#38:29:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var dup27 = match("MESSAGE#38:29:01/1_1", "nwparser.p0", " %{saddr->} dst= %{p0}");
+var dup26 = match("MESSAGE#38:29:01/1_1", "nwparser.p0", " %{saddr->} dst= %{p0}");
 
-var dup28 = match("MESSAGE#38:29:01/4", "nwparser.p0", "%{} ");
+var dup27 = match("MESSAGE#38:29:01/4", "nwparser.p0", "%{} ");
 
-var dup29 = setc("eventcategory","1401050100");
+var dup28 = setc("eventcategory","1401050100");
 
-var dup30 = setc("eventcategory","1401030000");
+var dup29 = setc("eventcategory","1401030000");
 
-var dup31 = match("MESSAGE#40:30:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} src=%{p0}");
+var dup30 = match("MESSAGE#40:30:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} src=%{p0}");
 
-var dup32 = setc("eventcategory","1301020000");
+var dup31 = setc("eventcategory","1301020000");
 
-var dup33 = match("MESSAGE#49:33:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{p0}");
+var dup32 = match("MESSAGE#49:33:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{p0}");
+
+var dup33 = match("MESSAGE#52:35:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} ");
 
 var dup34 = match("MESSAGE#54:36:01/2_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} %{p0}");
 
@@ -201,478 +201,486 @@ var dup83 = setc("eventcategory","1001020309");
 
 var dup84 = setc("eventcategory","1303000000");
 
-var dup85 = match("MESSAGE#202:139:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} ");
+var dup85 = match("MESSAGE#202:139:01/3_1", "nwparser.p0", "%{daddr->} ");
 
-var dup86 = match("MESSAGE#202:139:01/3_1", "nwparser.p0", "%{daddr->} ");
+var dup86 = setc("eventcategory","1801010100");
 
-var dup87 = setc("eventcategory","1801010100");
+var dup87 = setc("eventcategory","1604010000");
 
-var dup88 = setc("eventcategory","1604010000");
+var dup88 = setc("eventcategory","1002020000");
 
-var dup89 = setc("eventcategory","1002020000");
+var dup89 = match("MESSAGE#240:171:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} npcs= %{p0}");
 
-var dup90 = match("MESSAGE#240:171:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} npcs= %{p0}");
+var dup90 = match("MESSAGE#240:171:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} npcs= %{p0}");
 
-var dup91 = match("MESSAGE#240:171:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} npcs= %{p0}");
+var dup91 = match("MESSAGE#240:171:03/4", "nwparser.p0", "%{} %{info}");
 
-var dup92 = match("MESSAGE#240:171:03/4", "nwparser.p0", "%{} %{info}");
+var dup92 = setc("eventcategory","1001010000");
 
-var dup93 = setc("eventcategory","1001010000");
+var dup93 = match("MESSAGE#256:180:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note= %{p0}");
 
-var dup94 = match("MESSAGE#256:180:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note= %{p0}");
+var dup94 = match("MESSAGE#256:180:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note= %{p0}");
 
-var dup95 = match("MESSAGE#256:180:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note= %{p0}");
+var dup95 = match("MESSAGE#256:180:01/4", "nwparser.p0", "%{}\"%{fld3}\" npcs=%{info}");
 
-var dup96 = match("MESSAGE#256:180:01/4", "nwparser.p0", "%{}\"%{fld3}\" npcs=%{info}");
+var dup96 = match("MESSAGE#260:194/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} sport=%{sport->} dport=%{dport->} %{p0}");
 
-var dup97 = match("MESSAGE#260:194/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} sport=%{sport->} dport=%{dport->} %{p0}");
+var dup97 = match("MESSAGE#260:194/1_0", "nwparser.p0", "sent=%{sbytes->} ");
 
-var dup98 = match("MESSAGE#260:194/1_0", "nwparser.p0", "sent=%{sbytes->} ");
+var dup98 = match("MESSAGE#260:194/1_1", "nwparser.p0", " rcvd=%{rbytes}");
 
-var dup99 = match("MESSAGE#260:194/1_1", "nwparser.p0", " rcvd=%{rbytes}");
+var dup99 = match("MESSAGE#262:196/1_0", "nwparser.p0", "sent=%{sbytes->} cmd=%{p0}");
 
-var dup100 = match("MESSAGE#262:196/1_0", "nwparser.p0", "sent=%{sbytes->} cmd=%{p0}");
+var dup100 = match("MESSAGE#262:196/2", "nwparser.p0", "%{method}");
 
-var dup101 = match("MESSAGE#262:196/2", "nwparser.p0", "%{method}");
+var dup101 = setc("eventcategory","1401060000");
 
-var dup102 = setc("eventcategory","1401060000");
+var dup102 = setc("eventcategory","1804000000");
 
-var dup103 = setc("eventcategory","1804000000");
+var dup103 = match("MESSAGE#280:261:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{p0}");
 
-var dup104 = match("MESSAGE#280:261:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{p0}");
+var dup104 = setc("eventcategory","1401070000");
 
-var dup105 = setc("eventcategory","1401070000");
+var dup105 = match("MESSAGE#283:273/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{p0}");
 
-var dup106 = match("MESSAGE#283:273/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{p0}");
+var dup106 = setc("eventcategory","1801030000");
 
-var dup107 = setc("eventcategory","1801030000");
+var dup107 = setc("eventcategory","1402020300");
 
-var dup108 = setc("eventcategory","1402020300");
+var dup108 = match("MESSAGE#302:401/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} %{p0}");
 
-var dup109 = match("MESSAGE#302:401/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} %{p0}");
+var dup109 = match("MESSAGE#302:401/1_1", "nwparser.p0", " %{space}");
 
-var dup110 = match("MESSAGE#302:401/1_1", "nwparser.p0", " %{space}");
+var dup110 = setc("eventcategory","1402000000");
 
-var dup111 = setc("eventcategory","1402000000");
+var dup111 = match("MESSAGE#313:446/3_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=\"%{p0}");
 
-var dup112 = match("MESSAGE#313:446/3_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=\"%{p0}");
+var dup112 = match("MESSAGE#313:446/3_1", "nwparser.p0", "%{protocol->} fw_action=\"%{p0}");
 
-var dup113 = match("MESSAGE#313:446/3_1", "nwparser.p0", "%{protocol->} fw_action=\"%{p0}");
+var dup113 = match("MESSAGE#313:446/4", "nwparser.p0", "%{action}\"");
 
-var dup114 = match("MESSAGE#313:446/4", "nwparser.p0", "%{action}\"");
+var dup114 = setc("eventcategory","1803020000");
 
-var dup115 = setc("eventcategory","1803020000");
+var dup115 = match("MESSAGE#318:522:01/4", "nwparser.p0", "%{}proto=%{protocol->} npcs=%{info}");
 
-var dup116 = match("MESSAGE#318:522:01/4", "nwparser.p0", "%{}proto=%{protocol->} npcs=%{info}");
+var dup116 = match("MESSAGE#321:524/5_0", "nwparser.p0", "proto=%{protocol->} ");
 
-var dup117 = match("MESSAGE#321:524/5_0", "nwparser.p0", "proto=%{protocol->} ");
+var dup117 = match("MESSAGE#330:537:01/0", "nwparser.payload", "msg=\"%{action}\" f=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var dup118 = match("MESSAGE#330:537:01/0", "nwparser.payload", "msg=\"%{action}\" f=%{fld1->} n=%{fld2->} src= %{p0}");
+var dup118 = match("MESSAGE#332:537:08/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} appName=\"%{application}\"n=%{p0}");
 
-var dup119 = match("MESSAGE#332:537:08/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} appName=\"%{application}\"n=%{p0}");
+var dup119 = match("MESSAGE#332:537:08/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
 
-var dup120 = match("MESSAGE#332:537:08/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
+var dup120 = match("MESSAGE#332:537:08/0_2", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51}n=%{p0}");
 
-var dup121 = match("MESSAGE#332:537:08/0_2", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51}n=%{p0}");
+var dup121 = match("MESSAGE#332:537:08/0_3", "nwparser.payload", "msg=\"%{event_description}\"n=%{p0}");
 
-var dup122 = match("MESSAGE#332:537:08/0_3", "nwparser.payload", "msg=\"%{event_description}\"n=%{p0}");
+var dup122 = match("MESSAGE#332:537:08/1_0", "nwparser.p0", "%{fld1->} usr=\"%{username}\"src=%{p0}");
 
-var dup123 = match("MESSAGE#332:537:08/1_0", "nwparser.p0", "%{fld1->} usr=\"%{username}\"src=%{p0}");
+var dup123 = match("MESSAGE#332:537:08/1_1", "nwparser.p0", "%{fld1}src=%{p0}");
 
-var dup124 = match("MESSAGE#332:537:08/1_1", "nwparser.p0", "%{fld1}src=%{p0}");
+var dup124 = match("MESSAGE#332:537:08/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{p0}");
 
-var dup125 = match("MESSAGE#332:537:08/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{p0}");
+var dup125 = match("MESSAGE#332:537:08/5_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
 
-var dup126 = match("MESSAGE#332:537:08/5_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
+var dup126 = match("MESSAGE#332:537:08/5_1", "nwparser.p0", " proto=%{protocol->} sent=%{p0}");
 
-var dup127 = match("MESSAGE#332:537:08/5_1", "nwparser.p0", " proto=%{protocol->} sent=%{p0}");
+var dup127 = match("MESSAGE#333:537:09/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{p0}");
 
-var dup128 = match("MESSAGE#333:537:09/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{p0}");
+var dup128 = match("MESSAGE#333:537:09/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} %{p0}");
 
-var dup129 = match("MESSAGE#333:537:09/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} %{p0}");
+var dup129 = match("MESSAGE#333:537:09/5_1", "nwparser.p0", "%{sbytes->} %{p0}");
 
-var dup130 = match("MESSAGE#333:537:09/5_1", "nwparser.p0", "%{sbytes->} %{p0}");
+var dup130 = match("MESSAGE#333:537:09/6_0", "nwparser.p0", " spkt=%{fld3->} cdur=%{fld7->} fw_action=\"%{action}\"");
 
-var dup131 = match("MESSAGE#333:537:09/6_0", "nwparser.p0", " spkt=%{fld3->} cdur=%{fld7->} fw_action=\"%{action}\"");
+var dup131 = match("MESSAGE#333:537:09/6_1", "nwparser.p0", "spkt=%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
 
-var dup132 = match("MESSAGE#333:537:09/6_1", "nwparser.p0", "spkt=%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
+var dup132 = match("MESSAGE#333:537:09/6_2", "nwparser.p0", "spkt=%{fld3->} cdur=%{fld7->} ");
 
-var dup133 = match("MESSAGE#333:537:09/6_2", "nwparser.p0", "spkt=%{fld3->} cdur=%{fld7->} ");
+var dup133 = match("MESSAGE#333:537:09/6_3", "nwparser.p0", " spkt=%{fld3}");
 
-var dup134 = match("MESSAGE#333:537:09/6_3", "nwparser.p0", " spkt=%{fld3}");
+var dup134 = match("MESSAGE#336:537:04/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var dup135 = match("MESSAGE#336:537:04/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
+var dup135 = match("MESSAGE#336:537:04/3_2", "nwparser.p0", "%{daddr->} proto= %{p0}");
 
-var dup136 = match("MESSAGE#336:537:04/3_2", "nwparser.p0", "%{daddr->} proto= %{p0}");
+var dup136 = match("MESSAGE#338:537:10/1_0", "nwparser.p0", "%{fld2->} usr=\"%{username}\" %{p0}");
 
-var dup137 = match("MESSAGE#338:537:10/1_0", "nwparser.p0", "%{fld2->} usr=\"%{username}\" %{p0}");
+var dup137 = match("MESSAGE#338:537:10/1_1", "nwparser.p0", "%{fld2->} %{p0}");
 
-var dup138 = match("MESSAGE#338:537:10/1_1", "nwparser.p0", "%{fld2->} %{p0}");
+var dup138 = match("MESSAGE#338:537:10/2", "nwparser.p0", "%{}src=%{p0}");
 
-var dup139 = match("MESSAGE#338:537:10/2", "nwparser.p0", "%{}src=%{p0}");
+var dup139 = match("MESSAGE#338:537:10/3_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var dup140 = match("MESSAGE#338:537:10/3_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var dup140 = match("MESSAGE#338:537:10/3_1", "nwparser.p0", "%{saddr->} dst=%{p0}");
 
-var dup141 = match("MESSAGE#338:537:10/3_1", "nwparser.p0", "%{saddr->} dst=%{p0}");
+var dup141 = match("MESSAGE#338:537:10/6_0", "nwparser.p0", "npcs=%{info->} ");
 
-var dup142 = match("MESSAGE#338:537:10/6_0", "nwparser.p0", "npcs=%{info->} ");
+var dup142 = match("MESSAGE#338:537:10/6_1", "nwparser.p0", "cdur=%{fld12->} ");
 
-var dup143 = match("MESSAGE#338:537:10/6_1", "nwparser.p0", "cdur=%{fld12->} ");
+var dup143 = setc("event_description","Connection Closed");
 
-var dup144 = setc("event_description","Connection Closed");
+var dup144 = setc("eventcategory","1801020000");
 
-var dup145 = setc("eventcategory","1801020000");
+var dup145 = setc("ec_activity","Permit");
 
-var dup146 = setc("ec_activity","Permit");
+var dup146 = setc("action","allowed");
 
-var dup147 = setc("action","allowed");
+var dup147 = match("MESSAGE#355:598:01/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var dup148 = match("MESSAGE#355:598:01/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var dup148 = match("MESSAGE#361:606/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var dup149 = match("MESSAGE#361:606/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var dup149 = match("MESSAGE#361:606/1_1", "nwparser.p0", "%{daddr}:%{dport->} srcMac=%{p0}");
 
-var dup150 = match("MESSAGE#361:606/1_1", "nwparser.p0", "%{daddr}:%{dport->} srcMac=%{p0}");
+var dup150 = match("MESSAGE#361:606/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr}proto=%{p0}");
 
-var dup151 = match("MESSAGE#361:606/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr}proto=%{p0}");
+var dup151 = setc("eventcategory","1001030500");
 
-var dup152 = setc("eventcategory","1001030500");
+var dup152 = match("MESSAGE#366:712:02/0", "nwparser.payload", "msg=\"%{action}\" %{p0}");
 
-var dup153 = match("MESSAGE#366:712:02/0", "nwparser.payload", "msg=\"%{action}\" %{p0}");
+var dup153 = match("MESSAGE#366:712:02/1_0", "nwparser.p0", "app=%{fld21->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
 
-var dup154 = match("MESSAGE#366:712:02/1_0", "nwparser.p0", "app=%{fld21->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
+var dup154 = match("MESSAGE#366:712:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
 
-var dup155 = match("MESSAGE#366:712:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
+var dup155 = match("MESSAGE#366:712:02/3_0", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
-var dup156 = match("MESSAGE#366:712:02/3_0", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var dup156 = match("MESSAGE#366:712:02/3_1", "nwparser.p0", "%{smacaddr->} proto=%{p0}");
 
-var dup157 = match("MESSAGE#366:712:02/3_1", "nwparser.p0", "%{smacaddr->} proto=%{p0}");
+var dup157 = match("MESSAGE#366:712:02/4_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=%{p0}");
 
-var dup158 = match("MESSAGE#366:712:02/4_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=%{p0}");
+var dup158 = match("MESSAGE#366:712:02/4_1", "nwparser.p0", "%{protocol->} fw_action=%{p0}");
 
-var dup159 = match("MESSAGE#366:712:02/4_1", "nwparser.p0", "%{protocol->} fw_action=%{p0}");
+var dup159 = match("MESSAGE#366:712:02/5", "nwparser.p0", "%{fld51}");
 
-var dup160 = match("MESSAGE#366:712:02/5", "nwparser.p0", "%{fld51}");
+var dup160 = setc("eventcategory","1801010000");
 
-var dup161 = setc("eventcategory","1801010000");
+var dup161 = match("MESSAGE#391:908/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{p0}");
 
-var dup162 = match("MESSAGE#391:908/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{p0}");
+var dup162 = match("MESSAGE#391:908/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
-var dup163 = match("MESSAGE#391:908/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var dup163 = setc("eventcategory","1003010000");
 
-var dup164 = setc("eventcategory","1003010000");
+var dup164 = setc("eventcategory","1609000000");
 
-var dup165 = setc("eventcategory","1609000000");
+var dup165 = setc("eventcategory","1204000000");
 
-var dup166 = setc("eventcategory","1204000000");
+var dup166 = setc("eventcategory","1602000000");
 
-var dup167 = setc("eventcategory","1602000000");
+var dup167 = match("MESSAGE#439:1199/2", "nwparser.p0", "%{} %{daddr}:%{dport}:%{dinterface->} npcs=%{info}");
 
-var dup168 = match("MESSAGE#439:1199/2", "nwparser.p0", "%{} %{daddr}:%{dport}:%{dinterface->} npcs=%{info}");
+var dup168 = setc("eventcategory","1803000000");
 
-var dup169 = setc("eventcategory","1803000000");
+var dup169 = match("MESSAGE#444:1198/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var dup170 = match("MESSAGE#444:1198/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var dup170 = match("MESSAGE#461:1220/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=%{p0}");
 
-var dup171 = match("MESSAGE#461:1220/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=%{p0}");
+var dup171 = match("MESSAGE#461:1220/3_1", "nwparser.p0", "%{daddr}:%{dport->} note=%{p0}");
 
-var dup172 = match("MESSAGE#461:1220/3_1", "nwparser.p0", "%{daddr}:%{dport->} note=%{p0}");
+var dup172 = match("MESSAGE#461:1220/4", "nwparser.p0", "%{}\"%{info}\" fw_action=\"%{action}\"");
 
-var dup173 = match("MESSAGE#461:1220/4", "nwparser.p0", "%{}\"%{info}\" fw_action=\"%{action}\"");
+var dup173 = match("MESSAGE#471:1369/1_0", "nwparser.p0", "%{protocol}/%{fld3}fw_action=\"%{p0}");
 
-var dup174 = match("MESSAGE#471:1369/1_0", "nwparser.p0", "%{protocol}/%{fld3}fw_action=\"%{p0}");
+var dup174 = match("MESSAGE#471:1369/1_1", "nwparser.p0", "%{protocol}fw_action=\"%{p0}");
 
-var dup175 = match("MESSAGE#471:1369/1_1", "nwparser.p0", "%{protocol}fw_action=\"%{p0}");
+var dup175 = linear_select([
+	dup8,
+	dup9,
+]);
 
 var dup176 = linear_select([
-	dup9,
-	dup10,
-]);
-
-var dup177 = linear_select([
+	dup15,
 	dup16,
-	dup17,
 ]);
 
-var dup178 = match("MESSAGE#403:24:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
+var dup177 = match("MESSAGE#403:24:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var dup179 = linear_select([
+var dup178 = linear_select([
+	dup25,
 	dup26,
-	dup27,
 ]);
 
-var dup180 = linear_select([
+var dup179 = linear_select([
 	dup34,
 	dup35,
 ]);
 
-var dup181 = linear_select([
-	dup26,
+var dup180 = linear_select([
+	dup25,
 	dup39,
 ]);
 
-var dup182 = linear_select([
+var dup181 = linear_select([
 	dup41,
 	dup42,
 ]);
 
-var dup183 = linear_select([
+var dup182 = linear_select([
 	dup46,
 	dup47,
 ]);
 
-var dup184 = linear_select([
+var dup183 = linear_select([
 	dup49,
 	dup50,
 ]);
 
-var dup185 = match("MESSAGE#116:82:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
+var dup184 = match("MESSAGE#116:82:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
 	dup62,
 ]));
 
-var dup186 = match("MESSAGE#118:83:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
+var dup185 = match("MESSAGE#118:83:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
 	dup5,
 ]));
 
-var dup187 = linear_select([
+var dup186 = linear_select([
 	dup71,
 	dup75,
 	dup76,
 ]);
 
-var dup188 = linear_select([
-	dup9,
-	dup26,
+var dup187 = linear_select([
+	dup8,
+	dup25,
 ]);
 
-var dup189 = match("MESSAGE#168:111:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=%{shost}", processor_chain([
+var dup188 = match("MESSAGE#168:111:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=%{shost}", processor_chain([
 	dup1,
 ]));
 
-var dup190 = linear_select([
+var dup189 = linear_select([
+	dup33,
 	dup85,
-	dup86,
 ]);
 
-var dup191 = linear_select([
+var dup190 = linear_select([
+	dup89,
 	dup90,
-	dup91,
 ]);
 
-var dup192 = match("MESSAGE#253:178", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
+var dup191 = match("MESSAGE#253:178", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
 	dup5,
 ]));
 
-var dup193 = linear_select([
+var dup192 = linear_select([
+	dup93,
 	dup94,
-	dup95,
 ]);
 
-var dup194 = linear_select([
+var dup193 = linear_select([
+	dup97,
 	dup98,
-	dup99,
 ]);
 
-var dup195 = match("MESSAGE#277:252", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
-	dup89,
+var dup194 = match("MESSAGE#277:252", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+	dup88,
 ]));
 
-var dup196 = match("MESSAGE#293:355", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup89,
+var dup195 = match("MESSAGE#293:355", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup88,
 ]));
 
-var dup197 = match("MESSAGE#295:356", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+var dup196 = match("MESSAGE#295:356", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
 	dup1,
 ]));
 
-var dup198 = match("MESSAGE#298:358", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
+var dup197 = match("MESSAGE#298:358", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
 	dup1,
 ]));
 
-var dup199 = match("MESSAGE#414:371:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} note=\"%{event_description}\"", processor_chain([
+var dup198 = match("MESSAGE#414:371:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} note=\"%{event_description}\"", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
+
+var dup199 = linear_select([
+	dup66,
+	dup109,
+]);
 
 var dup200 = linear_select([
-	dup66,
-	dup110,
+	dup111,
+	dup112,
 ]);
 
 var dup201 = linear_select([
-	dup112,
-	dup113,
-]);
-
-var dup202 = linear_select([
-	dup117,
+	dup116,
 	dup45,
 ]);
 
-var dup203 = linear_select([
-	dup9,
-	dup27,
+var dup202 = linear_select([
+	dup8,
+	dup26,
 ]);
 
-var dup204 = linear_select([
-	dup9,
-	dup26,
+var dup203 = linear_select([
+	dup8,
+	dup25,
 	dup39,
 ]);
 
-var dup205 = linear_select([
+var dup204 = linear_select([
 	dup71,
+	dup15,
 	dup16,
-	dup17,
+]);
+
+var dup205 = linear_select([
+	dup122,
+	dup123,
 ]);
 
 var dup206 = linear_select([
-	dup123,
-	dup124,
-]);
-
-var dup207 = linear_select([
 	dup68,
 	dup69,
 	dup74,
 ]);
 
-var dup208 = linear_select([
+var dup207 = linear_select([
+	dup128,
 	dup129,
-	dup130,
+]);
+
+var dup208 = linear_select([
+	dup41,
+	dup42,
+	dup135,
 ]);
 
 var dup209 = linear_select([
-	dup41,
-	dup42,
 	dup136,
+	dup137,
 ]);
 
 var dup210 = linear_select([
-	dup137,
-	dup138,
+	dup139,
+	dup140,
 ]);
 
 var dup211 = linear_select([
-	dup140,
 	dup141,
+	dup142,
 ]);
 
 var dup212 = linear_select([
-	dup142,
-	dup143,
-]);
-
-var dup213 = linear_select([
 	dup49,
-	dup150,
+	dup149,
 ]);
 
-var dup214 = match("MESSAGE#365:710", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup152,
+var dup213 = match("MESSAGE#365:710", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup151,
 ]));
 
-var dup215 = linear_select([
-	dup154,
+var dup214 = linear_select([
+	dup153,
 	dup40,
 ]);
 
-var dup216 = linear_select([
+var dup215 = linear_select([
+	dup155,
 	dup156,
+]);
+
+var dup216 = linear_select([
 	dup157,
-]);
-
-var dup217 = linear_select([
 	dup158,
-	dup159,
 ]);
 
-var dup218 = match("MESSAGE#375:766", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
+var dup217 = match("MESSAGE#375:766", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
 	dup5,
 ]));
 
-var dup219 = match("MESSAGE#377:860:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{ntype->} ", processor_chain([
+var dup218 = match("MESSAGE#377:860:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{ntype->} ", processor_chain([
 	dup5,
 ]));
 
-var dup220 = match("MESSAGE#393:914", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{host->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{shost}", processor_chain([
+var dup219 = match("MESSAGE#393:914", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{host->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{shost}", processor_chain([
 	dup5,
-	dup24,
+	dup23,
 ]));
 
-var dup221 = match("MESSAGE#399:994", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
+var dup220 = match("MESSAGE#399:994", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var dup222 = match("MESSAGE#406:1110", "nwparser.payload", "msg=\"%{msg}\" %{space->} n=%{fld1}", processor_chain([
+var dup221 = match("MESSAGE#406:1110", "nwparser.payload", "msg=\"%{msg}\" %{space->} n=%{fld1}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var dup223 = match("MESSAGE#420:614", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
-	dup165,
+var dup222 = match("MESSAGE#420:614", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+	dup164,
 	dup37,
 ]));
 
-var dup224 = match("MESSAGE#454:654", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2}", processor_chain([
+var dup223 = match("MESSAGE#454:654", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2}", processor_chain([
 	dup1,
 ]));
+
+var dup224 = linear_select([
+	dup170,
+	dup171,
+]);
 
 var dup225 = linear_select([
-	dup171,
-	dup172,
-]);
-
-var dup226 = linear_select([
+	dup173,
 	dup174,
-	dup175,
 ]);
 
-var dup227 = match("MESSAGE#482:796", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+var dup226 = match("MESSAGE#482:796", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
 	dup1,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
+
+var dup227 = all_match({
+	processors: [
+		dup30,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
+	],
+	on_success: processor_chain([
+		dup29,
+	]),
+});
 
 var dup228 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup30,
+		dup86,
 	]),
 });
 
 var dup229 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup87,
+		dup59,
 	]),
 });
 
 var dup230 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup96,
+		dup193,
 	],
 	on_success: processor_chain([
 		dup59,
@@ -681,114 +689,104 @@ var dup230 = all_match({
 
 var dup231 = all_match({
 	processors: [
-		dup97,
-		dup194,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup59,
+		dup101,
 	]),
 });
 
 var dup232 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
-	],
-	on_success: processor_chain([
-		dup102,
-	]),
-});
-
-var dup233 = all_match({
-	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
-	],
-	on_success: processor_chain([
 		dup30,
-	]),
-});
-
-var dup234 = all_match({
-	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		dup29,
 	]),
 });
 
-var dup235 = all_match({
+var dup233 = all_match({
 	processors: [
-		dup104,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
+		dup28,
+	]),
+});
+
+var dup234 = all_match({
+	processors: [
+		dup103,
+		dup178,
+		dup10,
+		dup189,
+	],
+	on_success: processor_chain([
+		dup104,
+	]),
+});
+
+var dup235 = all_match({
+	processors: [
 		dup105,
+		dup178,
+		dup10,
+		dup189,
+	],
+	on_success: processor_chain([
+		dup107,
 	]),
 });
 
 var dup236 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup108,
+		dup199,
 	],
 	on_success: processor_chain([
-		dup108,
+		dup88,
 	]),
 });
 
 var dup237 = all_match({
 	processors: [
-		dup109,
-		dup200,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup89,
+		dup110,
 	]),
 });
 
 var dup238 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
-	],
-	on_success: processor_chain([
-		dup111,
-	]),
-});
-
-var dup239 = all_match({
-	processors: [
 		dup44,
-		dup180,
+		dup179,
 		dup36,
-		dup190,
+		dup189,
 	],
 	on_success: processor_chain([
 		dup5,
 	]),
 });
 
-var dup240 = all_match({
+var dup239 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup177,
+		dup178,
+		dup10,
+		dup176,
 		dup79,
 	],
 	on_success: processor_chain([
@@ -796,51 +794,51 @@ var dup240 = all_match({
 	]),
 });
 
-var dup241 = all_match({
+var dup240 = all_match({
 	processors: [
-		dup153,
+		dup152,
+		dup214,
+		dup154,
 		dup215,
-		dup155,
 		dup216,
-		dup217,
-		dup160,
+		dup159,
 	],
 	on_success: processor_chain([
-		dup152,
+		dup151,
 		dup51,
 		dup52,
 		dup53,
 		dup54,
 		dup37,
 		dup55,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
-var dup242 = all_match({
+var dup241 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup193,
-		dup96,
+		dup7,
+		dup175,
+		dup10,
+		dup192,
+		dup95,
 	],
 	on_success: processor_chain([
 		dup1,
 	]),
 });
 
-var dup243 = all_match({
+var dup242 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup7,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -972,81 +970,83 @@ var part13 = match("MESSAGE#12:13", "nwparser.payload", "Restarting SonicWALL; d
 
 var msg13 = msg("13", part13);
 
-var part14 = match("MESSAGE#13:14/1_0", "nwparser.p0", "msg=\"Web site access denied\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} dstname=%{dhost->} arg=%{fld2->} code=%{icmpcode->} ");
+var part14 = match("MESSAGE#13:14/0", "nwparser.payload", "%{} %{p0}");
 
-var part15 = match("MESSAGE#13:14/1_1", "nwparser.p0", "Web site blocked %{}");
+var part15 = match("MESSAGE#13:14/1_0", "nwparser.p0", "msg=\"Web site access denied\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} dstname=%{dhost->} arg=%{fld2->} code=%{icmpcode->} ");
+
+var part16 = match("MESSAGE#13:14/1_1", "nwparser.p0", "Web site blocked %{}");
 
 var select5 = linear_select([
-	part14,
 	part15,
+	part16,
 ]);
 
 var all1 = all_match({
 	processors: [
-		dup6,
+		part14,
 		select5,
 	],
 	on_success: processor_chain([
-		dup7,
+		dup6,
 		setc("action","Web site access denied"),
 	]),
 });
 
 var msg14 = msg("14", all1);
 
-var part16 = match("MESSAGE#14:14:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} code= %{p0}");
+var part17 = match("MESSAGE#14:14:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} code= %{p0}");
 
-var part17 = match("MESSAGE#14:14:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} code= %{p0}");
+var part18 = match("MESSAGE#14:14:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} code= %{p0}");
 
 var select6 = linear_select([
-	part16,
 	part17,
+	part18,
 ]);
 
-var part18 = match("MESSAGE#14:14:01/4", "nwparser.p0", "%{} %{fld3->} Category=%{fld4->} npcs=%{info}");
+var part19 = match("MESSAGE#14:14:01/4", "nwparser.p0", "%{} %{fld3->} Category=%{fld4->} npcs=%{info}");
 
 var all2 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
+		dup7,
+		dup175,
+		dup10,
 		select6,
-		part18,
+		part19,
 	],
 	on_success: processor_chain([
-		dup7,
+		dup6,
 	]),
 });
 
 var msg15 = msg("14:01", all2);
 
-var part19 = match("MESSAGE#15:14:02", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{name->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup7,
-	dup12,
+var part20 = match("MESSAGE#15:14:02", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{name->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup6,
+	dup11,
 ]));
 
-var msg16 = msg("14:02", part19);
+var msg16 = msg("14:02", part20);
 
-var part20 = match("MESSAGE#16:14:03", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup7,
-	dup12,
+var part21 = match("MESSAGE#16:14:03", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup6,
+	dup11,
 ]));
 
-var msg17 = msg("14:03", part20);
+var msg17 = msg("14:03", part21);
 
-var part21 = match("MESSAGE#17:14:04", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{name->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup7,
-	dup12,
+var part22 = match("MESSAGE#17:14:04", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{name->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup6,
+	dup11,
 ]));
 
-var msg18 = msg("14:04", part21);
+var msg18 = msg("14:04", part22);
 
-var part22 = match("MESSAGE#18:14:05", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr}dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{dhost->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup7,
-	dup12,
+var part23 = match("MESSAGE#18:14:05", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} sess=\"%{fld2}\" n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr}dstMac=%{dmacaddr->} proto=%{protocol->} dstname=%{dhost->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup6,
+	dup11,
 ]));
 
-var msg19 = msg("14:05", part22);
+var msg19 = msg("14:05", part23);
 
 var select7 = linear_select([
 	msg14,
@@ -1057,121 +1057,121 @@ var select7 = linear_select([
 	msg19,
 ]);
 
-var part23 = match("MESSAGE#19:15", "nwparser.payload", "Newsgroup blocked%{}", processor_chain([
+var part24 = match("MESSAGE#19:15", "nwparser.payload", "Newsgroup blocked%{}", processor_chain([
+	dup12,
+]));
+
+var msg20 = msg("15", part24);
+
+var part25 = match("MESSAGE#20:16", "nwparser.payload", "Web site accessed%{}", processor_chain([
 	dup13,
 ]));
 
-var msg20 = msg("15", part23);
+var msg21 = msg("16", part25);
 
-var part24 = match("MESSAGE#20:16", "nwparser.payload", "Web site accessed%{}", processor_chain([
-	dup14,
-]));
-
-var msg21 = msg("16", part24);
-
-var part25 = match("MESSAGE#21:17", "nwparser.payload", "Newsgroup accessed%{}", processor_chain([
-	dup14,
-]));
-
-var msg22 = msg("17", part25);
-
-var part26 = match("MESSAGE#22:18", "nwparser.payload", "ActiveX blocked%{}", processor_chain([
+var part26 = match("MESSAGE#21:17", "nwparser.payload", "Newsgroup accessed%{}", processor_chain([
 	dup13,
 ]));
 
-var msg23 = msg("18", part26);
+var msg22 = msg("17", part26);
 
-var part27 = match("MESSAGE#23:19", "nwparser.payload", "Java blocked%{}", processor_chain([
-	dup13,
+var part27 = match("MESSAGE#22:18", "nwparser.payload", "ActiveX blocked%{}", processor_chain([
+	dup12,
 ]));
 
-var msg24 = msg("19", part27);
+var msg23 = msg("18", part27);
 
-var part28 = match("MESSAGE#24:20", "nwparser.payload", "ActiveX or Java archive blocked%{}", processor_chain([
-	dup13,
+var part28 = match("MESSAGE#23:19", "nwparser.payload", "Java blocked%{}", processor_chain([
+	dup12,
 ]));
 
-var msg25 = msg("20", part28);
+var msg24 = msg("19", part28);
 
-var part29 = match("MESSAGE#25:21", "nwparser.payload", "Cookie removed%{}", processor_chain([
+var part29 = match("MESSAGE#24:20", "nwparser.payload", "ActiveX or Java archive blocked%{}", processor_chain([
+	dup12,
+]));
+
+var msg25 = msg("20", part29);
+
+var part30 = match("MESSAGE#25:21", "nwparser.payload", "Cookie removed%{}", processor_chain([
 	dup1,
 ]));
 
-var msg26 = msg("21", part29);
+var msg26 = msg("21", part30);
 
-var part30 = match("MESSAGE#26:22", "nwparser.payload", "Ping of death blocked%{}", processor_chain([
-	dup15,
+var part31 = match("MESSAGE#26:22", "nwparser.payload", "Ping of death blocked%{}", processor_chain([
+	dup14,
 ]));
 
-var msg27 = msg("22", part30);
+var msg27 = msg("22", part31);
 
-var part31 = match("MESSAGE#27:23", "nwparser.payload", "IP spoof detected%{}", processor_chain([
-	dup15,
+var part32 = match("MESSAGE#27:23", "nwparser.payload", "IP spoof detected%{}", processor_chain([
+	dup14,
 ]));
 
-var msg28 = msg("23", part31);
+var msg28 = msg("23", part32);
 
-var part32 = match("MESSAGE#28:23:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var part33 = match("MESSAGE#28:23:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var part33 = match("MESSAGE#28:23:01/3_0", "nwparser.p0", "- MAC address: %{p0}");
+var part34 = match("MESSAGE#28:23:01/3_0", "nwparser.p0", "- MAC address: %{p0}");
 
-var part34 = match("MESSAGE#28:23:01/3_1", "nwparser.p0", "mac= %{p0}");
+var part35 = match("MESSAGE#28:23:01/3_1", "nwparser.p0", "mac= %{p0}");
 
 var select8 = linear_select([
-	part33,
 	part34,
+	part35,
 ]);
 
-var part35 = match("MESSAGE#28:23:01/4", "nwparser.p0", "%{} %{smacaddr}");
+var part36 = match("MESSAGE#28:23:01/4", "nwparser.p0", "%{} %{smacaddr}");
 
 var all3 = all_match({
 	processors: [
-		part32,
-		dup177,
-		dup11,
+		part33,
+		dup176,
+		dup10,
 		select8,
-		part35,
+		part36,
 	],
 	on_success: processor_chain([
-		dup15,
+		dup14,
 	]),
 });
 
 var msg29 = msg("23:01", all3);
 
-var part36 = match("MESSAGE#29:23:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} - MAC address: %{smacaddr}", processor_chain([
-	dup15,
+var part37 = match("MESSAGE#29:23:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} - MAC address: %{smacaddr}", processor_chain([
+	dup14,
 ]));
 
-var msg30 = msg("23:02", part36);
+var msg30 = msg("23:02", part37);
 
-var part37 = match("MESSAGE#30:23:03/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var part38 = match("MESSAGE#30:23:03/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var part38 = match("MESSAGE#30:23:03/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac= %{p0}");
+var part39 = match("MESSAGE#30:23:03/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac= %{p0}");
 
-var part39 = match("MESSAGE#30:23:03/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} srcMac= %{p0}");
+var part40 = match("MESSAGE#30:23:03/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} srcMac= %{p0}");
 
 var select9 = linear_select([
-	part38,
 	part39,
+	part40,
 ]);
 
-var part40 = match("MESSAGE#30:23:03/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol}");
+var part41 = match("MESSAGE#30:23:03/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol}");
 
 var all4 = all_match({
 	processors: [
-		part37,
+		part38,
 		select9,
-		part40,
+		part41,
 	],
 	on_success: processor_chain([
-		dup15,
-		dup12,
+		dup14,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
@@ -1184,72 +1184,72 @@ var select10 = linear_select([
 	msg31,
 ]);
 
-var part41 = match("MESSAGE#31:24", "nwparser.payload", "Illegal LAN address in use%{}", processor_chain([
-	dup23,
+var part42 = match("MESSAGE#31:24", "nwparser.payload", "Illegal LAN address in use%{}", processor_chain([
+	dup22,
 ]));
 
-var msg32 = msg("24", part41);
+var msg32 = msg("24", part42);
 
-var msg33 = msg("24:01", dup178);
+var msg33 = msg("24:01", dup177);
 
 var select11 = linear_select([
 	msg32,
 	msg33,
 ]);
 
-var part42 = match("MESSAGE#32:25", "nwparser.payload", "Possible SYN flood attack%{}", processor_chain([
-	dup15,
+var part43 = match("MESSAGE#32:25", "nwparser.payload", "Possible SYN flood attack%{}", processor_chain([
+	dup14,
 ]));
 
-var msg34 = msg("25", part42);
+var msg34 = msg("25", part43);
 
-var part43 = match("MESSAGE#33:26", "nwparser.payload", "Probable SYN flood attack%{}", processor_chain([
-	dup15,
+var part44 = match("MESSAGE#33:26", "nwparser.payload", "Probable SYN flood attack%{}", processor_chain([
+	dup14,
 ]));
 
-var msg35 = msg("26", part43);
+var msg35 = msg("26", part44);
 
-var part44 = match("MESSAGE#34:27", "nwparser.payload", "Land Attack Dropped%{}", processor_chain([
-	dup15,
+var part45 = match("MESSAGE#34:27", "nwparser.payload", "Land Attack Dropped%{}", processor_chain([
+	dup14,
 ]));
 
-var msg36 = msg("27", part44);
+var msg36 = msg("27", part45);
 
-var part45 = match("MESSAGE#35:28", "nwparser.payload", "Fragmented Packet Dropped%{}", processor_chain([
-	dup15,
+var part46 = match("MESSAGE#35:28", "nwparser.payload", "Fragmented Packet Dropped%{}", processor_chain([
+	dup14,
 ]));
 
-var msg37 = msg("28", part45);
+var msg37 = msg("28", part46);
 
-var part46 = match("MESSAGE#36:28:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
-	dup15,
+var part47 = match("MESSAGE#36:28:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
+	dup14,
 ]));
 
-var msg38 = msg("28:01", part46);
+var msg38 = msg("28:01", part47);
 
 var select12 = linear_select([
 	msg37,
 	msg38,
 ]);
 
-var part47 = match("MESSAGE#37:29", "nwparser.payload", "Successful administrator login%{}", processor_chain([
-	dup25,
+var part48 = match("MESSAGE#37:29", "nwparser.payload", "Successful administrator login%{}", processor_chain([
+	dup24,
 ]));
 
-var msg39 = msg("29", part47);
+var msg39 = msg("29", part48);
 
-var part48 = match("MESSAGE#38:29:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} usr=%{username->} src=%{p0}");
+var part49 = match("MESSAGE#38:29:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} usr=%{username->} src=%{p0}");
 
 var all5 = all_match({
 	processors: [
-		part48,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		part49,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
 	],
 	on_success: processor_chain([
-		dup29,
+		dup28,
 	]),
 });
 
@@ -1260,60 +1260,60 @@ var select13 = linear_select([
 	msg40,
 ]);
 
-var part49 = match("MESSAGE#39:30", "nwparser.payload", "Administrator login failed - incorrect password%{}", processor_chain([
-	dup30,
+var part50 = match("MESSAGE#39:30", "nwparser.payload", "Administrator login failed - incorrect password%{}", processor_chain([
+	dup29,
 ]));
 
-var msg41 = msg("30", part49);
+var msg41 = msg("30", part50);
 
-var msg42 = msg("30:01", dup228);
+var msg42 = msg("30:01", dup227);
 
 var select14 = linear_select([
 	msg41,
 	msg42,
 ]);
 
-var part50 = match("MESSAGE#41:31", "nwparser.payload", "Successful user login%{}", processor_chain([
-	dup25,
+var part51 = match("MESSAGE#41:31", "nwparser.payload", "Successful user login%{}", processor_chain([
+	dup24,
 ]));
 
-var msg43 = msg("31", part50);
+var msg43 = msg("31", part51);
 
 var all6 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup30,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
 	],
 	on_success: processor_chain([
-		dup25,
+		dup24,
 	]),
 });
 
 var msg44 = msg("31:01", all6);
 
-var part51 = match("MESSAGE#43:31:02", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup25,
-	dup12,
+var part52 = match("MESSAGE#43:31:02", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup24,
+	dup11,
 ]));
 
-var msg45 = msg("31:02", part51);
+var msg45 = msg("31:02", part52);
 
-var part52 = match("MESSAGE#44:31:03", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration}n=%{fld1}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}proto=%{protocol}note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup25,
-	dup12,
+var part53 = match("MESSAGE#44:31:03", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration}n=%{fld1}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}proto=%{protocol}note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup24,
+	dup11,
 ]));
 
-var msg46 = msg("31:03", part52);
+var msg46 = msg("31:03", part53);
 
-var part53 = match("MESSAGE#45:31:04", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup25,
-	dup12,
+var part54 = match("MESSAGE#45:31:04", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup24,
+	dup11,
 ]));
 
-var msg47 = msg("31:04", part53);
+var msg47 = msg("31:04", part54);
 
 var select15 = linear_select([
 	msg43,
@@ -1323,35 +1323,35 @@ var select15 = linear_select([
 	msg47,
 ]);
 
-var part54 = match("MESSAGE#46:32", "nwparser.payload", "User login failed - incorrect password%{}", processor_chain([
-	dup30,
+var part55 = match("MESSAGE#46:32", "nwparser.payload", "User login failed - incorrect password%{}", processor_chain([
+	dup29,
 ]));
 
-var msg48 = msg("32", part54);
+var msg48 = msg("32", part55);
 
-var msg49 = msg("32:01", dup228);
+var msg49 = msg("32:01", dup227);
 
 var select16 = linear_select([
 	msg48,
 	msg49,
 ]);
 
-var part55 = match("MESSAGE#48:33", "nwparser.payload", "Unknown user attempted to log in%{}", processor_chain([
-	dup32,
+var part56 = match("MESSAGE#48:33", "nwparser.payload", "Unknown user attempted to log in%{}", processor_chain([
+	dup31,
 ]));
 
-var msg50 = msg("33", part55);
+var msg50 = msg("33", part56);
 
 var all7 = all_match({
 	processors: [
-		dup33,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup32,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
 	],
 	on_success: processor_chain([
-		dup30,
+		dup29,
 	]),
 });
 
@@ -1362,25 +1362,31 @@ var select17 = linear_select([
 	msg51,
 ]);
 
-var part56 = match("MESSAGE#50:34", "nwparser.payload", "Login screen timed out%{}", processor_chain([
+var part57 = match("MESSAGE#50:34", "nwparser.payload", "Login screen timed out%{}", processor_chain([
 	dup5,
 ]));
 
-var msg52 = msg("34", part56);
+var msg52 = msg("34", part57);
 
-var part57 = match("MESSAGE#51:35", "nwparser.payload", "Attempted administrator login from WAN%{}", processor_chain([
+var part58 = match("MESSAGE#51:35", "nwparser.payload", "Attempted administrator login from WAN%{}", processor_chain([
 	setc("eventcategory","1401040000"),
 ]));
 
-var msg53 = msg("35", part57);
+var msg53 = msg("35", part58);
+
+var part59 = match("MESSAGE#52:35:01/3_1", "nwparser.p0", "%{daddr}");
+
+var select18 = linear_select([
+	dup33,
+	part59,
+]);
 
 var all8 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup30,
+		dup178,
+		dup10,
+		select18,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1401050200"),
@@ -1389,49 +1395,49 @@ var all8 = all_match({
 
 var msg54 = msg("35:01", all8);
 
-var select18 = linear_select([
+var select19 = linear_select([
 	msg53,
 	msg54,
 ]);
 
-var part58 = match("MESSAGE#53:36", "nwparser.payload", "TCP connection dropped%{}", processor_chain([
+var part60 = match("MESSAGE#53:36", "nwparser.payload", "TCP connection dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg55 = msg("36", part58);
+var msg55 = msg("36", part60);
 
-var part59 = match("MESSAGE#54:36:01/0", "nwparser.payload", "msg=\"%{msg}\" %{p0}");
+var part61 = match("MESSAGE#54:36:01/0", "nwparser.payload", "msg=\"%{msg}\" %{p0}");
 
-var part60 = match("MESSAGE#54:36:01/1_0", "nwparser.p0", "app=%{fld51->} appName=\"%{application}\" n=%{fld1->} src= %{p0}");
+var part62 = match("MESSAGE#54:36:01/1_0", "nwparser.p0", "app=%{fld51->} appName=\"%{application}\" n=%{fld1->} src= %{p0}");
 
-var part61 = match("MESSAGE#54:36:01/1_1", "nwparser.p0", "n=%{fld1->} src= %{p0}");
-
-var select19 = linear_select([
-	part60,
-	part61,
-]);
-
-var part62 = match("MESSAGE#54:36:01/6_0", "nwparser.p0", "srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\" ");
-
-var part63 = match("MESSAGE#54:36:01/6_1", "nwparser.p0", " rule=%{rule->} ");
-
-var part64 = match("MESSAGE#54:36:01/6_2", "nwparser.p0", " proto=%{protocol->} ");
+var part63 = match("MESSAGE#54:36:01/1_1", "nwparser.p0", "n=%{fld1->} src= %{p0}");
 
 var select20 = linear_select([
 	part62,
 	part63,
+]);
+
+var part64 = match("MESSAGE#54:36:01/6_0", "nwparser.p0", "srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\" ");
+
+var part65 = match("MESSAGE#54:36:01/6_1", "nwparser.p0", " rule=%{rule->} ");
+
+var part66 = match("MESSAGE#54:36:01/6_2", "nwparser.p0", " proto=%{protocol->} ");
+
+var select21 = linear_select([
 	part64,
+	part65,
+	part66,
 ]);
 
 var all9 = all_match({
 	processors: [
-		part59,
-		select19,
-		dup180,
-		dup36,
-		dup177,
-		dup11,
+		part61,
 		select20,
+		dup179,
+		dup36,
+		dup176,
+		dup10,
+		select21,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -1441,26 +1447,26 @@ var all9 = all_match({
 
 var msg56 = msg("36:01", all9);
 
-var part65 = match("MESSAGE#55:36:02/5_0", "nwparser.p0", "rule=%{rule->} %{p0}");
+var part67 = match("MESSAGE#55:36:02/5_0", "nwparser.p0", "rule=%{rule->} %{p0}");
 
-var part66 = match("MESSAGE#55:36:02/5_1", "nwparser.p0", "proto=%{protocol->} %{p0}");
+var part68 = match("MESSAGE#55:36:02/5_1", "nwparser.p0", "proto=%{protocol->} %{p0}");
 
-var select21 = linear_select([
-	part65,
-	part66,
+var select22 = linear_select([
+	part67,
+	part68,
 ]);
 
-var part67 = match("MESSAGE#55:36:02/6", "nwparser.p0", "%{}npcs=%{info}");
+var part69 = match("MESSAGE#55:36:02/6", "nwparser.p0", "%{}npcs=%{info}");
 
 var all10 = all_match({
 	processors: [
 		dup38,
-		dup181,
-		dup11,
-		dup177,
-		dup11,
-		select21,
-		part67,
+		dup180,
+		dup10,
+		dup176,
+		dup10,
+		select22,
+		part69,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -1469,57 +1475,57 @@ var all10 = all_match({
 
 var msg57 = msg("36:02", all10);
 
-var select22 = linear_select([
+var select23 = linear_select([
 	msg55,
 	msg56,
 	msg57,
 ]);
 
-var part68 = match("MESSAGE#56:37", "nwparser.payload", "UDP packet dropped%{}", processor_chain([
+var part70 = match("MESSAGE#56:37", "nwparser.payload", "UDP packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg58 = msg("37", part68);
+var msg58 = msg("37", part70);
 
-var part69 = match("MESSAGE#57:37:01/0", "nwparser.payload", "msg=\"UDP packet dropped\" %{p0}");
+var part71 = match("MESSAGE#57:37:01/0", "nwparser.payload", "msg=\"UDP packet dropped\" %{p0}");
 
-var part70 = match("MESSAGE#57:37:01/1_0", "nwparser.p0", "app=%{fld51->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
-
-var select23 = linear_select([
-	part70,
-	dup40,
-]);
-
-var part71 = match("MESSAGE#57:37:01/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{p0}");
-
-var part72 = match("MESSAGE#57:37:01/3_0", "nwparser.p0", "%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} %{p0}");
-
-var part73 = match("MESSAGE#57:37:01/3_1", "nwparser.p0", "%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} %{p0}");
-
-var part74 = match("MESSAGE#57:37:01/3_2", "nwparser.p0", "%{dport}:%{dinterface->} %{p0}");
+var part72 = match("MESSAGE#57:37:01/1_0", "nwparser.p0", "app=%{fld51->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
 
 var select24 = linear_select([
 	part72,
-	part73,
-	part74,
+	dup40,
 ]);
 
-var part75 = match("MESSAGE#57:37:01/4_0", "nwparser.p0", "proto=%{protocol->} fw_action=\"%{fld3}\" ");
+var part73 = match("MESSAGE#57:37:01/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{p0}");
 
-var part76 = match("MESSAGE#57:37:01/4_1", "nwparser.p0", " rule=%{rule}");
+var part74 = match("MESSAGE#57:37:01/3_0", "nwparser.p0", "%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} %{p0}");
+
+var part75 = match("MESSAGE#57:37:01/3_1", "nwparser.p0", "%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} %{p0}");
+
+var part76 = match("MESSAGE#57:37:01/3_2", "nwparser.p0", "%{dport}:%{dinterface->} %{p0}");
 
 var select25 = linear_select([
+	part74,
 	part75,
 	part76,
 ]);
 
+var part77 = match("MESSAGE#57:37:01/4_0", "nwparser.p0", "proto=%{protocol->} fw_action=\"%{fld3}\" ");
+
+var part78 = match("MESSAGE#57:37:01/4_1", "nwparser.p0", " rule=%{rule}");
+
+var select26 = linear_select([
+	part77,
+	part78,
+]);
+
 var all11 = all_match({
 	processors: [
-		part69,
-		select23,
 		part71,
 		select24,
+		part73,
 		select25,
+		select26,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -1529,18 +1535,18 @@ var all11 = all_match({
 
 var msg59 = msg("37:01", all11);
 
-var part77 = match("MESSAGE#58:37:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} rule=%{rule}", processor_chain([
+var part79 = match("MESSAGE#58:37:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} rule=%{rule}", processor_chain([
 	dup5,
 ]));
 
-var msg60 = msg("37:02", part77);
+var msg60 = msg("37:02", part79);
 
 var all12 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup182,
+		dup7,
+		dup175,
+		dup10,
+		dup181,
 		dup43,
 	],
 	on_success: processor_chain([
@@ -1550,14 +1556,14 @@ var all12 = all_match({
 
 var msg61 = msg("37:03", all12);
 
-var part78 = match("MESSAGE#60:37:04", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
+var part80 = match("MESSAGE#60:37:04", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
 	dup5,
-	dup12,
+	dup11,
 ]));
 
-var msg62 = msg("37:04", part78);
+var msg62 = msg("37:04", part80);
 
-var select26 = linear_select([
+var select27 = linear_select([
 	msg58,
 	msg59,
 	msg60,
@@ -1565,27 +1571,27 @@ var select26 = linear_select([
 	msg62,
 ]);
 
-var part79 = match("MESSAGE#61:38", "nwparser.payload", "ICMP packet dropped%{}", processor_chain([
+var part81 = match("MESSAGE#61:38", "nwparser.payload", "ICMP packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg63 = msg("38", part79);
+var msg63 = msg("38", part81);
 
-var part80 = match("MESSAGE#62:38:01/5_0", "nwparser.p0", "type=%{type->} code=%{code->} ");
+var part82 = match("MESSAGE#62:38:01/5_0", "nwparser.p0", "type=%{type->} code=%{code->} ");
 
-var select27 = linear_select([
-	part80,
+var select28 = linear_select([
+	part82,
 	dup45,
 ]);
 
 var all13 = all_match({
 	processors: [
 		dup44,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		dup11,
-		select27,
+		dup176,
+		dup10,
+		select28,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -1594,15 +1600,15 @@ var all13 = all_match({
 
 var msg64 = msg("38:01", all13);
 
-var part81 = match("MESSAGE#63:38:02/4", "nwparser.p0", "%{} %{fld3->} icmpCode=%{fld4->} npcs=%{info}");
+var part83 = match("MESSAGE#63:38:02/4", "nwparser.p0", "%{} %{fld3->} icmpCode=%{fld4->} npcs=%{info}");
 
 var all14 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup183,
-		part81,
+		dup7,
+		dup175,
+		dup10,
+		dup182,
+		part83,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -1611,172 +1617,172 @@ var all14 = all_match({
 
 var msg65 = msg("38:02", all14);
 
-var part82 = match("MESSAGE#64:38:03/1_0", "nwparser.p0", "%{event_description}\" app=%{fld2->} appName=\"%{application}\"%{p0}");
+var part84 = match("MESSAGE#64:38:03/1_0", "nwparser.p0", "%{event_description}\" app=%{fld2->} appName=\"%{application}\"%{p0}");
 
-var part83 = match("MESSAGE#64:38:03/1_1", "nwparser.p0", "%{event_description}\"%{p0}");
+var part85 = match("MESSAGE#64:38:03/1_1", "nwparser.p0", "%{event_description}\"%{p0}");
 
-var select28 = linear_select([
-	part82,
-	part83,
+var select29 = linear_select([
+	part84,
+	part85,
 ]);
 
-var part84 = match("MESSAGE#64:38:03/2", "nwparser.p0", "%{}n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part86 = match("MESSAGE#64:38:03/2", "nwparser.p0", "%{}n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var part85 = match("MESSAGE#64:38:03/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"");
+var part87 = match("MESSAGE#64:38:03/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"");
 
 var all15 = all_match({
 	processors: [
 		dup48,
-		select28,
-		part84,
-		dup184,
-		part85,
+		select29,
+		part86,
+		dup183,
+		part87,
 	],
 	on_success: processor_chain([
 		dup5,
-		dup12,
+		dup11,
+		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg66 = msg("38:03", all15);
 
-var select29 = linear_select([
+var select30 = linear_select([
 	msg63,
 	msg64,
 	msg65,
 	msg66,
 ]);
 
-var part86 = match("MESSAGE#65:39", "nwparser.payload", "PPTP packet dropped%{}", processor_chain([
+var part88 = match("MESSAGE#65:39", "nwparser.payload", "PPTP packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg67 = msg("39", part86);
+var msg67 = msg("39", part88);
 
-var part87 = match("MESSAGE#66:40", "nwparser.payload", "IPSec packet dropped%{}", processor_chain([
+var part89 = match("MESSAGE#66:40", "nwparser.payload", "IPSec packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg68 = msg("40", part87);
+var msg68 = msg("40", part89);
 
-var part88 = match("MESSAGE#67:41:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} note=\"IP Protocol: %{dclass_counter1}\"", processor_chain([
+var part90 = match("MESSAGE#67:41:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} note=\"IP Protocol: %{dclass_counter1}\"", processor_chain([
 	dup5,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg69 = msg("41:01", part88);
+var msg69 = msg("41:01", part90);
 
-var part89 = match("MESSAGE#68:41:02", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport}:%{sinterface->} dst=%{dtransaddr}:%{dtransport}::%{dinterface}", processor_chain([
+var part91 = match("MESSAGE#68:41:02", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport}:%{sinterface->} dst=%{dtransaddr}:%{dtransport}::%{dinterface}", processor_chain([
 	dup5,
 ]));
 
-var msg70 = msg("41:02", part89);
+var msg70 = msg("41:02", part91);
 
-var part90 = match("MESSAGE#69:41:03", "nwparser.payload", "Unknown protocol dropped%{}", processor_chain([
+var part92 = match("MESSAGE#69:41:03", "nwparser.payload", "Unknown protocol dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg71 = msg("41:03", part90);
+var msg71 = msg("41:03", part92);
 
-var select30 = linear_select([
+var select31 = linear_select([
 	msg69,
 	msg70,
 	msg71,
 ]);
 
-var part91 = match("MESSAGE#70:42", "nwparser.payload", "IPSec packet dropped; waiting for pending IPSec connection%{}", processor_chain([
+var part93 = match("MESSAGE#70:42", "nwparser.payload", "IPSec packet dropped; waiting for pending IPSec connection%{}", processor_chain([
 	dup5,
 ]));
 
-var msg72 = msg("42", part91);
+var msg72 = msg("42", part93);
 
-var part92 = match("MESSAGE#71:43", "nwparser.payload", "IPSec connection interrupt%{}", processor_chain([
+var part94 = match("MESSAGE#71:43", "nwparser.payload", "IPSec connection interrupt%{}", processor_chain([
 	dup5,
 ]));
 
-var msg73 = msg("43", part92);
+var msg73 = msg("43", part94);
 
-var part93 = match("MESSAGE#72:44", "nwparser.payload", "NAT could not remap incoming packet%{}", processor_chain([
+var part95 = match("MESSAGE#72:44", "nwparser.payload", "NAT could not remap incoming packet%{}", processor_chain([
 	dup5,
 ]));
 
-var msg74 = msg("44", part93);
+var msg74 = msg("44", part95);
 
-var part94 = match("MESSAGE#73:45", "nwparser.payload", "ARP timeout%{}", processor_chain([
+var part96 = match("MESSAGE#73:45", "nwparser.payload", "ARP timeout%{}", processor_chain([
 	dup5,
 ]));
 
-var msg75 = msg("45", part94);
+var msg75 = msg("45", part96);
 
-var part95 = match("MESSAGE#74:45:01", "nwparser.payload", "msg=\"ARP timeout\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+var part97 = match("MESSAGE#74:45:01", "nwparser.payload", "msg=\"ARP timeout\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
 	dup5,
 ]));
 
-var msg76 = msg("45:01", part95);
+var msg76 = msg("45:01", part97);
 
-var part96 = match("MESSAGE#75:45:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr->} dst=%{daddr->} npcs=%{info}", processor_chain([
+var part98 = match("MESSAGE#75:45:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr->} dst=%{daddr->} npcs=%{info}", processor_chain([
 	dup5,
 ]));
 
-var msg77 = msg("45:02", part96);
+var msg77 = msg("45:02", part98);
 
-var select31 = linear_select([
+var select32 = linear_select([
 	msg75,
 	msg76,
 	msg77,
 ]);
 
-var part97 = match("MESSAGE#76:46:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} proto=%{protocol}/%{fld4}", processor_chain([
+var part99 = match("MESSAGE#76:46:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} proto=%{protocol}/%{fld4}", processor_chain([
 	dup5,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg78 = msg("46:01", part97);
+var msg78 = msg("46:01", part99);
 
-var part98 = match("MESSAGE#77:46:02", "nwparser.payload", "msg=\"Broadcast packet dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
+var part100 = match("MESSAGE#77:46:02", "nwparser.payload", "msg=\"Broadcast packet dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
 	dup5,
 ]));
 
-var msg79 = msg("46:02", part98);
+var msg79 = msg("46:02", part100);
 
-var part99 = match("MESSAGE#78:46", "nwparser.payload", "Broadcast packet dropped%{}", processor_chain([
+var part101 = match("MESSAGE#78:46", "nwparser.payload", "Broadcast packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg80 = msg("46", part99);
+var msg80 = msg("46", part101);
 
-var part100 = match("MESSAGE#79:46:03/0", "nwparser.payload", "msg=\"Broadcast packet dropped\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var part102 = match("MESSAGE#79:46:03/0", "nwparser.payload", "msg=\"Broadcast packet dropped\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
 var all16 = all_match({
 	processors: [
-		part100,
-		dup176,
-		dup11,
-		dup182,
+		part102,
+		dup175,
+		dup10,
+		dup181,
 		dup43,
 	],
 	on_success: processor_chain([
@@ -1786,127 +1792,127 @@ var all16 = all_match({
 
 var msg81 = msg("46:03", all16);
 
-var select32 = linear_select([
+var select33 = linear_select([
 	msg78,
 	msg79,
 	msg80,
 	msg81,
 ]);
 
-var part101 = match("MESSAGE#80:47", "nwparser.payload", "No ICMP redirect sent%{}", processor_chain([
+var part103 = match("MESSAGE#80:47", "nwparser.payload", "No ICMP redirect sent%{}", processor_chain([
 	dup5,
 ]));
 
-var msg82 = msg("47", part101);
+var msg82 = msg("47", part103);
 
-var part102 = match("MESSAGE#81:48", "nwparser.payload", "Out-of-order command packet dropped%{}", processor_chain([
+var part104 = match("MESSAGE#81:48", "nwparser.payload", "Out-of-order command packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg83 = msg("48", part102);
+var msg83 = msg("48", part104);
 
-var part103 = match("MESSAGE#82:49", "nwparser.payload", "Failure to add data channel%{}", processor_chain([
+var part105 = match("MESSAGE#82:49", "nwparser.payload", "Failure to add data channel%{}", processor_chain([
 	dup5,
 ]));
 
-var msg84 = msg("49", part103);
+var msg84 = msg("49", part105);
 
-var part104 = match("MESSAGE#83:50", "nwparser.payload", "RealAudio decode failure%{}", processor_chain([
+var part106 = match("MESSAGE#83:50", "nwparser.payload", "RealAudio decode failure%{}", processor_chain([
 	dup5,
 ]));
 
-var msg85 = msg("50", part104);
+var msg85 = msg("50", part106);
 
-var part105 = match("MESSAGE#84:51", "nwparser.payload", "Duplicate packet dropped%{}", processor_chain([
+var part107 = match("MESSAGE#84:51", "nwparser.payload", "Duplicate packet dropped%{}", processor_chain([
 	dup5,
 ]));
 
-var msg86 = msg("51", part105);
+var msg86 = msg("51", part107);
 
-var part106 = match("MESSAGE#85:52", "nwparser.payload", "No HOST tag found in HTTP request%{}", processor_chain([
+var part108 = match("MESSAGE#85:52", "nwparser.payload", "No HOST tag found in HTTP request%{}", processor_chain([
 	dup5,
 ]));
 
-var msg87 = msg("52", part106);
+var msg87 = msg("52", part108);
 
-var part107 = match("MESSAGE#86:53", "nwparser.payload", "The cache is full; too many open connections; some will be dropped%{}", processor_chain([
+var part109 = match("MESSAGE#86:53", "nwparser.payload", "The cache is full; too many open connections; some will be dropped%{}", processor_chain([
 	dup2,
 ]));
 
-var msg88 = msg("53", part107);
+var msg88 = msg("53", part109);
 
-var part108 = match("MESSAGE#87:58", "nwparser.payload", "License exceeded: Connection dropped because too many IP addresses are in use on your LAN%{}", processor_chain([
+var part110 = match("MESSAGE#87:58", "nwparser.payload", "License exceeded: Connection dropped because too many IP addresses are in use on your LAN%{}", processor_chain([
 	dup56,
 ]));
 
-var msg89 = msg("58", part108);
+var msg89 = msg("58", part110);
 
-var part109 = match("MESSAGE#88:60", "nwparser.payload", "Access to Proxy Server Blocked%{}", processor_chain([
-	dup13,
+var part111 = match("MESSAGE#88:60", "nwparser.payload", "Access to Proxy Server Blocked%{}", processor_chain([
+	dup12,
 ]));
 
-var msg90 = msg("60", part109);
+var msg90 = msg("60", part111);
 
-var part110 = match("MESSAGE#89:61", "nwparser.payload", "Diagnostic Code E%{}", processor_chain([
+var part112 = match("MESSAGE#89:61", "nwparser.payload", "Diagnostic Code E%{}", processor_chain([
 	dup1,
 ]));
 
-var msg91 = msg("61", part110);
+var msg91 = msg("61", part112);
 
-var part111 = match("MESSAGE#90:62", "nwparser.payload", "Dynamic IPSec client connected%{}", processor_chain([
+var part113 = match("MESSAGE#90:62", "nwparser.payload", "Dynamic IPSec client connected%{}", processor_chain([
 	dup57,
 ]));
 
-var msg92 = msg("62", part111);
+var msg92 = msg("62", part113);
 
-var part112 = match("MESSAGE#91:63", "nwparser.payload", "IPSec packet too big%{}", processor_chain([
+var part114 = match("MESSAGE#91:63", "nwparser.payload", "IPSec packet too big%{}", processor_chain([
 	dup58,
 ]));
 
-var msg93 = msg("63", part112);
+var msg93 = msg("63", part114);
 
-var part113 = match("MESSAGE#92:63:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+var part115 = match("MESSAGE#92:63:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
 	dup58,
 ]));
 
-var msg94 = msg("63:01", part113);
+var msg94 = msg("63:01", part115);
 
-var select33 = linear_select([
+var select34 = linear_select([
 	msg93,
 	msg94,
 ]);
 
-var part114 = match("MESSAGE#93:64", "nwparser.payload", "Diagnostic Code D%{}", processor_chain([
+var part116 = match("MESSAGE#93:64", "nwparser.payload", "Diagnostic Code D%{}", processor_chain([
 	dup1,
 ]));
 
-var msg95 = msg("64", part114);
+var msg95 = msg("64", part116);
 
-var part115 = match("MESSAGE#94:65", "nwparser.payload", "Illegal IPSec SPI%{}", processor_chain([
+var part117 = match("MESSAGE#94:65", "nwparser.payload", "Illegal IPSec SPI%{}", processor_chain([
 	dup58,
 ]));
 
-var msg96 = msg("65", part115);
+var msg96 = msg("65", part117);
 
-var part116 = match("MESSAGE#95:66", "nwparser.payload", "Unknown IPSec SPI%{}", processor_chain([
+var part118 = match("MESSAGE#95:66", "nwparser.payload", "Unknown IPSec SPI%{}", processor_chain([
 	dup58,
 ]));
 
-var msg97 = msg("66", part116);
+var msg97 = msg("66", part118);
 
-var part117 = match("MESSAGE#96:67", "nwparser.payload", "IPSec Authentication Failed%{}", processor_chain([
+var part119 = match("MESSAGE#96:67", "nwparser.payload", "IPSec Authentication Failed%{}", processor_chain([
 	dup58,
 ]));
 
-var msg98 = msg("67", part117);
+var msg98 = msg("67", part119);
 
 var all17 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup30,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
 	],
 	on_success: processor_chain([
 		dup58,
@@ -1915,44 +1921,44 @@ var all17 = all_match({
 
 var msg99 = msg("67:01", all17);
 
-var select34 = linear_select([
+var select35 = linear_select([
 	msg98,
 	msg99,
 ]);
 
-var part118 = match("MESSAGE#98:68", "nwparser.payload", "IPSec Decryption Failed%{}", processor_chain([
+var part120 = match("MESSAGE#98:68", "nwparser.payload", "IPSec Decryption Failed%{}", processor_chain([
 	dup58,
 ]));
 
-var msg100 = msg("68", part118);
+var msg100 = msg("68", part120);
 
-var part119 = match("MESSAGE#99:69", "nwparser.payload", "Incompatible IPSec Security Association%{}", processor_chain([
+var part121 = match("MESSAGE#99:69", "nwparser.payload", "Incompatible IPSec Security Association%{}", processor_chain([
 	dup58,
 ]));
 
-var msg101 = msg("69", part119);
+var msg101 = msg("69", part121);
 
-var part120 = match("MESSAGE#100:70", "nwparser.payload", "IPSec packet from illegal host%{}", processor_chain([
+var part122 = match("MESSAGE#100:70", "nwparser.payload", "IPSec packet from illegal host%{}", processor_chain([
 	dup58,
 ]));
 
-var msg102 = msg("70", part120);
+var msg102 = msg("70", part122);
 
-var part121 = match("MESSAGE#101:70:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} %{p0}");
+var part123 = match("MESSAGE#101:70:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} %{p0}");
 
-var part122 = match("MESSAGE#101:70:01/1_0", "nwparser.p0", "dst=%{daddr->} ");
+var part124 = match("MESSAGE#101:70:01/1_0", "nwparser.p0", "dst=%{daddr->} ");
 
-var part123 = match("MESSAGE#101:70:01/1_1", "nwparser.p0", " dstname=%{name}");
+var part125 = match("MESSAGE#101:70:01/1_1", "nwparser.p0", " dstname=%{name}");
 
-var select35 = linear_select([
-	part122,
-	part123,
+var select36 = linear_select([
+	part124,
+	part125,
 ]);
 
 var all18 = all_match({
 	processors: [
-		part121,
-		select35,
+		part123,
+		select36,
 	],
 	on_success: processor_chain([
 		dup58,
@@ -1961,142 +1967,141 @@ var all18 = all_match({
 
 var msg103 = msg("70:01", all18);
 
-var select36 = linear_select([
+var select37 = linear_select([
 	msg102,
 	msg103,
 ]);
 
-var part124 = match("MESSAGE#102:72", "nwparser.payload", "NetBus Attack Dropped%{}", processor_chain([
+var part126 = match("MESSAGE#102:72", "nwparser.payload", "NetBus Attack Dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg104 = msg("72", part124);
+var msg104 = msg("72", part126);
 
-var part125 = match("MESSAGE#103:72:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
+var part127 = match("MESSAGE#103:72:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
 	dup59,
 ]));
 
-var msg105 = msg("72:01", part125);
+var msg105 = msg("72:01", part127);
 
-var select37 = linear_select([
+var select38 = linear_select([
 	msg104,
 	msg105,
 ]);
 
-var part126 = match("MESSAGE#104:73", "nwparser.payload", "Back Orifice Attack Dropped%{}", processor_chain([
+var part128 = match("MESSAGE#104:73", "nwparser.payload", "Back Orifice Attack Dropped%{}", processor_chain([
 	dup60,
 ]));
 
-var msg106 = msg("73", part126);
+var msg106 = msg("73", part128);
 
-var part127 = match("MESSAGE#105:74", "nwparser.payload", "Net Spy Attack Dropped%{}", processor_chain([
+var part129 = match("MESSAGE#105:74", "nwparser.payload", "Net Spy Attack Dropped%{}", processor_chain([
 	dup61,
 ]));
 
-var msg107 = msg("74", part127);
+var msg107 = msg("74", part129);
 
-var part128 = match("MESSAGE#106:75", "nwparser.payload", "Sub Seven Attack Dropped%{}", processor_chain([
+var part130 = match("MESSAGE#106:75", "nwparser.payload", "Sub Seven Attack Dropped%{}", processor_chain([
 	dup60,
 ]));
 
-var msg108 = msg("75", part128);
+var msg108 = msg("75", part130);
 
-var part129 = match("MESSAGE#107:76", "nwparser.payload", "Ripper Attack Dropped%{}", processor_chain([
+var part131 = match("MESSAGE#107:76", "nwparser.payload", "Ripper Attack Dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg109 = msg("76", part129);
+var msg109 = msg("76", part131);
 
-var part130 = match("MESSAGE#108:77", "nwparser.payload", "Striker Attack Dropped%{}", processor_chain([
+var part132 = match("MESSAGE#108:77", "nwparser.payload", "Striker Attack Dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg110 = msg("77", part130);
+var msg110 = msg("77", part132);
 
-var part131 = match("MESSAGE#109:78", "nwparser.payload", "Senna Spy Attack Dropped%{}", processor_chain([
+var part133 = match("MESSAGE#109:78", "nwparser.payload", "Senna Spy Attack Dropped%{}", processor_chain([
 	dup61,
 ]));
 
-var msg111 = msg("78", part131);
+var msg111 = msg("78", part133);
 
-var part132 = match("MESSAGE#110:79", "nwparser.payload", "Priority Attack Dropped%{}", processor_chain([
+var part134 = match("MESSAGE#110:79", "nwparser.payload", "Priority Attack Dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg112 = msg("79", part132);
+var msg112 = msg("79", part134);
 
-var part133 = match("MESSAGE#111:80", "nwparser.payload", "Ini Killer Attack Dropped%{}", processor_chain([
+var part135 = match("MESSAGE#111:80", "nwparser.payload", "Ini Killer Attack Dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg113 = msg("80", part133);
+var msg113 = msg("80", part135);
 
-var part134 = match("MESSAGE#112:81", "nwparser.payload", "Smurf Amplification Attack Dropped%{}", processor_chain([
-	dup15,
+var part136 = match("MESSAGE#112:81", "nwparser.payload", "Smurf Amplification Attack Dropped%{}", processor_chain([
+	dup14,
 ]));
 
-var msg114 = msg("81", part134);
+var msg114 = msg("81", part136);
 
-var part135 = match("MESSAGE#113:82", "nwparser.payload", "Possible Port Scan%{}", processor_chain([
+var part137 = match("MESSAGE#113:82", "nwparser.payload", "Possible Port Scan%{}", processor_chain([
 	dup62,
 ]));
 
-var msg115 = msg("82", part135);
+var msg115 = msg("82", part137);
 
-var part136 = match("MESSAGE#114:82:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{info}\"", processor_chain([
+var part138 = match("MESSAGE#114:82:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{info}\"", processor_chain([
 	dup62,
 ]));
 
-var msg116 = msg("82:02", part136);
+var msg116 = msg("82:02", part138);
 
-var part137 = match("MESSAGE#115:82:03", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{fld3}\" npcs=%{info}", processor_chain([
+var part139 = match("MESSAGE#115:82:03", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{fld3}\" npcs=%{info}", processor_chain([
 	dup62,
 ]));
 
-var msg117 = msg("82:03", part137);
+var msg117 = msg("82:03", part139);
 
-var msg118 = msg("82:01", dup185);
+var msg118 = msg("82:01", dup184);
 
-var select38 = linear_select([
+var select39 = linear_select([
 	msg115,
 	msg116,
 	msg117,
 	msg118,
 ]);
 
-var part138 = match("MESSAGE#117:83", "nwparser.payload", "Probable Port Scan%{}", processor_chain([
+var part140 = match("MESSAGE#117:83", "nwparser.payload", "Probable Port Scan%{}", processor_chain([
 	dup62,
 ]));
 
-var msg119 = msg("83", part138);
+var msg119 = msg("83", part140);
 
-var msg120 = msg("83:01", dup186);
+var msg120 = msg("83:01", dup185);
 
-var part139 = match("MESSAGE#119:83:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{fld3}\" npcs=%{info}", processor_chain([
+var part141 = match("MESSAGE#119:83:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{fld3}\" npcs=%{info}", processor_chain([
 	dup5,
 ]));
 
-var msg121 = msg("83:02", part139);
+var msg121 = msg("83:02", part141);
 
-var select39 = linear_select([
+var select40 = linear_select([
 	msg119,
 	msg120,
 	msg121,
 ]);
 
-var part140 = match("MESSAGE#120:84/1_0", "nwparser.p0", "msg=\"Failed to resolve name\" n=%{fld1->} dstname=%{dhost->} ");
+var part142 = match("MESSAGE#120:84/0_0", "nwparser.payload", "msg=\"Failed to resolve name\" n=%{fld1->} dstname=%{dhost}");
 
-var part141 = match("MESSAGE#120:84/1_1", "nwparser.p0", " Failed to resolve name %{}");
+var part143 = match("MESSAGE#120:84/0_1", "nwparser.payload", "Failed to resolve name%{}");
 
-var select40 = linear_select([
-	part140,
-	part141,
+var select41 = linear_select([
+	part142,
+	part143,
 ]);
 
 var all19 = all_match({
 	processors: [
-		dup6,
-		select40,
+		select41,
 	],
 	on_success: processor_chain([
 		dup63,
@@ -2106,61 +2111,61 @@ var all19 = all_match({
 
 var msg122 = msg("84", all19);
 
-var part142 = match("MESSAGE#121:87", "nwparser.payload", "IKE Responder: Accepting IPSec proposal%{}", processor_chain([
+var part144 = match("MESSAGE#121:87", "nwparser.payload", "IKE Responder: Accepting IPSec proposal%{}", processor_chain([
 	dup64,
 ]));
 
-var msg123 = msg("87", part142);
+var msg123 = msg("87", part144);
 
-var part143 = match("MESSAGE#122:87:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+var part145 = match("MESSAGE#122:87:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
 	dup64,
 ]));
 
-var msg124 = msg("87:01", part143);
+var msg124 = msg("87:01", part145);
 
-var select41 = linear_select([
+var select42 = linear_select([
 	msg123,
 	msg124,
 ]);
 
-var part144 = match("MESSAGE#123:88", "nwparser.payload", "IKE Responder: IPSec proposal not acceptable%{}", processor_chain([
+var part146 = match("MESSAGE#123:88", "nwparser.payload", "IKE Responder: IPSec proposal not acceptable%{}", processor_chain([
 	dup58,
 ]));
 
-var msg125 = msg("88", part144);
+var msg125 = msg("88", part146);
 
-var part145 = match("MESSAGE#124:88:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{saddr->} dst=%{daddr}", processor_chain([
+var part147 = match("MESSAGE#124:88:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{saddr->} dst=%{daddr}", processor_chain([
 	dup58,
 ]));
 
-var msg126 = msg("88:01", part145);
+var msg126 = msg("88:01", part147);
 
-var select42 = linear_select([
+var select43 = linear_select([
 	msg125,
 	msg126,
 ]);
 
-var part146 = match("MESSAGE#125:89", "nwparser.payload", "IKE negotiation complete. Adding IPSec SA%{}", processor_chain([
+var part148 = match("MESSAGE#125:89", "nwparser.payload", "IKE negotiation complete. Adding IPSec SA%{}", processor_chain([
 	dup64,
 ]));
 
-var msg127 = msg("89", part146);
+var msg127 = msg("89", part148);
 
-var part147 = match("MESSAGE#126:89:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} %{p0}");
+var part149 = match("MESSAGE#126:89:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} %{p0}");
 
-var part148 = match("MESSAGE#126:89:01/1_0", "nwparser.p0", "src=%{saddr}:::%{sinterface->} dst=%{daddr}:::%{dinterface->} ");
+var part150 = match("MESSAGE#126:89:01/1_0", "nwparser.p0", "src=%{saddr}:::%{sinterface->} dst=%{daddr}:::%{dinterface->} ");
 
-var part149 = match("MESSAGE#126:89:01/1_1", "nwparser.p0", " src=%{saddr->} dst=%{daddr->} dstname=%{name}");
+var part151 = match("MESSAGE#126:89:01/1_1", "nwparser.p0", " src=%{saddr->} dst=%{daddr->} dstname=%{name}");
 
-var select43 = linear_select([
-	part148,
-	part149,
+var select44 = linear_select([
+	part150,
+	part151,
 ]);
 
 var all20 = all_match({
 	processors: [
-		part147,
-		select43,
+		part149,
+		select44,
 	],
 	on_success: processor_chain([
 		dup64,
@@ -2169,87 +2174,87 @@ var all20 = all_match({
 
 var msg128 = msg("89:01", all20);
 
-var select44 = linear_select([
+var select45 = linear_select([
 	msg127,
 	msg128,
 ]);
 
-var part150 = match("MESSAGE#127:90", "nwparser.payload", "Starting IKE negotiation%{}", processor_chain([
+var part152 = match("MESSAGE#127:90", "nwparser.payload", "Starting IKE negotiation%{}", processor_chain([
 	dup64,
 ]));
 
-var msg129 = msg("90", part150);
+var msg129 = msg("90", part152);
 
-var part151 = match("MESSAGE#128:91", "nwparser.payload", "Deleting IPSec SA for destination%{}", processor_chain([
+var part153 = match("MESSAGE#128:91", "nwparser.payload", "Deleting IPSec SA for destination%{}", processor_chain([
 	dup64,
 ]));
 
-var msg130 = msg("91", part151);
+var msg130 = msg("91", part153);
 
-var part152 = match("MESSAGE#129:92", "nwparser.payload", "Deleting IPSec SA%{}", processor_chain([
+var part154 = match("MESSAGE#129:92", "nwparser.payload", "Deleting IPSec SA%{}", processor_chain([
 	dup64,
 ]));
 
-var msg131 = msg("92", part152);
+var msg131 = msg("92", part154);
 
-var part153 = match("MESSAGE#130:93", "nwparser.payload", "Diagnostic Code A%{}", processor_chain([
+var part155 = match("MESSAGE#130:93", "nwparser.payload", "Diagnostic Code A%{}", processor_chain([
 	dup1,
 ]));
 
-var msg132 = msg("93", part153);
+var msg132 = msg("93", part155);
 
-var part154 = match("MESSAGE#131:94", "nwparser.payload", "Diagnostic Code B%{}", processor_chain([
+var part156 = match("MESSAGE#131:94", "nwparser.payload", "Diagnostic Code B%{}", processor_chain([
 	dup1,
 ]));
 
-var msg133 = msg("94", part154);
+var msg133 = msg("94", part156);
 
-var part155 = match("MESSAGE#132:95", "nwparser.payload", "Diagnostic Code C%{}", processor_chain([
+var part157 = match("MESSAGE#132:95", "nwparser.payload", "Diagnostic Code C%{}", processor_chain([
 	dup1,
 ]));
 
-var msg134 = msg("95", part155);
+var msg134 = msg("95", part157);
 
-var part156 = match("MESSAGE#133:96", "nwparser.payload", "Status%{}", processor_chain([
+var part158 = match("MESSAGE#133:96", "nwparser.payload", "Status%{}", processor_chain([
 	dup1,
 ]));
 
-var msg135 = msg("96", part156);
+var msg135 = msg("96", part158);
 
-var part157 = match("MESSAGE#134:97", "nwparser.payload", "Web site hit%{}", processor_chain([
+var part159 = match("MESSAGE#134:97", "nwparser.payload", "Web site hit%{}", processor_chain([
 	dup1,
 ]));
 
-var msg136 = msg("97", part157);
+var msg136 = msg("97", part159);
 
-var part158 = match("MESSAGE#135:97:01/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld->} %{p0}");
+var part160 = match("MESSAGE#135:97:01/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld->} %{p0}");
 
-var part159 = match("MESSAGE#135:97:01/5_0", "nwparser.p0", "rcvd=%{rbytes->} %{p0}");
+var part161 = match("MESSAGE#135:97:01/5_0", "nwparser.p0", "rcvd=%{rbytes->} %{p0}");
 
-var part160 = match("MESSAGE#135:97:01/5_1", "nwparser.p0", "sent=%{sbytes->} %{p0}");
-
-var select45 = linear_select([
-	part159,
-	part160,
-]);
-
-var part161 = match("MESSAGE#135:97:01/7_0", "nwparser.p0", "result=%{result->} dstname=%{name->} ");
+var part162 = match("MESSAGE#135:97:01/5_1", "nwparser.p0", "sent=%{sbytes->} %{p0}");
 
 var select46 = linear_select([
 	part161,
+	part162,
+]);
+
+var part163 = match("MESSAGE#135:97:01/7_0", "nwparser.p0", "result=%{result->} dstname=%{name->} ");
+
+var select47 = linear_select([
+	part163,
 	dup66,
 ]);
 
 var all21 = all_match({
 	processors: [
 		dup65,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		part158,
-		select45,
-		dup11,
+		dup176,
+		part160,
 		select46,
+		dup10,
+		select47,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2258,15 +2263,15 @@ var all21 = all_match({
 
 var msg137 = msg("97:01", all21);
 
-var part162 = match("MESSAGE#136:97:02/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld->} result=%{result}");
+var part164 = match("MESSAGE#136:97:02/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld->} result=%{result}");
 
 var all22 = all_match({
 	processors: [
 		dup65,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		part162,
+		dup176,
+		part164,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2275,28 +2280,28 @@ var all22 = all_match({
 
 var msg138 = msg("97:02", all22);
 
-var part163 = match("MESSAGE#137:97:03/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld3->} sent=%{sbytes->} rcvd=%{rbytes->} %{p0}");
+var part165 = match("MESSAGE#137:97:03/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld3->} sent=%{sbytes->} rcvd=%{rbytes->} %{p0}");
 
-var part164 = match("MESSAGE#137:97:03/5_0", "nwparser.p0", "result=%{result->} dstname=%{name->} %{p0}");
+var part166 = match("MESSAGE#137:97:03/5_0", "nwparser.p0", "result=%{result->} dstname=%{name->} %{p0}");
 
-var part165 = match("MESSAGE#137:97:03/5_1", "nwparser.p0", "dstname=%{name->} %{p0}");
+var part167 = match("MESSAGE#137:97:03/5_1", "nwparser.p0", "dstname=%{name->} %{p0}");
 
-var select47 = linear_select([
-	part164,
-	part165,
+var select48 = linear_select([
+	part166,
+	part167,
 ]);
 
-var part166 = match("MESSAGE#137:97:03/6", "nwparser.p0", "%{}arg=%{fld4->} code=%{fld5->} Category=\"%{category}\" npcs=%{info}");
+var part168 = match("MESSAGE#137:97:03/6", "nwparser.p0", "%{}arg=%{fld4->} code=%{fld5->} Category=\"%{category}\" npcs=%{info}");
 
 var all23 = all_match({
 	processors: [
 		dup67,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		part163,
-		select47,
-		part166,
+		dup176,
+		part165,
+		select48,
+		part168,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2305,28 +2310,28 @@ var all23 = all_match({
 
 var msg139 = msg("97:03", all23);
 
-var part167 = match("MESSAGE#138:97:04/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld3->} %{p0}");
+var part169 = match("MESSAGE#138:97:04/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld3->} %{p0}");
 
-var part168 = match("MESSAGE#138:97:04/5_0", "nwparser.p0", "result=%{result->} dstname=%{name->} arg= %{p0}");
+var part170 = match("MESSAGE#138:97:04/5_0", "nwparser.p0", "result=%{result->} dstname=%{name->} arg= %{p0}");
 
-var part169 = match("MESSAGE#138:97:04/5_1", "nwparser.p0", "dstname=%{name->} arg= %{p0}");
+var part171 = match("MESSAGE#138:97:04/5_1", "nwparser.p0", "dstname=%{name->} arg= %{p0}");
 
-var select48 = linear_select([
-	part168,
-	part169,
+var select49 = linear_select([
+	part170,
+	part171,
 ]);
 
-var part170 = match("MESSAGE#138:97:04/6", "nwparser.p0", "%{} %{fld4->} code=%{fld5->} Category=\"%{category}\" npcs=%{info}");
+var part172 = match("MESSAGE#138:97:04/6", "nwparser.p0", "%{} %{fld4->} code=%{fld5->} Category=\"%{category}\" npcs=%{info}");
 
 var all24 = all_match({
 	processors: [
 		dup67,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		part167,
-		select48,
-		part170,
+		dup176,
+		part169,
+		select49,
+		part172,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2335,15 +2340,15 @@ var all24 = all_match({
 
 var msg140 = msg("97:04", all24);
 
-var part171 = match("MESSAGE#139:97:05/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld2->} dstname=%{name->} arg=%{fld3->} code=%{fld4->} Category=%{category}");
+var part173 = match("MESSAGE#139:97:05/4", "nwparser.p0", "%{}proto=%{protocol->} op=%{fld2->} dstname=%{name->} arg=%{fld3->} code=%{fld4->} Category=%{category}");
 
 var all25 = all_match({
 	processors: [
 		dup65,
-		dup180,
+		dup179,
 		dup36,
-		dup177,
-		part171,
+		dup176,
+		part173,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2352,76 +2357,76 @@ var all25 = all_match({
 
 var msg141 = msg("97:05", all25);
 
-var part172 = match("MESSAGE#140:97:06/0", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{p0}");
+var part174 = match("MESSAGE#140:97:06/0", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{p0}");
 
-var select49 = linear_select([
+var select50 = linear_select([
 	dup68,
 	dup69,
 ]);
 
-var part173 = match("MESSAGE#140:97:06/2", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"");
+var part175 = match("MESSAGE#140:97:06/2", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"");
 
 var all26 = all_match({
 	processors: [
-		part172,
-		select49,
-		part173,
+		part174,
+		select50,
+		part175,
 	],
 	on_success: processor_chain([
 		dup70,
-		dup12,
+		dup11,
 	]),
 });
 
 var msg142 = msg("97:06", all26);
 
-var part174 = match("MESSAGE#141:97:07/0", "nwparser.payload", "app=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
+var part176 = match("MESSAGE#141:97:07/0", "nwparser.payload", "app=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
 
-var part175 = match("MESSAGE#141:97:07/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{fld3->} srcMac=%{p0}");
+var part177 = match("MESSAGE#141:97:07/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{fld3->} srcMac=%{p0}");
 
-var select50 = linear_select([
-	part175,
+var select51 = linear_select([
+	part177,
 	dup49,
 ]);
 
-var part176 = match("MESSAGE#141:97:07/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} dstname=%{dhost->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"");
+var part178 = match("MESSAGE#141:97:07/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} dstname=%{dhost->} arg=%{param->} code=%{resultcode->} Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"");
 
 var all27 = all_match({
 	processors: [
-		part174,
-		select50,
 		part176,
+		select51,
+		part178,
 	],
 	on_success: processor_chain([
 		dup70,
-		dup12,
+		dup11,
 	]),
 });
 
 var msg143 = msg("97:07", all27);
 
-var part177 = match("MESSAGE#142:97:08", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part179 = match("MESSAGE#142:97:08", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup70,
-	dup12,
+	dup11,
 ]));
 
-var msg144 = msg("97:08", part177);
+var msg144 = msg("97:08", part179);
 
-var part178 = match("MESSAGE#143:97:09", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part180 = match("MESSAGE#143:97:09", "nwparser.payload", "app=%{fld1}sess=\"%{fld2}\" n=%{fld3}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup70,
-	dup12,
+	dup11,
 ]));
 
-var msg145 = msg("97:09", part178);
+var msg145 = msg("97:09", part180);
 
-var part179 = match("MESSAGE#144:97:10", "nwparser.payload", "app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part181 = match("MESSAGE#144:97:10", "nwparser.payload", "app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}dstname=%{dhost}arg=%{param}code=%{resultcode}Category=\"%{category}\" rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup70,
-	dup12,
+	dup11,
 ]));
 
-var msg146 = msg("97:10", part179);
+var msg146 = msg("97:10", part181);
 
-var select51 = linear_select([
+var select52 = linear_select([
 	msg136,
 	msg137,
 	msg138,
@@ -2435,40 +2440,40 @@ var select51 = linear_select([
 	msg146,
 ]);
 
-var part180 = match("MESSAGE#145:98/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} appName=\"%{application}\"%{p0}");
+var part182 = match("MESSAGE#145:98/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} appName=\"%{application}\"%{p0}");
 
-var part181 = match("MESSAGE#145:98/0_1", "nwparser.payload", " msg=\"%{event_description}\"%{p0}");
-
-var select52 = linear_select([
-	part180,
-	part181,
-]);
-
-var part182 = match("MESSAGE#145:98/1", "nwparser.p0", "%{}n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
-
-var part183 = match("MESSAGE#145:98/2_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} %{p0}");
+var part183 = match("MESSAGE#145:98/0_1", "nwparser.payload", " msg=\"%{event_description}\"%{p0}");
 
 var select53 = linear_select([
+	part182,
 	part183,
+]);
+
+var part184 = match("MESSAGE#145:98/1", "nwparser.p0", "%{}n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
+
+var part185 = match("MESSAGE#145:98/2_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} %{p0}");
+
+var select54 = linear_select([
+	part185,
 	dup71,
 ]);
 
-var part184 = match("MESSAGE#145:98/3_1", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} ");
+var part186 = match("MESSAGE#145:98/3_1", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} ");
 
-var part185 = match("MESSAGE#145:98/3_2", "nwparser.p0", " proto=%{protocol}");
+var part187 = match("MESSAGE#145:98/3_2", "nwparser.p0", " proto=%{protocol}");
 
-var select54 = linear_select([
+var select55 = linear_select([
 	dup72,
-	part184,
-	part185,
+	part186,
+	part187,
 ]);
 
 var all28 = all_match({
 	processors: [
-		select52,
-		part182,
 		select53,
+		part184,
 		select54,
+		select55,
 	],
 	on_success: processor_chain([
 		dup70,
@@ -2476,85 +2481,85 @@ var all28 = all_match({
 		setc("ec_activity","Stop"),
 		dup53,
 		dup54,
-		dup12,
+		dup11,
 		setc("action","Opened"),
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg147 = msg("98", all28);
 
-var part186 = match("MESSAGE#146:98:07", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} proto=%{protocol}/%{fld4->} sent=%{sbytes->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part188 = match("MESSAGE#146:98:07", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} proto=%{protocol}/%{fld4->} sent=%{sbytes->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup1,
-	dup12,
+	dup11,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg148 = msg("98:07", part186);
+var msg148 = msg("98:07", part188);
 
-var part187 = match("MESSAGE#147:98:01/1_0", "nwparser.p0", "%{msg}\" app=%{fld2->} sess=\"%{fld3}\"%{p0}");
+var part189 = match("MESSAGE#147:98:01/1_0", "nwparser.p0", "%{msg}\" app=%{fld2->} sess=\"%{fld3}\"%{p0}");
 
-var part188 = match("MESSAGE#147:98:01/1_1", "nwparser.p0", "%{msg}\"%{p0}");
-
-var select55 = linear_select([
-	part187,
-	part188,
-]);
-
-var part189 = match("MESSAGE#147:98:01/2", "nwparser.p0", "%{}n=%{p0}");
-
-var part190 = match("MESSAGE#147:98:01/3_0", "nwparser.p0", "%{fld1->} usr=%{username->} src=%{p0}");
-
-var part191 = match("MESSAGE#147:98:01/3_1", "nwparser.p0", "%{fld1->} src=%{p0}");
+var part190 = match("MESSAGE#147:98:01/1_1", "nwparser.p0", "%{msg}\"%{p0}");
 
 var select56 = linear_select([
+	part189,
 	part190,
-	part191,
 ]);
 
+var part191 = match("MESSAGE#147:98:01/2", "nwparser.p0", "%{}n=%{p0}");
+
+var part192 = match("MESSAGE#147:98:01/3_0", "nwparser.p0", "%{fld1->} usr=%{username->} src=%{p0}");
+
+var part193 = match("MESSAGE#147:98:01/3_1", "nwparser.p0", "%{fld1->} src=%{p0}");
+
 var select57 = linear_select([
+	part192,
+	part193,
+]);
+
+var select58 = linear_select([
 	dup73,
 	dup69,
 	dup74,
 ]);
 
-var part192 = match("MESSAGE#147:98:01/7_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} fw_action=\"%{action}\"");
+var part194 = match("MESSAGE#147:98:01/7_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} fw_action=\"%{action}\"");
 
-var part193 = match("MESSAGE#147:98:01/7_1", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} ");
+var part195 = match("MESSAGE#147:98:01/7_1", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} ");
 
-var part194 = match("MESSAGE#147:98:01/7_2", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} rule=\"%{rulename}\" fw_action=\"%{action}\"");
+var part196 = match("MESSAGE#147:98:01/7_2", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} rule=\"%{rulename}\" fw_action=\"%{action}\"");
 
-var part195 = match("MESSAGE#147:98:01/7_4", "nwparser.p0", " proto=%{protocol->} sent=%{sbytes}");
+var part197 = match("MESSAGE#147:98:01/7_4", "nwparser.p0", " proto=%{protocol->} sent=%{sbytes}");
 
-var part196 = match("MESSAGE#147:98:01/7_5", "nwparser.p0", "proto=%{protocol}");
+var part198 = match("MESSAGE#147:98:01/7_5", "nwparser.p0", "proto=%{protocol}");
 
-var select58 = linear_select([
-	part192,
-	part193,
+var select59 = linear_select([
 	part194,
-	dup72,
 	part195,
 	part196,
+	dup72,
+	part197,
+	part198,
 ]);
 
 var all29 = all_match({
 	processors: [
 		dup48,
-		select55,
-		part189,
 		select56,
+		part191,
 		select57,
-		dup11,
-		dup187,
 		select58,
+		dup10,
+		dup186,
+		select59,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2563,92 +2568,92 @@ var all29 = all_match({
 
 var msg149 = msg("98:01", all29);
 
-var part197 = match("MESSAGE#148:98:06/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} appName=\"%{application}\" %{p0}");
+var part199 = match("MESSAGE#148:98:06/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} appName=\"%{application}\" %{p0}");
 
-var part198 = match("MESSAGE#148:98:06/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} %{p0}");
+var part200 = match("MESSAGE#148:98:06/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2->} %{p0}");
 
-var part199 = match("MESSAGE#148:98:06/0_2", "nwparser.payload", " msg=\"%{event_description}\" sess=%{fld2->} %{p0}");
-
-var select59 = linear_select([
-	part197,
-	part198,
-	part199,
-]);
-
-var part200 = match("MESSAGE#148:98:06/1_0", "nwparser.p0", "n=%{fld1->} usr=%{username->} %{p0}");
-
-var part201 = match("MESSAGE#148:98:06/1_1", "nwparser.p0", " n=%{fld1->} %{p0}");
+var part201 = match("MESSAGE#148:98:06/0_2", "nwparser.payload", " msg=\"%{event_description}\" sess=%{fld2->} %{p0}");
 
 var select60 = linear_select([
+	part199,
 	part200,
 	part201,
 ]);
 
-var part202 = match("MESSAGE#148:98:06/2", "nwparser.p0", "%{}src= %{p0}");
+var part202 = match("MESSAGE#148:98:06/1_0", "nwparser.p0", "n=%{fld1->} usr=%{username->} %{p0}");
 
-var part203 = match("MESSAGE#148:98:06/5_0", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{dmacaddr->} proto=%{p0}");
-
-var part204 = match("MESSAGE#148:98:06/5_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} proto=%{p0}");
+var part203 = match("MESSAGE#148:98:06/1_1", "nwparser.p0", " n=%{fld1->} %{p0}");
 
 var select61 = linear_select([
+	part202,
 	part203,
-	part204,
+]);
+
+var part204 = match("MESSAGE#148:98:06/2", "nwparser.p0", "%{}src= %{p0}");
+
+var part205 = match("MESSAGE#148:98:06/5_0", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{dmacaddr->} proto=%{p0}");
+
+var part206 = match("MESSAGE#148:98:06/5_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{dmacaddr->} proto=%{p0}");
+
+var select62 = linear_select([
+	part205,
+	part206,
 	dup77,
 	dup78,
 ]);
 
-var part205 = match("MESSAGE#148:98:06/6", "nwparser.p0", "%{protocol->} %{p0}");
+var part207 = match("MESSAGE#148:98:06/6", "nwparser.p0", "%{protocol->} %{p0}");
 
-var part206 = match("MESSAGE#148:98:06/7_0", "nwparser.p0", "sent=%{sbytes->} rule=\"%{rulename}\" fw_action=\"%{action}\"");
+var part208 = match("MESSAGE#148:98:06/7_0", "nwparser.p0", "sent=%{sbytes->} rule=\"%{rulename}\" fw_action=\"%{action}\"");
 
-var part207 = match("MESSAGE#148:98:06/7_1", "nwparser.p0", "sent=%{sbytes->} rule=\"%{rulename}\" fw_action=%{action}");
+var part209 = match("MESSAGE#148:98:06/7_1", "nwparser.p0", "sent=%{sbytes->} rule=\"%{rulename}\" fw_action=%{action}");
 
-var part208 = match("MESSAGE#148:98:06/7_2", "nwparser.p0", "sent=%{sbytes->} fw_action=\"%{action}\"");
+var part210 = match("MESSAGE#148:98:06/7_2", "nwparser.p0", "sent=%{sbytes->} fw_action=\"%{action}\"");
 
-var part209 = match("MESSAGE#148:98:06/7_3", "nwparser.p0", "sent=%{sbytes}");
+var part211 = match("MESSAGE#148:98:06/7_3", "nwparser.p0", "sent=%{sbytes}");
 
-var part210 = match("MESSAGE#148:98:06/7_4", "nwparser.p0", "fw_action=\"%{action}\"");
+var part212 = match("MESSAGE#148:98:06/7_4", "nwparser.p0", "fw_action=\"%{action}\"");
 
-var select62 = linear_select([
-	part206,
-	part207,
+var select63 = linear_select([
 	part208,
 	part209,
 	part210,
+	part211,
+	part212,
 ]);
 
 var all30 = all_match({
 	processors: [
-		select59,
 		select60,
-		part202,
-		dup188,
-		dup11,
 		select61,
-		part205,
+		part204,
+		dup187,
+		dup10,
 		select62,
+		part207,
+		select63,
 	],
 	on_success: processor_chain([
 		dup70,
-		dup12,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg150 = msg("98:06", all30);
 
-var part211 = match("MESSAGE#149:98:02/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} usr=%{username->} src=%{p0}");
+var part213 = match("MESSAGE#149:98:02/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} usr=%{username->} src=%{p0}");
 
 var all31 = all_match({
 	processors: [
-		part211,
-		dup179,
-		dup11,
-		dup177,
+		part213,
+		dup178,
+		dup10,
+		dup176,
 		dup79,
 	],
 	on_success: processor_chain([
@@ -2658,18 +2663,18 @@ var all31 = all_match({
 
 var msg151 = msg("98:02", all31);
 
-var part212 = match("MESSAGE#150:98:03/0_0", "nwparser.payload", "Connection %{}");
+var part214 = match("MESSAGE#150:98:03/0_0", "nwparser.payload", "Connection %{}");
 
-var part213 = match("MESSAGE#150:98:03/0_1", "nwparser.payload", " msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} ");
+var part215 = match("MESSAGE#150:98:03/0_1", "nwparser.payload", " msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} ");
 
-var select63 = linear_select([
-	part212,
-	part213,
+var select64 = linear_select([
+	part214,
+	part215,
 ]);
 
 var all32 = all_match({
 	processors: [
-		select63,
+		select64,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2679,15 +2684,15 @@ var all32 = all_match({
 
 var msg152 = msg("98:03", all32);
 
-var part214 = match("MESSAGE#151:98:04/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} vpnpolicy=\"%{policyname}\" npcs=%{info}");
+var part216 = match("MESSAGE#151:98:04/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} vpnpolicy=\"%{policyname}\" npcs=%{info}");
 
 var all33 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup177,
-		part214,
+		dup7,
+		dup178,
+		dup10,
+		dup176,
+		part216,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2696,15 +2701,15 @@ var all33 = all_match({
 
 var msg153 = msg("98:04", all33);
 
-var part215 = match("MESSAGE#152:98:05/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} npcs=%{info}");
+var part217 = match("MESSAGE#152:98:05/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} npcs=%{info}");
 
 var all34 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup177,
-		part215,
+		dup7,
+		dup178,
+		dup10,
+		dup176,
+		part217,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2713,7 +2718,7 @@ var all34 = all_match({
 
 var msg154 = msg("98:05", all34);
 
-var select64 = linear_select([
+var select65 = linear_select([
 	msg147,
 	msg148,
 	msg149,
@@ -2724,22 +2729,22 @@ var select64 = linear_select([
 	msg154,
 ]);
 
-var part216 = match("MESSAGE#153:986", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup30,
-	dup12,
+var part218 = match("MESSAGE#153:986", "nwparser.payload", "msg=\"%{msg}\" dur=%{duration->} n=%{fld1->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup29,
+	dup11,
 ]));
 
-var msg155 = msg("986", part216);
+var msg155 = msg("986", part218);
 
-var part217 = match("MESSAGE#154:427/4", "nwparser.p0", "%{}note=\"%{event_description}\"");
+var part219 = match("MESSAGE#154:427/4", "nwparser.p0", "%{}note=\"%{event_description}\"");
 
 var all35 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup177,
-		part217,
+		dup178,
+		dup10,
+		dup176,
+		part219,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -2748,321 +2753,321 @@ var all35 = all_match({
 
 var msg156 = msg("427", all35);
 
-var part218 = match("MESSAGE#155:428/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"");
+var part220 = match("MESSAGE#155:428/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"");
 
 var all36 = all_match({
 	processors: [
 		dup81,
-		dup184,
-		part218,
+		dup183,
+		part220,
 	],
 	on_success: processor_chain([
-		dup23,
+		dup22,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg157 = msg("428", all36);
 
-var part219 = match("MESSAGE#156:99", "nwparser.payload", "Retransmitting DHCP DISCOVER.%{}", processor_chain([
+var part221 = match("MESSAGE#156:99", "nwparser.payload", "Retransmitting DHCP DISCOVER.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg158 = msg("99", part219);
+var msg158 = msg("99", part221);
 
-var part220 = match("MESSAGE#157:100", "nwparser.payload", "Retransmitting DHCP REQUEST (Requesting).%{}", processor_chain([
+var part222 = match("MESSAGE#157:100", "nwparser.payload", "Retransmitting DHCP REQUEST (Requesting).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg159 = msg("100", part220);
+var msg159 = msg("100", part222);
 
-var part221 = match("MESSAGE#158:101", "nwparser.payload", "Retransmitting DHCP REQUEST (Renewing).%{}", processor_chain([
+var part223 = match("MESSAGE#158:101", "nwparser.payload", "Retransmitting DHCP REQUEST (Renewing).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg160 = msg("101", part221);
+var msg160 = msg("101", part223);
 
-var part222 = match("MESSAGE#159:102", "nwparser.payload", "Retransmitting DHCP REQUEST (Rebinding).%{}", processor_chain([
+var part224 = match("MESSAGE#159:102", "nwparser.payload", "Retransmitting DHCP REQUEST (Rebinding).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg161 = msg("102", part222);
+var msg161 = msg("102", part224);
 
-var part223 = match("MESSAGE#160:103", "nwparser.payload", "Retransmitting DHCP REQUEST (Rebooting).%{}", processor_chain([
+var part225 = match("MESSAGE#160:103", "nwparser.payload", "Retransmitting DHCP REQUEST (Rebooting).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg162 = msg("103", part223);
+var msg162 = msg("103", part225);
 
-var part224 = match("MESSAGE#161:104", "nwparser.payload", "Retransmitting DHCP REQUEST (Verifying).%{}", processor_chain([
+var part226 = match("MESSAGE#161:104", "nwparser.payload", "Retransmitting DHCP REQUEST (Verifying).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg163 = msg("104", part224);
+var msg163 = msg("104", part226);
 
-var part225 = match("MESSAGE#162:105", "nwparser.payload", "Sending DHCP DISCOVER.%{}", processor_chain([
+var part227 = match("MESSAGE#162:105", "nwparser.payload", "Sending DHCP DISCOVER.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg164 = msg("105", part225);
+var msg164 = msg("105", part227);
 
-var part226 = match("MESSAGE#163:106", "nwparser.payload", "DHCP Server not available. Did not get any DHCP OFFER.%{}", processor_chain([
+var part228 = match("MESSAGE#163:106", "nwparser.payload", "DHCP Server not available. Did not get any DHCP OFFER.%{}", processor_chain([
 	dup63,
 ]));
 
-var msg165 = msg("106", part226);
+var msg165 = msg("106", part228);
 
-var part227 = match("MESSAGE#164:107", "nwparser.payload", "Got DHCP OFFER. Selecting.%{}", processor_chain([
+var part229 = match("MESSAGE#164:107", "nwparser.payload", "Got DHCP OFFER. Selecting.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg166 = msg("107", part227);
+var msg166 = msg("107", part229);
 
-var part228 = match("MESSAGE#165:108", "nwparser.payload", "Sending DHCP REQUEST.%{}", processor_chain([
+var part230 = match("MESSAGE#165:108", "nwparser.payload", "Sending DHCP REQUEST.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg167 = msg("108", part228);
+var msg167 = msg("108", part230);
 
-var part229 = match("MESSAGE#166:109", "nwparser.payload", "DHCP Client did not get DHCP ACK.%{}", processor_chain([
+var part231 = match("MESSAGE#166:109", "nwparser.payload", "DHCP Client did not get DHCP ACK.%{}", processor_chain([
 	dup63,
 ]));
 
-var msg168 = msg("109", part229);
+var msg168 = msg("109", part231);
 
-var part230 = match("MESSAGE#167:110", "nwparser.payload", "DHCP Client got NACK.%{}", processor_chain([
+var part232 = match("MESSAGE#167:110", "nwparser.payload", "DHCP Client got NACK.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg169 = msg("110", part230);
+var msg169 = msg("110", part232);
 
-var msg170 = msg("111:01", dup189);
+var msg170 = msg("111:01", dup188);
 
-var part231 = match("MESSAGE#169:111", "nwparser.payload", "DHCP Client got ACK from server.%{}", processor_chain([
+var part233 = match("MESSAGE#169:111", "nwparser.payload", "DHCP Client got ACK from server.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg171 = msg("111", part231);
+var msg171 = msg("111", part233);
 
-var select65 = linear_select([
+var select66 = linear_select([
 	msg170,
 	msg171,
 ]);
 
-var part232 = match("MESSAGE#170:112", "nwparser.payload", "DHCP Client is declining address offered by the server.%{}", processor_chain([
+var part234 = match("MESSAGE#170:112", "nwparser.payload", "DHCP Client is declining address offered by the server.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg172 = msg("112", part232);
+var msg172 = msg("112", part234);
 
-var part233 = match("MESSAGE#171:113", "nwparser.payload", "DHCP Client sending REQUEST and going to REBIND state.%{}", processor_chain([
+var part235 = match("MESSAGE#171:113", "nwparser.payload", "DHCP Client sending REQUEST and going to REBIND state.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg173 = msg("113", part233);
+var msg173 = msg("113", part235);
 
-var part234 = match("MESSAGE#172:114", "nwparser.payload", "DHCP Client sending REQUEST and going to RENEW state.%{}", processor_chain([
+var part236 = match("MESSAGE#172:114", "nwparser.payload", "DHCP Client sending REQUEST and going to RENEW state.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg174 = msg("114", part234);
+var msg174 = msg("114", part236);
 
-var msg175 = msg("115:01", dup189);
+var msg175 = msg("115:01", dup188);
 
-var part235 = match("MESSAGE#174:115", "nwparser.payload", "Sending DHCP REQUEST (Renewing).%{}", processor_chain([
+var part237 = match("MESSAGE#174:115", "nwparser.payload", "Sending DHCP REQUEST (Renewing).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg176 = msg("115", part235);
+var msg176 = msg("115", part237);
 
-var select66 = linear_select([
+var select67 = linear_select([
 	msg175,
 	msg176,
 ]);
 
-var part236 = match("MESSAGE#175:116", "nwparser.payload", "Sending DHCP REQUEST (Rebinding).%{}", processor_chain([
+var part238 = match("MESSAGE#175:116", "nwparser.payload", "Sending DHCP REQUEST (Rebinding).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg177 = msg("116", part236);
+var msg177 = msg("116", part238);
 
-var part237 = match("MESSAGE#176:117", "nwparser.payload", "Sending DHCP REQUEST (Rebooting).%{}", processor_chain([
+var part239 = match("MESSAGE#176:117", "nwparser.payload", "Sending DHCP REQUEST (Rebooting).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg178 = msg("117", part237);
+var msg178 = msg("117", part239);
 
-var part238 = match("MESSAGE#177:118", "nwparser.payload", "Sending DHCP REQUEST (Verifying).%{}", processor_chain([
+var part240 = match("MESSAGE#177:118", "nwparser.payload", "Sending DHCP REQUEST (Verifying).%{}", processor_chain([
 	dup64,
 ]));
 
-var msg179 = msg("118", part238);
+var msg179 = msg("118", part240);
 
-var part239 = match("MESSAGE#178:119", "nwparser.payload", "DHCP Client failed to verify and lease has expired. Go to INIT state.%{}", processor_chain([
+var part241 = match("MESSAGE#178:119", "nwparser.payload", "DHCP Client failed to verify and lease has expired. Go to INIT state.%{}", processor_chain([
 	dup63,
 ]));
 
-var msg180 = msg("119", part239);
+var msg180 = msg("119", part241);
 
-var part240 = match("MESSAGE#179:120", "nwparser.payload", "DHCP Client failed to verify and lease is still valid. Go to BOUND state.%{}", processor_chain([
+var part242 = match("MESSAGE#179:120", "nwparser.payload", "DHCP Client failed to verify and lease is still valid. Go to BOUND state.%{}", processor_chain([
 	dup63,
 ]));
 
-var msg181 = msg("120", part240);
+var msg181 = msg("120", part242);
 
-var part241 = match("MESSAGE#180:121", "nwparser.payload", "DHCP Client got a new IP address lease.%{}", processor_chain([
+var part243 = match("MESSAGE#180:121", "nwparser.payload", "DHCP Client got a new IP address lease.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg182 = msg("121", part241);
+var msg182 = msg("121", part243);
 
-var part242 = match("MESSAGE#181:122", "nwparser.payload", "Access attempt from host without Anti-Virus agent installed%{}", processor_chain([
+var part244 = match("MESSAGE#181:122", "nwparser.payload", "Access attempt from host without Anti-Virus agent installed%{}", processor_chain([
 	dup63,
 ]));
 
-var msg183 = msg("122", part242);
+var msg183 = msg("122", part244);
 
-var part243 = match("MESSAGE#182:123", "nwparser.payload", "Anti-Virus agent out-of-date on host%{}", processor_chain([
+var part245 = match("MESSAGE#182:123", "nwparser.payload", "Anti-Virus agent out-of-date on host%{}", processor_chain([
 	dup63,
 ]));
 
-var msg184 = msg("123", part243);
+var msg184 = msg("123", part245);
 
-var part244 = match("MESSAGE#183:124", "nwparser.payload", "Received AV Alert: %s%{}", processor_chain([
+var part246 = match("MESSAGE#183:124", "nwparser.payload", "Received AV Alert: %s%{}", processor_chain([
 	dup64,
 ]));
 
-var msg185 = msg("124", part244);
+var msg185 = msg("124", part246);
 
-var part245 = match("MESSAGE#184:125", "nwparser.payload", "Unused AV log entry.%{}", processor_chain([
+var part247 = match("MESSAGE#184:125", "nwparser.payload", "Unused AV log entry.%{}", processor_chain([
 	dup64,
 ]));
 
-var msg186 = msg("125", part245);
+var msg186 = msg("125", part247);
 
-var part246 = match("MESSAGE#185:1254", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
+var part248 = match("MESSAGE#185:1254", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
 	dup83,
-	dup12,
+	dup11,
 ]));
 
-var msg187 = msg("1254", part246);
+var msg187 = msg("1254", part248);
 
-var part247 = match("MESSAGE#186:1256", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
+var part249 = match("MESSAGE#186:1256", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
 	dup70,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg188 = msg("1256", part247);
+var msg188 = msg("1256", part249);
 
-var part248 = match("MESSAGE#187:1257", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+var part250 = match("MESSAGE#187:1257", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
 	dup83,
-	dup12,
+	dup11,
 ]));
 
-var msg189 = msg("1257", part248);
+var msg189 = msg("1257", part250);
 
-var part249 = match("MESSAGE#188:126", "nwparser.payload", "Starting PPPoE discovery%{}", processor_chain([
+var part251 = match("MESSAGE#188:126", "nwparser.payload", "Starting PPPoE discovery%{}", processor_chain([
 	dup64,
 ]));
 
-var msg190 = msg("126", part249);
+var msg190 = msg("126", part251);
 
-var part250 = match("MESSAGE#189:127", "nwparser.payload", "PPPoE LCP Link Up%{}", processor_chain([
+var part252 = match("MESSAGE#189:127", "nwparser.payload", "PPPoE LCP Link Up%{}", processor_chain([
 	dup64,
 ]));
 
-var msg191 = msg("127", part250);
+var msg191 = msg("127", part252);
 
-var part251 = match("MESSAGE#190:128", "nwparser.payload", "PPPoE LCP Link Down%{}", processor_chain([
+var part253 = match("MESSAGE#190:128", "nwparser.payload", "PPPoE LCP Link Down%{}", processor_chain([
 	dup5,
 ]));
 
-var msg192 = msg("128", part251);
+var msg192 = msg("128", part253);
 
-var part252 = match("MESSAGE#191:129", "nwparser.payload", "PPPoE terminated%{}", processor_chain([
+var part254 = match("MESSAGE#191:129", "nwparser.payload", "PPPoE terminated%{}", processor_chain([
 	dup5,
 ]));
 
-var msg193 = msg("129", part252);
+var msg193 = msg("129", part254);
 
-var part253 = match("MESSAGE#192:130", "nwparser.payload", "PPPoE Network Connected%{}", processor_chain([
+var part255 = match("MESSAGE#192:130", "nwparser.payload", "PPPoE Network Connected%{}", processor_chain([
 	dup1,
 ]));
 
-var msg194 = msg("130", part253);
+var msg194 = msg("130", part255);
 
-var part254 = match("MESSAGE#193:131", "nwparser.payload", "PPPoE Network Disconnected%{}", processor_chain([
+var part256 = match("MESSAGE#193:131", "nwparser.payload", "PPPoE Network Disconnected%{}", processor_chain([
 	dup1,
 ]));
 
-var msg195 = msg("131", part254);
+var msg195 = msg("131", part256);
 
-var part255 = match("MESSAGE#194:132", "nwparser.payload", "PPPoE discovery process complete%{}", processor_chain([
+var part257 = match("MESSAGE#194:132", "nwparser.payload", "PPPoE discovery process complete%{}", processor_chain([
 	dup1,
 ]));
 
-var msg196 = msg("132", part255);
+var msg196 = msg("132", part257);
 
-var part256 = match("MESSAGE#195:133", "nwparser.payload", "PPPoE starting CHAP Authentication%{}", processor_chain([
+var part258 = match("MESSAGE#195:133", "nwparser.payload", "PPPoE starting CHAP Authentication%{}", processor_chain([
 	dup1,
 ]));
 
-var msg197 = msg("133", part256);
+var msg197 = msg("133", part258);
 
-var part257 = match("MESSAGE#196:134", "nwparser.payload", "PPPoE starting PAP Authentication%{}", processor_chain([
+var part259 = match("MESSAGE#196:134", "nwparser.payload", "PPPoE starting PAP Authentication%{}", processor_chain([
 	dup1,
 ]));
 
-var msg198 = msg("134", part257);
+var msg198 = msg("134", part259);
 
-var part258 = match("MESSAGE#197:135", "nwparser.payload", "PPPoE CHAP Authentication Failed%{}", processor_chain([
+var part260 = match("MESSAGE#197:135", "nwparser.payload", "PPPoE CHAP Authentication Failed%{}", processor_chain([
 	dup84,
 ]));
 
-var msg199 = msg("135", part258);
+var msg199 = msg("135", part260);
 
-var part259 = match("MESSAGE#198:136", "nwparser.payload", "PPPoE PAP Authentication Failed%{}", processor_chain([
+var part261 = match("MESSAGE#198:136", "nwparser.payload", "PPPoE PAP Authentication Failed%{}", processor_chain([
 	dup84,
 ]));
 
-var msg200 = msg("136", part259);
+var msg200 = msg("136", part261);
 
-var part260 = match("MESSAGE#199:137", "nwparser.payload", "Wan IP Changed%{}", processor_chain([
+var part262 = match("MESSAGE#199:137", "nwparser.payload", "Wan IP Changed%{}", processor_chain([
 	dup3,
 ]));
 
-var msg201 = msg("137", part260);
+var msg201 = msg("137", part262);
 
-var part261 = match("MESSAGE#200:138", "nwparser.payload", "XAUTH Succeeded%{}", processor_chain([
+var part263 = match("MESSAGE#200:138", "nwparser.payload", "XAUTH Succeeded%{}", processor_chain([
 	dup3,
 ]));
 
-var msg202 = msg("138", part261);
+var msg202 = msg("138", part263);
 
-var part262 = match("MESSAGE#201:139", "nwparser.payload", "XAUTH Failed%{}", processor_chain([
+var part264 = match("MESSAGE#201:139", "nwparser.payload", "XAUTH Failed%{}", processor_chain([
 	dup5,
 ]));
 
-var msg203 = msg("139", part262);
+var msg203 = msg("139", part264);
 
 var all37 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1801020100"),
@@ -3071,291 +3076,291 @@ var all37 = all_match({
 
 var msg204 = msg("139:01", all37);
 
-var select67 = linear_select([
+var select68 = linear_select([
 	msg203,
 	msg204,
 ]);
 
-var msg205 = msg("140", dup229);
+var msg205 = msg("140", dup228);
 
-var msg206 = msg("141", dup229);
+var msg206 = msg("141", dup228);
 
-var part263 = match("MESSAGE#205:142", "nwparser.payload", "Primary firewall has transitioned to Active%{}", processor_chain([
+var part265 = match("MESSAGE#205:142", "nwparser.payload", "Primary firewall has transitioned to Active%{}", processor_chain([
 	dup1,
 ]));
 
-var msg207 = msg("142", part263);
+var msg207 = msg("142", part265);
 
-var part264 = match("MESSAGE#206:143", "nwparser.payload", "Backup firewall has transitioned to Active%{}", processor_chain([
+var part266 = match("MESSAGE#206:143", "nwparser.payload", "Backup firewall has transitioned to Active%{}", processor_chain([
 	dup1,
 ]));
 
-var msg208 = msg("143", part264);
+var msg208 = msg("143", part266);
 
-var part265 = match("MESSAGE#207:1431", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=::%{sinterface->} dstV6=%{daddr_v6->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
+var part267 = match("MESSAGE#207:1431", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=::%{sinterface->} dstV6=%{daddr_v6->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} type=%{icmptype->} icmpCode=%{icmpcode->} fw_action=\"%{action}\"", processor_chain([
 	dup70,
-	dup12,
+	dup11,
 ]));
 
-var msg209 = msg("1431", part265);
+var msg209 = msg("1431", part267);
 
-var part266 = match("MESSAGE#208:144", "nwparser.payload", "Primary firewall has transitioned to Idle%{}", processor_chain([
+var part268 = match("MESSAGE#208:144", "nwparser.payload", "Primary firewall has transitioned to Idle%{}", processor_chain([
 	dup1,
 ]));
 
-var msg210 = msg("144", part266);
+var msg210 = msg("144", part268);
 
-var part267 = match("MESSAGE#209:145", "nwparser.payload", "Backup firewall has transitioned to Idle%{}", processor_chain([
+var part269 = match("MESSAGE#209:145", "nwparser.payload", "Backup firewall has transitioned to Idle%{}", processor_chain([
 	dup1,
 ]));
 
-var msg211 = msg("145", part267);
+var msg211 = msg("145", part269);
 
-var part268 = match("MESSAGE#210:146", "nwparser.payload", "Primary missed heartbeats from Active Backup: Primary going Active%{}", processor_chain([
-	dup88,
+var part270 = match("MESSAGE#210:146", "nwparser.payload", "Primary missed heartbeats from Active Backup: Primary going Active%{}", processor_chain([
+	dup87,
 ]));
 
-var msg212 = msg("146", part268);
+var msg212 = msg("146", part270);
 
-var part269 = match("MESSAGE#211:147", "nwparser.payload", "Backup missed heartbeats from Active Primary: Backup going Active%{}", processor_chain([
-	dup88,
+var part271 = match("MESSAGE#211:147", "nwparser.payload", "Backup missed heartbeats from Active Primary: Backup going Active%{}", processor_chain([
+	dup87,
 ]));
 
-var msg213 = msg("147", part269);
+var msg213 = msg("147", part271);
 
-var part270 = match("MESSAGE#212:148", "nwparser.payload", "Primary received error signal from Active Backup: Primary going Active%{}", processor_chain([
+var part272 = match("MESSAGE#212:148", "nwparser.payload", "Primary received error signal from Active Backup: Primary going Active%{}", processor_chain([
 	dup1,
 ]));
 
-var msg214 = msg("148", part270);
+var msg214 = msg("148", part272);
 
-var part271 = match("MESSAGE#213:1480", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+var part273 = match("MESSAGE#213:1480", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
 	setc("eventcategory","1204010000"),
-	dup12,
+	dup11,
 ]));
 
-var msg215 = msg("1480", part271);
+var msg215 = msg("1480", part273);
 
-var part272 = match("MESSAGE#214:149", "nwparser.payload", "Backup received error signal from Active Primary: Backup going Active%{}", processor_chain([
+var part274 = match("MESSAGE#214:149", "nwparser.payload", "Backup received error signal from Active Primary: Backup going Active%{}", processor_chain([
 	dup1,
 ]));
 
-var msg216 = msg("149", part272);
+var msg216 = msg("149", part274);
 
-var part273 = match("MESSAGE#215:150", "nwparser.payload", "Backup firewall being preempted by Primary%{}", processor_chain([
+var part275 = match("MESSAGE#215:150", "nwparser.payload", "Backup firewall being preempted by Primary%{}", processor_chain([
 	dup1,
 ]));
 
-var msg217 = msg("150", part273);
+var msg217 = msg("150", part275);
 
-var part274 = match("MESSAGE#216:151", "nwparser.payload", "Primary firewall preempting Backup%{}", processor_chain([
+var part276 = match("MESSAGE#216:151", "nwparser.payload", "Primary firewall preempting Backup%{}", processor_chain([
 	dup1,
 ]));
 
-var msg218 = msg("151", part274);
+var msg218 = msg("151", part276);
 
-var part275 = match("MESSAGE#217:152", "nwparser.payload", "Active Backup detects Active Primary: Backup rebooting%{}", processor_chain([
+var part277 = match("MESSAGE#217:152", "nwparser.payload", "Active Backup detects Active Primary: Backup rebooting%{}", processor_chain([
 	dup1,
 ]));
 
-var msg219 = msg("152", part275);
+var msg219 = msg("152", part277);
 
-var part276 = match("MESSAGE#218:153", "nwparser.payload", "Imported HA hardware ID did not match this firewall%{}", processor_chain([
+var part278 = match("MESSAGE#218:153", "nwparser.payload", "Imported HA hardware ID did not match this firewall%{}", processor_chain([
 	setc("eventcategory","1603010000"),
 ]));
 
-var msg220 = msg("153", part276);
+var msg220 = msg("153", part278);
 
-var part277 = match("MESSAGE#219:154", "nwparser.payload", "Received AV Alert: Your SonicWALL Network Anti-Virus subscription has expired. %s%{}", processor_chain([
+var part279 = match("MESSAGE#219:154", "nwparser.payload", "Received AV Alert: Your SonicWALL Network Anti-Virus subscription has expired. %s%{}", processor_chain([
 	dup56,
 ]));
 
-var msg221 = msg("154", part277);
+var msg221 = msg("154", part279);
 
-var part278 = match("MESSAGE#220:155", "nwparser.payload", "Primary received heartbeat from wrong source%{}", processor_chain([
-	dup88,
+var part280 = match("MESSAGE#220:155", "nwparser.payload", "Primary received heartbeat from wrong source%{}", processor_chain([
+	dup87,
 ]));
 
-var msg222 = msg("155", part278);
+var msg222 = msg("155", part280);
 
-var part279 = match("MESSAGE#221:156", "nwparser.payload", "Backup received heartbeat from wrong source%{}", processor_chain([
-	dup88,
+var part281 = match("MESSAGE#221:156", "nwparser.payload", "Backup received heartbeat from wrong source%{}", processor_chain([
+	dup87,
 ]));
 
-var msg223 = msg("156", part279);
+var msg223 = msg("156", part281);
 
-var part280 = match("MESSAGE#222:157:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
+var part282 = match("MESSAGE#222:157:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
 	dup1,
 ]));
 
-var msg224 = msg("157:01", part280);
+var msg224 = msg("157:01", part282);
 
-var part281 = match("MESSAGE#223:157", "nwparser.payload", "HA packet processing error%{}", processor_chain([
+var part283 = match("MESSAGE#223:157", "nwparser.payload", "HA packet processing error%{}", processor_chain([
 	dup5,
 ]));
 
-var msg225 = msg("157", part281);
+var msg225 = msg("157", part283);
 
-var select68 = linear_select([
+var select69 = linear_select([
 	msg224,
 	msg225,
 ]);
 
-var part282 = match("MESSAGE#224:158", "nwparser.payload", "Heartbeat received from incompatible source%{}", processor_chain([
-	dup88,
+var part284 = match("MESSAGE#224:158", "nwparser.payload", "Heartbeat received from incompatible source%{}", processor_chain([
+	dup87,
 ]));
 
-var msg226 = msg("158", part282);
+var msg226 = msg("158", part284);
 
-var part283 = match("MESSAGE#225:159", "nwparser.payload", "Diagnostic Code F%{}", processor_chain([
+var part285 = match("MESSAGE#225:159", "nwparser.payload", "Diagnostic Code F%{}", processor_chain([
 	dup5,
 ]));
 
-var msg227 = msg("159", part283);
+var msg227 = msg("159", part285);
 
-var part284 = match("MESSAGE#226:160", "nwparser.payload", "Forbidden E-mail attachment altered%{}", processor_chain([
+var part286 = match("MESSAGE#226:160", "nwparser.payload", "Forbidden E-mail attachment altered%{}", processor_chain([
 	setc("eventcategory","1203000000"),
 ]));
 
-var msg228 = msg("160", part284);
+var msg228 = msg("160", part286);
 
-var part285 = match("MESSAGE#227:161", "nwparser.payload", "PPPoE PAP Authentication success.%{}", processor_chain([
+var part287 = match("MESSAGE#227:161", "nwparser.payload", "PPPoE PAP Authentication success.%{}", processor_chain([
 	dup57,
 ]));
 
-var msg229 = msg("161", part285);
+var msg229 = msg("161", part287);
 
-var part286 = match("MESSAGE#228:162", "nwparser.payload", "PPPoE PAP Authentication Failed. Please verify PPPoE username and password%{}", processor_chain([
-	dup32,
+var part288 = match("MESSAGE#228:162", "nwparser.payload", "PPPoE PAP Authentication Failed. Please verify PPPoE username and password%{}", processor_chain([
+	dup31,
 ]));
 
-var msg230 = msg("162", part286);
+var msg230 = msg("162", part288);
 
-var part287 = match("MESSAGE#229:163", "nwparser.payload", "Disconnecting PPPoE due to traffic timeout%{}", processor_chain([
+var part289 = match("MESSAGE#229:163", "nwparser.payload", "Disconnecting PPPoE due to traffic timeout%{}", processor_chain([
 	dup5,
 ]));
 
-var msg231 = msg("163", part287);
+var msg231 = msg("163", part289);
 
-var part288 = match("MESSAGE#230:164", "nwparser.payload", "No response from ISP Disconnecting PPPoE.%{}", processor_chain([
+var part290 = match("MESSAGE#230:164", "nwparser.payload", "No response from ISP Disconnecting PPPoE.%{}", processor_chain([
 	dup5,
 ]));
 
-var msg232 = msg("164", part288);
+var msg232 = msg("164", part290);
 
-var part289 = match("MESSAGE#231:165", "nwparser.payload", "Backup going Active in preempt mode after reboot%{}", processor_chain([
+var part291 = match("MESSAGE#231:165", "nwparser.payload", "Backup going Active in preempt mode after reboot%{}", processor_chain([
 	dup1,
 ]));
 
-var msg233 = msg("165", part289);
+var msg233 = msg("165", part291);
 
-var part290 = match("MESSAGE#232:166", "nwparser.payload", "Denied TCP connection from LAN%{}", processor_chain([
-	dup13,
+var part292 = match("MESSAGE#232:166", "nwparser.payload", "Denied TCP connection from LAN%{}", processor_chain([
+	dup12,
 ]));
 
-var msg234 = msg("166", part290);
+var msg234 = msg("166", part292);
 
-var part291 = match("MESSAGE#233:167", "nwparser.payload", "Denied UDP packet from LAN%{}", processor_chain([
-	dup13,
+var part293 = match("MESSAGE#233:167", "nwparser.payload", "Denied UDP packet from LAN%{}", processor_chain([
+	dup12,
 ]));
 
-var msg235 = msg("167", part291);
+var msg235 = msg("167", part293);
 
-var part292 = match("MESSAGE#234:168", "nwparser.payload", "Denied ICMP packet from LAN%{}", processor_chain([
-	dup13,
+var part294 = match("MESSAGE#234:168", "nwparser.payload", "Denied ICMP packet from LAN%{}", processor_chain([
+	dup12,
 ]));
 
-var msg236 = msg("168", part292);
+var msg236 = msg("168", part294);
 
-var part293 = match("MESSAGE#235:169", "nwparser.payload", "Firewall access from LAN%{}", processor_chain([
+var part295 = match("MESSAGE#235:169", "nwparser.payload", "Firewall access from LAN%{}", processor_chain([
 	dup1,
 ]));
 
-var msg237 = msg("169", part293);
+var msg237 = msg("169", part295);
 
-var part294 = match("MESSAGE#236:170", "nwparser.payload", "Received a path MTU icmp message from router/gateway%{}", processor_chain([
+var part296 = match("MESSAGE#236:170", "nwparser.payload", "Received a path MTU icmp message from router/gateway%{}", processor_chain([
 	dup1,
 ]));
 
-var msg238 = msg("170", part294);
+var msg238 = msg("170", part296);
 
-var part295 = match("MESSAGE#237:171", "nwparser.payload", "Probable TCP FIN scan%{}", processor_chain([
+var part297 = match("MESSAGE#237:171", "nwparser.payload", "Probable TCP FIN scan%{}", processor_chain([
 	dup62,
 ]));
 
-var msg239 = msg("171", part295);
+var msg239 = msg("171", part297);
 
-var part296 = match("MESSAGE#238:171:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup89,
+var part298 = match("MESSAGE#238:171:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup88,
 ]));
 
-var msg240 = msg("171:01", part296);
+var msg240 = msg("171:01", part298);
 
-var part297 = match("MESSAGE#239:171:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}:%{dport}", processor_chain([
-	dup89,
+var part299 = match("MESSAGE#239:171:02", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}:%{dport}", processor_chain([
+	dup88,
 ]));
 
-var msg241 = msg("171:02", part297);
+var msg241 = msg("171:02", part299);
 
-var part298 = match("MESSAGE#240:171:03/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld1}\" sess=%{fld2->} n=%{fld3->} src=%{p0}");
+var part300 = match("MESSAGE#240:171:03/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld1}\" sess=%{fld2->} n=%{fld3->} src=%{p0}");
 
 var all38 = all_match({
 	processors: [
-		part298,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		part300,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
-		dup89,
+		dup88,
 	]),
 });
 
 var msg242 = msg("171:03", all38);
 
-var select69 = linear_select([
+var select70 = linear_select([
 	msg239,
 	msg240,
 	msg241,
 	msg242,
 ]);
 
-var part299 = match("MESSAGE#241:172", "nwparser.payload", "Probable TCP XMAS scan%{}", processor_chain([
+var part301 = match("MESSAGE#241:172", "nwparser.payload", "Probable TCP XMAS scan%{}", processor_chain([
 	dup62,
 ]));
 
-var msg243 = msg("172", part299);
+var msg243 = msg("172", part301);
 
-var part300 = match("MESSAGE#242:172:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1}", processor_chain([
+var part302 = match("MESSAGE#242:172:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1}", processor_chain([
 	dup62,
 ]));
 
-var msg244 = msg("172:01", part300);
+var msg244 = msg("172:01", part302);
 
-var select70 = linear_select([
+var select71 = linear_select([
 	msg243,
 	msg244,
 ]);
 
-var part301 = match("MESSAGE#243:173", "nwparser.payload", "Probable TCP NULL scan%{}", processor_chain([
+var part303 = match("MESSAGE#243:173", "nwparser.payload", "Probable TCP NULL scan%{}", processor_chain([
 	dup62,
 ]));
 
-var msg245 = msg("173", part301);
+var msg245 = msg("173", part303);
 
-var part302 = match("MESSAGE#244:174", "nwparser.payload", "IPSEC Replay Detected%{}", processor_chain([
+var part304 = match("MESSAGE#244:174", "nwparser.payload", "IPSEC Replay Detected%{}", processor_chain([
 	dup59,
 ]));
 
-var msg246 = msg("174", part302);
+var msg246 = msg("174", part304);
 
 var all39 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup177,
+		dup178,
+		dup10,
+		dup176,
 		dup79,
 	],
 	on_success: processor_chain([
@@ -3368,12 +3373,12 @@ var msg247 = msg("174:01", all39);
 var all40 = all_match({
 	processors: [
 		dup44,
-		dup180,
+		dup179,
 		dup36,
-		dup190,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup13,
+		dup12,
 	]),
 });
 
@@ -3381,71 +3386,71 @@ var msg248 = msg("174:02", all40);
 
 var all41 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup182,
+		dup7,
+		dup175,
+		dup10,
+		dup181,
 		dup43,
 	],
 	on_success: processor_chain([
-		dup13,
+		dup12,
 	]),
 });
 
 var msg249 = msg("174:03", all41);
 
-var select71 = linear_select([
+var select72 = linear_select([
 	msg246,
 	msg247,
 	msg248,
 	msg249,
 ]);
 
-var part303 = match("MESSAGE#248:175", "nwparser.payload", "TCP FIN packet dropped%{}", processor_chain([
+var part305 = match("MESSAGE#248:175", "nwparser.payload", "TCP FIN packet dropped%{}", processor_chain([
 	dup59,
 ]));
 
-var msg250 = msg("175", part303);
+var msg250 = msg("175", part305);
 
-var part304 = match("MESSAGE#249:175:01", "nwparser.payload", "msg=\"ICMP packet from LAN dropped\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} type=%{type}", processor_chain([
+var part306 = match("MESSAGE#249:175:01", "nwparser.payload", "msg=\"ICMP packet from LAN dropped\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} type=%{type}", processor_chain([
 	dup59,
 ]));
 
-var msg251 = msg("175:01", part304);
+var msg251 = msg("175:01", part306);
 
-var part305 = match("MESSAGE#250:175:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr->} dst=%{daddr->} type=%{type->} icmpCode=%{fld3->} npcs=%{info}", processor_chain([
+var part307 = match("MESSAGE#250:175:02", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr->} dst=%{daddr->} type=%{type->} icmpCode=%{fld3->} npcs=%{info}", processor_chain([
 	dup59,
 ]));
 
-var msg252 = msg("175:02", part305);
+var msg252 = msg("175:02", part307);
 
-var select72 = linear_select([
+var select73 = linear_select([
 	msg250,
 	msg251,
 	msg252,
 ]);
 
-var part306 = match("MESSAGE#251:176", "nwparser.payload", "Fraudulent Microsoft Certificate Blocked%{}", processor_chain([
-	dup89,
+var part308 = match("MESSAGE#251:176", "nwparser.payload", "Fraudulent Microsoft Certificate Blocked%{}", processor_chain([
+	dup88,
 ]));
 
-var msg253 = msg("176", part306);
+var msg253 = msg("176", part308);
 
-var msg254 = msg("177", dup186);
+var msg254 = msg("177", dup185);
 
-var msg255 = msg("178", dup192);
+var msg255 = msg("178", dup191);
 
-var msg256 = msg("179", dup186);
+var msg256 = msg("179", dup185);
 
 var all42 = all_match({
 	processors: [
-		dup33,
-		dup179,
-		dup11,
-		dup190,
+		dup32,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup93,
+		dup92,
 	]),
 });
 
@@ -3453,33 +3458,33 @@ var msg257 = msg("180", all42);
 
 var all43 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup193,
-		dup96,
+		dup7,
+		dup175,
+		dup10,
+		dup192,
+		dup95,
 	],
 	on_success: processor_chain([
-		dup93,
+		dup92,
 	]),
 });
 
 var msg258 = msg("180:01", all43);
 
-var select73 = linear_select([
+var select74 = linear_select([
 	msg257,
 	msg258,
 ]);
 
-var msg259 = msg("181", dup185);
+var msg259 = msg("181", dup184);
 
 var all44 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup7,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup62,
@@ -3488,31 +3493,31 @@ var all44 = all_match({
 
 var msg260 = msg("181:01", all44);
 
-var select74 = linear_select([
+var select75 = linear_select([
 	msg259,
 	msg260,
 ]);
 
-var msg261 = msg("193", dup230);
+var msg261 = msg("193", dup229);
 
-var msg262 = msg("194", dup231);
+var msg262 = msg("194", dup230);
 
-var msg263 = msg("195", dup231);
+var msg263 = msg("195", dup230);
 
-var part307 = match("MESSAGE#262:196/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{fld2->} dst=%{daddr}:%{fld3->} sport=%{sport->} dport=%{dport->} %{p0}");
+var part309 = match("MESSAGE#262:196/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{fld2->} dst=%{daddr}:%{fld3->} sport=%{sport->} dport=%{dport->} %{p0}");
 
-var part308 = match("MESSAGE#262:196/1_1", "nwparser.p0", " rcvd=%{rbytes->} cmd=%{p0}");
+var part310 = match("MESSAGE#262:196/1_1", "nwparser.p0", " rcvd=%{rbytes->} cmd=%{p0}");
 
-var select75 = linear_select([
-	dup100,
-	part308,
+var select76 = linear_select([
+	dup99,
+	part310,
 ]);
 
 var all45 = all_match({
 	processors: [
-		part307,
-		select75,
-		dup101,
+		part309,
+		select76,
+		dup100,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -3521,18 +3526,18 @@ var all45 = all_match({
 
 var msg264 = msg("196", all45);
 
-var part309 = match("MESSAGE#263:196:01/1_1", "nwparser.p0", "rcvd=%{rbytes->} cmd=%{p0}");
+var part311 = match("MESSAGE#263:196:01/1_1", "nwparser.p0", "rcvd=%{rbytes->} cmd=%{p0}");
 
-var select76 = linear_select([
-	dup100,
-	part309,
+var select77 = linear_select([
+	dup99,
+	part311,
 ]);
 
 var all46 = all_match({
 	processors: [
-		dup97,
-		select76,
-		dup101,
+		dup96,
+		select77,
+		dup100,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -3541,106 +3546,106 @@ var all46 = all_match({
 
 var msg265 = msg("196:01", all46);
 
-var select77 = linear_select([
+var select78 = linear_select([
 	msg264,
 	msg265,
 ]);
 
-var msg266 = msg("199", dup232);
+var msg266 = msg("199", dup231);
 
-var msg267 = msg("200", dup233);
+var msg267 = msg("200", dup232);
 
-var part310 = match("MESSAGE#266:235:02", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} usr=%{username->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
-	dup29,
+var part312 = match("MESSAGE#266:235:02", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} usr=%{username->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
+	dup28,
 ]));
 
-var msg268 = msg("235:02", part310);
+var msg268 = msg("235:02", part312);
 
-var part311 = match("MESSAGE#267:235/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} usr=%{username->} src=%{p0}");
+var part313 = match("MESSAGE#267:235/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} usr=%{username->} src=%{p0}");
 
 var all47 = all_match({
 	processors: [
-		part311,
-		dup179,
-		dup11,
-		dup190,
+		part313,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup29,
+		dup28,
 	]),
 });
 
 var msg269 = msg("235", all47);
 
-var msg270 = msg("235:01", dup234);
+var msg270 = msg("235:01", dup233);
 
-var select78 = linear_select([
+var select79 = linear_select([
 	msg268,
 	msg269,
 	msg270,
 ]);
 
-var msg271 = msg("236", dup234);
+var msg271 = msg("236", dup233);
 
-var msg272 = msg("237", dup232);
+var msg272 = msg("237", dup231);
 
-var msg273 = msg("238", dup232);
+var msg273 = msg("238", dup231);
 
-var part312 = match("MESSAGE#272:239", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr->} dst=%{dtransaddr}", processor_chain([
-	dup103,
+var part314 = match("MESSAGE#272:239", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr->} dst=%{dtransaddr}", processor_chain([
+	dup102,
 ]));
 
-var msg274 = msg("239", part312);
+var msg274 = msg("239", part314);
 
-var part313 = match("MESSAGE#273:240", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr->} dst=%{dtransaddr}", processor_chain([
-	dup103,
+var part315 = match("MESSAGE#273:240", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr->} dst=%{dtransaddr}", processor_chain([
+	dup102,
 ]));
 
-var msg275 = msg("240", part313);
+var msg275 = msg("240", part315);
 
-var part314 = match("MESSAGE#274:241", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
+var part316 = match("MESSAGE#274:241", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
 	dup70,
 ]));
 
-var msg276 = msg("241", part314);
+var msg276 = msg("241", part316);
 
-var part315 = match("MESSAGE#275:241:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+var part317 = match("MESSAGE#275:241:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
 	dup70,
 ]));
 
-var msg277 = msg("241:01", part315);
+var msg277 = msg("241:01", part317);
 
-var select79 = linear_select([
+var select80 = linear_select([
 	msg276,
 	msg277,
 ]);
 
-var part316 = match("MESSAGE#276:242/1_0", "nwparser.p0", "%{saddr}:%{sport}:: %{p0}");
+var part318 = match("MESSAGE#276:242/1_0", "nwparser.p0", "%{saddr}:%{sport}:: %{p0}");
 
-var part317 = match("MESSAGE#276:242/1_1", "nwparser.p0", "%{saddr}:%{sport->} %{p0}");
-
-var select80 = linear_select([
-	part316,
-	part317,
-	dup35,
-]);
-
-var part318 = match("MESSAGE#276:242/3_0", "nwparser.p0", "%{daddr}:%{dport}:: ");
-
-var part319 = match("MESSAGE#276:242/3_1", "nwparser.p0", "%{daddr}:%{dport->} ");
+var part319 = match("MESSAGE#276:242/1_1", "nwparser.p0", "%{saddr}:%{sport->} %{p0}");
 
 var select81 = linear_select([
 	part318,
 	part319,
-	dup86,
+	dup35,
+]);
+
+var part320 = match("MESSAGE#276:242/3_0", "nwparser.p0", "%{daddr}:%{dport}:: ");
+
+var part321 = match("MESSAGE#276:242/3_1", "nwparser.p0", "%{daddr}:%{dport->} ");
+
+var select82 = linear_select([
+	part320,
+	part321,
+	dup85,
 ]);
 
 var all48 = all_match({
 	processors: [
 		dup44,
-		select80,
-		dup36,
 		select81,
+		dup36,
+		select82,
 	],
 	on_success: processor_chain([
 		dup70,
@@ -3649,143 +3654,143 @@ var all48 = all_match({
 
 var msg278 = msg("242", all48);
 
-var msg279 = msg("252", dup195);
+var msg279 = msg("252", dup194);
 
-var msg280 = msg("255", dup195);
+var msg280 = msg("255", dup194);
 
-var msg281 = msg("257", dup195);
+var msg281 = msg("257", dup194);
 
-var msg282 = msg("261:01", dup235);
+var msg282 = msg("261:01", dup234);
 
-var msg283 = msg("261", dup195);
+var msg283 = msg("261", dup194);
 
-var select82 = linear_select([
+var select83 = linear_select([
 	msg282,
 	msg283,
 ]);
 
-var msg284 = msg("262", dup235);
+var msg284 = msg("262", dup234);
 
 var all49 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg285 = msg("273", all49);
 
-var msg286 = msg("328", dup236);
+var msg286 = msg("328", dup235);
 
-var msg287 = msg("329", dup233);
+var msg287 = msg("329", dup232);
 
-var msg288 = msg("346", dup195);
+var msg288 = msg("346", dup194);
 
-var msg289 = msg("350", dup195);
+var msg289 = msg("350", dup194);
 
-var msg290 = msg("351", dup195);
+var msg290 = msg("351", dup194);
 
-var msg291 = msg("352", dup195);
+var msg291 = msg("352", dup194);
 
-var part320 = match("MESSAGE#290:353:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
+var part322 = match("MESSAGE#290:353:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
 	dup5,
 ]));
 
-var msg292 = msg("353:01", part320);
+var msg292 = msg("353:01", part322);
 
-var part321 = match("MESSAGE#291:353", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr->} dst=%{dtransaddr->} dstname=%{shost->} lifeSeconds=%{misc}\"", processor_chain([
+var part323 = match("MESSAGE#291:353", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr->} dst=%{dtransaddr->} dstname=%{shost->} lifeSeconds=%{misc}\"", processor_chain([
 	dup5,
 ]));
 
-var msg293 = msg("353", part321);
+var msg293 = msg("353", part323);
 
-var select83 = linear_select([
+var select84 = linear_select([
 	msg292,
 	msg293,
 ]);
 
-var part322 = match("MESSAGE#292:354", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=\"%{shost->} lifeSeconds=%{misc}\"", processor_chain([
+var part324 = match("MESSAGE#292:354", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=\"%{shost->} lifeSeconds=%{misc}\"", processor_chain([
 	dup1,
 ]));
 
-var msg294 = msg("354", part322);
+var msg294 = msg("354", part324);
 
-var msg295 = msg("355", dup196);
+var msg295 = msg("355", dup195);
 
-var msg296 = msg("355:01", dup195);
+var msg296 = msg("355:01", dup194);
 
-var select84 = linear_select([
+var select85 = linear_select([
 	msg295,
 	msg296,
 ]);
 
-var msg297 = msg("356", dup197);
+var msg297 = msg("356", dup196);
 
-var part323 = match("MESSAGE#296:357", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport->} dstname=%{name->} ", processor_chain([
-	dup89,
+var part325 = match("MESSAGE#296:357", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport->} dstname=%{name->} ", processor_chain([
+	dup88,
 ]));
 
-var msg298 = msg("357", part323);
+var msg298 = msg("357", part325);
 
-var part324 = match("MESSAGE#297:357:01", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
-	dup89,
+var part326 = match("MESSAGE#297:357:01", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+	dup88,
 ]));
 
-var msg299 = msg("357:01", part324);
+var msg299 = msg("357:01", part326);
 
-var select85 = linear_select([
+var select86 = linear_select([
 	msg298,
 	msg299,
 ]);
 
-var msg300 = msg("358", dup198);
+var msg300 = msg("358", dup197);
 
-var part325 = match("MESSAGE#299:371", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr->} dst=%{dtransaddr->} dstname=%{shost}", processor_chain([
+var part327 = match("MESSAGE#299:371", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr->} dst=%{dtransaddr->} dstname=%{shost}", processor_chain([
 	setc("eventcategory","1503000000"),
 ]));
 
-var msg301 = msg("371", part325);
+var msg301 = msg("371", part327);
 
-var msg302 = msg("371:01", dup199);
+var msg302 = msg("371:01", dup198);
 
-var select86 = linear_select([
+var select87 = linear_select([
 	msg301,
 	msg302,
 ]);
 
-var msg303 = msg("372", dup195);
+var msg303 = msg("372", dup194);
 
-var msg304 = msg("373", dup197);
+var msg304 = msg("373", dup196);
 
-var msg305 = msg("401", dup237);
+var msg305 = msg("401", dup236);
 
-var msg306 = msg("402", dup237);
+var msg306 = msg("402", dup236);
 
-var msg307 = msg("406", dup198);
+var msg307 = msg("406", dup197);
 
-var part326 = match("MESSAGE#305:413", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
+var part328 = match("MESSAGE#305:413", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport}", processor_chain([
 	dup1,
 ]));
 
-var msg308 = msg("413", part326);
+var msg308 = msg("413", part328);
 
-var msg309 = msg("414", dup195);
+var msg309 = msg("414", dup194);
 
-var msg310 = msg("438", dup238);
+var msg310 = msg("438", dup237);
 
-var msg311 = msg("439", dup238);
+var msg311 = msg("439", dup237);
 
 var all50 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1501020000"),
@@ -3796,10 +3801,10 @@ var msg312 = msg("440", all50);
 
 var all51 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1502050000"),
@@ -3808,23 +3813,23 @@ var all51 = all_match({
 
 var msg313 = msg("441", all51);
 
-var part327 = match("MESSAGE#311:441:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1}", processor_chain([
+var part329 = match("MESSAGE#311:441:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1}", processor_chain([
 	setc("eventcategory","1001020000"),
 ]));
 
-var msg314 = msg("441:01", part327);
+var msg314 = msg("441:01", part329);
 
-var select87 = linear_select([
+var select88 = linear_select([
 	msg313,
 	msg314,
 ]);
 
 var all52 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1501030000"),
@@ -3833,67 +3838,67 @@ var all52 = all_match({
 
 var msg315 = msg("442", all52);
 
-var part328 = match("MESSAGE#313:446/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{p0}");
+var part330 = match("MESSAGE#313:446/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{p0}");
 
-var part329 = match("MESSAGE#313:446/1_0", "nwparser.p0", "%{fld1->} appName=\"%{application}\" n=%{p0}");
+var part331 = match("MESSAGE#313:446/1_0", "nwparser.p0", "%{fld1->} appName=\"%{application}\" n=%{p0}");
 
-var part330 = match("MESSAGE#313:446/1_1", "nwparser.p0", "%{fld1->} n=%{p0}");
+var part332 = match("MESSAGE#313:446/1_1", "nwparser.p0", "%{fld1->} n=%{p0}");
 
-var select88 = linear_select([
-	part329,
-	part330,
+var select89 = linear_select([
+	part331,
+	part332,
 ]);
 
-var part331 = match("MESSAGE#313:446/2", "nwparser.p0", "%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var part333 = match("MESSAGE#313:446/2", "nwparser.p0", "%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
 var all53 = all_match({
 	processors: [
-		part328,
-		select88,
-		part331,
-		dup201,
-		dup114,
+		part330,
+		select89,
+		part333,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup59,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg316 = msg("446", all53);
 
-var part332 = match("MESSAGE#314:477", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=\"MAC=%{smacaddr->} HostName:%{hostname}\"", processor_chain([
-	dup115,
+var part334 = match("MESSAGE#314:477", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=\"MAC=%{smacaddr->} HostName:%{hostname}\"", processor_chain([
+	dup114,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg317 = msg("477", part332);
+var msg317 = msg("477", part334);
 
 var all54 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup190,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup29,
+		dup28,
 	]),
 });
 
@@ -3901,31 +3906,31 @@ var msg318 = msg("509", all54);
 
 var all55 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup105,
+		dup104,
 	]),
 });
 
 var msg319 = msg("520", all55);
 
-var msg320 = msg("522", dup239);
+var msg320 = msg("522", dup238);
 
-var part333 = match("MESSAGE#318:522:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} srcV6=%{saddr_v6->} src= %{p0}");
+var part335 = match("MESSAGE#318:522:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} srcV6=%{saddr_v6->} src= %{p0}");
 
-var part334 = match("MESSAGE#318:522:01/2", "nwparser.p0", "%{}dstV6=%{daddr_v6->} dst= %{p0}");
+var part336 = match("MESSAGE#318:522:01/2", "nwparser.p0", "%{}dstV6=%{daddr_v6->} dst= %{p0}");
 
 var all56 = all_match({
 	processors: [
-		part333,
-		dup180,
-		part334,
-		dup177,
-		dup116,
+		part335,
+		dup179,
+		part336,
+		dup176,
+		dup115,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -3934,20 +3939,20 @@ var all56 = all_match({
 
 var msg321 = msg("522:01", all56);
 
-var part335 = match("MESSAGE#319:522:02/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} %{shost->} dst= %{p0}");
+var part337 = match("MESSAGE#319:522:02/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} %{shost->} dst= %{p0}");
 
-var select89 = linear_select([
-	part335,
+var select90 = linear_select([
+	part337,
 	dup39,
 ]);
 
 var all57 = all_match({
 	processors: [
 		dup38,
-		select89,
-		dup11,
-		dup177,
-		dup116,
+		select90,
+		dup10,
+		dup176,
+		dup115,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -3956,22 +3961,22 @@ var all57 = all_match({
 
 var msg322 = msg("522:02", all57);
 
-var select90 = linear_select([
+var select91 = linear_select([
 	msg320,
 	msg321,
 	msg322,
 ]);
 
-var msg323 = msg("523", dup239);
+var msg323 = msg("523", dup238);
 
 var all58 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup177,
-		dup11,
-		dup202,
+		dup178,
+		dup10,
+		dup176,
+		dup10,
+		dup201,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -3980,24 +3985,24 @@ var all58 = all_match({
 
 var msg324 = msg("524", all58);
 
-var part336 = match("MESSAGE#322:524:01/5_0", "nwparser.p0", "proto=%{protocol->} npcs= %{p0}");
+var part338 = match("MESSAGE#322:524:01/5_0", "nwparser.p0", "proto=%{protocol->} npcs= %{p0}");
 
-var part337 = match("MESSAGE#322:524:01/5_1", "nwparser.p0", "rule=%{rule->} npcs= %{p0}");
+var part339 = match("MESSAGE#322:524:01/5_1", "nwparser.p0", "rule=%{rule->} npcs= %{p0}");
 
-var select91 = linear_select([
-	part336,
-	part337,
+var select92 = linear_select([
+	part338,
+	part339,
 ]);
 
 var all59 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup177,
-		dup11,
-		select91,
-		dup92,
+		dup7,
+		dup178,
+		dup10,
+		dup176,
+		dup10,
+		select92,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4006,62 +4011,62 @@ var all59 = all_match({
 
 var msg325 = msg("524:01", all59);
 
-var part338 = match("MESSAGE#323:524:02/0", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol}rule=\"%{p0}");
+var part340 = match("MESSAGE#323:524:02/0", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol}rule=\"%{p0}");
 
-var part339 = match("MESSAGE#323:524:02/1_0", "nwparser.p0", "%{rule}\" note=\"%{rulename}\"%{p0}");
+var part341 = match("MESSAGE#323:524:02/1_0", "nwparser.p0", "%{rule}\" note=\"%{rulename}\"%{p0}");
 
-var part340 = match("MESSAGE#323:524:02/1_1", "nwparser.p0", "%{rule}\"%{p0}");
+var part342 = match("MESSAGE#323:524:02/1_1", "nwparser.p0", "%{rule}\"%{p0}");
 
-var select92 = linear_select([
-	part339,
-	part340,
+var select93 = linear_select([
+	part341,
+	part342,
 ]);
 
-var part341 = match("MESSAGE#323:524:02/2", "nwparser.p0", "%{}fw_action=\"%{action}\"");
+var part343 = match("MESSAGE#323:524:02/2", "nwparser.p0", "%{}fw_action=\"%{action}\"");
 
 var all60 = all_match({
 	processors: [
-		part338,
-		select92,
-		part341,
+		part340,
+		select93,
+		part343,
 	],
 	on_success: processor_chain([
-		dup7,
-		dup12,
+		dup6,
+		dup11,
 	]),
 });
 
 var msg326 = msg("524:02", all60);
 
-var select93 = linear_select([
+var select94 = linear_select([
 	msg324,
 	msg325,
 	msg326,
 ]);
 
-var msg327 = msg("526", dup240);
+var msg327 = msg("526", dup239);
 
-var part342 = match("MESSAGE#325:526:01/1_1", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{fld20->} dst= %{p0}");
+var part344 = match("MESSAGE#325:526:01/1_1", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{fld20->} dst= %{p0}");
 
-var select94 = linear_select([
-	dup26,
-	part342,
+var select95 = linear_select([
+	dup25,
+	part344,
 	dup39,
 ]);
 
-var part343 = match("MESSAGE#325:526:01/3_1", "nwparser.p0", " %{daddr->} ");
+var part345 = match("MESSAGE#325:526:01/3_1", "nwparser.p0", " %{daddr->} ");
 
-var select95 = linear_select([
-	dup85,
-	part343,
+var select96 = linear_select([
+	dup33,
+	part345,
 ]);
 
 var all61 = all_match({
 	processors: [
 		dup80,
-		select94,
-		dup11,
 		select95,
+		dup10,
+		select96,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4072,11 +4077,11 @@ var msg328 = msg("526:01", all61);
 
 var all62 = all_match({
 	processors: [
-		dup8,
-		dup203,
-		dup11,
-		dup177,
-		dup116,
+		dup7,
+		dup202,
+		dup10,
+		dup176,
+		dup115,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4085,28 +4090,28 @@ var all62 = all_match({
 
 var msg329 = msg("526:02", all62);
 
-var part344 = match("MESSAGE#327:526:03", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part346 = match("MESSAGE#327:526:03", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup1,
-	dup12,
+	dup11,
 ]));
 
-var msg330 = msg("526:03", part344);
+var msg330 = msg("526:03", part346);
 
-var part345 = match("MESSAGE#328:526:04", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part347 = match("MESSAGE#328:526:04", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup1,
-	dup12,
+	dup11,
 ]));
 
-var msg331 = msg("526:04", part345);
+var msg331 = msg("526:04", part347);
 
-var part346 = match("MESSAGE#329:526:05", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+var part348 = match("MESSAGE#329:526:05", "nwparser.payload", "msg=\"%{msg}\" app=%{fld1}n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
 	dup1,
-	dup12,
+	dup11,
 ]));
 
-var msg332 = msg("526:05", part346);
+var msg332 = msg("526:05", part348);
 
-var select96 = linear_select([
+var select97 = linear_select([
 	msg327,
 	msg328,
 	msg329,
@@ -4115,436 +4120,436 @@ var select96 = linear_select([
 	msg332,
 ]);
 
-var part347 = match("MESSAGE#330:537:01/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} rcvd=%{p0}");
+var part349 = match("MESSAGE#330:537:01/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes->} rcvd=%{p0}");
 
-var part348 = match("MESSAGE#330:537:01/5_0", "nwparser.p0", "%{rbytes->} vpnpolicy=%{fld3->} ");
+var part350 = match("MESSAGE#330:537:01/5_0", "nwparser.p0", "%{rbytes->} vpnpolicy=%{fld3->} ");
 
-var part349 = match("MESSAGE#330:537:01/5_1", "nwparser.p0", "%{rbytes->} ");
+var part351 = match("MESSAGE#330:537:01/5_1", "nwparser.p0", "%{rbytes->} ");
 
-var select97 = linear_select([
-	part348,
-	part349,
+var select98 = linear_select([
+	part350,
+	part351,
 ]);
 
 var all63 = all_match({
 	processors: [
-		dup118,
+		dup117,
+		dup203,
+		dup10,
 		dup204,
-		dup11,
-		dup205,
-		part347,
-		select97,
+		part349,
+		select98,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg333 = msg("537:01", all63);
 
-var part350 = match("MESSAGE#331:537:02/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes}");
+var part352 = match("MESSAGE#331:537:02/4", "nwparser.p0", "%{}proto=%{protocol->} sent=%{sbytes}");
 
 var all64 = all_match({
 	processors: [
-		dup118,
+		dup117,
+		dup203,
+		dup10,
 		dup204,
-		dup11,
-		dup205,
-		part350,
+		part352,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg334 = msg("537:02", all64);
 
-var select98 = linear_select([
+var select99 = linear_select([
+	dup118,
 	dup119,
 	dup120,
 	dup121,
-	dup122,
 ]);
 
-var part351 = match("MESSAGE#332:537:08/3_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
+var part353 = match("MESSAGE#332:537:08/3_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
 
-var part352 = match("MESSAGE#332:537:08/3_2", "nwparser.p0", " %{daddr}srcMac=%{p0}");
-
-var select99 = linear_select([
-	dup125,
-	part351,
-	part352,
-]);
-
-var part353 = match("MESSAGE#332:537:08/4", "nwparser.p0", "%{} %{smacaddr->} %{p0}");
+var part354 = match("MESSAGE#332:537:08/3_2", "nwparser.p0", " %{daddr}srcMac=%{p0}");
 
 var select100 = linear_select([
-	dup126,
-	dup127,
+	dup124,
+	part353,
+	part354,
 ]);
 
-var part354 = match("MESSAGE#332:537:08/6_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{p0}");
-
-var part355 = match("MESSAGE#332:537:08/6_1", "nwparser.p0", "%{sbytes->} spkt=%{p0}");
+var part355 = match("MESSAGE#332:537:08/4", "nwparser.p0", "%{} %{smacaddr->} %{p0}");
 
 var select101 = linear_select([
-	part354,
-	part355,
+	dup125,
+	dup126,
 ]);
 
-var part356 = match("MESSAGE#332:537:08/7_0", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} fw_action=\"%{action}\" ");
+var part356 = match("MESSAGE#332:537:08/6_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{p0}");
 
-var part357 = match("MESSAGE#332:537:08/7_1", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
-
-var part358 = match("MESSAGE#332:537:08/7_2", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} fw_action=\"%{action}\" ");
-
-var part359 = match("MESSAGE#332:537:08/7_3", "nwparser.p0", "%{fld3->} cdur=%{fld7->} ");
-
-var part360 = match("MESSAGE#332:537:08/7_4", "nwparser.p0", "%{fld3}");
+var part357 = match("MESSAGE#332:537:08/6_1", "nwparser.p0", "%{sbytes->} spkt=%{p0}");
 
 var select102 = linear_select([
 	part356,
 	part357,
+]);
+
+var part358 = match("MESSAGE#332:537:08/7_0", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} fw_action=\"%{action}\" ");
+
+var part359 = match("MESSAGE#332:537:08/7_1", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
+
+var part360 = match("MESSAGE#332:537:08/7_2", "nwparser.p0", "%{fld3->} rpkt=%{fld6->} fw_action=\"%{action}\" ");
+
+var part361 = match("MESSAGE#332:537:08/7_3", "nwparser.p0", "%{fld3->} cdur=%{fld7->} ");
+
+var part362 = match("MESSAGE#332:537:08/7_4", "nwparser.p0", "%{fld3}");
+
+var select103 = linear_select([
 	part358,
 	part359,
 	part360,
+	part361,
+	part362,
 ]);
 
 var all65 = all_match({
 	processors: [
-		select98,
-		dup206,
-		dup207,
 		select99,
-		part353,
+		dup205,
+		dup206,
 		select100,
+		part355,
 		select101,
 		select102,
+		select103,
 	],
 	on_success: processor_chain([
-		dup107,
-		dup12,
+		dup106,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg335 = msg("537:08", all65);
 
-var select103 = linear_select([
-	dup120,
-	dup119,
-	dup121,
-	dup122,
-]);
-
-var part361 = match("MESSAGE#333:537:09/3_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} dstMac=%{p0}");
-
-var part362 = match("MESSAGE#333:537:09/3_2", "nwparser.p0", " %{daddr}dstMac=%{p0}");
-
 var select104 = linear_select([
-	dup128,
-	part361,
-	part362,
+	dup119,
+	dup118,
+	dup120,
+	dup121,
 ]);
 
-var part363 = match("MESSAGE#333:537:09/4", "nwparser.p0", "%{} %{dmacaddr->} proto=%{protocol->} sent=%{p0}");
+var part363 = match("MESSAGE#333:537:09/3_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} dstMac=%{p0}");
+
+var part364 = match("MESSAGE#333:537:09/3_2", "nwparser.p0", " %{daddr}dstMac=%{p0}");
 
 var select105 = linear_select([
+	dup127,
+	part363,
+	part364,
+]);
+
+var part365 = match("MESSAGE#333:537:09/4", "nwparser.p0", "%{} %{dmacaddr->} proto=%{protocol->} sent=%{p0}");
+
+var select106 = linear_select([
+	dup130,
 	dup131,
 	dup132,
 	dup133,
-	dup134,
 ]);
 
 var all66 = all_match({
 	processors: [
-		select103,
-		dup206,
-		dup207,
 		select104,
-		part363,
-		dup208,
+		dup205,
+		dup206,
 		select105,
+		part365,
+		dup207,
+		select106,
 	],
 	on_success: processor_chain([
-		dup107,
-		dup12,
+		dup106,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg336 = msg("537:09", all66);
 
-var part364 = match("MESSAGE#334:537:07/0_1", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
-
-var select106 = linear_select([
-	dup119,
-	part364,
-	dup121,
-	dup122,
-]);
-
-var part365 = match("MESSAGE#334:537:07/4_0", "nwparser.p0", "srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
-
-var part366 = match("MESSAGE#334:537:07/4_1", "nwparser.p0", " srcMac=%{smacaddr->} proto=%{protocol->} sent=%{p0}");
+var part366 = match("MESSAGE#334:537:07/0_1", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
 
 var select107 = linear_select([
-	part365,
+	dup118,
 	part366,
-	dup126,
-	dup127,
+	dup120,
+	dup121,
 ]);
 
-var part367 = match("MESSAGE#334:537:07/6_3", "nwparser.p0", " spkt=%{fld3->} fw_action=\"%{action}\"");
+var part367 = match("MESSAGE#334:537:07/4_0", "nwparser.p0", "srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
+
+var part368 = match("MESSAGE#334:537:07/4_1", "nwparser.p0", " srcMac=%{smacaddr->} proto=%{protocol->} sent=%{p0}");
 
 var select108 = linear_select([
+	part367,
+	part368,
+	dup125,
+	dup126,
+]);
+
+var part369 = match("MESSAGE#334:537:07/6_3", "nwparser.p0", " spkt=%{fld3->} fw_action=\"%{action}\"");
+
+var select109 = linear_select([
+	dup130,
 	dup131,
 	dup132,
+	part369,
 	dup133,
-	part367,
-	dup134,
 ]);
 
 var all67 = all_match({
 	processors: [
-		select106,
-		dup206,
-		dup207,
-		dup187,
 		select107,
-		dup208,
+		dup205,
+		dup206,
+		dup186,
 		select108,
+		dup207,
+		select109,
 	],
 	on_success: processor_chain([
-		dup107,
-		dup12,
+		dup106,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg337 = msg("537:07", all67);
 
-var part368 = match("MESSAGE#335:537/1_0", "nwparser.p0", "%{action}\" app=%{fld51->} appName=\"%{application}\"%{p0}");
+var part370 = match("MESSAGE#335:537/1_0", "nwparser.p0", "%{action}\" app=%{fld51->} appName=\"%{application}\"%{p0}");
 
-var part369 = match("MESSAGE#335:537/1_1", "nwparser.p0", "%{action}\"%{p0}");
-
-var select109 = linear_select([
-	part368,
-	part369,
-]);
-
-var part370 = match("MESSAGE#335:537/2", "nwparser.p0", "%{}n=%{fld1->} src= %{p0}");
-
-var part371 = match("MESSAGE#335:537/4_0", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} sent=%{p0}");
-
-var part372 = match("MESSAGE#335:537/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}: proto=%{protocol->} sent=%{p0}");
-
-var part373 = match("MESSAGE#335:537/4_2", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} sent=%{p0}");
-
-var part374 = match("MESSAGE#335:537/4_3", "nwparser.p0", " %{daddr->} proto=%{protocol->} sent=%{p0}");
+var part371 = match("MESSAGE#335:537/1_1", "nwparser.p0", "%{action}\"%{p0}");
 
 var select110 = linear_select([
+	part370,
 	part371,
-	part372,
-	part373,
-	part374,
 ]);
 
-var part375 = match("MESSAGE#335:537/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} cdur=%{fld5->} fw_action=\"%{fld6}\"");
+var part372 = match("MESSAGE#335:537/2", "nwparser.p0", "%{}n=%{fld1->} src= %{p0}");
 
-var part376 = match("MESSAGE#335:537/5_1", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} fw_action=\"%{fld5}\"");
+var part373 = match("MESSAGE#335:537/4_0", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} sent=%{p0}");
 
-var part377 = match("MESSAGE#335:537/5_2", "nwparser.p0", "%{sbytes->} spkt=%{fld3}fw_action=\"%{fld4}\"");
+var part374 = match("MESSAGE#335:537/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}: proto=%{protocol->} sent=%{p0}");
 
-var part378 = match("MESSAGE#335:537/5_3", "nwparser.p0", "%{sbytes}rcvd=%{rbytes}");
+var part375 = match("MESSAGE#335:537/4_2", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} sent=%{p0}");
 
-var part379 = match("MESSAGE#335:537/5_4", "nwparser.p0", "%{sbytes}");
+var part376 = match("MESSAGE#335:537/4_3", "nwparser.p0", " %{daddr->} proto=%{protocol->} sent=%{p0}");
 
 var select111 = linear_select([
+	part373,
+	part374,
 	part375,
 	part376,
+]);
+
+var part377 = match("MESSAGE#335:537/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} cdur=%{fld5->} fw_action=\"%{fld6}\"");
+
+var part378 = match("MESSAGE#335:537/5_1", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} fw_action=\"%{fld5}\"");
+
+var part379 = match("MESSAGE#335:537/5_2", "nwparser.p0", "%{sbytes->} spkt=%{fld3}fw_action=\"%{fld4}\"");
+
+var part380 = match("MESSAGE#335:537/5_3", "nwparser.p0", "%{sbytes}rcvd=%{rbytes}");
+
+var part381 = match("MESSAGE#335:537/5_4", "nwparser.p0", "%{sbytes}");
+
+var select112 = linear_select([
 	part377,
 	part378,
 	part379,
+	part380,
+	part381,
 ]);
 
 var all68 = all_match({
 	processors: [
 		dup48,
-		select109,
-		part370,
-		dup204,
 		select110,
+		part372,
+		dup203,
 		select111,
+		select112,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg338 = msg("537", all68);
 
-var part380 = match("MESSAGE#336:537:04/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} cdur=%{fld5->} npcs=%{info}");
+var part382 = match("MESSAGE#336:537:04/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} cdur=%{fld5->} npcs=%{info}");
 
 var all69 = all_match({
 	processors: [
-		dup135,
-		dup181,
-		dup11,
-		dup209,
-		part380,
+		dup134,
+		dup180,
+		dup10,
+		dup208,
+		part382,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg339 = msg("537:04", all69);
 
-var part381 = match("MESSAGE#337:537:05/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} spkt=%{fld3->} cdur=%{p0}");
+var part383 = match("MESSAGE#337:537:05/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} spkt=%{fld3->} cdur=%{p0}");
 
-var part382 = match("MESSAGE#337:537:05/5_0", "nwparser.p0", "%{fld4->} appcat=%{fld5->} appid=%{fld6->} npcs= %{p0}");
+var part384 = match("MESSAGE#337:537:05/5_0", "nwparser.p0", "%{fld4->} appcat=%{fld5->} appid=%{fld6->} npcs= %{p0}");
 
-var part383 = match("MESSAGE#337:537:05/5_1", "nwparser.p0", "%{fld4->} npcs= %{p0}");
+var part385 = match("MESSAGE#337:537:05/5_1", "nwparser.p0", "%{fld4->} npcs= %{p0}");
 
-var select112 = linear_select([
-	part382,
-	part383,
+var select113 = linear_select([
+	part384,
+	part385,
 ]);
 
 var all70 = all_match({
 	processors: [
-		dup135,
-		dup181,
-		dup11,
-		dup209,
-		part381,
-		select112,
-		dup92,
+		dup134,
+		dup180,
+		dup10,
+		dup208,
+		part383,
+		select113,
+		dup91,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg340 = msg("537:05", all70);
 
-var part384 = match("MESSAGE#338:537:10/0", "nwparser.payload", "msg=\"%{event_description}\" sess=%{fld1->} n=%{p0}");
+var part386 = match("MESSAGE#338:537:10/0", "nwparser.payload", "msg=\"%{event_description}\" sess=%{fld1->} n=%{p0}");
 
-var part385 = match("MESSAGE#338:537:10/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{p0}");
+var part387 = match("MESSAGE#338:537:10/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} dstMac=%{p0}");
 
-var part386 = match("MESSAGE#338:537:10/4_2", "nwparser.p0", "%{daddr->} dstMac=%{p0}");
+var part388 = match("MESSAGE#338:537:10/4_2", "nwparser.p0", "%{daddr->} dstMac=%{p0}");
 
-var select113 = linear_select([
-	dup128,
-	part385,
-	part386,
+var select114 = linear_select([
+	dup127,
+	part387,
+	part388,
 ]);
 
-var part387 = match("MESSAGE#338:537:10/5", "nwparser.p0", "%{} %{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld10->} rpkt=%{fld11->} %{p0}");
+var part389 = match("MESSAGE#338:537:10/5", "nwparser.p0", "%{} %{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld10->} rpkt=%{fld11->} %{p0}");
 
 var all71 = all_match({
 	processors: [
-		part384,
+		part386,
+		dup209,
+		dup138,
 		dup210,
-		dup139,
+		select114,
+		part389,
 		dup211,
-		select113,
-		part387,
-		dup212,
 	],
 	on_success: processor_chain([
-		dup107,
-		dup12,
+		dup106,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg341 = msg("537:10", all71);
 
-var part388 = match("MESSAGE#339:537:03/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{p0}");
+var part390 = match("MESSAGE#339:537:03/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{p0}");
 
-var part389 = match("MESSAGE#339:537:03/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
+var part391 = match("MESSAGE#339:537:03/4_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
 
-var part390 = match("MESSAGE#339:537:03/4_2", "nwparser.p0", "%{daddr->} proto=%{p0}");
+var part392 = match("MESSAGE#339:537:03/4_2", "nwparser.p0", "%{daddr->} proto=%{p0}");
 
-var select114 = linear_select([
+var select115 = linear_select([
 	dup77,
-	part389,
-	part390,
+	part391,
+	part392,
 ]);
 
-var part391 = match("MESSAGE#339:537:03/5", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld10->} rpkt=%{fld11->} %{p0}");
+var part393 = match("MESSAGE#339:537:03/5", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld10->} rpkt=%{fld11->} %{p0}");
 
 var all72 = all_match({
 	processors: [
-		part388,
+		part390,
+		dup209,
+		dup138,
 		dup210,
-		dup139,
+		select115,
+		part393,
 		dup211,
-		select114,
-		part391,
-		dup212,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg342 = msg("537:03", all72);
 
-var part392 = match("MESSAGE#340:537:06/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} spkt=%{fld3->} npcs=%{info}");
+var part394 = match("MESSAGE#340:537:06/4", "nwparser.p0", "%{} %{protocol->} sent=%{sbytes->} spkt=%{fld3->} npcs=%{info}");
 
 var all73 = all_match({
 	processors: [
-		dup135,
-		dup181,
-		dup11,
-		dup209,
-		part392,
+		dup134,
+		dup180,
+		dup10,
+		dup208,
+		part394,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 	]),
 });
 
 var msg343 = msg("537:06", all73);
 
-var part393 = match("MESSAGE#341:537:11", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}spkt=%{fld3}rpkt=%{fld4}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup107,
+var part395 = match("MESSAGE#341:537:11", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2}usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}sent=%{sbytes}rcvd=%{rbytes}spkt=%{fld3}rpkt=%{fld4}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup106,
 	dup54,
-	dup12,
-	dup144,
+	dup11,
+	dup143,
 ]));
 
-var msg344 = msg("537:11", part393);
+var msg344 = msg("537:11", part395);
 
-var part394 = match("MESSAGE#342:537:12", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup107,
+var part396 = match("MESSAGE#342:537:12", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} spkt=%{fld3->} rpkt=%{fld4->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup106,
 	dup54,
-	dup12,
-	dup144,
+	dup11,
+	dup143,
 ]));
 
-var msg345 = msg("537:12", part394);
+var msg345 = msg("537:12", part396);
 
-var select115 = linear_select([
+var select116 = linear_select([
 	msg333,
 	msg334,
 	msg335,
@@ -4560,18 +4565,18 @@ var select115 = linear_select([
 	msg345,
 ]);
 
-var msg346 = msg("538", dup230);
+var msg346 = msg("538", dup229);
 
-var msg347 = msg("549", dup233);
+var msg347 = msg("549", dup232);
 
-var msg348 = msg("557", dup233);
+var msg348 = msg("557", dup232);
 
 var all74 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1402020200"),
@@ -4580,18 +4585,18 @@ var all74 = all_match({
 
 var msg349 = msg("558", all74);
 
-var msg350 = msg("561", dup236);
+var msg350 = msg("561", dup235);
 
-var msg351 = msg("562", dup236);
+var msg351 = msg("562", dup235);
 
-var msg352 = msg("563", dup236);
+var msg352 = msg("563", dup235);
 
 var all75 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		setc("eventcategory","1402020400"),
@@ -4600,38 +4605,38 @@ var all75 = all_match({
 
 var msg353 = msg("583", all75);
 
-var part395 = match("MESSAGE#351:597:01", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} type=%{icmptype->} code=%{icmpcode}", processor_chain([
-	dup145,
+var part397 = match("MESSAGE#351:597:01", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} type=%{icmptype->} code=%{icmpcode}", processor_chain([
+	dup144,
 	dup51,
-	dup146,
+	dup145,
 	dup53,
 	dup54,
-	dup12,
-	dup147,
+	dup11,
+	dup146,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg354 = msg("597:01", part395);
+var msg354 = msg("597:01", part397);
 
-var part396 = match("MESSAGE#352:597:02", "nwparser.payload", "msg=%{msg->} n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} type=%{icmptype->} code=%{icmpcode}", processor_chain([
+var part398 = match("MESSAGE#352:597:02", "nwparser.payload", "msg=%{msg->} n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} type=%{icmptype->} code=%{icmpcode}", processor_chain([
 	dup1,
 ]));
 
-var msg355 = msg("597:02", part396);
+var msg355 = msg("597:02", part398);
 
-var part397 = match("MESSAGE#353:597:03/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src= %{p0}");
+var part399 = match("MESSAGE#353:597:03/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src= %{p0}");
 
 var all76 = all_match({
 	processors: [
-		part397,
-		dup188,
-		dup11,
-		dup191,
-		dup92,
+		part399,
+		dup187,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4640,25 +4645,25 @@ var all76 = all_match({
 
 var msg356 = msg("597:03", all76);
 
-var select116 = linear_select([
+var select117 = linear_select([
 	msg354,
 	msg355,
 	msg356,
 ]);
 
-var part398 = match("MESSAGE#354:598", "nwparser.payload", "msg=%{msg->} n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} type=%{type->} code=%{code}", processor_chain([
+var part400 = match("MESSAGE#354:598", "nwparser.payload", "msg=%{msg->} n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} type=%{type->} code=%{code}", processor_chain([
 	dup1,
 ]));
 
-var msg357 = msg("598", part398);
+var msg357 = msg("598", part400);
 
-var part399 = match("MESSAGE#355:598:01/2", "nwparser.p0", "%{} %{type->} npcs=%{info}");
+var part401 = match("MESSAGE#355:598:01/2", "nwparser.p0", "%{} %{type->} npcs=%{info}");
 
 var all77 = all_match({
 	processors: [
-		dup148,
-		dup183,
-		part399,
+		dup147,
+		dup182,
+		part401,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4669,9 +4674,9 @@ var msg358 = msg("598:01", all77);
 
 var all78 = all_match({
 	processors: [
-		dup148,
-		dup191,
-		dup92,
+		dup147,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4680,37 +4685,37 @@ var all78 = all_match({
 
 var msg359 = msg("598:02", all78);
 
-var select117 = linear_select([
+var select118 = linear_select([
 	msg357,
 	msg358,
 	msg359,
 ]);
 
-var part400 = match("MESSAGE#357:602:01", "nwparser.payload", "msg=\"%{event_description}allowed\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} proto=%{protocol}/%{fld4}", processor_chain([
-	dup145,
+var part402 = match("MESSAGE#357:602:01", "nwparser.payload", "msg=\"%{event_description}allowed\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} proto=%{protocol}/%{fld4}", processor_chain([
+	dup144,
 	dup51,
-	dup146,
+	dup145,
 	dup53,
 	dup54,
-	dup12,
-	dup147,
+	dup11,
+	dup146,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg360 = msg("602:01", part400);
+var msg360 = msg("602:01", part402);
 
-var msg361 = msg("602:02", dup240);
+var msg361 = msg("602:02", dup239);
 
 var all79 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup177,
+		dup7,
+		dup178,
+		dup10,
+		dup176,
 		dup79,
 	],
 	on_success: processor_chain([
@@ -4720,80 +4725,80 @@ var all79 = all_match({
 
 var msg362 = msg("602:03", all79);
 
-var select118 = linear_select([
+var select119 = linear_select([
 	msg360,
 	msg361,
 	msg362,
 ]);
 
-var msg363 = msg("605", dup198);
+var msg363 = msg("605", dup197);
 
 var all80 = all_match({
 	processors: [
-		dup149,
-		dup213,
-		dup151,
-		dup201,
-		dup114,
+		dup148,
+		dup212,
+		dup150,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
-		dup89,
+		dup88,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg364 = msg("606", all80);
 
-var part401 = match("MESSAGE#362:608/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} ipscat=%{ipscat->} ipspri=%{p0}");
+var part403 = match("MESSAGE#362:608/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} ipscat=%{ipscat->} ipspri=%{p0}");
 
-var part402 = match("MESSAGE#362:608/1_0", "nwparser.p0", "%{fld66->} pktdatId=%{fld11->} n=%{p0}");
+var part404 = match("MESSAGE#362:608/1_0", "nwparser.p0", "%{fld66->} pktdatId=%{fld11->} n=%{p0}");
 
-var part403 = match("MESSAGE#362:608/1_1", "nwparser.p0", "%{ipspri->} n=%{p0}");
-
-var select119 = linear_select([
-	part402,
-	part403,
-]);
-
-var part404 = match("MESSAGE#362:608/2", "nwparser.p0", "%{fld1->} src=%{saddr}:%{p0}");
-
-var part405 = match("MESSAGE#362:608/3_0", "nwparser.p0", "%{sport}:%{sinterface->} dst=%{p0}");
-
-var part406 = match("MESSAGE#362:608/3_1", "nwparser.p0", "%{sport->} dst=%{p0}");
+var part405 = match("MESSAGE#362:608/1_1", "nwparser.p0", "%{ipspri->} n=%{p0}");
 
 var select120 = linear_select([
+	part404,
 	part405,
-	part406,
 ]);
 
-var part407 = match("MESSAGE#362:608/4", "nwparser.p0", "%{daddr}:%{p0}");
+var part406 = match("MESSAGE#362:608/2", "nwparser.p0", "%{fld1->} src=%{saddr}:%{p0}");
 
-var part408 = match("MESSAGE#362:608/5_0", "nwparser.p0", "%{dport}:%{dinterface->} proto=%{protocol->} fw_action=\"%{fld2}\"");
+var part407 = match("MESSAGE#362:608/3_0", "nwparser.p0", "%{sport}:%{sinterface->} dst=%{p0}");
 
-var part409 = match("MESSAGE#362:608/5_1", "nwparser.p0", "%{dport}:%{dinterface}");
-
-var part410 = match("MESSAGE#362:608/5_2", "nwparser.p0", "%{dport}");
+var part408 = match("MESSAGE#362:608/3_1", "nwparser.p0", "%{sport->} dst=%{p0}");
 
 var select121 = linear_select([
+	part407,
 	part408,
-	part409,
+]);
+
+var part409 = match("MESSAGE#362:608/4", "nwparser.p0", "%{daddr}:%{p0}");
+
+var part410 = match("MESSAGE#362:608/5_0", "nwparser.p0", "%{dport}:%{dinterface->} proto=%{protocol->} fw_action=\"%{fld2}\"");
+
+var part411 = match("MESSAGE#362:608/5_1", "nwparser.p0", "%{dport}:%{dinterface}");
+
+var part412 = match("MESSAGE#362:608/5_2", "nwparser.p0", "%{dport}");
+
+var select122 = linear_select([
 	part410,
+	part411,
+	part412,
 ]);
 
 var all81 = all_match({
 	processors: [
-		part401,
-		select119,
-		part404,
+		part403,
 		select120,
-		part407,
+		part406,
 		select121,
+		part409,
+		select122,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -4803,160 +4808,160 @@ var all81 = all_match({
 
 var msg365 = msg("608", all81);
 
-var msg366 = msg("616", dup196);
+var msg366 = msg("616", dup195);
 
-var msg367 = msg("658", dup192);
+var msg367 = msg("658", dup191);
 
-var msg368 = msg("710", dup214);
+var msg368 = msg("710", dup213);
 
-var msg369 = msg("712:02", dup241);
+var msg369 = msg("712:02", dup240);
 
-var msg370 = msg("712", dup214);
+var msg370 = msg("712", dup213);
 
 var all82 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup193,
-		dup96,
+		dup7,
+		dup175,
+		dup10,
+		dup192,
+		dup95,
 	],
 	on_success: processor_chain([
-		dup152,
+		dup151,
 	]),
 });
 
 var msg371 = msg("712:01", all82);
 
-var select122 = linear_select([
+var select123 = linear_select([
 	msg369,
 	msg370,
 	msg371,
 ]);
 
-var part411 = match("MESSAGE#369:713:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} note=%{info}", processor_chain([
+var part413 = match("MESSAGE#369:713:01", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{fld2->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld3->} note=%{info}", processor_chain([
 	dup5,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg372 = msg("713:01", part411);
+var msg372 = msg("713:01", part413);
 
-var msg373 = msg("713:04", dup241);
+var msg373 = msg("713:04", dup240);
 
-var msg374 = msg("713:02", dup214);
+var msg374 = msg("713:02", dup213);
 
-var part412 = match("MESSAGE#372:713:03", "nwparser.payload", "msg=\"%{event_description}dropped\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{action}\" npcs=%{info}", processor_chain([
+var part414 = match("MESSAGE#372:713:03", "nwparser.payload", "msg=\"%{event_description}dropped\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=\"%{action}\" npcs=%{info}", processor_chain([
 	dup5,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg375 = msg("713:03", part412);
+var msg375 = msg("713:03", part414);
 
-var select123 = linear_select([
+var select124 = linear_select([
 	msg372,
 	msg373,
 	msg374,
 	msg375,
 ]);
 
-var part413 = match("MESSAGE#373:760", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=%{info}", processor_chain([
-	dup115,
+var part415 = match("MESSAGE#373:760", "nwparser.payload", "msg=\"%{event_description}dropped\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=%{info}", processor_chain([
+	dup114,
 	dup51,
 	dup52,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
 	dup55,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg376 = msg("760", part413);
+var msg376 = msg("760", part415);
 
-var part414 = match("MESSAGE#374:760:01/0", "nwparser.payload", "msg=\"%{event_description}dropped\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var part416 = match("MESSAGE#374:760:01/0", "nwparser.payload", "msg=\"%{event_description}dropped\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var part415 = match("MESSAGE#374:760:01/4", "nwparser.p0", "%{} %{action->} npcs=%{info}");
+var part417 = match("MESSAGE#374:760:01/4", "nwparser.p0", "%{} %{action->} npcs=%{info}");
 
 var all83 = all_match({
 	processors: [
-		part414,
-		dup176,
-		dup11,
-		dup193,
-		part415,
+		part416,
+		dup175,
+		dup10,
+		dup192,
+		part417,
 	],
 	on_success: processor_chain([
-		dup115,
+		dup114,
 		dup51,
 		dup52,
 		dup53,
 		dup54,
-		dup12,
+		dup11,
 		dup55,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg377 = msg("760:01", all83);
 
-var select124 = linear_select([
+var select125 = linear_select([
 	msg376,
 	msg377,
 ]);
 
-var msg378 = msg("766", dup218);
+var msg378 = msg("766", dup217);
 
-var msg379 = msg("860", dup218);
+var msg379 = msg("860", dup217);
 
-var msg380 = msg("860:01", dup219);
+var msg380 = msg("860:01", dup218);
 
-var select125 = linear_select([
+var select126 = linear_select([
 	msg379,
 	msg380,
 ]);
 
-var part416 = match("MESSAGE#378:866/0", "nwparser.payload", "msg=\"%{msg}\" n=%{p0}");
+var part418 = match("MESSAGE#378:866/0", "nwparser.payload", "msg=\"%{msg}\" n=%{p0}");
 
-var part417 = match("MESSAGE#378:866/1_0", "nwparser.p0", "%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\" ");
+var part419 = match("MESSAGE#378:866/1_0", "nwparser.p0", "%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\" ");
 
-var part418 = match("MESSAGE#378:866/1_1", "nwparser.p0", "%{ntype->} ");
+var part420 = match("MESSAGE#378:866/1_1", "nwparser.p0", "%{ntype->} ");
 
-var select126 = linear_select([
-	part417,
-	part418,
+var select127 = linear_select([
+	part419,
+	part420,
 ]);
 
 var all84 = all_match({
 	processors: [
-		part416,
-		select126,
+		part418,
+		select127,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -4966,127 +4971,127 @@ var all84 = all_match({
 
 var msg381 = msg("866", all84);
 
-var msg382 = msg("866:01", dup219);
+var msg382 = msg("866:01", dup218);
 
-var select127 = linear_select([
+var select128 = linear_select([
 	msg381,
 	msg382,
 ]);
 
-var msg383 = msg("867", dup218);
+var msg383 = msg("867", dup217);
 
-var msg384 = msg("867:01", dup219);
+var msg384 = msg("867:01", dup218);
 
-var select128 = linear_select([
+var select129 = linear_select([
 	msg383,
 	msg384,
 ]);
 
-var part419 = match("MESSAGE#382:882", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
+var part421 = match("MESSAGE#382:882", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol}", processor_chain([
 	dup1,
 ]));
 
-var msg385 = msg("882", part419);
+var msg385 = msg("882", part421);
 
-var part420 = match("MESSAGE#383:882:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} npcs=%{info}", processor_chain([
+var part422 = match("MESSAGE#383:882:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} npcs=%{info}", processor_chain([
 	dup1,
 ]));
 
-var msg386 = msg("882:01", part420);
+var msg386 = msg("882:01", part422);
 
-var select129 = linear_select([
+var select130 = linear_select([
 	msg385,
 	msg386,
 ]);
 
-var part421 = match("MESSAGE#384:888", "nwparser.payload", "msg=\"%{reason};%{action}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}", processor_chain([
-	dup161,
+var part423 = match("MESSAGE#384:888", "nwparser.payload", "msg=\"%{reason};%{action}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}", processor_chain([
+	dup160,
 ]));
 
-var msg387 = msg("888", part421);
+var msg387 = msg("888", part423);
 
-var part422 = match("MESSAGE#385:888:01", "nwparser.payload", "msg=\"%{reason};%{action}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=%{fld3->} npcs=%{info}", processor_chain([
-	dup161,
+var part424 = match("MESSAGE#385:888:01", "nwparser.payload", "msg=\"%{reason};%{action}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} note=%{fld3->} npcs=%{info}", processor_chain([
+	dup160,
 ]));
 
-var msg388 = msg("888:01", part422);
+var msg388 = msg("888:01", part424);
 
-var select130 = linear_select([
+var select131 = linear_select([
 	msg387,
 	msg388,
 ]);
 
 var all85 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup7,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
-		dup161,
+		dup160,
 	]),
 });
 
 var msg389 = msg("892", all85);
 
-var msg390 = msg("904", dup218);
+var msg390 = msg("904", dup217);
 
-var msg391 = msg("905", dup218);
+var msg391 = msg("905", dup217);
 
-var msg392 = msg("906", dup218);
+var msg392 = msg("906", dup217);
 
-var msg393 = msg("907", dup218);
+var msg393 = msg("907", dup217);
 
-var select131 = linear_select([
+var select132 = linear_select([
 	dup73,
-	dup140,
+	dup139,
 ]);
 
 var all86 = all_match({
 	processors: [
+		dup161,
+		select132,
+		dup10,
+		dup212,
 		dup162,
-		select131,
-		dup11,
-		dup213,
-		dup163,
-		dup201,
-		dup114,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup70,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg394 = msg("908", all86);
 
-var msg395 = msg("909", dup218);
+var msg395 = msg("909", dup217);
 
-var msg396 = msg("914", dup220);
+var msg396 = msg("914", dup219);
 
-var part423 = match("MESSAGE#394:931", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
+var part425 = match("MESSAGE#394:931", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
 	dup64,
 ]));
 
-var msg397 = msg("931", part423);
+var msg397 = msg("931", part425);
 
-var msg398 = msg("657", dup220);
+var msg398 = msg("657", dup219);
 
 var all87 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup7,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -5095,165 +5100,165 @@ var all87 = all_match({
 
 var msg399 = msg("657:01", all87);
 
-var select132 = linear_select([
+var select133 = linear_select([
 	msg398,
 	msg399,
 ]);
 
-var msg400 = msg("403", dup199);
+var msg400 = msg("403", dup198);
 
-var msg401 = msg("534", dup178);
+var msg401 = msg("534", dup177);
 
-var msg402 = msg("994", dup221);
+var msg402 = msg("994", dup220);
 
-var part424 = match("MESSAGE#400:243", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} proto=%{protocol}", processor_chain([
+var part426 = match("MESSAGE#400:243", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} proto=%{protocol}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var msg403 = msg("243", part424);
+var msg403 = msg("243", part426);
 
-var msg404 = msg("995", dup178);
+var msg404 = msg("995", dup177);
 
-var part425 = match("MESSAGE#402:997", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{fld3->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld4->} note=\"%{info}\"", processor_chain([
+var part427 = match("MESSAGE#402:997", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface}:%{fld3->} dst=%{daddr}:%{dport}:%{dinterface}:%{fld4->} note=\"%{info}\"", processor_chain([
 	dup1,
 	dup51,
 	dup53,
 	dup54,
-	dup12,
+	dup11,
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg405 = msg("997", part425);
+var msg405 = msg("997", part427);
 
-var msg406 = msg("998", dup221);
+var msg406 = msg("998", dup220);
 
-var part426 = match("MESSAGE#405:998:01", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup107,
-	dup12,
+var part428 = match("MESSAGE#405:998:01", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld3->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup106,
+	dup11,
 ]));
 
-var msg407 = msg("998:01", part426);
+var msg407 = msg("998:01", part428);
 
-var select133 = linear_select([
+var select134 = linear_select([
 	msg406,
 	msg407,
 ]);
 
-var msg408 = msg("1110", dup222);
+var msg408 = msg("1110", dup221);
 
-var msg409 = msg("565", dup222);
+var msg409 = msg("565", dup221);
 
-var part427 = match("MESSAGE#408:404", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} note=\"%{event_description}\"", processor_chain([
+var part429 = match("MESSAGE#408:404", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} note=\"%{event_description}\"", processor_chain([
 	dup1,
 	dup54,
 ]));
 
-var msg410 = msg("404", part427);
+var msg410 = msg("404", part429);
 
-var select134 = linear_select([
-	dup150,
+var select135 = linear_select([
+	dup149,
 	dup50,
 ]);
 
-var part428 = match("MESSAGE#409:267:01/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} note=\"%{fld3}\" fw_action=\"%{action}\"");
+var part430 = match("MESSAGE#409:267:01/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} note=\"%{fld3}\" fw_action=\"%{action}\"");
 
 var all88 = all_match({
 	processors: [
 		dup81,
-		select134,
-		part428,
+		select135,
+		part430,
 	],
 	on_success: processor_chain([
-		dup107,
+		dup106,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg411 = msg("267:01", all88);
 
-var part429 = match("MESSAGE#410:267", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}", processor_chain([
+var part431 = match("MESSAGE#410:267", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}", processor_chain([
 	dup1,
 	dup54,
 ]));
 
-var msg412 = msg("267", part429);
+var msg412 = msg("267", part431);
 
-var select135 = linear_select([
+var select136 = linear_select([
 	msg411,
 	msg412,
 ]);
 
-var part430 = match("MESSAGE#411:263", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} proto=%{protocol}", processor_chain([
+var part432 = match("MESSAGE#411:263", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} proto=%{protocol}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var msg413 = msg("263", part430);
+var msg413 = msg("263", part432);
 
-var part431 = match("MESSAGE#412:264", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
-	dup105,
-	dup12,
+var part433 = match("MESSAGE#412:264", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
+	dup104,
+	dup11,
 ]));
 
-var msg414 = msg("264", part431);
+var msg414 = msg("264", part433);
 
-var msg415 = msg("412", dup199);
+var msg415 = msg("412", dup198);
 
-var part432 = match("MESSAGE#415:793", "nwparser.payload", "msg=\"%{msg}\" af_polid=%{fld1->} af_policy=\"%{fld2}\" af_type=\"%{fld3}\" af_service=\"%{fld4}\" af_action=\"%{fld5}\" n=%{fld6->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{shost->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{dhost}", processor_chain([
+var part434 = match("MESSAGE#415:793", "nwparser.payload", "msg=\"%{msg}\" af_polid=%{fld1->} af_policy=\"%{fld2}\" af_type=\"%{fld3}\" af_service=\"%{fld4}\" af_action=\"%{fld5}\" n=%{fld6->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{shost->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{dhost}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var msg416 = msg("793", part432);
+var msg416 = msg("793", part434);
 
-var part433 = match("MESSAGE#416:805", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} if=%{fld2->} ucastRx=%{fld3->} bcastRx=%{fld4->} bytesRx=%{rbytes->} ucastTx=%{fld5->} bcastTx=%{fld6->} bytesTx=%{sbytes}", processor_chain([
+var part435 = match("MESSAGE#416:805", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} if=%{fld2->} ucastRx=%{fld3->} bcastRx=%{fld4->} bytesRx=%{rbytes->} ucastTx=%{fld5->} bcastTx=%{fld6->} bytesTx=%{sbytes}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var msg417 = msg("805", part433);
+var msg417 = msg("805", part435);
 
-var part434 = match("MESSAGE#417:809", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
-	dup164,
-	dup12,
+var part436 = match("MESSAGE#417:809", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
+	dup163,
+	dup11,
 ]));
 
-var msg418 = msg("809", part434);
+var msg418 = msg("809", part436);
 
-var part435 = match("MESSAGE#418:809:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
-	dup164,
-	dup12,
+var part437 = match("MESSAGE#418:809:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} fw_action=\"%{action}\"", processor_chain([
+	dup163,
+	dup11,
 ]));
 
-var msg419 = msg("809:01", part435);
+var msg419 = msg("809:01", part437);
 
-var select136 = linear_select([
+var select137 = linear_select([
 	msg418,
 	msg419,
 ]);
 
-var msg420 = msg("935", dup220);
+var msg420 = msg("935", dup219);
 
-var msg421 = msg("614", dup223);
+var msg421 = msg("614", dup222);
 
-var part436 = match("MESSAGE#421:748/0", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
+var part438 = match("MESSAGE#421:748/0", "nwparser.payload", "msg=\"%{event_description}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
 
 var all89 = all_match({
 	processors: [
-		part436,
-		dup201,
-		dup114,
+		part438,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup58,
@@ -5263,157 +5268,157 @@ var all89 = all_match({
 
 var msg422 = msg("748", all89);
 
-var part437 = match("MESSAGE#422:794/0", "nwparser.payload", "msg=\"%{event_description}\" sid=%{sid->} spycat=%{fld1->} spypri=%{fld2->} pktdatId=%{fld3->} n=%{fld4->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
+var part439 = match("MESSAGE#422:794/0", "nwparser.payload", "msg=\"%{event_description}\" sid=%{sid->} spycat=%{fld1->} spypri=%{fld2->} pktdatId=%{fld3->} n=%{fld4->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
 
-var part438 = match("MESSAGE#422:794/1_0", "nwparser.p0", "%{protocol}/%{fld5->} fw_action=\"%{p0}");
+var part440 = match("MESSAGE#422:794/1_0", "nwparser.p0", "%{protocol}/%{fld5->} fw_action=\"%{p0}");
 
-var select137 = linear_select([
-	part438,
-	dup113,
+var select138 = linear_select([
+	part440,
+	dup112,
 ]);
 
 var all90 = all_match({
 	processors: [
-		part437,
-		select137,
-		dup114,
+		part439,
+		select138,
+		dup113,
 	],
 	on_success: processor_chain([
-		dup165,
+		dup164,
 		dup37,
 	]),
 });
 
 var msg423 = msg("794", all90);
 
-var msg424 = msg("1086", dup223);
+var msg424 = msg("1086", dup222);
 
-var part439 = match("MESSAGE#424:1430", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
-	dup165,
+var part441 = match("MESSAGE#424:1430", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
+	dup164,
 	dup37,
 ]));
 
-var msg425 = msg("1430", part439);
+var msg425 = msg("1430", part441);
 
-var msg426 = msg("1149", dup223);
+var msg426 = msg("1149", dup222);
 
-var msg427 = msg("1159", dup223);
+var msg427 = msg("1159", dup222);
 
-var part440 = match("MESSAGE#427:1195", "nwparser.payload", "n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
-	dup165,
+var part442 = match("MESSAGE#427:1195", "nwparser.payload", "n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+	dup164,
 	dup37,
 ]));
 
-var msg428 = msg("1195", part440);
+var msg428 = msg("1195", part442);
 
-var part441 = match("MESSAGE#428:1195:01", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1}", processor_chain([
-	dup165,
+var part443 = match("MESSAGE#428:1195:01", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1}", processor_chain([
+	dup164,
 	dup37,
 ]));
 
-var msg429 = msg("1195:01", part441);
+var msg429 = msg("1195:01", part443);
 
-var select138 = linear_select([
+var select139 = linear_select([
 	msg428,
 	msg429,
 ]);
 
-var part442 = match("MESSAGE#429:1226", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+var part444 = match("MESSAGE#429:1226", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
 	dup5,
 	dup37,
 ]));
 
-var msg430 = msg("1226", part442);
+var msg430 = msg("1226", part444);
 
-var part443 = match("MESSAGE#430:1222", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport->} note=\"%{fld3}\" fw_action=\"%{action}\"", processor_chain([
+var part445 = match("MESSAGE#430:1222", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport->} note=\"%{fld3}\" fw_action=\"%{action}\"", processor_chain([
 	dup5,
 	dup37,
 ]));
 
-var msg431 = msg("1222", part443);
+var msg431 = msg("1222", part445);
 
-var part444 = match("MESSAGE#431:1154", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{shost->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{dhost}", processor_chain([
+var part446 = match("MESSAGE#431:1154", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{shost->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{dhost}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var msg432 = msg("1154", part444);
+var msg432 = msg("1154", part446);
 
-var part445 = match("MESSAGE#432:1154:01/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{p0}");
+var part447 = match("MESSAGE#432:1154:01/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{p0}");
 
 var all91 = all_match({
 	processors: [
-		part445,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		part447,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
-		dup24,
+		dup23,
 	]),
 });
 
 var msg433 = msg("1154:01", all91);
 
-var part446 = match("MESSAGE#433:1154:02", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=\"%{fld1}\" appid%{fld2->} catid=%{fld3->} sess=\"%{fld4}\" n=%{fld5->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup166,
-	dup12,
+var part448 = match("MESSAGE#433:1154:02", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=\"%{fld1}\" appid%{fld2->} catid=%{fld3->} sess=\"%{fld4}\" n=%{fld5->} usr=\"%{username}\" src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup165,
+	dup11,
 ]));
 
-var msg434 = msg("1154:02", part446);
+var msg434 = msg("1154:02", part448);
 
-var part447 = match("MESSAGE#434:1154:03/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=\"%{fld1}\" appid=%{fld2->} catid=%{fld3->} n=%{fld4->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part449 = match("MESSAGE#434:1154:03/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=\"%{fld1}\" appid=%{fld2->} catid=%{fld3->} n=%{fld4->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var select139 = linear_select([
-	dup125,
+var select140 = linear_select([
+	dup124,
 	dup49,
 ]);
 
-var part448 = match("MESSAGE#434:1154:03/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"");
+var part450 = match("MESSAGE#434:1154:03/2", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} rule=\"%{rule}\" fw_action=\"%{action}\"");
 
 var all92 = all_match({
 	processors: [
-		part447,
-		select139,
-		part448,
+		part449,
+		select140,
+		part450,
 	],
 	on_success: processor_chain([
-		dup166,
-		dup12,
+		dup165,
+		dup11,
 	]),
 });
 
 var msg435 = msg("1154:03", all92);
 
-var select140 = linear_select([
+var select141 = linear_select([
 	msg432,
 	msg433,
 	msg434,
 	msg435,
 ]);
 
-var part449 = match("MESSAGE#435:msg", "nwparser.payload", "msg=\"%{msg}\" src=%{stransaddr->} dst=%{dtransaddr->} %{result}", processor_chain([
-	dup167,
+var part451 = match("MESSAGE#435:msg", "nwparser.payload", "msg=\"%{msg}\" src=%{stransaddr->} dst=%{dtransaddr->} %{result}", processor_chain([
+	dup166,
 ]));
 
-var msg436 = msg("msg", part449);
+var msg436 = msg("msg", part451);
 
-var part450 = match("MESSAGE#436:src", "nwparser.payload", "src=%{stransaddr->} dst=%{dtransaddr->} %{msg}", processor_chain([
-	dup167,
+var part452 = match("MESSAGE#436:src", "nwparser.payload", "src=%{stransaddr->} dst=%{dtransaddr->} %{msg}", processor_chain([
+	dup166,
 ]));
 
-var msg437 = msg("src", part450);
+var msg437 = msg("src", part452);
 
 var all93 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup177,
-		dup11,
-		dup202,
+		dup7,
+		dup178,
+		dup10,
+		dup176,
+		dup10,
+		dup201,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5422,15 +5427,15 @@ var all93 = all_match({
 
 var msg438 = msg("1235", all93);
 
-var part451 = match("MESSAGE#438:1197/4", "nwparser.p0", "%{}\"%{fld3->} Protocol:%{protocol}\" npcs=%{info}");
+var part453 = match("MESSAGE#438:1197/4", "nwparser.p0", "%{}\"%{fld3->} Protocol:%{protocol}\" npcs=%{info}");
 
 var all94 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup11,
-		dup193,
-		part451,
+		dup7,
+		dup178,
+		dup10,
+		dup192,
+		part453,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5439,13 +5444,13 @@ var all94 = all_match({
 
 var msg439 = msg("1197", all94);
 
-var part452 = match("MESSAGE#439:1199/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3->} sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var part454 = match("MESSAGE#439:1199/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3->} sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
 var all95 = all_match({
 	processors: [
-		part452,
-		dup179,
-		dup168,
+		part454,
+		dup178,
+		dup167,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5454,35 +5459,35 @@ var all95 = all_match({
 
 var msg440 = msg("1199", all95);
 
-var part453 = match("MESSAGE#440:1199:01", "nwparser.payload", "msg=\"Responder from country blocked: Responder IP:%{fld1}Country Name:%{location_country}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup169,
-	dup12,
+var part455 = match("MESSAGE#440:1199:01", "nwparser.payload", "msg=\"Responder from country blocked: Responder IP:%{fld1}Country Name:%{location_country}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup168,
+	dup11,
 ]));
 
-var msg441 = msg("1199:01", part453);
+var msg441 = msg("1199:01", part455);
 
-var part454 = match("MESSAGE#441:1199:02", "nwparser.payload", "msg=\"Responder from country blocked: Responder IP:%{fld1}Country Name:%{location_country}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
-	dup169,
-	dup12,
+var part456 = match("MESSAGE#441:1199:02", "nwparser.payload", "msg=\"Responder from country blocked: Responder IP:%{fld1}Country Name:%{location_country}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}rule=\"%{rule}\" fw_action=\"%{action}\"", processor_chain([
+	dup168,
+	dup11,
 ]));
 
-var msg442 = msg("1199:02", part454);
+var msg442 = msg("1199:02", part456);
 
-var select141 = linear_select([
+var select142 = linear_select([
 	msg440,
 	msg441,
 	msg442,
 ]);
 
-var part455 = match("MESSAGE#442:1155/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} catid=%{fld3->} sess=%{fld4->} n=%{fld5->} src=%{p0}");
+var part457 = match("MESSAGE#442:1155/0", "nwparser.payload", "msg=\"%{msg}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} catid=%{fld3->} sess=%{fld4->} n=%{fld5->} src=%{p0}");
 
 var all96 = all_match({
 	processors: [
-		part455,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		part457,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5491,22 +5496,22 @@ var all96 = all_match({
 
 var msg443 = msg("1155", all96);
 
-var part456 = match("MESSAGE#443:1155:01", "nwparser.payload", "msg=\"%{action}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}", processor_chain([
-	dup107,
+var part458 = match("MESSAGE#443:1155:01", "nwparser.payload", "msg=\"%{action}\" sid=%{sid->} appcat=%{fld1->} appid=%{fld2->} n=%{fld3->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost}", processor_chain([
+	dup106,
 ]));
 
-var msg444 = msg("1155:01", part456);
+var msg444 = msg("1155:01", part458);
 
-var select142 = linear_select([
+var select143 = linear_select([
 	msg443,
 	msg444,
 ]);
 
 var all97 = all_match({
 	processors: [
-		dup170,
-		dup203,
-		dup168,
+		dup169,
+		dup202,
+		dup167,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5517,9 +5522,9 @@ var msg445 = msg("1198", all97);
 
 var all98 = all_match({
 	processors: [
-		dup8,
-		dup179,
-		dup168,
+		dup7,
+		dup178,
+		dup167,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5528,30 +5533,30 @@ var all98 = all_match({
 
 var msg446 = msg("714", all98);
 
-var msg447 = msg("709", dup242);
+var msg447 = msg("709", dup241);
 
-var msg448 = msg("1005", dup242);
+var msg448 = msg("1005", dup241);
 
-var msg449 = msg("1003", dup242);
+var msg449 = msg("1003", dup241);
 
-var msg450 = msg("1007", dup243);
+var msg450 = msg("1007", dup242);
 
-var part457 = match("MESSAGE#450:1008", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}::%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
-	dup105,
-	dup12,
+var part459 = match("MESSAGE#450:1008", "nwparser.payload", "msg=\"%{msg}\" sess=\"%{fld1}\" dur=%{duration->} n=%{fld2->} usr=\"%{username}\" src=%{saddr}::%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} note=\"%{rulename}\" fw_action=\"%{action}\"", processor_chain([
+	dup104,
+	dup11,
 ]));
 
-var msg451 = msg("1008", part457);
+var msg451 = msg("1008", part459);
 
-var msg452 = msg("708", dup243);
+var msg452 = msg("708", dup242);
 
 var all99 = all_match({
 	processors: [
-		dup170,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup169,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5560,166 +5565,166 @@ var all99 = all_match({
 
 var msg453 = msg("1201", all99);
 
-var msg454 = msg("1201:01", dup243);
+var msg454 = msg("1201:01", dup242);
 
-var select143 = linear_select([
+var select144 = linear_select([
 	msg453,
 	msg454,
 ]);
 
-var msg455 = msg("654", dup224);
+var msg455 = msg("654", dup223);
 
-var msg456 = msg("670", dup224);
+var msg456 = msg("670", dup223);
 
-var msg457 = msg("884", dup243);
+var msg457 = msg("884", dup242);
 
-var part458 = match("MESSAGE#457:1153", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} rcvd=%{rbytes->} note=\"%{info}\"", processor_chain([
+var part460 = match("MESSAGE#457:1153", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{protocol->} rcvd=%{rbytes->} note=\"%{info}\"", processor_chain([
 	dup1,
 ]));
 
-var msg458 = msg("1153", part458);
+var msg458 = msg("1153", part460);
 
-var part459 = match("MESSAGE#458:1153:01/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1->} sess=%{fld2->} n=%{p0}");
+var part461 = match("MESSAGE#458:1153:01/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1->} sess=%{fld2->} n=%{p0}");
 
-var part460 = match("MESSAGE#458:1153:01/0_1", "nwparser.payload", " msg=\"%{event_description}\" sess=%{fld2->} n=%{p0}");
+var part462 = match("MESSAGE#458:1153:01/0_1", "nwparser.payload", " msg=\"%{event_description}\" sess=%{fld2->} n=%{p0}");
 
-var part461 = match("MESSAGE#458:1153:01/0_2", "nwparser.payload", " msg=\"%{event_description}\" n=%{p0}");
-
-var select144 = linear_select([
-	part459,
-	part460,
-	part461,
-]);
-
-var part462 = match("MESSAGE#458:1153:01/1", "nwparser.p0", "%{fld3->} usr=\"%{username}\" src=%{p0}");
-
-var part463 = match("MESSAGE#458:1153:01/2_0", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
+var part463 = match("MESSAGE#458:1153:01/0_2", "nwparser.payload", " msg=\"%{event_description}\" n=%{p0}");
 
 var select145 = linear_select([
+	part461,
+	part462,
 	part463,
-	dup26,
 ]);
 
-var part464 = match("MESSAGE#458:1153:01/4_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac= %{p0}");
+var part464 = match("MESSAGE#458:1153:01/1", "nwparser.p0", "%{fld3->} usr=\"%{username}\" src=%{p0}");
 
-var part465 = match("MESSAGE#458:1153:01/4_1", "nwparser.p0", "%{daddr}:%{dport}srcMac= %{p0}");
-
-var part466 = match("MESSAGE#458:1153:01/4_2", "nwparser.p0", "%{daddr}srcMac= %{p0}");
+var part465 = match("MESSAGE#458:1153:01/2_0", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
 
 var select146 = linear_select([
-	part464,
 	part465,
-	part466,
+	dup25,
 ]);
 
-var part467 = match("MESSAGE#458:1153:01/5", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} %{p0}");
+var part466 = match("MESSAGE#458:1153:01/4_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac= %{p0}");
 
-var part468 = match("MESSAGE#458:1153:01/6_0", "nwparser.p0", "sent=%{sbytes}rcvd=%{rbytes->} ");
+var part467 = match("MESSAGE#458:1153:01/4_1", "nwparser.p0", "%{daddr}:%{dport}srcMac= %{p0}");
 
-var part469 = match("MESSAGE#458:1153:01/6_1", "nwparser.p0", "type=%{fld4->} icmpCode=%{fld5->} rcvd=%{rbytes->} ");
-
-var part470 = match("MESSAGE#458:1153:01/6_2", "nwparser.p0", "rcvd=%{rbytes->} ");
+var part468 = match("MESSAGE#458:1153:01/4_2", "nwparser.p0", "%{daddr}srcMac= %{p0}");
 
 var select147 = linear_select([
+	part466,
+	part467,
 	part468,
-	part469,
+]);
+
+var part469 = match("MESSAGE#458:1153:01/5", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} %{p0}");
+
+var part470 = match("MESSAGE#458:1153:01/6_0", "nwparser.p0", "sent=%{sbytes}rcvd=%{rbytes->} ");
+
+var part471 = match("MESSAGE#458:1153:01/6_1", "nwparser.p0", "type=%{fld4->} icmpCode=%{fld5->} rcvd=%{rbytes->} ");
+
+var part472 = match("MESSAGE#458:1153:01/6_2", "nwparser.p0", "rcvd=%{rbytes->} ");
+
+var select148 = linear_select([
 	part470,
+	part471,
+	part472,
 ]);
 
 var all100 = all_match({
 	processors: [
-		select144,
-		part462,
 		select145,
-		dup11,
+		part464,
 		select146,
-		part467,
+		dup10,
 		select147,
+		part469,
+		select148,
 	],
 	on_success: processor_chain([
 		dup1,
-		dup12,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg459 = msg("1153:01", all100);
 
-var part471 = match("MESSAGE#459:1153:02/0", "nwparser.payload", "msg=\"%{event_description}\" %{p0}");
+var part473 = match("MESSAGE#459:1153:02/0", "nwparser.payload", "msg=\"%{event_description}\" %{p0}");
 
-var part472 = match("MESSAGE#459:1153:02/1_0", "nwparser.p0", "app=%{fld1->} n=%{fld2->} src=%{p0}");
+var part474 = match("MESSAGE#459:1153:02/1_0", "nwparser.p0", "app=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var part473 = match("MESSAGE#459:1153:02/1_1", "nwparser.p0", " n=%{fld2->} src=%{p0}");
+var part475 = match("MESSAGE#459:1153:02/1_1", "nwparser.p0", " n=%{fld2->} src=%{p0}");
 
-var select148 = linear_select([
-	part472,
-	part473,
+var select149 = linear_select([
+	part474,
+	part475,
 ]);
 
-var part474 = match("MESSAGE#459:1153:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} ");
+var part476 = match("MESSAGE#459:1153:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{sbytes->} rcvd=%{rbytes->} ");
 
 var all101 = all_match({
 	processors: [
-		part471,
-		select148,
-		part474,
+		part473,
+		select149,
+		part476,
 	],
 	on_success: processor_chain([
 		dup1,
-		dup12,
+		dup11,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var msg460 = msg("1153:02", all101);
 
-var select149 = linear_select([
+var select150 = linear_select([
 	msg458,
 	msg459,
 	msg460,
 ]);
 
-var part475 = match("MESSAGE#460:1107", "nwparser.payload", "msg=\"%{msg}\"%{space}n=%{fld1}", processor_chain([
+var part477 = match("MESSAGE#460:1107", "nwparser.payload", "msg=\"%{msg}\"%{space}n=%{fld1}", processor_chain([
 	dup1,
 ]));
 
-var msg461 = msg("1107", part475);
+var msg461 = msg("1107", part477);
 
-var part476 = match("MESSAGE#461:1220/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{p0}");
+var part478 = match("MESSAGE#461:1220/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{p0}");
 
-var part477 = match("MESSAGE#461:1220/1_0", "nwparser.p0", "%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part479 = match("MESSAGE#461:1220/1_0", "nwparser.p0", "%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var part478 = match("MESSAGE#461:1220/1_1", "nwparser.p0", "%{fld2}src=%{saddr}:%{sport->} dst=%{p0}");
+var part480 = match("MESSAGE#461:1220/1_1", "nwparser.p0", "%{fld2}src=%{saddr}:%{sport->} dst=%{p0}");
 
-var select150 = linear_select([
-	part477,
-	part478,
+var select151 = linear_select([
+	part479,
+	part480,
 ]);
 
 var all102 = all_match({
 	processors: [
-		part476,
-		select150,
-		dup11,
-		dup225,
-		dup173,
+		part478,
+		select151,
+		dup10,
+		dup224,
+		dup172,
 	],
 	on_success: processor_chain([
-		dup161,
+		dup160,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
@@ -5728,68 +5733,68 @@ var msg462 = msg("1220", all102);
 
 var all103 = all_match({
 	processors: [
-		dup149,
-		dup225,
-		dup173,
+		dup148,
+		dup224,
+		dup172,
 	],
 	on_success: processor_chain([
-		dup161,
+		dup160,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg463 = msg("1230", all103);
 
-var part479 = match("MESSAGE#463:1231", "nwparser.payload", "msg=\"%{msg}\"%{space}n=%{fld1->} note=\"%{info}\"", processor_chain([
+var part481 = match("MESSAGE#463:1231", "nwparser.payload", "msg=\"%{msg}\"%{space}n=%{fld1->} note=\"%{info}\"", processor_chain([
 	dup1,
 ]));
 
-var msg464 = msg("1231", part479);
+var msg464 = msg("1231", part481);
 
-var part480 = match("MESSAGE#464:1233", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
-	dup169,
-	dup12,
+var part482 = match("MESSAGE#464:1233", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
+	dup168,
+	dup11,
 ]));
 
-var msg465 = msg("1233", part480);
+var msg465 = msg("1233", part482);
 
-var part481 = match("MESSAGE#465:1079/0", "nwparser.payload", "msg=\"User%{username}log%{p0}");
+var part483 = match("MESSAGE#465:1079/0", "nwparser.payload", "msg=\"User%{username}log%{p0}");
 
-var part482 = match("MESSAGE#465:1079/1_0", "nwparser.p0", "in%{p0}");
+var part484 = match("MESSAGE#465:1079/1_0", "nwparser.p0", "in%{p0}");
 
-var part483 = match("MESSAGE#465:1079/1_1", "nwparser.p0", "out%{p0}");
-
-var select151 = linear_select([
-	part482,
-	part483,
-]);
-
-var part484 = match("MESSAGE#465:1079/2", "nwparser.p0", "\"%{p0}");
-
-var part485 = match("MESSAGE#465:1079/3_0", "nwparser.p0", "dur=%{duration->} %{space}n=%{fld1}");
-
-var part486 = match("MESSAGE#465:1079/3_1", "nwparser.p0", "sess=\"%{fld2}\" n=%{fld1->} ");
-
-var part487 = match("MESSAGE#465:1079/3_2", "nwparser.p0", "n=%{fld1}");
+var part485 = match("MESSAGE#465:1079/1_1", "nwparser.p0", "out%{p0}");
 
 var select152 = linear_select([
+	part484,
 	part485,
-	part486,
+]);
+
+var part486 = match("MESSAGE#465:1079/2", "nwparser.p0", "\"%{p0}");
+
+var part487 = match("MESSAGE#465:1079/3_0", "nwparser.p0", "dur=%{duration->} %{space}n=%{fld1}");
+
+var part488 = match("MESSAGE#465:1079/3_1", "nwparser.p0", "sess=\"%{fld2}\" n=%{fld1->} ");
+
+var part489 = match("MESSAGE#465:1079/3_2", "nwparser.p0", "n=%{fld1}");
+
+var select153 = linear_select([
 	part487,
+	part488,
+	part489,
 ]);
 
 var all104 = all_match({
 	processors: [
-		part481,
-		select151,
-		part484,
+		part483,
 		select152,
+		part486,
+		select153,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5798,68 +5803,68 @@ var all104 = all_match({
 
 var msg466 = msg("1079", all104);
 
-var part488 = match("MESSAGE#466:1079:01", "nwparser.payload", "msg=\"Client%{username}is assigned IP:%{hostip}\" %{space->} n=%{fld1}", processor_chain([
+var part490 = match("MESSAGE#466:1079:01", "nwparser.payload", "msg=\"Client%{username}is assigned IP:%{hostip}\" %{space->} n=%{fld1}", processor_chain([
 	dup1,
 ]));
 
-var msg467 = msg("1079:01", part488);
+var msg467 = msg("1079:01", part490);
 
-var part489 = match("MESSAGE#467:1079:02", "nwparser.payload", "msg=\"destination for %{daddr->} is not allowed by access control\" n=%{fld2}", processor_chain([
+var part491 = match("MESSAGE#467:1079:02", "nwparser.payload", "msg=\"destination for %{daddr->} is not allowed by access control\" n=%{fld2}", processor_chain([
 	dup1,
-	dup12,
+	dup11,
 	setc("event_description","destination is not allowed by access control"),
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg468 = msg("1079:02", part489);
+var msg468 = msg("1079:02", part491);
 
-var part490 = match("MESSAGE#468:1079:03", "nwparser.payload", "msg=\"SSLVPN Client %{username->} matched device profile Default Device Profile for Windows\" n=%{fld2}", processor_chain([
+var part492 = match("MESSAGE#468:1079:03", "nwparser.payload", "msg=\"SSLVPN Client %{username->} matched device profile Default Device Profile for Windows\" n=%{fld2}", processor_chain([
 	dup1,
-	dup12,
+	dup11,
 	setc("event_description","SSLVPN Client matched device profile Default Device Profile for Windows"),
+	dup17,
 	dup18,
 	dup19,
 	dup20,
 	dup21,
-	dup22,
 ]));
 
-var msg469 = msg("1079:03", part490);
+var msg469 = msg("1079:03", part492);
 
-var select153 = linear_select([
+var select154 = linear_select([
 	msg466,
 	msg467,
 	msg468,
 	msg469,
 ]);
 
-var part491 = match("MESSAGE#469:1080/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} usr=\"%{username}\" src= %{p0}");
+var part493 = match("MESSAGE#469:1080/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} usr=\"%{username}\" src= %{p0}");
 
-var part492 = match("MESSAGE#469:1080/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
-
-var select154 = linear_select([
-	dup73,
-	part492,
-]);
+var part494 = match("MESSAGE#469:1080/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
 var select155 = linear_select([
+	dup73,
+	part494,
+]);
+
+var select156 = linear_select([
 	dup77,
 	dup78,
 ]);
 
-var part493 = match("MESSAGE#469:1080/4", "nwparser.p0", "%{} %{protocol}");
+var part495 = match("MESSAGE#469:1080/4", "nwparser.p0", "%{} %{protocol}");
 
 var all105 = all_match({
 	processors: [
-		part491,
-		select154,
-		dup11,
-		select155,
 		part493,
+		select155,
+		dup10,
+		select156,
+		part495,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -5868,35 +5873,35 @@ var all105 = all_match({
 
 var msg470 = msg("1080", all105);
 
-var part494 = match("MESSAGE#470:580", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
+var part496 = match("MESSAGE#470:580", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{protocol->} note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
 	dup5,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg471 = msg("580", part494);
+var msg471 = msg("580", part496);
 
-var part495 = match("MESSAGE#471:1369/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{p0}");
+var part497 = match("MESSAGE#471:1369/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{p0}");
 
 var all106 = all_match({
 	processors: [
-		part495,
-		dup226,
-		dup114,
+		part497,
+		dup225,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup70,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
@@ -5905,20 +5910,20 @@ var msg472 = msg("1369", all106);
 
 var all107 = all_match({
 	processors: [
-		dup149,
-		dup213,
-		dup151,
-		dup226,
-		dup114,
+		dup148,
+		dup212,
+		dup150,
+		dup225,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup70,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
@@ -5927,272 +5932,272 @@ var msg473 = msg("1370", all107);
 
 var all108 = all_match({
 	processors: [
-		dup149,
-		dup213,
-		dup163,
-		dup201,
-		dup114,
+		dup148,
+		dup212,
+		dup162,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
 		dup70,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg474 = msg("1371", all108);
 
-var part496 = match("MESSAGE#474:1387/1_1", "nwparser.p0", "%{saddr}:%{sport}: dst=%{p0}");
+var part498 = match("MESSAGE#474:1387/1_1", "nwparser.p0", "%{saddr}:%{sport}: dst=%{p0}");
 
-var select156 = linear_select([
-	dup140,
-	part496,
+var select157 = linear_select([
+	dup139,
+	part498,
 ]);
 
 var all109 = all_match({
 	processors: [
+		dup161,
+		select157,
+		dup10,
+		dup212,
 		dup162,
-		select156,
-		dup11,
-		dup213,
-		dup163,
-		dup201,
-		dup114,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
-		dup161,
+		dup160,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg475 = msg("1387", all109);
 
-var part497 = match("MESSAGE#475:1391/0", "nwparser.payload", "pktdatId=%{fld1}pktdatNum=\"%{fld2}\" pktdatEnc=\"%{fld3}\" n=%{fld4}src=%{p0}");
+var part499 = match("MESSAGE#475:1391/0", "nwparser.payload", "pktdatId=%{fld1}pktdatNum=\"%{fld2}\" pktdatEnc=\"%{fld3}\" n=%{fld4}src=%{p0}");
 
-var part498 = match("MESSAGE#475:1391/1_1", "nwparser.p0", "%{saddr}:%{sport}dst=%{p0}");
-
-var select157 = linear_select([
-	dup69,
-	part498,
-]);
-
-var part499 = match("MESSAGE#475:1391/2_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost}");
-
-var part500 = match("MESSAGE#475:1391/2_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}");
-
-var part501 = match("MESSAGE#475:1391/2_2", "nwparser.p0", "%{daddr}:%{dport}");
+var part500 = match("MESSAGE#475:1391/1_1", "nwparser.p0", "%{saddr}:%{sport}dst=%{p0}");
 
 var select158 = linear_select([
-	part499,
+	dup69,
 	part500,
+]);
+
+var part501 = match("MESSAGE#475:1391/2_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost}");
+
+var part502 = match("MESSAGE#475:1391/2_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}");
+
+var part503 = match("MESSAGE#475:1391/2_2", "nwparser.p0", "%{daddr}:%{dport}");
+
+var select159 = linear_select([
 	part501,
+	part502,
+	part503,
 ]);
 
 var all110 = all_match({
 	processors: [
-		part497,
-		select157,
+		part499,
 		select158,
+		select159,
 	],
 	on_success: processor_chain([
 		dup1,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg476 = msg("1391", all110);
 
-var part502 = match("MESSAGE#476:1253", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1}appName=\"%{application}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}fw_action=\"%{action}\"", processor_chain([
+var part504 = match("MESSAGE#476:1253", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1}appName=\"%{application}\" n=%{fld2}src=%{saddr}:%{sport}:%{sinterface}dst=%{daddr}:%{dport}:%{dinterface}srcMac=%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}fw_action=\"%{action}\"", processor_chain([
 	dup5,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg477 = msg("1253", part502);
+var msg477 = msg("1253", part504);
 
-var part503 = match("MESSAGE#477:1009", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2}note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
+var part505 = match("MESSAGE#477:1009", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2}note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
 	dup5,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg478 = msg("1009", part503);
+var msg478 = msg("1009", part505);
 
-var part504 = match("MESSAGE#478:910/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2}appName=\"%{application}\" n=%{fld3}src=%{saddr}:%{sport}:%{sinterface}dst=%{p0}");
+var part506 = match("MESSAGE#478:910/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld2}appName=\"%{application}\" n=%{fld3}src=%{saddr}:%{sport}:%{sinterface}dst=%{p0}");
 
-var part505 = match("MESSAGE#478:910/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{p0}");
+var part507 = match("MESSAGE#478:910/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost}srcMac=%{p0}");
 
-var part506 = match("MESSAGE#478:910/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac=%{p0}");
+var part508 = match("MESSAGE#478:910/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}srcMac=%{p0}");
 
-var select159 = linear_select([
-	part505,
-	part506,
+var select160 = linear_select([
+	part507,
+	part508,
 ]);
 
-var part507 = match("MESSAGE#478:910/2", "nwparser.p0", "%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}fw_action=\"%{action}\"");
+var part509 = match("MESSAGE#478:910/2", "nwparser.p0", "%{smacaddr}dstMac=%{dmacaddr}proto=%{protocol}fw_action=\"%{action}\"");
 
 var all111 = all_match({
 	processors: [
-		part504,
-		select159,
-		part507,
+		part506,
+		select160,
+		part509,
 	],
 	on_success: processor_chain([
 		dup5,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg479 = msg("910", all111);
 
-var part508 = match("MESSAGE#479:m:01", "nwparser.payload", "m=%{id1}msg=\"%{event_description}\" n=%{fld2}if=%{interface}ucastRx=%{fld3}bcastRx=%{fld4}bytesRx=%{rbytes}ucastTx=%{fld5}bcastTx=%{fld6}bytesTx=%{sbytes}", processor_chain([
+var part510 = match("MESSAGE#479:m:01", "nwparser.payload", "m=%{id1}msg=\"%{event_description}\" n=%{fld2}if=%{interface}ucastRx=%{fld3}bcastRx=%{fld4}bytesRx=%{rbytes}ucastTx=%{fld5}bcastTx=%{fld6}bytesTx=%{sbytes}", processor_chain([
 	dup1,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
-	dup20,
-	dup22,
+	dup19,
+	dup21,
 	dup37,
 ]));
 
-var msg480 = msg("m:01", part508);
+var msg480 = msg("m:01", part510);
 
-var part509 = match("MESSAGE#480:1011", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1}note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
+var part511 = match("MESSAGE#480:1011", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1}note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
 	dup1,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg481 = msg("1011", part509);
+var msg481 = msg("1011", part511);
 
-var part510 = match("MESSAGE#481:609", "nwparser.payload", "msg=\"%{event_description}\" sid=%{sid->} ipscat=\"%{fld3}\" ipspri=%{fld4->} pktdatId=%{fld5->} n=%{fld6->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
-	dup166,
+var part512 = match("MESSAGE#481:609", "nwparser.payload", "msg=\"%{event_description}\" sid=%{sid->} ipscat=\"%{fld3}\" ipspri=%{fld4->} pktdatId=%{fld5->} n=%{fld6->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} proto=%{protocol->} fw_action=\"%{action}\"", processor_chain([
+	dup165,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg482 = msg("609", part510);
+var msg482 = msg("609", part512);
 
-var msg483 = msg("796", dup227);
+var msg483 = msg("796", dup226);
 
-var part511 = match("MESSAGE#483:880", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
+var part513 = match("MESSAGE#483:880", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} note=\"%{info}\" fw_action=\"%{action}\"", processor_chain([
 	dup70,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg484 = msg("880", part511);
+var msg484 = msg("880", part513);
 
-var part512 = match("MESSAGE#484:1309", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
-	dup161,
+var part514 = match("MESSAGE#484:1309", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+	dup160,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
-var msg485 = msg("1309", part512);
+var msg485 = msg("1309", part514);
 
-var msg486 = msg("1310", dup227);
+var msg486 = msg("1310", dup226);
 
-var part513 = match("MESSAGE#486:1232/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=\"%{p0}");
+var part515 = match("MESSAGE#486:1232/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note=\"%{p0}");
 
-var part514 = match("MESSAGE#486:1232/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=\"%{p0}");
+var part516 = match("MESSAGE#486:1232/1_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=\"%{p0}");
 
-var select160 = linear_select([
-	part513,
-	part514,
+var select161 = linear_select([
+	part515,
+	part516,
 ]);
 
-var part515 = match("MESSAGE#486:1232/2", "nwparser.p0", "%{info}\" fw_action=\"%{action}\"");
+var part517 = match("MESSAGE#486:1232/2", "nwparser.p0", "%{info}\" fw_action=\"%{action}\"");
 
 var all112 = all_match({
 	processors: [
 		dup81,
-		select160,
-		part515,
+		select161,
+		part517,
 	],
 	on_success: processor_chain([
 		dup1,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
 
 var msg487 = msg("1232", all112);
 
-var part516 = match("MESSAGE#487:1447/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1->} appName=\"%{application}\" n=%{fld2->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var part518 = match("MESSAGE#487:1447/0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld1->} appName=\"%{application}\" n=%{fld2->} srcV6=%{saddr_v6->} src=%{saddr}:%{sport}:%{sinterface->} dstV6=%{daddr_v6->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
 var all113 = all_match({
 	processors: [
-		part516,
-		dup201,
-		dup114,
+		part518,
+		dup200,
+		dup113,
 	],
 	on_success: processor_chain([
-		dup161,
+		dup160,
 		dup54,
-		dup18,
+		dup17,
 		dup82,
+		dup19,
 		dup20,
 		dup21,
-		dup22,
 		dup37,
 	]),
 });
@@ -6217,7 +6222,7 @@ var chain1 = processor_chain([
 		"105": msg164,
 		"106": msg165,
 		"107": msg166,
-		"1079": select153,
+		"1079": select154,
 		"108": msg167,
 		"1080": msg470,
 		"1086": msg424,
@@ -6225,28 +6230,28 @@ var chain1 = processor_chain([
 		"11": msg10,
 		"110": msg169,
 		"1107": msg461,
-		"111": select65,
+		"111": select66,
 		"1110": msg408,
 		"112": msg172,
 		"113": msg173,
 		"114": msg174,
 		"1149": msg426,
-		"115": select66,
-		"1153": select149,
-		"1154": select140,
-		"1155": select142,
+		"115": select67,
+		"1153": select150,
+		"1154": select141,
+		"1155": select143,
 		"1159": msg427,
 		"116": msg177,
 		"117": msg178,
 		"118": msg179,
 		"119": msg180,
-		"1195": select138,
+		"1195": select139,
 		"1197": msg439,
 		"1198": msg445,
-		"1199": select141,
+		"1199": select142,
 		"12": select4,
 		"120": msg181,
-		"1201": select143,
+		"1201": select144,
 		"121": msg182,
 		"122": msg183,
 		"1220": msg462,
@@ -6284,7 +6289,7 @@ var chain1 = processor_chain([
 		"1371": msg474,
 		"138": msg202,
 		"1387": msg475,
-		"139": select67,
+		"139": select68,
 		"1391": msg476,
 		"14": select7,
 		"140": msg205,
@@ -6309,7 +6314,7 @@ var chain1 = processor_chain([
 		"154": msg221,
 		"155": msg222,
 		"156": msg223,
-		"157": select68,
+		"157": select69,
 		"158": msg226,
 		"159": msg227,
 		"16": msg21,
@@ -6325,37 +6330,37 @@ var chain1 = processor_chain([
 		"169": msg237,
 		"17": msg22,
 		"170": msg238,
-		"171": select69,
-		"172": select70,
+		"171": select70,
+		"172": select71,
 		"173": msg245,
-		"174": select71,
-		"175": select72,
+		"174": select72,
+		"175": select73,
 		"176": msg253,
 		"177": msg254,
 		"178": msg255,
 		"179": msg256,
 		"18": msg23,
-		"180": select73,
-		"181": select74,
+		"180": select74,
+		"181": select75,
 		"19": msg24,
 		"193": msg261,
 		"194": msg262,
 		"195": msg263,
-		"196": select77,
+		"196": select78,
 		"199": msg266,
 		"20": msg25,
 		"200": msg267,
 		"21": msg26,
 		"22": msg27,
 		"23": select10,
-		"235": select78,
+		"235": select79,
 		"236": msg271,
 		"237": msg272,
 		"238": msg273,
 		"239": msg274,
 		"24": select11,
 		"240": msg275,
-		"241": select79,
+		"241": select80,
 		"242": msg278,
 		"243": msg403,
 		"25": msg34,
@@ -6363,11 +6368,11 @@ var chain1 = processor_chain([
 		"255": msg280,
 		"257": msg281,
 		"26": msg35,
-		"261": select82,
+		"261": select83,
 		"262": msg284,
 		"263": msg413,
 		"264": msg414,
-		"267": select135,
+		"267": select136,
 		"27": msg36,
 		"273": msg285,
 		"28": select12,
@@ -6380,22 +6385,22 @@ var chain1 = processor_chain([
 		"33": select17,
 		"34": msg52,
 		"346": msg288,
-		"35": select18,
+		"35": select19,
 		"350": msg289,
 		"351": msg290,
 		"352": msg291,
-		"353": select83,
+		"353": select84,
 		"354": msg294,
-		"355": select84,
+		"355": select85,
 		"356": msg297,
-		"357": select85,
+		"357": select86,
 		"358": msg300,
-		"36": select22,
-		"37": select26,
-		"371": select86,
+		"36": select23,
+		"37": select27,
+		"371": select87,
 		"372": msg303,
 		"373": msg304,
-		"38": select29,
+		"38": select30,
 		"39": msg67,
 		"4": msg1,
 		"40": msg68,
@@ -6404,7 +6409,7 @@ var chain1 = processor_chain([
 		"403": msg400,
 		"404": msg410,
 		"406": msg307,
-		"41": select30,
+		"41": select31,
 		"412": msg415,
 		"413": msg308,
 		"414": msg309,
@@ -6416,11 +6421,11 @@ var chain1 = processor_chain([
 		"439": msg311,
 		"44": msg74,
 		"440": msg312,
-		"441": select87,
+		"441": select88,
 		"442": msg315,
 		"446": msg316,
-		"45": select31,
-		"46": select32,
+		"45": select32,
+		"46": select33,
 		"47": msg82,
 		"477": msg317,
 		"48": msg83,
@@ -6431,13 +6436,13 @@ var chain1 = processor_chain([
 		"51": msg86,
 		"52": msg87,
 		"520": msg319,
-		"522": select90,
+		"522": select91,
 		"523": msg323,
-		"524": select93,
-		"526": select96,
+		"524": select94,
+		"526": select97,
 		"53": msg88,
 		"534": msg401,
-		"537": select115,
+		"537": select116,
 		"538": msg346,
 		"549": msg347,
 		"557": msg348,
@@ -6449,11 +6454,11 @@ var chain1 = processor_chain([
 		"58": msg89,
 		"580": msg471,
 		"583": msg353,
-		"597": select116,
-		"598": select117,
+		"597": select117,
+		"598": select118,
 		"6": select3,
 		"60": msg90,
-		"602": select118,
+		"602": select119,
 		"605": msg363,
 		"606": msg364,
 		"608": msg365,
@@ -6462,32 +6467,32 @@ var chain1 = processor_chain([
 		"614": msg421,
 		"616": msg366,
 		"62": msg92,
-		"63": select33,
+		"63": select34,
 		"64": msg95,
 		"65": msg96,
 		"654": msg455,
-		"657": select132,
+		"657": select133,
 		"658": msg367,
 		"66": msg97,
-		"67": select34,
+		"67": select35,
 		"670": msg456,
 		"68": msg100,
 		"69": msg101,
 		"7": msg6,
-		"70": select36,
+		"70": select37,
 		"708": msg452,
 		"709": msg447,
 		"710": msg368,
-		"712": select122,
-		"713": select123,
+		"712": select123,
+		"713": select124,
 		"714": msg446,
-		"72": select37,
+		"72": select38,
 		"73": msg106,
 		"74": msg107,
 		"748": msg422,
 		"75": msg108,
 		"76": msg109,
-		"760": select124,
+		"760": select125,
 		"766": msg378,
 		"77": msg110,
 		"78": msg111,
@@ -6498,21 +6503,21 @@ var chain1 = processor_chain([
 		"8": msg7,
 		"80": msg113,
 		"805": msg417,
-		"809": select136,
+		"809": select137,
 		"81": msg114,
-		"82": select38,
-		"83": select39,
+		"82": select39,
+		"83": select40,
 		"84": msg122,
-		"860": select125,
-		"866": select127,
-		"867": select128,
-		"87": select41,
-		"88": select42,
+		"860": select126,
+		"866": select128,
+		"867": select129,
+		"87": select42,
+		"88": select43,
 		"880": msg484,
-		"882": select129,
+		"882": select130,
 		"884": msg457,
-		"888": select130,
-		"89": select44,
+		"888": select131,
+		"89": select45,
 		"892": msg389,
 		"9": msg8,
 		"90": msg129,
@@ -6532,536 +6537,534 @@ var chain1 = processor_chain([
 		"94": msg133,
 		"95": msg134,
 		"96": msg135,
-		"97": select51,
-		"98": select64,
+		"97": select52,
+		"98": select65,
 		"986": msg155,
 		"99": msg158,
 		"994": msg402,
 		"995": msg404,
 		"997": msg405,
-		"998": select133,
+		"998": select134,
 		"m": msg480,
 		"msg": msg436,
 		"src": msg437,
 	}),
 ]);
 
-var part517 = match("MESSAGE#13:14/0", "nwparser.payload", "%{} %{p0}");
+var part519 = match("MESSAGE#14:14:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var part518 = match("MESSAGE#14:14:01/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var part520 = match("MESSAGE#14:14:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
 
-var part519 = match("MESSAGE#14:14:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst= %{p0}");
+var part521 = match("MESSAGE#14:14:01/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var part520 = match("MESSAGE#14:14:01/1_1", "nwparser.p0", " %{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var part522 = match("MESSAGE#14:14:01/2", "nwparser.p0", "%{} %{p0}");
 
-var part521 = match("MESSAGE#14:14:01/2", "nwparser.p0", "%{} %{p0}");
+var part523 = match("MESSAGE#28:23:01/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} %{p0}");
 
-var part522 = match("MESSAGE#28:23:01/1_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} %{p0}");
+var part524 = match("MESSAGE#28:23:01/1_1", "nwparser.p0", "%{daddr->} %{p0}");
 
-var part523 = match("MESSAGE#28:23:01/1_1", "nwparser.p0", "%{daddr->} %{p0}");
+var part525 = match("MESSAGE#38:29:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var part524 = match("MESSAGE#38:29:01/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var part526 = match("MESSAGE#38:29:01/1_1", "nwparser.p0", " %{saddr->} dst= %{p0}");
 
-var part525 = match("MESSAGE#38:29:01/1_1", "nwparser.p0", " %{saddr->} dst= %{p0}");
+var part527 = match("MESSAGE#38:29:01/4", "nwparser.p0", "%{} ");
 
-var part526 = match("MESSAGE#38:29:01/4", "nwparser.p0", "%{} ");
+var part528 = match("MESSAGE#40:30:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} src=%{p0}");
 
-var part527 = match("MESSAGE#40:30:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld->} src=%{p0}");
+var part529 = match("MESSAGE#49:33:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{p0}");
 
-var part528 = match("MESSAGE#49:33:01/0", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{p0}");
+var part530 = match("MESSAGE#52:35:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} ");
 
-var part529 = match("MESSAGE#54:36:01/2_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} %{p0}");
+var part531 = match("MESSAGE#54:36:01/2_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} %{p0}");
 
-var part530 = match("MESSAGE#54:36:01/2_1", "nwparser.p0", "%{saddr->} %{p0}");
+var part532 = match("MESSAGE#54:36:01/2_1", "nwparser.p0", "%{saddr->} %{p0}");
 
-var part531 = match("MESSAGE#54:36:01/3", "nwparser.p0", "%{}dst= %{p0}");
+var part533 = match("MESSAGE#54:36:01/3", "nwparser.p0", "%{}dst= %{p0}");
 
-var part532 = match("MESSAGE#55:36:02/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
+var part534 = match("MESSAGE#55:36:02/0", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var part533 = match("MESSAGE#55:36:02/1_1", "nwparser.p0", "%{saddr->} dst= %{p0}");
+var part535 = match("MESSAGE#55:36:02/1_1", "nwparser.p0", "%{saddr->} dst= %{p0}");
 
-var part534 = match("MESSAGE#57:37:01/1_1", "nwparser.p0", "n=%{fld1->} src=%{p0}");
+var part536 = match("MESSAGE#57:37:01/1_1", "nwparser.p0", "n=%{fld1->} src=%{p0}");
 
-var part535 = match("MESSAGE#59:37:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto= %{p0}");
+var part537 = match("MESSAGE#59:37:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto= %{p0}");
 
-var part536 = match("MESSAGE#59:37:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} proto= %{p0}");
+var part538 = match("MESSAGE#59:37:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} proto= %{p0}");
 
-var part537 = match("MESSAGE#59:37:03/4", "nwparser.p0", "%{} %{protocol->} npcs=%{info}");
+var part539 = match("MESSAGE#59:37:03/4", "nwparser.p0", "%{} %{protocol->} npcs=%{info}");
 
-var part538 = match("MESSAGE#62:38:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src= %{p0}");
+var part540 = match("MESSAGE#62:38:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src= %{p0}");
 
-var part539 = match("MESSAGE#62:38:01/5_1", "nwparser.p0", "rule=%{rule->} ");
+var part541 = match("MESSAGE#62:38:01/5_1", "nwparser.p0", "rule=%{rule->} ");
 
-var part540 = match("MESSAGE#63:38:02/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} type= %{p0}");
+var part542 = match("MESSAGE#63:38:02/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} type= %{p0}");
 
-var part541 = match("MESSAGE#63:38:02/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} type= %{p0}");
+var part543 = match("MESSAGE#63:38:02/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} type= %{p0}");
 
-var part542 = match("MESSAGE#64:38:03/0", "nwparser.payload", "msg=\"%{p0}");
+var part544 = match("MESSAGE#64:38:03/0", "nwparser.payload", "msg=\"%{p0}");
 
-var part543 = match("MESSAGE#64:38:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
+var part545 = match("MESSAGE#64:38:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
 
-var part544 = match("MESSAGE#64:38:03/3_1", "nwparser.p0", "%{daddr->} srcMac=%{p0}");
+var part546 = match("MESSAGE#64:38:03/3_1", "nwparser.p0", "%{daddr->} srcMac=%{p0}");
 
-var part545 = match("MESSAGE#135:97:01/0", "nwparser.payload", "n=%{fld1->} src= %{p0}");
+var part547 = match("MESSAGE#135:97:01/0", "nwparser.payload", "n=%{fld1->} src= %{p0}");
 
-var part546 = match("MESSAGE#135:97:01/7_1", "nwparser.p0", "dstname=%{name->} ");
+var part548 = match("MESSAGE#135:97:01/7_1", "nwparser.p0", "dstname=%{name->} ");
 
-var part547 = match("MESSAGE#137:97:03/0", "nwparser.payload", "sess=%{fld1->} n=%{fld2->} src= %{p0}");
+var part549 = match("MESSAGE#137:97:03/0", "nwparser.payload", "sess=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var part548 = match("MESSAGE#140:97:06/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{p0}");
+var part550 = match("MESSAGE#140:97:06/1_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost}dst=%{p0}");
 
-var part549 = match("MESSAGE#140:97:06/1_1", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}dst=%{p0}");
+var part551 = match("MESSAGE#140:97:06/1_1", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}dst=%{p0}");
 
-var part550 = match("MESSAGE#145:98/2_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} %{p0}");
+var part552 = match("MESSAGE#145:98/2_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} %{p0}");
 
-var part551 = match("MESSAGE#145:98/3_0", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} fw_action=\"%{action}\"");
+var part553 = match("MESSAGE#145:98/3_0", "nwparser.p0", "proto=%{protocol->} sent=%{sbytes->} fw_action=\"%{action}\"");
 
-var part552 = match("MESSAGE#147:98:01/4_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
+var part554 = match("MESSAGE#147:98:01/4_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface}:%{shost->} dst=%{p0}");
 
-var part553 = match("MESSAGE#147:98:01/4_2", "nwparser.p0", "%{saddr}dst=%{p0}");
+var part555 = match("MESSAGE#147:98:01/4_2", "nwparser.p0", "%{saddr}dst=%{p0}");
 
-var part554 = match("MESSAGE#147:98:01/6_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} %{p0}");
+var part556 = match("MESSAGE#147:98:01/6_1", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} %{p0}");
 
-var part555 = match("MESSAGE#147:98:01/6_2", "nwparser.p0", " %{daddr->} %{p0}");
+var part557 = match("MESSAGE#147:98:01/6_2", "nwparser.p0", " %{daddr->} %{p0}");
 
-var part556 = match("MESSAGE#148:98:06/5_2", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{p0}");
+var part558 = match("MESSAGE#148:98:06/5_2", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} proto=%{p0}");
 
-var part557 = match("MESSAGE#148:98:06/5_3", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
+var part559 = match("MESSAGE#148:98:06/5_3", "nwparser.p0", " %{daddr}:%{dport}:%{dinterface->} proto=%{p0}");
 
-var part558 = match("MESSAGE#149:98:02/4", "nwparser.p0", "%{}proto=%{protocol}");
+var part560 = match("MESSAGE#149:98:02/4", "nwparser.p0", "%{}proto=%{protocol}");
 
-var part559 = match("MESSAGE#154:427/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{p0}");
+var part561 = match("MESSAGE#154:427/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{p0}");
 
-var part560 = match("MESSAGE#155:428/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part562 = match("MESSAGE#155:428/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var part561 = match("MESSAGE#202:139:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} ");
+var part563 = match("MESSAGE#202:139:01/3_1", "nwparser.p0", "%{daddr->} ");
 
-var part562 = match("MESSAGE#202:139:01/3_1", "nwparser.p0", "%{daddr->} ");
+var part564 = match("MESSAGE#240:171:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} npcs= %{p0}");
 
-var part563 = match("MESSAGE#240:171:03/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} npcs= %{p0}");
+var part565 = match("MESSAGE#240:171:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} npcs= %{p0}");
 
-var part564 = match("MESSAGE#240:171:03/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} npcs= %{p0}");
+var part566 = match("MESSAGE#240:171:03/4", "nwparser.p0", "%{} %{info}");
 
-var part565 = match("MESSAGE#240:171:03/4", "nwparser.p0", "%{} %{info}");
+var part567 = match("MESSAGE#256:180:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note= %{p0}");
 
-var part566 = match("MESSAGE#256:180:01/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} note= %{p0}");
+var part568 = match("MESSAGE#256:180:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note= %{p0}");
 
-var part567 = match("MESSAGE#256:180:01/3_1", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note= %{p0}");
+var part569 = match("MESSAGE#256:180:01/4", "nwparser.p0", "%{}\"%{fld3}\" npcs=%{info}");
 
-var part568 = match("MESSAGE#256:180:01/4", "nwparser.p0", "%{}\"%{fld3}\" npcs=%{info}");
+var part570 = match("MESSAGE#260:194/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} sport=%{sport->} dport=%{dport->} %{p0}");
 
-var part569 = match("MESSAGE#260:194/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} sport=%{sport->} dport=%{dport->} %{p0}");
+var part571 = match("MESSAGE#260:194/1_0", "nwparser.p0", "sent=%{sbytes->} ");
 
-var part570 = match("MESSAGE#260:194/1_0", "nwparser.p0", "sent=%{sbytes->} ");
+var part572 = match("MESSAGE#260:194/1_1", "nwparser.p0", " rcvd=%{rbytes}");
 
-var part571 = match("MESSAGE#260:194/1_1", "nwparser.p0", " rcvd=%{rbytes}");
+var part573 = match("MESSAGE#262:196/1_0", "nwparser.p0", "sent=%{sbytes->} cmd=%{p0}");
 
-var part572 = match("MESSAGE#262:196/1_0", "nwparser.p0", "sent=%{sbytes->} cmd=%{p0}");
+var part574 = match("MESSAGE#262:196/2", "nwparser.p0", "%{method}");
 
-var part573 = match("MESSAGE#262:196/2", "nwparser.p0", "%{method}");
+var part575 = match("MESSAGE#280:261:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{p0}");
 
-var part574 = match("MESSAGE#280:261:01/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{p0}");
+var part576 = match("MESSAGE#283:273/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{p0}");
 
-var part575 = match("MESSAGE#283:273/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld->} src=%{p0}");
+var part577 = match("MESSAGE#302:401/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} %{p0}");
 
-var part576 = match("MESSAGE#302:401/0", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr->} %{p0}");
+var part578 = match("MESSAGE#302:401/1_1", "nwparser.p0", " %{space}");
 
-var part577 = match("MESSAGE#302:401/1_1", "nwparser.p0", " %{space}");
+var part579 = match("MESSAGE#313:446/3_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=\"%{p0}");
 
-var part578 = match("MESSAGE#313:446/3_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=\"%{p0}");
+var part580 = match("MESSAGE#313:446/3_1", "nwparser.p0", "%{protocol->} fw_action=\"%{p0}");
 
-var part579 = match("MESSAGE#313:446/3_1", "nwparser.p0", "%{protocol->} fw_action=\"%{p0}");
+var part581 = match("MESSAGE#313:446/4", "nwparser.p0", "%{action}\"");
 
-var part580 = match("MESSAGE#313:446/4", "nwparser.p0", "%{action}\"");
+var part582 = match("MESSAGE#318:522:01/4", "nwparser.p0", "%{}proto=%{protocol->} npcs=%{info}");
 
-var part581 = match("MESSAGE#318:522:01/4", "nwparser.p0", "%{}proto=%{protocol->} npcs=%{info}");
+var part583 = match("MESSAGE#321:524/5_0", "nwparser.p0", "proto=%{protocol->} ");
 
-var part582 = match("MESSAGE#321:524/5_0", "nwparser.p0", "proto=%{protocol->} ");
+var part584 = match("MESSAGE#330:537:01/0", "nwparser.payload", "msg=\"%{action}\" f=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var part583 = match("MESSAGE#330:537:01/0", "nwparser.payload", "msg=\"%{action}\" f=%{fld1->} n=%{fld2->} src= %{p0}");
+var part585 = match("MESSAGE#332:537:08/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} appName=\"%{application}\"n=%{p0}");
 
-var part584 = match("MESSAGE#332:537:08/0_0", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} appName=\"%{application}\"n=%{p0}");
+var part586 = match("MESSAGE#332:537:08/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
 
-var part585 = match("MESSAGE#332:537:08/0_1", "nwparser.payload", "msg=\"%{event_description}\" app=%{fld51->} sess=\"%{fld4}\" n=%{p0}");
+var part587 = match("MESSAGE#332:537:08/0_2", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51}n=%{p0}");
 
-var part586 = match("MESSAGE#332:537:08/0_2", "nwparser.payload", " msg=\"%{event_description}\" app=%{fld51}n=%{p0}");
+var part588 = match("MESSAGE#332:537:08/0_3", "nwparser.payload", "msg=\"%{event_description}\"n=%{p0}");
 
-var part587 = match("MESSAGE#332:537:08/0_3", "nwparser.payload", "msg=\"%{event_description}\"n=%{p0}");
+var part589 = match("MESSAGE#332:537:08/1_0", "nwparser.p0", "%{fld1->} usr=\"%{username}\"src=%{p0}");
 
-var part588 = match("MESSAGE#332:537:08/1_0", "nwparser.p0", "%{fld1->} usr=\"%{username}\"src=%{p0}");
+var part590 = match("MESSAGE#332:537:08/1_1", "nwparser.p0", "%{fld1}src=%{p0}");
 
-var part589 = match("MESSAGE#332:537:08/1_1", "nwparser.p0", "%{fld1}src=%{p0}");
+var part591 = match("MESSAGE#332:537:08/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{p0}");
 
-var part590 = match("MESSAGE#332:537:08/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} srcMac=%{p0}");
+var part592 = match("MESSAGE#332:537:08/5_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
 
-var part591 = match("MESSAGE#332:537:08/5_0", "nwparser.p0", "dstMac=%{dmacaddr->} proto=%{protocol->} sent=%{p0}");
+var part593 = match("MESSAGE#332:537:08/5_1", "nwparser.p0", " proto=%{protocol->} sent=%{p0}");
 
-var part592 = match("MESSAGE#332:537:08/5_1", "nwparser.p0", " proto=%{protocol->} sent=%{p0}");
+var part594 = match("MESSAGE#333:537:09/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{p0}");
 
-var part593 = match("MESSAGE#333:537:09/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface}:%{dhost->} dstMac=%{p0}");
+var part595 = match("MESSAGE#333:537:09/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} %{p0}");
 
-var part594 = match("MESSAGE#333:537:09/5_0", "nwparser.p0", "%{sbytes->} rcvd=%{rbytes->} %{p0}");
+var part596 = match("MESSAGE#333:537:09/5_1", "nwparser.p0", "%{sbytes->} %{p0}");
 
-var part595 = match("MESSAGE#333:537:09/5_1", "nwparser.p0", "%{sbytes->} %{p0}");
+var part597 = match("MESSAGE#333:537:09/6_0", "nwparser.p0", " spkt=%{fld3->} cdur=%{fld7->} fw_action=\"%{action}\"");
 
-var part596 = match("MESSAGE#333:537:09/6_0", "nwparser.p0", " spkt=%{fld3->} cdur=%{fld7->} fw_action=\"%{action}\"");
+var part598 = match("MESSAGE#333:537:09/6_1", "nwparser.p0", "spkt=%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
 
-var part597 = match("MESSAGE#333:537:09/6_1", "nwparser.p0", "spkt=%{fld3->} rpkt=%{fld6->} cdur=%{fld7->} ");
+var part599 = match("MESSAGE#333:537:09/6_2", "nwparser.p0", "spkt=%{fld3->} cdur=%{fld7->} ");
 
-var part598 = match("MESSAGE#333:537:09/6_2", "nwparser.p0", "spkt=%{fld3->} cdur=%{fld7->} ");
+var part600 = match("MESSAGE#333:537:09/6_3", "nwparser.p0", " spkt=%{fld3}");
 
-var part599 = match("MESSAGE#333:537:09/6_3", "nwparser.p0", " spkt=%{fld3}");
+var part601 = match("MESSAGE#336:537:04/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
 
-var part600 = match("MESSAGE#336:537:04/0", "nwparser.payload", "msg=\"%{action}\" sess=%{fld1->} n=%{fld2->} src= %{p0}");
+var part602 = match("MESSAGE#336:537:04/3_2", "nwparser.p0", "%{daddr->} proto= %{p0}");
 
-var part601 = match("MESSAGE#336:537:04/3_2", "nwparser.p0", "%{daddr->} proto= %{p0}");
+var part603 = match("MESSAGE#338:537:10/1_0", "nwparser.p0", "%{fld2->} usr=\"%{username}\" %{p0}");
 
-var part602 = match("MESSAGE#338:537:10/1_0", "nwparser.p0", "%{fld2->} usr=\"%{username}\" %{p0}");
+var part604 = match("MESSAGE#338:537:10/1_1", "nwparser.p0", "%{fld2->} %{p0}");
 
-var part603 = match("MESSAGE#338:537:10/1_1", "nwparser.p0", "%{fld2->} %{p0}");
+var part605 = match("MESSAGE#338:537:10/2", "nwparser.p0", "%{}src=%{p0}");
 
-var part604 = match("MESSAGE#338:537:10/2", "nwparser.p0", "%{}src=%{p0}");
+var part606 = match("MESSAGE#338:537:10/3_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var part605 = match("MESSAGE#338:537:10/3_0", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part607 = match("MESSAGE#338:537:10/3_1", "nwparser.p0", "%{saddr->} dst=%{p0}");
 
-var part606 = match("MESSAGE#338:537:10/3_1", "nwparser.p0", "%{saddr->} dst=%{p0}");
+var part608 = match("MESSAGE#338:537:10/6_0", "nwparser.p0", "npcs=%{info->} ");
 
-var part607 = match("MESSAGE#338:537:10/6_0", "nwparser.p0", "npcs=%{info->} ");
+var part609 = match("MESSAGE#338:537:10/6_1", "nwparser.p0", "cdur=%{fld12->} ");
 
-var part608 = match("MESSAGE#338:537:10/6_1", "nwparser.p0", "cdur=%{fld12->} ");
+var part610 = match("MESSAGE#355:598:01/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
 
-var part609 = match("MESSAGE#355:598:01/0", "nwparser.payload", "msg=%{msg->} sess=%{fld1->} n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst= %{p0}");
+var part611 = match("MESSAGE#361:606/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
 
-var part610 = match("MESSAGE#361:606/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{p0}");
+var part612 = match("MESSAGE#361:606/1_1", "nwparser.p0", "%{daddr}:%{dport->} srcMac=%{p0}");
 
-var part611 = match("MESSAGE#361:606/1_1", "nwparser.p0", "%{daddr}:%{dport->} srcMac=%{p0}");
+var part613 = match("MESSAGE#361:606/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr}proto=%{p0}");
 
-var part612 = match("MESSAGE#361:606/2", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr}proto=%{p0}");
+var part614 = match("MESSAGE#366:712:02/0", "nwparser.payload", "msg=\"%{action}\" %{p0}");
 
-var part613 = match("MESSAGE#366:712:02/0", "nwparser.payload", "msg=\"%{action}\" %{p0}");
+var part615 = match("MESSAGE#366:712:02/1_0", "nwparser.p0", "app=%{fld21->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
 
-var part614 = match("MESSAGE#366:712:02/1_0", "nwparser.p0", "app=%{fld21->} appName=\"%{application}\" n=%{fld1->} src=%{p0}");
+var part616 = match("MESSAGE#366:712:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
 
-var part615 = match("MESSAGE#366:712:02/2", "nwparser.p0", "%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface->} srcMac=%{p0}");
+var part617 = match("MESSAGE#366:712:02/3_0", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
-var part616 = match("MESSAGE#366:712:02/3_0", "nwparser.p0", "%{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var part618 = match("MESSAGE#366:712:02/3_1", "nwparser.p0", "%{smacaddr->} proto=%{p0}");
 
-var part617 = match("MESSAGE#366:712:02/3_1", "nwparser.p0", "%{smacaddr->} proto=%{p0}");
+var part619 = match("MESSAGE#366:712:02/4_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=%{p0}");
 
-var part618 = match("MESSAGE#366:712:02/4_0", "nwparser.p0", "%{protocol}/%{fld3->} fw_action=%{p0}");
+var part620 = match("MESSAGE#366:712:02/4_1", "nwparser.p0", "%{protocol->} fw_action=%{p0}");
 
-var part619 = match("MESSAGE#366:712:02/4_1", "nwparser.p0", "%{protocol->} fw_action=%{p0}");
+var part621 = match("MESSAGE#366:712:02/5", "nwparser.p0", "%{fld51}");
 
-var part620 = match("MESSAGE#366:712:02/5", "nwparser.p0", "%{fld51}");
+var part622 = match("MESSAGE#391:908/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{p0}");
 
-var part621 = match("MESSAGE#391:908/0", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld2->} src=%{p0}");
+var part623 = match("MESSAGE#391:908/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
 
-var part622 = match("MESSAGE#391:908/4", "nwparser.p0", "%{} %{smacaddr->} dstMac=%{dmacaddr->} proto=%{p0}");
+var part624 = match("MESSAGE#439:1199/2", "nwparser.p0", "%{} %{daddr}:%{dport}:%{dinterface->} npcs=%{info}");
 
-var part623 = match("MESSAGE#439:1199/2", "nwparser.p0", "%{} %{daddr}:%{dport}:%{dinterface->} npcs=%{info}");
+var part625 = match("MESSAGE#444:1198/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
 
-var part624 = match("MESSAGE#444:1198/0", "nwparser.payload", "msg=\"%{msg}\" note=\"%{fld3}\" sess=%{fld1->} n=%{fld2->} src=%{p0}");
+var part626 = match("MESSAGE#461:1220/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=%{p0}");
 
-var part625 = match("MESSAGE#461:1220/3_0", "nwparser.p0", "%{daddr}:%{dport}:%{dinterface->} note=%{p0}");
+var part627 = match("MESSAGE#461:1220/3_1", "nwparser.p0", "%{daddr}:%{dport->} note=%{p0}");
 
-var part626 = match("MESSAGE#461:1220/3_1", "nwparser.p0", "%{daddr}:%{dport->} note=%{p0}");
+var part628 = match("MESSAGE#461:1220/4", "nwparser.p0", "%{}\"%{info}\" fw_action=\"%{action}\"");
 
-var part627 = match("MESSAGE#461:1220/4", "nwparser.p0", "%{}\"%{info}\" fw_action=\"%{action}\"");
+var part629 = match("MESSAGE#471:1369/1_0", "nwparser.p0", "%{protocol}/%{fld3}fw_action=\"%{p0}");
 
-var part628 = match("MESSAGE#471:1369/1_0", "nwparser.p0", "%{protocol}/%{fld3}fw_action=\"%{p0}");
-
-var part629 = match("MESSAGE#471:1369/1_1", "nwparser.p0", "%{protocol}fw_action=\"%{p0}");
-
-var select161 = linear_select([
-	dup9,
-	dup10,
-]);
+var part630 = match("MESSAGE#471:1369/1_1", "nwparser.p0", "%{protocol}fw_action=\"%{p0}");
 
 var select162 = linear_select([
-	dup16,
-	dup17,
+	dup8,
+	dup9,
 ]);
-
-var part630 = match("MESSAGE#403:24:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
-	dup1,
-	dup24,
-]));
 
 var select163 = linear_select([
-	dup26,
-	dup27,
+	dup15,
+	dup16,
 ]);
 
+var part631 = match("MESSAGE#403:24:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
+	dup1,
+	dup23,
+]));
+
 var select164 = linear_select([
+	dup25,
+	dup26,
+]);
+
+var select165 = linear_select([
 	dup34,
 	dup35,
 ]);
 
-var select165 = linear_select([
-	dup26,
+var select166 = linear_select([
+	dup25,
 	dup39,
 ]);
 
-var select166 = linear_select([
+var select167 = linear_select([
 	dup41,
 	dup42,
 ]);
 
-var select167 = linear_select([
+var select168 = linear_select([
 	dup46,
 	dup47,
 ]);
 
-var select168 = linear_select([
+var select169 = linear_select([
 	dup49,
 	dup50,
 ]);
 
-var part631 = match("MESSAGE#116:82:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
+var part632 = match("MESSAGE#116:82:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
 	dup62,
 ]));
 
-var part632 = match("MESSAGE#118:83:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
+var part633 = match("MESSAGE#118:83:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr}:%{sport}:%{sinterface->} dst=%{daddr}:%{dport}:%{dinterface}", processor_chain([
 	dup5,
 ]));
 
-var select169 = linear_select([
+var select170 = linear_select([
 	dup71,
 	dup75,
 	dup76,
 ]);
 
-var select170 = linear_select([
-	dup9,
-	dup26,
+var select171 = linear_select([
+	dup8,
+	dup25,
 ]);
 
-var part633 = match("MESSAGE#168:111:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=%{shost}", processor_chain([
+var part634 = match("MESSAGE#168:111:01", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} dstname=%{shost}", processor_chain([
 	dup1,
 ]));
 
-var select171 = linear_select([
-	dup85,
-	dup86,
-]);
-
 var select172 = linear_select([
-	dup90,
-	dup91,
+	dup33,
+	dup85,
 ]);
 
-var part634 = match("MESSAGE#253:178", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
+var select173 = linear_select([
+	dup89,
+	dup90,
+]);
+
+var part635 = match("MESSAGE#253:178", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
 	dup5,
 ]));
 
-var select173 = linear_select([
-	dup94,
-	dup95,
-]);
-
 var select174 = linear_select([
-	dup98,
-	dup99,
+	dup93,
+	dup94,
 ]);
-
-var part635 = match("MESSAGE#277:252", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
-	dup89,
-]));
-
-var part636 = match("MESSAGE#293:355", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup89,
-]));
-
-var part637 = match("MESSAGE#295:356", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup1,
-]));
-
-var part638 = match("MESSAGE#298:358", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
-	dup1,
-]));
-
-var part639 = match("MESSAGE#414:371:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} note=\"%{event_description}\"", processor_chain([
-	dup1,
-	dup24,
-]));
 
 var select175 = linear_select([
-	dup66,
-	dup110,
+	dup97,
+	dup98,
 ]);
 
+var part636 = match("MESSAGE#277:252", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{saddr->} dst=%{daddr}", processor_chain([
+	dup88,
+]));
+
+var part637 = match("MESSAGE#293:355", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup88,
+]));
+
+var part638 = match("MESSAGE#295:356", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup1,
+]));
+
+var part639 = match("MESSAGE#298:358", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} ", processor_chain([
+	dup1,
+]));
+
+var part640 = match("MESSAGE#414:371:01", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr->} note=\"%{event_description}\"", processor_chain([
+	dup1,
+	dup23,
+]));
+
 var select176 = linear_select([
-	dup112,
-	dup113,
+	dup66,
+	dup109,
 ]);
 
 var select177 = linear_select([
-	dup117,
-	dup45,
+	dup111,
+	dup112,
 ]);
 
 var select178 = linear_select([
-	dup9,
-	dup27,
+	dup116,
+	dup45,
 ]);
 
 var select179 = linear_select([
-	dup9,
+	dup8,
 	dup26,
-	dup39,
 ]);
 
 var select180 = linear_select([
-	dup71,
-	dup16,
-	dup17,
+	dup8,
+	dup25,
+	dup39,
 ]);
 
 var select181 = linear_select([
-	dup123,
-	dup124,
+	dup71,
+	dup15,
+	dup16,
 ]);
 
 var select182 = linear_select([
+	dup122,
+	dup123,
+]);
+
+var select183 = linear_select([
 	dup68,
 	dup69,
 	dup74,
 ]);
 
-var select183 = linear_select([
-	dup129,
-	dup130,
-]);
-
 var select184 = linear_select([
-	dup41,
-	dup42,
-	dup136,
+	dup128,
+	dup129,
 ]);
 
 var select185 = linear_select([
-	dup137,
-	dup138,
+	dup41,
+	dup42,
+	dup135,
 ]);
 
 var select186 = linear_select([
-	dup140,
-	dup141,
+	dup136,
+	dup137,
 ]);
 
 var select187 = linear_select([
-	dup142,
-	dup143,
+	dup139,
+	dup140,
 ]);
 
 var select188 = linear_select([
-	dup49,
-	dup150,
+	dup141,
+	dup142,
 ]);
 
-var part640 = match("MESSAGE#365:710", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
-	dup152,
+var select189 = linear_select([
+	dup49,
+	dup149,
+]);
+
+var part641 = match("MESSAGE#365:710", "nwparser.payload", "msg=\"%{action}\" n=%{fld1->} src=%{saddr}:%{sport->} dst=%{daddr}:%{dport}", processor_chain([
+	dup151,
 ]));
 
-var select189 = linear_select([
-	dup154,
+var select190 = linear_select([
+	dup153,
 	dup40,
 ]);
 
-var select190 = linear_select([
-	dup156,
-	dup157,
-]);
-
 var select191 = linear_select([
-	dup158,
-	dup159,
+	dup155,
+	dup156,
 ]);
 
-var part641 = match("MESSAGE#375:766", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
+var select192 = linear_select([
+	dup157,
+	dup158,
+]);
+
+var part642 = match("MESSAGE#375:766", "nwparser.payload", "msg=\"%{msg}\" n=%{ntype->} ", processor_chain([
 	dup5,
 ]));
 
-var part642 = match("MESSAGE#377:860:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{ntype->} ", processor_chain([
+var part643 = match("MESSAGE#377:860:01", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{ntype->} ", processor_chain([
 	dup5,
 ]));
 
-var part643 = match("MESSAGE#393:914", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{host->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{shost}", processor_chain([
+var part644 = match("MESSAGE#393:914", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} src=%{stransaddr}:%{stransport}:%{sinterface}:%{host->} dst=%{dtransaddr}:%{dtransport}:%{dinterface}:%{shost}", processor_chain([
 	dup5,
-	dup24,
+	dup23,
 ]));
 
-var part644 = match("MESSAGE#399:994", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
+var part645 = match("MESSAGE#399:994", "nwparser.payload", "msg=\"%{msg}\" n=%{fld1->} usr=%{username->} src=%{stransaddr}:%{stransport->} dst=%{dtransaddr}:%{dtransport->} note=\"%{event_description}\"", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var part645 = match("MESSAGE#406:1110", "nwparser.payload", "msg=\"%{msg}\" %{space->} n=%{fld1}", processor_chain([
+var part646 = match("MESSAGE#406:1110", "nwparser.payload", "msg=\"%{msg}\" %{space->} n=%{fld1}", processor_chain([
 	dup1,
-	dup24,
+	dup23,
 ]));
 
-var part646 = match("MESSAGE#420:614", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
-	dup165,
+var part647 = match("MESSAGE#420:614", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+	dup164,
 	dup37,
 ]));
 
-var part647 = match("MESSAGE#454:654", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2}", processor_chain([
+var part648 = match("MESSAGE#454:654", "nwparser.payload", "msg=\"%{msg}\" sess=%{fld1->} n=%{fld2}", processor_chain([
 	dup1,
 ]));
 
-var select192 = linear_select([
-	dup171,
-	dup172,
-]);
-
 var select193 = linear_select([
-	dup174,
-	dup175,
+	dup170,
+	dup171,
 ]);
 
-var part648 = match("MESSAGE#482:796", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
+var select194 = linear_select([
+	dup173,
+	dup174,
+]);
+
+var part649 = match("MESSAGE#482:796", "nwparser.payload", "msg=\"%{event_description}\" n=%{fld1->} fw_action=\"%{action}\"", processor_chain([
 	dup1,
 	dup54,
-	dup18,
+	dup17,
 	dup82,
+	dup19,
 	dup20,
 	dup21,
-	dup22,
 	dup37,
 ]));
 
 var all114 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup177,
-		dup28,
+		dup30,
+		dup178,
+		dup10,
+		dup176,
+		dup27,
 	],
 	on_success: processor_chain([
-		dup30,
+		dup29,
 	]),
 });
 
 var all115 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup87,
+		dup86,
 	]),
 });
 
 var all116 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		dup59,
@@ -7070,8 +7073,8 @@ var all116 = all_match({
 
 var all117 = all_match({
 	processors: [
-		dup97,
-		dup194,
+		dup96,
+		dup193,
 	],
 	on_success: processor_chain([
 		dup59,
@@ -7080,92 +7083,92 @@ var all117 = all_match({
 
 var all118 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup102,
+		dup101,
 	]),
 });
 
 var all119 = all_match({
 	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
-	],
-	on_success: processor_chain([
 		dup30,
-	]),
-});
-
-var all120 = all_match({
-	processors: [
-		dup31,
-		dup179,
-		dup11,
-		dup190,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
 		dup29,
 	]),
 });
 
-var all121 = all_match({
+var all120 = all_match({
 	processors: [
-		dup104,
-		dup179,
-		dup11,
-		dup190,
+		dup30,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup105,
+		dup28,
+	]),
+});
+
+var all121 = all_match({
+	processors: [
+		dup103,
+		dup178,
+		dup10,
+		dup189,
+	],
+	on_success: processor_chain([
+		dup104,
 	]),
 });
 
 var all122 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup108,
+		dup107,
 	]),
 });
 
 var all123 = all_match({
 	processors: [
-		dup109,
-		dup200,
+		dup108,
+		dup199,
 	],
 	on_success: processor_chain([
-		dup89,
+		dup88,
 	]),
 });
 
 var all124 = all_match({
 	processors: [
-		dup106,
-		dup179,
-		dup11,
-		dup190,
+		dup105,
+		dup178,
+		dup10,
+		dup189,
 	],
 	on_success: processor_chain([
-		dup111,
+		dup110,
 	]),
 });
 
 var all125 = all_match({
 	processors: [
 		dup44,
-		dup180,
+		dup179,
 		dup36,
-		dup190,
+		dup189,
 	],
 	on_success: processor_chain([
 		dup5,
@@ -7175,9 +7178,9 @@ var all125 = all_match({
 var all126 = all_match({
 	processors: [
 		dup80,
-		dup179,
-		dup11,
-		dup177,
+		dup178,
+		dup10,
+		dup176,
 		dup79,
 	],
 	on_success: processor_chain([
@@ -7187,36 +7190,36 @@ var all126 = all_match({
 
 var all127 = all_match({
 	processors: [
-		dup153,
+		dup152,
+		dup214,
+		dup154,
 		dup215,
-		dup155,
 		dup216,
-		dup217,
-		dup160,
+		dup159,
 	],
 	on_success: processor_chain([
-		dup152,
+		dup151,
 		dup51,
 		dup52,
 		dup53,
 		dup54,
 		dup37,
 		dup55,
+		dup17,
 		dup18,
 		dup19,
 		dup20,
 		dup21,
-		dup22,
 	]),
 });
 
 var all128 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup193,
-		dup96,
+		dup7,
+		dup175,
+		dup10,
+		dup192,
+		dup95,
 	],
 	on_success: processor_chain([
 		dup1,
@@ -7225,11 +7228,11 @@ var all128 = all_match({
 
 var all129 = all_match({
 	processors: [
-		dup8,
-		dup176,
-		dup11,
-		dup191,
-		dup92,
+		dup7,
+		dup175,
+		dup10,
+		dup190,
+		dup91,
 	],
 	on_success: processor_chain([
 		dup1,
