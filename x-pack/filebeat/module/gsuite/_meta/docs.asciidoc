@@ -21,6 +21,7 @@ It is compatible with a subset of applications under the https://developers.goog
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login[Login Audit Activity Events]
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings[Admin Audit Activity Events]
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive[Drive Activity Events]
+- https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups[Groups Audit Activity Events]
 
 === Configure the module
 
