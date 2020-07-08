@@ -6,274 +6,218 @@ package o365audit
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 const (
-	inputName    = "o365audit"
-	fieldsPrefix = inputName
+	pluginName   = "o365audit"
+	fieldsPrefix = pluginName
 )
 
-func init() {
-	if err := input.Register(inputName, NewInput); err != nil {
-		panic(errors.Wrapf(err, "unable to create %s input", inputName))
-	}
+type o365input struct {
+	config Config
 }
 
-type o365input struct {
-	config  Config
-	outlet  channel.Outleter
-	storage *stateStorage
-	log     *logp.Logger
-	pollers map[stream]*poll.Poller
-	cancel  func()
-	ctx     context.Context
-	wg      sync.WaitGroup
-	runOnce sync.Once
+// Stream represents an event stream.
+type stream struct {
+	tenantID    string
+	contentType string
 }
 
 type apiEnvironment struct {
 	TenantID    string
 	ContentType string
 	Config      APIConfig
-	Callback    func(beat.Event) bool
+	Callback    func(event beat.Event, cursor interface{}) error
 	Logger      *logp.Logger
 	Clock       func() time.Time
 }
 
-// NewInput creates a new o365audit input.
-func NewInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	inputContext input.Context,
-) (inp input.Input, err error) {
-	cfgwarn.Beta("The %s input is beta", inputName)
-	inp, err = newInput(cfg, connector, inputContext)
-	return inp, errors.Wrap(err, inputName)
+func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+	return v2.Plugin{
+		Name:       pluginName,
+		Stability:  feature.Experimental,
+		Deprecated: false,
+		Info:       "O365 logs",
+		Doc:        "Collect logs from O365 service",
+		Manager: &cursor.InputManager{
+			Logger:     log,
+			StateStore: store,
+			Type:       pluginName,
+			Configure:  configure,
+		},
+	}
 }
 
-func newInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	inputContext input.Context,
-) (inp input.Input, err error) {
+func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading config")
+		return nil, nil, errors.Wrap(err, "reading config")
 	}
 
-	log := logp.NewLogger(inputName)
-
-	// TODO: Update with input v2 state.
-	storage := newStateStorage(noopPersister{})
-
-	var out channel.Outleter
-	out, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
-			acker.LastEventPrivateReporter(func(_ int, private interface{}) {
-				// Errors don't have a cursor.
-				if cursor, ok := private.(cursor); ok {
-					log.Debugf("ACKed cursor %+v", cursor)
-					if err := storage.Save(cursor); err != nil && err != errNoUpdate {
-						log.Errorf("Error saving state: %v", err)
-					}
-				}
-			}),
-		),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer func() {
-		if err != nil {
-			cancel()
-		}
-	}()
-
-	pollers := make(map[stream]*poll.Poller)
+	var sources []cursor.Source
 	for _, tenantID := range config.TenantID {
-		// MaxRequestsPerMinute limitation is per tenant.
-		delay := time.Duration(len(config.ContentType)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
-		auth, err := config.NewTokenProvider(tenantID)
-		if err != nil {
-			return nil, err
-		}
-		if _, err = auth.Token(); err != nil {
-			return nil, errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
-		}
 		for _, contentType := range config.ContentType {
-			key := stream{
+			sources = append(sources, &stream{
 				tenantID:    tenantID,
 				contentType: contentType,
-			}
-			poller, err := poll.New(
-				poll.WithTokenProvider(auth),
-				poll.WithMinRequestInterval(delay),
-				poll.WithLogger(log.With("tenantID", tenantID, "contentType", contentType)),
-				poll.WithContext(ctx),
-				poll.WithRequestDecorator(
-					autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+inputName)),
-					autorest.WithQueryParameters(common.MapStr{
-						"publisherIdentifier": tenantID,
-					}),
-				),
-			)
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to create API poller")
-			}
-			pollers[key] = poller
+			})
 		}
 	}
 
-	return &o365input{
-		config:  config,
-		outlet:  out,
-		storage: storage,
-		log:     log,
-		pollers: pollers,
-		ctx:     ctx,
-		cancel:  cancel,
-	}, nil
+	return sources, &o365input{config: config}, nil
 }
 
-// Run starts the o365input. Only has effect the first time it's called.
-func (inp *o365input) Run() {
-	inp.runOnce.Do(inp.run)
+func (s *stream) Name() string {
+	return s.tenantID + "::" + s.contentType
 }
 
-func (inp *o365input) run() {
-	for stream, poller := range inp.pollers {
-		start := inp.loadLastLocation(stream)
-		inp.log.Infow("Start fetching events",
-			"cursor", start,
-			"tenantID", stream.tenantID,
-			"contentType", stream.contentType)
-		inp.runPoller(poller, start)
-	}
-}
+func (inp *o365input) Name() string { return pluginName }
 
-func (inp *o365input) runPoller(poller *poll.Poller, start cursor) {
-	ctx := apiEnvironment{
-		TenantID:    start.tenantID,
-		ContentType: start.contentType,
-		Config:      inp.config.API,
-		Callback:    inp.reportEvent,
-		Logger:      poller.Logger(),
-		Clock:       time.Now,
-	}
-	inp.wg.Add(1)
-	go func() {
-		defer logp.Recover("panic in " + inputName + " runner.")
-		defer inp.wg.Done()
-		action := ListBlob(start, ctx)
-		// When resuming from a saved state, it's necessary to query for the
-		// same startTime that provided the last ACKed event. Otherwise there's
-		// the risk of observing partial blobs with different line counts, due to
-		// how the backend works.
-		if start.line > 0 {
-			action = action.WithStartTime(start.startTime)
-		}
-		if err := poller.Run(action); err != nil {
-			ctx.Logger.Errorf("API polling terminated with error: %v", err.Error())
-			msg := common.MapStr{}
-			msg.Put("error.message", err.Error())
-			msg.Put("event.kind", "pipeline_error")
-			event := beat.Event{
-				Timestamp: time.Now(),
-				Fields:    msg,
-			}
-			inp.reportEvent(event)
-		}
-	}()
-}
-
-func (inp *o365input) reportEvent(event beat.Event) bool {
-	return inp.outlet.OnEvent(event)
-}
-
-// Stop terminates the o365 input.
-func (inp *o365input) Stop() {
-	inp.log.Info("Stopping input " + inputName)
-	defer inp.log.Info(inputName + " stopped.")
-	defer inp.outlet.Close()
-	inp.cancel()
-}
-
-// Wait terminates the o365input and waits for all the pollers to finalize.
-func (inp *o365input) Wait() {
-	inp.Stop()
-	inp.wg.Wait()
-}
-
-func (inp *o365input) loadLastLocation(key stream) cursor {
-	period := inp.config.API.MaxRetention
-	retentionLimit := time.Now().UTC().Add(-period)
-	cursor, err := inp.storage.Load(key)
+func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
+	tenantID := src.(*stream).tenantID
+	auth, err := inp.config.NewTokenProvider(tenantID)
 	if err != nil {
-		if err == errStateNotFound {
-			inp.log.Infof("No saved state found. Will fetch events for the last %v.", period.String())
-		} else {
-			inp.log.Errorw("Error loading saved state. Will fetch all retained events. "+
+		return err
+	}
+
+	if _, err := auth.Token(); err != nil {
+		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
+	}
+
+	return nil
+}
+
+func (inp *o365input) Run(
+	ctx v2.Context,
+	src cursor.Source,
+	cursor cursor.Cursor,
+	publisher cursor.Publisher,
+) error {
+	stream := src.(*stream)
+	tenantID, contentType := stream.tenantID, stream.contentType
+	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
+
+	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID)
+	if err != nil {
+		return err
+	}
+
+	if _, err := tokenProvider.Token(); err != nil {
+		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", stream.tenantID)
+	}
+
+	config := &inp.config
+
+	// MaxRequestsPerMinute limitation is per tenant.
+	delay := time.Duration(len(config.ContentType)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
+
+	poller, err := poll.New(
+		poll.WithTokenProvider(tokenProvider),
+		poll.WithMinRequestInterval(delay),
+		poll.WithLogger(log),
+		poll.WithContext(ctxtool.FromCanceller(ctx.Cancelation)),
+		poll.WithRequestDecorator(
+			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName)),
+			autorest.WithQueryParameters(common.MapStr{
+				"publisherIdentifier": tenantID,
+			}),
+		),
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to create API poller")
+	}
+
+	start := initCheckpoint(log, cursor, config.API.MaxRetention)
+	action := makeListBlob(start, apiEnvironment{
+		Logger:      log,
+		TenantID:    tenantID,
+		ContentType: contentType,
+		Config:      inp.config.API,
+		Callback:    publisher.Publish,
+		Clock:       time.Now,
+	})
+	if start.Line > 0 {
+		action = action.WithStartTime(start.StartTime)
+	}
+
+	log.Infow("Start fetching events", "cursor", start)
+	err = poller.Run(action)
+	if err != nil && ctx.Cancelation.Err() != err && err != context.Canceled {
+		msg := common.MapStr{}
+		msg.Put("error.message", err.Error())
+		msg.Put("event.kind", "pipeline_error")
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields:    msg,
+		}
+		publisher.Publish(event, nil)
+	}
+	return err
+}
+
+func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duration) checkpoint {
+	var cp checkpoint
+	retentionLimit := time.Now().UTC().Add(-maxRetention)
+
+	if c.IsNew() {
+		log.Infof("No saved state found. Will fetch events for the last %v.", maxRetention.String())
+		cp.Timestamp = retentionLimit
+	} else {
+		err := c.Unpack(&cp)
+		if err != nil {
+			log.Errorw("Error loading saved state. Will fetch all retained events. "+
 				"Depending on max_retention, this can cause event loss or duplication.",
 				"error", err,
-				"max_retention", period.String())
+				"max_retention", maxRetention.String())
+			cp.Timestamp = retentionLimit
 		}
-		cursor.timestamp = retentionLimit
 	}
-	if cursor.timestamp.Before(retentionLimit) {
-		inp.log.Warnw("Last update exceeds the retention limit. "+
+
+	if cp.Timestamp.Before(retentionLimit) {
+		log.Warnw("Last update exceeds the retention limit. "+
 			"Probably some events have been lost.",
-			"resume_since", cursor,
+			"resume_since", cp,
 			"retention_limit", retentionLimit,
-			"max_retention", period.String())
+			"max_retention", maxRetention.String())
 		// Due to API limitations, it's necessary to perform a query for each
 		// day. These avoids performing a lot of queries that will return empty
 		// when the input hasn't run in a long time.
-		cursor.timestamp = retentionLimit
+		cp.Timestamp = retentionLimit
 	}
-	return cursor
-}
 
-var errTerminated = errors.New("terminated due to output closed")
+	return cp
+}
 
 // Report returns an action that produces a beat.Event from the given object.
 func (env apiEnvironment) Report(doc common.MapStr, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
-		if !env.Callback(env.toBeatEvent(doc, private)) {
-			return errTerminated
-		}
-		return nil
+		return env.Callback(env.toBeatEvent(doc), private)
 	}
 }
 
 // ReportAPIError returns an action that produces a beat.Event from an API error.
 func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	return func(poll.Enqueuer) error {
-		if !env.Callback(err.ToBeatEvent()) {
-			return errTerminated
-		}
-		return nil
+		return env.Callback(err.ToBeatEvent(), nil)
 	}
 }
 
-func (env apiEnvironment) toBeatEvent(doc common.MapStr, private interface{}) beat.Event {
+func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
 	var errs multierror.Errors
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
@@ -285,7 +229,6 @@ func (env apiEnvironment) toBeatEvent(doc common.MapStr, private interface{}) be
 		Fields: common.MapStr{
 			fieldsPrefix: doc,
 		},
-		Private: private,
 	}
 	if env.Config.SetIDFromAuditRecord {
 		if id, err := getString(doc, "Id"); err == nil && len(id) > 0 {
