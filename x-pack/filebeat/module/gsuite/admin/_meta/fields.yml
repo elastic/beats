@@ -1,0 +1,41 @@
+- name: admin
+  type: group
+  fields:
+    - name: application.edition
+      type: keyword
+      description: The GSuite edition.
+    - name: application.name
+      type: keyword
+      description: The application's name.
+    - name: group.email
+      type: keyword
+      description: The group's primary email address.
+    - name: new_value
+      type: keyword
+      description: The new value for the setting.
+    - name: old_value
+      type: keyword
+      description: The old value for the setting.
+    - name: org_unit.name
+      type: keyword
+      description: The organizational unit name.
+    - name: setting
+      type: keyword
+      description: The setting name.
+    - name: group.priorities
+      type: keyword
+      description: Group priorities.
+    - name: domain
+      type: keyword
+      description: The primary domain name.
+    - name: managed_configuration
+      type: keyword
+      description: The name of the managed configuration.
+    - name: mobile_app.package_id
+      type: keyword
+      description: The mobile application package ID.
+    - name: non_featured_services_selection
+      type: keyword
+      description: >
+        Non-featured services selection.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED

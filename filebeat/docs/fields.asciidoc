@@ -61464,6 +61464,116 @@ type: keyword
 --
 
 
+*`gsuite.admin.application.edition`*::
++
+--
+The GSuite edition.
+
+type: keyword
+
+--
+
+*`gsuite.admin.application.name`*::
++
+--
+The application's name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.group.email`*::
++
+--
+The group's primary email address.
+
+type: keyword
+
+--
+
+*`gsuite.admin.new_value`*::
++
+--
+The new value for the setting.
+
+type: keyword
+
+--
+
+*`gsuite.admin.old_value`*::
++
+--
+The old value for the setting.
+
+type: keyword
+
+--
+
+*`gsuite.admin.org_unit.name`*::
++
+--
+The organizational unit name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.setting`*::
++
+--
+The setting name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.group.priorities`*::
++
+--
+Group priorities.
+
+type: keyword
+
+--
+
+*`gsuite.admin.domain`*::
++
+--
+The primary domain name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.managed_configuration`*::
++
+--
+The name of the managed configuration.
+
+type: keyword
+
+--
+
+*`gsuite.admin.mobile_app.package_id`*::
++
+--
+The mobile application package ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.non_featured_services_selection`*::
++
+--
+Non-featured services selection. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED
+
+
+type: keyword
+
+--
+
+
 *`gsuite.login.affected_email_address`*::
 +
 --
