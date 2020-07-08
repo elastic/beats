@@ -61554,7 +61554,7 @@ type: keyword
 
 --
 
-*`gsuite.admin.mobile_app.package_id`*::
+*`gsuite.admin.app.package_id`*::
 +
 --
 The mobile application package ID.
@@ -61604,6 +61604,69 @@ type: keyword
 +
 --
 Gateway name. Present on some chat settings.
+
+type: keyword
+
+--
+
+*`gsuite.admin.app.id`*::
++
+--
+The application ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.chrome_os.session_type`*::
++
+--
+Chrome OS session type.
+
+type: keyword
+
+--
+
+*`gsuite.admin.device.serial_number`*::
++
+--
+Device serial number.
+
+type: keyword
+
+--
+
+*`gsuite.admin.device.type`*::
++
+--
+Device type.
+
+type: keyword
+
+--
+
+*`gsuite.admin.print_server.name`*::
++
+--
+The name of the print server.
+
+type: keyword
+
+--
+
+*`gsuite.admin.printer.name`*::
++
+--
+The name of the printer.
+
+type: keyword
+
+--
+
+*`gsuite.admin.device.command_details`*::
++
+--
+Command details.
 
 type: keyword
 

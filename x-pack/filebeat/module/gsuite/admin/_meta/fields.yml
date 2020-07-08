@@ -31,7 +31,7 @@
     - name: managed_configuration
       type: keyword
       description: The name of the managed configuration.
-    - name: mobile_app.package_id
+    - name: app.package_id
       type: keyword
       description: The mobile application package ID.
     - name: non_featured_services_selection
@@ -51,3 +51,24 @@
     - name: gateway.name
       type: keyword
       description: Gateway name. Present on some chat settings.
+    - name: app.id
+      type: keyword
+      description: The application ID.
+    - name: chrome_os.session_type
+      type: keyword
+      description: Chrome OS session type.
+    - name: device.serial_number
+      type: keyword
+      description: Device serial number.
+    - name: device.type
+      type: keyword
+      description: Device type.
+    - name: print_server.name
+      type: keyword
+      description: The name of the print server.
+    - name: printer.name
+      type: keyword
+      description: The name of the printer.
+    - name: device.command_details
+      type: keyword
+      description: Command details.

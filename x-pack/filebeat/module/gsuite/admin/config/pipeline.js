@@ -21,6 +21,20 @@ var login = (function () {
             case "RELEASE_CALENDAR_RESOURCES":
             case "MEET_INTEROP_MODIFY_GATEWAY":
             case "CHANGE_CHAT_SETTING":
+            case "CHANGE_CHROME_OS_ANDROID_APPLICATION_SETTING":
+            case "CHANGE_DEVICE_STATE":
+            case "CHANGE_CHROME_OS_APPLICATION_SETTING":
+            case "CHANGE_CHROME_OS_DEVICE_ANNOTATION":
+            case "CHANGE_CHROME_OS_DEVICE_SETTING":
+            case "CHANGE_CHROME_OS_DEVICE_STATE":
+            case "CHANGE_CHROME_OS_PUBLIC_SESSION_SETTING":
+            case "UPDATE_CHROME_OS_PRINT_SERVER":
+            case "UPDATE_CHROME_OS_PRINTER":
+            case "CHANGE_CHROME_OS_SETTING":
+            case "CHANGE_CHROME_OS_USER_SETTING":
+            case "MOVE_DEVICE_TO_ORG_UNIT_DETAILED":
+            case "UPDATE_DEVICE":
+            case "SEND_CHROME_OS_DEVICE_COMMAND":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -29,6 +43,8 @@ var login = (function () {
             case "CREATE_CALENDAR_RESOURCE":
             case "CREATE_CALENDAR_RESOURCE_FEATURE":
             case "MEET_INTEROP_CREATE_GATEWAY":
+            case "INSERT_CHROME_OS_PRINT_SERVER":
+            case "INSERT_CHROME_OS_PRINTER":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -37,10 +53,16 @@ var login = (function () {
             case "DELETE_CALENDAR_RESOURCE":
             case "DELETE_CALENDAR_RESOURCE_FEATURE":
             case "MEET_INTEROP_DELETE_GATEWAY":
+            case "DELETE_CHROME_OS_PRINT_SERVER":
+            case "DELETE_CHROME_OS_PRINTER":
+            case "REMOVE_CHROME_OS_APPLICATION_SETTINGS":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
                 evt.Put("event.type", ["group", "change"]);
+                break;
+            case "ISSUE_DEVICE_COMMAND":
+                evt.Put("event.type", ["info"]);
                 break;
         }
     };
@@ -144,7 +166,7 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.MOBILE_APP_PACKAGE_ID",
-                    to: "gsuite.admin.mobile_app.package_id",
+                    to: "gsuite.admin.app.package_id",
                 },
                 {
                     from: "gsuite.admin.FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTION",
@@ -165,6 +187,50 @@ var login = (function () {
                 {
                     from: "gsuite.admin.GATEWAY_NAME",
                     to: "gsuite.admin.gateway.name",
+                },
+                {
+                    from: "gsuite.admin.APP_ID",
+                    to: "gsuite.admin.app.id",
+                },
+                {
+                    from: "gsuite.admin.CHROME_OS_SESSION_TYPE",
+                    to: "gsuite.admin.chrome_os.session_type",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_NEW_STATE",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_PREVIOUS_STATE",
+                    to: "gsuite.admin.old_value",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_SERIAL_NUMBER",
+                    to: "gsuite.admin.device.serial_number",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_TYPE",
+                    to: "gsuite.admin.device.type",
+                },
+                {
+                    from: "gsuite.admin.PRINT_SERVER_NAME",
+                    to: "gsuite.admin.print_server.name",
+                },
+                {
+                    from: "gsuite.admin.PRINTER_NAME",
+                    to: "gsuite.admin.printer.name",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_COMMAND_DETAILS",
+                    to: "gsuite.admin.device.command_details",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_NEW_ORG_UNIT",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_PREVIOUS_ORG_UNIT",
+                    to: "gsuite.admin.old_value",
                 },
             ],
             mode: "rename",
