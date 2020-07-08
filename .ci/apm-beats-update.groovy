@@ -35,7 +35,13 @@ pipeline {
       when {
         beforeAgent true
         expression {
-          return isCommentTrigger() || isUserTrigger()
+          def ret = isCommentTrigger() || isUserTrigger()
+          if(!ret){
+            currentBuild.result = 'NOT_BUILT'
+            currentBuild.description = "Build Skipped"
+            currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+          }
+          return ret
         }
       }
       /**
