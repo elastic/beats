@@ -309,6 +309,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
+- Fix k8s scheduler compatibility issue. {pull}19699[19699]
 
 *Packetbeat*
 
@@ -608,6 +609,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for named ports in autodiscover. {pull}19398[19398]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 - Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
+- The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
 
 *Packetbeat*
 

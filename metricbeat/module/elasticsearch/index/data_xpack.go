@@ -38,10 +38,10 @@ var (
 
 // Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
 type stats struct {
-	Indices map[string]index `json:"indices"`
+	Indices map[string]Index `json:"indices"`
 }
 
-type index struct {
+type Index struct {
 	UUID      string     `json:"uuid"`
 	Primaries indexStats `json:"primaries"`
 	Total     indexStats `json:"total"`
@@ -173,7 +173,7 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx *index, clusterState common.MapStr) error {
+func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index metadata from cluster state")
