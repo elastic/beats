@@ -142,14 +142,14 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":      c.Dict("write", threadPoolStatsSchema),
-			"generic":    c.Dict("generic", threadPoolStatsSchema),
-			"get":        c.Dict("get", threadPoolStatsSchema),
-			"management": c.Dict("management", threadPoolStatsSchema),
-			"search":     c.Dict("search", threadPoolStatsSchema),
-			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
+			"bulk":       c.Dict("bulk", xpackThreadPoolStatsSchema, c.DictOptional),
+			"index":      c.Dict("index", xpackThreadPoolStatsSchema, c.DictOptional),
+			"write":      c.Dict("write", xpackThreadPoolStatsSchema),
+			"generic":    c.Dict("generic", xpackThreadPoolStatsSchema),
+			"get":        c.Dict("get", xpackThreadPoolStatsSchema),
+			"management": c.Dict("management", xpackThreadPoolStatsSchema),
+			"search":     c.Dict("search", xpackThreadPoolStatsSchema),
+			"watcher":    c.Dict("watcher", xpackThreadPoolStatsSchema, c.DictOptional),
 		}),
 		"fs": c.Dict("fs", s.Schema{
 			"total": c.Dict("total", s.Schema{
@@ -169,7 +169,7 @@ var (
 		}),
 	}
 
-	threadPoolStatsSchema = s.Schema{
+	xpackThreadPoolStatsSchema = s.Schema{
 		"threads":  c.Int("threads"),
 		"queue":    c.Int("queue"),
 		"rejected": c.Int("rejected"),

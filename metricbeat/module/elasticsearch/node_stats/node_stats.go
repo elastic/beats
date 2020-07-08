@@ -84,7 +84,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			return nil
 		}
 	} else {
-		return eventsMapping(r, *info, content)
+		return eventsMapping(r, m, *info, content)
 	}
 
 	return nil
