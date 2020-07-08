@@ -42,6 +42,8 @@ var login = (function () {
             case "RENAME_ROLE":
             case "UPDATE_ROLE":
             case "UNASSIGN_ROLE":
+            case "TRANSFER_DOCUMENT_OWNERSHIP":
+            case "CHANGE_DOCS_SETTING":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -71,6 +73,7 @@ var login = (function () {
                 evt.Put("event.type", ["group", "change"]);
                 break;
             case "ISSUE_DEVICE_COMMAND":
+            case "DRIVE_DATA_RESTORE":
                 evt.Put("event.type", ["info"]);
                 break;
         }
@@ -127,6 +130,19 @@ var login = (function () {
         evt.AppendTo("related.user", data[0]);
     };
 
+    var setEventDuration = function(evt) {
+        var start = evt.Get("event.start");
+        var end = evt.Get("event.end");
+        if (!start || !end) {
+            return;
+        }
+
+        var millisToNano = 1e6;
+        var tsStart = Date.parse(start) * millisToNano;
+        var tsEnd = Date.parse(end) * millisToNano;
+
+        evt.Put("event.duration", tsEnd-tsStart);
+    };
 
     var pipeline = new processor.Chain()
         .Add(categorizeEvent)
@@ -253,6 +269,14 @@ var login = (function () {
                     from: "gsuite.admin.PRIVILEGE_NAME",
                     to: "gsuite.admin.privilege.name",
                 },
+                {
+                    from: "gsuite.admin.BEGIN_DATE_TIME",
+                    to: "event.start",
+                },
+                {
+                    from: "gsuite.admin.END_DATE_TIME",
+                    to: "event.end",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -260,6 +284,7 @@ var login = (function () {
         })
         .Add(setGroupInfo)
         .Add(setRelatedUserInfo)
+        .Add(setEventDuration)
         .Build();
 
     return {
