@@ -10,7 +10,8 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['appsearch']
     COMPOSE_TIMEOUT = 600
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    # @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/19739")
     def test_stats(self):
         self.render_config_template(modules=[{
             "name": "appsearch",
