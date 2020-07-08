@@ -364,8 +364,8 @@
         "observer.vendor": "F5",
         "process.pid": 2289,
         "related.ip": [
-            "10.204.123.107",
-            "10.225.160.182"
+            "10.225.160.182",
+            "10.204.123.107"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "eFinib",
@@ -1103,6 +1103,7 @@
         "event.module": "f5",
         "event.original": "September 2017/09/06 06:55:24 iconsequ high idunt[571]: 01490549: :siuta: atev: Assigned PPP Dynamic IPv4: 10.6.32.7 Tunnel Type: exerci inesciu Resource: quid Client IP: 10.198.70.58 - orem ",
         "fileset.name": "bigipapm",
+        "group.name": "exerci",
         "input.type": "log",
         "log.flags": [
             "dissect_parsing_error"
@@ -1456,6 +1457,7 @@
         "event.module": "f5",
         "event.original": "March 2018/03/25 09:31:24 uisau high irat[2943]: 01490549: :emsequi: ueporroq: Assigned PPP Dynamic IPv4: 10.142.213.80 Tunnel Type: tationu gnaaliq Resource: olore Client IP: 10.16.181.60 - ameaquei ",
         "fileset.name": "bigipapm",
+        "group.name": "tationu",
         "input.type": "log",
         "log.flags": [
             "dissect_parsing_error"
@@ -1554,8 +1556,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.187.64.126",
-            "10.47.99.72"
+            "10.47.99.72",
+            "10.187.64.126"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",

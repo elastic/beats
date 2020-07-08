@@ -1111,7 +1111,7 @@
         "event.dataset": "rapid7.nexpose",
         "event.module": "rapid7",
         "event.original": "%NEXPOSE-mipsa: 2018-5-21T1:41:41 [uas] iat[Thread: Renamed] [Started: hite] [Duration: adipis] Renamed abo to suntex",
-        "event.outcome": "Success",
+        "event.outcome": "success",
         "file.name": "abo",
         "fileset.name": "nexpose",
         "input.type": "log",

@@ -954,7 +954,7 @@ var ecs_mappings = {
     "dport": {convert: to_long, to:[{field: "destination.port", setter: fld_prio, prio: 0}]},
     "dtransaddr": {convert: to_ip, to:[{field: "destination.nat.ip", setter: fld_prio, prio: 0},{field: "related.ip", setter: fld_append}]},
     "dtransport": {convert: to_long, to:[{field: "destination.nat.port", setter: fld_prio, prio: 0}]},
-    "ec_outcome": {to:[{field: "event.outcome", setter: fld_set}]},
+    "ec_outcome": {to:[{field: "event.outcome", setter: fld_ecs_outcome}]},
     "event_description": {to:[{field: "message", setter: fld_prio, prio: 0}]},
     "event_time": {convert: to_date, to:[{field: "@timestamp", setter: fld_set}]},
     "event_type": {to:[{field: "event.action", setter: fld_prio, prio: 1}]},
@@ -964,6 +964,8 @@ var ecs_mappings = {
     "filename_size": {convert: to_long, to:[{field: "file.size", setter: fld_set}]},
     "filepath": {to:[{field: "file.path", setter: fld_set}]},
     "filetype": {to:[{field: "file.type", setter: fld_set}]},
+    "group": {to:[{field: "group.name", setter: fld_set}]},
+    "groupid": {to:[{field: "group.id", setter: fld_set}]},
     "host": {to:[{field: "host.name", setter: fld_prio, prio: 1}]},
     "hostip": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 0},{field: "related.ip", setter: fld_append}]},
     "hostip_v6": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 1},{field: "related.ip", setter: fld_append}]},
@@ -985,6 +987,7 @@ var ecs_mappings = {
     "logon_id": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 5}]},
     "longdec_dst": {convert: to_double, to:[{field: "destination.geo.location.lon", setter: fld_set}]},
     "longdec_src": {convert: to_double, to:[{field: "source.geo.location.lon", setter: fld_set}]},
+    "macaddr": {convert: to_mac, to:[{field: "host.mac", setter: fld_prio, prio: 2}]},
     "messageid": {to:[{field: "event.code", setter: fld_prio, prio: 1}]},
     "method": {to:[{field: "http.request.method", setter: fld_set}]},
     "msg": {to:[{field: "log.original", setter: fld_set}]},
@@ -1849,6 +1852,24 @@ function fld_prio(dst, value) {
     } else if(this.prio < dst[this.field].prio) {
         dst[this.field].v = value;
         dst[this.field].prio = this.prio;
+    }
+}
+
+var valid_ecs_outcome = {
+    'failure': true,
+    'success': true,
+    'unknown': true
+};
+
+function fld_ecs_outcome(dst, value) {
+    value = value.toLowerCase();
+    if (valid_ecs_outcome[value] === undefined) {
+        value = 'unknown';
+    }
+    if (dst[this.field] === undefined) {
+        dst[this.field] = { v: value };
+    } else if (dst[this.field].v === 'unknown') {
+        dst[this.field] = { v: value };
     }
 }
 
