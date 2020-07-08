@@ -560,6 +560,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
 
+*Elastic Log Driver*
+- Add support for `docker logs` command {pull}19531[19531]
+
 ==== Deprecated
 
 *Affecting all Beats*
