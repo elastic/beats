@@ -447,12 +447,12 @@ func (c *s3Collector) decodeJSONWithKey(decoder *json.Decoder, objectHash string
 }
 
 func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
-	vJSON, err := json.Marshal(jsonFields)
+	vJSON, _ := json.Marshal(jsonFields)
 	log := string(vJSON)
 	offset += len([]byte(log))
 	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
 
-	err = c.forwardEvent(event)
+	err := c.forwardEvent(event)
 	if err != nil {
 		err = errors.Wrap(err, "forwardEvent failed")
 		c.logger.Error(err)
