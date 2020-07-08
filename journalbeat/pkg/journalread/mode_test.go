@@ -15,6 +15,44 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build linux,cgo
+package journalread
 
-package reader
+import (
+	"testing"
+)
+
+func TestMode_Unpack(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		tests := map[string]SeekMode{
+			"head":   SeekHead,
+			"tail":   SeekTail,
+			"cursor": SeekCursor,
+		}
+
+		for str, want := range tests {
+			t.Run(str, func(t *testing.T) {
+				var m SeekMode
+				if err := m.Unpack(str); err != nil {
+					t.Fatal(err)
+				}
+
+				if m != want {
+					t.Errorf("wrong mode, expected %v, got %v", want, m)
+				}
+			})
+		}
+	})
+
+	t.Run("failing", func(t *testing.T) {
+		cases := []string{"invalid", "", "unknown"}
+
+		for _, str := range cases {
+			t.Run(str, func(t *testing.T) {
+				var m SeekMode
+				if err := m.Unpack(str); err == nil {
+					t.Errorf("an error was expected, got %v", m)
+				}
+			})
+		}
+	})
+}
