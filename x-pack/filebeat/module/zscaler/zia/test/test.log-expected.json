@@ -1,7 +1,9 @@
 [
     {
         "@timestamp": "2017-06-23T17:16:42.000Z",
-        "event.action": "<action>",
+        "event.action": [
+            "<action>"
+        ],
         "event.code": "<id>",
         "event.dataset": "zscaler.zia",
         "event.module": "zscaler",
@@ -17,6 +19,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.user": [
+            "<username>"
+        ],
         "rsa.db.index": "<info>",
         "rsa.identity.user_dept": "<user_dept>",
         "rsa.internal.data": "hello",
@@ -46,9 +51,7 @@
             "forwarded"
         ],
         "url.original": "<url>",
-        "user.name": [
-            "<username>"
-        ],
+        "user.name": "<username>",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "<user_agent>"

@@ -13,6 +13,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 6720,
+        "related.user": [
+            "abo"
+        ],
         "rsa.internal.messageid": "01490106",
         "rsa.misc.log_session_id": "sequa",
         "rsa.misc.result": "success",
@@ -23,9 +26,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "abo"
-        ]
+        "user.name": "abo"
     },
     {
         "@timestamp": "2016-02-12T15:12:33.000Z",
@@ -91,6 +92,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 5738,
+        "related.user": [
+            "ccaecat"
+        ],
         "rsa.db.index": "veleumi",
         "rsa.internal.messageid": "crond",
         "rsa.misc.client": "crond",
@@ -101,9 +105,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "ccaecat"
-        ]
+        "user.name": "ccaecat"
     },
     {
         "@timestamp": "2016-03-26T12:20:16.000Z",
@@ -282,7 +284,9 @@
     },
     {
         "@timestamp": "2016-07-04T13:38:16.000Z",
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "01490514",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -311,7 +315,9 @@
     },
     {
         "@timestamp": "2016-07-18T20:40:50.000Z",
-        "event.action": "cancel",
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "CROND",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -324,6 +330,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 1675,
+        "related.user": [
+            "sitvolup"
+        ],
         "rsa.internal.messageid": "CROND",
         "rsa.misc.action": [
             "cancel"
@@ -336,9 +345,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "sitvolup"
-        ]
+        "user.name": "sitvolup"
     },
     {
         "@timestamp": "2016-08-02T03:43:25.000Z",
@@ -361,8 +368,8 @@
         "observer.vendor": "F5",
         "process.pid": 2289,
         "related.ip": [
-            "10.225.160.182",
-            "10.204.123.107"
+            "10.204.123.107",
+            "10.225.160.182"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "eFinib",
@@ -466,6 +473,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 5983,
+        "related.user": [
+            "tenimad"
+        ],
         "rsa.internal.messageid": "01490103",
         "rsa.misc.log_session_id": "tse",
         "rsa.misc.severity": "very-high",
@@ -475,9 +485,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "tenimad"
-        ]
+        "user.name": "tenimad"
     },
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
@@ -518,6 +526,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 4946,
+        "related.user": [
+            "reetdol"
+        ],
         "rsa.internal.messageid": "01490106",
         "rsa.misc.log_session_id": "itecto",
         "rsa.misc.result": "success",
@@ -528,9 +539,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "reetdol"
-        ]
+        "user.name": "reetdol"
     },
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
@@ -702,7 +711,9 @@
     },
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
-        "event.action": "allow",
+        "event.action": [
+            "allow"
+        ],
         "event.code": "01490106",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -715,6 +726,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 5270,
+        "related.user": [
+            "strude"
+        ],
         "rsa.internal.messageid": "01490106",
         "rsa.misc.action": [
             "allow"
@@ -728,9 +742,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "strude"
-        ]
+        "user.name": "strude"
     },
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
@@ -803,6 +815,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 7589,
+        "related.user": [
+            "tob"
+        ],
         "rsa.db.index": "itempo",
         "rsa.internal.messageid": "01490107",
         "rsa.misc.log_session_id": "mag",
@@ -814,9 +829,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "tob"
-        ]
+        "user.name": "tob"
     },
     {
         "@timestamp": "2017-04-16T10:29:41.000Z",
@@ -832,6 +845,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 5899,
+        "related.user": [
+            "iqua"
+        ],
         "rsa.internal.messageid": "01490107",
         "rsa.misc.log_session_id": "mvolupta",
         "rsa.misc.result": "unknown",
@@ -843,9 +859,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "iqua"
-        ]
+        "user.name": "iqua"
     },
     {
         "@timestamp": "2017-04-30T17:32:16.000Z",
@@ -893,7 +907,9 @@
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "01490514",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -1960,7 +1976,9 @@
     },
     {
         "@timestamp": "2019-01-19T15:25:23.000Z",
-        "event.action": "block",
+        "event.action": [
+            "block"
+        ],
         "event.code": "crond",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -1973,6 +1991,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 4071,
+        "related.user": [
+            "iconsequ"
+        ],
         "rsa.internal.messageid": "crond",
         "rsa.misc.action": [
             "block"
@@ -1985,9 +2006,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "iconsequ"
-        ]
+        "user.name": "iconsequ"
     },
     {
         "@timestamp": "2019-02-02T22:27:57.000Z",
@@ -2145,7 +2164,9 @@
     },
     {
         "@timestamp": "2019-04-29T16:43:23.000Z",
-        "event.action": "cancel",
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "CROND",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2158,6 +2179,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 2977,
+        "related.user": [
+            "emac"
+        ],
         "rsa.internal.messageid": "CROND",
         "rsa.misc.action": [
             "cancel"
@@ -2170,9 +2194,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "emac"
-        ]
+        "user.name": "emac"
     },
     {
         "@timestamp": "2019-05-13T23:45:57.000Z",
@@ -2210,6 +2232,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 7733,
+        "related.user": [
+            "equuntur"
+        ],
         "rsa.internal.messageid": "01490106",
         "rsa.misc.log_session_id": "tura",
         "rsa.misc.result": "success",
@@ -2220,9 +2245,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "equuntur"
-        ]
+        "user.name": "equuntur"
     },
     {
         "@timestamp": "2019-06-11T13:51:06.000Z",
@@ -2365,6 +2388,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 613,
+        "related.user": [
+            "xplicabo"
+        ],
         "rsa.internal.messageid": "01490019",
         "rsa.misc.disposition": " Successful",
         "rsa.misc.log_session_id": "suscipi",
@@ -2375,9 +2401,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "xplicabo"
-        ]
+        "user.name": "xplicabo"
     },
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
@@ -2453,7 +2477,9 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "Rule",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2466,6 +2492,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 71,
+        "related.user": [
+            "aecon"
+        ],
         "rsa.internal.event_desc": "qui",
         "rsa.internal.messageid": "Rule",
         "rsa.misc.action": [
@@ -2481,9 +2510,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "aecon"
-        ]
+        "user.name": "aecon"
     },
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
@@ -2523,6 +2550,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 3538,
+        "related.user": [
+            "texp"
+        ],
         "rsa.internal.messageid": "01490019",
         "rsa.misc.disposition": " Successful",
         "rsa.misc.log_session_id": "orisnis",
@@ -2533,9 +2563,7 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "texp"
-        ]
+        "user.name": "texp"
     },
     {
         "@timestamp": "2019-11-30T02:21:57.000Z",
@@ -2564,7 +2592,9 @@
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
-        "event.action": "allow",
+        "event.action": [
+            "allow"
+        ],
         "event.code": "01490106",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -2577,6 +2607,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 2121,
+        "related.user": [
+            "oditem"
+        ],
         "rsa.internal.messageid": "01490106",
         "rsa.misc.action": [
             "allow"
@@ -2590,8 +2623,6 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "user.name": [
-            "oditem"
-        ]
+        "user.name": "oditem"
     }
 ]

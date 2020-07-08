@@ -10,7 +10,9 @@
         "destination.ip": [
             "209.73.177.115"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -25,13 +27,16 @@
             "10.105.21.199",
             "209.73.177.115"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -52,9 +57,7 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
@@ -70,7 +73,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -82,8 +87,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -91,8 +99,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -113,9 +121,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
@@ -131,7 +137,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -147,14 +155,17 @@
             "10.105.21.199",
             "207.58.145.61"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -175,13 +186,13 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/styles.css",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:01.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -196,14 +207,17 @@
         "related.ip": [
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -224,13 +238,13 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/styles.css",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:02.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -245,14 +259,17 @@
         "related.ip": [
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -273,9 +290,7 @@
         ],
         "url.domain": "www.google-analytics.com",
         "url.original": "http://www.google-analytics.com/urchin.js",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:03.000Z",
@@ -291,7 +306,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -306,14 +323,17 @@
             "207.58.145.61",
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -334,9 +354,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
@@ -349,7 +367,9 @@
         "destination.ip": [
             "66.102.9.147"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -364,6 +384,9 @@
         "related.ip": [
             "66.102.9.147",
             "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -393,9 +416,7 @@
         ],
         "url.domain": "www.google-analytics.com",
         "url.original": "http://www.google-analytics.com/__utm.gif?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
@@ -411,7 +432,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -427,14 +450,17 @@
             "10.105.21.199",
             "207.58.145.61"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -455,9 +481,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/graphics/newslogo.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
@@ -473,7 +497,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -489,14 +515,17 @@
             "207.58.145.61",
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -517,9 +546,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/shop/arsenal_shop_ad.jpg",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
@@ -535,7 +562,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -548,8 +577,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -557,8 +589,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -579,13 +611,13 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FUS.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -600,14 +632,17 @@
         "related.ip": [
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -628,9 +663,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FGB.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
@@ -646,7 +679,9 @@
         "destination.ip": [
             "209.85.16.38"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -659,8 +694,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "209.85.16.38",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.85.16.38"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -668,8 +706,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -690,9 +728,7 @@
         ],
         "url.domain": "as.casalemedia.com",
         "url.original": "http://as.casalemedia.com/s?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:06.000Z",
@@ -703,7 +739,9 @@
         "destination.ip": [
             "68.142.213.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -718,13 +756,16 @@
             "10.105.21.199",
             "68.142.213.132"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -745,9 +786,7 @@
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "us.bc.yahoo.com:443",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
@@ -760,7 +799,9 @@
         "destination.ip": [
             "217.212.240.172"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -773,8 +814,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "217.212.240.172",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.212.240.172"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -804,9 +848,7 @@
         ],
         "url.domain": "impgb.tradedoubler.com",
         "url.original": "http://impgb.tradedoubler.com/imp/img/16349696/992098",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
@@ -822,7 +864,9 @@
         "destination.ip": [
             "206.169.136.22"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -838,14 +882,17 @@
             "206.169.136.22",
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -866,13 +913,13 @@
         ],
         "url.domain": "4.adbrite.com",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -887,14 +934,17 @@
         "related.ip": [
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -915,9 +965,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FFR.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
@@ -933,7 +981,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -948,6 +998,9 @@
         "related.ip": [
             "10.105.21.199",
             "207.58.145.61"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -977,9 +1030,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FAU.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
@@ -995,7 +1046,9 @@
         "destination.ip": [
             "207.58.145.61"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1008,8 +1061,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1039,9 +1095,7 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/graphics/spacer.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:10.000Z",
@@ -1052,7 +1106,9 @@
         "destination.ip": [
             "64.127.126.178"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1065,8 +1121,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "64.127.126.178",
-            "10.105.21.199"
+            "10.105.21.199",
+            "64.127.126.178"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1096,9 +1155,7 @@
         ],
         "url.domain": "4.adbrite.com",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:11.000Z",
@@ -1114,7 +1171,9 @@
         "destination.ip": [
             "213.160.98.161"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1127,8 +1186,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.161",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.161"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1158,9 +1220,7 @@
         ],
         "url.domain": "ff.connextra.com",
         "url.original": "http://ff.connextra.com/Ladbrokes/selector/image?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:15.000Z",
@@ -1176,7 +1236,9 @@
         "destination.ip": [
             "213.160.98.160"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1192,14 +1254,17 @@
             "213.160.98.160",
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1220,13 +1285,13 @@
         ],
         "url.domain": "dd.connextra.com",
         "url.original": "http://dd.connextra.com/servlet/controller?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:17.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1240,14 +1305,17 @@
         "related.ip": [
             "10.105.47.218"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1268,9 +1336,7 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:22.000Z",
@@ -1283,7 +1349,9 @@
         "destination.ip": [
             "209.73.177.115"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1295,8 +1363,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "209.73.177.115"
+            "209.73.177.115",
+            "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1325,13 +1396,13 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:23.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1345,6 +1416,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1374,9 +1448,7 @@
         ],
         "url.domain": "update.messenger.yahoo.com",
         "url.original": "http://update.messenger.yahoo.com/msgrcli7.html",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:23.000Z",
@@ -1389,7 +1461,9 @@
         "destination.ip": [
             "216.155.194.239"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1401,8 +1475,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -1431,9 +1508,7 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
@@ -1449,7 +1524,9 @@
         "destination.ip": [
             "204.13.51.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1464,14 +1541,17 @@
             "10.105.47.218",
             "204.13.51.238"
         ],
+        "related.user": [
+            "nazsoau"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1492,9 +1572,7 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
@@ -1510,7 +1588,9 @@
         "destination.ip": [
             "204.13.51.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1523,8 +1603,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
+        ],
+        "related.user": [
+            "nazsoau"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1554,9 +1637,7 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/friend/styles/homepage.css",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:25.000Z",
@@ -1569,7 +1650,9 @@
         "destination.ip": [
             "216.155.194.239"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1581,8 +1664,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -1611,13 +1697,13 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:26.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1632,14 +1718,17 @@
         "related.ip": [
             "10.105.37.58"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1660,13 +1749,13 @@
         ],
         "url.domain": "rms.adobe.com",
         "url.original": "http://rms.adobe.com/read/0600/win_/ENU/read0600win_ENUadbe0000.xml",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:27.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1680,6 +1769,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.47.218"
+        ],
+        "related.user": [
+            "nazsoau"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1709,13 +1801,13 @@
         ],
         "url.domain": "images.hi5.com",
         "url.original": "http://images.hi5.com/styles/style.css",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:27.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1729,6 +1821,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.47.218"
+        ],
+        "related.user": [
+            "nazsoau"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1758,9 +1853,7 @@
         ],
         "url.domain": "images.hi5.com",
         "url.original": "http://images.hi5.com/friend/styles/buttons_en_us.css",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:27.000Z",
@@ -1776,7 +1869,9 @@
         "destination.ip": [
             "204.13.51.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1791,14 +1886,17 @@
             "204.13.51.238",
             "10.105.47.218"
         ],
+        "related.user": [
+            "nazsoau"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1819,9 +1917,7 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:29.000Z",
@@ -1837,7 +1933,9 @@
         "destination.ip": [
             "204.13.51.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1852,6 +1950,9 @@
         "related.ip": [
             "204.13.51.238",
             "10.105.47.218"
+        ],
+        "related.user": [
+            "nazsoau"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1881,9 +1982,7 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/friend/styles/headernav.css",
-        "user.name": [
-            "nazsoau"
-        ]
+        "user.name": "nazsoau"
     },
     {
         "@timestamp": "2006-09-08T04:22:30.000Z",
@@ -1896,7 +1995,9 @@
         "destination.ip": [
             "216.155.194.239"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1910,6 +2011,9 @@
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -1938,9 +2042,7 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
@@ -1951,7 +2053,9 @@
         "destination.ip": [
             "68.142.194.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1963,8 +2067,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.194.14"
+            "68.142.194.14",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -1994,9 +2101,7 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
@@ -2009,7 +2114,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2025,14 +2132,17 @@
             "68.142.219.132",
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2053,9 +2163,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/playmessenger.asp",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:34.000Z",
@@ -2068,7 +2176,9 @@
         "destination.ip": [
             "216.155.194.239"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2080,16 +2190,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2110,9 +2223,7 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:35.000Z",
@@ -2123,7 +2234,9 @@
         "destination.ip": [
             "209.191.93.51"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2136,8 +2249,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "209.191.93.51"
+            "209.191.93.51",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2167,9 +2283,7 @@
         ],
         "url.domain": "address.yahoo.com",
         "url.original": "http://address.yahoo.com/yab/us?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:36.000Z",
@@ -2185,7 +2299,9 @@
         "destination.ip": [
             "63.245.209.21"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2200,6 +2316,9 @@
         "related.ip": [
             "63.245.209.21",
             "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2229,9 +2348,7 @@
         ],
         "url.domain": "fxfeeds.mozilla.org",
         "url.original": "http://fxfeeds.mozilla.org/rss20.xml",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
@@ -2244,7 +2361,9 @@
         "destination.ip": [
             "68.142.231.252"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2256,8 +2375,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.231.252"
+            "68.142.231.252",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2265,8 +2387,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -2287,9 +2409,7 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
@@ -2300,7 +2420,9 @@
         "destination.ip": [
             "68.142.194.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2312,8 +2434,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.194.14"
+            "68.142.194.14",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2343,13 +2468,13 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2363,13 +2488,16 @@
         "related.ip": [
             "10.105.37.17"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2390,13 +2518,13 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2410,6 +2538,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.37.17"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "POST",
@@ -2438,13 +2569,13 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2459,13 +2590,16 @@
         "related.ip": [
             "10.105.37.17"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2486,13 +2620,13 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2506,13 +2640,16 @@
         "related.ip": [
             "10.105.37.17"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2533,9 +2670,7 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
@@ -2548,7 +2683,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2561,8 +2698,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2592,13 +2732,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2611,6 +2751,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.37.17"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "CONNECT",
@@ -2639,9 +2782,7 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
@@ -2654,7 +2795,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2667,8 +2810,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2676,8 +2822,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -2698,9 +2844,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations_over.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
@@ -2713,7 +2857,9 @@
         "destination.ip": [
             "216.155.194.239"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2725,16 +2871,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2755,9 +2904,7 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
@@ -2770,7 +2917,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2783,8 +2932,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2814,9 +2966,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_left.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:40.000Z",
@@ -2829,7 +2979,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2842,8 +2994,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2873,13 +3028,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/launchcast_radio.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:40.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2893,6 +3048,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.47.191"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "POST",
@@ -2921,13 +3079,13 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2941,6 +3099,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.47.191"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "POST",
@@ -2969,9 +3130,7 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
@@ -2984,7 +3143,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2997,8 +3158,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3006,8 +3170,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3028,9 +3192,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_right.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
@@ -3043,7 +3205,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3056,8 +3220,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3087,9 +3254,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_center.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
@@ -3102,7 +3267,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3117,6 +3284,9 @@
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3146,9 +3316,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_off.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
@@ -3161,7 +3329,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3176,6 +3346,9 @@
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3205,13 +3378,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3225,6 +3398,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -3254,13 +3430,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_off_state_station.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3275,14 +3451,17 @@
         "related.ip": [
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3303,13 +3482,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_fill.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3323,6 +3502,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -3352,9 +3534,7 @@
         ],
         "url.domain": "us.i1.yimg.com",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/toolbar50x50.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:43.000Z",
@@ -3367,7 +3547,9 @@
         "destination.ip": [
             "212.58.226.33"
         ],
-        "event.action": "TCP_REFRESH_MISS",
+        "event.action": [
+            "TCP_REFRESH_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3380,8 +3562,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "212.58.226.33"
+            "212.58.226.33",
+            "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3411,9 +3596,7 @@
         ],
         "url.domain": "newsrss.bbc.co.uk",
         "url.original": "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:44.000Z",
@@ -3426,7 +3609,9 @@
         "destination.ip": [
             "68.142.231.252"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3442,14 +3627,17 @@
             "68.142.231.252",
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3470,13 +3658,13 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:44.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3490,6 +3678,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -3519,13 +3710,13 @@
         ],
         "url.domain": "us.ent1.yimg.com",
         "url.original": "http://us.ent1.yimg.com/images.launch.yahoo.com/000/032/457/32457654.jpg",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:44.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3539,6 +3730,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -3568,9 +3762,7 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060906/thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:45.000Z",
@@ -3583,7 +3775,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3599,13 +3793,16 @@
             "68.142.219.132",
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -3626,9 +3823,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:46.000Z",
@@ -3644,7 +3839,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3660,14 +3857,17 @@
             "10.105.33.214",
             "213.160.98.159"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3688,9 +3888,7 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060908/thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
@@ -3703,7 +3901,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3716,8 +3916,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3725,8 +3928,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3747,9 +3950,7 @@
         ],
         "url.domain": "radio.music.yahoo.com",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
@@ -3762,7 +3963,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3775,8 +3978,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -3784,8 +3990,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3806,9 +4012,7 @@
         ],
         "url.domain": "radio.music.yahoo.com",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
@@ -3821,7 +4025,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3837,14 +4043,17 @@
             "10.105.33.214",
             "68.142.219.132"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -3865,13 +4074,13 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:49.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3886,14 +4095,17 @@
         "related.ip": [
             "10.105.37.65"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3914,13 +4126,13 @@
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/iesocks?",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:49.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3934,6 +4146,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.37.65"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -3963,9 +4178,7 @@
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/return?",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
@@ -3981,7 +4194,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3994,8 +4209,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4003,8 +4221,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4025,9 +4243,7 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060907/thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
@@ -4040,7 +4256,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4053,8 +4271,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4062,8 +4283,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4084,9 +4305,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/515/starter.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
@@ -4099,7 +4318,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4115,14 +4336,17 @@
             "68.142.219.132",
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4143,9 +4367,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/player/default.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
@@ -4161,7 +4383,9 @@
         "destination.ip": [
             "213.160.98.152"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4174,8 +4398,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.152"
+            "213.160.98.152",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4183,8 +4410,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-shockwave-flash",
         "rsa.misc.result_code": "200",
@@ -4205,9 +4432,7 @@
         ],
         "url.domain": "us.a2.yimg.com",
         "url.original": "http://us.a2.yimg.com/us.yimg.com/a/ya/yahoo_messenger/081106_lrec_msgr_interophitchhiker.swf?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:53.000Z",
@@ -4220,7 +4445,9 @@
         "destination.ip": [
             "68.142.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4236,14 +4463,17 @@
             "10.105.33.214",
             "68.142.219.132"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4264,9 +4494,7 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/player/stickwall.asp?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:54.000Z",
@@ -4277,7 +4505,9 @@
         "destination.ip": [
             "68.142.213.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4290,8 +4520,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.213.132"
+            "68.142.213.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4321,9 +4554,7 @@
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "http://us.bc.yahoo.com/b?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:56.000Z",
@@ -4334,7 +4565,9 @@
         "destination.ip": [
             "68.142.194.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4347,8 +4580,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4378,9 +4614,7 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
@@ -4391,7 +4625,9 @@
         "destination.ip": [
             "216.109.124.55"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4403,16 +4639,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.109.124.55",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.109.124.55"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4433,13 +4672,13 @@
         ],
         "url.domain": "pclick.internal.yahoo.com",
         "url.original": "pclick.internal.yahoo.com:443",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4453,6 +4692,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -4482,9 +4724,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20051025184124/radio.launch.yahoo.com/radioapi/includes/js/compVersionedJS/rapiBridge_1_4.js",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
@@ -4500,7 +4740,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4513,8 +4755,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4522,8 +4767,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -4544,9 +4789,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222754/radio.launch.yahoo.com/radio/clientdata/515/other.css",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
@@ -4562,7 +4805,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4577,6 +4822,9 @@
         "related.ip": [
             "10.105.33.214",
             "213.160.98.159"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4606,9 +4854,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_left.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
@@ -4621,7 +4867,9 @@
         "destination.ip": [
             "209.73.177.115"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4636,13 +4884,16 @@
             "209.73.177.115",
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4663,9 +4914,7 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
@@ -4681,7 +4930,9 @@
         "destination.ip": [
             "213.160.98.167"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4697,14 +4948,17 @@
             "213.160.98.167",
             "10.105.33.214"
         ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -4725,9 +4979,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20050829181418/radio.launch.yahoo.com/radio/common_radio/resources/images/noaccess_msgr_uk.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
@@ -4743,7 +4995,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4756,8 +5010,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4765,8 +5022,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4787,13 +5044,13 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_right.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4807,6 +5064,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -4836,9 +5096,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222807/radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
@@ -4854,7 +5112,9 @@
         "destination.ip": [
             "213.160.98.167"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4867,8 +5127,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.167"
+            "213.160.98.167",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4898,9 +5161,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_off.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
@@ -4916,7 +5177,9 @@
         "destination.ip": [
             "213.160.98.159"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4929,8 +5192,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4960,9 +5226,7 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222756/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_center.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:23:00.000Z",
@@ -4978,7 +5242,9 @@
         "destination.ip": [
             "213.160.98.167"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4993,6 +5259,9 @@
         "related.ip": [
             "213.160.98.167",
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -5022,13 +5291,13 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_fill.gif",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5043,14 +5312,17 @@
         "related.ip": [
             "10.105.37.180"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5071,13 +5343,13 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "http://www.google.com/supported_domains",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5091,6 +5363,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.47.191"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -5120,9 +5395,7 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/en-us/agent5/chknews.asp?",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
@@ -5133,7 +5406,9 @@
         "destination.ip": [
             "216.109.125.112"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5148,6 +5423,9 @@
         "related.ip": [
             "216.109.125.112",
             "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -5177,9 +5455,7 @@
         ],
         "url.domain": "launch.adserver.yahoo.com",
         "url.original": "http://launch.adserver.yahoo.com/l?",
-        "user.name": [
-            "adeolaegbedokun"
-        ]
+        "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:23:02.000Z",
@@ -5192,7 +5468,9 @@
         "destination.ip": [
             "217.12.10.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5207,6 +5485,9 @@
         "related.ip": [
             "10.105.21.199",
             "217.12.10.96"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -5236,13 +5517,13 @@
         ],
         "url.domain": "uk.f250.mail.yahoo.com",
         "url.original": "http://uk.f250.mail.yahoo.com/dc/launch?",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:02.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5255,6 +5536,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.37.180"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "CONNECT",
@@ -5283,9 +5567,7 @@
         ],
         "url.domain": "login.live.com",
         "url.original": "login.live.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:23:04.000Z",
@@ -5301,7 +5583,9 @@
         "destination.ip": [
             "213.160.98.169"
         ],
-        "event.action": "TCP_SWAPFAIL_MISS",
+        "event.action": [
+            "TCP_SWAPFAIL_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5314,8 +5598,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.169",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.169"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -5345,13 +5632,13 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/77cf3e56414f974dfd8616f56f0f632c_1.js",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:05.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5366,14 +5653,17 @@
         "related.ip": [
             "10.105.21.199"
         ],
+        "related.user": [
+            "badeyek"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -5394,9 +5684,7 @@
         ],
         "url.domain": "us.js1.yimg.com",
         "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/hdr/ygma5.css",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
@@ -5412,7 +5700,9 @@
         "destination.ip": [
             "213.160.98.169"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5425,8 +5715,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.169",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.169"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -5434,8 +5727,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -5456,13 +5749,13 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/f7fc76100697c9c2d25dd0ec35e563b0_1.js",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5476,6 +5769,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -5505,13 +5801,13 @@
         ],
         "url.domain": "us.js1.yimg.com",
         "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5525,6 +5821,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -5554,13 +5853,13 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
-        "event.action": "TCP_HIT",
+        "event.action": [
+            "TCP_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5574,6 +5873,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -5603,8 +5905,6 @@
         ],
         "url.domain": "us.i1.yimg.com",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/pim/dclient/d/img/liam_ball_1.gif",
-        "user.name": [
-            "badeyek"
-        ]
+        "user.name": "badeyek"
     }
 ]

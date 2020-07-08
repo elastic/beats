@@ -684,7 +684,9 @@
         ]
     },
     {
-        "event.action": "Upgrading database",
+        "event.action": [
+            "Upgrading database"
+        ],
         "event.code": "Upgrading",
         "event.dataset": "rapid7.nexpose",
         "event.module": "rapid7",
@@ -1333,7 +1335,9 @@
         ]
     },
     {
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "AssetGroupEventHandler",
         "event.dataset": "rapid7.nexpose",
         "event.module": "rapid7",
@@ -1622,7 +1626,9 @@
         ]
     },
     {
-        "event.action": "allow",
+        "event.action": [
+            "allow"
+        ],
         "event.code": "AssetGroupEventHandler",
         "event.dataset": "rapid7.nexpose",
         "event.module": "rapid7",
@@ -1664,7 +1670,9 @@
         ]
     },
     {
-        "event.action": "Shutting down",
+        "event.action": [
+            "Shutting down"
+        ],
         "event.code": "ConsoleScanImporter",
         "event.dataset": "rapid7.nexpose",
         "event.module": "rapid7",

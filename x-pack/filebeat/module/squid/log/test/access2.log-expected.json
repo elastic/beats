@@ -1,7 +1,9 @@
 [
     {
         "@timestamp": "2002-10-23T10:25:29.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -15,6 +17,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -50,13 +55,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r3_c6.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:30.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -70,6 +75,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -105,13 +113,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c1.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:31.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -126,14 +134,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -160,13 +171,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -180,6 +191,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -215,13 +229,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/anglais/produit4.html",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -236,60 +250,8 @@
         "related.ip": [
             "210.8.79.199"
         ],
-        "rsa.internal.hcode": "NONE",
-        "rsa.internal.messageid": "GET",
-        "rsa.investigations.ec_activity": "Request",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
-        ],
-        "rsa.misc.content_type": "image/gif",
-        "rsa.misc.result_code": "304",
-        "rsa.network.domain": "www.bealplanet.com",
-        "rsa.time.duration_time": 6,
-        "rsa.time.event_time": "2002-10-23T10:25:32.000Z",
-        "rsa.time.event_time_str": "1035368732",
-        "rsa.web.alias_host": "www.bealplanet.com",
-        "server.domain": "www.bealplanet.com",
-        "service.type": "squid",
-        "source.as.number": 2764,
-        "source.as.organization.name": "AAPT Limited",
-        "source.bytes": 268,
-        "source.geo.continent_name": "Oceania",
-        "source.geo.country_iso_code": "AU",
-        "source.geo.location.lat": -33.494,
-        "source.geo.location.lon": 143.2104,
-        "source.ip": [
-            "210.8.79.199"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "www.bealplanet.com",
-        "url.original": "http://www.bealplanet.com/produits/img/produits-ang.gif",
-        "user.name": [
+        "related.user": [
             "-"
-        ]
-    },
-    {
-        "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
-        "event.code": "GET",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1035368732.456      6 210.8.79.199 TCP_IMS_HIT/304 268 GET http://www.bealplanet.com/produits/img/cale.gif - NONE/- image/gif",
-        "fileset.name": "log",
-        "http.response.body.content": "cale.gif",
-        "input.type": "log",
-        "log.offset": 784,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
-        "related.ip": [
-            "210.8.79.199"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -324,14 +286,72 @@
             "forwarded"
         ],
         "url.domain": "www.bealplanet.com",
-        "url.original": "http://www.bealplanet.com/produits/img/cale.gif",
-        "user.name": [
-            "-"
-        ]
+        "url.original": "http://www.bealplanet.com/produits/img/produits-ang.gif",
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
+        "event.code": "GET",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1035368732.456      6 210.8.79.199 TCP_IMS_HIT/304 268 GET http://www.bealplanet.com/produits/img/cale.gif - NONE/- image/gif",
+        "fileset.name": "log",
+        "http.response.body.content": "cale.gif",
+        "input.type": "log",
+        "log.offset": 784,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.ip": [
+            "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
+        ],
+        "rsa.internal.hcode": "NONE",
+        "rsa.internal.messageid": "GET",
+        "rsa.investigations.ec_activity": "Request",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "TCP_IMS_HIT",
+            "GET"
+        ],
+        "rsa.misc.content_type": "image/gif",
+        "rsa.misc.result_code": "304",
+        "rsa.network.domain": "www.bealplanet.com",
+        "rsa.time.duration_time": 6,
+        "rsa.time.event_time": "2002-10-23T10:25:32.000Z",
+        "rsa.time.event_time_str": "1035368732",
+        "rsa.web.alias_host": "www.bealplanet.com",
+        "server.domain": "www.bealplanet.com",
+        "service.type": "squid",
+        "source.as.number": 2764,
+        "source.as.organization.name": "AAPT Limited",
+        "source.bytes": 268,
+        "source.geo.continent_name": "Oceania",
+        "source.geo.country_iso_code": "AU",
+        "source.geo.location.lat": -33.494,
+        "source.geo.location.lon": 143.2104,
+        "source.ip": [
+            "210.8.79.199"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "www.bealplanet.com",
+        "url.original": "http://www.bealplanet.com/produits/img/cale.gif",
+        "user.name": "-"
+    },
+    {
+        "@timestamp": "2002-10-23T10:25:32.000Z",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -346,14 +366,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -380,13 +403,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/fond2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -400,6 +423,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -435,13 +461,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/logo_orange.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -455,6 +481,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -490,13 +519,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/chat.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_REFRESH_MISS",
+        "event.action": [
+            "TCP_REFRESH_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -510,6 +539,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -545,13 +577,13 @@
         ],
         "url.domain": "www.call-kelly.com",
         "url.original": "http://www.call-kelly.com/horizontal.js",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -566,14 +598,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -600,13 +635,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/icone_notice.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -621,14 +656,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -655,13 +693,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/spelenium1.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -676,14 +714,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -710,13 +751,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/spelenium2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -730,6 +771,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -765,13 +809,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/spelenium3.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -785,6 +829,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -820,13 +867,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/speleniumgold.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:32.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -840,6 +887,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -875,13 +925,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/antipode.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -895,6 +945,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -930,13 +983,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/logospelenium.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -950,6 +1003,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -985,13 +1041,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/0spelenium1.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1005,6 +1061,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1040,13 +1099,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c4.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1060,6 +1119,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1095,13 +1157,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/0spelenium2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1115,6 +1177,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1150,13 +1215,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/0spelenium3.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1170,6 +1235,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1205,13 +1273,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/0antipode.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1225,6 +1293,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -1260,13 +1331,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/0spelenium4.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1281,14 +1352,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1315,13 +1389,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c5.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1335,6 +1409,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1370,13 +1447,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c7.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1390,14 +1467,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1424,13 +1504,13 @@
         ],
         "url.domain": "www.call-kelly.com",
         "url.original": "http://www.call-kelly.com/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:33.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1444,6 +1524,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -1479,13 +1562,13 @@
         ],
         "url.domain": "www.call-kelly.com",
         "url.original": "http://www.call-kelly.com/vertical.js",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1499,6 +1582,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1534,13 +1620,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c9.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1554,6 +1640,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1589,13 +1678,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c10.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:34.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1610,14 +1699,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1644,13 +1736,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c11.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1664,6 +1756,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1699,13 +1794,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r5_c1.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1720,14 +1815,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1754,13 +1852,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/journalCWS2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:35.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1774,6 +1872,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1809,13 +1910,13 @@
         ],
         "url.domain": "counter11.sextracker.com",
         "url.original": "http://counter11.sextracker.com/c4/id/0/259914",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1829,6 +1930,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -1864,13 +1968,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/vertbar.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1884,6 +1988,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -1919,13 +2026,13 @@
         ],
         "url.domain": "66.181.163.170",
         "url.original": "http://66.181.163.170/pics/12.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1940,14 +2047,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -1974,13 +2084,13 @@
         ],
         "url.domain": "66.181.163.170",
         "url.original": "http://66.181.163.170/pics/tease.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:36.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1995,14 +2105,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2029,13 +2142,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/getacro.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:37.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2050,14 +2163,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_DEFAULT_PARENT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2084,13 +2200,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/journaltitle.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:38.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2104,6 +2220,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -2139,13 +2258,13 @@
         ],
         "url.domain": "66.181.163.170",
         "url.original": "http://66.181.163.170/pics/5.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:39.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2159,6 +2278,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -2194,13 +2316,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/msbutton.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:39.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2214,6 +2336,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_DEFAULT_PARENT",
         "rsa.internal.messageid": "GET",
@@ -2249,13 +2374,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/msbutton_f2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:40.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2270,14 +2395,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2304,13 +2432,13 @@
         ],
         "url.domain": "66.181.163.170",
         "url.original": "http://66.181.163.170/pics/8.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:41.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2324,6 +2452,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -2359,13 +2490,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/subsbutton_f2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2380,14 +2511,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2414,13 +2548,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/subsbutton.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2435,14 +2569,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -2469,13 +2606,13 @@
         ],
         "url.domain": "66.181.163.170",
         "url.original": "http://66.181.163.170/pics/17.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2490,14 +2627,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2524,13 +2664,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/shim.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:42.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2545,14 +2685,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2579,13 +2722,13 @@
         ],
         "url.domain": "www.penis-enlargement-product.com",
         "url.original": "http://www.penis-enlargement-product.com/banners/ban2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:43.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2599,6 +2742,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -2634,13 +2780,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/jcwspanel_r1_c1.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2654,6 +2800,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -2689,13 +2838,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/fond2.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2709,6 +2858,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -2744,13 +2896,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/speleo-ang.html",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": "TCP_IMS_HIT",
+        "event.action": [
+            "TCP_IMS_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2765,14 +2917,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -2799,13 +2954,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/produits/img/cale.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2820,14 +2975,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -2854,13 +3012,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/titre_speleo.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:47.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2874,6 +3032,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -2909,13 +3070,13 @@
         ],
         "url.domain": "botw.topbucks.com",
         "url.original": "http://botw.topbucks.com/mx_vertical_04_ani.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2929,6 +3090,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -2964,13 +3128,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/francais.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2985,14 +3149,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3019,13 +3186,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/anglais_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3039,6 +3206,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3074,13 +3244,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/deutsch.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:48.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3094,6 +3264,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3129,13 +3302,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/espanol.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3149,6 +3322,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3184,13 +3360,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/italiano.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3205,14 +3381,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3239,13 +3418,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/nederlands.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3259,6 +3438,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3294,13 +3476,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/portuges.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3315,14 +3497,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3349,13 +3534,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/japanese.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:49.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3370,14 +3555,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3404,13 +3592,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/logobeal.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3424,6 +3612,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3459,13 +3650,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/spelenium1.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3479,6 +3670,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3514,13 +3708,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/bout1_ang.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:50.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3534,6 +3728,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3569,13 +3766,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/bout2_ang.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:51.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3590,14 +3787,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3624,13 +3824,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/attention.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:52.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3645,14 +3845,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3679,13 +3882,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/francais_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3699,6 +3902,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3734,13 +3940,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/deutsch_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3755,14 +3961,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3789,13 +3998,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/espanol_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3809,6 +4018,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3844,13 +4056,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/italiano_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3865,14 +4077,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3899,13 +4114,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/nederlands_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:53.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3919,6 +4134,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -3954,13 +4172,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/japanese_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3975,14 +4193,17 @@
         "related.ip": [
             "210.8.79.199"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4009,13 +4230,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/portuges_bis.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4030,14 +4251,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4064,13 +4288,13 @@
         ],
         "url.domain": "cybercatinc.com",
         "url.original": "http://cybercatinc.com/banners/July/logo16.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:54.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4084,6 +4308,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -4119,13 +4346,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/bout1bis_ang.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:57.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4139,6 +4366,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_DEFAULT_PARENT",
         "rsa.internal.messageid": "GET",
@@ -4174,13 +4404,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/bout2bis_ang.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:57.000Z",
-        "event.action": "TCP_MEM_HIT",
+        "event.action": [
+            "TCP_MEM_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4194,6 +4424,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.199"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -4229,13 +4462,13 @@
         ],
         "url.domain": "www.bealplanet.com",
         "url.original": "http://www.bealplanet.com/notices/img/bout2bis_ang.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:58.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4249,14 +4482,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4283,13 +4519,13 @@
         ],
         "url.domain": "www.frenchcum.com",
         "url.original": "http://www.frenchcum.com/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:25:59.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4303,6 +4539,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -4338,13 +4577,13 @@
         ],
         "url.domain": "www.cyberhairy.com",
         "url.original": "http://www.cyberhairy.com/advertisingbanners/468x60-CFF-01.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:01.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4359,14 +4598,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4393,13 +4635,13 @@
         ],
         "url.domain": "www.girls-home-alone.com",
         "url.original": "http://www.girls-home-alone.com/banners/call-kelly.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:01.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4413,6 +4655,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
@@ -4448,13 +4693,13 @@
         ],
         "url.domain": "cybercatinc.com",
         "url.original": "http://cybercatinc.com/banners/July/npban_adult.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:09.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4468,14 +4713,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4502,13 +4750,13 @@
         ],
         "url.domain": "c2.xxxcounter.com",
         "url.original": "http://c2.xxxcounter.com/c2/id/2/148582/0/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:13.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4523,14 +4771,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4557,13 +4808,13 @@
         ],
         "url.domain": "www.frenchcum.com",
         "url.original": "http://www.frenchcum.com/eclair.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:13.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4578,14 +4829,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4612,9 +4866,7 @@
         ],
         "url.domain": "www.frenchcum.com",
         "url.original": "http://www.frenchcum.com/frenchcumnew.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:13.000Z",
@@ -4627,7 +4879,9 @@
         "destination.ip": [
             "80.69.64.224"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4643,14 +4897,17 @@
             "80.69.64.224",
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4677,13 +4934,13 @@
         ],
         "url.domain": "www.usaminutes.tv",
         "url.original": "http://www.usaminutes.tv/iframe_pix/index_3.php?",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:14.000Z",
-        "event.action": "TCP_REFRESH_MISS",
+        "event.action": [
+            "TCP_REFRESH_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4698,14 +4955,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_MISS",
-            "GET"
+            "GET",
+            "TCP_REFRESH_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4732,13 +4992,13 @@
         ],
         "url.domain": "www.frenchcum.com",
         "url.original": "http://www.frenchcum.com/oki02.gif",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4752,14 +5012,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4786,13 +5049,13 @@
         ],
         "url.domain": "rr3.xxxcounter.com",
         "url.original": "http://rr3.xxxcounter.com/c2/id/2/148582/0/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4806,6 +5069,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_DEFAULT_PARENT",
         "rsa.internal.messageid": "GET",
@@ -4841,13 +5107,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c3.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4861,6 +5127,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.192"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -4896,13 +5165,13 @@
         ],
         "url.domain": "counter4.sextracker.com",
         "url.original": "http://counter4.sextracker.com/c7/id/0/315043",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4917,14 +5186,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4951,13 +5223,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r2_c6_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:15.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4972,14 +5244,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5006,13 +5281,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c1_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5027,14 +5302,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5061,13 +5339,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c2_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5081,6 +5359,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -5116,13 +5397,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/carafano.pdf",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:16.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5136,6 +5417,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -5171,13 +5455,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c3_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": "TCP_REFRESH_HIT",
+        "event.action": [
+            "TCP_REFRESH_HIT"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5192,14 +5476,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "PARENT_HIT",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5226,13 +5513,13 @@
         ],
         "url.domain": "www.usaminutes.tv",
         "url.original": "http://www.usaminutes.tv/iframe_pix/7.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": "TCP_DENIED",
+        "event.action": [
+            "TCP_DENIED"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5246,6 +5533,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "202.67.67.124"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "NONE",
         "rsa.internal.messageid": "GET",
@@ -5284,13 +5574,13 @@
         ],
         "url.domain": "rmapup.real.com",
         "url.original": "http://rmapup.real.com/fcgi-bin/upgrade.fcgi?",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5305,14 +5595,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5339,13 +5632,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c4_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:17.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5359,6 +5652,9 @@
         "observer.vendor": "Squid",
         "related.ip": [
             "210.8.79.228"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
@@ -5394,13 +5690,13 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/carafano.pdf",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:18.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5414,14 +5710,17 @@
         "related.ip": [
             "210.8.79.192"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "TIMEOUT_FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -5448,13 +5747,13 @@
         ],
         "url.domain": "c1.xxxcounter.com",
         "url.original": "http://c1.xxxcounter.com/c2/id/16/190203/0/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2002-10-23T10:26:18.000Z",
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5469,14 +5768,17 @@
         "related.ip": [
             "210.8.79.228"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "FIRST_PARENT_MISS",
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -5503,8 +5805,6 @@
         ],
         "url.domain": "www.fas.harvard.edu",
         "url.original": "http://www.fas.harvard.edu/~hpcws/nav/navbar_r4_c5_f2.jpg",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     }
 ]

@@ -105,7 +105,9 @@
         ]
     },
     {
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -349,7 +351,9 @@
         ]
     },
     {
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -361,6 +365,9 @@
         "observer.product": "Director",
         "observer.type": "Configuration",
         "observer.vendor": "Bluecoat",
+        "related.user": [
+            "itaut"
+        ],
         "rsa.internal.messageid": "configd",
         "rsa.misc.action": [
             "accept"
@@ -372,9 +379,7 @@
             "bluecoat.director",
             "forwarded"
         ],
-        "user.name": [
-            "itaut"
-        ]
+        "user.name": "itaut"
     },
     {
         "event.code": "authd",
@@ -439,7 +444,9 @@
         ]
     },
     {
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -637,7 +644,9 @@
         ]
     },
     {
-        "event.action": "allow",
+        "event.action": [
+            "allow"
+        ],
         "event.code": "runner",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -728,7 +737,9 @@
         ]
     },
     {
-        "event.action": "cancel",
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -740,6 +751,9 @@
         "observer.product": "Director",
         "observer.type": "Configuration",
         "observer.vendor": "Bluecoat",
+        "related.user": [
+            "sperna"
+        ],
         "rsa.internal.messageid": "configd",
         "rsa.misc.action": [
             "cancel"
@@ -751,9 +765,7 @@
             "bluecoat.director",
             "forwarded"
         ],
-        "user.name": [
-            "sperna"
-        ]
+        "user.name": "sperna"
     },
     {
         "event.code": "auditd",
@@ -1203,7 +1215,9 @@
         ]
     },
     {
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "configd",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -1299,7 +1313,9 @@
         ]
     },
     {
-        "event.action": "accept",
+        "event.action": [
+            "accept"
+        ],
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -1672,7 +1688,9 @@
         ]
     },
     {
-        "event.action": "cancel",
+        "event.action": [
+            "cancel"
+        ],
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",
@@ -2027,7 +2045,9 @@
         ]
     },
     {
-        "event.action": "block",
+        "event.action": [
+            "block"
+        ],
         "event.code": "heartbeat",
         "event.dataset": "bluecoat.director",
         "event.module": "bluecoat",

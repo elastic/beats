@@ -1040,7 +1040,9 @@
         ]
     },
     {
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "watchdog",
         "event.dataset": "infoblox.nios",
         "event.module": "infoblox",
@@ -1277,6 +1279,9 @@
         "observer.product": "Network",
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
+        "related.user": [
+            "temUt"
+        ],
         "rsa.internal.data": "atatn",
         "rsa.internal.event_desc": "RADIUS authentication succeeded for user",
         "rsa.internal.messageid": "serial_console",
@@ -1293,9 +1298,7 @@
             "infoblox.nios",
             "forwarded"
         ],
-        "user.name": [
-            "temUt"
-        ]
+        "user.name": "temUt"
     },
     {
         "event.code": "httpd",

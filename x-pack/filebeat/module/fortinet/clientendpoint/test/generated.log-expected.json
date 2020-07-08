@@ -5,7 +5,9 @@
             "10.102.123.34"
         ],
         "destination.port": 3994,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -24,6 +26,9 @@
         "related.ip": [
             "10.102.123.34",
             "10.150.92.220"
+        ],
+        "related.user": [
+            "billoi"
         ],
         "rsa.counters.dclass_c1": 884,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -51,9 +56,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "billoi"
-        ]
+        "user.name": "billoi"
     },
     {
         "@timestamp": "2020-02-12T15:12:33.000Z",
@@ -61,7 +64,9 @@
             "10.102.218.31"
         ],
         "destination.port": 3376,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -78,8 +83,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6183,
         "related.ip": [
-            "10.102.218.31",
-            "10.22.119.124"
+            "10.22.119.124",
+            "10.102.218.31"
+        ],
+        "related.user": [
+            "itamet"
         ],
         "rsa.counters.dclass_c1": 873,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -107,9 +115,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "itamet"
-        ]
+        "user.name": "itamet"
     },
     {
         "@timestamp": "2020-02-26T22:15:08.000Z",
@@ -117,7 +123,9 @@
             "10.26.46.95"
         ],
         "destination.port": 7599,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -134,8 +142,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1130,
         "related.ip": [
-            "10.26.46.95",
-            "10.135.105.231"
+            "10.135.105.231",
+            "10.26.46.95"
+        ],
+        "related.user": [
+            "meumfug"
         ],
         "rsa.counters.dclass_c1": 4454,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -163,9 +174,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "meumfug"
-        ]
+        "user.name": "meumfug"
     },
     {
         "@timestamp": "2020-03-12T05:17:42.000Z",
@@ -173,7 +182,9 @@
             "10.202.204.154"
         ],
         "destination.port": 3587,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -190,8 +201,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5712,
         "related.ip": [
-            "10.134.137.177",
-            "10.202.204.154"
+            "10.202.204.154",
+            "10.134.137.177"
+        ],
+        "related.user": [
+            "con"
         ],
         "rsa.counters.dclass_c1": 101,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -219,9 +233,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "con"
-        ]
+        "user.name": "con"
     },
     {
         "@timestamp": "2020-03-26T12:20:16.000Z",
@@ -229,7 +241,9 @@
             "10.131.115.96"
         ],
         "destination.port": 1890,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -248,6 +262,9 @@
         "related.ip": [
             "10.85.66.161",
             "10.131.115.96"
+        ],
+        "related.user": [
+            "onev"
         ],
         "rsa.counters.dclass_c1": 5509,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -275,9 +292,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "onev"
-        ]
+        "user.name": "onev"
     },
     {
         "@timestamp": "2020-04-09T19:22:51.000Z",
@@ -285,7 +300,9 @@
             "10.11.200.161"
         ],
         "destination.port": 4665,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -302,8 +319,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4243,
         "related.ip": [
-            "10.183.202.41",
-            "10.11.200.161"
+            "10.11.200.161",
+            "10.183.202.41"
+        ],
+        "related.user": [
+            "iusmodt"
         ],
         "rsa.counters.dclass_c1": 513,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -331,9 +351,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "iusmodt"
-        ]
+        "user.name": "iusmodt"
     },
     {
         "@timestamp": "2020-04-24T02:25:25.000Z",
@@ -341,7 +359,9 @@
             "10.214.225.125"
         ],
         "destination.port": 2121,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -360,6 +380,9 @@
         "related.ip": [
             "10.12.44.169",
             "10.214.225.125"
+        ],
+        "related.user": [
+            "uam"
         ],
         "rsa.counters.dclass_c1": 6499,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -387,9 +410,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uam"
-        ]
+        "user.name": "uam"
     },
     {
         "@timestamp": "2020-05-08T09:27:59.000Z",
@@ -397,7 +418,9 @@
             "10.233.127.83"
         ],
         "destination.port": 3676,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -414,8 +437,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3904,
         "related.ip": [
-            "10.64.155.245",
-            "10.233.127.83"
+            "10.233.127.83",
+            "10.64.155.245"
+        ],
+        "related.user": [
+            "olab"
         ],
         "rsa.counters.dclass_c1": 3391,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -443,9 +469,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "olab"
-        ]
+        "user.name": "olab"
     },
     {
         "@timestamp": "2020-05-22T16:30:33.000Z",
@@ -453,7 +477,9 @@
             "10.69.20.77"
         ],
         "destination.port": 7579,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -470,8 +496,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 776,
         "related.ip": [
-            "10.69.20.77",
-            "10.178.244.31"
+            "10.178.244.31",
+            "10.69.20.77"
+        ],
+        "related.user": [
+            "moll"
         ],
         "rsa.counters.dclass_c1": 5812,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -499,9 +528,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "moll"
-        ]
+        "user.name": "moll"
     },
     {
         "@timestamp": "2020-06-05T23:33:08.000Z",
@@ -509,7 +536,9 @@
             "10.10.65.154"
         ],
         "destination.port": 7572,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -528,6 +557,9 @@
         "related.ip": [
             "10.197.5.210",
             "10.10.65.154"
+        ],
+        "related.user": [
+            "olo"
         ],
         "rsa.counters.dclass_c1": 5529,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -555,9 +587,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "olo"
-        ]
+        "user.name": "olo"
     },
     {
         "@timestamp": "2020-06-20T06:35:42.000Z",
@@ -565,7 +595,9 @@
             "10.177.124.147"
         ],
         "destination.port": 4173,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -582,8 +614,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5794,
         "related.ip": [
-            "10.89.185.38",
-            "10.177.124.147"
+            "10.177.124.147",
+            "10.89.185.38"
+        ],
+        "related.user": [
+            "uis"
         ],
         "rsa.counters.dclass_c1": 2703,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -611,9 +646,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uis"
-        ]
+        "user.name": "uis"
     },
     {
         "@timestamp": "2020-07-04T13:38:16.000Z",
@@ -621,7 +654,9 @@
             "10.157.213.15"
         ],
         "destination.port": 600,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -640,6 +675,9 @@
         "related.ip": [
             "10.157.213.15",
             "10.212.55.143"
+        ],
+        "related.user": [
+            "nibus"
         ],
         "rsa.counters.dclass_c1": 2399,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -667,9 +705,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "nibus"
-        ]
+        "user.name": "nibus"
     },
     {
         "@timestamp": "2019-07-18T20:40:50.000Z",
@@ -677,7 +713,9 @@
             "10.124.100.32"
         ],
         "destination.port": 7699,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -694,8 +732,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5376,
         "related.ip": [
-            "10.208.134.60",
-            "10.124.100.32"
+            "10.124.100.32",
+            "10.208.134.60"
+        ],
+        "related.user": [
+            "admi"
         ],
         "rsa.counters.dclass_c1": 4111,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -723,9 +764,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "admi"
-        ]
+        "user.name": "admi"
     },
     {
         "@timestamp": "2019-08-02T03:43:25.000Z",
@@ -733,7 +772,9 @@
             "10.55.77.49"
         ],
         "destination.port": 4683,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -752,6 +793,9 @@
         "related.ip": [
             "10.55.77.49",
             "10.75.148.116"
+        ],
+        "related.user": [
+            "tdolorem"
         ],
         "rsa.counters.dclass_c1": 2460,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -779,9 +823,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tdolorem"
-        ]
+        "user.name": "tdolorem"
     },
     {
         "@timestamp": "2019-08-16T10:45:59.000Z",
@@ -789,7 +831,9 @@
             "10.21.92.218"
         ],
         "destination.port": 5716,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -808,6 +852,9 @@
         "related.ip": [
             "10.21.92.218",
             "10.210.74.24"
+        ],
+        "related.user": [
+            "nihi"
         ],
         "rsa.counters.dclass_c1": 6088,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -835,9 +882,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "nihi"
-        ]
+        "user.name": "nihi"
     },
     {
         "@timestamp": "2019-08-30T17:48:33.000Z",
@@ -845,7 +890,9 @@
             "10.84.105.75"
         ],
         "destination.port": 98,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -862,8 +909,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 499,
         "related.ip": [
-            "10.84.105.75",
-            "10.78.151.178"
+            "10.78.151.178",
+            "10.84.105.75"
+        ],
+        "related.user": [
+            "deFinibu"
         ],
         "rsa.counters.dclass_c1": 1559,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -891,9 +941,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "deFinibu"
-        ]
+        "user.name": "deFinibu"
     },
     {
         "@timestamp": "2019-09-14T00:51:07.000Z",
@@ -901,7 +949,9 @@
             "10.76.229.163"
         ],
         "destination.port": 6387,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -918,8 +968,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2857,
         "related.ip": [
-            "10.76.229.163",
-            "10.47.241.218"
+            "10.47.241.218",
+            "10.76.229.163"
+        ],
+        "related.user": [
+            "mnisist"
         ],
         "rsa.counters.dclass_c1": 391,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -947,9 +1000,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "mnisist"
-        ]
+        "user.name": "mnisist"
     },
     {
         "@timestamp": "2019-09-28T07:53:42.000Z",
@@ -957,7 +1008,9 @@
             "10.104.134.200"
         ],
         "destination.port": 2508,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -976,6 +1029,9 @@
         "related.ip": [
             "10.104.134.200",
             "10.121.219.204"
+        ],
+        "related.user": [
+            "rQuisau"
         ],
         "rsa.counters.dclass_c1": 5126,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1003,9 +1059,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "rQuisau"
-        ]
+        "user.name": "rQuisau"
     },
     {
         "@timestamp": "2019-10-12T14:56:16.000Z",
@@ -1013,7 +1067,9 @@
             "10.252.122.195"
         ],
         "destination.port": 2807,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1030,8 +1086,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1669,
         "related.ip": [
-            "10.252.122.195",
-            "10.118.80.140"
+            "10.118.80.140",
+            "10.252.122.195"
+        ],
+        "related.user": [
+            "remagn"
         ],
         "rsa.counters.dclass_c1": 2385,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1059,9 +1118,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "remagn"
-        ]
+        "user.name": "remagn"
     },
     {
         "@timestamp": "2019-10-26T21:58:50.000Z",
@@ -1069,7 +1126,9 @@
             "10.31.95.218"
         ],
         "destination.port": 7042,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1086,8 +1145,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2374,
         "related.ip": [
-            "10.31.95.218",
-            "10.195.36.51"
+            "10.195.36.51",
+            "10.31.95.218"
+        ],
+        "related.user": [
+            "laborum"
         ],
         "rsa.counters.dclass_c1": 3750,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1115,9 +1177,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "laborum"
-        ]
+        "user.name": "laborum"
     },
     {
         "@timestamp": "2019-11-10T05:01:24.000Z",
@@ -1125,7 +1185,9 @@
             "10.170.148.40"
         ],
         "destination.port": 6371,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1142,8 +1204,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 753,
         "related.ip": [
-            "10.170.148.40",
-            "10.197.250.10"
+            "10.197.250.10",
+            "10.170.148.40"
+        ],
+        "related.user": [
+            "rinrepre"
         ],
         "rsa.counters.dclass_c1": 651,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1171,9 +1236,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "rinrepre"
-        ]
+        "user.name": "rinrepre"
     },
     {
         "@timestamp": "2019-11-24T12:03:59.000Z",
@@ -1181,7 +1244,9 @@
             "10.233.171.118"
         ],
         "destination.port": 7410,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1200,6 +1265,9 @@
         "related.ip": [
             "10.19.145.131",
             "10.233.171.118"
+        ],
+        "related.user": [
+            "modtemp"
         ],
         "rsa.counters.dclass_c1": 2924,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1227,9 +1295,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "modtemp"
-        ]
+        "user.name": "modtemp"
     },
     {
         "@timestamp": "2019-12-08T19:06:33.000Z",
@@ -1237,7 +1303,9 @@
             "10.134.148.219"
         ],
         "destination.port": 4430,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1256,6 +1324,9 @@
         "related.ip": [
             "10.134.148.219",
             "10.248.204.182"
+        ],
+        "related.user": [
+            "fugitse"
         ],
         "rsa.counters.dclass_c1": 1713,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1283,9 +1354,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "fugitse"
-        ]
+        "user.name": "fugitse"
     },
     {
         "@timestamp": "2019-12-23T02:09:07.000Z",
@@ -1293,7 +1362,9 @@
             "10.177.238.183"
         ],
         "destination.port": 6458,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1312,6 +1383,9 @@
         "related.ip": [
             "10.177.238.183",
             "10.59.122.242"
+        ],
+        "related.user": [
+            "xerc"
         ],
         "rsa.counters.dclass_c1": 4129,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1339,9 +1413,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "xerc"
-        ]
+        "user.name": "xerc"
     },
     {
         "@timestamp": "2020-01-06T09:11:41.000Z",
@@ -1349,7 +1421,9 @@
             "10.10.27.73"
         ],
         "destination.port": 2574,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1366,8 +1440,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6106,
         "related.ip": [
-            "10.74.33.75",
-            "10.10.27.73"
+            "10.10.27.73",
+            "10.74.33.75"
+        ],
+        "related.user": [
+            "quaturve"
         ],
         "rsa.counters.dclass_c1": 766,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1395,9 +1472,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "quaturve"
-        ]
+        "user.name": "quaturve"
     },
     {
         "@timestamp": "2020-01-20T16:14:16.000Z",
@@ -1405,7 +1480,9 @@
             "10.32.239.1"
         ],
         "destination.port": 3128,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1424,6 +1501,9 @@
         "related.ip": [
             "10.241.65.49",
             "10.32.239.1"
+        ],
+        "related.user": [
+            "asia"
         ],
         "rsa.counters.dclass_c1": 7400,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1451,9 +1531,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "asia"
-        ]
+        "user.name": "asia"
     },
     {
         "@timestamp": "2020-02-03T23:16:50.000Z",
@@ -1461,7 +1539,9 @@
             "10.14.36.202"
         ],
         "destination.port": 6036,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1480,6 +1560,9 @@
         "related.ip": [
             "10.14.36.202",
             "10.167.85.181"
+        ],
+        "related.user": [
+            "dtemp"
         ],
         "rsa.counters.dclass_c1": 1637,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1507,9 +1590,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dtemp"
-        ]
+        "user.name": "dtemp"
     },
     {
         "@timestamp": "2020-02-18T06:19:24.000Z",
@@ -1517,7 +1598,9 @@
             "10.164.39.248"
         ],
         "destination.port": 5194,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1534,8 +1617,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3609,
         "related.ip": [
-            "10.164.39.248",
-            "10.104.64.94"
+            "10.104.64.94",
+            "10.164.39.248"
+        ],
+        "related.user": [
+            "dant"
         ],
         "rsa.counters.dclass_c1": 3370,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1563,9 +1649,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dant"
-        ]
+        "user.name": "dant"
     },
     {
         "@timestamp": "2020-03-04T13:21:59.000Z",
@@ -1573,7 +1657,9 @@
             "10.135.187.104"
         ],
         "destination.port": 4708,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1590,8 +1676,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5919,
         "related.ip": [
-            "10.135.187.104",
-            "10.208.14.185"
+            "10.208.14.185",
+            "10.135.187.104"
+        ],
+        "related.user": [
+            "rcitati"
         ],
         "rsa.counters.dclass_c1": 1871,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1619,9 +1708,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "rcitati"
-        ]
+        "user.name": "rcitati"
     },
     {
         "@timestamp": "2020-03-18T20:24:33.000Z",
@@ -1629,7 +1716,9 @@
             "10.248.101.25"
         ],
         "destination.port": 5740,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1648,6 +1737,9 @@
         "related.ip": [
             "10.248.101.25",
             "10.60.129.15"
+        ],
+        "related.user": [
+            "nevo"
         ],
         "rsa.counters.dclass_c1": 513,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1675,9 +1767,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "nevo"
-        ]
+        "user.name": "nevo"
     },
     {
         "@timestamp": "2020-04-02T03:27:07.000Z",
@@ -1685,7 +1775,9 @@
             "10.145.26.181"
         ],
         "destination.port": 6088,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1704,6 +1796,9 @@
         "related.ip": [
             "10.46.49.26",
             "10.145.26.181"
+        ],
+        "related.user": [
+            "cons"
         ],
         "rsa.counters.dclass_c1": 1399,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1731,9 +1826,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "cons"
-        ]
+        "user.name": "cons"
     },
     {
         "@timestamp": "2020-04-16T10:29:41.000Z",
@@ -1741,7 +1834,9 @@
             "10.66.2.232"
         ],
         "destination.port": 5764,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1760,6 +1855,9 @@
         "related.ip": [
             "10.66.2.232",
             "10.27.14.168"
+        ],
+        "related.user": [
+            "evolu"
         ],
         "rsa.counters.dclass_c1": 6129,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1787,9 +1885,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "evolu"
-        ]
+        "user.name": "evolu"
     },
     {
         "@timestamp": "2020-04-30T17:32:16.000Z",
@@ -1797,7 +1893,9 @@
             "10.201.238.90"
         ],
         "destination.port": 7130,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1816,6 +1914,9 @@
         "related.ip": [
             "10.201.238.90",
             "10.151.58.196"
+        ],
+        "related.user": [
+            "temqu"
         ],
         "rsa.counters.dclass_c1": 7440,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1843,9 +1944,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "temqu"
-        ]
+        "user.name": "temqu"
     },
     {
         "@timestamp": "2020-05-15T00:34:50.000Z",
@@ -1853,7 +1952,9 @@
             "10.105.91.31"
         ],
         "destination.port": 5987,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1872,6 +1973,9 @@
         "related.ip": [
             "10.217.150.196",
             "10.105.91.31"
+        ],
+        "related.user": [
+            "siutali"
         ],
         "rsa.counters.dclass_c1": 660,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1899,9 +2003,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "siutali"
-        ]
+        "user.name": "siutali"
     },
     {
         "@timestamp": "2020-05-29T07:37:24.000Z",
@@ -1909,7 +2011,9 @@
             "10.226.83.168"
         ],
         "destination.port": 4153,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1926,8 +2030,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4306,
         "related.ip": [
-            "10.226.83.168",
-            "10.184.18.202"
+            "10.184.18.202",
+            "10.226.83.168"
+        ],
+        "related.user": [
+            "borios"
         ],
         "rsa.counters.dclass_c1": 2512,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -1955,9 +2062,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "borios"
-        ]
+        "user.name": "borios"
     },
     {
         "@timestamp": "2020-06-12T14:39:58.000Z",
@@ -1965,7 +2070,9 @@
             "10.113.95.59"
         ],
         "destination.port": 4367,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -1984,6 +2091,9 @@
         "related.ip": [
             "10.255.39.252",
             "10.113.95.59"
+        ],
+        "related.user": [
+            "atisun"
         ],
         "rsa.counters.dclass_c1": 2612,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2011,9 +2121,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "atisun"
-        ]
+        "user.name": "atisun"
     },
     {
         "@timestamp": "2020-06-26T21:42:33.000Z",
@@ -2021,7 +2129,9 @@
             "10.43.226.231"
         ],
         "destination.port": 2778,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2038,8 +2148,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 829,
         "related.ip": [
-            "10.173.136.186",
-            "10.43.226.231"
+            "10.43.226.231",
+            "10.173.136.186"
+        ],
+        "related.user": [
+            "uscipitl"
         ],
         "rsa.counters.dclass_c1": 1497,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2067,9 +2180,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uscipitl"
-        ]
+        "user.name": "uscipitl"
     },
     {
         "@timestamp": "2019-07-11T04:45:07.000Z",
@@ -2077,7 +2188,9 @@
             "10.54.37.86"
         ],
         "destination.port": 5089,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2094,8 +2207,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6867,
         "related.ip": [
-            "10.54.37.86",
-            "10.58.64.108"
+            "10.58.64.108",
+            "10.54.37.86"
+        ],
+        "related.user": [
+            "dolorsit"
         ],
         "rsa.counters.dclass_c1": 1865,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2123,9 +2239,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dolorsit"
-        ]
+        "user.name": "dolorsit"
     },
     {
         "@timestamp": "2019-07-25T11:47:41.000Z",
@@ -2133,7 +2247,9 @@
             "10.159.119.34"
         ],
         "destination.port": 6197,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2150,8 +2266,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7536,
         "related.ip": [
-            "10.205.228.138",
-            "10.159.119.34"
+            "10.159.119.34",
+            "10.205.228.138"
+        ],
+        "related.user": [
+            "aquae"
         ],
         "rsa.counters.dclass_c1": 3714,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2179,9 +2298,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aquae"
-        ]
+        "user.name": "aquae"
     },
     {
         "@timestamp": "2019-08-08T18:50:15.000Z",
@@ -2189,7 +2306,9 @@
             "10.29.133.28"
         ],
         "destination.port": 1085,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2206,8 +2325,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5433,
         "related.ip": [
-            "10.29.133.28",
-            "10.163.93.20"
+            "10.163.93.20",
+            "10.29.133.28"
+        ],
+        "related.user": [
+            "tpersp"
         ],
         "rsa.counters.dclass_c1": 2486,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2235,9 +2357,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tpersp"
-        ]
+        "user.name": "tpersp"
     },
     {
         "@timestamp": "2019-08-23T01:52:50.000Z",
@@ -2245,7 +2365,9 @@
             "10.50.0.61"
         ],
         "destination.port": 5905,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2264,6 +2386,9 @@
         "related.ip": [
             "10.113.30.163",
             "10.50.0.61"
+        ],
+        "related.user": [
+            "dolore"
         ],
         "rsa.counters.dclass_c1": 2019,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2291,9 +2416,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dolore"
-        ]
+        "user.name": "dolore"
     },
     {
         "@timestamp": "2019-09-06T08:55:24.000Z",
@@ -2301,7 +2424,9 @@
             "10.30.47.165"
         ],
         "destination.port": 3801,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2320,6 +2445,9 @@
         "related.ip": [
             "10.39.145.136",
             "10.30.47.165"
+        ],
+        "related.user": [
+            "invo"
         ],
         "rsa.counters.dclass_c1": 992,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2347,9 +2475,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "invo"
-        ]
+        "user.name": "invo"
     },
     {
         "@timestamp": "2019-09-20T15:57:58.000Z",
@@ -2357,7 +2483,9 @@
             "10.36.112.145"
         ],
         "destination.port": 7122,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2374,8 +2502,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 246,
         "related.ip": [
-            "10.30.25.84",
-            "10.36.112.145"
+            "10.36.112.145",
+            "10.30.25.84"
+        ],
+        "related.user": [
+            "bor"
         ],
         "rsa.counters.dclass_c1": 5608,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2403,9 +2534,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "bor"
-        ]
+        "user.name": "bor"
     },
     {
         "@timestamp": "2019-10-04T23:00:32.000Z",
@@ -2413,7 +2542,9 @@
             "10.162.114.217"
         ],
         "destination.port": 7503,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2430,8 +2561,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1276,
         "related.ip": [
-            "10.162.114.217",
-            "10.97.96.177"
+            "10.97.96.177",
+            "10.162.114.217"
+        ],
+        "related.user": [
+            "itse"
         ],
         "rsa.counters.dclass_c1": 2826,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2459,9 +2593,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "itse"
-        ]
+        "user.name": "itse"
     },
     {
         "@timestamp": "2019-10-19T06:03:07.000Z",
@@ -2469,7 +2601,9 @@
             "10.140.7.83"
         ],
         "destination.port": 3298,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2486,8 +2620,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2189,
         "related.ip": [
-            "10.140.7.83",
-            "10.229.71.175"
+            "10.229.71.175",
+            "10.140.7.83"
+        ],
+        "related.user": [
+            "eseru"
         ],
         "rsa.counters.dclass_c1": 4969,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2515,9 +2652,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "eseru"
-        ]
+        "user.name": "eseru"
     },
     {
         "@timestamp": "2019-11-02T13:05:41.000Z",
@@ -2525,7 +2660,9 @@
             "10.149.13.76"
         ],
         "destination.port": 2000,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2542,8 +2679,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1478,
         "related.ip": [
-            "10.149.13.76",
-            "10.232.254.65"
+            "10.232.254.65",
+            "10.149.13.76"
+        ],
+        "related.user": [
+            "itesseq"
         ],
         "rsa.counters.dclass_c1": 7037,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2571,9 +2711,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "itesseq"
-        ]
+        "user.name": "itesseq"
     },
     {
         "@timestamp": "2019-11-16T20:08:15.000Z",
@@ -2581,7 +2719,9 @@
             "10.90.33.138"
         ],
         "destination.port": 7876,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2598,8 +2738,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5524,
         "related.ip": [
-            "10.40.251.202",
-            "10.90.33.138"
+            "10.90.33.138",
+            "10.40.251.202"
+        ],
+        "related.user": [
+            "amcor"
         ],
         "rsa.counters.dclass_c1": 4762,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2627,9 +2770,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "amcor"
-        ]
+        "user.name": "amcor"
     },
     {
         "@timestamp": "2019-12-01T03:10:49.000Z",
@@ -2637,7 +2778,9 @@
             "10.243.237.151"
         ],
         "destination.port": 6296,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2656,6 +2799,9 @@
         "related.ip": [
             "10.243.237.151",
             "10.98.194.212"
+        ],
+        "related.user": [
+            "eri"
         ],
         "rsa.counters.dclass_c1": 5539,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2683,9 +2829,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "eri"
-        ]
+        "user.name": "eri"
     },
     {
         "@timestamp": "2019-12-15T10:13:24.000Z",
@@ -2693,7 +2837,9 @@
             "10.28.84.106"
         ],
         "destination.port": 4844,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2712,6 +2858,9 @@
         "related.ip": [
             "10.28.84.106",
             "10.193.233.229"
+        ],
+        "related.user": [
+            "luptatem"
         ],
         "rsa.counters.dclass_c1": 3030,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2739,9 +2888,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "luptatem"
-        ]
+        "user.name": "luptatem"
     },
     {
         "@timestamp": "2019-12-29T17:15:58.000Z",
@@ -2749,7 +2896,9 @@
             "10.85.185.13"
         ],
         "destination.port": 7793,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2766,8 +2915,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7224,
         "related.ip": [
-            "10.85.185.13",
-            "10.180.195.43"
+            "10.180.195.43",
+            "10.85.185.13"
+        ],
+        "related.user": [
+            "atione"
         ],
         "rsa.counters.dclass_c1": 2147,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2795,9 +2947,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "atione"
-        ]
+        "user.name": "atione"
     },
     {
         "@timestamp": "2020-01-13T00:18:32.000Z",
@@ -2805,7 +2955,9 @@
             "10.201.237.233"
         ],
         "destination.port": 3023,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2822,8 +2974,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3421,
         "related.ip": [
-            "10.201.237.233",
-            "10.107.45.175"
+            "10.107.45.175",
+            "10.201.237.233"
+        ],
+        "related.user": [
+            "aeconseq"
         ],
         "rsa.counters.dclass_c1": 6981,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2851,9 +3006,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aeconseq"
-        ]
+        "user.name": "aeconseq"
     },
     {
         "@timestamp": "2020-01-27T07:21:06.000Z",
@@ -2861,7 +3014,9 @@
             "10.196.206.130"
         ],
         "destination.port": 1725,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2880,6 +3035,9 @@
         "related.ip": [
             "10.196.206.130",
             "10.239.80.120"
+        ],
+        "related.user": [
+            "isn"
         ],
         "rsa.counters.dclass_c1": 3896,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2907,9 +3065,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "isn"
-        ]
+        "user.name": "isn"
     },
     {
         "@timestamp": "2020-02-10T14:23:41.000Z",
@@ -2917,7 +3073,9 @@
             "10.47.24.77"
         ],
         "destination.port": 1919,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2936,6 +3094,9 @@
         "related.ip": [
             "10.47.24.77",
             "10.234.222.214"
+        ],
+        "related.user": [
+            "ntNeq"
         ],
         "rsa.counters.dclass_c1": 6068,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -2963,9 +3124,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ntNeq"
-        ]
+        "user.name": "ntNeq"
     },
     {
         "@timestamp": "2020-02-24T21:26:15.000Z",
@@ -2973,7 +3132,9 @@
             "10.139.127.232"
         ],
         "destination.port": 1812,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -2990,8 +3151,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4116,
         "related.ip": [
-            "10.139.127.232",
-            "10.202.7.89"
+            "10.202.7.89",
+            "10.139.127.232"
+        ],
+        "related.user": [
+            "osquir"
         ],
         "rsa.counters.dclass_c1": 6412,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3019,9 +3183,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "osquir"
-        ]
+        "user.name": "osquir"
     },
     {
         "@timestamp": "2020-03-11T04:28:49.000Z",
@@ -3029,7 +3191,9 @@
             "10.40.35.49"
         ],
         "destination.port": 3071,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3048,6 +3212,9 @@
         "related.ip": [
             "10.130.241.232",
             "10.40.35.49"
+        ],
+        "related.user": [
+            "aturQu"
         ],
         "rsa.counters.dclass_c1": 3552,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3075,9 +3242,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aturQu"
-        ]
+        "user.name": "aturQu"
     },
     {
         "@timestamp": "2020-03-25T11:31:24.000Z",
@@ -3085,7 +3250,9 @@
             "10.167.252.183"
         ],
         "destination.port": 5107,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3102,8 +3269,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5735,
         "related.ip": [
-            "10.167.252.183",
-            "10.157.196.101"
+            "10.157.196.101",
+            "10.167.252.183"
+        ],
+        "related.user": [
+            "tatem"
         ],
         "rsa.counters.dclass_c1": 2302,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3131,9 +3301,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tatem"
-        ]
+        "user.name": "tatem"
     },
     {
         "@timestamp": "2020-04-08T18:33:58.000Z",
@@ -3141,7 +3309,9 @@
             "10.46.56.204"
         ],
         "destination.port": 5070,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3158,8 +3328,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7079,
         "related.ip": [
-            "10.97.149.97",
-            "10.46.56.204"
+            "10.46.56.204",
+            "10.97.149.97"
+        ],
+        "related.user": [
+            "esseq"
         ],
         "rsa.counters.dclass_c1": 3665,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3187,9 +3360,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "esseq"
-        ]
+        "user.name": "esseq"
     },
     {
         "@timestamp": "2020-04-23T01:36:32.000Z",
@@ -3197,7 +3368,9 @@
             "10.151.129.181"
         ],
         "destination.port": 5773,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3214,8 +3387,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5026,
         "related.ip": [
-            "10.28.105.124",
-            "10.151.129.181"
+            "10.151.129.181",
+            "10.28.105.124"
+        ],
+        "related.user": [
+            "nesciun"
         ],
         "rsa.counters.dclass_c1": 2604,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3243,9 +3419,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "nesciun"
-        ]
+        "user.name": "nesciun"
     },
     {
         "@timestamp": "2020-05-07T08:39:06.000Z",
@@ -3253,7 +3427,9 @@
             "10.145.101.26"
         ],
         "destination.port": 2559,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3272,6 +3448,9 @@
         "related.ip": [
             "10.128.63.143",
             "10.145.101.26"
+        ],
+        "related.user": [
+            "ssusci"
         ],
         "rsa.counters.dclass_c1": 5137,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3299,9 +3478,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ssusci"
-        ]
+        "user.name": "ssusci"
     },
     {
         "@timestamp": "2020-05-21T15:41:41.000Z",
@@ -3309,7 +3486,9 @@
             "10.62.229.89"
         ],
         "destination.port": 5348,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3326,8 +3505,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5140,
         "related.ip": [
-            "10.2.244.159",
-            "10.62.229.89"
+            "10.62.229.89",
+            "10.2.244.159"
+        ],
+        "related.user": [
+            "inBCSedu"
         ],
         "rsa.counters.dclass_c1": 2159,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3355,9 +3537,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "inBCSedu"
-        ]
+        "user.name": "inBCSedu"
     },
     {
         "@timestamp": "2020-06-04T22:44:15.000Z",
@@ -3365,7 +3545,9 @@
             "10.54.83.119"
         ],
         "destination.port": 338,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3382,8 +3564,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 315,
         "related.ip": [
-            "10.54.83.119",
-            "10.250.19.146"
+            "10.250.19.146",
+            "10.54.83.119"
+        ],
+        "related.user": [
+            "radi"
         ],
         "rsa.counters.dclass_c1": 7074,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3411,9 +3596,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "radi"
-        ]
+        "user.name": "radi"
     },
     {
         "@timestamp": "2020-06-19T05:46:49.000Z",
@@ -3421,7 +3604,9 @@
             "10.1.96.93"
         ],
         "destination.port": 428,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3438,8 +3623,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5398,
         "related.ip": [
-            "10.1.96.93",
-            "10.54.73.158"
+            "10.54.73.158",
+            "10.1.96.93"
+        ],
+        "related.user": [
+            "snos"
         ],
         "rsa.counters.dclass_c1": 1049,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3467,9 +3655,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "snos"
-        ]
+        "user.name": "snos"
     },
     {
         "@timestamp": "2020-07-03T12:49:23.000Z",
@@ -3477,7 +3663,9 @@
             "10.94.114.83"
         ],
         "destination.port": 4803,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3496,6 +3684,9 @@
         "related.ip": [
             "10.94.114.83",
             "10.126.87.182"
+        ],
+        "related.user": [
+            "dolores"
         ],
         "rsa.counters.dclass_c1": 291,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3523,9 +3714,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dolores"
-        ]
+        "user.name": "dolores"
     },
     {
         "@timestamp": "2019-07-17T19:51:58.000Z",
@@ -3533,7 +3722,9 @@
             "10.38.28.151"
         ],
         "destination.port": 347,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3552,6 +3743,9 @@
         "related.ip": [
             "10.38.28.151",
             "10.206.165.83"
+        ],
+        "related.user": [
+            "erspi"
         ],
         "rsa.counters.dclass_c1": 2124,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3579,9 +3773,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "erspi"
-        ]
+        "user.name": "erspi"
     },
     {
         "@timestamp": "2019-08-01T02:54:32.000Z",
@@ -3589,7 +3781,9 @@
             "10.77.229.168"
         ],
         "destination.port": 3777,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3608,6 +3802,9 @@
         "related.ip": [
             "10.181.247.224",
             "10.77.229.168"
+        ],
+        "related.user": [
+            "ame"
         ],
         "rsa.counters.dclass_c1": 3343,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3635,9 +3832,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ame"
-        ]
+        "user.name": "ame"
     },
     {
         "@timestamp": "2019-08-15T09:57:06.000Z",
@@ -3645,7 +3840,9 @@
             "10.57.85.98"
         ],
         "destination.port": 1444,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3662,8 +3859,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5493,
         "related.ip": [
-            "10.42.252.243",
-            "10.57.85.98"
+            "10.57.85.98",
+            "10.42.252.243"
+        ],
+        "related.user": [
+            "nisiu"
         ],
         "rsa.counters.dclass_c1": 4145,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3691,9 +3891,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "nisiu"
-        ]
+        "user.name": "nisiu"
     },
     {
         "@timestamp": "2019-08-29T16:59:40.000Z",
@@ -3701,7 +3899,9 @@
             "10.193.66.155"
         ],
         "destination.port": 4965,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3718,8 +3918,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2913,
         "related.ip": [
-            "10.193.66.155",
-            "10.7.43.184"
+            "10.7.43.184",
+            "10.193.66.155"
+        ],
+        "related.user": [
+            "tobeatae"
         ],
         "rsa.counters.dclass_c1": 1129,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3747,9 +3950,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tobeatae"
-        ]
+        "user.name": "tobeatae"
     },
     {
         "@timestamp": "2019-09-13T00:02:15.000Z",
@@ -3757,7 +3958,9 @@
             "10.81.234.34"
         ],
         "destination.port": 1710,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3776,6 +3979,9 @@
         "related.ip": [
             "10.196.96.162",
             "10.81.234.34"
+        ],
+        "related.user": [
+            "aliqui"
         ],
         "rsa.counters.dclass_c1": 4798,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3803,9 +4009,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aliqui"
-        ]
+        "user.name": "aliqui"
     },
     {
         "@timestamp": "2019-09-27T07:04:49.000Z",
@@ -3813,7 +4017,9 @@
             "10.77.78.180"
         ],
         "destination.port": 5380,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3830,8 +4036,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4984,
         "related.ip": [
-            "10.97.236.123",
-            "10.77.78.180"
+            "10.77.78.180",
+            "10.97.236.123"
+        ],
+        "related.user": [
+            "ptatems"
         ],
         "rsa.counters.dclass_c1": 1471,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3859,9 +4068,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ptatems"
-        ]
+        "user.name": "ptatems"
     },
     {
         "@timestamp": "2019-10-11T14:07:23.000Z",
@@ -3869,7 +4076,9 @@
             "10.108.45.59"
         ],
         "destination.port": 7229,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3888,6 +4097,9 @@
         "related.ip": [
             "10.118.82.34",
             "10.108.45.59"
+        ],
+        "related.user": [
+            "olorem"
         ],
         "rsa.counters.dclass_c1": 5362,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3915,9 +4127,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "olorem"
-        ]
+        "user.name": "olorem"
     },
     {
         "@timestamp": "2019-10-25T21:09:57.000Z",
@@ -3925,7 +4135,9 @@
             "10.170.252.219"
         ],
         "destination.port": 2454,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -3944,6 +4156,9 @@
         "related.ip": [
             "10.180.180.230",
             "10.170.252.219"
+        ],
+        "related.user": [
+            "orumSec"
         ],
         "rsa.counters.dclass_c1": 2292,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -3971,9 +4186,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "orumSec"
-        ]
+        "user.name": "orumSec"
     },
     {
         "@timestamp": "2019-11-09T04:12:32.000Z",
@@ -3981,7 +4194,9 @@
             "10.83.119.181"
         ],
         "destination.port": 5693,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4000,6 +4215,9 @@
         "related.ip": [
             "10.123.74.66",
             "10.83.119.181"
+        ],
+        "related.user": [
+            "ursin"
         ],
         "rsa.counters.dclass_c1": 1629,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4027,9 +4245,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ursin"
-        ]
+        "user.name": "ursin"
     },
     {
         "@timestamp": "2019-11-23T11:15:06.000Z",
@@ -4037,7 +4253,9 @@
             "10.141.143.56"
         ],
         "destination.port": 2442,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4056,6 +4274,9 @@
         "related.ip": [
             "10.141.143.56",
             "10.225.255.211"
+        ],
+        "related.user": [
+            "aaliq"
         ],
         "rsa.counters.dclass_c1": 5104,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4083,9 +4304,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aaliq"
-        ]
+        "user.name": "aaliq"
     },
     {
         "@timestamp": "2019-12-07T18:17:40.000Z",
@@ -4093,7 +4312,9 @@
             "10.219.1.151"
         ],
         "destination.port": 4323,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4112,6 +4333,9 @@
         "related.ip": [
             "10.219.1.151",
             "10.250.81.189"
+        ],
+        "related.user": [
+            "olup"
         ],
         "rsa.counters.dclass_c1": 3006,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4139,9 +4363,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "olup"
-        ]
+        "user.name": "olup"
     },
     {
         "@timestamp": "2019-12-22T01:20:14.000Z",
@@ -4149,7 +4371,9 @@
             "10.189.42.62"
         ],
         "destination.port": 4262,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4166,8 +4390,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2780,
         "related.ip": [
-            "10.36.110.69",
-            "10.189.42.62"
+            "10.189.42.62",
+            "10.36.110.69"
+        ],
+        "related.user": [
+            "roquisq"
         ],
         "rsa.counters.dclass_c1": 2563,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4195,9 +4422,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "roquisq"
-        ]
+        "user.name": "roquisq"
     },
     {
         "@timestamp": "2020-01-05T08:22:49.000Z",
@@ -4205,7 +4430,9 @@
             "10.202.132.214"
         ],
         "destination.port": 3392,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4224,6 +4451,9 @@
         "related.ip": [
             "10.202.132.214",
             "10.179.147.45"
+        ],
+        "related.user": [
+            "stquidol"
         ],
         "rsa.counters.dclass_c1": 3575,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4251,9 +4481,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "stquidol"
-        ]
+        "user.name": "stquidol"
     },
     {
         "@timestamp": "2020-01-19T15:25:23.000Z",
@@ -4261,7 +4489,9 @@
             "10.169.98.165"
         ],
         "destination.port": 6084,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4278,8 +4508,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2280,
         "related.ip": [
-            "10.169.98.165",
-            "10.51.221.217"
+            "10.51.221.217",
+            "10.169.98.165"
+        ],
+        "related.user": [
+            "metco"
         ],
         "rsa.counters.dclass_c1": 3630,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4307,9 +4540,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "metco"
-        ]
+        "user.name": "metco"
     },
     {
         "@timestamp": "2020-02-02T22:27:57.000Z",
@@ -4317,7 +4548,9 @@
             "10.85.104.146"
         ],
         "destination.port": 4438,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4336,6 +4569,9 @@
         "related.ip": [
             "10.85.104.146",
             "10.243.6.41"
+        ],
+        "related.user": [
+            "emacc"
         ],
         "rsa.counters.dclass_c1": 73,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4363,9 +4599,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "emacc"
-        ]
+        "user.name": "emacc"
     },
     {
         "@timestamp": "2020-02-17T05:30:32.000Z",
@@ -4373,7 +4607,9 @@
             "10.30.246.132"
         ],
         "destination.port": 388,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4390,8 +4626,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3990,
         "related.ip": [
-            "10.208.18.210",
-            "10.30.246.132"
+            "10.30.246.132",
+            "10.208.18.210"
+        ],
+        "related.user": [
+            "osqu"
         ],
         "rsa.counters.dclass_c1": 3795,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4419,9 +4658,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "osqu"
-        ]
+        "user.name": "osqu"
     },
     {
         "@timestamp": "2020-03-03T12:33:06.000Z",
@@ -4429,7 +4666,9 @@
             "10.167.9.200"
         ],
         "destination.port": 4568,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4448,6 +4687,9 @@
         "related.ip": [
             "10.167.9.200",
             "10.37.174.58"
+        ],
+        "related.user": [
+            "tvol"
         ],
         "rsa.counters.dclass_c1": 4337,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4475,9 +4717,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tvol"
-        ]
+        "user.name": "tvol"
     },
     {
         "@timestamp": "2020-03-17T19:35:40.000Z",
@@ -4485,7 +4725,9 @@
             "10.251.29.244"
         ],
         "destination.port": 919,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4504,6 +4746,9 @@
         "related.ip": [
             "10.221.220.148",
             "10.251.29.244"
+        ],
+        "related.user": [
+            "ptate"
         ],
         "rsa.counters.dclass_c1": 355,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4531,9 +4776,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ptate"
-        ]
+        "user.name": "ptate"
     },
     {
         "@timestamp": "2020-04-01T02:38:14.000Z",
@@ -4541,7 +4784,9 @@
             "10.189.82.19"
         ],
         "destination.port": 4057,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4560,6 +4805,9 @@
         "related.ip": [
             "10.198.143.216",
             "10.189.82.19"
+        ],
+        "related.user": [
+            "iamqui"
         ],
         "rsa.counters.dclass_c1": 5914,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4587,9 +4835,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "iamqui"
-        ]
+        "user.name": "iamqui"
     },
     {
         "@timestamp": "2020-04-15T09:40:49.000Z",
@@ -4597,7 +4843,9 @@
             "10.70.29.203"
         ],
         "destination.port": 6317,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4616,6 +4864,9 @@
         "related.ip": [
             "10.70.29.203",
             "10.141.216.14"
+        ],
+        "related.user": [
+            "dese"
         ],
         "rsa.counters.dclass_c1": 2465,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4643,9 +4894,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "dese"
-        ]
+        "user.name": "dese"
     },
     {
         "@timestamp": "2020-04-29T16:43:23.000Z",
@@ -4653,7 +4902,9 @@
             "10.137.85.123"
         ],
         "destination.port": 7073,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4672,6 +4923,9 @@
         "related.ip": [
             "10.137.85.123",
             "10.183.243.246"
+        ],
+        "related.user": [
+            "idatat"
         ],
         "rsa.counters.dclass_c1": 4248,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4699,9 +4953,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "idatat"
-        ]
+        "user.name": "idatat"
     },
     {
         "@timestamp": "2020-05-13T23:45:57.000Z",
@@ -4709,7 +4961,9 @@
             "10.158.54.131"
         ],
         "destination.port": 1585,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4726,8 +4980,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7353,
         "related.ip": [
-            "10.10.86.55",
-            "10.158.54.131"
+            "10.158.54.131",
+            "10.10.86.55"
+        ],
+        "related.user": [
+            "tatevel"
         ],
         "rsa.counters.dclass_c1": 7608,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4755,9 +5012,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "tatevel"
-        ]
+        "user.name": "tatevel"
     },
     {
         "@timestamp": "2020-05-28T06:48:31.000Z",
@@ -4765,7 +5020,9 @@
             "10.187.170.23"
         ],
         "destination.port": 3220,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4782,8 +5039,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7182,
         "related.ip": [
-            "10.105.136.146",
-            "10.187.170.23"
+            "10.187.170.23",
+            "10.105.136.146"
+        ],
+        "related.user": [
+            "uatu"
         ],
         "rsa.counters.dclass_c1": 5957,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4811,9 +5071,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uatu"
-        ]
+        "user.name": "uatu"
     },
     {
         "@timestamp": "2020-06-11T13:51:06.000Z",
@@ -4821,7 +5079,9 @@
             "10.125.166.198"
         ],
         "destination.port": 6301,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4840,6 +5100,9 @@
         "related.ip": [
             "10.125.166.198",
             "10.114.211.238"
+        ],
+        "related.user": [
+            "sumquiad"
         ],
         "rsa.counters.dclass_c1": 111,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4867,9 +5130,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "sumquiad"
-        ]
+        "user.name": "sumquiad"
     },
     {
         "@timestamp": "2020-06-25T20:53:40.000Z",
@@ -4877,7 +5138,9 @@
             "10.209.239.122"
         ],
         "destination.port": 1450,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4896,6 +5159,9 @@
         "related.ip": [
             "10.29.7.142",
             "10.209.239.122"
+        ],
+        "related.user": [
+            "atatnon"
         ],
         "rsa.counters.dclass_c1": 3307,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4923,9 +5189,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "atatnon"
-        ]
+        "user.name": "atatnon"
     },
     {
         "@timestamp": "2020-07-10T03:56:14.000Z",
@@ -4933,7 +5197,9 @@
             "10.146.57.23"
         ],
         "destination.port": 5483,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -4950,8 +5216,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5772,
         "related.ip": [
-            "10.146.57.23",
-            "10.144.109.148"
+            "10.144.109.148",
+            "10.146.57.23"
+        ],
+        "related.user": [
+            "xerc"
         ],
         "rsa.counters.dclass_c1": 6552,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -4979,9 +5248,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "xerc"
-        ]
+        "user.name": "xerc"
     },
     {
         "@timestamp": "2019-07-24T10:58:48.000Z",
@@ -4989,7 +5256,9 @@
             "10.11.2.200"
         ],
         "destination.port": 7541,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5008,6 +5277,9 @@
         "related.ip": [
             "10.69.230.223",
             "10.11.2.200"
+        ],
+        "related.user": [
+            "uatu"
         ],
         "rsa.counters.dclass_c1": 7154,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5035,9 +5307,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uatu"
-        ]
+        "user.name": "uatu"
     },
     {
         "@timestamp": "2019-08-07T18:01:23.000Z",
@@ -5045,7 +5315,9 @@
             "10.120.148.241"
         ],
         "destination.port": 1655,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "smtp",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5064,6 +5336,9 @@
         "related.ip": [
             "10.100.154.220",
             "10.120.148.241"
+        ],
+        "related.user": [
+            "orsitvol"
         ],
         "rsa.counters.dclass_c1": 4047,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5091,9 +5366,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "orsitvol"
-        ]
+        "user.name": "orsitvol"
     },
     {
         "@timestamp": "2019-08-22T01:03:57.000Z",
@@ -5101,7 +5374,9 @@
             "10.90.50.149"
         ],
         "destination.port": 7260,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5120,6 +5395,9 @@
         "related.ip": [
             "10.90.50.149",
             "10.153.166.133"
+        ],
+        "related.user": [
+            "porissu"
         ],
         "rsa.counters.dclass_c1": 5213,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5147,9 +5425,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "porissu"
-        ]
+        "user.name": "porissu"
     },
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
@@ -5157,7 +5433,9 @@
             "10.117.190.234"
         ],
         "destination.port": 7475,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5176,6 +5454,9 @@
         "related.ip": [
             "10.230.130.3",
             "10.117.190.234"
+        ],
+        "related.user": [
+            "ttenb"
         ],
         "rsa.counters.dclass_c1": 5360,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5203,9 +5484,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "ttenb"
-        ]
+        "user.name": "ttenb"
     },
     {
         "@timestamp": "2019-09-19T15:09:05.000Z",
@@ -5213,7 +5492,9 @@
             "10.203.117.6"
         ],
         "destination.port": 2510,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5232,6 +5513,9 @@
         "related.ip": [
             "10.55.103.200",
             "10.203.117.6"
+        ],
+        "related.user": [
+            "enbyCic"
         ],
         "rsa.counters.dclass_c1": 1119,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5259,9 +5543,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "enbyCic"
-        ]
+        "user.name": "enbyCic"
     },
     {
         "@timestamp": "2019-10-03T22:11:40.000Z",
@@ -5269,7 +5551,9 @@
             "10.75.122.228"
         ],
         "destination.port": 5,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5288,6 +5572,9 @@
         "related.ip": [
             "10.75.122.228",
             "10.244.52.142"
+        ],
+        "related.user": [
+            "isciv"
         ],
         "rsa.counters.dclass_c1": 2894,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5315,9 +5602,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "isciv"
-        ]
+        "user.name": "isciv"
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
@@ -5325,7 +5610,9 @@
             "10.119.143.168"
         ],
         "destination.port": 4131,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5344,6 +5631,9 @@
         "related.ip": [
             "10.7.142.212",
             "10.119.143.168"
+        ],
+        "related.user": [
+            "oinven"
         ],
         "rsa.counters.dclass_c1": 1612,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5371,9 +5661,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "oinven"
-        ]
+        "user.name": "oinven"
     },
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
@@ -5381,7 +5669,9 @@
             "10.252.146.103"
         ],
         "destination.port": 5995,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "pop3",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5400,6 +5690,9 @@
         "related.ip": [
             "10.116.105.31",
             "10.252.146.103"
+        ],
+        "related.user": [
+            "rsint"
         ],
         "rsa.counters.dclass_c1": 3194,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5427,9 +5720,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "rsint"
-        ]
+        "user.name": "rsint"
     },
     {
         "@timestamp": "2019-11-15T19:19:22.000Z",
@@ -5437,7 +5728,9 @@
             "10.213.41.210"
         ],
         "destination.port": 3626,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "ms-wbt-server",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5456,6 +5749,9 @@
         "related.ip": [
             "10.163.239.13",
             "10.213.41.210"
+        ],
+        "related.user": [
+            "aedictas"
         ],
         "rsa.counters.dclass_c1": 4955,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5483,9 +5779,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aedictas"
-        ]
+        "user.name": "aedictas"
     },
     {
         "@timestamp": "2019-11-30T02:21:57.000Z",
@@ -5493,7 +5787,9 @@
             "10.190.36.112"
         ],
         "destination.port": 4829,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "https",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5510,8 +5806,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3793,
         "related.ip": [
-            "10.184.109.84",
-            "10.190.36.112"
+            "10.190.36.112",
+            "10.184.109.84"
+        ],
+        "related.user": [
+            "uat"
         ],
         "rsa.counters.dclass_c1": 5630,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5539,9 +5838,7 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "uat"
-        ]
+        "user.name": "uat"
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
@@ -5549,7 +5846,9 @@
             "10.19.21.239"
         ],
         "destination.port": 6995,
-        "event.action": "deny",
+        "event.action": [
+            "deny"
+        ],
         "event.code": "http",
         "event.dataset": "fortinet.clientendpoint",
         "event.module": "fortinet",
@@ -5566,8 +5865,11 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5985,
         "related.ip": [
-            "10.19.21.239",
-            "10.175.181.138"
+            "10.175.181.138",
+            "10.19.21.239"
+        ],
+        "related.user": [
+            "aliqu"
         ],
         "rsa.counters.dclass_c1": 3326,
         "rsa.counters.dclass_c1_str": "block_count",
@@ -5595,8 +5897,6 @@
             "fortinet.clientendpoint",
             "forwarded"
         ],
-        "user.name": [
-            "aliqu"
-        ]
+        "user.name": "aliqu"
     }
 ]

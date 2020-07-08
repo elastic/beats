@@ -4,8 +4,10 @@
             "10.70.155.35"
         ],
         "destination.port": 892,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -20,8 +22,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.70.155.35",
-            "10.81.122.126"
+            "10.81.122.126",
+            "10.70.155.35"
+        ],
+        "related.user": [
+            "tatno",
+            "aqui",
+            "magn"
         ],
         "rsa.counters.dclass_c1": 5910,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -51,14 +58,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "magn",
-            "aqui",
-            "tatno"
-        ]
+        "user.name": "tatno"
     },
     {
-        "event.category": "erep",
+        "event.action": [
+            "erep"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -70,6 +75,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "temq"
+        ],
         "rsa.internal.event_desc": "eacomm",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "erep",
@@ -80,17 +88,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "temq"
-        ]
+        "user.name": "temq"
     },
     {
         "destination.ip": [
             "10.58.116.231"
         ],
         "destination.port": 996,
-        "event.action": "accept",
-        "event.category": "rumet",
+        "event.action": [
+            "rumet",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -106,6 +114,11 @@
         "related.ip": [
             "10.58.116.231",
             "10.159.182.171"
+        ],
+        "related.user": [
+            "qua",
+            "temUten",
+            "uradi"
         ],
         "rsa.counters.dclass_c1": 3626,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -131,19 +144,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "uradi",
-            "temUten",
-            "qua"
-        ]
+        "user.name": "qua"
     },
     {
         "destination.ip": [
             "10.157.161.103"
         ],
         "destination.port": 4782,
-        "event.action": "deny",
-        "event.category": "liquide",
+        "event.action": [
+            "liquide",
+            "deny"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -160,16 +171,21 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.64.70.5",
-            "10.157.161.103"
+            "10.157.161.103",
+            "10.64.70.5"
+        ],
+        "related.user": [
+            "emeumfu",
+            "CSed",
+            "tem"
         ],
         "rsa.counters.event_counter": 3561,
         "rsa.db.database": "lupt",
         "rsa.internal.event_desc": "tat",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "deny",
-            "taut"
+            "taut",
+            "deny"
         ],
         "rsa.misc.category": "tion",
         "rsa.misc.disposition": "eataev",
@@ -197,19 +213,17 @@
         ],
         "url.original": "https://api.example.org/uames/tati.jpg?isnostru=iquaUten#santium",
         "url.query": "iciatisu",
-        "user.name": [
-            "tem",
-            "emeumfu",
-            "CSed"
-        ]
+        "user.name": "tem"
     },
     {
         "destination.ip": [
             "10.230.76.224"
         ],
         "destination.port": 5715,
-        "event.action": "accept",
-        "event.category": "remagn",
+        "event.action": [
+            "accept",
+            "remagn"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -228,6 +242,11 @@
         "related.ip": [
             "10.230.76.224",
             "10.47.202.102"
+        ],
+        "related.user": [
+            "hitect",
+            "dol",
+            "tlabori"
         ],
         "rsa.counters.event_counter": 3339,
         "rsa.db.database": "leumiu",
@@ -262,19 +281,17 @@
         ],
         "url.original": "https://mail.example.com/aaliquaU/ntor.html?ern=psaquae#ationemu",
         "url.query": "ice",
-        "user.name": [
-            "dol",
-            "tlabori",
-            "hitect"
-        ]
+        "user.name": "tlabori"
     },
     {
         "destination.ip": [
             "10.10.38.139"
         ],
         "destination.port": 189,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -291,6 +308,11 @@
         "related.ip": [
             "10.32.67.231",
             "10.10.38.139"
+        ],
+        "related.user": [
+            "itame",
+            "adeseru",
+            "ari"
         ],
         "rsa.counters.dclass_c1": 2628,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -320,19 +342,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "adeseru",
-            "itame",
-            "ari"
-        ]
+        "user.name": "ari"
     },
     {
         "destination.ip": [
             "10.133.189.215"
         ],
         "destination.port": 7865,
-        "event.action": "block",
-        "event.category": "tmo",
+        "event.action": [
+            "tmo",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -348,6 +368,11 @@
         "related.ip": [
             "10.133.189.215",
             "10.206.97.204"
+        ],
+        "related.user": [
+            "fugitse",
+            "evita",
+            "ommodico"
         ],
         "rsa.counters.dclass_c1": 4842,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -373,19 +398,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "fugitse",
-            "ommodico",
-            "evita"
-        ]
+        "user.name": "evita"
     },
     {
         "destination.ip": [
             "10.145.248.111"
         ],
         "destination.port": 95,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "deny",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -402,6 +425,11 @@
         "related.ip": [
             "10.148.106.167",
             "10.145.248.111"
+        ],
+        "related.user": [
+            "tectobe",
+            "uae",
+            "tium"
         ],
         "rsa.counters.dclass_c1": 3994,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -431,19 +459,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "uae",
-            "tium",
-            "tectobe"
-        ]
+        "user.name": "tectobe"
     },
     {
         "destination.ip": [
             "10.77.52.83"
         ],
         "destination.port": 2646,
-        "event.action": "accept",
-        "event.category": "Login",
+        "event.action": [
+            "accept",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -460,6 +486,11 @@
         "related.ip": [
             "10.7.46.36",
             "10.77.52.83"
+        ],
+        "related.user": [
+            "atno",
+            "ccaec",
+            "upta"
         ],
         "rsa.counters.dclass_c1": 1458,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -489,19 +520,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ccaec",
-            "atno",
-            "upta"
-        ]
+        "user.name": "atno"
     },
     {
         "destination.ip": [
             "10.221.102.245"
         ],
         "destination.port": 337,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -518,6 +547,11 @@
         "related.ip": [
             "10.221.102.245",
             "10.43.226.231"
+        ],
+        "related.user": [
+            "rinre",
+            "eFi",
+            "ritatise"
         ],
         "rsa.counters.dclass_c1": 302,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -547,19 +581,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ritatise",
-            "eFi",
-            "rinre"
-        ]
+        "user.name": "rinre"
     },
     {
         "destination.ip": [
             "10.239.96.8"
         ],
         "destination.port": 6223,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -574,8 +606,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.239.96.8",
-            "10.56.136.27"
+            "10.56.136.27",
+            "10.239.96.8"
+        ],
+        "related.user": [
+            "atevelit",
+            "nts",
+            "orsitam"
         ],
         "rsa.counters.dclass_c1": 3714,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -605,19 +642,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "orsitam",
-            "atevelit",
-            "nts"
-        ]
+        "user.name": "atevelit"
     },
     {
         "destination.ip": [
             "10.10.216.74"
         ],
         "destination.port": 7231,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -634,6 +669,11 @@
         "related.ip": [
             "10.10.216.74",
             "10.147.76.202"
+        ],
+        "related.user": [
+            "oeni",
+            "sit",
+            "ctetura"
         ],
         "rsa.counters.dclass_c1": 5313,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -663,19 +703,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ctetura",
-            "oeni",
-            "sit"
-        ]
+        "user.name": "sit"
     },
     {
         "destination.ip": [
             "10.177.219.214"
         ],
         "destination.port": 2300,
-        "event.action": "cancel",
-        "event.category": "nBCSedut",
+        "event.action": [
+            "nBCSedut",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -694,6 +732,11 @@
         "related.ip": [
             "10.177.219.214",
             "10.123.199.236"
+        ],
+        "related.user": [
+            "rum",
+            "emUteni",
+            "texpli"
         ],
         "rsa.counters.event_counter": 5653,
         "rsa.db.database": "gnaaliqu",
@@ -729,19 +772,17 @@
         ],
         "url.original": "https://www.example.com/ulapar/aboreetd.htm?par=lorin#pitl",
         "url.query": "por",
-        "user.name": [
-            "rum",
-            "emUteni",
-            "texpli"
-        ]
+        "user.name": "texpli"
     },
     {
         "destination.ip": [
             "10.110.114.175"
         ],
         "destination.port": 2639,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -758,6 +799,11 @@
         "related.ip": [
             "10.20.72.231",
             "10.110.114.175"
+        ],
+        "related.user": [
+            "snost",
+            "upt",
+            "imide"
         ],
         "rsa.counters.dclass_c1": 5798,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -787,19 +833,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "upt",
-            "snost",
-            "imide"
-        ]
+        "user.name": "upt"
     },
     {
         "destination.ip": [
             "10.230.206.60"
         ],
         "destination.port": 3684,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "deny",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -816,6 +860,11 @@
         "related.ip": [
             "10.230.206.60",
             "10.111.90.75"
+        ],
+        "related.user": [
+            "rem",
+            "aincidu",
+            "rcitat"
         ],
         "rsa.counters.dclass_c1": 1264,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -845,19 +894,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "rcitat",
-            "aincidu",
-            "rem"
-        ]
+        "user.name": "aincidu"
     },
     {
         "destination.ip": [
             "10.154.53.249"
         ],
         "destination.port": 1513,
-        "event.action": "accept",
-        "event.category": "uisa",
+        "event.action": [
+            "accept",
+            "uisa"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -874,8 +921,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.186.77.109",
-            "10.154.53.249"
+            "10.154.53.249",
+            "10.186.77.109"
+        ],
+        "related.user": [
+            "erun",
+            "dutpers",
+            "est"
         ],
         "rsa.counters.event_counter": 5380,
         "rsa.db.database": "orisn",
@@ -910,19 +962,17 @@
         ],
         "url.original": "https://api.example.org/borisnis/exeaco.html?inven=eufugi#accusant",
         "url.query": "onse",
-        "user.name": [
-            "erun",
-            "dutpers",
-            "est"
-        ]
+        "user.name": "est"
     },
     {
         "destination.ip": [
             "10.201.164.145"
         ],
         "destination.port": 2700,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -937,8 +987,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.201.164.145",
-            "10.111.233.194"
+            "10.111.233.194",
+            "10.201.164.145"
+        ],
+        "related.user": [
+            "ullamcor",
+            "sequa",
+            "miurerep"
         ],
         "rsa.counters.dclass_c1": 6595,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -968,19 +1023,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "miurerep",
-            "ullamcor",
-            "sequa"
-        ]
+        "user.name": "sequa"
     },
     {
         "destination.ip": [
             "10.241.230.235"
         ],
         "destination.port": 3421,
-        "event.action": "accept",
-        "event.category": "ssecil",
+        "event.action": [
+            "ssecil",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1000,13 +1053,18 @@
             "10.241.230.235",
             "10.57.164.187"
         ],
+        "related.user": [
+            "olorsit",
+            "scingeli",
+            "isn"
+        ],
         "rsa.counters.event_counter": 3317,
         "rsa.db.database": "sBono",
         "rsa.internal.event_desc": "llamco",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "olorem",
-            "accept"
+            "accept",
+            "olorem"
         ],
         "rsa.misc.category": "atu",
         "rsa.misc.disposition": "untincul",
@@ -1034,19 +1092,17 @@
         ],
         "url.original": "https://example.org/emqu/riss.gif?sitvol=dolore#nsequat",
         "url.query": "olorsi",
-        "user.name": [
-            "olorsit",
-            "scingeli",
-            "isn"
-        ]
+        "user.name": "olorsit"
     },
     {
         "destination.ip": [
             "10.79.147.101"
         ],
         "destination.port": 1280,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "deny",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1063,6 +1119,11 @@
         "related.ip": [
             "10.105.46.101",
             "10.79.147.101"
+        ],
+        "related.user": [
+            "cingel",
+            "uptat",
+            "ddoeius"
         ],
         "rsa.counters.dclass_c1": 6068,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1092,19 +1153,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "cingel",
-            "ddoeius",
-            "uptat"
-        ]
+        "user.name": "uptat"
     },
     {
         "destination.ip": [
             "10.49.71.118"
         ],
         "destination.port": 4322,
-        "event.action": "cancel",
-        "event.category": "eprehend",
+        "event.action": [
+            "cancel",
+            "eprehend"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1124,13 +1183,18 @@
             "10.102.166.19",
             "10.49.71.118"
         ],
+        "related.user": [
+            "eritin",
+            "udan",
+            "aincidun"
+        ],
         "rsa.counters.event_counter": 7731,
         "rsa.db.database": "yCic",
         "rsa.internal.event_desc": "caboNemo",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "uto",
-            "cancel"
+            "cancel",
+            "uto"
         ],
         "rsa.misc.category": "dexerc",
         "rsa.misc.disposition": "strumex",
@@ -1158,19 +1222,17 @@
         ],
         "url.original": "https://mail.example.com/molestia/quir.jpg?elitsed=labore#uela",
         "url.query": "ntexplic",
-        "user.name": [
-            "eritin",
-            "udan",
-            "aincidun"
-        ]
+        "user.name": "aincidun"
     },
     {
         "destination.ip": [
             "10.28.153.102"
         ],
         "destination.port": 6366,
-        "event.action": "allow",
-        "event.category": "plic",
+        "event.action": [
+            "allow",
+            "plic"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1186,6 +1248,11 @@
         "related.ip": [
             "10.50.222.68",
             "10.28.153.102"
+        ],
+        "related.user": [
+            "tas",
+            "amali",
+            "rsita"
         ],
         "rsa.counters.dclass_c1": 4527,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1211,19 +1278,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "rsita",
-            "amali",
-            "tas"
-        ]
+        "user.name": "rsita"
     },
     {
         "destination.ip": [
             "10.199.169.48"
         ],
         "destination.port": 6443,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1238,8 +1303,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.46.192.198",
-            "10.199.169.48"
+            "10.199.169.48",
+            "10.46.192.198"
+        ],
+        "related.user": [
+            "imadmini",
+            "oditempo",
+            "rumetMal"
         ],
         "rsa.counters.dclass_c1": 4128,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1269,19 +1339,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "imadmini",
-            "oditempo",
-            "rumetMal"
-        ]
+        "user.name": "imadmini"
     },
     {
         "destination.ip": [
             "10.201.81.46"
         ],
         "destination.port": 6515,
-        "event.action": "block",
-        "event.category": "BCS",
+        "event.action": [
+            "block",
+            "BCS"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1301,13 +1369,18 @@
             "10.251.1.35",
             "10.201.81.46"
         ],
+        "related.user": [
+            "niam",
+            "est",
+            "agnaaliq"
+        ],
         "rsa.counters.event_counter": 2001,
         "rsa.db.database": "mquisno",
         "rsa.internal.event_desc": "equep",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "amc",
-            "block"
+            "block",
+            "amc"
         ],
         "rsa.misc.category": "ever",
         "rsa.misc.disposition": "tali",
@@ -1335,19 +1408,17 @@
         ],
         "url.original": "https://example.com/admi/onnu.gif?saute=atatnon#tcupida",
         "url.query": "isa",
-        "user.name": [
-            "niam",
-            "est",
-            "agnaaliq"
-        ]
+        "user.name": "niam"
     },
     {
         "destination.ip": [
             "10.7.81.204"
         ],
         "destination.port": 3984,
-        "event.action": "accept",
-        "event.category": "uradi",
+        "event.action": [
+            "accept",
+            "uradi"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1367,13 +1438,18 @@
             "10.7.81.204",
             "10.131.82.68"
         ],
+        "related.user": [
+            "ersp",
+            "amnisi",
+            "ulap"
+        ],
         "rsa.counters.event_counter": 1710,
         "rsa.db.database": "nrepreh",
         "rsa.internal.event_desc": "nimad",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "prehe",
-            "accept"
+            "accept",
+            "prehe"
         ],
         "rsa.misc.category": "ataevita",
         "rsa.misc.disposition": "oremqu",
@@ -1400,19 +1476,17 @@
         ],
         "url.original": "https://www5.example.net/squira/aliqui.gif?veleum=piciatis#nes",
         "url.query": "lmolesti",
-        "user.name": [
-            "ersp",
-            "ulap",
-            "amnisi"
-        ]
+        "user.name": "ersp"
     },
     {
         "destination.ip": [
             "10.94.132.21"
         ],
         "destination.port": 2945,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "deny",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1429,6 +1503,11 @@
         "related.ip": [
             "10.94.132.21",
             "10.114.193.232"
+        ],
+        "related.user": [
+            "nse",
+            "odi",
+            "eetdo"
         ],
         "rsa.counters.dclass_c1": 6784,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1458,19 +1537,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "eetdo",
-            "odi",
-            "nse"
-        ]
+        "user.name": "odi"
     },
     {
         "destination.ip": [
             "10.44.226.104"
         ],
         "destination.port": 7020,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1485,8 +1562,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.44.226.104",
-            "10.9.56.220"
+            "10.9.56.220",
+            "10.44.226.104"
+        ],
+        "related.user": [
+            "autf",
+            "nse",
+            "reseosq"
         ],
         "rsa.counters.dclass_c1": 5380,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1516,19 +1598,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "nse",
-            "autf",
-            "reseosq"
-        ]
+        "user.name": "nse"
     },
     {
         "destination.ip": [
             "10.48.209.115"
         ],
         "destination.port": 3450,
-        "event.action": "cancel",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1543,8 +1623,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.33.195.166",
-            "10.48.209.115"
+            "10.48.209.115",
+            "10.33.195.166"
+        ],
+        "related.user": [
+            "iamea",
+            "aconsequ",
+            "umiurer"
         ],
         "rsa.counters.dclass_c1": 3249,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1574,19 +1659,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "iamea",
-            "umiurer",
-            "aconsequ"
-        ]
+        "user.name": "aconsequ"
     },
     {
         "destination.ip": [
             "10.85.137.156"
         ],
         "destination.port": 2763,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1603,6 +1686,11 @@
         "related.ip": [
             "10.188.121.11",
             "10.85.137.156"
+        ],
+        "related.user": [
+            "etMaloru",
+            "orumSe",
+            "olori"
         ],
         "rsa.counters.dclass_c1": 2491,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1632,19 +1720,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "olori",
-            "etMaloru",
-            "orumSe"
-        ]
+        "user.name": "orumSe"
     },
     {
         "destination.ip": [
             "10.238.245.236"
         ],
         "destination.port": 3575,
-        "event.action": "cancel",
-        "event.category": "tnul",
+        "event.action": [
+            "tnul",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1660,6 +1746,11 @@
         "related.ip": [
             "10.238.245.236",
             "10.45.215.202"
+        ],
+        "related.user": [
+            "gia",
+            "stquidol",
+            "ihilmole"
         ],
         "rsa.counters.dclass_c1": 7822,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1685,19 +1776,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "stquidol",
-            "ihilmole",
-            "gia"
-        ]
+        "user.name": "stquidol"
     },
     {
         "destination.ip": [
             "10.213.109.180"
         ],
         "destination.port": 6536,
-        "event.action": "accept",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1714,6 +1803,11 @@
         "related.ip": [
             "10.213.109.180",
             "10.222.85.95"
+        ],
+        "related.user": [
+            "emp",
+            "essequam",
+            "etdolor"
         ],
         "rsa.counters.dclass_c1": 2905,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1743,19 +1837,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "etdolor",
-            "emp",
-            "essequam"
-        ]
+        "user.name": "essequam"
     },
     {
         "destination.ip": [
             "10.229.165.102"
         ],
         "destination.port": 2069,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1772,6 +1864,11 @@
         "related.ip": [
             "10.229.165.102",
             "10.18.225.139"
+        ],
+        "related.user": [
+            "lestia",
+            "orum",
+            "edquian"
         ],
         "rsa.counters.dclass_c1": 3553,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1801,19 +1898,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "lestia",
-            "orum",
-            "edquian"
-        ]
+        "user.name": "lestia"
     },
     {
         "destination.ip": [
             "10.119.4.120"
         ],
         "destination.port": 3822,
-        "event.action": "accept",
-        "event.category": "turadip",
+        "event.action": [
+            "accept",
+            "turadip"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1829,6 +1924,11 @@
         "related.ip": [
             "10.119.4.120",
             "10.63.177.46"
+        ],
+        "related.user": [
+            "itseddo",
+            "veleumi",
+            "ptassita"
         ],
         "rsa.counters.dclass_c1": 5719,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1854,19 +1954,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ptassita",
-            "itseddo",
-            "veleumi"
-        ]
+        "user.name": "veleumi"
     },
     {
         "destination.ip": [
             "10.189.6.107"
         ],
         "destination.port": 767,
-        "event.action": "allow",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "allow"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1883,6 +1981,11 @@
         "related.ip": [
             "10.189.6.107",
             "10.50.69.209"
+        ],
+        "related.user": [
+            "exerci",
+            "eirur",
+            "isci"
         ],
         "rsa.counters.dclass_c1": 1684,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1912,19 +2015,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "exerci",
-            "isci",
-            "eirur"
-        ]
+        "user.name": "exerci"
     },
     {
         "destination.ip": [
             "10.74.166.70"
         ],
         "destination.port": 1453,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "accept",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1941,6 +2042,11 @@
         "related.ip": [
             "10.74.166.70",
             "10.88.176.226"
+        ],
+        "related.user": [
+            "olor",
+            "ender",
+            "roinBCSe"
         ],
         "rsa.counters.dclass_c1": 723,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1970,19 +2076,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ender",
-            "olor",
-            "roinBCSe"
-        ]
+        "user.name": "olor"
     },
     {
         "destination.ip": [
             "10.123.56.46"
         ],
         "destination.port": 6729,
-        "event.action": "cancel",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -1999,6 +2103,11 @@
         "related.ip": [
             "10.123.56.46",
             "10.182.181.162"
+        ],
+        "related.user": [
+            "oreseo",
+            "uid",
+            "sit"
         ],
         "rsa.counters.dclass_c1": 6438,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2028,19 +2137,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "oreseo",
-            "uid",
-            "sit"
-        ]
+        "user.name": "sit"
     },
     {
         "destination.ip": [
             "10.169.124.164"
         ],
         "destination.port": 62,
-        "event.action": "accept",
-        "event.category": "lesti",
+        "event.action": [
+            "accept",
+            "lesti"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2054,8 +2161,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.169.124.164",
-            "10.176.83.7"
+            "10.176.83.7",
+            "10.169.124.164"
+        ],
+        "related.user": [
+            "iamqui",
+            "hilmole",
+            "dolor"
         ],
         "rsa.counters.dclass_c1": 2894,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2081,19 +2193,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "dolor",
-            "iamqui",
-            "hilmole"
-        ]
+        "user.name": "iamqui"
     },
     {
         "destination.ip": [
             "10.87.238.169"
         ],
         "destination.port": 1598,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2108,8 +2218,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.87.238.169",
-            "10.173.125.112"
+            "10.173.125.112",
+            "10.87.238.169"
+        ],
+        "related.user": [
+            "iusmodt",
+            "itaedict",
+            "CSedu"
         ],
         "rsa.counters.dclass_c1": 7780,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2139,19 +2254,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "itaedict",
-            "CSedu",
-            "iusmodt"
-        ]
+        "user.name": "CSedu"
     },
     {
         "destination.ip": [
             "10.245.219.7"
         ],
         "destination.port": 4792,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2166,8 +2279,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.245.219.7",
-            "10.53.133.90"
+            "10.53.133.90",
+            "10.245.219.7"
+        ],
+        "related.user": [
+            "rsit",
+            "ptatev",
+            "nvol"
         ],
         "rsa.counters.dclass_c1": 6066,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2197,19 +2315,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "rsit",
-            "ptatev",
-            "nvol"
-        ]
+        "user.name": "rsit"
     },
     {
         "destination.ip": [
             "10.67.173.228"
         ],
         "destination.port": 4444,
-        "event.action": "block",
-        "event.category": "aliqui",
+        "event.action": [
+            "aliqui",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2226,8 +2342,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.67.173.228",
-            "10.161.64.168"
+            "10.161.64.168",
+            "10.67.173.228"
+        ],
+        "related.user": [
+            "nesci",
+            "tam",
+            "onsectet"
         ],
         "rsa.counters.event_counter": 2448,
         "rsa.db.database": "sin",
@@ -2263,19 +2384,17 @@
         ],
         "url.original": "https://www.example.net/orem/eniamqui.gif?seq=rumSe#tatnonp",
         "url.query": "ommo",
-        "user.name": [
-            "onsectet",
-            "nesci",
-            "tam"
-        ]
+        "user.name": "onsectet"
     },
     {
         "destination.ip": [
             "10.90.50.149"
         ],
         "destination.port": 1936,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2290,8 +2409,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.90.50.149",
-            "10.168.225.209"
+            "10.168.225.209",
+            "10.90.50.149"
+        ],
+        "related.user": [
+            "olupta",
+            "olu",
+            "aUtenima"
         ],
         "rsa.counters.dclass_c1": 1127,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2321,19 +2445,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "olupta",
-            "aUtenima",
-            "olu"
-        ]
+        "user.name": "olu"
     },
     {
         "destination.ip": [
             "10.59.182.36"
         ],
         "destination.port": 5792,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2350,6 +2472,11 @@
         "related.ip": [
             "10.59.182.36",
             "10.18.150.82"
+        ],
+        "related.user": [
+            "qua",
+            "mtota",
+            "luptat"
         ],
         "rsa.counters.dclass_c1": 6112,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2379,14 +2506,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "qua",
-            "luptat",
-            "mtota"
-        ]
+        "user.name": "mtota"
     },
     {
-        "event.category": "ulamcola",
+        "event.action": [
+            "ulamcola"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2398,6 +2523,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "llita"
+        ],
         "rsa.internal.event_desc": "nturmag",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "ulamcola",
@@ -2408,17 +2536,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "llita"
-        ]
+        "user.name": "llita"
     },
     {
         "destination.ip": [
             "10.52.190.18"
         ],
         "destination.port": 4411,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2435,6 +2563,11 @@
         "related.ip": [
             "10.52.190.18",
             "10.198.142.81"
+        ],
+        "related.user": [
+            "upta",
+            "secte",
+            "ciati"
         ],
         "rsa.counters.dclass_c1": 1063,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2464,19 +2597,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "upta",
-            "ciati",
-            "secte"
-        ]
+        "user.name": "ciati"
     },
     {
         "destination.ip": [
             "10.49.169.175"
         ],
         "destination.port": 5020,
-        "event.action": "cancel",
-        "event.category": "strumex",
+        "event.action": [
+            "cancel",
+            "strumex"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2496,13 +2627,18 @@
             "10.97.108.108",
             "10.49.169.175"
         ],
+        "related.user": [
+            "idolor",
+            "onpr",
+            "iquamqu"
+        ],
         "rsa.counters.event_counter": 4795,
         "rsa.db.database": "uira",
         "rsa.internal.event_desc": "velites",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "caboN",
-            "cancel"
+            "cancel",
+            "caboN"
         ],
         "rsa.misc.category": "oloremi",
         "rsa.misc.disposition": "edqui",
@@ -2529,19 +2665,17 @@
         ],
         "url.original": "https://api.example.org/eumiu/tatevel.htm?quisnost=sequines#olor",
         "url.query": "sequa",
-        "user.name": [
-            "onpr",
-            "idolor",
-            "iquamqu"
-        ]
+        "user.name": "iquamqu"
     },
     {
         "destination.ip": [
             "10.65.185.178"
         ],
         "destination.port": 7750,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "accept",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2556,8 +2690,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.65.185.178",
-            "10.96.216.244"
+            "10.96.216.244",
+            "10.65.185.178"
+        ],
+        "related.user": [
+            "tvolup",
+            "assi",
+            "tin"
         ],
         "rsa.counters.dclass_c1": 5602,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2587,19 +2726,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "tvolup",
-            "tin",
-            "assi"
-        ]
+        "user.name": "tin"
     },
     {
         "destination.ip": [
             "10.223.71.185"
         ],
         "destination.port": 916,
-        "event.action": "allow",
-        "event.category": "deFini",
+        "event.action": [
+            "allow",
+            "deFini"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2613,8 +2750,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.33.181.176",
-            "10.223.71.185"
+            "10.223.71.185",
+            "10.33.181.176"
+        ],
+        "related.user": [
+            "loremips",
+            "uptateve",
+            "atisetqu"
         ],
         "rsa.counters.dclass_c1": 3804,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2640,19 +2782,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "atisetqu",
-            "loremips",
-            "uptateve"
-        ]
+        "user.name": "uptateve"
     },
     {
         "destination.ip": [
             "10.238.252.246"
         ],
         "destination.port": 6289,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2667,8 +2807,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.238.252.246",
-            "10.255.179.32"
+            "10.255.179.32",
+            "10.238.252.246"
+        ],
+        "related.user": [
+            "iatn",
+            "iamea",
+            "olore"
         ],
         "rsa.counters.dclass_c1": 5626,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2698,19 +2843,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "iamea",
-            "iatn",
-            "olore"
-        ]
+        "user.name": "iamea"
     },
     {
         "destination.ip": [
             "10.98.52.184"
         ],
         "destination.port": 7402,
-        "event.action": "cancel",
-        "event.category": "Logout",
+        "event.action": [
+            "cancel",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2727,6 +2870,11 @@
         "related.ip": [
             "10.98.52.184",
             "10.28.124.136"
+        ],
+        "related.user": [
+            "billoi",
+            "icaboNe",
+            "umq"
         ],
         "rsa.counters.dclass_c1": 4298,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2756,19 +2904,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "billoi",
-            "umq",
-            "icaboNe"
-        ]
+        "user.name": "umq"
     },
     {
         "destination.ip": [
             "10.200.162.248"
         ],
         "destination.port": 1419,
-        "event.action": "deny",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "deny"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2783,8 +2929,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.200.162.248",
-            "10.92.177.251"
+            "10.92.177.251",
+            "10.200.162.248"
+        ],
+        "related.user": [
+            "billo",
+            "lumdol",
+            "cul"
         ],
         "rsa.counters.dclass_c1": 3914,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2814,19 +2965,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "cul",
-            "lumdol",
-            "billo"
-        ]
+        "user.name": "lumdol"
     },
     {
         "destination.ip": [
             "10.103.215.159"
         ],
         "destination.port": 1265,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2841,8 +2990,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.88.60.147",
-            "10.103.215.159"
+            "10.103.215.159",
+            "10.88.60.147"
+        ],
+        "related.user": [
+            "mull",
+            "ueporr",
+            "seq"
         ],
         "rsa.counters.dclass_c1": 392,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2871,19 +3025,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ueporr",
-            "seq",
-            "mull"
-        ]
+        "user.name": "ueporr"
     },
     {
         "destination.ip": [
             "10.93.246.218"
         ],
         "destination.port": 4628,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "accept",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2900,6 +3052,11 @@
         "related.ip": [
             "10.93.246.218",
             "10.229.190.11"
+        ],
+        "related.user": [
+            "cteturad",
+            "mtot",
+            "roinBCS"
         ],
         "rsa.counters.dclass_c1": 1929,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2929,19 +3086,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "mtot",
-            "roinBCS",
-            "cteturad"
-        ]
+        "user.name": "mtot"
     },
     {
         "destination.ip": [
             "10.89.16.162"
         ],
         "destination.port": 3056,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -2958,6 +3113,11 @@
         "related.ip": [
             "10.178.183.11",
             "10.89.16.162"
+        ],
+        "related.user": [
+            "atvol",
+            "taevitae",
+            "modit"
         ],
         "rsa.counters.dclass_c1": 1449,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2987,19 +3147,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "modit",
-            "taevitae",
-            "atvol"
-        ]
+        "user.name": "taevitae"
     },
     {
         "destination.ip": [
             "10.67.129.100"
         ],
         "destination.port": 1961,
-        "event.action": "deny",
-        "event.category": "remque",
+        "event.action": [
+            "remque",
+            "deny"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3018,6 +3176,11 @@
         "related.ip": [
             "10.67.129.100",
             "10.244.73.167"
+        ],
+        "related.user": [
+            "exerc",
+            "gnama",
+            "sunte"
         ],
         "rsa.counters.event_counter": 2592,
         "rsa.db.database": "tasu",
@@ -3053,19 +3216,17 @@
         ],
         "url.original": "https://mail.example.net/smodit/ine.html?amquisn=Finibus#nsequat",
         "url.query": "mvol",
-        "user.name": [
-            "sunte",
-            "exerc",
-            "gnama"
-        ]
+        "user.name": "gnama"
     },
     {
         "destination.ip": [
             "10.20.158.236"
         ],
         "destination.port": 4443,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "deny",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3082,6 +3243,11 @@
         "related.ip": [
             "10.20.158.236",
             "10.52.221.103"
+        ],
+        "related.user": [
+            "dantium",
+            "aute",
+            "oinve"
         ],
         "rsa.counters.dclass_c1": 6386,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3111,19 +3277,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "oinve",
-            "dantium",
-            "aute"
-        ]
+        "user.name": "dantium"
     },
     {
         "destination.ip": [
             "10.250.231.196"
         ],
         "destination.port": 5863,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3138,8 +3302,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.250.231.196",
-            "10.199.46.88"
+            "10.199.46.88",
+            "10.250.231.196"
+        ],
+        "related.user": [
+            "equuntur",
+            "olup",
+            "utlabore"
         ],
         "rsa.counters.dclass_c1": 2867,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3169,19 +3338,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "utlabore",
-            "olup",
-            "equuntur"
-        ]
+        "user.name": "olup"
     },
     {
         "destination.ip": [
             "10.41.44.94"
         ],
         "destination.port": 702,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "block",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3196,8 +3363,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.49.122.64",
-            "10.41.44.94"
+            "10.41.44.94",
+            "10.49.122.64"
+        ],
+        "related.user": [
+            "nim",
+            "suntincu",
+            "fugia"
         ],
         "rsa.counters.dclass_c1": 1508,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3227,19 +3399,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "fugia",
-            "suntincu",
-            "nim"
-        ]
+        "user.name": "nim"
     },
     {
         "destination.ip": [
             "10.101.60.188"
         ],
         "destination.port": 5558,
-        "event.action": "accept",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3256,6 +3426,11 @@
         "related.ip": [
             "10.186.129.34",
             "10.101.60.188"
+        ],
+        "related.user": [
+            "eritquii",
+            "uptatem",
+            "itaed"
         ],
         "rsa.counters.dclass_c1": 944,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3285,19 +3460,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "uptatem",
-            "eritquii",
-            "itaed"
-        ]
+        "user.name": "uptatem"
     },
     {
         "destination.ip": [
             "10.184.199.84"
         ],
         "destination.port": 2057,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3314,6 +3487,11 @@
         "related.ip": [
             "10.138.191.99",
             "10.184.199.84"
+        ],
+        "related.user": [
+            "upt",
+            "cid",
+            "ationem"
         ],
         "rsa.counters.dclass_c1": 3291,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3343,19 +3521,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ationem",
-            "cid",
-            "upt"
-        ]
+        "user.name": "cid"
     },
     {
         "destination.ip": [
             "10.40.12.51"
         ],
         "destination.port": 5633,
-        "event.action": "cancel",
-        "event.category": "preh",
+        "event.action": [
+            "preh",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3372,16 +3548,21 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.40.12.51",
-            "10.27.120.57"
+            "10.27.120.57",
+            "10.40.12.51"
+        ],
+        "related.user": [
+            "remeum",
+            "volupta",
+            "doconse"
         ],
         "rsa.counters.event_counter": 1576,
         "rsa.db.database": "ptat",
         "rsa.internal.event_desc": "iatisun",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "uep",
-            "cancel"
+            "cancel",
+            "uep"
         ],
         "rsa.misc.category": "cto",
         "rsa.misc.disposition": "orumSect",
@@ -3409,19 +3590,17 @@
         ],
         "url.original": "https://internal.example.com/nde/reprehe.html?enimipsa=mquisno#eaco",
         "url.query": "empor",
-        "user.name": [
-            "volupta",
-            "remeum",
-            "doconse"
-        ]
+        "user.name": "remeum"
     },
     {
         "destination.ip": [
             "10.86.147.37"
         ],
         "destination.port": 6845,
-        "event.action": "allow",
-        "event.category": "epteu",
+        "event.action": [
+            "allow",
+            "epteu"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3441,13 +3620,18 @@
             "10.106.63.42",
             "10.86.147.37"
         ],
+        "related.user": [
+            "olor",
+            "ugitse",
+            "aeca"
+        ],
         "rsa.counters.event_counter": 2211,
         "rsa.db.database": "ameiu",
         "rsa.internal.event_desc": "por",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "mip",
-            "allow"
+            "allow",
+            "mip"
         ],
         "rsa.misc.category": "stiae",
         "rsa.misc.disposition": "icta",
@@ -3475,19 +3659,17 @@
         ],
         "url.original": "https://www5.example.com/olu/nofdeF.html?ipsu=siarch#itautfu",
         "url.query": "rrorsi",
-        "user.name": [
-            "olor",
-            "aeca",
-            "ugitse"
-        ]
+        "user.name": "olor"
     },
     {
         "destination.ip": [
             "10.110.240.8"
         ],
         "destination.port": 6650,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3502,8 +3684,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.112.132.76",
-            "10.110.240.8"
+            "10.110.240.8",
+            "10.112.132.76"
+        ],
+        "related.user": [
+            "ulamcola",
+            "tam",
+            "equun"
         ],
         "rsa.counters.dclass_c1": 5784,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3533,19 +3720,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "tam",
-            "equun",
-            "ulamcola"
-        ]
+        "user.name": "tam"
     },
     {
         "destination.ip": [
             "10.76.222.159"
         ],
         "destination.port": 403,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "accept",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3562,6 +3747,11 @@
         "related.ip": [
             "10.7.141.213",
             "10.76.222.159"
+        ],
+        "related.user": [
+            "labor",
+            "natuser",
+            "niamq"
         ],
         "rsa.counters.dclass_c1": 5670,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3591,19 +3781,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "natuser",
-            "labor",
-            "niamq"
-        ]
+        "user.name": "natuser"
     },
     {
         "destination.ip": [
             "10.246.196.160"
         ],
         "destination.port": 894,
-        "event.action": "allow",
-        "event.category": "Logout",
+        "event.action": [
+            "allow",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3618,8 +3806,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.170.90.90",
-            "10.246.196.160"
+            "10.246.196.160",
+            "10.170.90.90"
+        ],
+        "related.user": [
+            "equ",
+            "epteurs",
+            "urautod"
         ],
         "rsa.counters.dclass_c1": 4933,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3649,14 +3842,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "epteurs",
-            "urautod",
-            "equ"
-        ]
+        "user.name": "equ"
     },
     {
-        "event.category": "veniam",
+        "event.action": [
+            "veniam"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3668,6 +3859,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "entoreve"
+        ],
         "rsa.internal.event_desc": "exeaco",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "veniam",
@@ -3678,17 +3872,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "entoreve"
-        ]
+        "user.name": "entoreve"
     },
     {
         "destination.ip": [
             "10.209.129.155"
         ],
         "destination.port": 769,
-        "event.action": "block",
-        "event.category": "Logout",
+        "event.action": [
+            "block",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3703,8 +3897,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.128.118.157",
-            "10.209.129.155"
+            "10.209.129.155",
+            "10.128.118.157"
+        ],
+        "related.user": [
+            "essequa",
+            "xerci",
+            "mdolore"
         ],
         "rsa.counters.dclass_c1": 2931,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3734,19 +3933,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "essequa",
-            "xerci",
-            "mdolore"
-        ]
+        "user.name": "mdolore"
     },
     {
         "destination.ip": [
             "10.219.218.23"
         ],
         "destination.port": 2855,
-        "event.action": "deny",
-        "event.category": "nsequatD",
+        "event.action": [
+            "deny",
+            "nsequatD"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3763,16 +3960,21 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.21.69.33",
-            "10.219.218.23"
+            "10.219.218.23",
+            "10.21.69.33"
+        ],
+        "related.user": [
+            "tesseq",
+            "orumS",
+            "labor"
         ],
         "rsa.counters.event_counter": 2428,
         "rsa.db.database": "exeacomm",
         "rsa.internal.event_desc": "itanimi",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "deny",
-            "meumfug"
+            "meumfug",
+            "deny"
         ],
         "rsa.misc.category": "rinc",
         "rsa.misc.disposition": "isistena",
@@ -3800,19 +4002,17 @@
         ],
         "url.original": "https://www.example.org/uatu/gel.gif?itsed=mvolu#agn",
         "url.query": "eritinvo",
-        "user.name": [
-            "tesseq",
-            "labor",
-            "orumS"
-        ]
+        "user.name": "labor"
     },
     {
         "destination.ip": [
             "10.209.39.25"
         ],
         "destination.port": 3954,
-        "event.action": "block",
-        "event.category": "ius",
+        "event.action": [
+            "ius",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3826,8 +4026,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.67.163.107",
-            "10.209.39.25"
+            "10.209.39.25",
+            "10.67.163.107"
+        ],
+        "related.user": [
+            "tion",
+            "quaeabi",
+            "eddoe"
         ],
         "rsa.counters.dclass_c1": 3469,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3853,19 +4058,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "quaeabi",
-            "tion",
-            "eddoe"
-        ]
+        "user.name": "tion"
     },
     {
         "destination.ip": [
             "10.61.247.113"
         ],
         "destination.port": 599,
-        "event.action": "cancel",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3882,6 +4085,11 @@
         "related.ip": [
             "10.61.247.113",
             "10.120.66.172"
+        ],
+        "related.user": [
+            "tur",
+            "iamqu",
+            "iduntut"
         ],
         "rsa.counters.dclass_c1": 2218,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3911,19 +4119,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "tur",
-            "iamqu",
-            "iduntut"
-        ]
+        "user.name": "tur"
     },
     {
         "destination.ip": [
             "10.206.65.159"
         ],
         "destination.port": 6326,
-        "event.action": "deny",
-        "event.category": "oluptass",
+        "event.action": [
+            "deny",
+            "oluptass"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3940,8 +4146,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.206.65.159",
-            "10.31.56.237"
+            "10.31.56.237",
+            "10.206.65.159"
+        ],
+        "related.user": [
+            "amcorpor",
+            "atem",
+            "cit"
         ],
         "rsa.counters.event_counter": 1295,
         "rsa.db.database": "oloremeu",
@@ -3976,14 +4187,12 @@
         ],
         "url.original": "https://internal.example.com/nde/naturau.txt?sBonor=odit#ercitati",
         "url.query": "lapa",
-        "user.name": [
-            "amcorpor",
-            "atem",
-            "cit"
-        ]
+        "user.name": "cit"
     },
     {
-        "event.category": "iades",
+        "event.action": [
+            "iades"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -3995,6 +4204,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "inculpa"
+        ],
         "rsa.internal.event_desc": "onorum",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "iades",
@@ -4005,17 +4217,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "inculpa"
-        ]
+        "user.name": "inculpa"
     },
     {
         "destination.ip": [
             "10.108.76.145"
         ],
         "destination.port": 4698,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4032,6 +4244,11 @@
         "related.ip": [
             "10.147.56.184",
             "10.108.76.145"
+        ],
+        "related.user": [
+            "uisautem",
+            "idid",
+            "trumexer"
         ],
         "rsa.counters.dclass_c1": 1294,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4061,19 +4278,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "trumexer",
-            "uisautem",
-            "idid"
-        ]
+        "user.name": "trumexer"
     },
     {
         "destination.ip": [
             "10.193.58.50"
         ],
         "destination.port": 5693,
-        "event.action": "cancel",
-        "event.category": "oloremeu",
+        "event.action": [
+            "oloremeu",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4090,16 +4305,21 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.28.248.90",
-            "10.193.58.50"
+            "10.193.58.50",
+            "10.28.248.90"
+        ],
+        "related.user": [
+            "eaqu",
+            "totamrem",
+            "cto"
         ],
         "rsa.counters.event_counter": 4385,
         "rsa.db.database": "itani",
         "rsa.internal.event_desc": "doloremi",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "sequatD",
-            "cancel"
+            "cancel",
+            "sequatD"
         ],
         "rsa.misc.category": "uisno",
         "rsa.misc.disposition": "atevel",
@@ -4126,19 +4346,17 @@
         ],
         "url.original": "https://api.example.com/veleum/eturad.jpg?eetdol=aut#eriti",
         "url.query": "ipsum",
-        "user.name": [
-            "eaqu",
-            "cto",
-            "totamrem"
-        ]
+        "user.name": "cto"
     },
     {
         "destination.ip": [
             "10.84.3.244"
         ],
         "destination.port": 3154,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4155,6 +4373,11 @@
         "related.ip": [
             "10.211.242.138",
             "10.84.3.244"
+        ],
+        "related.user": [
+            "olest",
+            "ciun",
+            "asia"
         ],
         "rsa.counters.dclass_c1": 545,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4184,14 +4407,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "olest",
-            "asia",
-            "ciun"
-        ]
+        "user.name": "olest"
     },
     {
-        "event.category": "quidolo",
+        "event.action": [
+            "quidolo"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4203,6 +4424,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "destlabo"
+        ],
         "rsa.internal.event_desc": "utaliqui",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "quidolo",
@@ -4213,17 +4437,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "destlabo"
-        ]
+        "user.name": "destlabo"
     },
     {
         "destination.ip": [
             "10.121.189.113"
         ],
         "destination.port": 5635,
-        "event.action": "accept",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4240,6 +4464,11 @@
         "related.ip": [
             "10.121.189.113",
             "10.13.86.14"
+        ],
+        "related.user": [
+            "turvelil",
+            "volu",
+            "lapa"
         ],
         "rsa.counters.dclass_c1": 7284,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4268,19 +4497,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "lapa",
-            "volu",
-            "turvelil"
-        ]
+        "user.name": "lapa"
     },
     {
         "destination.ip": [
             "10.32.220.188"
         ],
         "destination.port": 2394,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "accept",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4297,6 +4524,11 @@
         "related.ip": [
             "10.50.195.220",
             "10.32.220.188"
+        ],
+        "related.user": [
+            "nimi",
+            "lorinrep",
+            "ectob"
         ],
         "rsa.counters.dclass_c1": 2636,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4326,19 +4558,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ectob",
-            "nimi",
-            "lorinrep"
-        ]
+        "user.name": "ectob"
     },
     {
         "destination.ip": [
             "10.189.155.253"
         ],
         "destination.port": 984,
-        "event.action": "allow",
-        "event.category": "Login",
+        "event.action": [
+            "allow",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4353,8 +4583,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.29.74.57",
-            "10.189.155.253"
+            "10.189.155.253",
+            "10.29.74.57"
+        ],
+        "related.user": [
+            "exe",
+            "colab",
+            "iutaliqu"
         ],
         "rsa.counters.dclass_c1": 3432,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4384,19 +4619,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "exe",
-            "iutaliqu",
-            "colab"
-        ]
+        "user.name": "iutaliqu"
     },
     {
         "destination.ip": [
             "10.107.41.59"
         ],
         "destination.port": 926,
-        "event.action": "block",
-        "event.category": "acom",
+        "event.action": [
+            "block",
+            "acom"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4410,8 +4643,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.107.41.59",
-            "10.149.2.62"
+            "10.149.2.62",
+            "10.107.41.59"
+        ],
+        "related.user": [
+            "utal",
+            "edictasu",
+            "oreseo"
         ],
         "rsa.counters.dclass_c1": 3008,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4437,19 +4675,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "edictasu",
-            "utal",
-            "oreseo"
-        ]
+        "user.name": "oreseo"
     },
     {
         "destination.ip": [
             "10.20.211.186"
         ],
         "destination.port": 4062,
-        "event.action": "accept",
-        "event.category": "erit",
+        "event.action": [
+            "accept",
+            "erit"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4466,8 +4702,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.20.211.186",
-            "10.11.237.65"
+            "10.11.237.65",
+            "10.20.211.186"
+        ],
+        "related.user": [
+            "ncidid",
+            "olo",
+            "ptassit"
         ],
         "rsa.counters.event_counter": 3743,
         "rsa.db.database": "ataevit",
@@ -4502,19 +4743,17 @@
         ],
         "url.original": "https://www5.example.org/onsequ/Bon.txt?remap=mUt#admi",
         "url.query": "siarch",
-        "user.name": [
-            "olo",
-            "ptassit",
-            "ncidid"
-        ]
+        "user.name": "ncidid"
     },
     {
         "destination.ip": [
             "10.190.18.213"
         ],
         "destination.port": 2201,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4531,6 +4770,11 @@
         "related.ip": [
             "10.190.18.213",
             "10.177.60.55"
+        ],
+        "related.user": [
+            "tametcon",
+            "rror",
+            "etdolore"
         ],
         "rsa.counters.dclass_c1": 7327,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4560,19 +4804,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "etdolore",
-            "rror",
-            "tametcon"
-        ]
+        "user.name": "rror"
     },
     {
         "destination.ip": [
             "10.173.169.212"
         ],
         "destination.port": 292,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "cancel",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4587,8 +4829,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.131.253.222",
-            "10.173.169.212"
+            "10.173.169.212",
+            "10.131.253.222"
+        ],
+        "related.user": [
+            "oinB",
+            "orumet",
+            "utod"
         ],
         "rsa.counters.dclass_c1": 6659,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4618,19 +4865,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "orumet",
-            "oinB",
-            "utod"
-        ]
+        "user.name": "oinB"
     },
     {
         "destination.ip": [
             "10.33.131.63"
         ],
         "destination.port": 1437,
-        "event.action": "cancel",
-        "event.category": "lum",
+        "event.action": [
+            "cancel",
+            "lum"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4646,6 +4891,11 @@
         "related.ip": [
             "10.5.54.131",
             "10.33.131.63"
+        ],
+        "related.user": [
+            "psamvolu",
+            "liq",
+            "imven"
         ],
         "rsa.counters.dclass_c1": 587,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4671,19 +4921,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "psamvolu",
-            "imven",
-            "liq"
-        ]
+        "user.name": "imven"
     },
     {
         "destination.ip": [
             "10.164.123.69"
         ],
         "destination.port": 2543,
-        "event.action": "cancel",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4698,8 +4946,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.161.51.238",
-            "10.164.123.69"
+            "10.164.123.69",
+            "10.161.51.238"
+        ],
+        "related.user": [
+            "litesse",
+            "xercitat",
+            "xeacomm"
         ],
         "rsa.counters.dclass_c1": 5031,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4729,19 +4982,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "litesse",
-            "xercitat",
-            "xeacomm"
-        ]
+        "user.name": "litesse"
     },
     {
         "destination.ip": [
             "10.112.73.97"
         ],
         "destination.port": 6125,
-        "event.action": "accept",
-        "event.category": "odte",
+        "event.action": [
+            "accept",
+            "odte"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4755,8 +5006,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.227.144.202",
-            "10.112.73.97"
+            "10.112.73.97",
+            "10.227.144.202"
+        ],
+        "related.user": [
+            "quinesc",
+            "uelau",
+            "uelauda"
         ],
         "rsa.counters.dclass_c1": 2469,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4782,14 +5038,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "quinesc",
-            "uelau",
-            "uelauda"
-        ]
+        "user.name": "quinesc"
     },
     {
-        "event.category": "scip",
+        "event.action": [
+            "scip"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4801,6 +5055,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "voluptas"
+        ],
         "rsa.internal.event_desc": "upta",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "scip",
@@ -4811,17 +5068,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "voluptas"
-        ]
+        "user.name": "voluptas"
     },
     {
         "destination.ip": [
             "10.185.248.253"
         ],
         "destination.port": 3804,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "block"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4838,6 +5095,11 @@
         "related.ip": [
             "10.185.248.253",
             "10.76.165.58"
+        ],
+        "related.user": [
+            "amqua",
+            "ugitse",
+            "nisi"
         ],
         "rsa.counters.dclass_c1": 4963,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4867,19 +5129,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ugitse",
-            "amqua",
-            "nisi"
-        ]
+        "user.name": "nisi"
     },
     {
         "destination.ip": [
             "10.177.36.122"
         ],
         "destination.port": 5686,
-        "event.action": "accept",
-        "event.category": "itessec",
+        "event.action": [
+            "accept",
+            "itessec"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4896,8 +5156,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.177.36.122",
-            "10.163.27.208"
+            "10.163.27.208",
+            "10.177.36.122"
+        ],
+        "related.user": [
+            "avolu",
+            "eFini",
+            "ept"
         ],
         "rsa.counters.event_counter": 4087,
         "rsa.db.database": "aaliq",
@@ -4932,19 +5197,17 @@
         ],
         "url.original": "https://www5.example.com/tcu/mmodo.jpg?stlabo=atema#sunt",
         "url.query": "orporiss",
-        "user.name": [
-            "avolu",
-            "ept",
-            "eFini"
-        ]
+        "user.name": "eFini"
     },
     {
         "destination.ip": [
             "10.35.215.152"
         ],
         "destination.port": 7489,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -4959,8 +5222,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.143.175.148",
-            "10.35.215.152"
+            "10.35.215.152",
+            "10.143.175.148"
+        ],
+        "related.user": [
+            "ium",
+            "etdo",
+            "itaspern"
         ],
         "rsa.counters.dclass_c1": 6141,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4990,19 +5258,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "itaspern",
-            "etdo",
-            "ium"
-        ]
+        "user.name": "ium"
     },
     {
         "destination.ip": [
             "10.254.252.105"
         ],
         "destination.port": 146,
-        "event.action": "allow",
-        "event.category": "Logout",
+        "event.action": [
+            "allow",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5019,6 +5285,11 @@
         "related.ip": [
             "10.25.246.131",
             "10.254.252.105"
+        ],
+        "related.user": [
+            "ptatemU",
+            "asp",
+            "ataev"
         ],
         "rsa.counters.dclass_c1": 2949,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5048,19 +5319,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ptatemU",
-            "ataev",
-            "asp"
-        ]
+        "user.name": "asp"
     },
     {
         "destination.ip": [
             "10.248.16.82"
         ],
         "destination.port": 6834,
-        "event.action": "accept",
-        "event.category": "Login",
+        "event.action": [
+            "accept",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5077,6 +5346,11 @@
         "related.ip": [
             "10.44.179.66",
             "10.248.16.82"
+        ],
+        "related.user": [
+            "proiden",
+            "loinv",
+            "xercita"
         ],
         "rsa.counters.dclass_c1": 2353,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5106,19 +5380,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "proiden",
-            "loinv",
-            "xercita"
-        ]
+        "user.name": "loinv"
     },
     {
         "destination.ip": [
             "10.88.53.149"
         ],
         "destination.port": 4048,
-        "event.action": "allow",
-        "event.category": "temac",
+        "event.action": [
+            "temac",
+            "allow"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5135,8 +5407,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.88.53.149",
-            "10.55.166.205"
+            "10.55.166.205",
+            "10.88.53.149"
+        ],
+        "related.user": [
+            "strumex",
+            "reseosqu",
+            "tqui"
         ],
         "rsa.counters.event_counter": 6219,
         "rsa.db.database": "atus",
@@ -5172,19 +5449,17 @@
         ],
         "url.original": "https://www.example.net/umSecti/emaccu.html?atu=ddo#veli",
         "url.query": "ata",
-        "user.name": [
-            "reseosqu",
-            "tqui",
-            "strumex"
-        ]
+        "user.name": "tqui"
     },
     {
         "destination.ip": [
             "10.199.117.125"
         ],
         "destination.port": 1799,
-        "event.action": "cancel",
-        "event.category": "ionevo",
+        "event.action": [
+            "ionevo",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5201,8 +5476,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.199.117.125",
-            "10.116.180.96"
+            "10.116.180.96",
+            "10.199.117.125"
+        ],
+        "related.user": [
+            "pidatatn",
+            "iof",
+            "ciun"
         ],
         "rsa.counters.event_counter": 6700,
         "rsa.db.database": "ssitaspe",
@@ -5237,19 +5517,17 @@
         ],
         "url.original": "https://mail.example.com/enatuser/epteurs.txt?orsit=rcit#niamqu",
         "url.query": "nrep",
-        "user.name": [
-            "pidatatn",
-            "iof",
-            "ciun"
-        ]
+        "user.name": "pidatatn"
     },
     {
         "destination.ip": [
             "10.64.76.110"
         ],
         "destination.port": 2200,
-        "event.action": "cancel",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5264,8 +5542,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.250.226.105",
-            "10.64.76.110"
+            "10.64.76.110",
+            "10.250.226.105"
+        ],
+        "related.user": [
+            "imidest",
+            "ommod",
+            "ptate"
         ],
         "rsa.counters.dclass_c1": 6041,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5295,19 +5578,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "ptate",
-            "ommod",
-            "imidest"
-        ]
+        "user.name": "ptate"
     },
     {
         "destination.ip": [
             "10.164.52.43"
         ],
         "destination.port": 2077,
-        "event.action": "block",
-        "event.category": "persp",
+        "event.action": [
+            "block",
+            "persp"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5327,13 +5608,18 @@
             "10.29.141.252",
             "10.164.52.43"
         ],
+        "related.user": [
+            "Nemoe",
+            "seq",
+            "reverit"
+        ],
         "rsa.counters.event_counter": 249,
         "rsa.db.database": "neavolup",
         "rsa.internal.event_desc": "itame",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "block",
-            "atemq"
+            "atemq",
+            "block"
         ],
         "rsa.misc.category": "quaturv",
         "rsa.misc.disposition": "lumdolor",
@@ -5361,19 +5647,17 @@
         ],
         "url.original": "https://api.example.net/adminimv/equatD.html?obeatae=sedqui#ntNeq",
         "url.query": "aturve",
-        "user.name": [
-            "Nemoe",
-            "reverit",
-            "seq"
-        ]
+        "user.name": "seq"
     },
     {
         "destination.ip": [
             "10.115.42.231"
         ],
         "destination.port": 2143,
-        "event.action": "deny",
-        "event.category": "Login",
+        "event.action": [
+            "Login",
+            "deny"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5388,8 +5672,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.161.212.150",
-            "10.115.42.231"
+            "10.115.42.231",
+            "10.161.212.150"
+        ],
+        "related.user": [
+            "tasnul",
+            "res",
+            "sequamn"
         ],
         "rsa.counters.dclass_c1": 4846,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5419,19 +5708,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "sequamn",
-            "res",
-            "tasnul"
-        ]
+        "user.name": "res"
     },
     {
         "destination.ip": [
             "10.66.163.3"
         ],
         "destination.port": 1085,
-        "event.action": "accept",
-        "event.category": "Logout",
+        "event.action": [
+            "Logout",
+            "accept"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5446,8 +5733,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.66.163.3",
-            "10.9.126.156"
+            "10.9.126.156",
+            "10.66.163.3"
+        ],
+        "related.user": [
+            "asnulapa",
+            "accusa",
+            "aeconseq"
         ],
         "rsa.counters.dclass_c1": 7469,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5477,14 +5769,12 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "aeconseq",
-            "accusa",
-            "asnulapa"
-        ]
+        "user.name": "aeconseq"
     },
     {
-        "event.category": "odtem",
+        "event.action": [
+            "odtem"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5496,6 +5786,9 @@
         "observer.product": "Secure",
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
+        "related.user": [
+            "mipsa"
+        ],
         "rsa.internal.event_desc": "nimide",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.event_type": "odtem",
@@ -5506,17 +5799,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "mipsa"
-        ]
+        "user.name": "mipsa"
     },
     {
         "destination.ip": [
             "10.217.176.124"
         ],
         "destination.port": 7276,
-        "event.action": "cancel",
-        "event.category": "sauteir",
+        "event.action": [
+            "sauteir",
+            "cancel"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5533,8 +5826,13 @@
         "observer.type": "WAF",
         "observer.vendor": "Imperva",
         "related.ip": [
-            "10.217.176.124",
-            "10.220.106.170"
+            "10.220.106.170",
+            "10.217.176.124"
+        ],
+        "related.user": [
+            "itsedq",
+            "uisaute",
+            "min"
         ],
         "rsa.counters.event_counter": 1318,
         "rsa.db.database": "iaturEx",
@@ -5569,19 +5867,17 @@
         ],
         "url.original": "https://internal.example.net/fdeFin/ursi.txt?lapariat=red#rinre",
         "url.query": "upta",
-        "user.name": [
-            "uisaute",
-            "itsedq",
-            "min"
-        ]
+        "user.name": "min"
     },
     {
         "destination.ip": [
             "10.9.248.95"
         ],
         "destination.port": 2294,
-        "event.action": "deny",
-        "event.category": "Logout",
+        "event.action": [
+            "deny",
+            "Logout"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5598,6 +5894,11 @@
         "related.ip": [
             "10.9.248.95",
             "10.120.18.135"
+        ],
+        "related.user": [
+            "ero",
+            "iatquovo",
+            "ratvolup"
         ],
         "rsa.counters.dclass_c1": 6969,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5627,19 +5928,17 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "iatquovo",
-            "ero",
-            "ratvolup"
-        ]
+        "user.name": "iatquovo"
     },
     {
         "destination.ip": [
             "10.249.76.99"
         ],
         "destination.port": 7480,
-        "event.action": "block",
-        "event.category": "Login",
+        "event.action": [
+            "block",
+            "Login"
+        ],
         "event.code": "Imperva",
         "event.dataset": "imperva.securesphere",
         "event.module": "imperva",
@@ -5656,6 +5955,11 @@
         "related.ip": [
             "10.109.203.111",
             "10.249.76.99"
+        ],
+        "related.user": [
+            "atio",
+            "uis",
+            "xercita"
         ],
         "rsa.counters.dclass_c1": 3516,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5684,10 +5988,6 @@
             "imperva.securesphere",
             "forwarded"
         ],
-        "user.name": [
-            "xercita",
-            "atio",
-            "uis"
-        ]
+        "user.name": "xercita"
     }
 ]

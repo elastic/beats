@@ -10,7 +10,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -22,16 +24,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -52,9 +57,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:34:18.000Z",
@@ -67,7 +70,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -79,16 +84,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -109,9 +117,7 @@
         ],
         "url.domain": "0.client-channel.google.com",
         "url.original": "0.client-channel.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:34:20.000Z",
@@ -124,7 +130,9 @@
         "destination.ip": [
             "173.194.123.102"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -136,16 +144,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.102",
-            "::1"
+            "::1",
+            "173.194.123.102"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -166,9 +177,7 @@
         ],
         "url.domain": "clients4.google.com",
         "url.original": "clients4.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:34:22.000Z",
@@ -181,7 +190,9 @@
         "destination.ip": [
             "173.194.123.102"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -193,8 +204,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.102",
-            "::1"
+            "::1",
+            "173.194.123.102"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -223,9 +237,7 @@
         ],
         "url.domain": "clients6.google.com",
         "url.original": "clients6.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:34:48.000Z",
@@ -238,7 +250,9 @@
         "destination.ip": [
             "173.194.123.97"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -250,8 +264,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.97"
+            "173.194.123.97",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -280,9 +297,7 @@
         ],
         "url.domain": "drive.google.com",
         "url.original": "drive.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:02.000Z",
@@ -295,7 +310,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -310,13 +327,16 @@
             "173.194.206.189",
             "::1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -337,9 +357,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:07.000Z",
@@ -352,7 +370,9 @@
         "destination.ip": [
             "173.194.123.102"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -367,13 +387,16 @@
             "173.194.123.102",
             "::1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -394,9 +417,7 @@
         ],
         "url.domain": "clients2.google.com",
         "url.original": "clients2.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:16.000Z",
@@ -409,7 +430,9 @@
         "destination.ip": [
             "173.194.123.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -421,8 +444,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.96"
+            "173.194.123.96",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -451,9 +477,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:17.000Z",
@@ -466,7 +490,9 @@
         "destination.ip": [
             "173.194.123.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -478,16 +504,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.96",
-            "::1"
+            "::1",
+            "173.194.123.96"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -508,9 +537,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:27.000Z",
@@ -523,7 +550,9 @@
         "destination.ip": [
             "173.194.123.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -537,6 +566,9 @@
         "related.ip": [
             "173.194.123.96",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -565,9 +597,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:29.000Z",
@@ -583,7 +613,9 @@
         "destination.ip": [
             "216.58.219.237"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -595,16 +627,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.237",
-            "::1"
+            "::1",
+            "216.58.219.237"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -625,9 +660,7 @@
         ],
         "url.domain": "accounts.google.com",
         "url.original": "accounts.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:34.000Z",
@@ -640,7 +673,9 @@
         "destination.ip": [
             "173.194.123.68"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -652,16 +687,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.68",
-            "::1"
+            "::1",
+            "173.194.123.68"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -682,9 +720,7 @@
         ],
         "url.domain": "apis.google.com",
         "url.original": "apis.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:34.000Z",
@@ -697,7 +733,9 @@
         "destination.ip": [
             "173.194.123.102"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -711,6 +749,9 @@
         "related.ip": [
             "173.194.123.102",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -739,9 +780,7 @@
         ],
         "url.domain": "clients6.google.com",
         "url.original": "clients6.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:50.000Z",
@@ -754,7 +793,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -766,16 +807,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -796,9 +840,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:35:58.000Z",
@@ -811,7 +853,9 @@
         "destination.ip": [
             "173.194.123.105"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -826,6 +870,9 @@
         "related.ip": [
             "::1",
             "173.194.123.105"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -854,9 +901,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:36:50.000Z",
@@ -869,7 +914,9 @@
         "destination.ip": [
             "173.194.123.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -881,8 +928,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.96"
+            "173.194.123.96",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -911,9 +961,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:36:50.000Z",
@@ -926,7 +974,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -938,16 +988,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -968,9 +1021,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:37:47.000Z",
@@ -983,7 +1034,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -995,8 +1048,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1025,9 +1081,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:38:14.000Z",
@@ -1040,7 +1094,9 @@
         "destination.ip": [
             "173.194.123.96"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1052,8 +1108,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.96",
-            "::1"
+            "::1",
+            "173.194.123.96"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1082,9 +1141,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:38:24.000Z",
@@ -1097,7 +1154,9 @@
         "destination.ip": [
             "173.194.123.71"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1111,6 +1170,9 @@
         "related.ip": [
             "173.194.123.71",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1139,9 +1201,7 @@
         ],
         "url.domain": "drive.google.com",
         "url.original": "drive.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:38:39.000Z",
@@ -1154,7 +1214,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1166,16 +1228,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1196,9 +1261,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:39:31.000Z",
@@ -1211,7 +1274,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1226,13 +1291,16 @@
             "173.194.206.189",
             "::1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1253,9 +1321,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:40:21.000Z",
@@ -1268,7 +1334,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1282,6 +1350,9 @@
         "related.ip": [
             "::1",
             "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1310,9 +1381,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:41:13.000Z",
@@ -1325,7 +1394,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1339,6 +1410,9 @@
         "related.ip": [
             "173.194.206.189",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1367,9 +1441,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:42:08.000Z",
@@ -1382,7 +1454,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1394,8 +1468,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1424,9 +1501,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:43:05.000Z",
@@ -1439,7 +1514,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1451,8 +1528,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1481,9 +1561,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:44:00.000Z",
@@ -1496,7 +1574,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1508,8 +1588,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1538,9 +1621,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:44:58.000Z",
@@ -1553,7 +1634,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1565,16 +1648,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1595,9 +1681,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:45:53.000Z",
@@ -1610,7 +1694,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1624,6 +1710,9 @@
         "related.ip": [
             "::1",
             "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1652,9 +1741,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:46:51.000Z",
@@ -1667,7 +1754,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1682,13 +1771,16 @@
             "::1",
             "173.194.206.189"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1709,9 +1801,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:47:47.000Z",
@@ -1724,7 +1814,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1736,16 +1828,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1766,9 +1861,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:47:51.000Z",
@@ -1781,7 +1874,9 @@
         "destination.ip": [
             "173.194.123.67"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1793,16 +1888,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.123.67"
+            "173.194.123.67",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1823,9 +1921,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:48:41.000Z",
@@ -1838,7 +1934,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1850,8 +1948,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1880,9 +1981,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:49:33.000Z",
@@ -1895,7 +1994,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1907,16 +2008,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1937,9 +2041,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:50:27.000Z",
@@ -1952,7 +2054,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -1964,8 +2068,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.206.189",
-            "::1"
+            "::1",
+            "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -1994,9 +2101,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:51:21.000Z",
@@ -2009,7 +2114,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2021,16 +2128,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2051,9 +2161,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:52:15.000Z",
@@ -2066,7 +2174,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2080,6 +2190,9 @@
         "related.ip": [
             "173.194.206.189",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2108,9 +2221,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:53:09.000Z",
@@ -2123,7 +2234,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2138,13 +2251,16 @@
             "::1",
             "173.194.206.189"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2165,9 +2281,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:54:01.000Z",
@@ -2180,7 +2294,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2194,6 +2310,9 @@
         "related.ip": [
             "::1",
             "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2222,9 +2341,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:54:59.000Z",
@@ -2237,7 +2354,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2251,6 +2370,9 @@
         "related.ip": [
             "::1",
             "173.194.206.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2279,9 +2401,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:55:56.000Z",
@@ -2294,7 +2414,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2309,13 +2431,16 @@
             "::1",
             "173.194.206.189"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2336,9 +2461,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:56:50.000Z",
@@ -2351,7 +2474,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2366,13 +2491,16 @@
             "::1",
             "173.194.206.189"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2393,9 +2521,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:57:45.000Z",
@@ -2408,7 +2534,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2420,8 +2548,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2450,9 +2581,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:57:53.000Z",
@@ -2465,7 +2594,9 @@
         "destination.ip": [
             "173.194.123.101"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2477,16 +2608,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.101",
-            "::1"
+            "::1",
+            "173.194.123.101"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2507,9 +2641,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:58:39.000Z",
@@ -2522,7 +2654,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2534,16 +2668,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2564,9 +2701,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:59:32.000Z",
@@ -2579,7 +2714,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2593,6 +2730,9 @@
         "related.ip": [
             "173.194.206.189",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2621,9 +2761,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:59:34.000Z",
@@ -2636,7 +2774,9 @@
         "destination.ip": [
             "173.194.123.99"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2651,13 +2791,16 @@
             "::1",
             "173.194.123.99"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2678,9 +2821,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-18T16:59:34.000Z",
@@ -2693,7 +2834,9 @@
         "destination.ip": [
             "173.194.206.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2705,8 +2848,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "173.194.206.189"
+            "173.194.206.189",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2735,9 +2881,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-28T05:11:24.000Z",
@@ -2750,7 +2894,9 @@
         "destination.ip": [
             "74.125.226.83"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2764,6 +2910,9 @@
         "related.ip": [
             "74.125.226.83",
             "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -2793,9 +2942,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "http://www.google.com/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-28T05:11:25.000Z",
@@ -2808,7 +2955,9 @@
         "destination.ip": [
             "173.194.123.40"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2821,16 +2970,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.123.40",
-            "::1"
+            "::1",
+            "173.194.123.40"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -2851,9 +3003,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-28T05:12:30.000Z",
@@ -2866,7 +3016,9 @@
         "destination.ip": [
             "173.194.123.41"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2881,13 +3033,16 @@
             "::1",
             "173.194.123.41"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2908,9 +3063,7 @@
         ],
         "url.domain": "apis.google.com",
         "url.original": "apis.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-05-28T05:12:32.000Z",
@@ -2923,7 +3076,9 @@
         "destination.ip": [
             "74.125.226.83"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2935,8 +3090,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.226.83",
-            "::1"
+            "::1",
+            "74.125.226.83"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -2965,9 +3123,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:19:50.000Z",
@@ -2983,7 +3139,9 @@
         "destination.ip": [
             "216.58.219.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -2996,16 +3154,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.174",
-            "::1"
+            "::1",
+            "216.58.219.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -3026,9 +3187,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:20:03.000Z",
@@ -3044,7 +3203,9 @@
         "destination.ip": [
             "216.58.219.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3057,8 +3218,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.174"
+            "216.58.219.174",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -3087,9 +3251,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:20:29.000Z",
@@ -3105,7 +3267,9 @@
         "destination.ip": [
             "216.58.219.165"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3117,16 +3281,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.165",
-            "::1"
+            "::1",
+            "216.58.219.165"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3147,9 +3314,7 @@
         ],
         "url.domain": "mail.google.com",
         "url.original": "mail.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:21:02.000Z",
@@ -3165,7 +3330,9 @@
         "destination.ip": [
             "216.58.219.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3177,16 +3344,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.174"
+            "216.58.219.174",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3207,9 +3377,7 @@
         ],
         "url.domain": "clients6.google.com",
         "url.original": "clients6.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:21:04.000Z",
@@ -3225,7 +3393,9 @@
         "destination.ip": [
             "216.58.219.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3237,16 +3407,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.174",
-            "::1"
+            "::1",
+            "216.58.219.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3267,9 +3440,7 @@
         ],
         "url.domain": "clients6.google.com",
         "url.original": "clients6.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:21:09.000Z",
@@ -3285,7 +3456,9 @@
         "destination.ip": [
             "216.58.219.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3300,13 +3473,16 @@
             "216.58.219.174",
             "::1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3327,9 +3503,7 @@
         ],
         "url.domain": "play.google.com",
         "url.original": "play.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:22:20.000Z",
@@ -3345,7 +3519,9 @@
         "destination.ip": [
             "216.58.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3357,16 +3533,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "::1",
-            "216.58.219.132"
+            "216.58.219.132",
+            "::1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3387,9 +3566,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:22:20.000Z",
@@ -3405,7 +3582,9 @@
         "destination.ip": [
             "216.58.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3419,6 +3598,9 @@
         "related.ip": [
             "::1",
             "216.58.219.132"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3447,9 +3629,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:22:20.000Z",
@@ -3465,7 +3645,9 @@
         "destination.ip": [
             "216.58.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3477,16 +3659,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.132",
-            "::1"
+            "::1",
+            "216.58.219.132"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3507,9 +3692,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:22:32.000Z",
@@ -3525,7 +3708,9 @@
         "destination.ip": [
             "216.58.219.142"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3539,6 +3724,9 @@
         "related.ip": [
             "::1",
             "216.58.219.142"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3567,9 +3755,7 @@
         ],
         "url.domain": "plus.google.com",
         "url.original": "plus.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:23:07.000Z",
@@ -3585,7 +3771,9 @@
         "destination.ip": [
             "216.58.219.142"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3597,8 +3785,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.142",
-            "::1"
+            "::1",
+            "216.58.219.142"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3627,9 +3818,7 @@
         ],
         "url.domain": "docs.google.com",
         "url.original": "docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:23:44.000Z",
@@ -3645,7 +3834,9 @@
         "destination.ip": [
             "216.58.219.142"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3660,13 +3851,16 @@
             "::1",
             "216.58.219.142"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3687,9 +3881,7 @@
         ],
         "url.domain": "plus.google.com",
         "url.original": "plus.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:24:21.000Z",
@@ -3705,7 +3897,9 @@
         "destination.ip": [
             "216.58.219.132"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3717,8 +3911,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.132",
-            "::1"
+            "::1",
+            "216.58.219.132"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -3747,9 +3944,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:25:14.000Z",
@@ -3762,7 +3957,9 @@
         "destination.ip": [
             "74.125.141.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3774,16 +3971,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.141.189",
-            "::1"
+            "::1",
+            "74.125.141.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3804,9 +4004,7 @@
         ],
         "url.domain": "0.docs.google.com",
         "url.original": "0.docs.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:25:14.000Z",
@@ -3819,7 +4017,9 @@
         "destination.ip": [
             "74.125.141.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3831,16 +4031,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.141.189",
-            "::1"
+            "::1",
+            "74.125.141.189"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3861,9 +4064,7 @@
         ],
         "url.domain": "0.talkgadget.google.com",
         "url.original": "0.talkgadget.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:25:14.000Z",
@@ -3876,7 +4077,9 @@
         "destination.ip": [
             "74.125.141.189"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3891,13 +4094,16 @@
             "::1",
             "74.125.141.189"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3918,9 +4124,7 @@
         ],
         "url.domain": "0.client-channel.google.com",
         "url.original": "0.client-channel.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2015-10-19T15:25:14.000Z",
@@ -3936,7 +4140,9 @@
         "destination.ip": [
             "216.58.219.133"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -3951,13 +4157,16 @@
             "216.58.219.133",
             "::1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3978,9 +4187,7 @@
         ],
         "url.domain": "mail.google.com",
         "url.original": "mail.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2016-02-01T14:19:56.000Z",
@@ -3996,7 +4203,9 @@
         "destination.ip": [
             "216.58.219.228"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4011,13 +4220,16 @@
             "216.58.219.228",
             "10.100.0.1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4038,9 +4250,7 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "www.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2016-02-01T14:19:58.000Z",
@@ -4056,7 +4266,9 @@
         "destination.ip": [
             "216.58.219.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4068,16 +4280,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.238"
+            "216.58.219.238",
+            "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4098,9 +4313,7 @@
         ],
         "url.domain": "apis.google.com",
         "url.original": "apis.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2016-05-10T16:45:50.000Z",
@@ -4113,7 +4326,9 @@
         "destination.ip": [
             "173.194.205.113"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "GET",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4125,8 +4340,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "173.194.205.113",
-            "10.100.0.1"
+            "10.100.0.1",
+            "173.194.205.113"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "GET",
@@ -4134,8 +4352,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "301",
@@ -4156,9 +4374,7 @@
         ],
         "url.domain": "google.com",
         "url.original": "http://google.com/",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-01-04T16:27:23.000Z",
@@ -4171,7 +4387,9 @@
         "destination.ip": [
             "172.217.6.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4184,16 +4402,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "172.217.6.238"
+            "172.217.6.238",
+            "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -4214,9 +4435,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-01-04T16:27:24.000Z",
@@ -4229,7 +4448,9 @@
         "destination.ip": [
             "172.217.6.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4242,16 +4463,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.6.238",
-            "10.100.0.1"
+            "10.100.0.1",
+            "172.217.6.238"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "application/ocsp-response",
         "rsa.misc.result_code": "200",
@@ -4272,9 +4496,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-01-07T17:23:08.000Z",
@@ -4290,7 +4512,9 @@
         "destination.ip": [
             "216.58.219.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4305,6 +4529,9 @@
         "related.ip": [
             "216.58.219.238",
             "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -4333,9 +4560,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-01-07T17:23:08.000Z",
@@ -4351,7 +4576,9 @@
         "destination.ip": [
             "216.58.219.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4366,6 +4593,9 @@
         "related.ip": [
             "216.58.219.238",
             "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -4394,9 +4624,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-04-20T20:53:25.000Z",
@@ -4409,7 +4637,9 @@
         "destination.ip": [
             "172.217.6.238"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "POST",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4424,6 +4654,9 @@
         "related.ip": [
             "10.100.0.1",
             "172.217.6.238"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "POST",
@@ -4452,9 +4685,7 @@
         ],
         "url.domain": "clients1.google.com",
         "url.original": "http://clients1.google.com/ocsp",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:43.000Z",
@@ -4467,7 +4698,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4481,6 +4714,9 @@
         "related.ip": [
             "10.100.2.85",
             "172.217.10.14"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4509,9 +4745,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:45.000Z",
@@ -4524,7 +4758,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4536,8 +4772,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.2.85",
-            "172.217.10.14"
+            "172.217.10.14",
+            "10.100.2.85"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4566,9 +4805,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:47.000Z",
@@ -4581,7 +4818,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4596,13 +4835,16 @@
             "172.217.10.14",
             "10.100.2.85"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4623,9 +4865,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:53.000Z",
@@ -4638,7 +4878,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4653,13 +4895,16 @@
             "10.100.2.85",
             "172.217.12.174"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4680,9 +4925,7 @@
         ],
         "url.domain": "play.google.com",
         "url.original": "play.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:55.000Z",
@@ -4695,7 +4938,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4707,8 +4952,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.2.85",
-            "172.217.10.14"
+            "172.217.10.14",
+            "10.100.2.85"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4737,9 +4985,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:54:57.000Z",
@@ -4752,7 +4998,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4767,13 +5015,16 @@
             "10.100.2.85",
             "172.217.10.14"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4794,9 +5045,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:57:48.000Z",
@@ -4809,7 +5058,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4821,8 +5072,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.12.174",
-            "10.100.2.85"
+            "10.100.2.85",
+            "172.217.12.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4851,9 +5105,7 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:57:49.000Z",
@@ -4866,7 +5118,9 @@
         "destination.ip": [
             "172.217.10.14"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4878,16 +5132,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.2.85",
-            "172.217.10.14"
+            "172.217.10.14",
+            "10.100.2.85"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4908,9 +5165,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:57:50.000Z",
@@ -4923,7 +5178,9 @@
         "destination.ip": [
             "173.194.204.156"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4937,6 +5194,9 @@
         "related.ip": [
             "10.100.2.85",
             "173.194.204.156"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -4965,9 +5225,7 @@
         ],
         "url.domain": "stats.g.doubleclick.net",
         "url.original": "stats.g.doubleclick.net:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2017-12-27T22:57:51.000Z",
@@ -4980,7 +5238,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -4992,8 +5252,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.2.85",
-            "172.217.12.174"
+            "172.217.12.174",
+            "10.100.2.85"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5022,9 +5285,7 @@
         ],
         "url.domain": "play.google.com",
         "url.original": "play.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:13:25.000Z",
@@ -5037,7 +5298,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5052,13 +5315,16 @@
             "172.217.12.174",
             "10.100.0.1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5079,9 +5345,7 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:16:23.000Z",
@@ -5094,7 +5358,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5108,6 +5374,9 @@
         "related.ip": [
             "172.217.12.174",
             "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5136,9 +5405,7 @@
         ],
         "url.domain": "play.google.com",
         "url.original": "play.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:18:21.000Z",
@@ -5151,7 +5418,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5163,8 +5432,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "172.217.12.174",
-            "10.100.0.1"
+            "10.100.0.1",
+            "172.217.12.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5193,9 +5465,7 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:21:20.000Z",
@@ -5208,7 +5478,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5220,8 +5492,11 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "172.217.12.174"
+            "172.217.12.174",
+            "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5250,9 +5525,7 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:28.000Z",
@@ -5265,7 +5538,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5279,6 +5554,9 @@
         "related.ip": [
             "10.100.0.1",
             "172.217.12.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5307,9 +5585,7 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:48.000Z",
@@ -5325,7 +5601,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5337,16 +5615,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.58.219.206",
-            "10.100.0.1"
+            "10.100.0.1",
+            "216.58.219.206"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5367,9 +5648,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:48.000Z",
@@ -5385,7 +5664,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5399,6 +5680,9 @@
         "related.ip": [
             "216.58.219.206",
             "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5427,9 +5711,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:49.000Z",
@@ -5445,7 +5727,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5459,6 +5743,9 @@
         "related.ip": [
             "216.58.219.206",
             "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5487,9 +5774,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:49.000Z",
@@ -5505,7 +5790,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5519,6 +5806,9 @@
         "related.ip": [
             "10.100.0.1",
             "216.58.219.206"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5547,9 +5837,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:23:50.000Z",
@@ -5565,7 +5853,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5580,13 +5870,16 @@
             "10.100.0.1",
             "216.58.219.206"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5607,9 +5900,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:24:01.000Z",
@@ -5622,7 +5913,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5636,6 +5929,9 @@
         "related.ip": [
             "10.100.0.1",
             "172.217.12.174"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
@@ -5664,9 +5960,7 @@
         ],
         "url.domain": "apis.google.com",
         "url.original": "apis.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:24:01.000Z",
@@ -5682,7 +5976,9 @@
         "destination.ip": [
             "216.58.219.206"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5694,16 +5990,19 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.100.0.1",
-            "216.58.219.206"
+            "216.58.219.206",
+            "10.100.0.1"
+        ],
+        "related.user": [
+            "-"
         ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5724,9 +6023,7 @@
         ],
         "url.domain": "i.ytimg.com",
         "url.original": "i.ytimg.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     },
     {
         "@timestamp": "2018-03-15T21:24:01.000Z",
@@ -5739,7 +6036,9 @@
         "destination.ip": [
             "172.217.12.174"
         ],
-        "event.action": "TCP_MISS",
+        "event.action": [
+            "TCP_MISS"
+        ],
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
         "event.module": "squid",
@@ -5754,13 +6053,16 @@
             "172.217.12.174",
             "10.100.0.1"
         ],
+        "related.user": [
+            "-"
+        ],
         "rsa.internal.hcode": "DIRECT",
         "rsa.internal.messageid": "CONNECT",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5781,8 +6083,6 @@
         ],
         "url.domain": "news.google.com",
         "url.original": "news.google.com:443",
-        "user.name": [
-            "-"
-        ]
+        "user.name": "-"
     }
 ]

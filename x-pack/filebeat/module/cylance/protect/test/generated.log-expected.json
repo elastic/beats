@@ -1,7 +1,9 @@
 [
     {
         "@timestamp": "2016-01-29T08:09:59.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -35,7 +37,9 @@
     },
     {
         "@timestamp": "2016-02-12T03:12:33.000Z",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -68,7 +72,9 @@
     },
     {
         "@timestamp": "2020-02-26T10:15:08.000Z",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -97,7 +103,9 @@
     },
     {
         "@timestamp": "2016-03-12T05:17:42.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -111,6 +119,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.164.119.63"
+        ],
+        "related.user": [
+            "gelit"
         ],
         "rsa.db.index": "dquiac",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -133,13 +144,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "gelit"
-        ]
+        "user.name": "gelit"
     },
     {
         "@timestamp": "2016-03-26T12:20:16.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -153,6 +164,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.155.162.162"
+        ],
+        "related.user": [
+            "quid"
         ],
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1600000000,
@@ -174,13 +188,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "quid"
-        ]
+        "user.name": "quid"
     },
     {
         "@timestamp": "2020-04-09T07:22:51.000Z",
-        "event.category": "ThreatUpdated",
+        "event.action": [
+            "ThreatUpdated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -212,7 +226,9 @@
     },
     {
         "@timestamp": "2020-04-24T14:25:25.000Z",
-        "event.category": "Device Policy Assigned",
+        "event.action": [
+            "Device Policy Assigned"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -243,7 +259,9 @@
     },
     {
         "@timestamp": "2016-05-08T09:27:59.000Z",
-        "event.category": "Registration",
+        "event.action": [
+            "Registration"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -257,6 +275,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.215.110.141"
+        ],
+        "related.user": [
+            "nibus"
         ],
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -278,13 +299,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "nibus"
-        ]
+        "user.name": "nibus"
     },
     {
         "@timestamp": "2020-05-22T04:30:33.000Z",
-        "event.category": "PolicyAdd",
+        "event.action": [
+            "PolicyAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -314,7 +335,9 @@
     },
     {
         "@timestamp": "2016-06-05T11:33:08.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -345,7 +368,9 @@
     },
     {
         "@timestamp": "2016-06-20T06:35:42.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -376,7 +401,9 @@
     },
     {
         "@timestamp": "2016-07-04T13:38:16.000Z",
-        "event.category": "DeviceRemove",
+        "event.action": [
+            "DeviceRemove"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -411,7 +438,9 @@
     },
     {
         "@timestamp": "2016-07-18T08:40:50.000Z",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -445,7 +474,9 @@
     },
     {
         "@timestamp": "2016-08-02T03:43:25.000Z",
-        "event.category": "pechange",
+        "event.action": [
+            "pechange"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -478,7 +509,9 @@
     },
     {
         "@timestamp": "2019-08-16T10:45:59.000Z",
-        "event.category": "Device Policy Assigned",
+        "event.action": [
+            "Device Policy Assigned"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -492,6 +525,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.238.164.29"
+        ],
+        "related.user": [
+            "sequam"
         ],
         "rsa.db.index": "ris",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -513,13 +549,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "sequam"
-        ]
+        "user.name": "sequam"
     },
     {
         "@timestamp": "2019-08-30T05:48:33.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -547,7 +583,9 @@
     },
     {
         "@timestamp": "2019-09-13T12:51:07.000Z",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -578,7 +616,9 @@
     },
     {
         "@timestamp": "2019-09-28T07:53:42.000Z",
-        "event.category": "Device Policy Assigned",
+        "event.action": [
+            "Device Policy Assigned"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -606,8 +646,10 @@
     },
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
-        "event.action": "accept",
-        "event.category": "fullaccess",
+        "event.action": [
+            "accept",
+            "fullaccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -649,7 +691,9 @@
     },
     {
         "@timestamp": "2016-10-26T09:58:50.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -683,7 +727,9 @@
     },
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -714,8 +760,10 @@
     },
     {
         "@timestamp": "2016-11-24T12:03:59.000Z",
-        "event.action": "block",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "block",
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -757,7 +805,9 @@
     },
     {
         "@timestamp": "2016-12-08T07:06:33.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -791,7 +841,9 @@
     },
     {
         "@timestamp": "2016-12-23T14:09:07.000Z",
-        "event.category": "Registration",
+        "event.action": [
+            "Registration"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -806,6 +858,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.1645",
+        "related.user": [
+            "commodo"
+        ],
         "rsa.db.index": "entorev",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -822,13 +877,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "commodo"
-        ]
+        "user.name": "commodo"
     },
     {
         "@timestamp": "2017-01-06T09:11:41.000Z",
-        "event.category": "PolicyAdd",
+        "event.action": [
+            "PolicyAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -862,7 +917,9 @@
     },
     {
         "@timestamp": "2017-01-20T04:14:16.000Z",
-        "event.category": "ZoneAddDevice",
+        "event.action": [
+            "ZoneAddDevice"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -895,7 +952,9 @@
     },
     {
         "@timestamp": "2017-02-03T11:16:50.000Z",
-        "event.category": "pechange",
+        "event.action": [
+            "pechange"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -929,8 +988,10 @@
     },
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
-        "event.action": "deny",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess",
+            "deny"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -972,7 +1033,9 @@
     },
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
-        "event.category": "Alert",
+        "event.action": [
+            "Alert"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1006,7 +1069,9 @@
     },
     {
         "@timestamp": "2017-03-18T08:24:33.000Z",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1041,7 +1106,9 @@
     },
     {
         "@timestamp": "2017-04-02T03:27:07.000Z",
-        "event.category": "Alert",
+        "event.action": [
+            "Alert"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1075,7 +1142,9 @@
     },
     {
         "@timestamp": "2020-04-16T10:29:41.000Z",
-        "event.category": "Device Policy Assigned",
+        "event.action": [
+            "Device Policy Assigned"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1105,7 +1174,9 @@
     },
     {
         "@timestamp": "2020-04-30T05:32:16.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1135,7 +1206,9 @@
     },
     {
         "@timestamp": "2017-05-14T12:34:50.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1167,7 +1240,9 @@
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1199,7 +1274,9 @@
     },
     {
         "@timestamp": "2020-06-12T14:39:58.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1229,7 +1306,9 @@
     },
     {
         "@timestamp": "2017-06-26T09:42:33.000Z",
-        "event.category": "PolicyAdd",
+        "event.action": [
+            "PolicyAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1262,8 +1341,10 @@
     },
     {
         "@timestamp": "2017-07-11T04:45:07.000Z",
-        "event.action": "allow",
-        "event.category": "Device Policy Assigned",
+        "event.action": [
+            "allow",
+            "Device Policy Assigned"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1279,6 +1360,9 @@
         "process.pid": 2957,
         "related.ip": [
             "10.169.5.162"
+        ],
+        "related.user": [
+            "cillumd"
         ],
         "rsa.db.index": "tNe",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1303,14 +1387,14 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "cillumd"
-        ]
+        "user.name": "cillumd"
     },
     {
         "@timestamp": "2017-07-25T11:47:41.000Z",
-        "event.action": "cancel",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "cancel",
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1352,7 +1436,9 @@
     },
     {
         "@timestamp": "2017-08-08T06:50:15.000Z",
-        "event.category": "PolicyAdd",
+        "event.action": [
+            "PolicyAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1382,7 +1468,9 @@
     },
     {
         "@timestamp": "2017-08-22T13:52:50.000Z",
-        "event.category": "Registration",
+        "event.action": [
+            "Registration"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1414,8 +1502,10 @@
     },
     {
         "@timestamp": "2017-09-06T08:55:24.000Z",
-        "event.action": "accept",
-        "event.category": "threat_quarantined",
+        "event.action": [
+            "accept",
+            "threat_quarantined"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1457,7 +1547,9 @@
     },
     {
         "@timestamp": "2019-09-20T03:57:58.000Z",
-        "event.category": "DeviceRemove",
+        "event.action": [
+            "DeviceRemove"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1470,6 +1562,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.14.74.218"
+        ],
+        "related.user": [
+            "Nemoenim"
         ],
         "rsa.db.index": "labori",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1489,13 +1584,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "Nemoenim"
-        ]
+        "user.name": "Nemoenim"
     },
     {
         "@timestamp": "2019-10-04T11:00:32.000Z",
-        "event.category": "ThreatUpdated",
+        "event.action": [
+            "ThreatUpdated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1528,7 +1623,9 @@
     },
     {
         "@timestamp": "2017-10-19T06:03:07.000Z",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1562,7 +1659,9 @@
     },
     {
         "@timestamp": "2017-11-02T13:05:41.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1593,7 +1692,9 @@
     },
     {
         "@timestamp": "2019-11-16T08:08:15.000Z",
-        "event.category": "ZoneAddDevice",
+        "event.action": [
+            "ZoneAddDevice"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1626,7 +1727,9 @@
     },
     {
         "@timestamp": "2019-12-01T03:10:49.000Z",
-        "event.category": "PolicyAdd",
+        "event.action": [
+            "PolicyAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1655,7 +1758,9 @@
     },
     {
         "@timestamp": "2019-12-15T10:13:24.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1687,7 +1792,9 @@
     },
     {
         "@timestamp": "2017-12-29T05:15:58.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1721,7 +1828,9 @@
     },
     {
         "@timestamp": "2018-01-12T12:18:32.000Z",
-        "event.category": "Device Updated",
+        "event.action": [
+            "Device Updated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1750,7 +1859,9 @@
     },
     {
         "@timestamp": "2018-01-27T07:21:06.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1783,7 +1894,9 @@
     },
     {
         "@timestamp": "2020-02-10T14:23:41.000Z",
-        "event.category": "threat_quarantined",
+        "event.action": [
+            "threat_quarantined"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1817,8 +1930,10 @@
     },
     {
         "@timestamp": "2018-02-24T21:26:15.000Z",
-        "event.action": "block",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd",
+            "block"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1860,7 +1975,9 @@
     },
     {
         "@timestamp": "2018-03-11T04:28:49.000Z",
-        "event.category": "fullaccess",
+        "event.action": [
+            "fullaccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1874,6 +1991,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.186.8.127"
+        ],
+        "related.user": [
+            "boreet"
         ],
         "rsa.db.index": "ento",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1896,14 +2016,14 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "boreet"
-        ]
+        "user.name": "boreet"
     },
     {
         "@timestamp": "2020-03-25T11:31:24.000Z",
-        "event.action": "block",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity",
+            "block"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1918,6 +2038,9 @@
         "process.pid": 6944,
         "related.ip": [
             "10.202.89.144"
+        ],
+        "related.user": [
+            "iarchite"
         ],
         "rsa.db.index": "ueporroq",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1939,13 +2062,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "iarchite"
-        ]
+        "user.name": "iarchite"
     },
     {
         "@timestamp": "2018-04-08T06:33:58.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -1979,7 +2102,9 @@
     },
     {
         "@timestamp": "2018-04-22T13:36:32.000Z",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2012,7 +2137,9 @@
     },
     {
         "@timestamp": "2018-05-07T08:39:06.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2043,7 +2170,9 @@
     },
     {
         "@timestamp": "2018-05-21T03:41:41.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2078,7 +2207,9 @@
     },
     {
         "@timestamp": "2018-06-04T10:44:15.000Z",
-        "event.category": "Registration",
+        "event.action": [
+            "Registration"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2116,7 +2247,9 @@
     },
     {
         "@timestamp": "2018-06-19T05:46:49.000Z",
-        "event.category": "pechange",
+        "event.action": [
+            "pechange"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2151,7 +2284,9 @@
     },
     {
         "@timestamp": "2018-07-03T12:49:23.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2181,8 +2316,10 @@
     },
     {
         "@timestamp": "2018-07-17T07:51:58.000Z",
-        "event.action": "accept",
-        "event.category": "ZoneAddDevice",
+        "event.action": [
+            "ZoneAddDevice",
+            "accept"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2198,6 +2335,9 @@
         "process.pid": 7294,
         "related.ip": [
             "10.221.20.165"
+        ],
+        "related.user": [
+            "reseo"
         ],
         "rsa.db.index": "ons",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2222,13 +2362,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "reseo"
-        ]
+        "user.name": "reseo"
     },
     {
         "@timestamp": "2018-08-01T14:54:32.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2243,6 +2383,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.5334",
+        "related.user": [
+            "dipi"
+        ],
         "rsa.db.index": "bori",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2259,13 +2402,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "dipi"
-        ]
+        "user.name": "dipi"
     },
     {
         "@timestamp": "2018-08-15T09:57:06.000Z",
-        "event.category": "threat_quarantined",
+        "event.action": [
+            "threat_quarantined"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2280,6 +2423,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.3772",
+        "related.user": [
+            "ciatisun"
+        ],
         "rsa.db.index": "quira",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2297,14 +2443,14 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "ciatisun"
-        ]
+        "user.name": "ciatisun"
     },
     {
         "@timestamp": "2019-08-29T04:59:40.000Z",
-        "event.action": "deny",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed",
+            "deny"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2320,6 +2466,9 @@
         "process.pid": 2571,
         "related.ip": [
             "10.152.213.228"
+        ],
+        "related.user": [
+            "temp"
         ],
         "rsa.db.index": "ali",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2343,13 +2492,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "temp"
-        ]
+        "user.name": "temp"
     },
     {
         "@timestamp": "2018-09-12T12:02:15.000Z",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2382,7 +2531,9 @@
     },
     {
         "@timestamp": "2018-09-27T07:04:49.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2397,6 +2548,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.7696",
+        "related.user": [
+            "taliqu"
+        ],
         "rsa.db.index": "xeaco",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2413,13 +2567,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "taliqu"
-        ]
+        "user.name": "taliqu"
     },
     {
         "@timestamp": "2018-10-11T14:07:23.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2448,7 +2602,9 @@
     },
     {
         "@timestamp": "2018-10-25T09:09:57.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2482,8 +2638,10 @@
     },
     {
         "@timestamp": "2019-11-09T04:12:32.000Z",
-        "event.action": "accept",
-        "event.category": "DeviceRemove",
+        "event.action": [
+            "accept",
+            "DeviceRemove"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2499,6 +2657,9 @@
         "process.pid": 782,
         "related.ip": [
             "10.94.129.251"
+        ],
+        "related.user": [
+            "porinc"
         ],
         "rsa.db.index": "quiado",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2522,13 +2683,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "porinc"
-        ]
+        "user.name": "porinc"
     },
     {
         "@timestamp": "2018-11-23T11:15:06.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2561,7 +2722,9 @@
     },
     {
         "@timestamp": "2019-12-07T06:17:40.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2574,6 +2737,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.205.246.104"
+        ],
+        "related.user": [
+            "mto"
         ],
         "rsa.db.index": "dent",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2593,13 +2759,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "mto"
-        ]
+        "user.name": "mto"
     },
     {
         "@timestamp": "2018-12-21T13:20:14.000Z",
-        "event.category": "ZoneAdd",
+        "event.action": [
+            "ZoneAdd"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2633,7 +2799,9 @@
     },
     {
         "@timestamp": "2020-01-05T08:22:49.000Z",
-        "event.category": "ThreatUpdated",
+        "event.action": [
+            "ThreatUpdated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2668,7 +2836,9 @@
     },
     {
         "@timestamp": "2020-01-19T03:25:23.000Z",
-        "event.category": "threat_quarantined",
+        "event.action": [
+            "threat_quarantined"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2702,7 +2872,9 @@
     },
     {
         "@timestamp": "2020-02-02T10:27:57.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2733,8 +2905,10 @@
     },
     {
         "@timestamp": "2019-02-17T05:30:32.000Z",
-        "event.action": "block",
-        "event.category": "LoginSuccess",
+        "event.action": [
+            "block",
+            "LoginSuccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2776,7 +2950,9 @@
     },
     {
         "@timestamp": "2019-03-03T12:33:06.000Z",
-        "event.category": "Device Updated",
+        "event.action": [
+            "Device Updated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2791,6 +2967,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.4566",
+        "related.user": [
+            "nostrude"
+        ],
         "rsa.db.index": "itati",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1804010000,
@@ -2808,13 +2987,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "nostrude"
-        ]
+        "user.name": "nostrude"
     },
     {
         "@timestamp": "2019-03-17T07:35:40.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2845,7 +3024,9 @@
     },
     {
         "@timestamp": "2020-04-01T14:38:14.000Z",
-        "event.category": "DeviceRemove",
+        "event.action": [
+            "DeviceRemove"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2872,7 +3053,9 @@
     },
     {
         "@timestamp": "2020-04-15T09:40:49.000Z",
-        "event.category": "threat_found",
+        "event.action": [
+            "threat_found"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2902,8 +3085,10 @@
     },
     {
         "@timestamp": "2019-04-29T04:43:23.000Z",
-        "event.action": "allow",
-        "event.category": "Registration",
+        "event.action": [
+            "allow",
+            "Registration"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2919,6 +3104,9 @@
         "process.pid": 3114,
         "related.ip": [
             "10.59.33.174"
+        ],
+        "related.user": [
+            "mcorp"
         ],
         "rsa.db.index": "aperiam",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2943,13 +3131,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "mcorp"
-        ]
+        "user.name": "mcorp"
     },
     {
         "@timestamp": "2020-05-13T11:45:57.000Z",
-        "event.category": "DeviceRemove",
+        "event.action": [
+            "DeviceRemove"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -2976,7 +3164,9 @@
     },
     {
         "@timestamp": "2019-05-28T06:48:31.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3008,7 +3198,9 @@
     },
     {
         "@timestamp": "2019-06-11T13:51:06.000Z",
-        "event.category": "fullaccess",
+        "event.action": [
+            "fullaccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3042,7 +3234,9 @@
     },
     {
         "@timestamp": "2019-06-25T08:53:40.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3076,7 +3270,9 @@
     },
     {
         "@timestamp": "2019-07-10T03:56:14.000Z",
-        "event.category": "pechange",
+        "event.action": [
+            "pechange"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3107,7 +3303,9 @@
     },
     {
         "@timestamp": "2019-07-24T10:58:48.000Z",
-        "event.category": "ThreatUpdated",
+        "event.action": [
+            "ThreatUpdated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3142,7 +3340,9 @@
     },
     {
         "@timestamp": "2019-08-07T06:01:23.000Z",
-        "event.category": "ThreatUpdated",
+        "event.action": [
+            "ThreatUpdated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3179,7 +3379,9 @@
     },
     {
         "@timestamp": "2019-08-21T13:03:57.000Z",
-        "event.category": "Alert",
+        "event.action": [
+            "Alert"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3216,7 +3418,9 @@
     },
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3231,6 +3435,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.1903",
+        "related.user": [
+            "officiad"
+        ],
         "rsa.db.index": "aliqua",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -3247,13 +3454,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "officiad"
-        ]
+        "user.name": "officiad"
     },
     {
         "@timestamp": "2019-09-19T03:09:05.000Z",
-        "event.category": "Device Updated",
+        "event.action": [
+            "Device Updated"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3287,7 +3494,9 @@
     },
     {
         "@timestamp": "2019-10-03T10:11:40.000Z",
-        "event.category": "fullaccess",
+        "event.action": [
+            "fullaccess"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3321,7 +3530,9 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3335,6 +3546,9 @@
         "observer.vendor": "Cylance",
         "related.ip": [
             "10.234.254.96"
+        ],
+        "related.user": [
+            "orem"
         ],
         "rsa.db.index": "isaute",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -3357,13 +3571,13 @@
             "cylance.protect",
             "forwarded"
         ],
-        "user.name": [
-            "orem"
-        ]
+        "user.name": "orem"
     },
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
-        "event.category": "threat_changed",
+        "event.action": [
+            "threat_changed"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3394,7 +3608,9 @@
     },
     {
         "@timestamp": "2019-11-15T07:19:22.000Z",
-        "event.category": "SyslogSettingsSave",
+        "event.action": [
+            "SyslogSettingsSave"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3426,7 +3642,9 @@
     },
     {
         "@timestamp": "2019-11-30T14:21:57.000Z",
-        "event.category": "SystemSecurity",
+        "event.action": [
+            "SystemSecurity"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",
@@ -3461,7 +3679,9 @@
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
-        "event.category": "DeviceEdit",
+        "event.action": [
+            "DeviceEdit"
+        ],
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
         "event.module": "cylance",

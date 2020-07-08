@@ -12,6 +12,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.6078",
+        "related.user": [
+            "rci"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "olab",
@@ -22,9 +25,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "rci"
-        ]
+        "user.name": "rci"
     },
     {
         "@timestamp": "2020-02-12T15:12:33.000Z",
@@ -38,6 +39,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "tatemac"
+        ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
         "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
@@ -47,9 +51,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "tatemac"
-        ]
+        "user.name": "tatemac"
     },
     {
         "@timestamp": "2020-02-26T22:15:08.000Z",
@@ -63,6 +65,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "nseq"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -72,9 +77,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "nseq"
-        ]
+        "user.name": "nseq"
     },
     {
         "@timestamp": "2020-03-12T05:17:42.000Z",
@@ -277,7 +280,9 @@
     },
     {
         "@timestamp": "2020-07-04T13:38:16.000Z",
-        "event.category": "Fault Occured",
+        "event.action": [
+            "Fault Occured"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -312,6 +317,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "uiano"
+        ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
         "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
@@ -321,9 +329,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "uiano"
-        ]
+        "user.name": "uiano"
     },
     {
         "@timestamp": "2019-08-02T03:43:25.000Z",
@@ -342,8 +348,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.179.26.34",
-            "10.38.77.13"
+            "10.38.77.13",
+            "10.179.26.34"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -452,6 +458,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "qua"
+        ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
         "rsa.time.event_time": "2019-09-28T07:53:42.000Z",
@@ -461,9 +470,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "qua"
-        ]
+        "user.name": "qua"
     },
     {
         "@timestamp": "2019-10-12T14:56:16.000Z",
@@ -497,6 +504,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "turveli"
+        ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
         "rsa.time.event_time": "2019-10-26T21:58:50.000Z",
@@ -506,9 +516,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "turveli"
-        ]
+        "user.name": "turveli"
     },
     {
         "@timestamp": "2019-11-10T05:01:24.000Z",
@@ -522,6 +530,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "caecatc"
+        ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
         "rsa.time.event_time": "2019-11-10T05:01:24.000Z",
@@ -531,9 +542,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "caecatc"
-        ]
+        "user.name": "caecatc"
     },
     {
         "@timestamp": "2019-11-24T12:03:59.000Z",
@@ -643,6 +652,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "mqui"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -652,9 +664,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "mqui"
-        ]
+        "user.name": "mqui"
     },
     {
         "@timestamp": "2020-02-03T23:16:50.000Z",
@@ -729,7 +739,9 @@
     },
     {
         "@timestamp": "2020-03-18T20:24:33.000Z",
-        "event.category": "Script mitigation",
+        "event.action": [
+            "Script mitigation"
+        ],
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -950,6 +962,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.2126",
+        "related.user": [
+            "emseq"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "luptasn",
@@ -960,9 +975,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "emseq"
-        ]
+        "user.name": "emseq"
     },
     {
         "@timestamp": "2019-07-11T04:45:07.000Z",
@@ -976,6 +989,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "suntexp"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -985,9 +1001,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "suntexp"
-        ]
+        "user.name": "suntexp"
     },
     {
         "@timestamp": "2019-07-25T11:47:41.000Z",
@@ -1100,7 +1114,9 @@
     },
     {
         "@timestamp": "2019-09-20T15:57:58.000Z",
-        "event.category": "Script mitigation",
+        "event.action": [
+            "Script mitigation"
+        ],
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1136,6 +1152,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "uptate"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1145,9 +1164,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "uptate"
-        ]
+        "user.name": "uptate"
     },
     {
         "@timestamp": "2019-10-19T06:03:07.000Z",
@@ -1192,8 +1209,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.108.167.93",
-            "10.161.136.76"
+            "10.161.136.76",
+            "10.108.167.93"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1318,6 +1335,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "uiac"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1327,9 +1347,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "uiac"
-        ]
+        "user.name": "uiac"
     },
     {
         "@timestamp": "2020-01-27T07:21:06.000Z",
@@ -1365,6 +1383,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "ersp"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1374,9 +1395,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "ersp"
-        ]
+        "user.name": "ersp"
     },
     {
         "@timestamp": "2020-02-24T21:26:15.000Z",
@@ -1430,6 +1449,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "rsitv"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1439,9 +1461,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "rsitv"
-        ]
+        "user.name": "rsitv"
     },
     {
         "@timestamp": "2020-04-08T18:33:58.000Z",
@@ -1480,6 +1500,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "udexerci"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1489,9 +1512,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "udexerci"
-        ]
+        "user.name": "udexerci"
     },
     {
         "@timestamp": "2020-05-07T08:39:06.000Z",
@@ -1529,6 +1550,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.4425",
+        "related.user": [
+            "ati"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "natuse",
@@ -1539,9 +1563,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "ati"
-        ]
+        "user.name": "ati"
     },
     {
         "@timestamp": "2020-06-04T22:44:15.000Z",
@@ -1630,7 +1652,9 @@
     },
     {
         "@timestamp": "2019-07-17T19:51:58.000Z",
-        "event.category": "Fault Cleared",
+        "event.action": [
+            "Fault Cleared"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1688,6 +1712,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "dutp"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1697,13 +1724,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "dutp"
-        ]
+        "user.name": "dutp"
     },
     {
         "@timestamp": "2019-08-29T16:59:40.000Z",
-        "event.category": "Fault Cleared",
+        "event.action": [
+            "Fault Cleared"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1762,7 +1789,9 @@
     },
     {
         "@timestamp": "2019-09-27T07:04:49.000Z",
-        "event.category": "Fault Occured",
+        "event.action": [
+            "Fault Occured"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1844,6 +1873,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "ven"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1853,9 +1885,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "ven"
-        ]
+        "user.name": "ven"
     },
     {
         "@timestamp": "2019-11-23T11:15:06.000Z",
@@ -1870,6 +1900,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.1721",
+        "related.user": [
+            "suntin"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "evitaed",
@@ -1880,9 +1913,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "suntin"
-        ]
+        "user.name": "suntin"
     },
     {
         "@timestamp": "2019-12-07T18:17:40.000Z",
@@ -1920,6 +1951,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.6412",
+        "related.user": [
+            "psumqu"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "litani",
@@ -1930,9 +1964,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "psumqu"
-        ]
+        "user.name": "psumqu"
     },
     {
         "@timestamp": "2020-01-05T08:22:49.000Z",
@@ -1946,6 +1978,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "onula"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -1955,9 +1990,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "onula"
-        ]
+        "user.name": "onula"
     },
     {
         "@timestamp": "2020-01-19T15:25:23.000Z",
@@ -1991,6 +2024,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "remips"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -2000,13 +2036,13 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "remips"
-        ]
+        "user.name": "remips"
     },
     {
         "@timestamp": "2020-02-17T05:30:32.000Z",
-        "event.category": "Script mitigation",
+        "event.action": [
+            "Script mitigation"
+        ],
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2032,7 +2068,9 @@
     },
     {
         "@timestamp": "2020-03-03T12:33:06.000Z",
-        "event.category": "Fault Cleared",
+        "event.action": [
+            "Fault Cleared"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2192,8 +2230,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.44.47.27",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.44.47.27"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2222,6 +2260,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.2883",
+        "related.user": [
+            "lor"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "emvele",
@@ -2232,9 +2273,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "lor"
-        ]
+        "user.name": "lor"
     },
     {
         "@timestamp": "2020-06-25T20:53:40.000Z",
@@ -2291,6 +2330,9 @@
         "observer.product": "Arbor",
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
+        "related.user": [
+            "tMal"
+        ],
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
@@ -2300,9 +2342,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "tMal"
-        ]
+        "user.name": "tMal"
     },
     {
         "@timestamp": "2019-08-07T18:01:23.000Z",
@@ -2317,6 +2357,9 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "observer.version": "1.2552",
+        "related.user": [
+            "onu"
+        ],
         "rsa.internal.event_desc": "Configuration changed",
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "maveni",
@@ -2327,9 +2370,7 @@
             "netscout.sightline",
             "forwarded"
         ],
-        "user.name": [
-            "onu"
-        ]
+        "user.name": "onu"
     },
     {
         "@timestamp": "2019-08-22T01:03:57.000Z",
@@ -2381,7 +2422,9 @@
     },
     {
         "@timestamp": "2019-09-19T15:09:05.000Z",
-        "event.category": "Script mitigation",
+        "event.action": [
+            "Script mitigation"
+        ],
         "event.code": "script",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2441,7 +2484,9 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "event.category": "Fault Cleared",
+        "event.action": [
+            "Fault Cleared"
+        ],
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",

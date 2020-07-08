@@ -65,6 +65,9 @@
         "related.ip": [
             "10.36.11.87"
         ],
+        "related.user": [
+            "uii"
+        ],
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "service.type": "f5",
@@ -76,9 +79,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "uii"
-        ]
+        "user.name": "uii"
     },
     {
         "event.code": "firepass",
@@ -92,6 +93,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "quipexe"
+        ],
         "rsa.internal.messageid": "firepass",
         "rsa.investigations.ec_activity": "Stop",
         "rsa.investigations.ec_subject": "Service",
@@ -103,9 +107,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "quipexe"
-        ]
+        "user.name": "quipexe"
     },
     {
         "destination.ip": [
@@ -124,6 +126,9 @@
         "related.ip": [
             "10.194.156.105"
         ],
+        "related.user": [
+            "uidolor"
+        ],
         "rsa.internal.messageid": "NetworkAccess",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "Communication",
@@ -133,9 +138,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "uidolor"
-        ]
+        "user.name": "uidolor"
     },
     {
         "event.code": "EndpointSecurity",
@@ -257,6 +260,9 @@
         "related.ip": [
             "10.37.126.205"
         ],
+        "related.user": [
+            "rad"
+        ],
         "rsa.internal.messageid": "sshd",
         "service.type": "f5",
         "source.ip": [
@@ -267,9 +273,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "rad"
-        ]
+        "user.name": "rad"
     },
     {
         "event.code": "httpd",
@@ -282,15 +286,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "isetq"
+        ],
         "rsa.internal.messageid": "httpd",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "isetq"
-        ]
+        "user.name": "isetq"
     },
     {
         "event.code": "firepass",
@@ -303,6 +308,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "onev"
+        ],
         "rsa.internal.messageid": "firepass",
         "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
         "service.type": "f5",
@@ -311,9 +319,7 @@
             "forwarded"
         ],
         "url.original": "https://www5.example.com/aquaeabi/giatq.html?veleumi=tia#enim",
-        "user.name": [
-            "onev"
-        ]
+        "user.name": "onev"
     },
     {
         "event.code": "heartbeat",
@@ -346,15 +352,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "anim"
+        ],
         "rsa.internal.messageid": "httpd",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "anim"
-        ]
+        "user.name": "anim"
     },
     {
         "event.code": "kernel",
@@ -432,6 +439,9 @@
         "related.ip": [
             "10.37.79.163"
         ],
+        "related.user": [
+            "riat"
+        ],
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
         "service.type": "f5",
@@ -443,9 +453,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "riat"
-        ]
+        "user.name": "riat"
     },
     {
         "event.code": "ntpd",
@@ -504,6 +512,9 @@
         "related.ip": [
             "10.159.182.171"
         ],
+        "related.user": [
+            "qua"
+        ],
         "rsa.internal.messageid": "sshd",
         "service.type": "f5",
         "source.ip": [
@@ -514,9 +525,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "qua"
-        ]
+        "user.name": "qua"
     },
     {
         "event.code": "sshd",
@@ -532,6 +541,9 @@
         "related.ip": [
             "10.206.197.113"
         ],
+        "related.user": [
+            "oll"
+        ],
         "rsa.internal.messageid": "sshd",
         "service.type": "f5",
         "source.ip": [
@@ -542,9 +554,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "oll"
-        ]
+        "user.name": "oll"
     },
     {
         "event.code": "Miscellaneous",
@@ -557,6 +567,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "taevi"
+        ],
         "rsa.internal.messageid": "Miscellaneous",
         "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "service.type": "f5",
@@ -564,12 +577,12 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "taevi"
-        ]
+        "user.name": "taevi"
     },
     {
-        "event.action": "started",
+        "event.action": [
+            "started"
+        ],
         "event.code": "snmp",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
@@ -606,6 +619,9 @@
         "related.ip": [
             "10.0.3.58"
         ],
+        "related.user": [
+            "labor"
+        ],
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "service.type": "f5",
@@ -617,9 +633,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "labor"
-        ]
+        "user.name": "labor"
     },
     {
         "event.code": "GarbageCollection",
@@ -654,6 +668,9 @@
         "related.ip": [
             "10.169.144.147"
         ],
+        "related.user": [
+            "ist"
+        ],
         "rsa.internal.messageid": "sshd",
         "service.type": "f5",
         "source.ip": [
@@ -664,9 +681,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "ist"
-        ]
+        "user.name": "ist"
     },
     {
         "event.code": "kernel",
@@ -792,7 +807,9 @@
         ]
     },
     {
-        "event.action": "block",
+        "event.action": [
+            "block"
+        ],
         "event.code": "security",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
@@ -836,6 +853,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "mexercit"
+        ],
         "rsa.db.index": "Logged",
         "rsa.internal.messageid": "maintenance",
         "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
@@ -844,9 +864,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "mexercit"
-        ]
+        "user.name": "mexercit"
     },
     {
         "event.code": "firepass",
@@ -859,6 +877,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "ume"
+        ],
         "rsa.internal.messageid": "firepass",
         "rsa.investigations.ec_activity": "Logoff",
         "rsa.investigations.ec_subject": "User",
@@ -867,9 +888,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "ume"
-        ]
+        "user.name": "ume"
     },
     {
         "event.code": "/USR/SBIN/CRON",
@@ -984,15 +1003,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "rehender"
+        ],
         "rsa.internal.messageid": "Miscellaneous",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "rehender"
-        ]
+        "user.name": "rehender"
     },
     {
         "destination.ip": [
@@ -1011,6 +1031,9 @@
         "related.ip": [
             "10.192.18.42"
         ],
+        "related.user": [
+            "equatD"
+        ],
         "rsa.internal.messageid": "NetworkAccess",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "Communication",
@@ -1021,9 +1044,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "equatD"
-        ]
+        "user.name": "equatD"
     },
     {
         "event.code": "heartbeat",
@@ -1058,6 +1079,9 @@
         "related.ip": [
             "10.86.63.253"
         ],
+        "related.user": [
+            "amvolup"
+        ],
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
         "service.type": "f5",
@@ -1069,9 +1093,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "amvolup"
-        ]
+        "user.name": "amvolup"
     },
     {
         "event.code": "EndpointSecurity",
@@ -1130,15 +1152,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "apariat"
+        ],
         "rsa.internal.messageid": "httpd",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "apariat"
-        ]
+        "user.name": "apariat"
     },
     {
         "event.code": "/USR/SBIN/CRON",
@@ -1259,15 +1282,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "eaq"
+        ],
         "rsa.internal.messageid": "Miscellaneous",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "eaq"
-        ]
+        "user.name": "eaq"
     },
     {
         "event.code": "EndpointSecurity",
@@ -1335,6 +1359,9 @@
         "related.ip": [
             "10.26.196.144"
         ],
+        "related.user": [
+            "edol"
+        ],
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "service.type": "f5",
@@ -1346,9 +1373,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "edol"
-        ]
+        "user.name": "edol"
     },
     {
         "event.code": "run-crons",
@@ -1371,7 +1396,9 @@
         ]
     },
     {
-        "event.action": "started",
+        "event.action": [
+            "started"
+        ],
         "event.code": "snmp",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
@@ -1408,6 +1435,9 @@
         "related.ip": [
             "10.237.205.140"
         ],
+        "related.user": [
+            "dutper"
+        ],
         "rsa.internal.event_desc": "user presented with challenge",
         "rsa.internal.messageid": "security",
         "rsa.investigations.ec_subject": "User",
@@ -1419,9 +1449,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "dutper"
-        ]
+        "user.name": "dutper"
     },
     {
         "event.code": "run-crons",
@@ -1473,6 +1501,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "aliquam"
+        ],
         "rsa.internal.messageid": "Miscellaneous",
         "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "service.type": "f5",
@@ -1480,9 +1511,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "aliquam"
-        ]
+        "user.name": "aliquam"
     },
     {
         "event.code": "mailer",
@@ -1545,15 +1574,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "lorinre"
+        ],
         "rsa.internal.messageid": "httpd",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "lorinre"
-        ]
+        "user.name": "lorinre"
     },
     {
         "destination.ip": [
@@ -1854,6 +1884,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "ntmollit"
+        ],
         "rsa.db.index": "Trying",
         "rsa.internal.messageid": "maintenance",
         "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
@@ -1862,9 +1895,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "ntmollit"
-        ]
+        "user.name": "ntmollit"
     },
     {
         "event.code": "heartbeat",
@@ -1917,15 +1948,16 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "litessec"
+        ],
         "rsa.internal.messageid": "httpd",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "litessec"
-        ]
+        "user.name": "litessec"
     },
     {
         "destination.ip": [
@@ -1965,6 +1997,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "tvolupt"
+        ],
         "rsa.internal.messageid": "firepass",
         "rsa.investigations.ec_activity": "Start",
         "rsa.investigations.ec_subject": "Service",
@@ -1977,9 +2012,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "tvolupt"
-        ]
+        "user.name": "tvolupt"
     },
     {
         "event.code": "mailer",
@@ -2017,6 +2050,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "ven"
+        ],
         "rsa.db.index": "nisist",
         "rsa.internal.messageid": "NetworkAccess",
         "rsa.investigations.ec_subject": "NetworkComm",
@@ -2028,9 +2064,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "ven"
-        ]
+        "user.name": "ven"
     },
     {
         "event.code": "/USR/SBIN/CRON",
@@ -2145,6 +2179,9 @@
         "observer.product": "FirePass",
         "observer.type": "VPN",
         "observer.vendor": "F5",
+        "related.user": [
+            "fugi"
+        ],
         "rsa.internal.messageid": "security",
         "rsa.investigations.ec_activity": "Logon",
         "rsa.investigations.ec_outcome": "Failure",
@@ -2156,9 +2193,7 @@
             "f5.firepass",
             "forwarded"
         ],
-        "user.name": [
-            "fugi"
-        ]
+        "user.name": "fugi"
     },
     {
         "event.code": "heartbeat",
@@ -2257,7 +2292,9 @@
         ]
     },
     {
-        "event.action": "started",
+        "event.action": [
+            "started"
+        ],
         "event.code": "snmp",
         "event.dataset": "f5.firepass",
         "event.module": "f5",
