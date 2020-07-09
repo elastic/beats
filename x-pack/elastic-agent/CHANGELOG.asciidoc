@@ -79,3 +79,4 @@
 - Agent now installs/uninstalls Elastic Endpoint {pull}19248[19248]
 - Agent now downloads Elastic Endpoint {pull}19503[19503]
 - Agent now load balances across multiple Kibana instances {pull}19628[19628]
+- Agent now sends its own logs to elasticsearch {pull}19811[19811]
