@@ -139,10 +139,8 @@ func (e agentError) Equal(target error) bool {
 
 // Is checks whether agent err is an err.
 func (e agentError) Is(target error) bool {
-	if agentErr, ok := target.(agentError); ok && e.Equal(agentErr) {
-		return true
-	} else if ok {
-		return false
+	if agentErr, ok := target.(agentError); ok {
+		return e.Equal(agentErr)
 	}
 
 	return goerrors.Is(e.err, target)
