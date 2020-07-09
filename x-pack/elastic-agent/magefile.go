@@ -234,7 +234,11 @@ func (Test) All() {
 // Unit runs all the unit tests.
 func (Test) Unit() error {
 	mg.Deps(Prepare.Env, Build.TestBinaries)
-	return RunGo("test", "-race", "-v", "-coverprofile", filepath.Join(buildDir, "coverage.out"), "./...")
+	raceFlag := ""
+	if os.Getenv("DEV_ARCH") == "amd64" {
+		raceFlag = "-race"
+	}
+	return RunGo("test", raceFlag, "-v", "-coverprofile", filepath.Join(buildDir, "coverage.out"), "./...")
 }
 
 // Coverage takes the coverages report from running all the tests and display the results in the browser.

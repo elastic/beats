@@ -38,10 +38,10 @@ var (
 
 // Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
 type stats struct {
-	Indices map[string]index `json:"indices"`
+	Indices map[string]Index `json:"indices"`
 }
 
-type index struct {
+type Index struct {
 	UUID      string     `json:"uuid"`
 	Primaries indexStats `json:"primaries"`
 	Total     indexStats `json:"total"`
@@ -49,6 +49,7 @@ type index struct {
 	Index   string     `json:"index"`
 	Created int64      `json:"created"`
 	Status  string     `json:"status"`
+	Hidden  bool       `json:"hidden"`
 	Shards  shardStats `json:"shards"`
 }
 
@@ -141,10 +142,20 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
+	indicesSettings, err := elasticsearch.GetIndicesSettings(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
+	}
+
 	var errs multierror.Errors
 	for name, idx := range indicesStats.Indices {
 		event := mb.Event{}
 		idx.Index = name
+
+		settings, exists := indicesSettings[name]
+		if exists {
+			idx.Hidden = settings.Hidden
+		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
@@ -173,7 +184,7 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx *index, clusterState common.MapStr) error {
+func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index metadata from cluster state")

@@ -716,6 +716,7 @@
         "file.owner": "alice@testsiem2.onmicrosoft.com",
         "fileset.name": "audit",
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "host.name": "testsiem2.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 10504,
         "o365.audit.CreationTime": "2020-02-24T20:11:15",

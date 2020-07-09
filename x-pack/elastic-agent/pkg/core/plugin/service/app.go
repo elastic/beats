@@ -125,6 +125,11 @@ func (a *Application) Name() string {
 	return a.name
 }
 
+// Started returns true if the application is started.
+func (a *Application) Started() bool {
+	return a.srvState != nil
+}
+
 // SetState sets the status of the application.
 func (a *Application) SetState(status state.Status, msg string) {
 	a.appLock.Lock()
@@ -231,6 +236,25 @@ func (a *Application) Stop() {
 	} else {
 		a.setState(state.Stopped, "Stopped")
 	}
+	a.srvState = nil
+
+	a.cleanUp()
+	a.stopCredsListener()
+}
+
+// Shutdown disconnects the service, but doesn't signal it to stop.
+func (a *Application) Shutdown() {
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	if a.srvState == nil {
+		return
+	}
+
+	// destroy the application in the server, this skips sending
+	// the expected stopping state to the service
+	a.setState(state.Stopped, "Stopped")
+	a.srvState.Destroy()
 	a.srvState = nil
 
 	a.cleanUp()

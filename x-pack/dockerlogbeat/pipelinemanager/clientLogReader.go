@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	helper "github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
@@ -38,9 +39,9 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		WaitClose: 0,
 	}
 	clientLogger := logp.NewLogger("clientLogReader")
-	settings.ACKCount = func(n int) {
+	settings.ACKHandler = acker.Counting(func(n int) {
 		clientLogger.Debugf("Pipeline client ACKS; %v", n)
-	}
+	})
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)
 	if err != nil {

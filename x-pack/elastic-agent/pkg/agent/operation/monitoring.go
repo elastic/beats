@@ -5,6 +5,8 @@
 package operation
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
@@ -19,6 +21,7 @@ const (
 	monitoringEnabledSubkey = "enabled"
 	logsProcessName         = "filebeat"
 	metricsProcessName      = "metricbeat"
+	artifactPrefix          = "beats"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -62,7 +65,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.getMonitoringSteps(s) {
+	for _, step := range o.generateMonitoringSteps(s.Version, nil) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -133,8 +136,9 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 			ID:      stepID,
 			Version: version,
 			ProgramSpec: program.Spec{
-				Name: logsProcessName,
-				Cmd:  logsProcessName,
+				Name:     logsProcessName,
+				Cmd:      logsProcessName,
+				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, logsProcessName),
 			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
@@ -154,8 +158,9 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 			ID:      stepID,
 			Version: version,
 			ProgramSpec: program.Spec{
-				Name: metricsProcessName,
-				Cmd:  metricsProcessName,
+				Name:     metricsProcessName,
+				Cmd:      metricsProcessName,
+				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, logsProcessName),
 			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
@@ -197,16 +202,6 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 								},
 							},
 						},
-						{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "logs",
-									"dataset":   "agent",
-									"namespace": "default",
-								},
-							},
-						},
 					},
 				},
 			},
@@ -243,16 +238,6 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 								"fields": map[string]interface{}{
 									"type":      "metrics",
 									"name":      "agent",
-									"namespace": "default",
-								},
-							},
-						},
-						{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "metrics",
-									"dataset":   "agent",
 									"namespace": "default",
 								},
 							},
