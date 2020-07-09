@@ -5,12 +5,14 @@
 package pipelinemanager
 
 import (
-	"os"
+	"io"
 	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
+
+	"github.com/docker/docker/api/types/backend"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -20,20 +22,26 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
 
-// ClientLogger is an instance of a pipeline logger client meant for reading from a single log stream
-// There's a many-to-one relationship between clients and pipelines.
-// Each container with the same config will get its own client to the same pipeline.
+// ClientLogger collects logs for a docker container logging to stdout and stderr, using the FIFO provided by the docker daemon.
+// Each log line is written to a local log file for retrieval via "docker logs", and forwarded to the beats publisher pipeline.
+// The local log storage is based on the docker json-file logger and supports the same settings. If "max-size" is not configured, we will rotate the log file every 10MB.
 type ClientLogger struct {
-	logFile       *pipereader.PipeReader
-	client        beat.Client
-	pipelineHash  uint64
-	closer        chan struct{}
-	containerMeta logger.Info
-	logger        *logp.Logger
+	// pipelineHash is a hash of the libbeat publisher pipeline config
+	pipelineHash uint64
+	// logger is the internal error message logger
+	logger *logp.Logger
+	// ContainerMeta is the metadata object for the container we get from docker
+	ContainerMeta logger.Info
+	// logFile is the FIFO reader that reads from the docker container stdio
+	logFile *pipereader.PipeReader
+	// client is the libbeat client object that sends logs upstream
+	client beat.Client
+	// localLog manages the local JSON logs for containers
+	localLog logger.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -50,7 +58,12 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 
 	clientLogger.Debugf("Created new logger for %d", hash)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hash, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
+	return &ClientLogger{logFile: inputFile,
+		client:        client,
+		pipelineHash:  hash,
+		ContainerMeta: info,
+		localLog:      localLog,
+		logger:        clientLogger}, nil
 }
 
 // Close closes the pipeline client and reader
@@ -64,7 +77,6 @@ func (cl *ClientLogger) Close() error {
 // ConsumePipelineAndSend consumes events from the FIFO pipe and sends them to the pipeline client
 func (cl *ClientLogger) ConsumePipelineAndSend() {
 	publishWriter := make(chan logdriver.LogEntry, 500)
-
 	go cl.publishLoop(publishWriter)
 	// Clean up the reader after we're done
 	defer func() {
@@ -76,7 +88,10 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
-			cl.logger.Error(os.Stderr, "Error getting message: %s\n", err)
+			if err == io.EOF {
+				return
+			}
+			cl.logger.Errorf("Error getting message: %s\n", err)
 			return
 		}
 		publishWriter <- log
@@ -96,6 +111,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			return
 		}
 
+		cl.localLog.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
 		cl.client.Publish(beat.Event{
@@ -103,11 +119,11 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			Fields: common.MapStr{
 				"message": line,
 				"container": common.MapStr{
-					"labels": helper.DeDotLabels(cl.containerMeta.ContainerLabels, true),
-					"id":     cl.containerMeta.ContainerID,
-					"name":   helper.ExtractContainerName([]string{cl.containerMeta.ContainerName}),
+					"labels": helper.DeDotLabels(cl.ContainerMeta.ContainerLabels, true),
+					"id":     cl.ContainerMeta.ContainerID,
+					"name":   helper.ExtractContainerName([]string{cl.ContainerMeta.ContainerName}),
 					"image": common.MapStr{
-						"name": cl.containerMeta.ContainerImageName,
+						"name": cl.ContainerMeta.ContainerImageName,
 					},
 				},
 			},
@@ -115,4 +131,19 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 
 	}
 
+}
+
+func constructLogSpoolMsg(line logdriver.LogEntry) *logger.Message {
+	var msg logger.Message
+
+	msg.Line = line.Line
+	msg.Source = line.Source
+	msg.Timestamp = time.Unix(0, line.TimeNano)
+	if line.PartialLogMetadata != nil {
+		msg.PLogMetaData = &backend.PartialLogMetaData{}
+		msg.PLogMetaData.ID = line.PartialLogMetadata.Id
+		msg.PLogMetaData.Last = line.PartialLogMetadata.Last
+		msg.PLogMetaData.Ordinal = int(line.PartialLogMetadata.Ordinal)
+	}
+	return &msg
 }
