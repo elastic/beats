@@ -43,5 +43,6 @@ rules:
     - fleet
     - inputs
     - output
+    - revision
 
 when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')
