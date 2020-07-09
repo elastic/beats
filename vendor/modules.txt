@@ -459,7 +459,7 @@ github.com/elastic/go-perf
 # github.com/elastic/go-seccomp-bpf v1.1.0
 github.com/elastic/go-seccomp-bpf
 github.com/elastic/go-seccomp-bpf/arch
-# github.com/elastic/go-structform v0.0.6
+# github.com/elastic/go-structform v0.0.7
 github.com/elastic/go-structform
 github.com/elastic/go-structform/cborl
 github.com/elastic/go-structform/gotype
@@ -797,13 +797,6 @@ github.com/tsg/gopacket/pcap
 # github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797
 github.com/urso/diag
 github.com/urso/diag/ctxfmt
-# github.com/urso/diag-ecs v0.0.0-20200210114345-ab085841dcb9
-github.com/urso/diag-ecs/ecs
-# github.com/urso/ecslog v0.0.1
-github.com/urso/ecslog
-github.com/urso/ecslog/backend
-github.com/urso/ecslog/backend/appender
-github.com/urso/ecslog/backend/layout
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
 # github.com/urso/magetools v0.0.0-20200125210132-c2e338f92f3a

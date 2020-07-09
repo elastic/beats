@@ -219,7 +219,7 @@ metricbeat.modules:
           value: i-0686946e22cf9494a
     - namespace: AWS/EBS
     - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
       tags:
         - key: "Organization"
           value: "Engineering"
@@ -372,6 +372,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  version: v1
 
 #----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
@@ -1296,10 +1297,10 @@ metricbeat.modules:
 #  - object: 'Process'
 #    instance: ["*"]
 #    counters:
-#    - name: 'Disk Writes/sec'
-#      field: physical_disk.write.per_sec
+#    - name: '% Processor Time'
+#      field: cpu_usage
 #      format: "float"
-#    - name: "% Disk Write Time"
+#    - name: "Thread Count"
 
 - module: windows
   metricsets: ["service"]

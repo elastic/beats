@@ -120,6 +120,11 @@ func (a *Application) Name() string {
 	return a.name
 }
 
+// Started returns true if the application is started.
+func (a *Application) Started() bool {
+	return a.state.Status != state.Stopped
+}
+
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()
@@ -148,6 +153,12 @@ func (a *Application) Stop() {
 		a.cleanUp()
 	}
 	a.setState(state.Stopped, "Stopped")
+}
+
+// Shutdown stops the application (aka. subprocess).
+func (a *Application) Shutdown() {
+	a.logger.Infof("Signaling application to stop because of shutdown: %s", a.id)
+	a.Stop()
 }
 
 // SetState sets the status of the application.

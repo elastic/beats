@@ -430,7 +430,7 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
-	l, _ := logger.New()
+	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -461,7 +461,7 @@ func TestConfiguration(t *testing.T) {
 			for _, program := range defPrograms {
 				programConfig, err := ioutil.ReadFile(filepath.Join(
 					"testdata",
-					name+"-"+strings.ToLower(program.Spec.Name)+".yml",
+					name+"-"+strings.ToLower(program.Spec.Cmd)+".yml",
 				))
 
 				require.NoError(t, err)

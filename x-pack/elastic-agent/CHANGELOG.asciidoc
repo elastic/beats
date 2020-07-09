@@ -10,6 +10,8 @@
 
 ==== Breaking changes
 - Rename agent to elastic-agent {pull}17391[17391]
+- Change fleet.yml structure, causes upgraded agent to register as new agent {pull}19248[19248]
+- Remove obfuscation of fleet.yml, causes re-enroll of agent to Fleet {pull}19678[19678]
 
 ==== Bugfixes
 
@@ -42,6 +44,7 @@
 - Avoid watching monitor logs {pull}18723[18723]
 - Guard against empty stream.datasource and namespace {pull}18769[18769]
 - Fix install service script for windows {pull}18814[18814]
+- Properly stops subprocess on shutdown {pull}19567[19567]
 
 ==== New features
 
@@ -71,3 +74,6 @@
 - Agent verifies packages before using them {pull}18876[18876]
 - Change stream.* to dataset.* fields {pull}18967[18967]
 - Agent now runs the GRPC server and spawned application connect by to Agent {pull}18973[18973]
+- Rename input.type logs to logfile {pull}19360[19360]
+- Agent now installs/uninstalls Elastic Endpoint {pull}19248[19248]
+- Agent now downloads Elastic Endpoint {pull}19503[19503]

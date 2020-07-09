@@ -30,16 +30,16 @@ import (
 
 // State is used to communicate the reading state of a file
 type State struct {
-	Id          string            `json:"-"` // local unique id to make comparison more efficient
-	Finished    bool              `json:"-"` // harvester state
-	Fileinfo    os.FileInfo       `json:"-"` // the file info
-	Source      string            `json:"source"`
-	Offset      int64             `json:"offset"`
-	Timestamp   time.Time         `json:"timestamp"`
-	TTL         time.Duration     `json:"ttl"`
-	Type        string            `json:"type"`
-	Meta        map[string]string `json:"meta"`
-	FileStateOS file.StateOS
+	Id          string            `json:"-" struct:"-"` // local unique id to make comparison more efficient
+	Finished    bool              `json:"-" struct:"-"` // harvester state
+	Fileinfo    os.FileInfo       `json:"-" struct:"-"` // the file info
+	Source      string            `json:"source" struct:"source"`
+	Offset      int64             `json:"offset" struct:"offset"`
+	Timestamp   time.Time         `json:"timestamp" struct:"timestamp"`
+	TTL         time.Duration     `json:"ttl" struct:"ttl"`
+	Type        string            `json:"type"  struct:"type"`
+	Meta        map[string]string `json:"meta" struct:"meta,omitempty"`
+	FileStateOS file.StateOS      `json:"FileStateOS" struct:"FileStateOS"`
 }
 
 // NewState creates a new file state

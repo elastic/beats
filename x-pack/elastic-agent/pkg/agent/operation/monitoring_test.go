@@ -120,7 +120,8 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
-	installer := &DummyInstaller{}
+	installer := &DummyInstallerChecker{}
+	uninstaller := &DummyUninstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
 	if err != nil {
@@ -132,7 +133,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,11 +147,13 @@ type testMonitorableApp struct {
 	monitor monitoring.Monitor
 }
 
-func (*testMonitorableApp) Name() string { return "" }
+func (*testMonitorableApp) Name() string  { return "" }
+func (*testMonitorableApp) Started() bool { return false }
 func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) Stop() {}
+func (*testMonitorableApp) Stop()     {}
+func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
@@ -171,6 +174,9 @@ func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []st
 
 // Cleanup cleans up all drops.
 func (b *testMonitor) Cleanup(string, string) error { return nil }
+
+// Close closes the monitor.
+func (b *testMonitor) Close() {}
 
 // Prepare executes steps in order for monitoring to work correctly
 func (b *testMonitor) Prepare(string, string, int, int) error { return nil }

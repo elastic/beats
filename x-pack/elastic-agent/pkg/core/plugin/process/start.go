@@ -136,8 +136,6 @@ func injectLogLevel(logLevel string, args []string) []string {
 	var level string
 	// Translate to level beat understands
 	switch logLevel {
-	case "trace":
-		level = "debug"
 	case "info":
 		level = "info"
 	case "debug":

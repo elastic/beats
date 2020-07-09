@@ -40,6 +40,7 @@ func TestConfig(t *testing.T) {
 		if !assert.NoError(t, err) {
 			return
 		}
+		assert.Equal(t, trimModeNone, cfg.TrimValues)
 	})
 
 	t.Run("invalid", func(t *testing.T) {
@@ -99,5 +100,40 @@ func TestConfig(t *testing.T) {
 		if !assert.Error(t, err) {
 			return
 		}
+	})
+
+	t.Run("with wrong trim_mode", func(t *testing.T) {
+		c, err := common.NewConfigFrom(map[string]interface{}{
+			"tokenizer":   "hello %{what}",
+			"field":       "message",
+			"trim_values": "bananas",
+		})
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		cfg := config{}
+		err = c.Unpack(&cfg)
+		if !assert.Error(t, err) {
+			return
+		}
+	})
+
+	t.Run("with valid trim_mode", func(t *testing.T) {
+		c, err := common.NewConfigFrom(map[string]interface{}{
+			"tokenizer":   "hello %{what}",
+			"field":       "message",
+			"trim_values": "all",
+		})
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		cfg := config{}
+		err = c.Unpack(&cfg)
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, trimModeAll, cfg.TrimValues)
 	})
 }

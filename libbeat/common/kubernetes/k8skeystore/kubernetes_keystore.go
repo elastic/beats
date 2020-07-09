@@ -101,6 +101,9 @@ func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interf
 func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString, error) {
 	// key = "kubernetes.somenamespace.somesecret.value"
 	tokens := strings.Split(key, ".")
+	if len(tokens) > 0 && tokens[0] != "kubernetes" {
+		return nil, keystore.ErrKeyDoesntExists
+	}
 	if len(tokens) != 4 {
 		k.logger.Debugf(
 			"not valid secret key: %v. Secrets should be of the following format %v",
