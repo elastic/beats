@@ -13,7 +13,7 @@ import (
 var (
 	homePath string
 	dataPath string
-	logsPath  string
+	logsPath string
 )
 
 func init() {

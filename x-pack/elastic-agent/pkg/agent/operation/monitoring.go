@@ -18,12 +18,11 @@ import (
 )
 
 const (
-	monitoringName          = "FLEET_MONITORING"
-	outputKey               = "output"
-	monitoringEnabledSubkey = "enabled"
-	logsProcessName         = "filebeat"
-	metricsProcessName      = "metricbeat"
-	artifactPrefix          = "beats"
+	monitoringName     = "FLEET_MONITORING"
+	outputKey          = "output"
+	logsProcessName    = "filebeat"
+	metricsProcessName = "metricbeat"
+	artifactPrefix     = "beats"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -181,8 +180,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			"type": "log",
 			"json": map[string]interface{}{
 				"keys_under_root": true,
-				"overwrite_keys": true,
-				"message_key": "message",
+				"overwrite_keys":  true,
+				"message_key":     "message",
 			},
 			"paths": []string{
 				filepath.Join(paths.Data(), "logs", "elastic-agent-json.log"),
@@ -209,8 +208,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				"type": "log",
 				"json": map[string]interface{}{
 					"keys_under_root": true,
-					"overwrite_keys": true,
-					"message_key": "message",
+					"overwrite_keys":  true,
+					"message_key":     "message",
 				},
 				"paths": paths,
 				"index": fmt.Sprintf("logs-elastic.agent.%s-default", name),
@@ -248,30 +247,31 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	if len(hosts) == 0 {
 		return nil, false
 	}
-
-	result := map[string]interface{}{
-		"metricbeat": map[string]interface{}{
-			"modules": []interface{}{
-				map[string]interface{}{
-					"module":     "beat",
-					"metricsets": []string{"stats", "state"},
-					"period":     "10s",
-					"hosts":      hosts,
-					"index":      "metrics-elastic.agent.metricbeat-default",
-					"processors": []map[string]interface{}{
-						{
-							"add_fields": map[string]interface{}{
-								"target": "dataset",
-								"fields": map[string]interface{}{
-									"type":      "metrics",
-									"name":      "elastic.agent.metricbeat",
-									"namespace": "default",
-								},
-							},
+	var modules []interface{}
+	for name, endpoints := range hosts {
+		modules = append(modules, map[string]interface{}{
+			"module":     "beat",
+			"metricsets": []string{"stats", "state"},
+			"period":     "10s",
+			"hosts":      endpoints,
+			"index":      fmt.Sprintf("metrics-elastic.agent.%s-default", name),
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "dataset",
+						"fields": map[string]interface{}{
+							"type":      "metrics",
+							"name":      fmt.Sprintf("elastic.agent.%s", name),
+							"namespace": "default",
 						},
 					},
 				},
 			},
+		})
+	}
+	result := map[string]interface{}{
+		"metricbeat": map[string]interface{}{
+			"modules": modules,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,
@@ -299,8 +299,8 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	return paths
 }
 
-func (o *Operator) getMetricbeatEndpoints() []string {
-	var endpoints []string
+func (o *Operator) getMetricbeatEndpoints() map[string][]string {
+	endpoints := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -308,7 +308,7 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	for _, a := range o.apps {
 		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints = append(endpoints, metricEndpoint)
+			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
 

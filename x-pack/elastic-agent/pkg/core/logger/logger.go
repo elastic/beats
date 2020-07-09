@@ -141,7 +141,7 @@ func makeInternalFileOutput() (zapcore.Core, error) {
 }
 
 // newMultiCoreWrapper takes the current zapcore.Core and appends it with the provided others.
-func newMultiCoreWrapper(cores ...zapcore.Core) func (zapcore.Core) zapcore.Core {
+func newMultiCoreWrapper(cores ...zapcore.Core) func(zapcore.Core) zapcore.Core {
 	return func(core zapcore.Core) zapcore.Core {
 		return &multiCore{append(cores, core)}
 	}
