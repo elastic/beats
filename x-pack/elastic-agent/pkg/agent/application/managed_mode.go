@@ -91,15 +91,6 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
-	// Extract only management related configuration.
-	managementCfg := &Config{}
-	if err := rawConfig.Unpack(managementCfg); err != nil {
-		return nil, errors.New(err,
-			fmt.Sprintf("fail to unpack configuration from %s", path),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
 	client, err := fleetapi.NewAuthWithConfig(log, cfg.AccessAPIKey, cfg.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
@@ -209,7 +200,6 @@ func newManaged(
 	gateway, err := newFleetGateway(
 		managedApplication.bgContext,
 		log,
-		managementCfg.Management,
 		agentInfo,
 		client,
 		actionDispatcher,
