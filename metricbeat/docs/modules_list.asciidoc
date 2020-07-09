@@ -192,7 +192,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
-|<<metricbeat-metricset-mysql-performance,performance>>   
+|<<metricbeat-metricset-mysql-performance,performance>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   
