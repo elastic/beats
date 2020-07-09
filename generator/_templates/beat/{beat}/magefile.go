@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/v7/generator/common/beatgen"
 )
 
 func init() {
@@ -23,11 +22,7 @@ func init() {
 	devtools.BeatDescription = "One sentence description of the Beat."
 	devtools.BeatVendor = "{full_name}"
 	devtools.BeatProjectType = devtools.CommunityProject
-}
-
-// VendorUpdate updates the vendor dir
-func VendorUpdate() error {
-	return beatgen.VendorUpdate()
+	devtools.CrossBuildMountModcache = true
 }
 
 // Package packages the Beat for distribution.

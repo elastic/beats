@@ -77,3 +77,4 @@
 - Rename input.type logs to logfile {pull}19360[19360]
 - Agent now installs/uninstalls Elastic Endpoint {pull}19248[19248]
 - Agent now downloads Elastic Endpoint {pull}19503[19503]
+- Agent now load balances across multiple Kibana instances {pull}19628[19628]
