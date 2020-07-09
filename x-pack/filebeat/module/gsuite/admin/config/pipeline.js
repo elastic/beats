@@ -54,6 +54,11 @@ var login = (function () {
             case "ORG_LICENSE_REVOKE":
             case "USER_LICENSE_REVOKE":
             case "UPDATE_DYNAMIC_LICENSE":
+            case "DROP_FROM_QUARANTINE":
+            case "CHANGE_EMAIL_SETTING":
+            case "CHANGE_GMAIL_SETTING":
+            case "REJECT_FROM_QUARANTINE":
+            case "RELEASE_FROM_QUARANTINE":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -66,6 +71,8 @@ var login = (function () {
             case "INSERT_CHROME_OS_PRINTER":
             case "CREATE_ROLE":
             case "ADD_WEB_ADDRESS":
+            case "EMAIL_UNDELETE":
+            case "CREATE_GMAIL_SETTING":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -79,6 +86,7 @@ var login = (function () {
             case "REMOVE_CHROME_OS_APPLICATION_SETTINGS":
             case "DELETE_ROLE":
             case "DELETE_WEB_ADDRESS":
+            case "DELETE_GMAIL_SETTING":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "DELETE_GROUP":
@@ -105,6 +113,7 @@ var login = (function () {
             case "VIEW_SITE_DETAILS":
             case "GROUP_LIST_DOWNLOAD":
             case "GROUP_MEMBERS_DOWNLOAD":
+            case "EMAIL_LOG_SEARCH":
                 evt.Put("event.type", ["info"]);
                 break;
         }
@@ -229,7 +238,15 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.SETTING_NAME",
-                    to: "gsuite.admin.setting",
+                    to: "gsuite.admin.setting.name",
+                },
+                {
+                    from: "gsuite.admin.SETTING_DESCRIPTION",
+                    to: "gsuite.admin.setting.description",
+                },
+                {
+                    from: "gsuite.admin.USER_DEFINED_SETTING_NAME",
+                    to: "gsuite.admin.user_defined_setting.name",
                 },
                 {
                     from: "gsuite.admin.GROUP_PRIORITIES",
@@ -332,6 +349,14 @@ var login = (function () {
                     to: "event.end",
                 },
                 {
+                    from: "gsuite.admin.START_DATE",
+                    to: "event.start",
+                },
+                {
+                    from: "gsuite.admin.END_DATE",
+                    to: "event.end",
+                },
+                {
                     from: "gsuite.admin.SITE_LOCATION",
                     to: "url.path",
                 },
@@ -364,6 +389,40 @@ var login = (function () {
                     from: "gsuite.admin.GROUP_MEMBER_BULK_UPLOAD_TOTAL_NUMBER",
                     to: "gsuite.admin.group.bulk_upload.total",
                     type: "long",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_MSG_ID",
+                    to: "gsuite.admin.email.log_search_filter.message_id",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_END_DATE",
+                    to: "gsuite.admin.email.log_search_filter.end_date",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_RECIPIENT",
+                    to: "gsuite.admin.email.log_search_filter.recipient.value",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_SENDER",
+                    to: "gsuite.admin.email.log_search_filter.sender.value",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_SMTP_RECIPIENT_IP",
+                    to: "gsuite.admin.email.log_search_filter.recipient.ip",
+                    type: "ip",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_SMTP_SENDER_IP",
+                    to: "gsuite.admin.email.log_search_filter.sender.ip",
+                    type: "ip",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_LOG_SEARCH_START_DATE",
+                    to: "gsuite.admin.email.log_search_filter.start_date",
+                },
+                {
+                    from: "gsuite.admin.QUARANTINE_NAME",
+                    to: "gsuite.admin.email.quarantine_name",
                 },
             ],
             mode: "rename",

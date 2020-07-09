@@ -19,7 +19,13 @@
     - name: org_unit.name
       type: keyword
       description: The organizational unit name.
-    - name: setting
+    - name: setting.name
+      type: keyword
+      description: The setting name.
+    - name: user_defined_setting.name
+      type: keyword
+      description: The name of the user-defined setting.
+    - name: setting.description
       type: keyword
       description: The setting name.
     - name: group.priorities
@@ -104,3 +110,27 @@
     - name: group.allowed_list
       type: keyword
       description: Names of allow-listed groups.
+    - name: email.quarantine_name
+      type: keyword
+      description: The name of the quarantine.
+    - name: email.log_search_filter.message_id
+      type: keyword
+      description: The log search filter's email message ID.
+    - name: email.log_search_filter.start_date
+      type: date
+      description: The log search filter's start date.
+    - name: email.log_search_filter.end_date
+      type: date
+      description: The log search filter's ending date.
+    - name: email.log_search_filter.recipient.value
+      type: keyword
+      description: The log search filter's email recipient.
+    - name: email.log_search_filter.sender.value
+      type: keyword
+      description: The log search filter's email sender.
+    - name: email.log_search_filter.recipient.ip
+      type: ip
+      description: The log search filter's email recipient's IP address.
+    - name: email.log_search_filter.sender.ip
+      type: ip
+      description: The log search filter's email sender's IP address.
