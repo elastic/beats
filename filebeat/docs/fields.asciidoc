@@ -1229,6 +1229,13 @@ type: keyword
 
 --
 
+*`aws.cloudtrail.request_parameters.text`*::
++
+--
+type: text
+
+--
+
 *`aws.cloudtrail.response_elements`*::
 +
 --
@@ -1238,12 +1245,26 @@ type: keyword
 
 --
 
+*`aws.cloudtrail.response_elements.text`*::
++
+--
+type: text
+
+--
+
 *`aws.cloudtrail.additional_eventdata`*::
 +
 --
 Additional data about the event that was not part of the request or response.
 
 type: keyword
+
+--
+
+*`aws.cloudtrail.additional_eventdata.text`*::
++
+--
+type: text
 
 --
 
@@ -1343,6 +1364,13 @@ type: keyword
 
 --
 
+*`aws.cloudtrail.service_event_details.text`*::
++
+--
+type: text
+
+--
+
 *`aws.cloudtrail.shared_event_id`*::
 +
 --
@@ -1398,6 +1426,49 @@ type: keyword
 Identifies whether multi factor authentication was used during ConsoleLogin
 
 type: boolean
+
+--
+
+[float]
+=== flattened
+
+ES flattened datatype for objects where the subfields aren't known in advance.
+
+
+*`aws.cloudtrail.flattened.additional_eventdata`*::
++
+--
+Additional data about the event that was not part of the request or response.
+
+
+type: flattened
+
+--
+
+*`aws.cloudtrail.flattened.request_parameters`*::
++
+--
+The parameters, if any, that were sent with the request.
+
+type: flattened
+
+--
+
+*`aws.cloudtrail.flattened.response_elements`*::
++
+--
+The response element for actions that make changes (create, update, or delete actions).
+
+type: flattened
+
+--
+
+*`aws.cloudtrail.flattened.service_event_details`*::
++
+--
+Identifies the service event, including what triggered the event and the result.
+
+type: flattened
 
 --
 
