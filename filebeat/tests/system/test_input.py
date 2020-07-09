@@ -2,6 +2,7 @@
 
 from filebeat import BaseTest
 import os
+import sys
 import time
 import unittest
 
