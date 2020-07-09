@@ -13,10 +13,10 @@ import groovy.transform.Field
  List of supported windows versions to be tested with
  NOTE:
    - 'windows-10' is too slow
-   - 'windows-2012-r2', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit' are disabled
+   - 'windows-2012-r2', 'windows-2008-r2', 'windows-7-32-bit' are disabled
       since we are working on releasing each windows version incrementally.
 */
-@Field def windowsVersions = ['windows-2019', 'windows-2016']
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-7']
 
 pipeline {
   agent { label 'ubuntu && immutable' }
