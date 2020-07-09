@@ -5,67 +5,15 @@
 package application
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 )
 
-// Config define the configuration of the Agent.
-type Config struct {
-	Management *config.Config `config:"management"`
-}
-
-func localDefaultConfig() *Config {
-	localModeCfg, _ := config.NewConfigFrom(map[string]interface{}{
-		"mode": "local",
-	})
-
-	return &Config{
-		Management: localModeCfg,
-	}
-}
-
-type managementMode int
-
-// Define the supported mode of management.
-const (
-	localMode managementMode = iota + 1
-	fleetMode
-)
-
-var managementModeMap = map[string]managementMode{
-	"local": localMode,
-	"fleet": fleetMode,
-}
-
-func (m *managementMode) Unpack(v string) error {
-	mgt, ok := managementModeMap[v]
-	if !ok {
-		return fmt.Errorf(
-			"unknown management mode, received '%s' and valid values are local or fleet",
-			v,
-		)
-	}
-	*m = mgt
-	return nil
-}
-
-// ManagementConfig defines the options for the running of the beats.
-type ManagementConfig struct {
-	Mode managementMode `config:"mode"`
-}
-
-func defaultManagementConfig() *ManagementConfig {
-	return &ManagementConfig{
-		Mode: localMode,
-	}
-}
-
 type localConfig struct {
+	Fleet    *FleetAgentConfig    `config:"fleet"`
 	Settings *localSettingsConfig `config:"agent" yaml:"agent"`
 }
 
@@ -90,6 +38,7 @@ func (r *reloadConfig) Validate() error {
 
 func localConfigDefault() *localConfig {
 	return &localConfig{
+		Fleet: defaultFleetAgentConfig(),
 		Settings: &localSettingsConfig{
 			Reload: &reloadConfig{
 				Enabled: true,
@@ -102,6 +51,7 @@ func localConfigDefault() *localConfig {
 // FleetAgentConfig is the internal configuration of the agent after the enrollment is done,
 // this configuration is not exposed in anyway in the elastic-agent.yml and is only internal configuration.
 type FleetAgentConfig struct {
+	Enabled      bool           `config:"enabled" yaml:"enabled"`
 	AccessAPIKey string         `config:"access_api_key" yaml:"access_api_key"`
 	Kibana       *kibana.Config `config:"kibana" yaml:"kibana"`
 	Reporting    *LogReporting  `config:"reporting" yaml:"reporting"`
@@ -120,12 +70,14 @@ type LogReporting struct {
 
 // Validate validates the required fields for accessing the API.
 func (e *FleetAgentConfig) Validate() error {
-	if len(e.AccessAPIKey) == 0 {
-		return errors.New("empty access token", errors.TypeConfig)
-	}
+	if e.Enabled {
+		if len(e.AccessAPIKey) == 0 {
+			return errors.New("empty access token", errors.TypeConfig)
+		}
 
-	if e.Kibana == nil || len(e.Kibana.Host) == 0 {
-		return errors.New("missing Kibana host configuration", errors.TypeConfig)
+		if e.Kibana == nil || len(e.Kibana.Host) == 0 {
+			return errors.New("missing Kibana host configuration", errors.TypeConfig)
+		}
 	}
 
 	return nil
@@ -133,6 +85,7 @@ func (e *FleetAgentConfig) Validate() error {
 
 func defaultFleetAgentConfig() *FleetAgentConfig {
 	return &FleetAgentConfig{
+		Enabled: false,
 		Reporting: &LogReporting{
 			Fleet: fleetreporter.DefaultFleetManagementConfig(),
 		},

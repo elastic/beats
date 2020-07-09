@@ -44,30 +44,26 @@ func createApplication(
 	rawConfig *config.Config,
 ) (Application, error) {
 	warn.LogNotGA(log)
-
 	log.Info("Detecting execution mode")
-	c := localDefaultConfig()
-	err := rawConfig.Unpack(c)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
 
-	mgmt := defaultManagementConfig()
-	err = c.Management.Unpack(mgmt)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
-
+	c := localConfigDefault()
 	ctx := context.Background()
+	if err := rawConfig.Unpack(c); err != nil {
+		return nil, errors.New(err, "initiating application")
+	}
 
-	switch mgmt.Mode {
-	case localMode:
+	if isStandalone(c) {
 		log.Info("Agent is managed locally")
 		return newLocal(ctx, log, pathConfigFile, rawConfig)
-	case fleetMode:
-		log.Info("Agent is managed by Fleet")
-		return newManaged(ctx, log, rawConfig)
-	default:
-		return nil, ErrInvalidMgmtMode
 	}
+
+	log.Info("Agent is managed by Fleet")
+	return newManaged(ctx, log, rawConfig)
+}
+
+// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func isStandalone(cfg *localConfig) bool {
+	return !cfg.Fleet.Enabled ||
+		len(cfg.Fleet.AccessAPIKey) == 0 ||
+		cfg.Fleet.Kibana == nil
 }

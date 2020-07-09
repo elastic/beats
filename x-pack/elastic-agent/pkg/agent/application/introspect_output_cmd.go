@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -46,9 +47,9 @@ func (c *IntrospectOutputCmd) introspectOutputs() error {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
-	if err != nil {
-		return err
+	lc := localConfigDefault()
+	if err := cfg.Unpack(lc); err != nil {
+		return errors.New(err, "initiating application")
 	}
 
 	l, err := newErrorLogger()
@@ -56,7 +57,7 @@ func (c *IntrospectOutputCmd) introspectOutputs() error {
 		return err
 	}
 
-	if isLocal {
+	if isStandalone(lc) {
 		return listOutputsFromConfig(l, cfg)
 	}
 
@@ -99,17 +100,17 @@ func (c *IntrospectOutputCmd) introspectOutput() error {
 		return err
 	}
 
+	lc := localConfigDefault()
+	if err := cfg.Unpack(lc); err != nil {
+		return errors.New(err, "initiating application")
+	}
+
 	l, err := newErrorLogger()
 	if err != nil {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
-	if err != nil {
-		return err
-	}
-
-	if isLocal {
+	if isStandalone(lc) {
 		return printOutputFromConfig(l, c.output, c.program, cfg)
 	}
 

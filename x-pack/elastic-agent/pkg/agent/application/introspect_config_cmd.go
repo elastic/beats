@@ -40,12 +40,12 @@ func (c *IntrospectConfigCmd) introspectConfig() error {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
-	if err != nil {
-		return err
+	lc := localConfigDefault()
+	if err := cfg.Unpack(lc); err != nil {
+		return errors.New(err, "initiating application")
 	}
 
-	if isLocal {
+	if isStandalone(lc) {
 		return printConfig(cfg)
 	}
 
@@ -93,22 +93,6 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return cfgChange.Config, nil
 	}
 	return nil, nil
-}
-
-func isLocalMode(rawConfig *config.Config) (bool, error) {
-	c := localDefaultConfig()
-	if err := rawConfig.Unpack(&c); err != nil {
-		return false, errors.New(err, "initiating application")
-	}
-
-	managementConfig := struct {
-		Mode string `config:"mode" yaml:"mode"`
-	}{}
-
-	if err := c.Management.Unpack(&managementConfig); err != nil {
-		return false, errors.New(err, "initiating application")
-	}
-	return managementConfig.Mode == "local", nil
 }
 
 func printMapStringConfig(mapStr map[string]interface{}) error {
