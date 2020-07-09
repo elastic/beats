@@ -6,10 +6,6 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
-    - name: cluster_uuid
-      type: alias
-      path: elasticsearch.cluster.id
-      
     - name: elasticsearch
       type: group
       description: >
@@ -23,6 +19,7 @@
           type: keyword
           description: >
             Elasticsearch cluster id.
+
 
         - name: cluster.state.id
           type: keyword
@@ -51,3 +48,434 @@
               type: boolean
               description: >
                 Is mlockall enabled on the node?
+
+
+
+      # Field aliases for migration from legacy structure
+
+    - name: cluster_uuid
+      type: alias
+      path: elasticsearch.cluster.id
+
+    - name: node_stats
+      type: group
+      fields:
+        - name: fs
+          type: group
+          fields:
+            - name: total
+              type: group
+              fields:
+                - name: available_in_bytes
+                  path: elasticsearch.node.stats.fs.summary.available.bytes
+                  type: alias
+                - name: free_in_bytes
+                  path: elasticsearch.node.stats.fs.summary.free.bytes
+                  type: alias
+                - name: total_in_bytes
+                  path: elasticsearch.node.stats.fs.summary.total.bytes
+                  type: alias
+
+            - name: io_stats
+              type: group
+              fields:
+                - name: total
+                  type: group
+                  fields:
+                    - name: operations
+                      path: elasticsearch.node.stats.fs.io_stats.total.operations.count
+                      type: alias
+                    - name: read_kilobytes
+                      path: elasticsearch.node.stats.fs.io_stats.total.read.kb
+                      type: alias
+                    - name: read_operations
+                      path: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
+                      type: alias
+                    - name: write_kilobytes
+                      path: elasticsearch.node.stats.fs.io_stats.total.write.kb
+                      type: alias
+                    - name: write_operations
+                      path: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
+                      type: alias
+
+        - name: indices
+          type: group
+          fields:
+            - name: bulk
+              type: group
+              fields:
+                - name: avg_size_in_bytes
+                  path: elasticsearch.node.stats.indices.bulk.avg_size.bytes
+                  type: alias
+                - name: avg_time_in_millis
+                  path: elasticsearch.node.stats.indices.bulk.avg_time.ms
+                  type: alias
+                - name: total_operations
+                  path: elasticsearch.node.stats.indices.bulk.operations.total.count
+                  type: alias
+                - name: total_size_in_bytes
+                  path: elasticsearch.node.stats.indices.bulk.total_size.bytes
+                  type: alias
+                - name: total_time_in_millis
+                  path: elasticsearch.node.stats.indices.bulk.total_time.ms
+                  type: alias
+
+            - name: docs
+              type: group
+              fields:
+                - name: count
+                  path: elasticsearch.node.stats.indices.docs.count
+                  type: alias
+
+            - name: fielddata
+              type: group
+              fields:
+                - name: evictions
+                  path: elasticsearch.node.stats.indices.fielddata.evictions.count
+                  type: alias
+                - name: memory_size_in_bytes
+                  path: elasticsearch.node.stats.indices.fielddata.memory.bytes
+                  type: alias
+
+            - name: indexing
+              type: group
+              fields:
+                - name: index_time_in_millis
+                  path: elasticsearch.node.stats.indices.indexing.index_time.ms
+                  type: alias
+                - name: index_total
+                  path: elasticsearch.node.stats.indices.indexing.index_total.count
+                  type: alias
+                - name: throttle_time_in_millis
+                  path: elasticsearch.node.stats.indices.indexing.throttle_time.ms
+                  type: alias
+
+            - name: query_cache
+              type: group
+              fields:
+                - name: evictions
+                  path: elasticsearch.node.stats.indices.query_cache.evictions.count
+                  type: alias
+                - name: hit_count
+                  path: elasticsearch.node.stats.indices.query_cache.hits.count
+                  type: alias
+                - name: memory_size_in_bytes
+                  path: elasticsearch.node.stats.indices.query_cache.memory.bytes
+                  type: alias
+                - name: miss_count
+                  path: elasticsearch.node.stats.indices.query_cache.misses.count
+                  type: alias
+
+            - name: request_cache
+              type: group
+              fields:
+                - name: evictions
+                  path: elasticsearch.node.stats.indices.request_cache.evictions.count
+                  type: alias
+                - name: hit_count
+                  path: elasticsearch.node.stats.indices.request_cache.hits.count
+                  type: alias
+                - name: memory_size_in_bytes
+                  path: elasticsearch.node.stats.indices.request_cache.memory.bytes
+                  type: alias
+                - name: miss_count
+                  path: elasticsearch.node.stats.indices.request_cache.misses.count
+                  type: alias
+
+            - name: search
+              type: group
+              fields:
+                - name: query_time_in_millis
+                  path: elasticsearch.node.stats.indices.search.query_time.ms
+                  type: alias
+                - name: query_total
+                  path: elasticsearch.node.stats.indices.search.query_total.count
+                  type: alias
+
+            - name: segments
+              type: group
+              fields:
+                - name: count
+                  path: elasticsearch.node.stats.indices.segments.count
+                  type: alias
+                - name: doc_values_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.doc_values.memory.bytes
+                  type: alias
+                - name: fixed_bit_set_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes
+                  type: alias
+                - name: index_writer_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.index_writer.memory.bytes
+                  type: alias
+                - name: memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.memory.bytes
+                  type: alias
+                - name: norms_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.norms.memory.bytes
+                  type: alias
+                - name: points_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.points.memory.bytes
+                  type: alias
+                - name: stored_fields_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes
+                  type: alias
+                - name: term_vectors_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes
+                  type: alias
+                - name: terms_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.terms.memory.bytes
+                  type: alias
+                - name: version_map_memory_in_bytes
+                  path: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
+                  type: alias
+
+            - name: store
+              type: group
+              fields:
+                - name: size_in_bytes
+                  path: elasticsearch.node.stats.indices.store.size.bytes
+                  type: alias
+
+        - name: jvm
+          type: group
+          fields:
+            - name: gc
+              type: group
+              fields:
+                - name: collectors
+                  type: group
+                  fields:
+                    - name: old
+                      type: group
+                      fields:
+                        - name: collection_count
+                          path: elasticsearch.node.stats.jvm.gc.collectors.old.collection.count
+                          type: alias
+                        - name: collection_time_in_millis
+                          path: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
+                          type: alias
+
+                    - name: young
+                      type: group
+                      fields:
+                        - name: collection_count
+                          path: elasticsearch.node.stats.jvm.gc.collectors.young.collection.count
+                          type: alias
+                        - name: collection_time_in_millis
+                          path: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
+                          type: alias
+
+            - name: mem
+              type: group
+              fields:
+                - name: heap_max_in_bytes
+                  path: elasticsearch.node.stats.jvm.mem.heap.max.bytes
+                  type: alias
+                - name: heap_used_in_bytes
+                  path: elasticsearch.node.stats.jvm.mem.heap.used.bytes
+                  type: alias
+                - name: heap_used_percent
+                  path: elasticsearch.node.stats.jvm.mem.heap.used.pct
+                  type: alias
+
+        - name: mlockall
+          path: elasticsearch.node.mlockall
+          type: alias
+        - name: node_id
+          path: elasticsearch.node.id
+          type: alias
+        - name: node_master
+          path: elasticsearch.node.master
+          type: alias
+        - name: os
+          type: group
+          fields:
+            - name: cpu
+              type: group
+              fields:
+                - name: load_average
+                  type: group
+                  fields:
+                    - name: 1m
+                      path: elasticsearch.node.stats.os.cpu.load_avg.1m
+                      type: alias
+                    - name: 5m
+                      path: elasticsearch.node.stats.os.cpu.load_avg.5m
+                      type: alias
+                    - name: 15m
+                      path: elasticsearch.node.stats.os.cpu.load_avg.15m
+                      type: alias
+
+            - name: cgroup
+              type: group
+              fields:
+                - name: cpuacct
+                  type: group
+                  fields:
+                    - name: control_group
+                      path: elasticsearch.node.stats.os.cgroup.cpuacct.control_group
+                      type: alias
+                    - name: usage_nanos
+                      path: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
+                      type: alias
+
+                - name: cpu
+                  type: group
+                  fields:
+                    - name: control_group
+                      path: elasticsearch.node.stats.os.cgroup.cpu.control_group
+                      type: alias
+                    - name: cfs_period_micros
+                      path: elasticsearch.node.stats.os.cgroup.cpu.cfs.period.us
+                      type: alias
+                    - name: cfs_quota_micros
+                      path: elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us
+                      type: alias
+                    - name: stat
+                      type: group
+                      fields:
+                        - name: number_of_elapsed_periods
+                          path: elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count
+                          type: alias
+                        - name: number_of_times_throttled
+                          path: elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count
+                          type: alias
+                        - name: time_throttled_nanos
+                          path: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
+                          type: alias
+
+                - name: memory
+                  type: group
+                  fields:
+                    - name: control_group
+                      path: elasticsearch.node.stats.os.cgroup.memory.control_group
+                      type: alias
+                    - name: limit_in_bytes
+                      path: elasticsearch.node.stats.os.cgroup.memory.limit.bytes
+                      type: alias
+                    - name: usage_in_bytes
+                      path: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
+                      type: alias
+
+        - name: process
+          type: group
+          fields:
+            - name: cpu
+              type: group
+              fields:
+                - name: percent
+                  path: elasticsearch.node.stats.process.cpu.pct
+                  type: alias
+            - name: max_file_descriptors
+              path: elasticsearch.node.stats.process.file_descriptors.max.count
+              type: alias
+            - name: open_file_descriptors
+              path: elasticsearch.node.stats.process.file_descriptors.open.count
+              type: alias
+        - name: thread_pool
+          type: group
+          fields:
+            - name: bulk
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.bulk.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.bulk.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.bulk.threads.count
+                  type: alias
+
+            - name: generic
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.generic.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.generic.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.generic.threads.count
+                  type: alias
+
+            - name: get
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.get.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.get.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.get.threads.count
+                  type: alias
+
+            - name: index
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.index.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.index.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.index.threads.count
+                  type: alias
+
+            - name: management
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.management.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.management.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.management.threads.count
+                  type: alias
+
+            - name: search
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.search.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.search.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.search.threads.count
+                  type: alias
+
+            - name: watcher
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.watcher.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.watcher.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.watcher.threads.count
+                  type: alias
+
+            - name: write
+              type: group
+              fields:
+                - name: queue
+                  path: elasticsearch.node.stats.thread_pool.write.queue.count
+                  type: alias
+                - name: rejected
+                  path: elasticsearch.node.stats.thread_pool.write.rejected.count
+                  type: alias
+                - name: threads
+                  path: elasticsearch.node.stats.thread_pool.write.threads.count
+                  type: alias
+
