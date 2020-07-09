@@ -17397,10 +17397,25 @@ type: boolean
 --
 
 [float]
-=== node.stats
+=== node
 
 node_stats
 
+
+
+*`node_stats.node.mlockall`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.master`*::
++
+--
+type: long
+
+--
 
 
 [float]
@@ -17459,6 +17474,273 @@ Total size of the store in bytes.
 
 
 type: long
+
+--
+
+
+*`node_stats.node.stats.indices.bulk.avg_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.bulk.avg_time.ms`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.bulk.operations.total.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.bulk.total_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.bulk.total_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.indices.fielddata.evictions.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.fielddata.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`node_stats.node.stats.indices.indexing.index_time.ms`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.indexing.index_total.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.indexing.throttle_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.indices.query_cache.evictions.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.query_cache.hits.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.query_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.query_cache.misses.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.indices.request_cache.evictions.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.request_cache.hits.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.request_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.request_cache.misses.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.indices.search.query_time.ms`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.indices.segments.doc_values.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.fixed_bit_set.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.index_writer.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.norms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.points.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.stored_fields.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.term_vectors.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.terms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.indices.segments.version_map.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`node_stats.node.stats.jvm.mem.heap.max.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`node_stats.node.stats.jvm.mem.heap.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.jvm.mem.heap.used.pct`*::
++
+--
+type: long
+
+format: percent
 
 --
 
@@ -17729,6 +18011,7 @@ type: long
 
 --
 
+
 *`node_stats.node.stats.fs.io_stats.total.read.kb`*::
 +
 --
@@ -17743,6 +18026,7 @@ type: long
 
 --
 
+
 *`node_stats.node.stats.fs.io_stats.total.write.kb`*::
 +
 --
@@ -17751,6 +18035,317 @@ type: long
 --
 
 *`node_stats.node.stats.fs.io_stats.total.write.operations.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.os.cpu.load_avg.1m`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.load_avg.5m`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.load_avg.15m`*::
++
+--
+type: long
+
+--
+
+
+
+*`node_stats.node.stats.os.cpu.cgroup.cpuacct.control_group`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.cpuacct.usage.ns`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.control_group`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.cfs.period.us`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.elapsed_periods.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.times_throttled.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.time_throttled.ns`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.os.cpu.cgroup.memory.control_group`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.memory.limit.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`node_stats.node.stats.os.cpu.cgroup.memory.usage.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+
+*`node_stats.node.stats.process.cpu.pct`*::
++
+--
+type: long
+
+format: percent
+
+--
+
+
+*`node_stats.node.stats.process.file_descriptors.max.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.process.file_descriptors.open.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`node_stats.node.stats.thread_pool.bulk.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.bulk.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.bulk.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.generic.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.generic.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.generic.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.get.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.get.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.get.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.index.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.index.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.index.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.management.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.management.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.management.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.search.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.search.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.search.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.watcher.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.watcher.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.watcher.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`node_stats.node.stats.thread_pool.write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.write.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`node_stats.node.stats.thread_pool.write.threads.count`*::
 +
 --
 type: long
