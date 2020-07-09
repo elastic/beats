@@ -30,6 +30,7 @@ import (
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -145,8 +146,8 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:  ctx.Cancelation,
-		ACKEvents: newInputACKHandler(ctx.Logger),
+		CloseRef:   ctx.Cancelation,
+		ACKHandler: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
@@ -174,8 +175,8 @@ func (inp *managedInput) createSourceID(s Source) string {
 	return fmt.Sprintf("%v::%v", inp.manager.Type, s.Name())
 }
 
-func newInputACKHandler(log *logp.Logger) func([]interface{}) {
-	return func(private []interface{}) {
+func newInputACKHandler(log *logp.Logger) beat.ACKer {
+	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int
 		for i := 0; i < len(private); i++ {
@@ -196,5 +197,5 @@ func newInputACKHandler(log *logp.Logger) func([]interface{}) {
 			return
 		}
 		private[last].(*updateOp).Execute(n)
-	}
+	})
 }

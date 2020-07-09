@@ -152,7 +152,8 @@ func (*testMonitorableApp) Started() bool { return false }
 func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) Stop() {}
+func (*testMonitorableApp) Stop()     {}
+func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
@@ -173,6 +174,9 @@ func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []st
 
 // Cleanup cleans up all drops.
 func (b *testMonitor) Cleanup(string, string) error { return nil }
+
+// Close closes the monitor.
+func (b *testMonitor) Close() {}
 
 // Prepare executes steps in order for monitoring to work correctly
 func (b *testMonitor) Prepare(string, string, int, int) error { return nil }

@@ -79,7 +79,7 @@
   metrics:
     - namespace: AWS/EC2
       name: [""]
-      tags.resource_type_filter: ""
+      resource_type: ""
       dimensions:
         - name: ""
           value: ""

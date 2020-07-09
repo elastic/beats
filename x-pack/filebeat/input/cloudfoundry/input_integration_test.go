@@ -110,7 +110,7 @@ func makeApiRequests(t *testing.T, ctx context.Context, address string) {
 	}
 
 	for {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, address, nil)
+		req, err := http.NewRequest(http.MethodGet, address, nil)
 		require.NoError(t, err)
 		resp, err := client.Do(req)
 		require.NoError(t, err)

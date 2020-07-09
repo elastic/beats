@@ -434,24 +434,16 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
-		var acker func([]interface{})
-		var activeEventPrivate []interface{}
-
-		ackEvents := func(n int) {
-			data, rest := activeEventPrivate[:n], activeEventPrivate[n:]
-			activeEventPrivate = rest
-			acker(data)
-		}
-
+		var acker beat.ACKer
 		var wgACKer sync.WaitGroup
 		wgACKer.Add(1)
 		pipeline := &pubtest.FakeConnector{
 			ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
 				defer wgACKer.Done()
-				acker = cfg.ACKEvents
+				acker = cfg.ACKHandler
 				return &pubtest.FakeClient{
 					PublishFunc: func(event beat.Event) {
-						activeEventPrivate = append(activeEventPrivate, event.Private)
+						acker.AddEvent(event, true)
 					},
 				}, nil
 			},
@@ -478,19 +470,19 @@ func TestManager_InputsRun(t *testing.T) {
 		require.Equal(t, nil, store.snapshot()["test::key"].Cursor)
 
 		// ACK first 2 events and check snapshot state
-		ackEvents(2)
+		acker.ACKEvents(2)
 		require.Equal(t, "test-cursor-state2", store.snapshot()["test::key"].Cursor)
 
 		// ACK 1 events and check snapshot state (3 events published)
-		ackEvents(1)
+		acker.ACKEvents(1)
 		require.Equal(t, "test-cursor-state3", store.snapshot()["test::key"].Cursor)
 
 		// ACK event without cursor update and check snapshot state not modified
-		ackEvents(1)
+		acker.ACKEvents(1)
 		require.Equal(t, "test-cursor-state3", store.snapshot()["test::key"].Cursor)
 
 		// ACK rest
-		ackEvents(3)
+		acker.ACKEvents(3)
 		require.Equal(t, "test-cursor-state6", store.snapshot()["test::key"].Cursor)
 	})
 }
