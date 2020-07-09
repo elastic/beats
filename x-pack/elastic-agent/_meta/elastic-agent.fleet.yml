@@ -2,26 +2,8 @@
 # Beats is configured under Fleet, you can define most settings
 # from the Kibana UI. You can update this file to configure the settings that
 # are not supported by Fleet.
-management:
-  mode: "fleet"
-
-  # Check in frequency configure the time between calls to fleet to retrieve the new configuration.
-  #
-  # Default is 30s
-  #checkin_frequency: 30s
-
-  # Add variance between API calls to better distribute the calls.
-  #jitter: 5s
-
-  # The Elastic Agent does Exponential backoff when an error happen.
-  #
-  #backoff:
-  #
-  # Initial time to wait before retrying the call.
-  # init: 1s
-  #
-  # Maximum time to wait before retrying the call.
-  # max: 10s
+fleet:
+  enabled: true
 
 # download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries

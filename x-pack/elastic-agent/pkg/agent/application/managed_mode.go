@@ -100,12 +100,12 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
-	client, err := fleetapi.NewAuthWithConfig(log, cfg.API.AccessAPIKey, cfg.API.Kibana)
+	client, err := fleetapi.NewAuthWithConfig(log, cfg.AccessAPIKey, cfg.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.API.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Kibana.Host))
 	}
 
 	managedApplication := &Managed{

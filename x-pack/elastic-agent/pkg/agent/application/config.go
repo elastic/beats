@@ -106,20 +106,15 @@ func localConfigDefault() *localConfig {
 // FleetAgentConfig is the internal configuration of the agent after the enrollment is done,
 // this configuration is not exposed in anyway in the elastic-agent.yml and is only internal configuration.
 type FleetAgentConfig struct {
-	API       *APIAccess    `config:"api" yaml:"api"`
-	Reporting *LogReporting `config:"reporting" yaml:"reporting"`
-	Info      *AgentInfo    `config:"agent" yaml:"agent"`
+	AccessAPIKey string         `config:"access_api_key" yaml:"access_api_key"`
+	Kibana       *kibana.Config `config:"kibana" yaml:"kibana"`
+	Reporting    *LogReporting  `config:"reporting" yaml:"reporting"`
+	Info         *AgentInfo     `config:"agent" yaml:"agent"`
 }
 
 // AgentInfo is a set of agent information.
 type AgentInfo struct {
 	ID string `json:"id" yaml:"id" config:"id"`
-}
-
-// APIAccess contains the required details to connect to the Kibana endpoint.
-type APIAccess struct {
-	AccessAPIKey string         `config:"access_api_key" yaml:"access_api_key"`
-	Kibana       *kibana.Config `config:"kibana" yaml:"kibana"`
 }
 
 // LogReporting define the fleet options for log reporting.
@@ -129,7 +124,7 @@ type LogReporting struct {
 }
 
 // Validate validates the required fields for accessing the API.
-func (e *APIAccess) Validate() error {
+func (e *FleetAgentConfig) Validate() error {
 	if len(e.AccessAPIKey) == 0 {
 		return errors.New("empty access token", errors.TypeConfig)
 	}
@@ -151,13 +146,14 @@ func defaultFleetAgentConfig() *FleetAgentConfig {
 	}
 }
 
-func createFleetConfigFromEnroll(agentID string, access *APIAccess) (*FleetAgentConfig, error) {
-	if err := access.Validate(); err != nil {
+func createFleetConfigFromEnroll(agentID string, accessAPIKey string, kbn *kibana.Config) (*FleetAgentConfig, error) {
+	cfg := defaultFleetAgentConfig()
+	cfg.AccessAPIKey = accessAPIKey
+	cfg.Kibana = kbn
+	cfg.Info.ID = agentID
+
+	if err := cfg.Validate(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
-
-	cfg := defaultFleetAgentConfig()
-	cfg.API = access
-	cfg.Info.ID = agentID
 	return cfg, nil
 }

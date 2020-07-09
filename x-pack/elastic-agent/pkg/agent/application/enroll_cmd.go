@@ -162,10 +162,7 @@ func (c *EnrollCmd) Execute() error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, &APIAccess{
-		AccessAPIKey: resp.Item.AccessAPIKey,
-		Kibana:       c.kibanaConfig,
-	})
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, resp.Item.AccessAPIKey, c.kibanaConfig)
 
 	reader, err := yamlToReader(fleetConfig)
 	if err != nil {

@@ -154,10 +154,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -214,10 +214,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -274,10 +274,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
