@@ -52,6 +52,11 @@ inputs:
 #       #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 #       #ssl.cipher_suites: []
 #       #ssl.curve_types: []
+#     reporting:
+#       # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
+#       #reporting_threshold: 10000
+#       # Frequency used to check the queue of events to be sent out to fleet.
+#       #reporting_check_frequency_sec: 30
 
 # download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries

@@ -51,21 +51,16 @@ func localConfigDefault() *localConfig {
 // FleetAgentConfig is the internal configuration of the agent after the enrollment is done,
 // this configuration is not exposed in anyway in the elastic-agent.yml and is only internal configuration.
 type FleetAgentConfig struct {
-	Enabled      bool           `config:"enabled" yaml:"enabled"`
-	AccessAPIKey string         `config:"access_api_key" yaml:"access_api_key"`
-	Kibana       *kibana.Config `config:"kibana" yaml:"kibana"`
-	Reporting    *LogReporting  `config:"reporting" yaml:"reporting"`
-	Info         *AgentInfo     `config:"agent" yaml:"agent"`
+	Enabled      bool                  `config:"enabled" yaml:"enabled"`
+	AccessAPIKey string                `config:"access_api_key" yaml:"access_api_key"`
+	Kibana       *kibana.Config        `config:"kibana" yaml:"kibana"`
+	Reporting    *fleetreporter.Config `config:"reporting" yaml:"reporting"`
+	Info         *AgentInfo            `config:"agent" yaml:"agent"`
 }
 
 // AgentInfo is a set of agent information.
 type AgentInfo struct {
 	ID string `json:"id" yaml:"id" config:"id"`
-}
-
-// LogReporting define the fleet options for log reporting.
-type LogReporting struct {
-	Fleet *fleetreporter.ManagementConfig `config:"fleet" yaml:"fleet"`
 }
 
 // Validate validates the required fields for accessing the API.
@@ -85,11 +80,9 @@ func (e *FleetAgentConfig) Validate() error {
 
 func defaultFleetAgentConfig() *FleetAgentConfig {
 	return &FleetAgentConfig{
-		Enabled: false,
-		Reporting: &LogReporting{
-			Fleet: fleetreporter.DefaultFleetManagementConfig(),
-		},
-		Info: &AgentInfo{},
+		Enabled:   false,
+		Reporting: fleetreporter.DefaultConfig(),
+		Info:      &AgentInfo{},
 	}
 }
 

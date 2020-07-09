@@ -117,7 +117,7 @@ func newManaged(
 	}
 
 	logR := logreporter.NewReporter(log)
-	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
+	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting)
 	if err != nil {
 		return nil, errors.New(err, "fail to create reporters")
 	}
