@@ -245,9 +245,6 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	if mg.Verbose() {
 		env["MAGEFILE_VERBOSE"] = "1"
 	}
-	if UseVendor {
-		env["GOFLAGS"] = "-mod=vendor"
-	}
 
 	runner := &IntegrationRunner{
 		steps:  runnerSteps,
