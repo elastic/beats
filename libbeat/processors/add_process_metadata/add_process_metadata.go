@@ -194,7 +194,7 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
-		// no process metadata, lets still try to get contianer id
+		// no process metadata, lets still try to get container id
 		p.log.Debugf("failed to get process metadata for PID=%d: %v", pid, err)
 		meta = common.MapStr{}
 	} else {
