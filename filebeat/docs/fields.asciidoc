@@ -2382,6 +2382,16 @@ type: keyword
 
 --
 
+*`azure.activitylogs.result_type`*::
++
+--
+Result type
+
+
+type: keyword
+
+--
+
 *`azure.activitylogs.result_signature`*::
 +
 --
@@ -2396,6 +2406,16 @@ type: keyword
 +
 --
 Category
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.event_category`*::
++
+--
+Event Category
 
 
 type: keyword
@@ -2435,6 +2455,16 @@ type: keyword
 Fields for Azure audit logs.
 
 
+
+*`azure.auditlogs.category`*::
++
+--
+The category of the operation.  Currently, Audit is the only supported value.
+
+
+type: keyword
+
+--
 
 *`azure.auditlogs.operation_name`*::
 +
@@ -2835,10 +2865,30 @@ type: keyword
 
 --
 
+*`azure.signinlogs.result_type`*::
++
+--
+Result type
+
+
+type: keyword
+
+--
+
 *`azure.signinlogs.identity`*::
 +
 --
 Identity
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.category`*::
++
+--
+Category
 
 
 type: keyword
