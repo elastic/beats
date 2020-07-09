@@ -4587,7 +4587,7 @@ type: date
 
 --
 
-*`azure.billing.billing_period`*::
+*`azure.billing.billing_period_id`*::
 +
 --
 The billing period id

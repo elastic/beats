@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -40,7 +42,7 @@ func NewClient(config Config) (*Client, error) {
 	return client, nil
 }
 
-// GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
+// GetMetrics returns the usage detail and forecast values.
 func (client *Client) GetMetrics() (Usage, error) {
 	var usage Usage
 	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
@@ -49,17 +51,17 @@ func (client *Client) GetMetrics() (Usage, error) {
 		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano)),
 		"", nil, "properties/instanceLocation")
 	if err != nil {
-		return usage, err
+		return usage, errors.Wrap(err, "Retrieving usage details failed in client")
 	}
 	usage.UsageDetails = usageDetails.Values()
 	actualCosts, err := client.BillingService.GetForcast(fmt.Sprintf("properties/chargeType eq '%s'", "Actual"))
 	if err != nil {
-		return usage, err
+		return usage, errors.Wrap(err, "Retrieving forecast - actual costs failed in client")
 	}
 	usage.ActualCosts = *actualCosts.Value
 	forecastCosts, err := client.BillingService.GetForcast(fmt.Sprintf("properties/chargeType eq '%s'", "Forecast"))
 	if err != nil {
-		return usage, err
+		return usage, errors.Wrap(err, "Retrieving forecast failed in client")
 	}
 	usage.ForecastCosts = *forecastCosts.Value
 	return usage, nil

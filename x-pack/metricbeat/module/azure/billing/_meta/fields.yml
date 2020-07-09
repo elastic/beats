@@ -28,7 +28,7 @@
       type: date
       description: >
         The usage end date
-    - name: billing_period
+    - name: billing_period_id
       type: keyword
       description: >
         The billing period id

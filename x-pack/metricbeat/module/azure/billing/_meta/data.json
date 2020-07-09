@@ -6,7 +6,7 @@
             "usage_start" : "2020-07-08T00:00:00.000Z",
             "usage_end" : "2020-07-08T23:59:59.000Z",
             "currency" : "USD",
-            "billing_period" : "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/providers/Microsoft.Billing/billingPeriods/20200701",
+            "billing_period_id" : "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/providers/Microsoft.Billing/billingPeriods/20200701",
             "account_name" : "Eng1",
             "pretax_cost" : "0.000004175936293",
             "department_name" : "Eng"
