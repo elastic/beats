@@ -5,7 +5,8 @@
 <titleabbrev>Instrumentation</titleabbrev>
 ++++
 
-The Beats publishing output and Elasticsearch output are instrumented with {apm-overview-ref-v}/overview.html[Elastic APM].
+Libbeat uses the Elastic APM Go Agent to instrument its publishing pipeline.
+Currently, only the Elasticsearch output is instrumented.
 To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to APM Server.
 
 Example configuration with instrumentation enabled:
@@ -57,26 +58,34 @@ If `api_key` is set then `secret_token` will be ignored.
 [float]
 ==== `profiling.cpu.enabled`
 
-This feature is experimental.
 Enable profiling of the server, recording profile samples as events.
+
+This feature is experimental.
 
 [float]
 ==== `profiling.cpu.interval`
+
+Configure the CPU profiling interval. Defaults to `60s`.
 
 This feature is experimental.
 
 [float]
 ==== `profiling.cpu.duration`
 
+Configure the CPU profiling duration. Defaults to `10s`.
+
 This feature is experimental.
 
 [float]
 ==== `profiling.heap.enabled`
 
-This feature is experimental.
 Set to true to enable heap profiling.
+
+This feature is experimental.
 
 [float]
 ==== `profiling.heap.interval`
+
+Configure the heap profiling interval. Defaults to `60s`.
 
 This feature is experimental.
