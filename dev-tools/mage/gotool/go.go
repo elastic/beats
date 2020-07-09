@@ -97,17 +97,23 @@ func ListTestFiles(pkg string) ([]string, error) {
 // the specified module. If the module does not exist in the cache,
 // an error will be returned.
 func ListModuleCacheDir(pkg string) (string, error) {
-	return listModuleDir(pkg, false)
+	return listModuleDir(pkg, false, false)
 }
 
 // ListModuleVendorDir returns the vendor directory containing the
 // specified module. If the module has not been vendored, an error
 // will be returned.
 func ListModuleVendorDir(pkg string) (string, error) {
-	return listModuleDir(pkg, true)
+	return listModuleDir(pkg, true, false)
 }
 
-func listModuleDir(pkg string, vendor bool) (string, error) {
+// ListModuleForceCacheDir returns the module cache directory containing the
+// specified module even if the repo has a vendor folder.
+func ListModuleForceCacheDir(pkg string) (string, error) {
+	return listModuleDir(pkg, false, true)
+}
+
+func listModuleDir(pkg string, vendor, force bool) (string, error) {
 	env := map[string]string{
 		// Make sure GOFLAGS does not influence behaviour.
 		"GOFLAGS": "",
@@ -115,6 +121,8 @@ func listModuleDir(pkg string, vendor bool) (string, error) {
 	args := []string{"-m", "-f", "{{.Dir}}"}
 	if vendor {
 		args = append(args, "-mod=vendor")
+	} else if force {
+		args = append(args, "-mod=mod")
 	}
 	args = append(args, pkg)
 	lines, err := getLines(callGo(env, "list", args...))

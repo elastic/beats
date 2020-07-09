@@ -281,7 +281,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-	return listModuleDir(elasticBeatsModulePath)
+	return gotool.ListModuleCacheDir(elasticBeatsModulePath)
 }
 
 var (
