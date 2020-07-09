@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
-	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
 
 // Config define the configuration of the Agent.
@@ -57,8 +56,7 @@ func (m *managementMode) Unpack(v string) error {
 
 // ManagementConfig defines the options for the running of the beats.
 type ManagementConfig struct {
-	Mode      managementMode      `config:"mode"`
-	Reporting *logreporter.Config `config:"reporting.log"`
+	Mode managementMode `config:"mode"`
 }
 
 func defaultManagementConfig() *ManagementConfig {
@@ -72,9 +70,8 @@ type localConfig struct {
 }
 
 type localManagementConfig struct {
-	Reload    *reloadConfig       `config:"reload" yaml:"reload"`
-	Path      string              `config:"path" yaml:"path"`
-	Reporting *logreporter.Config `config:"reporting" yaml:"reporting"`
+	Reload *reloadConfig `config:"reload" yaml:"reload"`
+	Path   string        `config:"path" yaml:"path"`
 }
 
 type reloadConfig struct {
@@ -98,7 +95,6 @@ func localConfigDefault() *localConfig {
 				Enabled: true,
 				Period:  10 * time.Second,
 			},
-			Reporting: logreporter.DefaultLogConfig(),
 		},
 	}
 }
@@ -119,7 +115,6 @@ type AgentInfo struct {
 
 // LogReporting define the fleet options for log reporting.
 type LogReporting struct {
-	Log   *logreporter.Config             `config:"log" yaml:"log"`
 	Fleet *fleetreporter.ManagementConfig `config:"fleet" yaml:"fleet"`
 }
 
@@ -139,7 +134,6 @@ func (e *FleetAgentConfig) Validate() error {
 func defaultFleetAgentConfig() *FleetAgentConfig {
 	return &FleetAgentConfig{
 		Reporting: &LogReporting{
-			Log:   logreporter.DefaultLogConfig(),
 			Fleet: fleetreporter.DefaultFleetManagementConfig(),
 		},
 		Info: &AgentInfo{},

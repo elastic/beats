@@ -116,7 +116,7 @@ func newManaged(
 		return nil, errors.New(err, "starting GRPC listener", errors.TypeNetwork)
 	}
 
-	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
+	logR := logreporter.NewReporter(log)
 	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
 	if err != nil {
 		return nil, errors.New(err, "fail to create reporters")

@@ -76,7 +76,7 @@ func newLocal(
 		return nil, errors.New(err, "initialize local mode")
 	}
 
-	logR := logreporter.NewReporter(log, c.Management.Reporting)
+	logR := logreporter.NewReporter(log)
 
 	localApplication := &Local{
 		log:       log,
