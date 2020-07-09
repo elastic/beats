@@ -102,16 +102,16 @@ func newLocal(
 	}
 	localApplication.router = router
 
-	discover := discoverer(pathConfigFile, c.Management.Path)
+	discover := discoverer(pathConfigFile, c.Settings.Path)
 	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
 
 	var cfgSource source
-	if !c.Management.Reload.Enabled {
+	if !c.Settings.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
 		cfgSource = newOnce(log, discover, emit)
 	} else {
-		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Management.Reload.Period)
-		cfgSource = newPeriodic(log, c.Management.Reload.Period, discover, emit)
+		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Settings.Reload.Period)
+		cfgSource = newPeriodic(log, c.Settings.Reload.Period, discover, emit)
 	}
 
 	localApplication.source = cfgSource

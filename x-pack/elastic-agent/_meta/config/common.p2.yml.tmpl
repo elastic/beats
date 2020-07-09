@@ -30,6 +30,17 @@ inputs:
 #   # enables metrics monitoring
 #   metrics: true
 
+# # Allow fleet to reload his configuration locally on disk.
+# # Notes: Only specific process configuration will be reloaded.
+# settings.reload:
+#   # enabled configure the Elastic Agent to reload or not the local configuration.
+#   #
+#   # Default is true
+#   enabled: true
+
+#   # period define how frequent we should look for changes in the configuration.
+#   period: 10s
+
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:
 #   #
@@ -54,17 +65,6 @@ inputs:
 #       #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 #       #ssl.cipher_suites: []
 #       #ssl.curve_types: []
-
-#   # Allow fleet to reload his configuration locally on disk.
-#   # Notes: Only specific process configuration will be reloaded.
-#   reload:
-#     # enabled configure the Elastic Agent to reload or not the local configuration.
-#     #
-#     # Default is true
-#     enabled: true
-
-#     # period define how frequent we should look for changes in the configuration.
-#     period: 10s
 
 # download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries

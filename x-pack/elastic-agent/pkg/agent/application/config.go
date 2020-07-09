@@ -66,10 +66,10 @@ func defaultManagementConfig() *ManagementConfig {
 }
 
 type localConfig struct {
-	Management *localManagementConfig `config:"management" yaml:"management"`
+	Settings *localSettingsConfig `config:"agent" yaml:"agent"`
 }
 
-type localManagementConfig struct {
+type localSettingsConfig struct {
 	Reload *reloadConfig `config:"reload" yaml:"reload"`
 	Path   string        `config:"path" yaml:"path"`
 }
@@ -90,7 +90,7 @@ func (r *reloadConfig) Validate() error {
 
 func localConfigDefault() *localConfig {
 	return &localConfig{
-		Management: &localManagementConfig{
+		Settings: &localSettingsConfig{
 			Reload: &reloadConfig{
 				Enabled: true,
 				Period:  10 * time.Second,
