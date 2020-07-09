@@ -70,6 +70,30 @@ var login = (function () {
             case "EDIT_ORG_UNIT_NAME":
             case "REVOKE_DEVICE_ENROLLMENT_TOKEN":
             case "TOGGLE_SERVICE_ENABLED":
+            case "ALLOW_STRONG_AUTHENTICATION":
+            case "ALLOW_SERVICE_FOR_OAUTH2_ACCESS":
+            case "DISALLOW_SERVICE_FOR_OAUTH2_ACCESS":
+            case "CHANGE_APP_ACCESS_SETTINGS_COLLECTION_ID":
+            case "ADD_TO_TRUSTED_OAUTH2_APPS":
+            case "REMOVE_FROM_TRUSTED_OAUTH2_APPS":
+            case "BLOCK_ON_DEVICE_ACCESS":
+            case "CHANGE_TWO_STEP_VERIFICATION_ENROLLMENT_PERIOD_DURATION":
+            case "CHANGE_TWO_STEP_VERIFICATION_FREQUENCY":
+            case "CHANGE_TWO_STEP_VERIFICATION_GRACE_PERIOD_DURATION":
+            case "CHANGE_TWO_STEP_VERIFICATION_START_DATE":
+            case "CHANGE_ALLOWED_TWO_STEP_VERIFICATION_METHODS":
+            case "TOGGLE_CAA_ENABLEMENT":
+            case "CHANGE_CAA_ERROR_MESSAGE":
+            case "CHANGE_CAA_APP_ASSIGNMENTS":
+            case "UNTRUST_DOMAIN_OWNED_OAUTH2_APPS":
+            case "TRUST_DOMAIN_OWNED_OAUTH2_APPS":
+            case "ENABLE_NON_ADMIN_USER_PASSWORD_RECOVERY":
+            case "ENFORCE_STRONG_AUTHENTICATION":
+            case "UPDATE_ERROR_MSG_FOR_RESTRICTED_OAUTH2_APPS":
+            case "WEAK_PROGRAMMATIC_LOGIN_SETTINGS_CHANGED":
+            case "SESSION_CONTROL_SETTINGS_CHANGE":
+            case "CHANGE_SESSION_LENGTH":
+            case "UNBLOCK_ON_DEVICE_ACCESS":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -240,8 +264,16 @@ var login = (function () {
                     to: "gsuite.admin.application.name",
                 },
                 {
+                    from: "gsuite.admin.REAUTH_APPLICATION",
+                    to: "gsuite.admin.application.name",
+                },
+                {
                     from: "gsuite.admin.GROUP_EMAIL",
                     to: "gsuite.admin.group.email",
+                },
+                {
+                    from: "gsuite.admin.GROUP_NAME",
+                    to: "group.name",
                 },
                 {
                     from: "gsuite.admin.NEW_VALUE",
@@ -454,6 +486,42 @@ var login = (function () {
                 {
                     from: "gsuite.admin.FULL_ORG_UNIT_PATH",
                     to: "gsuite.admin.org_unit.full",
+                },
+                {
+                    from: "gsuite.admin.OAUTH2_SERVICE_NAME",
+                    to: "gsuite.admin.oauth2.service.name",
+                },
+                {
+                    from: "gsuite.admin.OAUTH2_APP_ID",
+                    to: "gsuite.admin.oauth2.application.id",
+                },
+                {
+                    from: "gsuite.admin.OAUTH2_APP_NAME",
+                    to: "gsuite.admin.oauth2.application.name",
+                },
+                {
+                    from: "gsuite.admin.OAUTH2_APP_TYPE",
+                    to: "gsuite.admin.oauth2.application.type",
+                },
+                {
+                    from: "gsuite.admin.ALLOWED_TWO_STEP_VERIFICATION_METHOD",
+                    to: "gsuite.admin.verification_method",
+                },
+                {
+                    from: "gsuite.admin.CAA_ASSIGNMENTS_NEW",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.CAA_ASSIGNMENTS_OLD",
+                    to: "gsuite.admin.old_value",
+                },
+                {
+                    from: "gsuite.admin.REAUTH_SETTING_NEW",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.REAUTH_SETTING_OLD",
+                    to: "gsuite.admin.old_value",
                 },
             ],
             mode: "rename",

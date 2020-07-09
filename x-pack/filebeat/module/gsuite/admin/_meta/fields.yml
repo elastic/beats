@@ -147,3 +147,24 @@
       description: >
         Licences enabled.
         For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
+    - name: oauth2.service.name
+      type: keyword
+      description: >
+        OAuth2 service name.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
+    - name: oauth2.application.id
+      type: keyword
+      description: OAuth2 application ID.
+    - name: oauth2.application.name
+      type: keyword
+      description: OAuth2 application name.
+    - name: oauth2.application.type
+      type: keyword
+      description: >
+        OAuth2 application type.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
+    - name: verification_method
+      type: keyword
+      description: >
+        2-step verification method.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
