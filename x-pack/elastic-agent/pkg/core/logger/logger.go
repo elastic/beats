@@ -9,10 +9,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
 	"github.com/hashicorp/go-multierror"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -109,15 +109,20 @@ func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
 	cfg.Level = logp.DebugLevel
+	cfg.Files.Path = paths.Logs()
+	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
 
 	return &cfg
 }
 
+// makeInternalFileOutput creates a zapcore.Core logger that cannot be changed with configuration.
+//
+// This is the logger that the spawned filebeat expects to read the log file from and ship to ES.
 func makeInternalFileOutput() (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Data(), "logs", agentName)
+	filename := filepath.Join(paths.Data(), "logs", fmt.Sprintf("%s-json.log", agentName))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),
@@ -135,16 +140,19 @@ func makeInternalFileOutput() (zapcore.Core, error) {
 	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, logp.DebugLevel.ZapLevel())), nil
 }
 
+// newMultiCoreWrapper takes the current zapcore.Core and appends it with the provided others.
 func newMultiCoreWrapper(cores ...zapcore.Core) func (zapcore.Core) zapcore.Core {
 	return func(core zapcore.Core) zapcore.Core {
 		return &multiCore{append(cores, core)}
 	}
 }
 
+// multiCore allows multiple cores to be used for logging.
 type multiCore struct {
 	cores []zapcore.Core
 }
 
+// Enabled returns true if the level is enabled in any one of the cores.
 func (m multiCore) Enabled(level zapcore.Level) bool {
 	for _, core := range m.cores {
 		if core.Enabled(level) {
@@ -154,6 +162,7 @@ func (m multiCore) Enabled(level zapcore.Level) bool {
 	return false
 }
 
+// With creates a new multiCore with each core set with the given fields.
 func (m multiCore) With(fields []zapcore.Field) zapcore.Core {
 	cores := make([]zapcore.Core, len(m.cores))
 	for i, core := range m.cores {
@@ -162,6 +171,7 @@ func (m multiCore) With(fields []zapcore.Field) zapcore.Core {
 	return &multiCore{cores}
 }
 
+// Check will place each core that checks for that entry.
 func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *zapcore.CheckedEntry {
 	for _, core := range m.cores {
 		checked = core.Check(entry, checked)
@@ -169,6 +179,7 @@ func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *za
 	return checked
 }
 
+// Write writes the entry to each core.
 func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	var errs error
 	for _, core := range m.cores {
@@ -179,6 +190,7 @@ func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	return errs
 }
 
+// Sync syncs each core.
 func (m multiCore) Sync() error {
 	var errs error
 	for _, core := range m.cores {

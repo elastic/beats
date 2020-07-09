@@ -185,7 +185,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				"message_key": "message",
 			},
 			"paths": []string{
-				filepath.Join(paths.Data(), "logs", "elastic-agent"),
+				filepath.Join(paths.Data(), "logs", "elastic-agent-json.log"),
 			},
 			"index": "logs-elastic.agent-default",
 			"processors": []map[string]interface{}{
@@ -204,28 +204,30 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 	}
 	logPaths := o.getLogFilePaths()
 	if len(logPaths) > 0 {
-		inputs = append(inputs, map[string]interface{}{
-			"type": "log",
-			"multiline": map[string]interface{}{
-				"pattern": "^[0-9]{4}",
-				"negate":  true,
-				"match":   "after",
-			},
-			"paths": logPaths,
-			"index": "logs-elastic.agent.metricbeat-default",
-			"processors": []map[string]interface{}{
-				{
-					"add_fields": map[string]interface{}{
-						"target": "dataset",
-						"fields": map[string]interface{}{
-							"type":      "logs",
-							"name":      "elastic.agent.metricbeat",
-							"namespace": "default",
+		for name, paths := range logPaths {
+			inputs = append(inputs, map[string]interface{}{
+				"type": "log",
+				"json": map[string]interface{}{
+					"keys_under_root": true,
+					"overwrite_keys": true,
+					"message_key": "message",
+				},
+				"paths": paths,
+				"index": fmt.Sprintf("logs-elastic.agent.%s-default", name),
+				"processors": []map[string]interface{}{
+					{
+						"add_fields": map[string]interface{}{
+							"target": "dataset",
+							"fields": map[string]interface{}{
+								"type":      "logs",
+								"name":      fmt.Sprintf("elastic.agent.%s", name),
+								"namespace": "default",
+							},
 						},
 					},
 				},
-			},
-		})
+			})
+		}
 	}
 	result := map[string]interface{}{
 		"filebeat": map[string]interface{}{
@@ -281,8 +283,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	return result, true
 }
 
-func (o *Operator) getLogFilePaths() []string {
-	var paths []string
+func (o *Operator) getLogFilePaths() map[string][]string {
+	paths := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -290,7 +292,7 @@ func (o *Operator) getLogFilePaths() []string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
 		if logPath != "" {
-			paths = append(paths, logPath)
+			paths[a.Name()] = append(paths[a.Name()], logPath)
 		}
 	}
 
