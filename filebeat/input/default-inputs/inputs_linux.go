@@ -15,25 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package inputs
 
 import (
-	"os"
-
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// The basic model of execution:
-// - input: finds files in paths/globs to harvest, starts harvesters
-// - harvester: reads a file, sends events to the spooler
-// - spooler: buffers events until ready to flush to the publisher
-// - publisher: writes to the network, notifies registrar
-// - registrar: records positions of files read
-// Finally, input uses the registrar information, on restart, to
-// determine where in each file to restart a harvester.
-func main() {
-	if err := cmd.Filebeat(inputs.Init).Execute(); err != nil {
-		os.Exit(1)
+// inputs that are only supported on linux
+
+type osComponents interface {
+	cursor.StateStore
+}
+
+func osInputs(info beat.Info, log *logp.Logger, components osComponents) []v2.Plugin {
+	return []v2.Plugin{
+		// XXX: journald is currently disable.
+		// journald.Plugin(log, components),
 	}
 }
