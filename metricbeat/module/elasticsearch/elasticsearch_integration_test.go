@@ -226,8 +226,10 @@ func TestGetAllIndices(t *testing.T) {
 			switch idx.Index {
 			case indexVisible:
 				idxVisibleExists = true
+				require.False(t, idx.Hidden)
 			case indexHidden:
 				idxHiddenExists = true
+				require.True(t, idx.Hidden)
 			}
 		}
 
@@ -592,7 +594,6 @@ func ingestAndEnrichDoc(host string) error {
 
 func countIndices(elasticsearchHostPort string) (int, error) {
 	return countCatItems(elasticsearchHostPort, "indices", "&expand_wildcards=open,hidden")
-
 }
 
 func countShards(elasticsearchHostPort string) (int, error) {

@@ -25872,10 +25872,28 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.bucket.*`*::
 +
 --
 Pod preemption victims
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.sum`*::
++
+--
+Pod preemption victims sum
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
++
+--
+Pod preemption victims count
 
 type: long
 

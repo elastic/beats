@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -29,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,6 +45,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/go-concert/unison"
 
 	_ "github.com/elastic/beats/v7/filebeat/include"
 
@@ -66,12 +71,26 @@ var (
 type Filebeat struct {
 	config         *cfg.Config
 	moduleRegistry *fileset.ModuleRegistry
+	pluginFactory  PluginFactory
 	done           chan struct{}
 	pipeline       beat.PipelineConnector
 }
 
+type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
+
+type StateStore interface {
+	Access() (*statestore.Store, error)
+	CleanupInterval() time.Duration
+}
+
 // New creates a new Filebeat pointer instance.
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+func New(plugins PluginFactory) beat.Creator {
+	return func(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+		return newBeater(b, plugins, rawConfig)
+	}
+}
+
+func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
@@ -135,6 +154,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		done:           make(chan struct{}),
 		config:         &config,
 		moduleRegistry: moduleRegistry,
+		pluginFactory:  plugins,
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -268,8 +288,24 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info,
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done))
+	inputsLogger := logp.NewLogger("input")
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
+	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
+	if err != nil {
+		panic(err) // loader detected invalid state.
+	}
+
+	var inputTaskGroup unison.TaskGroup
+	defer inputTaskGroup.Stop()
+	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
+		logp.Err("Failed to initialize the input managers: %v", err)
+		return err
+	}
+
+	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
+		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
+	))
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
