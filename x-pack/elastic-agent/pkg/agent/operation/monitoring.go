@@ -184,22 +184,17 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				"overwrite_keys": true,
 				"message_key": "message",
 			},
-			"multiline": map[string]interface{}{
-				"pattern": "^[0-9]{4}",
-				"negate":  true,
-				"match":   "after",
-			},
 			"paths": []string{
 				filepath.Join(paths.Data(), "logs", "elastic-agent"),
 			},
-			"index": "logs-elastic.agent",
+			"index": "logs-elastic.agent-default",
 			"processors": []map[string]interface{}{
 				{
 					"add_fields": map[string]interface{}{
 						"target": "dataset",
 						"fields": map[string]interface{}{
 							"type":      "logs",
-							"name":      "elastic-agent",
+							"name":      "elastic.agent",
 							"namespace": "default",
 						},
 					},
@@ -217,14 +212,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				"match":   "after",
 			},
 			"paths": logPaths,
-			"index": "logs-agent-default",
+			"index": "logs-elastic.agent.metricbeat-default",
 			"processors": []map[string]interface{}{
 				{
 					"add_fields": map[string]interface{}{
 						"target": "dataset",
 						"fields": map[string]interface{}{
 							"type":      "logs",
-							"name":      "agent",
+							"name":      "elastic.agent.metricbeat",
 							"namespace": "default",
 						},
 					},
@@ -260,14 +255,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"metricsets": []string{"stats", "state"},
 					"period":     "10s",
 					"hosts":      hosts,
-					"index":      "metrics-agent-default",
+					"index":      "metrics-elastic.agent.metricbeat-default",
 					"processors": []map[string]interface{}{
 						{
 							"add_fields": map[string]interface{}{
 								"target": "dataset",
 								"fields": map[string]interface{}{
 									"type":      "metrics",
-									"name":      "agent",
+									"name":      "elastic.agent.metricbeat",
 									"namespace": "default",
 								},
 							},
