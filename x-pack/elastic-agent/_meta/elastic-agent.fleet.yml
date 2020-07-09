@@ -5,7 +5,7 @@
 fleet:
   enabled: true
 
-# download:
+# agent.download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries
 #   # e.g /windows-x86.zip
 #   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
@@ -20,7 +20,7 @@ fleet:
 #   # for reading program specifications.
 #   install_path: "${path.data}/install"
 
-# process:
+# agent.process:
 #   # minimal port number for spawned processes
 #   min_port: 10000
 #   # maximum port number for spawned processes
@@ -29,7 +29,7 @@ fleet:
 #   # start operation is considered a failure
 #   spawn_timeout: 30s
 
-# retry:
+# agent.retry:
 #   # enabled determines whether retry is possible. Default is false.
 #   enabled: true
 #   # retries_count specifies number of retries. Default is 3.

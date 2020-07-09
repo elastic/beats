@@ -10,6 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -35,21 +36,21 @@ func (c *IntrospectConfigCmd) Execute() error {
 }
 
 func (c *IntrospectConfigCmd) introspectConfig() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	lc := localConfigDefault()
-	if err := cfg.Unpack(lc); err != nil {
-		return errors.New(err, "initiating application")
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
 	}
 
-	if isStandalone(lc) {
-		return printConfig(cfg)
+	if isStandalone(cfg.Fleet) {
+		return printConfig(rawConfig)
 	}
 
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {

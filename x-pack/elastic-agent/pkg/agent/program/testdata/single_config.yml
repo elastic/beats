@@ -1,5 +1,6 @@
 name: Production Website DB Servers
 fleet:
+  enabled: true
   agent:
     id: fleet-agent-id
   api:
@@ -157,11 +158,8 @@ inputs:
         file: true
         network: true
 
-settings.monitoring:
+agent.monitoring:
   use_output: monitoring
 
-management:
-  host: "localhost"
-
-config:
+agent:
   reload: 123

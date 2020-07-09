@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -42,14 +42,14 @@ func (c *IntrospectOutputCmd) Execute() error {
 }
 
 func (c *IntrospectOutputCmd) introspectOutputs() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	lc := localConfigDefault()
-	if err := cfg.Unpack(lc); err != nil {
-		return errors.New(err, "initiating application")
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
 	}
 
 	l, err := newErrorLogger()
@@ -57,11 +57,11 @@ func (c *IntrospectOutputCmd) introspectOutputs() error {
 		return err
 	}
 
-	if isStandalone(lc) {
-		return listOutputsFromConfig(l, cfg)
+	if isStandalone(cfg.Fleet) {
+		return listOutputsFromConfig(l, rawConfig)
 	}
 
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
@@ -95,14 +95,14 @@ func listOutputsFromMap(log *logger.Logger, cfg map[string]interface{}) error {
 }
 
 func (c *IntrospectOutputCmd) introspectOutput() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	lc := localConfigDefault()
-	if err := cfg.Unpack(lc); err != nil {
-		return errors.New(err, "initiating application")
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
 	}
 
 	l, err := newErrorLogger()
@@ -110,11 +110,11 @@ func (c *IntrospectOutputCmd) introspectOutput() error {
 		return err
 	}
 
-	if isStandalone(lc) {
-		return printOutputFromConfig(l, c.output, c.program, cfg)
+	if isStandalone(cfg.Fleet) {
+		return printOutputFromConfig(l, c.output, c.program, rawConfig)
 	}
 
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {

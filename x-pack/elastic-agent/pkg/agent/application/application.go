@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -45,14 +45,14 @@ func createApplication(
 ) (Application, error) {
 	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
-
-	c := localConfigDefault()
 	ctx := context.Background()
-	if err := rawConfig.Unpack(c); err != nil {
-		return nil, errors.New(err, "initiating application")
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
 	}
 
-	if isStandalone(c) {
+	if isStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
 		return newLocal(ctx, log, pathConfigFile, rawConfig)
 	}
@@ -62,8 +62,9 @@ func createApplication(
 }
 
 // missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func isStandalone(cfg *localConfig) bool {
-	return !cfg.Fleet.Enabled ||
-		len(cfg.Fleet.AccessAPIKey) == 0 ||
-		cfg.Fleet.Kibana == nil
+func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+	return cfg == nil ||
+		!cfg.Enabled ||
+		len(cfg.AccessAPIKey) == 0 ||
+		cfg.Kibana == nil
 }

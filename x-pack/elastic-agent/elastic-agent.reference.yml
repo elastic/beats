@@ -58,7 +58,7 @@ inputs:
 #       # Frequency used to check the queue of events to be sent out to fleet.
 #       #reporting_check_frequency_sec: 30
 
-# download:
+# agent.download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries
 #   # e.g /windows-x86.zip
 #   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
@@ -73,7 +73,7 @@ inputs:
 #   # for reading program specifications.
 #   install_path: "${path.data}/install"
 
-# process:
+# agent.process:
 #   # timeout for creating new processes. when process is not successfully created by this timeout
 #   # start operation is considered a failure
 #   spawn_timeout: 30s
@@ -81,13 +81,13 @@ inputs:
 #   # is force killed
 #   stop_timeout: 30s
 
-# grpc:
+# agent.grpc:
 #   # listen address for the GRPC server that spawned processes connect back to.
 #   address: localhost
 #   # port for the GRPC server that spawned processes connect back to.
 #   port: 6789
 
-# retry:
+# agent.retry:
 #   # Enabled determines whether retry is possible. Default is false.
 #   enabled: true
 #   # RetriesCount specifies number of retries. Default is 3.
@@ -102,7 +102,7 @@ inputs:
 #   # Default is false
 #   exponential: false
 
-# settings.monitoring:
+# agent.monitoring:
 #   # enabled turns on monitoring of running processes
 #   enabled: false
 #   # enables log monitoring
@@ -112,7 +112,7 @@ inputs:
 
 # # Allow fleet to reload his configuration locally on disk.
 # # Notes: Only specific process configuration will be reloaded.
-# settings.reload:
+# agent.reload:
 #   # enabled configure the Elastic Agent to reload or not the local configuration.
 #   #
 #   # Default is true
@@ -128,35 +128,35 @@ inputs:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: info
+#agent.logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
 # Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
-#logging.selectors: [ ]
+#agent.logging.selectors: [ ]
 
 # Send all logging output to stderr. The default is false.
 logging.to_stderr: true
 
 # Send all logging output to syslog. The default is false.
-#logging.to_syslog: false
+#agent.logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
-#logging.to_eventlog: false
+#agent.logging.to_eventlog: false
 
 # If enabled, Elastic-Agent periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
-#logging.metrics.enabled: true
+#agent.logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.
-#logging.metrics.period: 30s
+#agent.logging.metrics.period: 30s
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
-#logging.to_files: true
-#logging.files:
+#agent.logging.to_files: true
+#agent.logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
   #path: /var/log/elastic-agent
@@ -187,10 +187,10 @@ logging.to_stderr: true
   # rotateonstartup: true
 
 # Set to true to log messages in JSON format.
-#logging.json: false
+#agent.logging.json: false
 
 # Set to true, to log messages with minimal required Elastic Common Schema (ECS)
 # information. Recommended to use in combination with `logging.json=true`
 # Defaults to false.
-#logging.ecs: false
+#agent.logging.ecs: false
 

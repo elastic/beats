@@ -19,6 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -374,14 +375,14 @@ func bytesToTMPFile(b []byte) (string, error) {
 	return f.Name(), nil
 }
 
-func readConfig(raw []byte) (*FleetAgentConfig, error) {
+func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 	r := bytes.NewReader(raw)
 	config, err := config.NewConfigFrom(r)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg := defaultFleetAgentConfig()
+	cfg := configuration.DefaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}

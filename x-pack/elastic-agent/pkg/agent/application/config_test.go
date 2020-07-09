@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
@@ -26,7 +27,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, false, m.Fleet.Enabled)
-		assert.Equal(t, true, isStandalone(&m))
+		assert.Equal(t, true, isStandalone(m.Fleet))
 
 	})
 
@@ -36,7 +37,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, true, m.Fleet.Enabled)
-		assert.Equal(t, false, isStandalone(&m))
+		assert.Equal(t, false, isStandalone(m.Fleet))
 	})
 }
 
@@ -47,7 +48,7 @@ func testLocalConfig(t *testing.T) {
 			"period":  0,
 		})
 
-		m := reloadConfig{}
+		m := configuration.ReloadConfig{}
 		err := c.Unpack(&m)
 		assert.Error(t, err)
 
