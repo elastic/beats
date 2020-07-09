@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-07-09T15:30:07.117Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "c5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -13,7 +12,6 @@
         "event.duration": 0,
         "event.end": "2020-06-30T10:07:44.333733Z",
         "event.id": "da637291085411733957_-1043898914",
-        "event.ingested": "2020-07-09T15:30:08.724746Z",
         "event.kind": "alert",
         "event.module": "microsoft",
         "event.provider": "defender_atp",
@@ -52,7 +50,6 @@
         "threat.technique.name": "Malware"
     },
     {
-        "@timestamp": "2020-07-09T15:30:07.117Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "543bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -65,7 +62,6 @@
         "event.duration": 2442699369800,
         "event.end": "2020-06-30T09:45:39.5484377Z",
         "event.id": "da637291048912199236_1126926584",
-        "event.ingested": "2020-07-09T15:30:08.808102Z",
         "event.kind": "alert",
         "event.module": "microsoft",
         "event.provider": "defender_atp",
@@ -119,7 +115,6 @@
         "threat.technique.name": "DefenseEvasion"
     },
     {
-        "@timestamp": "2020-07-09T15:30:07.117Z",
         "cloud.account.id": "43521344-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "53425a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -131,7 +126,6 @@
         "event.duration": 2442699369800,
         "event.end": "2020-06-30T09:45:39.5484377Z",
         "event.id": "da637291048912199236_1126926584",
-        "event.ingested": "2020-07-09T15:30:08.811408Z",
         "event.kind": "alert",
         "event.module": "microsoft",
         "event.provider": "defender_atp",
@@ -176,7 +170,6 @@
         "threat.technique.name": "DefenseEvasion"
     },
     {
-        "@timestamp": "2020-07-09T15:30:07.117Z",
         "cloud.account.id": "1234543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "t4563234bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -189,7 +182,6 @@
         "event.duration": 892514711800,
         "event.end": "2020-06-30T09:46:15.0876676Z",
         "event.id": "da637291063515066999_-2102938302",
-        "event.ingested": "2020-07-09T15:30:08.813613Z",
         "event.kind": "alert",
         "event.module": "microsoft",
         "event.provider": "defender_atp",
