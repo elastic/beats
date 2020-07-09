@@ -57,23 +57,23 @@ pipeline {
               axis {
                 name 'BEATS_FOLDER'
                 values (
-                  'auditbeat',
-                  'filebeat',
-                  'heartbeat',
+                  // 'auditbeat',
+                  // 'filebeat',
+                  // 'heartbeat',
                   'journalbeat',
-                  'metricbeat',
-                  'packetbeat',
-                  'winlogbeat',
+                  // 'metricbeat',
+                  // 'packetbeat',
+                  // 'winlogbeat',
                   'x-pack/auditbeat',
-                  'x-pack/elastic-agent',
-                  'x-pack/dockerlogbeat',
-                  'x-pack/filebeat',
-                  'x-pack/functionbeat',
+                  // 'x-pack/elastic-agent',
+                  // 'x-pack/dockerlogbeat',
+                  // 'x-pack/filebeat',
+                  // 'x-pack/functionbeat',
                   // 'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
-                  'x-pack/metricbeat',
+                  // 'x-pack/metricbeat',
                   // 'x-pack/packetbeat',
-                  'x-pack/winlogbeat'
+                  // 'x-pack/winlogbeat'
                 )
               }
             }
@@ -105,6 +105,13 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                    retryWithSleep(retries: 5, seconds: 5, backoff: true) {
+                      sh('''
+                        docker pull docker.elastic.co/beats-dev/golang-crossbuild:1.13.10-arm
+                        docker pull docker.elastic.co/beats-dev/golang-crossbuild:1.13.10-s390x
+                        docker pull docker.elastic.co/beats-dev/golang-crossbuild:1.13.10-ppc
+                      ''')
+                    }
                     deleteDir()
                     release()
                     pushCIDockerImages()
