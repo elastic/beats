@@ -22,9 +22,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
-
 	"strconv"
 	"strings"
 	"time"
@@ -47,8 +44,8 @@ type sqlRow interface {
 	Err() error
 }
 
-// DB gets a client ready to query the database
-func DB(driver, uri string, l *logp.Logger) (*DbClient, error) {
+// NewDBClient gets a client ready to query the database
+func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 	dbx, err := sql.Open(switchDriverName(driver), uri)
 	if err != nil {
 		return nil, errors.Wrap(err, "opening connection")

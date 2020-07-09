@@ -79,7 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
-	db, err := sql.DB(m.Driver, m.HostData().URI, m.Logger())
+	db, err := sql.DBClient(m.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return errors.Wrap(err, "error opening connection")
 	}
