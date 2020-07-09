@@ -20,8 +20,9 @@ package configure
 import (
 	"flag"
 	"fmt"
-	"go.uber.org/zap/zapcore"
 	"strings"
+
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
