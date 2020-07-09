@@ -6,7 +6,7 @@ package application
 
 import (
 	"context"
-	"strings"
+	"fmt"
 	"sync"
 	"time"
 
@@ -216,6 +216,8 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	resp, err := cmd.Execute(ctx, req)
 	if isUnauth(err) {
 		f.unauthCounter++
+		fmt.Println("unauth", f.unauthCounter)
+
 		if f.shouldUnroll() {
 			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
 			return &fleetapi.CheckinResponse{
@@ -242,11 +244,7 @@ func (f *fleetGateway) shouldUnroll() bool {
 }
 
 func isUnauth(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	return strings.Contains(err.Error(), fleetapi.ErrInvalidAPIKey.Error())
+	return errors.Is(err, fleetapi.ErrInvalidAPIKey)
 }
 
 func (f *fleetGateway) Start() {
