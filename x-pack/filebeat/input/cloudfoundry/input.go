@@ -6,49 +6,51 @@ package cloudfoundry
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/feature"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 )
 
-func init() {
-	err := input.Register("cloudfoundry", NewInput)
-	if err != nil {
-		panic(err)
+type cloudfoundryEvent interface {
+	Timestamp() time.Time
+	ToFields() common.MapStr
+}
+
+func Plugin() v2.Plugin {
+	return v2.Plugin{
+		Name:       "cloudfoundry",
+		Stability:  feature.Beta,
+		Deprecated: false,
+		Info:       "collect logs from cloudfoundry loggregator",
+		Manager:    stateless.NewInputManager(configure),
 	}
 }
 
-// NewInput creates a new udp input
-func NewInput(
-	cfg *common.Config,
-	outlet channel.Connector,
-	context input.Context,
-) (input.Input, error) {
-	cfgwarn.Beta("The cloudfoundry input is beta")
-
-	log := logp.NewLogger("cloudfoundry")
-
-	out, err := outlet.Connect(cfg)
-	if err != nil {
+func configure(cfg *common.Config) (stateless.Input, error) {
+	config := cloudfoundry.Config{}
+	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	var conf cloudfoundry.Config
-	if err = cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
-
-	switch conf.Version {
+	switch config.Version {
 	case cloudfoundry.ConsumerVersionV1:
-		return newInputV1(log, conf, out, context)
+		return configureV1(config)
 	case cloudfoundry.ConsumerVersionV2:
-		return newInputV2(log, conf, out, context)
+		return configureV2(config)
 	default:
-		return nil, fmt.Errorf("not supported consumer version: %s", conf.Version)
+		return nil, fmt.Errorf("not supported consumer version: %s", config.Version)
+	}
+}
+
+func createEvent(evt cloudfoundryEvent) beat.Event {
+	return beat.Event{
+		Timestamp: evt.Timestamp(),
+		Fields:    evt.ToFields(),
 	}
 }
