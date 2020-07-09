@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
@@ -54,7 +55,19 @@ func testInput(t *testing.T, version string) {
 	require.NoError(t, err)
 	go makeApiRequests(t, ctx, apiAddress)
 
-	client := pubtest.NewChanClient(0)
+	ch := make(chan beat.Event)
+	client := &pubtest.FakeClient{
+		PublishFunc: func(evt beat.Event) {
+			if ctx.Err() != nil {
+				return
+			}
+
+			select {
+			case ch <- evt:
+			case <-ctx.Done():
+			}
+		},
+	}
 
 	wg.Add(1)
 	go func() {
@@ -68,7 +81,7 @@ func testInput(t *testing.T, version string) {
 	}()
 
 	select {
-	case e := <-client.Channel:
+	case e := <-ch:
 		t.Logf("Event received: %+v", e)
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for events")
