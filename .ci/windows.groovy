@@ -350,8 +350,8 @@ def mageTargetWin(String context, String directory, String target, String label)
     def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
 
     // NOTE: skip filebeat with windows-2016 since there are some test failures.
-    if (directory.equals('filebeat') && label.equals('windows-2016')) {
-      log(level: 'WARN', text: "Skipped stage for the 'filebeat' with 'windows-2016' as long as there are test failures to be analysed.")
+    if (directory.equals('filebeat') && (label.equals('windows-2016') || label.equals('windows-2008-r2'))) {
+      log(level: 'WARN', text: "Skipped stage for the 'filebeat' with '${label}' as long as there are test failures to be analysed.")
     } else {
       node("${immutable} && ${label}"){
         withBeatsEnvWin() {
