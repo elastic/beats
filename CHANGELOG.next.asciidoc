@@ -645,6 +645,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Metricbeat*
 - Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
+- Deprecate tags.resource_type_filter config parameter and replace with resource_type. {pull}19688[19688]
 
 *Packetbeat*
 
