@@ -46,6 +46,14 @@ var login = (function () {
             case "CHANGE_DOCS_SETTING":
             case "CHANGE_SITES_SETTING":
             case "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES":
+            case "ORG_USERS_LICENSE_ASSIGNMENT":
+            case "ORG_ALL_USERS_LICENSE_ASSIGNMENT":
+            case "USER_LICENSE_ASSIGNMENT":
+            case "CHANGE_LICENSE_AUTO_ASSIGN":
+            case "USER_LICENSE_REASSIGNMENT":
+            case "ORG_LICENSE_REVOKE":
+            case "USER_LICENSE_REVOKE":
+            case "UPDATE_DYNAMIC_LICENSE":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -297,6 +305,14 @@ var login = (function () {
                 {
                     from: "gsuite.admin.SERVICE_NAME",
                     to: "gsuite.admin.service.name",
+                },
+                {
+                    from: "gsuite.admin.PRODUCT_NAME",
+                    to: "gsuite.admin.product.name",
+                },
+                {
+                    from: "gsuite.admin.SKU_NAME",
+                    to: "gsuite.admin.product.sku",
                 },
             ],
             mode: "rename",

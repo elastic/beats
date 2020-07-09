@@ -89,3 +89,9 @@
     - name: url.name
       type: keyword
       description: The website name.
+    - name: product.name
+      type: keyword
+      description: The product name.
+    - name: product.sku
+      type: keyword
+      description: The product SKU.
