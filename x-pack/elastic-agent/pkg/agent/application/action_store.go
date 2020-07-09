@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"io"
 
 	yaml "gopkg.in/yaml.v2"
 
