@@ -126,7 +126,6 @@ func Generate() error {
 		return errors.Wrap(err, "error while getting required beats version")
 	}
 
-	mg.Deps(setup.CopyVendor)
 	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {
@@ -154,17 +153,6 @@ func getConfiguredBeatsRevision(beatsModule, revision string) error {
 		gotool.Get.Update(),
 		gotool.Get.Package(beatsPkg),
 	)
-}
-
-// VendorUpdate updates the vendor directory if used
-func VendorUpdate() error {
-	err := sh.Rm("./vendor/github.com/elastic/beats")
-	if err != nil {
-		return errors.Wrap(err, "error removing vendor dir")
-	}
-
-	devtools.SetElasticBeatsDir(getAbsoluteBeatsPath())
-	return setup.CopyVendor()
 }
 
 // returns a "compleated" config object with everything we need

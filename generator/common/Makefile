@@ -38,7 +38,7 @@ prepare-test:: mage
 	export NEWBEAT_TYPE=${BEAT_TYPE} ; \
 	export NEWBEAT_DEV=1 ; \
 	export NEWBEAT_BEATS_REVISION=$(shell git rev-parse origin/master) ; \
-	mage -v GenerateCustomBeat
+	mage GenerateCustomBeat
 
 # Runs test build for the created beat
 .PHONY: test-build

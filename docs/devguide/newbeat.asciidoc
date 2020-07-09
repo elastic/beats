@@ -515,9 +515,6 @@ To depend on the latest `master` of `github.com/elastic/beats` run the following
 go get github.com/elastic/beats@master
 ----------------------------------------------------------------------
 
-To move the dependencies to vendor, you need to manually fetch the new
-`magefile.go` for newly generated Beats from the dev-tools of `elastic/beats`.
-
 We suggest you read the following section to learn about maintaining dependencies
 using go modules:
 * https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies[How to upgrade and downgrade dependencies]

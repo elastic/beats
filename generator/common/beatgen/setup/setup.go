@@ -95,42 +95,6 @@ func copyReplacedModules() error {
 	return w.Flush()
 }
 
-// CopyVendor copies a new version of the dependencies to the vendor folder
-func CopyVendor() error {
-	err := gotool.Mod.Vendor()
-	if err != nil {
-		return errors.Wrapf(err, "error while running go mod vendor")
-	}
-
-	err = devtools.CopyFilesToVendor(
-		"./vendor",
-		[]devtools.CopyModule{
-			devtools.CopyModule{
-				Name: "github.com/elastic/beats/v7",
-				FilesToCopy: []string{
-					"dev-tools",
-					"libbeat",
-					"licenses",
-					"metricbeat",
-					"script",
-					".go-version",
-				},
-			},
-			devtools.CopyModule{
-				Name: "github.com/tsg/go-daemon",
-				FilesToCopy: []string{
-					"src",
-				},
-			},
-		},
-	)
-	if err != nil {
-		return errors.Wrapf(err, "error while copying required files to vendor")
-	}
-
-	return nil
-}
-
 // GitInit initializes a new git repo in the current directory
 func GitInit() error {
 	return sh.Run("git", "init")

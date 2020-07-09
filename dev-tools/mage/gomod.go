@@ -36,7 +36,7 @@ type CopyModule struct {
 // CopyFilesToVendor copies packages which require the whole tree
 func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
 	for _, p := range modulesToCopy {
-		path, err := gotool.ListModuleForceCacheDir(p.Name)
+		path, err := gotool.ListModuleCacheDir(p.Name)
 		if err != nil {
 			return errors.Wrapf(err, "error while looking up cached dir of module: %s", p.Name)
 		}
