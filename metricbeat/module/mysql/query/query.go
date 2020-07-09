@@ -25,7 +25,6 @@ package query
 
 import (
 	"context"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -41,8 +40,10 @@ func init() {
 }
 
 type query struct {
-	QueryNamespace string `config:"query_namespace"`
-	Query          string `config:"query"`
+	Namespace      string `config:"query_namespace" validate:"nonzero,required"`
+	Query          string `config:"query" validate:"nonzero,required"`
+	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
+	DeDotEnabled   bool   `config:"dedot.enabled"`
 }
 
 // MetricSet for fetching MySQL server status.
@@ -50,9 +51,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	db     *sql.DbClient
 	Config struct {
-		Queries        []query `config:"sql_queries" validate:"nonzero,required"`
-		Namespace      string  `config:"namespace" validate:"nonzero,required"`
-		ResponseFormat string  `config:"sql_response_format"`
+		Queries   []query `config:"queries" validate:"nonzero,required"`
+		Namespace string  `config:"namespace" validate:"nonzero,required"`
 	}
 }
 
@@ -89,38 +89,45 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) fetchQuery(ctx context.Context, q query, reporter mb.ReporterV2) error {
-	if m.Config.ResponseFormat == "table" {
-		mss, err := m.db.FetchTableMode(ctx, q.Query)
+func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.ReporterV2) error {
+	if query.ResponseFormat == "table" {
+		mss, err := m.db.FetchTableMode(ctx, query.Query)
 		if err != nil {
 			return err
 		}
 
 		for _, ms := range mss {
-			event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
-			if q.QueryNamespace != "" {
-				event.ModuleFields[m.Config.Namespace] = common.MapStr{q.QueryNamespace: sql.ToDotKeys(ms)}
-			} else {
-				event.ModuleFields[m.Config.Namespace] = sql.ToDotKeys(ms)
-			}
+			event := m.transformMapStrToEvent(query,ms)
 			reporter.Event(event)
 		}
 	} else {
-		ms, err := m.db.FetchVariableMode(ctx, q.Query)
+		ms, err := m.db.FetchVariableMode(ctx, query.Query)
 		if err != nil {
 			return err
 		}
 
-		event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
-		if q.QueryNamespace != "" {
-			event.ModuleFields[m.Config.Namespace] = common.MapStr{q.QueryNamespace: sql.ToDotKeys(ms)}
-		} else {
-			event.ModuleFields[m.Config.Namespace] = sql.ToDotKeys(ms)
-		}
+		event := m.transformMapStrToEvent(query,ms)
 		reporter.Event(event)
 	}
 
 	return nil
+}
+
+func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Event {
+	event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
+
+	data := ms
+	if query.DeDotEnabled {
+		data = sql.ToDotKeys(ms)
+	}
+
+	if query.Namespace != "" {
+		event.ModuleFields[m.Config.Namespace] = common.MapStr{query.Namespace: data}
+	} else {
+		event.ModuleFields[m.Config.Namespace] = data
+	}
+
+	return event
 }
 
 // Close closes the database connection and prevents future queries.

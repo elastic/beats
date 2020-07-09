@@ -3,17 +3,20 @@ input:
   module: mysql
   metricset: query
   defaults:
-    sql_response_format: table
     namespace: performance
-    sql_queries:
+    queries:
       - query: >
-          SELECT digest_text , count_star , avg_timer_wait , max_timer_wait , last_seen , quantile_95
+          SELECT digest_text, count_star, avg_timer_wait, max_timer_wait, last_seen, quantile_95
             FROM performance_schema.events_statements_summary_by_digest
             ORDER BY avg_timer_wait DESC
             LIMIT 10
         query_namespace: events_statements
+        response_format: table
+        dedot.enabled: false
       - query: >
           SELECT object_schema, object_name, index_name, count_fetch
           FROM performance_schema.table_io_waits_summary_by_index_usage
           WHERE count_fetch > 0
         query_namespace: table_io_waits
+        response_format: table
+        dedot.enabled: false
