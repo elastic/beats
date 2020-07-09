@@ -72,8 +72,8 @@ shared:
   - &macos_agent_pkg_spec
     <<: *common
     extra_vars:
-      # OS X 10.11 Mountain Lion is the oldest supported by Go 1.13.
-      # https://golang.org/doc/go1.13#ports
+      # OS X 10.11 El Capitan is the oldest supported by Go 1.14.
+      # https://golang.org/doc/go1.14#ports
       min_supported_osx_version: 10.11
       identifier: 'co.{{.BeatVendor | tolower}}.beats.{{.BeatName}}'
       install_path: /Library/Application Support

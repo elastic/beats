@@ -255,9 +255,6 @@ func (b GolangCrossBuilder) Build() error {
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
-	if UseVendor {
-		args = append(args, "--env", "GOFLAGS=-mod=vendor")
-	}
 	if CrossBuildMountModcache {
 		// Mount $GOPATH/pkg/mod into the container, read-only.
 		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
