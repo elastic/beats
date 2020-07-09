@@ -15,12 +15,10 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
@@ -52,9 +50,7 @@ type Application struct {
 
 	monitor monitoring.Monitor
 
-	processConfig  *process.Config
-	downloadConfig *artifact.Config
-	retryConfig    *retry.Config
+	processConfig *process.Config
 
 	logger *logger.Logger
 
@@ -84,22 +80,20 @@ func NewApplication(
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
-		bgContext:      ctx,
-		id:             id,
-		name:           appName,
-		pipelineID:     pipelineID,
-		logLevel:       logLevel,
-		spec:           spec,
-		srv:            srv,
-		processConfig:  cfg.ProcessConfig,
-		downloadConfig: cfg.DownloadConfig,
-		retryConfig:    cfg.RetryConfig,
-		logger:         logger,
-		limiter:        b,
-		reporter:       reporter,
-		monitor:        monitor,
-		uid:            uid,
-		gid:            gid,
+		bgContext:     ctx,
+		id:            id,
+		name:          appName,
+		pipelineID:    pipelineID,
+		logLevel:      logLevel,
+		spec:          spec,
+		srv:           srv,
+		processConfig: cfg.ProcessConfig,
+		logger:        logger,
+		limiter:       b,
+		reporter:      reporter,
+		monitor:       monitor,
+		uid:           uid,
+		gid:           gid,
 	}, nil
 }
 
