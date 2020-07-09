@@ -155,6 +155,17 @@ func getConfiguredBeatsRevision(beatsModule, revision string) error {
 	)
 }
 
+// VendorUpdate updates the vendor directory if used
+func VendorUpdate() error {
+	err := sh.Rm("./vendor/github.com/elastic/beats")
+	if err != nil {
+		return errors.Wrap(err, "error removing vendor dir")
+	}
+
+	devtools.SetElasticBeatsDir(getAbsoluteBeatsPath())
+	return setup.CopyVendor()
+}
+
 // returns a "compleated" config object with everything we need
 func getConfig() (map[string]string, error) {
 	userCfg := make(map[string]string)
