@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/consumption/mgmt/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+
 	"github.com/shopspring/decimal"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -66,7 +67,7 @@ func EventsMapping(results Usage) []mb.Event {
 				forecastCost = item.Charge
 			}
 		}
-		parsedDate, err := time.Parse(time.RFC3339, *usageDate)
+		parsedDate, err := time.Parse("2006-01-02", *usageDate)
 		if err != nil {
 			parsedDate = time.Now().UTC()
 		}
@@ -82,6 +83,7 @@ func EventsMapping(results Usage) []mb.Event {
 			},
 			Timestamp: time.Now().UTC(),
 		}
+		//event.ID = generateEventID(parsedDate)
 		events = append(events, event)
 	}
 	return events

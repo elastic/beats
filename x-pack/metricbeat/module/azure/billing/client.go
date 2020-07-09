@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	//"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -29,12 +28,12 @@ type Usage struct {
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	billingService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
+	usageService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{
-		BillingService: *billingService,
+		BillingService: usageService,
 		Config:         config,
 		Log:            logp.NewLogger("azure monitor client"),
 	}
@@ -44,8 +43,7 @@ func NewClient(config Config) (*Client, error) {
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
 func (client *Client) GetMetrics() (Usage, error) {
 	var usage Usage
-	//startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
-	startTime := time.Now().UTC().Truncate(24 * time.Hour)
+	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
 	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
 	usageDetails, err := client.BillingService.GetUsageDetails(fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId), "properties/meterDetails",
 		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano)),
