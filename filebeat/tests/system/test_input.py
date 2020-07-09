@@ -3,6 +3,7 @@
 from filebeat import BaseTest
 import os
 import time
+import unittest
 
 from beat.beat import Proc
 
