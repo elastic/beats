@@ -1,13 +1,12 @@
 set GOPATH=%WORKSPACE%
 set MAGEFILE_CACHE=%WORKSPACE%\.magefile
-set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;%PATH%
 
 REM Configure GCC for either 32 or 64 bits
-IF EXIST "%PROGRAMFILES(X86)%" (
-    set PATH=C:\tools\mingw64\bin;%PATH%
-) ELSE (
-    set PATH=C:\tools\mingw32\bin;%PATH%
+set MINGW_ARCH=64
+IF NOT EXIST "%PROGRAMFILES(X86)%" (
+    set MINGW_ARCH=32
 )
+set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw%MINGW_ARCH%\bin;%PATH%
 
 where /q curl
 IF ERRORLEVEL 1 (
@@ -35,7 +34,7 @@ go get github.com/magefile/mage
 mage -version
 where mage
 
-IF not exist C:\Python38\python.exe (
+IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8.
     choco install python -y -r --no-progress --version 3.8.2 || echo ERROR && exit /b
 )
