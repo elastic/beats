@@ -163,6 +163,7 @@ processors:
     target_field: rule.description
     ignore_missing: true
     if: (ctx.json?.description).length() < 1020
+
 ######################
 ## ECS File Mapping ##
 ######################
