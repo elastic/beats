@@ -573,6 +573,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 - Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
+- Deprecate tags.resource_type_filter config parameter and replace with resource_type. {pull}19688[19688]
 
 *Packetbeat*
 
