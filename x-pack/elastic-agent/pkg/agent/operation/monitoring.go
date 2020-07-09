@@ -6,9 +6,11 @@ package operation
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -174,37 +176,65 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 }
 
 func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
-	paths := o.getLogFilePaths()
-	if len(paths) == 0 {
-		return nil, false
-	}
-
-	result := map[string]interface{}{
-		"filebeat": map[string]interface{}{
-			"inputs": []interface{}{
-				map[string]interface{}{
-					"type": "log",
-					"multiline": map[string]interface{}{
-						"pattern": "^[0-9]{4}",
-						"negate":  true,
-						"match":   "after",
-					},
-					"paths": paths,
-					"index": "logs-agent-default",
-					"processors": []map[string]interface{}{
-						{
-							"add_fields": map[string]interface{}{
-								"target": "dataset",
-								"fields": map[string]interface{}{
-									"type":      "logs",
-									"name":      "agent",
-									"namespace": "default",
-								},
-							},
+	inputs := []interface{}{
+		map[string]interface{}{
+			"type": "log",
+			"json": map[string]interface{}{
+				"keys_under_root": true,
+				"overwrite_keys": true,
+				"message_key": "message",
+			},
+			"multiline": map[string]interface{}{
+				"pattern": "^[0-9]{4}",
+				"negate":  true,
+				"match":   "after",
+			},
+			"paths": []string{
+				filepath.Join(paths.Data(), "logs", "elastic-agent"),
+			},
+			"index": "logs-elastic.agent",
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "dataset",
+						"fields": map[string]interface{}{
+							"type":      "logs",
+							"name":      "elastic-agent",
+							"namespace": "default",
 						},
 					},
 				},
 			},
+		},
+	}
+	logPaths := o.getLogFilePaths()
+	if len(logPaths) > 0 {
+		inputs = append(inputs, map[string]interface{}{
+			"type": "log",
+			"multiline": map[string]interface{}{
+				"pattern": "^[0-9]{4}",
+				"negate":  true,
+				"match":   "after",
+			},
+			"paths": logPaths,
+			"index": "logs-agent-default",
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "dataset",
+						"fields": map[string]interface{}{
+							"type":      "logs",
+							"name":      "agent",
+							"namespace": "default",
+						},
+					},
+				},
+			},
+		})
+	}
+	result := map[string]interface{}{
+		"filebeat": map[string]interface{}{
+			"inputs": inputs,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,

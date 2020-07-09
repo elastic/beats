@@ -5,7 +5,6 @@
 package release
 
 import (
-	"strconv"
 	"time"
 
 	libbeatVersion "github.com/elastic/beats/v7/libbeat/version"
@@ -31,6 +30,7 @@ func Version() string {
 
 // Snapshot returns true if binary was built as snapshot.
 func Snapshot() bool {
-	val, err := strconv.ParseBool(snapshot)
-	return err == nil && val
+	return true
+	//val, err := strconv.ParseBool(snapshot)
+	//return err == nil && val
 }

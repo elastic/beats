@@ -6,17 +6,16 @@ package logger
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/hashicorp/go-multierror"
-	"go.elastic.co/ecszap"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
+	"github.com/hashicorp/go-multierror"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/logp/configure"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -74,7 +73,11 @@ func NewFromConfig(name string, cfg *config.Config) (*Logger, error) {
 }
 
 func new(name string, cfg *common.Config) (*Logger, error) {
-	if err := configure.Logging("", cfg); err != nil {
+	internal, err := makeInternalFileOutput()
+	if err != nil {
+		return nil, err
+	}
+	if err := configure.Logging("", cfg, newMultiCoreWrapper(internal)); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 
@@ -105,18 +108,16 @@ func defaultConfig() (*common.Config, error) {
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
-	cfg.ECSEnabled = true
 	cfg.Level = logp.DebugLevel
-	cfg.ToStderr = true
 
 	return &cfg
 }
 
-func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
+func makeInternalFileOutput() (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Home(), "data", "logs", agentName))
+	filename := filepath.Join(paths.Data(), "logs", agentName)
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),
@@ -131,7 +132,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	}
 
 	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
-	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, cfg.Level.ZapLevel())), nil
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, logp.DebugLevel.ZapLevel())), nil
 }
 
 func newMultiCoreWrapper(cores ...zapcore.Core) func (zapcore.Core) zapcore.Core {
@@ -154,12 +155,18 @@ func (m multiCore) Enabled(level zapcore.Level) bool {
 }
 
 func (m multiCore) With(fields []zapcore.Field) zapcore.Core {
-	
-	panic("implement me")
+	cores := make([]zapcore.Core, len(m.cores))
+	for i, core := range m.cores {
+		cores[i] = core.With(fields)
+	}
+	return &multiCore{cores}
 }
 
-func (m multiCore) Check(entry zapcore.Entry, entry2 *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	panic("implement me")
+func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	for _, core := range m.cores {
+		checked = core.Check(entry, checked)
+	}
+	return checked
 }
 
 func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
@@ -180,40 +187,4 @@ func (m multiCore) Sync() error {
 		}
 	}
 	return errs
-}
-
-// With converts error fields into ECS compliant errors
-// before adding them to the logger.
-func (c core) With(fields []zapcore.Field) zapcore.Core {
-	convertToECSFields(fields)
-	return &core{c.Core.With(fields)}
-}
-
-// Check verifies whether or not the provided entry should be logged,
-// by comparing the log level with the configured log level in the core.
-// If it should be logged the core is added to the returned entry.
-func (c core) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	if c.Enabled(ent.Level) {
-		return ce.AddCore(ent, c)
-	}
-	return ce
-}
-
-// Write converts error fields into ECS compliant errors
-// before serializing the entry and fields.
-func (c core) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	convertToECSFields(fields)
-	fields = append(fields, zap.String("ecs.version", version))
-	return c.Core.Write(ent, fields)
-}
-
-func convertToECSFields(fields []zapcore.Field) {
-	for i, f := range fields {
-		if f.Type == zapcore.ErrorType {
-			fields[i] = zapcore.Field{Key: "error",
-				Type:      zapcore.ObjectMarshalerType,
-				Interface: internal.NewError(f.Interface.(error)),
-			}
-		}
-	}
 }
