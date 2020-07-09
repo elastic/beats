@@ -225,8 +225,8 @@ var (
 							"count": c.Int("write_operations"),
 						},
 					},
-				}),
-			}),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}),
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
