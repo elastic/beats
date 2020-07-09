@@ -16,7 +16,7 @@ import groovy.transform.Field
    - 'windows-2012-r2', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit' are disabled
       since we are working on releasing each windows version incrementally.
 */
-@Field def windowsVersions = ['windows-2019', 'windows-2016']
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2008-r2']
 
 pipeline {
   agent { label 'ubuntu && immutable' }
