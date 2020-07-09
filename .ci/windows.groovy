@@ -419,6 +419,8 @@ def withBeatsEnvWin(Closure body) {
   // NOTE: to support Windows 7 32 bits the arch in the go context path is required.
   def arch = is32bit() ? '386' : 'amd64'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${arch}"
+  // NOTE: to support Windows 7 32 bits the arch in the mingw context path is required.
+  def mingwArch =  is32bit() ? '32' : '64'
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -426,7 +428,7 @@ def withBeatsEnvWin(Closure body) {
     "DEV_OS=windows",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw64\\bin;${env.PATH}",
+    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}",
     "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
