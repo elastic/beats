@@ -28,11 +28,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -63,7 +63,8 @@
         "source.user.group.name": "Open Group",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "r8---sn-ci5gup-qxas.googlevideo.com",
         "url.full": "https://r8---sn-ci5gup-qxas.googlevideo.com/"
@@ -102,11 +103,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 654,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S110000E28BA631",
         "observer.type": "firewall",
@@ -138,7 +139,8 @@
         "source.ip": "5.5.5.15",
         "source.port": 46719,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "hanuman.com",
         "url.full": "http://hanuman.com/"
@@ -174,11 +176,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1224,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S110016E28BA631",
         "observer.type": "firewall",
@@ -216,7 +218,8 @@
         "source.ip": "5.5.5.15",
         "source.port": 49128,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -251,12 +254,12 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "http.response.status_code": "400",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1857,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -284,7 +287,8 @@
         "source.ip": "172.17.34.10",
         "source.port": 62851,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "his-eur1-neur1.servicebus.windows.net",
         "url.full": "https://his-eur1-neur1.servicebus.windows.net/$servicebus/websocket"
@@ -323,12 +327,12 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "http.response.status_code": "200",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2752,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -356,7 +360,8 @@
         "source.ip": "172.16.34.15",
         "source.port": 60471,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "40.90.137.127",
         "url.full": "https://40.90.137.127/"
@@ -393,12 +398,12 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "http.response.status_code": "304",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 3561,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -427,7 +432,8 @@
         "source.ip": "172.17.34.15",
         "source.port": 65391,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "update.eset.com",
         "url.full": "http://update.eset.com/eset_upd/ep7/dll/update.ver.signed",
@@ -449,10 +455,10 @@
         "event.severity": "1",
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 4696,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -480,7 +486,8 @@
         "sophosxg.firewall.website": "ta-web-static-testing.qa. astaro.de",
         "source.ip": "10.108.108.49",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -512,11 +519,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5258,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C01001K234RXPA1",
         "observer.type": "firewall",
@@ -548,7 +555,8 @@
         "source.user.group.name": "Clientless Open Group",
         "source.user.name": "rich",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "www.google.com",
         "url.full": "http://www.google.com/"
@@ -582,11 +590,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5873,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C01001K234RXPA1",
         "observer.type": "firewall",
@@ -620,7 +628,8 @@
         "source.user.group.name": "Clientless Open Group",
         "source.user.name": "rich",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.domain": "www.google.ca",
         "url.full": "http://www.google.ca/?gfe_rd=cr&ei=ojxHWP3WC4WN8QeRioDABw"

@@ -23,11 +23,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -55,7 +55,8 @@
         "source.port": 0,
         "source.user.email": "firewall@firewallgate.com",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -93,11 +94,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 748,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -138,7 +139,8 @@
         "source.port": 52742,
         "source.user.email": "telekommunikation@constant-big.email",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -178,11 +180,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 1540,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -223,7 +225,8 @@
         "source.port": 51789,
         "source.user.email": "ripxfc@17buddies.net",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -263,11 +266,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 2295,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -305,7 +308,8 @@
         "source.port": 55002,
         "source.user.email": "SHERIF.TOBGI@ELTOBGI.COM",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -336,11 +340,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 3123,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
@@ -372,7 +376,8 @@
         "source.port": 22420,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -403,11 +408,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 3852,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -439,7 +444,8 @@
         "source.port": 58043,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -470,11 +476,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4627,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -506,7 +512,8 @@
         "source.port": 60134,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -535,11 +542,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5389,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -571,7 +578,8 @@
         "source.port": 60298,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -601,11 +609,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6143,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -633,7 +641,8 @@
         "source.ip": "10.198.16.121",
         "source.port": 60392,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -664,11 +673,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6740,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -699,7 +708,8 @@
         "source.port": 60608,
         "source.user.email": "pankhil1@postman.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -730,11 +740,11 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 7445,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
@@ -767,7 +777,8 @@
         "source.port": 22333,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     }
 ]

@@ -15,5 +15,11 @@
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9005
 
-    # firewall hostanme 
-    #var.host_name: firewall.localgroup.local
+    # firewall default hostanme 
+    #var.default_host_name: firewall.localgroup.local
+    
+    # known firewalls
+    #var.known_devices:
+    #   "device1_serialnumber": "a.host.local"
+    #   "device2_serialnumber": "b.host.local"
+

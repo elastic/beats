@@ -39,6 +39,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
@@ -51,7 +52,6 @@
         "observer.egress.zone": "WAN",
         "observer.ingress.interface.name": "Port1",
         "observer.ingress.zone": "LAN",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -104,7 +104,8 @@
         "source.packets": 6,
         "source.port": 62841,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -147,6 +148,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 986,
@@ -159,7 +161,6 @@
         "observer.egress.zone": "WAN",
         "observer.ingress.interface.name": "Port3.400",
         "observer.ingress.zone": "DMZ",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -215,7 +216,8 @@
         "source.packets": 0,
         "source.port": 49144,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -248,6 +250,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1975,
@@ -256,7 +259,6 @@
         "network.transport": "tcp",
         "observer.egress.interface.name": "Port2",
         "observer.ingress.interface.name": "Port1",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -295,7 +297,8 @@
         "source.packets": 0,
         "source.port": 53287,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -327,6 +330,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2871,
@@ -335,7 +339,6 @@
         "network.transport": "tcp",
         "observer.egress.interface.name": "Port1",
         "observer.ingress.interface.name": "tun0",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -375,7 +378,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -414,6 +418,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 3784,
@@ -421,7 +426,6 @@
         "network.packets": 0,
         "network.transport": "tcp",
         "observer.ingress.interface.name": "Port2",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -469,7 +473,8 @@
         "source.packets": 0,
         "source.port": 55039,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -502,6 +507,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4674,
@@ -510,7 +516,6 @@
         "network.transport": "tcp",
         "observer.egress.interface.name": "Port2",
         "observer.ingress.interface.name": "Port1",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -551,7 +556,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -585,6 +591,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 5608,
@@ -592,7 +599,6 @@
         "network.packets": 0,
         "network.transport": "udp",
         "observer.ingress.interface.name": "Port1",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -631,7 +637,8 @@
         "source.packets": 0,
         "source.port": 3389,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -663,6 +670,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6492,
@@ -670,7 +678,6 @@
         "network.packets": 0,
         "network.transport": "tcp",
         "observer.ingress.interface.name": "tun0",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -708,7 +715,8 @@
         "source.packets": 0,
         "source.port": 58331,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -742,6 +750,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7360,
@@ -753,7 +762,6 @@
         "observer.egress.zone": "VPN",
         "observer.ingress.interface.name": "ipsec0",
         "observer.ingress.zone": "VPN",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -798,7 +806,8 @@
         "source.user.group.name": "elastic.group.local",
         "source.user.name": "elastic@user.local",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -830,6 +839,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 8335,
@@ -837,7 +847,6 @@
         "network.packets": 0,
         "network.transport": "icmp",
         "observer.ingress.interface.name": "Port1",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -878,7 +887,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -911,6 +921,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 9256,
@@ -920,7 +931,6 @@
         "observer.egress.interface.name": "Port1",
         "observer.egress.zone": "LAN",
         "observer.ingress.interface.name": "ipsec0",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -962,7 +972,8 @@
         "source.packets": 6,
         "source.port": 61925,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1000,13 +1011,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 10196,
         "network.bytes": 0,
         "network.packets": 0,
         "network.transport": "udp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1044,7 +1055,8 @@
         "source.packets": 0,
         "source.port": 1353,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1076,13 +1088,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 11056,
         "network.bytes": 0,
         "network.packets": 0,
         "network.transport": "0",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1119,7 +1131,8 @@
         "source.packets": 0,
         "source.port": 0,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1152,6 +1165,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 11884,
@@ -1159,7 +1173,6 @@
         "network.packets": 0,
         "network.transport": "udp",
         "observer.ingress.interface.name": "Port2.611",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1197,7 +1210,8 @@
         "source.packets": 0,
         "source.port": 137,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1231,6 +1245,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 12754,
@@ -1238,7 +1253,6 @@
         "network.packets": 0,
         "network.transport": "tcp",
         "observer.ingress.interface.name": "Port1",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1276,7 +1290,8 @@
         "source.packets": 0,
         "source.port": 41960,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1306,13 +1321,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13610,
         "network.bytes": 0,
         "network.packets": 0,
         "network.transport": "icmp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1349,7 +1364,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1388,13 +1404,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 14452,
         "network.bytes": 0,
         "network.packets": 0,
         "network.transport": "tcp",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1431,7 +1447,8 @@
         "source.packets": 0,
         "source.port": 1571,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1464,6 +1481,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 15286,
@@ -1471,7 +1489,6 @@
         "network.packets": 0,
         "network.transport": "udp",
         "observer.ingress.interface.name": "Port2.531",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
@@ -1509,7 +1526,8 @@
         "source.packets": 0,
         "source.port": 546,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1540,6 +1558,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 16158,
@@ -1547,7 +1566,6 @@
         "network.packets": 0,
         "network.transport": "icmp",
         "observer.ingress.interface.name": "Port3.611",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
@@ -1586,7 +1604,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1627,6 +1646,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 17024,
@@ -1634,7 +1654,6 @@
         "network.packets": 0,
         "network.transport": "icmp",
         "observer.ingress.interface.name": "Port3.611",
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
@@ -1673,7 +1692,8 @@
         "source.nat.port": 0,
         "source.packets": 0,
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     }
 ]

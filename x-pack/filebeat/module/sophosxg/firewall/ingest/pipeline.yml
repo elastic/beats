@@ -177,14 +177,33 @@ processors:
     target_field: event.code
     ignore_missing: true
 
+###################
+## Set host.name ##
+###################
+- script:
+    lang: painless
+    if: ctx?.observer?.serial_number != null
+    source: >-
+        def conf = ctx['_conf'];
+        if (conf == null) return;
+        def serial = ctx.observer.serial_number;
+        def name = conf['default'];
+        for (def item : conf.mappings) {
+            if (item.serial == serial) {
+                name = item.hostname;
+                break;
+            }
+        }
+        ctx["host"]["name"] = name;
+
 #############
 ## Cleanup ##
 #############
-
 - remove:
     field:
     - message
     - _temp_
+    - _conf
     - sophosxg.firewall.date
     - sophosxg.firewall.time
     - sophosxg.firewall.duration

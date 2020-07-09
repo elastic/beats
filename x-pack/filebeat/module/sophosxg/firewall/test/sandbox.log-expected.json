@@ -20,10 +20,10 @@
         ],
         "file.size": "0",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -38,7 +38,8 @@
         "sophosxg.firewall.priority": "Information",
         "sophosxg.firewall.reason": "eligible",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -65,10 +66,10 @@
         "file.hash.sha1": "83cd339302bf5e8ed5240ca6383418089c337a81",
         "file.size": "153006",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 343,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -96,7 +97,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith@iview.com",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -120,10 +122,10 @@
         ],
         "file.size": "0",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 809,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
@@ -138,7 +140,8 @@
         "sophosxg.firewall.priority": "Information",
         "sophosxg.firewall.reason": "eligible",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -164,10 +167,10 @@
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
         "file.size": "153010",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1151,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -195,7 +198,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -222,10 +226,10 @@
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
         "file.size": "153010",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 1599,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -253,7 +257,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     },
     {
@@ -280,10 +285,10 @@
         "file.hash.sha1": "d910c4a81122c360fe57f67a04999425a65249db",
         "file.size": "1124",
         "fileset.name": "firewall",
+        "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 2050,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
@@ -307,7 +312,8 @@
         "sophosxg.firewall.source": "sophostest.com",
         "source.ip": "172.16.34.24",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ]
     }
 ]

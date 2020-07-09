@@ -31,13 +31,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "http.request.method": "post",
         "http.response.status_code": "401",
         "http.version": "HTTP/1.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -73,7 +73,8 @@
         "source.geo.region_name": "Pomerania",
         "source.ip": "89.68.140.204",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.full": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)"
@@ -110,13 +111,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "http.request.method": "post",
         "http.response.status_code": "200",
         "http.version": "HTTP/1.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 993,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -153,7 +154,8 @@
         "source.geo.region_name": "Pomerania",
         "source.ip": "89.68.140.204",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.full": "/mapi/nspi/",
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)"
@@ -182,13 +184,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "http.request.method": "get",
         "http.response.status_code": "403",
         "http.version": "HTTP/1.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2004,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -220,7 +222,8 @@
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.full": "/",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
@@ -249,6 +252,7 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "my_fancy_host",
         "http.request.method": "get",
         "http.request.referrer": "http://www.iviewtest.com:8990/85-0-Download.html",
         "http.response.status_code": "403",
@@ -256,7 +260,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2640,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -289,7 +292,8 @@
         "source.ip": "10.198.235.254",
         "source.user.name": "jsmith",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.full": "/download/eicarcom2.zip",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
@@ -324,13 +328,13 @@
             "connection"
         ],
         "fileset.name": "firewall",
+        "host.name": "some_other_host.local",
         "http.request.method": "get",
         "http.response.status_code": "403",
         "http.version": "HTTP/1.0",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 3453,
-        "observer.name": "firewall.localgroup.local",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -366,7 +370,8 @@
         "source.geo.region_name": "Bucuresti",
         "source.ip": "83.97.20.30",
         "tags": [
-            "sophosxg-firewall forwarded"
+            "sophosxg-firewall",
+            "forwarded"
         ],
         "url.full": "/"
     }
