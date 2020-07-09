@@ -41,10 +41,10 @@ func init() {
 }
 
 type query struct {
-	Namespace      string `config:"query_namespace" validate:"nonzero,required"`
-	Query          string `config:"query" validate:"nonzero,required"`
-	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
-	DeDotEnabled   bool   `config:"dedot.enabled"`
+	Namespace          string `config:"query_namespace"`
+	Query              string `config:"query" validate:"nonzero,required"`
+	ResponseFormat     string `config:"response_format" validate:"nonzero,required"`
+	ReplaceUnderscores bool   `config:"replace_underscores"`
 }
 
 // MetricSet for fetching MySQL server status.
@@ -74,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
-		m.db, err = sql.DB("mysql", m.HostData().URI, m.Logger())
+		m.db, err = sql.NewDBClient("mysql", m.HostData().URI, m.Logger())
 		if err != nil {
 			return errors.Wrap(err, "mysql-status fetch failed")
 		}
@@ -118,7 +118,7 @@ func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Eve
 	event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
 
 	data := ms
-	if query.DeDotEnabled {
+	if query.ReplaceUnderscores {
 		data = sql.ToDotKeys(ms)
 	}
 
