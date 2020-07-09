@@ -25904,7 +25904,7 @@ Module for ingesting Microsoft Defender ATP.
 The date and time (in UTC) the alert was last updated.
 
 
-type: keyword
+type: date
 
 --
 
@@ -25914,7 +25914,7 @@ type: keyword
 The date and time in which the status of the alert was changed to 'Resolved'.
 
 
-type: keyword
+type: date
 
 --
 
@@ -26024,7 +26024,7 @@ type: keyword
 IP address involved in the alert
 
 
-type: keyword
+type: ip
 
 --
 

@@ -7,6 +7,7 @@ processors:
       - json.comments
       - host
     ignore_missing: true
+
 #########################
 ## ECS General Mapping ##
 #########################
@@ -43,8 +44,8 @@ processors:
     value: azure
 - set:
     field: '@timestamp'
-    value: '{{json.alertCreationTime}}'
-    if: ctx.json?.alertCreationTime != null
+    value: '{{json.alertUpdateTime}}'
+    if: ctx.json?.alertUpdateTime != null
 - rename:
     field: json.aadTenantId
     target_field: cloud.account.id
@@ -183,6 +184,7 @@ processors:
     field: json.evidence.filePath
     target_field: file.path
     ignore_missing: true
+
 ######################
 ## ECS Process Mapping ##
 ######################
@@ -206,6 +208,7 @@ processors:
     field: json.evidence.parentProcessCreationTime
     target_field: process.parent.start
     ignore_missing: true
+
 ##########################
 ## ECS Observer Mapping ##
 ##########################
@@ -219,6 +222,7 @@ processors:
     field: json.detectionSource
     target_field: observer.name
     ignore_missing: true
+
 #####################
 ## ECS URL Mapping ##
 #####################
@@ -227,6 +231,7 @@ processors:
     target_field: url.full
     ignore_missing: true
     if: ctx?.json?.evidence?.url != null
+
 ######################
 ## ECS Host Mapping ##
 ######################
@@ -238,6 +243,7 @@ processors:
     field: host.name
     value: '{{host.hostname}}'
     if: ctx?.host?.hostname != null
+
 ######################
 ## ECS User Mapping ##
 ######################
@@ -253,6 +259,7 @@ processors:
     field: json.evidence.userSid
     target_field: host.user.id
     ignore_missing: true
+
 #########################
 ## ECS Related Mapping ##
 #########################
@@ -272,74 +279,10 @@ processors:
     field: related.hash
     value: '{{file.hash.sha256}}'
     if: ctx.file?.hash?.sha256 != null
+
 #############
 ## Cleanup ##
 #############
-- remove:
-    field: 
-      - json.assignedTo
-    ignore_missing: true
-    if: ctx.json?.assignedTo == null
-- remove:
-    field: 
-      - json.classification
-    ignore_missing: true
-    if: ctx.json?.classification == null
-- remove:
-    field: 
-      - json.determination
-    ignore_missing: true
-    if: ctx.json?.determination == null
-- remove:
-    field: 
-      - json.evidence.aadUserId
-    ignore_missing: true
-    if: ctx.json?.evidence?.aadUserId == null
-- remove:
-    field: 
-      - json.evidence.domainName
-    ignore_missing: true
-    if: ctx.json?.evidence?.domainName == null
-- remove:
-    field: 
-      - json.evidence.userPrincipalName
-    ignore_missing: true
-    if: ctx.json?.evidence?.userPrincipalName == null
-- remove:
-    field: 
-      - json.investigationId
-    ignore_missing: true
-    if: ctx.json?.investigationId == null
-- remove:
-    field: 
-      - json.rbacGroupName
-    ignore_missing: true
-    if: ctx.json?.rbacGroupName == null
-- remove:
-    field: 
-      - json.resolvedTime
-    ignore_missing: true
-    if: ctx.json?.resolvedTime == null
-- remove:
-    field: 
-      - json.threatFamilyName
-    ignore_missing: true
-    if: ctx.json?.threatFamilyName == null
-- remove:
-    field: 
-      - json.evidence.ipAddress
-    ignore_missing: true
-    if: ctx.json?.evidence?.ipAddress == null
-- remove:
-    field: 
-      - json.evidence.accountName
-    ignore_missing: true
-    if: ctx.json?.evidence?.accountName == null
-- remove:
-    field: 
-      - json.evidence.url
-    ignore_missing: true
-    if: ctx.json?.evidence?.url == null
 - remove:
     field: 
       - json.alertCreationTime
