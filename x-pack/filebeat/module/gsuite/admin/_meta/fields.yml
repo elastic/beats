@@ -19,6 +19,9 @@
     - name: org_unit.name
       type: keyword
       description: The organizational unit name.
+    - name: org_unit.full
+      type: keyword
+      description: The org unit full path including the root org unit name.
     - name: setting.name
       type: keyword
       description: The setting name.
@@ -134,3 +137,13 @@
     - name: email.log_search_filter.sender.ip
       type: ip
       description: The log search filter's email sender's IP address.
+    - name: chrome_licenses.enabled
+      type: keyword
+      description: >
+        Licences enabled.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
+    - name: chrome_licenses.allowed
+      type: keyword
+      description: >
+        Licences enabled.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings

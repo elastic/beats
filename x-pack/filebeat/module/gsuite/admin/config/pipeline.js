@@ -59,6 +59,17 @@ var login = (function () {
             case "CHANGE_GMAIL_SETTING":
             case "REJECT_FROM_QUARANTINE":
             case "RELEASE_FROM_QUARANTINE":
+            case "CHROME_LICENSES_ENABLED":
+            case "CHROME_APPLICATION_LICENSE_RESERVATION_UPDATED":
+            case "ASSIGN_CUSTOM_LOGO":
+            case "UNASSIGN_CUSTOM_LOGO":
+            case "REVOKE_ENROLLMENT_TOKEN":
+            case "CHROME_LICENSES_ALLOWED":
+            case "EDIT_ORG_UNIT_DESCRIPTION":
+            case "MOVE_ORG_UNIT":
+            case "EDIT_ORG_UNIT_NAME":
+            case "REVOKE_DEVICE_ENROLLMENT_TOKEN":
+            case "TOGGLE_SERVICE_ENABLED":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -73,6 +84,10 @@ var login = (function () {
             case "ADD_WEB_ADDRESS":
             case "EMAIL_UNDELETE":
             case "CREATE_GMAIL_SETTING":
+            case "CHROME_APPLICATION_LICENSE_RESERVATION_CREATED":
+            case "CREATE_DEVICE_ENROLLMENT_TOKEN":
+            case "CREATE_ENROLLMENT_TOKEN":
+            case "CREATE_ORG_UNIT":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -87,6 +102,8 @@ var login = (function () {
             case "DELETE_ROLE":
             case "DELETE_WEB_ADDRESS":
             case "DELETE_GMAIL_SETTING":
+            case "CHROME_APPLICATION_LICENSE_RESERVATION_DELETED":
+            case "REMOVE_ORG_UNIT":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "DELETE_GROUP":
@@ -111,10 +128,12 @@ var login = (function () {
             case "ISSUE_DEVICE_COMMAND":
             case "DRIVE_DATA_RESTORE":
             case "VIEW_SITE_DETAILS":
-            case "GROUP_LIST_DOWNLOAD":
-            case "GROUP_MEMBERS_DOWNLOAD":
             case "EMAIL_LOG_SEARCH":
                 evt.Put("event.type", ["info"]);
+                break;
+            case "GROUP_LIST_DOWNLOAD":
+            case "GROUP_MEMBERS_DOWNLOAD":
+                evt.Put("event.type", ["group", "info"]);
                 break;
         }
     };
@@ -423,6 +442,18 @@ var login = (function () {
                 {
                     from: "gsuite.admin.QUARANTINE_NAME",
                     to: "gsuite.admin.email.quarantine_name",
+                },
+                {
+                    from: "gsuite.admin.CHROME_LICENSES_ENABLED",
+                    to: "gsuite.admin.chrome_licenses.enabled",
+                },
+                {
+                    from: "gsuite.admin.CHROME_LICENSES_ALLOWED",
+                    to: "gsuite.admin.chrome_licenses.allowed",
+                },
+                {
+                    from: "gsuite.admin.FULL_ORG_UNIT_PATH",
+                    to: "gsuite.admin.org_unit.full",
                 },
             ],
             mode: "rename",
