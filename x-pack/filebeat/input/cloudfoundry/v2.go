@@ -22,9 +22,10 @@ func configureV2(config cloudfoundry.Config) (*inputV2, error) {
 
 func (i *inputV2) Name() string { return "cloudfoundry-v2" }
 
-func (i *inputV2) Test(_ v2.TestContext) error {
-	// XXX: try to connect, but don't consume
-	return nil
+func (i *inputV2) Test(ctx v2.TestContext) error {
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", ctx.Logger)
+	_, err := hub.Client()
+	return err
 }
 
 func (i *inputV2) Run(ctx v2.Context, publisher stateless.Publisher) error {
