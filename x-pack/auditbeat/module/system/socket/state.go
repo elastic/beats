@@ -523,7 +523,7 @@ func (s *state) ExpireOlder() {
 	deadline = s.clock().Add(-s.socketTimeout)
 	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
-			s.onSockDestroyed(sock.sock, 0)
+			s.onSockDestroyed(sock.sock, sock, 0)
 		} else {
 			s.socketLRU.get()
 		}
@@ -704,13 +704,16 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 	s.Lock()
 	defer s.Unlock()
 
-	return s.onSockDestroyed(ptr, pid)
+	return s.onSockDestroyed(ptr, nil, pid)
 }
 
-func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
-	sock, found := s.socks[ptr]
-	if !found {
-		return nil
+func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
+	var found bool
+	if sock == nil {
+		sock, found = s.socks[ptr]
+		if !found {
+			return nil
+		}
 	}
 	// Enrich with pid
 	if sock.pid == 0 && pid != 0 {
