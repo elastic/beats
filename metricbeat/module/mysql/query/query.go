@@ -25,6 +25,7 @@ package query
 
 import (
 	"context"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -97,7 +98,7 @@ func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.Rep
 		}
 
 		for _, ms := range mss {
-			event := m.transformMapStrToEvent(query,ms)
+			event := m.transformMapStrToEvent(query, ms)
 			reporter.Event(event)
 		}
 	} else {
@@ -106,7 +107,7 @@ func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.Rep
 			return err
 		}
 
-		event := m.transformMapStrToEvent(query,ms)
+		event := m.transformMapStrToEvent(query, ms)
 		reporter.Event(event)
 	}
 
