@@ -81,12 +81,30 @@ var login = (function () {
             case "DELETE_WEB_ADDRESS":
                 evt.Put("event.type", ["deletion"]);
                 break;
+            case "DELETE_GROUP":
+                evt.Put("event.type", ["group", "creation"]);
+                break;
+            case "CREATE_GROUP":
+                evt.Put("event.type", ["group", "creation"]);
+                break;
             case "REORDER_GROUP_BASED_POLICIES_EVENT":
+            case "CHANGE_GROUP_DESCRIPTION":
+            case "ADD_GROUP_MEMBER":
+            case "REMOVE_GROUP_MEMBER":
+            case "UPDATE_GROUP_MEMBER":
+            case "UPDATE_GROUP_MEMBER_DELIVERY_SETTINGS":
+            case "UPDATE_GROUP_MEMBER_DELIVERY_SETTINGS_CAN_EMAIL_OVERRIDE":
+            case "CHANGE_GROUP_NAME":
+            case "CHANGE_GROUP_SETTING":
+            case "GROUP_MEMBER_BULK_UPLOAD":
+            case "WHITELISTED_GROUPS_UPDATED":
                 evt.Put("event.type", ["group", "change"]);
                 break;
             case "ISSUE_DEVICE_COMMAND":
             case "DRIVE_DATA_RESTORE":
             case "VIEW_SITE_DETAILS":
+            case "GROUP_LIST_DOWNLOAD":
+            case "GROUP_MEMBERS_DOWNLOAD":
                 evt.Put("event.type", ["info"]);
                 break;
         }
@@ -155,6 +173,29 @@ var login = (function () {
         var tsEnd = Date.parse(end) * millisToNano;
 
         evt.Put("event.duration", tsEnd-tsStart);
+    };
+
+    var setEventOutcome = function(evt) {
+        var failed = evt.Get("gsuite.admin.group.bulk_upload.failed");
+        if (failed === null) {
+            return;
+        }
+
+        if (failed === 0) {
+            evt.Put("event.outcome", "success");
+        } else {
+            evt.Put("event.outcome", "failure");
+        }
+    };
+
+    var setGroupAllowedlist = function(evt) {
+        var allowedList = evt.Get("gsuite.admin.WHITELISTED_GROUPS");
+        if (!allowedList) {
+            return;
+        }
+
+        evt.Put("gsuite.admin.group.allowed_list", allowedList.split(","));
+        evt.Delete("gsuite.admin.WHITELISTED_GROUPS");
     };
 
     var pipeline = new processor.Chain()
@@ -314,6 +355,16 @@ var login = (function () {
                     from: "gsuite.admin.SKU_NAME",
                     to: "gsuite.admin.product.sku",
                 },
+                {
+                    from: "gsuite.admin.GROUP_MEMBER_BULK_UPLOAD_FAILED_NUMBER",
+                    to: "gsuite.admin.group.bulk_upload.failed",
+                    type: "long",
+                },
+                {
+                    from: "gsuite.admin.GROUP_MEMBER_BULK_UPLOAD_TOTAL_NUMBER",
+                    to: "gsuite.admin.group.bulk_upload.total",
+                    type: "long",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -322,6 +373,8 @@ var login = (function () {
         .Add(setGroupInfo)
         .Add(setRelatedUserInfo)
         .Add(setEventDuration)
+        .Add(setEventOutcome)
+        .Add(setGroupAllowedlist)
         .Build();
 
     return {
