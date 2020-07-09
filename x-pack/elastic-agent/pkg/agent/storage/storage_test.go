@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -49,11 +50,7 @@ func TestReplaceOrRollbackStore(t *testing.T) {
 
 		require.True(t, bytes.Equal(writtenContent, replaceWith))
 		requireFilesCount(t, dir, 2)
-
-		info, err := os.Stat(target)
-		require.NoError(t, err)
-
-		require.Equal(t, perms, info.Mode())
+		checkPerms(t, target, perms)
 	})
 
 	t.Run("when save is not successful", func(t *testing.T) {
@@ -103,10 +100,6 @@ func TestReplaceOrRollbackStore(t *testing.T) {
 		require.True(t, bytes.Equal(writtenContent, replaceWith))
 		requireFilesCount(t, dir, 1)
 
-		info, err := os.Stat(target)
-		require.NoError(t, err)
-
-		require.Equal(t, perms, info.Mode())
 	})
 
 	t.Run("when target file do not exist", func(t *testing.T) {
@@ -135,11 +128,7 @@ func TestDiskStore(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, msg, content)
-
-		info, err := os.Stat(target)
-		require.NoError(t, err)
-
-		require.Equal(t, perms, info.Mode())
+		checkPerms(t, target, perms)
 	})
 
 	t.Run("when the target do no exist", func(t *testing.T) {
@@ -158,11 +147,7 @@ func TestDiskStore(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, msg, content)
-
-		info, err := os.Stat(target)
-		require.NoError(t, err)
-
-		require.Equal(t, perms, info.Mode())
+		checkPerms(t, target, perms)
 	})
 
 	t.Run("return an io.ReadCloser to the target file", func(t *testing.T) {
@@ -178,11 +163,7 @@ func TestDiskStore(t *testing.T) {
 		content, err := ioutil.ReadAll(r)
 		require.NoError(t, err)
 		require.Equal(t, msg, content)
-
-		info, err := os.Stat(target)
-		require.NoError(t, err)
-
-		require.Equal(t, perms, info.Mode())
+		checkPerms(t, target, perms)
 	})
 }
 
@@ -209,4 +190,15 @@ func requireFilesCount(t *testing.T, dir string, l int) {
 	files, err := ioutil.ReadDir(dir)
 	require.NoError(t, err)
 	require.Equal(t, l, len(files))
+}
+
+func checkPerms(t *testing.T, target string, expected os.FileMode) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		// Windows API validation of ACL is skipped, as its very complicated.
+		return
+	}
+	info, err := os.Stat(target)
+	require.NoError(t, err)
+	require.Equal(t, expected, info.Mode())
 }

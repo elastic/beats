@@ -2,6 +2,10 @@
     {
         "@timestamp": "2014-03-06T17:10:34.000Z",
         "aws.cloudtrail.event_version": "1.0",
+        "aws.cloudtrail.flattened.request_parameters.keyName": "mykeypair",
+        "aws.cloudtrail.flattened.response_elements.keyFingerprint": "30:1d:46:d0:5b:ad:7e:1b:b6:70:62:8b:ff:38:b5:e9:ab:5d:b8:21",
+        "aws.cloudtrail.flattened.response_elements.keyMaterial": "<sensitiveDataRemoved>",
+        "aws.cloudtrail.flattened.response_elements.keyName": "mykeypair",
         "aws.cloudtrail.request_parameters": "{keyName=mykeypair}",
         "aws.cloudtrail.response_elements": "{keyMaterial=<sensitiveDataRemoved>, keyFingerprint=30:1d:46:d0:5b:ad:7e:1b:b6:70:62:8b:ff:38:b5:e9:ab:5d:b8:21, keyName=mykeypair}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",

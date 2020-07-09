@@ -438,6 +438,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 - Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
+- Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
 
 *Heartbeat*
 
@@ -559,6 +560,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
+
+*Elastic Log Driver*
+- Add support for `docker logs` command {pull}19531[19531]
 
 ==== Deprecated
 
