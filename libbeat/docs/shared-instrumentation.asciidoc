@@ -1,13 +1,12 @@
-[float]
 [[configuration-instrumentation]]
-=== Instrumentation configuration
+== Configure APM instrumentation
 
 ++++
-<titleabbrev>Instrumentation configuration</titleabbrev>
+<titleabbrev>Instrumentation</titleabbrev>
 ++++
 
-The Beats publishing output and Elasticsearch output are instrumented with Elastic APM.
-To gain insight into the performance of {beatname_uc}, you can enable this instrumentation.
+The Beats publishing output and Elasticsearch output are instrumented with {apm-overview-ref-v}/overview.html[Elastic APM].
+To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to APM Server.
 
 Example configuration with instrumentation enabled:
 
@@ -22,99 +21,62 @@ instrumentation:
 ----
 
 [float]
-==== Configuration options
+=== Configuration options
 
 You can specify the following options in the `instrumentation` section of the +{beatname_lc}.yml+ config file:
 
 [float]
-===== `enabled`
+==== `enabled`
 
-Set to true to enable instrumentation of {beatname_uc}.
+Set to `true` to enable instrumentation of {beatname_uc}.
 Defaults to `false`.
 
 [float]
-===== `environment`
+==== `environment`
 
-Set the environment in which {beatname_uc} is running. For example, `staging`, `production`, `dev`, etc.
-Environments can be filtered in the APM app.
-
-[float]
-===== `hosts`
-
-APM Server hosts to report instrumentation results to. Defaults to `http://localhost:8200`.
+Set the environment in which {beatname_uc} is running, for example, `staging`, `production`, `dev`, etc.
+Environments can be filtered in the {kibana-ref}/xpack-apm.html[APM app].
 
 [float]
-===== `api_key`
+==== `hosts`
 
-API key used to secure communication with the APM Server(s). If `api_key` is set then `secret_token` will be ignored.
-
-[float]
-===== `secret_token`
-
-Secret token used to secure communication with the APM Server(s).
+The {apm-server-ref-v}/getting-started-apm-server.html[APM Server] hosts to report instrumentation data to.
+Defaults to `http://localhost:8200`.
 
 [float]
-===== `profiling.cpu.enabled`
+==== `api_key`
+
+{apm-server-ref-v}/api-key.html[API key] used to secure communication with the APM Server(s).
+If `api_key` is set then `secret_token` will be ignored.
+
+[float]
+==== `secret_token`
+
+{apm-server-ref-v}secret-token.html[Secret token] used to secure communication with the APM Server(s).
+
+[float]
+==== `profiling.cpu.enabled`
 
 This feature is experimental.
 Enable profiling of the server, recording profile samples as events.
 
 [float]
-===== `profiling.cpu.interval`
+==== `profiling.cpu.interval`
 
 This feature is experimental.
 
 [float]
-===== `profiling.cpu.duration`
+==== `profiling.cpu.duration`
 
 This feature is experimental.
 
 [float]
-===== `profiling.heap.enabled`
+==== `profiling.heap.enabled`
 
 This feature is experimental.
 Set to true to enable heap profiling.
 
 [float]
-===== `profiling.heap.interval`
+==== `profiling.heap.interval`
 
 This feature is experimental.
-
-
-
-
-
-
-These options are supported by all Elastic Beats. Because they are common
-options, they are not namespaced.
-
-Here is an example configuration:
-
-[source,yaml]
-------------------------------------------------------------------------------
-name: "my-shipper"
-tags: ["service-X", "web-tier"]
-------------------------------------------------------------------------------
-
-[float]
-==== `name`
-
-The name of the Beat. If this option is empty, the `hostname` of the server is
-used. The name is included as the `agent.name` field in each published transaction. You can
-use the name to group all transactions sent by a single Beat.
-
-Example:
-
-[source,yaml]
-------------------------------------------------------------------------------
-name: "my-shipper"
-------------------------------------------------------------------------------
-
-[float]
-==== `tags`
-
-A list of tags that the Beat includes in the `tags` field of each published
-transaction. Tags make it easy to group servers by different logical properties.
-For example, if you have a cluster of web servers, you can add the "webservers"
-tag to the Beat on each server, and then use filters and queries in the Kibana
-web interface to get visualisations for the whole group of servers.
