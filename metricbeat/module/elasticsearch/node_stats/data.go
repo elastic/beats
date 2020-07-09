@@ -267,11 +267,12 @@ var (
 				}),
 				"memory": c.Dict("memory", s.Schema{
 					"control_group": c.Str("control_group"),
+					// The two following values are currently string. See https://github.com/elastic/elasticsearch/pull/26166
 					"limit": s.Object{
-						"bytes": c.Int("limit_in_bytes"),
+						"bytes": c.Str("limit_in_bytes"),
 					},
 					"usage": s.Object{
-						"bytes": c.Int("usage_in_bytes"),
+						"bytes": c.Str("usage_in_bytes"),
 					},
 				}),
 			}),
