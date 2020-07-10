@@ -103,18 +103,6 @@ This is a list of Defender ATP fields that are mapped to ECS.
 | severity                            | event.severity                 |
 |======================================================================|
 
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
-
-:has-dashboards!:
-
-:fileset_ex!:
-
 :modulename!:
 
 
