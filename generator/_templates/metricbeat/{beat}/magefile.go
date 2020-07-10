@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/v7/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
@@ -26,11 +25,7 @@ func init() {
 
 	devtools.BeatDescription = "One sentence description of the Beat."
 	devtools.BeatVendor = "{full_name}"
-}
-
-// VendorUpdate updates elastic/beats/v7 in the vendor dir
-func VendorUpdate() error {
-	return beatgen.VendorUpdate()
+	devtools.CrossBuildMountModcache = true
 }
 
 // CollectAll generates the docs and the fields.

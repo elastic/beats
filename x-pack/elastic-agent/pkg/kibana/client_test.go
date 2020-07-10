@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -57,7 +58,7 @@ func TestPortDefaults(t *testing.T) {
 			c, err := NewWithConfig(l, cfg, nil)
 			require.NoError(t, err)
 
-			r, err := c.request("GET", "/", nil, strings.NewReader(""))
+			r, err := c.nextRequester().request("GET", "/", nil, strings.NewReader(""))
 			require.NoError(t, err)
 
 			assert.True(t, strings.HasSuffix(r.Host, fmt.Sprintf(":%d", tc.ExpectedPort)))
@@ -301,6 +302,90 @@ func TestHTTPClient(t *testing.T) {
 			assert.Equal(t, 1, len(debugger.messages))
 		},
 	))
+}
+
+func TestNextRequester(t *testing.T) {
+	t.Run("Picks first requester on initial call", func(t *testing.T) {
+		one := &requestClient{}
+		two := &requestClient{}
+		client, err := new(nil, nil, one, two)
+		require.NoError(t, err)
+		assert.Equal(t, one, client.nextRequester())
+	})
+
+	t.Run("Picks second requester when first has error", func(t *testing.T) {
+		one := &requestClient{
+			lastErr:    fmt.Errorf("fake error"),
+			lastErrOcc: time.Now().UTC(),
+		}
+		two := &requestClient{}
+		client, err := new(nil, nil, one, two)
+		require.NoError(t, err)
+		assert.Equal(t, two, client.nextRequester())
+	})
+
+	t.Run("Picks second requester when first has used", func(t *testing.T) {
+		one := &requestClient{
+			lastUsed: time.Now().UTC(),
+		}
+		two := &requestClient{}
+		client, err := new(nil, nil, one, two)
+		require.NoError(t, err)
+		assert.Equal(t, two, client.nextRequester())
+	})
+
+	t.Run("Picks second requester when its oldest", func(t *testing.T) {
+		one := &requestClient{
+			lastUsed: time.Now().UTC().Add(-time.Minute),
+		}
+		two := &requestClient{
+			lastUsed: time.Now().UTC().Add(-3 * time.Minute),
+		}
+		three := &requestClient{
+			lastUsed: time.Now().UTC().Add(-2 * time.Minute),
+		}
+		client, err := new(nil, nil, one, two, three)
+		require.NoError(t, err)
+		assert.Equal(t, two, client.nextRequester())
+	})
+
+	t.Run("Picks third requester when its second has error and first is last used", func(t *testing.T) {
+		one := &requestClient{
+			lastUsed: time.Now().UTC().Add(-time.Minute),
+		}
+		two := &requestClient{
+			lastUsed:   time.Now().UTC().Add(-3 * time.Minute),
+			lastErr:    fmt.Errorf("fake error"),
+			lastErrOcc: time.Now().Add(-time.Minute),
+		}
+		three := &requestClient{
+			lastUsed: time.Now().UTC().Add(-2 * time.Minute),
+		}
+		client, err := new(nil, nil, one, two, three)
+		require.NoError(t, err)
+		assert.Equal(t, three, client.nextRequester())
+	})
+
+	t.Run("Picks second requester when its oldest and all have old errors", func(t *testing.T) {
+		one := &requestClient{
+			lastUsed:   time.Now().UTC().Add(-time.Minute),
+			lastErr:    fmt.Errorf("fake error"),
+			lastErrOcc: time.Now().Add(-time.Minute),
+		}
+		two := &requestClient{
+			lastUsed:   time.Now().UTC().Add(-3 * time.Minute),
+			lastErr:    fmt.Errorf("fake error"),
+			lastErrOcc: time.Now().Add(-3 * time.Minute),
+		}
+		three := &requestClient{
+			lastUsed:   time.Now().UTC().Add(-2 * time.Minute),
+			lastErr:    fmt.Errorf("fake error"),
+			lastErrOcc: time.Now().Add(-2 * time.Minute),
+		}
+		client, err := new(nil, nil, one, two, three)
+		require.NoError(t, err)
+		assert.Equal(t, two, client.nextRequester())
+	})
 }
 
 func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, host string)) func(t *testing.T) {
