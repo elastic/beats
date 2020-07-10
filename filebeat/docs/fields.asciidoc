@@ -21635,58 +21635,7 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
 *`cisco.rsa.time.timestamp`*::
-=======
-*`gsuite.admin.role.id`*::
-+
---
-Unique identifier for this role privilege.
-
-type: keyword
-
---
-
-*`gsuite.admin.role.name`*::
-+
---
-The role name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings
-
-
-type: keyword
-
---
-
-*`gsuite.admin.privilege.name`*::
-+
---
-Privilege name.
-
-type: keyword
-
---
-
-*`gsuite.admin.service.name`*::
-+
---
-The service name.
-
-type: keyword
-
---
-
-*`gsuite.admin.url.name`*::
-+
---
-The website name.
-
-type: keyword
-
---
-
-
-*`gsuite.login.affected_email_address`*::
->>>>>>> 78c75950b... Add delegated admin settings
 +
 --
 type: keyword
@@ -61533,6 +61482,33 @@ type: keyword
 
 --
 
+*`gsuite.admin.application.enabled`*::
++
+--
+The enabled application.
+
+type: keyword
+
+--
+
+*`gsuite.admin.application.licences_order_number`*::
++
+--
+Order number used to redeem licenses.
+
+type: keyword
+
+--
+
+*`gsuite.admin.application.licences_purchased`*::
++
+--
+Number of licences purchased.
+
+type: keyword
+
+--
+
 *`gsuite.admin.group.email`*::
 +
 --
@@ -61569,7 +61545,34 @@ type: keyword
 
 --
 
-*`gsuite.admin.setting`*::
+*`gsuite.admin.org_unit.full`*::
++
+--
+The org unit full path including the root org unit name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.setting.name`*::
++
+--
+The setting name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.user_defined_setting.name`*::
++
+--
+The name of the user-defined setting.
+
+type: keyword
+
+--
+
+*`gsuite.admin.setting.description`*::
 +
 --
 The setting name.
@@ -61587,10 +61590,28 @@ type: keyword
 
 --
 
-*`gsuite.admin.domain`*::
+*`gsuite.admin.domain.alias`*::
++
+--
+The domain alias.
+
+type: keyword
+
+--
+
+*`gsuite.admin.domain.name`*::
 +
 --
 The primary domain name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.domain.secondary_name`*::
++
+--
+The secondary domain name.
 
 type: keyword
 
@@ -61718,6 +61739,301 @@ type: keyword
 +
 --
 Command details.
+
+type: keyword
+
+--
+
+*`gsuite.admin.role.id`*::
++
+--
+Unique identifier for this role privilege.
+
+type: keyword
+
+--
+
+*`gsuite.admin.role.name`*::
++
+--
+The role name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.privilege.name`*::
++
+--
+Privilege name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.service.name`*::
++
+--
+The service name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.url.name`*::
++
+--
+The website name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.product.name`*::
++
+--
+The product name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.product.sku`*::
++
+--
+The product SKU.
+
+type: keyword
+
+--
+
+*`gsuite.admin.group.bulk_upload.failed`*::
++
+--
+Number of failed records in bulk upload operation.
+
+type: long
+
+--
+
+*`gsuite.admin.group.bulk_upload.total`*::
++
+--
+Number of total records in bulk upload operation.
+
+type: long
+
+--
+
+*`gsuite.admin.group.allowed_list`*::
++
+--
+Names of allow-listed groups.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email.quarantine_name`*::
++
+--
+The name of the quarantine.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email.log_search_filter.message_id`*::
++
+--
+The log search filter's email message ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email.log_search_filter.start_date`*::
++
+--
+The log search filter's start date.
+
+type: date
+
+--
+
+*`gsuite.admin.email.log_search_filter.end_date`*::
++
+--
+The log search filter's ending date.
+
+type: date
+
+--
+
+*`gsuite.admin.email.log_search_filter.recipient.value`*::
++
+--
+The log search filter's email recipient.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email.log_search_filter.sender.value`*::
++
+--
+The log search filter's email sender.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email.log_search_filter.recipient.ip`*::
++
+--
+The log search filter's email recipient's IP address.
+
+type: ip
+
+--
+
+*`gsuite.admin.email.log_search_filter.sender.ip`*::
++
+--
+The log search filter's email sender's IP address.
+
+type: ip
+
+--
+
+*`gsuite.admin.chrome_licenses.enabled`*::
++
+--
+Licences enabled. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.chrome_licenses.allowed`*::
++
+--
+Licences enabled. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.oauth2.service.name`*::
++
+--
+OAuth2 service name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.oauth2.application.id`*::
++
+--
+OAuth2 application ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.oauth2.application.name`*::
++
+--
+OAuth2 application name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.oauth2.application.type`*::
++
+--
+OAuth2 application type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.verification_method`*::
++
+--
+Related verification method. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings and https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.alert.name`*::
++
+--
+The alert name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.rule.name`*::
++
+--
+The rule name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.api.client.name`*::
++
+--
+The API client name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.api.scopes`*::
++
+--
+The API scopes.
+
+type: keyword
+
+--
+
+*`gsuite.admin.mdm.token`*::
++
+--
+The MDM vendor enrollment token.
+
+type: keyword
+
+--
+
+*`gsuite.admin.mdm.vendor`*::
++
+--
+The MDM vendor's name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.info_type`*::
++
+--
+This will be used to state what kind of information was changed. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
+
 
 type: keyword
 

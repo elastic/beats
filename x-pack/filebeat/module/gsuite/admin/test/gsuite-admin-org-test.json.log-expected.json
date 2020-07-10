@@ -814,7 +814,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "gsuite.actor.type": "USER",
-        "gsuite.admin.domain": "example.com",
+        "gsuite.admin.domain.name": "example.com",
         "gsuite.admin.group.email": "group@example.com",
         "gsuite.admin.new_value": "new",
         "gsuite.admin.org_unit.name": "org",

@@ -249,7 +249,7 @@
         ],
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
-        "gsuite.admin.domain": "example.com",
+        "gsuite.admin.domain.name": "example.com",
         "gsuite.admin.new_value": "new",
         "gsuite.event.type": "APPLICATION_SETTINGS",
         "gsuite.kind": "admin#reports#activity",

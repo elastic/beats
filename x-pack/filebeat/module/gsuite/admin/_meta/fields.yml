@@ -7,6 +7,15 @@
     - name: application.name
       type: keyword
       description: The application's name.
+    - name: application.enabled
+      type: keyword
+      description: The enabled application.
+    - name: application.licences_order_number
+      type: keyword
+      description: Order number used to redeem licenses.
+    - name: application.licences_purchased
+      type: keyword
+      description: Number of licences purchased.
     - name: group.email
       type: keyword
       description: The group's primary email address.
@@ -34,9 +43,15 @@
     - name: group.priorities
       type: keyword
       description: Group priorities.
-    - name: domain
+    - name: domain.alias
+      type: keyword
+      description: The domain alias.
+    - name: domain.name
       type: keyword
       description: The primary domain name.
+    - name: domain.secondary_name
+      type: keyword
+      description: The secondary domain name.
     - name: managed_configuration
       type: keyword
       description: The name of the managed configuration.
@@ -166,5 +181,29 @@
     - name: verification_method
       type: keyword
       description: >
-        2-step verification method.
-        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
+        Related verification method.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings and
+        https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
+    - name: alert.name
+      type: keyword
+      description: The alert name.
+    - name: rule.name
+      type: keyword
+      description: The rule name.
+    - name: api.client.name
+      type: keyword
+      description: The API client name.
+    - name: api.scopes
+      type: keyword
+      description: The API scopes.
+    - name: mdm.token
+      type: keyword
+      description: The MDM vendor enrollment token.
+    - name: mdm.vendor
+      type: keyword
+      description: The MDM vendor's name.
+    - name: info_type
+      type: keyword
+      description: >
+        This will be used to state what kind of information was changed.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings

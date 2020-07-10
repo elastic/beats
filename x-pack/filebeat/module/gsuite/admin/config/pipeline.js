@@ -94,6 +94,73 @@ var login = (function () {
             case "SESSION_CONTROL_SETTINGS_CHANGE":
             case "CHANGE_SESSION_LENGTH":
             case "UNBLOCK_ON_DEVICE_ACCESS":
+            case "CHANGE_ACCOUNT_AUTO_RENEWAL":
+            case "ADD_APPLICATION":
+            case "ADD_APPLICATION_TO_WHITELIST":
+            case "CHANGE_ADVERTISEMENT_OPTION":
+            case "CHANGE_ALERT_CRITERIA":
+            case "ALERT_RECEIVERS_CHANGED":
+            case "RENAME_ALERT":
+            case "ALERT_STATUS_CHANGED":
+            case "ADD_DOMAIN_ALIAS":
+            case "REMOVE_DOMAIN_ALIAS":
+            case "TOGGLE_OAUTH_ACCESS_TO_ALL_APIS":
+            case "TOGGLE_ALLOW_ADMIN_PASSWORD_RESET":
+            case "ENABLE_API_ACCESS":
+            case "AUTHORIZE_API_CLIENT_ACCESS":
+            case "REMOVE_API_CLIENT_ACCESS":
+            case "CHROME_LICENSES_REDEEMED":
+            case "TOGGLE_AUTO_ADD_NEW_SERVICE":
+            case "CHANGE_PRIMARY_DOMAIN":
+            case "CHANGE_WHITELIST_SETTING":
+            case "COMMUNICATION_PREFERENCES_SETTING_CHANGE":
+            case "CHANGE_CONFLICT_ACCOUNT_ACTION":
+            case "ENABLE_FEEDBACK_SOLICITATION":
+            case "TOGGLE_CONTACT_SHARING":
+            case "TOGGLE_USE_CUSTOM_LOGO":
+            case "CHANGE_CUSTOM_LOGO":
+            case "CHANGE_DATA_LOCALIZATION_FOR_RUSSIA":
+            case "CHANGE_DATA_LOCALIZATION_SETTING":
+            case "CHANGE_DATA_PROTECTION_OFFICER_CONTACT_INFO":
+            case "CHANGE_DOMAIN_DEFAULT_LOCALE":
+            case "CHANGE_DOMAIN_DEFAULT_TIMEZONE":
+            case "CHANGE_DOMAIN_NAME":
+            case "TOGGLE_ENABLE_PRE_RELEASE_FEATURES":
+            case "CHANGE_DOMAIN_SUPPORT_MESSAGE":
+            case "ADD_TRUSTED_DOMAINS":
+            case "REMOVE_TRUSTED_DOMAINS":
+            case "CHANGE_EDU_TYPE":
+            case "TOGGLE_ENABLE_OAUTH_CONSUMER_KEY":
+            case "TOGGLE_SSO_ENABLED":
+            case "TOGGLE_SSL":
+            case "CHANGE_EU_REPRESENTATIVE_CONTACT_INFO":
+            case "CHANGE_LOGIN_BACKGROUND_COLOR":
+            case "CHANGE_LOGIN_BORDER_COLOR":
+            case "CHANGE_LOGIN_ACTIVITY_TRACE":
+            case "PLAY_FOR_WORK_ENROLL":
+            case "PLAY_FOR_WORK_UNENROLL":
+            case "TOGGLE_NEW_APP_FEATURES":
+            case "TOGGLE_USE_NEXT_GEN_CONTROL_PANEL":
+            case "TOGGLE_OPEN_ID_ENABLED":
+            case "CHANGE_ORGANIZATION_NAME":
+            case "TOGGLE_OUTBOUND_RELAY":
+            case "CHANGE_PASSWORD_MAX_LENGTH":
+            case "CHANGE_PASSWORD_MIN_LENGTH":
+            case "UPDATE_DOMAIN_PRIMARY_ADMIN_EMAIL":
+            case "ENABLE_SERVICE_OR_FEATURE_NOTIFICATIONS":
+            case "REMOVE_APPLICATION":
+            case "REMOVE_APPLICATION_FROM_WHITELIST":
+            case "CHANGE_RENEW_DOMAIN_REGISTRATION":
+            case "CHANGE_RESELLER_ACCESS":
+            case "RULE_ACTIONS_CHANGED":
+            case "CHANGE_RULE_CRITERIA":
+            case "RENAME_RULE":
+            case "RULE_STATUS_CHANGED":
+            case "ADD_SECONDARY_DOMAIN":
+            case "REMOVE_SECONDARY_DOMAIN":
+            case "UPDATE_DOMAIN_SECONDARY_EMAIL":
+            case "CHANGE_SSO_SETTINGS":
+            case "UPDATE_RULE":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -112,6 +179,12 @@ var login = (function () {
             case "CREATE_DEVICE_ENROLLMENT_TOKEN":
             case "CREATE_ENROLLMENT_TOKEN":
             case "CREATE_ORG_UNIT":
+            case "CREATE_ALERT":
+            case "CREATE_PLAY_FOR_WORK_TOKEN":
+            case "GENERATE_TRANSFER_TOKEN":
+            case "REGENERATE_OAUTH_CONSUMER_SECRET":
+            case "CREATE_RULE":
+            case "GENERATE_PIN":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -128,6 +201,9 @@ var login = (function () {
             case "DELETE_GMAIL_SETTING":
             case "CHROME_APPLICATION_LICENSE_RESERVATION_DELETED":
             case "REMOVE_ORG_UNIT":
+            case "DELETE_ALERT":
+            case "DELETE_PLAY_FOR_WORK_TOKEN":
+            case "DELETE_RULE":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "DELETE_GROUP":
@@ -153,6 +229,15 @@ var login = (function () {
             case "DRIVE_DATA_RESTORE":
             case "VIEW_SITE_DETAILS":
             case "EMAIL_LOG_SEARCH":
+            case "SKIP_DOMAIN_ALIAS_MX":
+            case "VERIFY_DOMAIN_ALIAS_MX":
+            case "VERIFY_DOMAIN_ALIAS":
+            case "VIEW_DNS_LOGIN_DETAILS":
+            case "MX_RECORD_VERIFICATION_CLAIM":
+            case "UPLOAD_OAUTH_CERTIFICATE":
+            case "SKIP_SECONDARY_DOMAIN_MX":
+            case "VERIFY_SECONDARY_DOMAIN_MX":
+            case "VERIFY_SECONDARY_DOMAIN":
                 evt.Put("event.type", ["info"]);
                 break;
             case "GROUP_LIST_DOWNLOAD":
@@ -168,6 +253,9 @@ var login = (function () {
         }
         if (param.multiValue) {
             return param.multiValue;
+        }
+        if (param.intValue !== null) {
+            return param.intValue;
         }
     };
 
@@ -264,6 +352,19 @@ var login = (function () {
                     to: "gsuite.admin.application.name",
                 },
                 {
+                    from: "gsuite.admin.APPLICATION_ENABLED",
+                    to: "gsuite.admin.application.enabled",
+                },
+                {
+                    from: "gsuite.admin.APP_LICENSES_ORDER_NUMBER",
+                    to: "gsuite.admin.application.licences_order_number",
+                },
+                {
+                    from: "gsuite.admin.CHROME_NUM_LICENSES_PURCHASED",
+                    to: "gsuite.admin.application.licences_purchased",
+                    type: "long",
+                },
+                {
                     from: "gsuite.admin.REAUTH_APPLICATION",
                     to: "gsuite.admin.application.name",
                 },
@@ -305,7 +406,15 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.DOMAIN_NAME",
-                    to: "gsuite.admin.domain",
+                    to: "gsuite.admin.domain.name",
+                },
+                {
+                    from: "gsuite.admin.DOMAIN_ALIAS",
+                    to: "gsuite.admin.domain.alias",
+                },
+                {
+                    from: "gsuite.admin.SECONDARY_DOMAIN_NAME",
+                    to: "gsuite.admin.domain.secondary_name",
                 },
                 {
                     from: "gsuite.admin.MANAGED_CONFIGURATION_NAME",
@@ -508,6 +617,10 @@ var login = (function () {
                     to: "gsuite.admin.verification_method",
                 },
                 {
+                    from: "gsuite.admin.DOMAIN_VERIFICATION_METHOD",
+                    to: "gsuite.admin.verification_method",
+                },
+                {
                     from: "gsuite.admin.CAA_ASSIGNMENTS_NEW",
                     to: "gsuite.admin.new_value",
                 },
@@ -522,6 +635,34 @@ var login = (function () {
                 {
                     from: "gsuite.admin.REAUTH_SETTING_OLD",
                     to: "gsuite.admin.old_value",
+                },
+                {
+                    from: "gsuite.admin.ALERT_NAME",
+                    to: "gsuite.admin.alert.name",
+                },
+                {
+                    from: "gsuite.admin.API_CLIENT_NAME",
+                    to: "gsuite.admin.api.client.name",
+                },
+                {
+                    from: "gsuite.admin.API_SCOPES",
+                    to: "gsuite.admin.api.scopes",
+                },
+                {
+                    from: "gsuite.admin.PLAY_FOR_WORK_TOKEN_ID",
+                    to: "gsuite.admin.mdm.token",
+                },
+                {
+                    from: "gsuite.admin.PLAY_FOR_WORK_MDM_VENDOR_NAME",
+                    to: "gsuite.admin.mdm.vendor",
+                },
+                {
+                    from: "gsuite.admin.INFO_TYPE",
+                    to: "gsuite.admin.info_type",
+                },
+                {
+                    from: "gsuite.admin.RULE_NAME",
+                    to: "gsuite.admin.rule.name",
                 },
             ],
             mode: "rename",
