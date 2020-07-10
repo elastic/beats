@@ -35,12 +35,12 @@ import (
 )
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
-type LineTestSpec struct {
+type lineTestCase struct {
 	encoding string
 	strings  []string
 }
 
-var tests = []LineTestSpec{
+var tests = []lineTestCase{
 	{"plain", []string{"I can", "eat glass"}},
 	{"latin1", []string{"I kå Glas frässa", "ond des macht mr nix!"}},
 	{"utf-16be", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
@@ -77,7 +77,7 @@ var tests = []LineTestSpec{
 }
 
 func TestReaderEncodings(t *testing.T) {
-	runTest := func(t *testing.T, test LineTestSpec) {
+	runTest := func(t *testing.T, test lineTestCase) {
 		codecFactory, ok := encoding.FindEncoding(test.encoding)
 		if !ok {
 			t.Fatalf("can not find encoding '%v'", test.encoding)
@@ -287,29 +287,11 @@ func randomString(r *rand.Rand, sz int) (string, error) {
 	return s[:sz], nil
 }
 
-func TestMaxBytesLimit(t *testing.T) {
-	const (
-		enc           = "plain"
-		numberOfLines = 102
-		bufferSize    = 1024
-		lineMaxLimit  = 3012
-		lineLen       = 5720 // exceeds lineMaxLimit
-	)
-
-	codecFactory, ok := encoding.FindEncoding(enc)
-	if !ok {
-		t.Fatalf("can not find encoding '%v'", enc)
-	}
-
-	buffer := bytes.NewBuffer(nil)
-	codec, _ := codecFactory(buffer)
-	nl := lineTerminatorCharacters[LineFeed]
-
-	// Generate random lines lengths including empty lines
+func setupTestMaxBytesLimit(lineMaxLimit, lineLen int, nl []byte) (lines []string, data string, err error) {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	lineCount := randomInt(rnd, 11, 142)
-	lines := make([]string, lineCount)
+	lines = make([]string, lineCount)
 
 	var b strings.Builder
 
@@ -330,7 +312,7 @@ func TestMaxBytesLimit(t *testing.T) {
 
 		s, err := randomString(rnd, sz)
 		if err != nil {
-			t.Fatal("failed to generate random string:", err)
+			return nil, "", err
 		}
 
 		lines[i] = s
@@ -339,9 +321,35 @@ func TestMaxBytesLimit(t *testing.T) {
 		}
 		b.Write(nl)
 	}
+	return lines, b.String(), nil
+}
+
+func TestMaxBytesLimit(t *testing.T) {
+	const (
+		enc           = "plain"
+		numberOfLines = 102
+		bufferSize    = 1024
+		lineMaxLimit  = 3012
+		lineLen       = 5720 // exceeds lineMaxLimit
+	)
+
+	codecFactory, ok := encoding.FindEncoding(enc)
+	if !ok {
+		t.Fatalf("can not find encoding '%v'", enc)
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	codec, _ := codecFactory(buffer)
+	nl := lineTerminatorCharacters[LineFeed]
+
+	// Generate random lines lengths including empty lines
+	lines, input, err := setupTestMaxBytesLimit(lineMaxLimit, lineLen, nl)
+	if err != nil {
+		t.Fatal("failed to generate random input:", err)
+	}
 
 	// Create line reader
-	reader, err := NewLineReader(strings.NewReader(b.String()), Config{codec, bufferSize, LineFeed, lineMaxLimit})
+	reader, err := NewLineReader(strings.NewReader(input), Config{codec, bufferSize, LineFeed, lineMaxLimit})
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
