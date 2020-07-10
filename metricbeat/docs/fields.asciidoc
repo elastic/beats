@@ -17397,25 +17397,10 @@ type: boolean
 --
 
 [float]
-=== node
+=== node.stats
 
 node_stats
 
-
-
-*`node_stats.node.mlockall`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.master`*::
-+
---
-type: long
-
---
 
 
 [float]

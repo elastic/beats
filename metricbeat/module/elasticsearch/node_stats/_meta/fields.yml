@@ -1,440 +1,432 @@
-- name: node
+- name: node.stats
   type: group
   description: >
     node_stats
   release: ga
   fields:
-    - name: mlockall
-      type: long
-    - name: master
-      type: long
-    - name: stats
+    - name: indices
       type: group
+      description: >
+        Node indices stats
       fields:
-        - name: indices
-          type: group
+        - name: docs.count
+          type: long
           description: >
-            Node indices stats
+            Total number of existing documents.
+        - name: docs.deleted
+          type: long
+          description: >
+            Total number of deleted documents.
+        - name: segments.count
+          type: long
+          description: >
+            Total number of segments.
+        - name: segments.memory.bytes
+          type: long
+          format: bytes
+          description: >
+            Total size of segments in bytes.
+        - name: store.size.bytes
+          type: long
+          description: >
+            Total size of the store in bytes.
+        - name: bulk
+          type: group
           fields:
-            - name: docs.count
-              type: long
-              description: >
-                Total number of existing documents.
-            - name: docs.deleted
-              type: long
-              description: >
-                Total number of deleted documents.
-            - name: segments.count
-              type: long
-              description: >
-                Total number of segments.
-            - name: segments.memory.bytes
+            - name: avg_size.bytes
               type: long
               format: bytes
-              description: >
-                Total size of segments in bytes.
-            - name: store.size.bytes
+            - name: avg_time.ms
               type: long
-              description: >
-                Total size of the store in bytes.
-            - name: bulk
-              type: group
-              fields:
-                - name: avg_size.bytes
-                  type: long
-                  format: bytes
-                - name: avg_time.ms
-                  type: long
-                - name: operations.total.count
-                  type: long
-                - name: total_size.bytes
-                  type: long
-                  format: bytes
-                - name: total_time.ms
-                  type: long
-            - name: fielddata
-              type: group
-              fields:
-                - name: evictions.count
-                  type: long
-                - name: memory.bytes
-                  type: long
-                  format: bytes
-            - name: indexing
-              type: group
-              fields:
-                - name: index_time.ms
-                  type: long
-                - name: index_total.count
-                  type: long
-                - name: throttle_time.ms
-                  type: long
-            - name: query_cache
-              type: group
-              fields:
-                - name: evictions.count
-                  type: long
-                - name: hits.count
-                  type: long
-                - name: memory.bytes
-                  type: long
-                  format: bytes
-                - name: misses.count
-                  type: long
-            - name: request_cache
-              type: group
-              fields:
-                - name: evictions.count
-                  type: long
-                - name: hits.count
-                  type: long
-                - name: memory.bytes
-                  type: long
-                  format: bytes
-                - name: misses.count
-                  type: long
-            - name: search
-              type: group
-              fields:
-                - name: query_time.ms
-                  type: long
-                - name: query_total.count
-                  type: long
-            - name: segments
-              type: group
-              fields:
-                - name: doc_values.memory.bytes
-                  type: long
-                  format: bytes
-                - name: fixed_bit_set.memory.bytes
-                  type: long
-                  format: bytes
-                - name: index_writer.memory.bytes
-                  type: long
-                  format: bytes
-                - name: norms.memory.bytes
-                  type: long
-                  format: bytes
-                - name: points.memory.bytes
-                  type: long
-                  format: bytes
-                - name: stored_fields.memory.bytes
-                  type: long
-                  format: bytes
-                - name: term_vectors.memory.bytes
-                  type: long
-                  format: bytes
-                - name: terms.memory.bytes
-                  type: long
-                  format: bytes
-                - name: version_map.memory.bytes
-                  type: long
-                  format: bytes
-        - name: jvm.mem.heap
+            - name: operations.total.count
+              type: long
+            - name: total_size.bytes
+              type: long
+              format: bytes
+            - name: total_time.ms
+              type: long
+        - name: fielddata
           type: group
+          fields:
+            - name: evictions.count
+              type: long
+            - name: memory.bytes
+              type: long
+              format: bytes
+        - name: indexing
+          type: group
+          fields:
+            - name: index_time.ms
+              type: long
+            - name: index_total.count
+              type: long
+            - name: throttle_time.ms
+              type: long
+        - name: query_cache
+          type: group
+          fields:
+            - name: evictions.count
+              type: long
+            - name: hits.count
+              type: long
+            - name: memory.bytes
+              type: long
+              format: bytes
+            - name: misses.count
+              type: long
+        - name: request_cache
+          type: group
+          fields:
+            - name: evictions.count
+              type: long
+            - name: hits.count
+              type: long
+            - name: memory.bytes
+              type: long
+              format: bytes
+            - name: misses.count
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: query_time.ms
+              type: long
+            - name: query_total.count
+              type: long
+        - name: segments
+          type: group
+          fields:
+            - name: doc_values.memory.bytes
+              type: long
+              format: bytes
+            - name: fixed_bit_set.memory.bytes
+              type: long
+              format: bytes
+            - name: index_writer.memory.bytes
+              type: long
+              format: bytes
+            - name: norms.memory.bytes
+              type: long
+              format: bytes
+            - name: points.memory.bytes
+              type: long
+              format: bytes
+            - name: stored_fields.memory.bytes
+              type: long
+              format: bytes
+            - name: term_vectors.memory.bytes
+              type: long
+              format: bytes
+            - name: terms.memory.bytes
+              type: long
+              format: bytes
+            - name: version_map.memory.bytes
+              type: long
+              format: bytes
+    - name: jvm.mem.heap
+      type: group
+      fields:
+        - name: max.bytes
+          type: long
+          format: bytes
+        - name: used
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+            - name: pct
+              type: long
+              format: percent
+    - name: jvm.mem.pools
+      type: group
+      description: >
+        JVM memory pool stats
+      fields:
+        - name: old
+          type: group
+          description: >
+            Old memory pool stats.
           fields:
             - name: max.bytes
               type: long
               format: bytes
-            - name: used
-              type: group
-              fields:
-                - name: bytes
-                  type: long
-                  format: bytes
-                - name: pct
-                  type: long
-                  format: percent
-        - name: jvm.mem.pools
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: young
           type: group
           description: >
-            JVM memory pool stats
+            Young memory pool stats.
           fields:
-            - name: old
-              type: group
-              description: >
-                Old memory pool stats.
-              fields:
-                - name: max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Max bytes.
-                - name: peak.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak bytes.
-                - name: peak_max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak max bytes.
-                - name: used.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Used bytes.
-            - name: young
-              type: group
-              description: >
-                Young memory pool stats.
-              fields:
-                - name: max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Max bytes.
-                - name: peak.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak bytes.
-                - name: peak_max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak max bytes.
-                - name: used.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Used bytes.
-            - name: survivor
-              type: group
-              description: >
-                Survivor memory pool stats.
-              fields:
-                - name: max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Max bytes.
-                - name: peak.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak bytes.
-                - name: peak_max.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Peak max bytes.
-                - name: used.bytes
-                  type: long
-                  format: bytes
-                  description:
-                    Used bytes.
-        - name: jvm.gc.collectors
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: survivor
           type: group
           description: >
-            GC collector stats.
+            Survivor memory pool stats.
           fields:
-            - name: old.collection
-              type: group
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+    - name: jvm.gc.collectors
+      type: group
+      description: >
+        GC collector stats.
+      fields:
+        - name: old.collection
+          type: group
+          description: >
+            Old collection gc.
+          fields:
+            - name: count
+              type: long
               description: >
-                Old collection gc.
-              fields:
-                - name: count
-                  type: long
-                  description: >
-                - name: ms
-                  type: long
-                  description: >
-            - name: young.collection
-              type: group
+            - name: ms
+              type: long
               description: >
-                Young collection gc.
-              fields:
-                - name: count
-                  type: long
-                  description: >
-                - name: ms
-                  type: long
-                  description: >
+        - name: young.collection
+          type: group
+          description: >
+            Young collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
 
-        - name: fs
+    - name: fs
+      type: group
+      fields:
+        - name: summary
+          type: group
+          description: >
+            File system summary
+          fields:
+            - name: total.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: free.bytes
+              type: long
+              format: bytes
+              description: >
+            - name: available.bytes
+              type: long
+              format: bytes
+              description: >
+        - name: io_stats
           type: group
           fields:
-            - name: summary
-              type: group
-              description: >
-                File system summary
-              fields:
-                - name: total.bytes
-                  type: long
-                  format: bytes
-                  description: >
-                - name: free.bytes
-                  type: long
-                  format: bytes
-                  description: >
-                - name: available.bytes
-                  type: long
-                  format: bytes
-                  description: >
-            - name: io_stats
+            - name: total
               type: group
               fields:
-                - name: total
+                - name: operations.count
+                  type: long
+                - name: read
                   type: group
                   fields:
+                    - name: kb
+                      type: long
                     - name: operations.count
                       type: long
-                    - name: read
-                      type: group
-                      fields:
-                        - name: kb
-                          type: long
-                        - name: operations.count
-                          type: long
-                    - name: write
-                      type: group
-                      fields:
-                        - name: kb
-                          type: long
-                        - name: operations.count
-                          type: long
-        - name: os.cpu
-          type: group
-          fields:
-            - name: load_avg.1m
-              type: long
-            - name: load_avg.5m
-              type: long
-            - name: load_avg.15m
-              type: long
-            - name: cgroup
-              type: group
-              fields:
-                - name: cpuacct
+                - name: write
                   type: group
                   fields:
-                    - name: control_group
+                    - name: kb
                       type: long
-                    - name: usage.ns
+                    - name: operations.count
                       type: long
-                - name: cpu
-                  type: group
-                  fields:
-                    - name: control_group
-                      type: long
-                    - name: cfs
-                      type: group
-                      fields:
-                        - name: period.us
-                          type: long
-                        - name: quota.us
-                          type: group
-                          type: long
-                    - name: stat
-                      type: group
-                      fields:
-                        - name: elapsed_periods.count
-                          type: long
-                        - name: times_throttled.count
-                          type: long
-                        - name: time_throttled.ns
-                          type: long
-                - name: memory
-                  type: group
-                  fields:
-                    - name: control_group
-                      type: long
-                    - name: limit.bytes
-                      type: long
-                      format: bytes
-                    - name: usage.bytes
-                      type: long
-                      format: bytes
-        - name: process
+    - name: os.cpu
+      type: group
+      fields:
+        - name: load_avg.1m
+          type: long
+        - name: load_avg.5m
+          type: long
+        - name: load_avg.15m
+          type: long
+        - name: cgroup
           type: group
           fields:
-            - name: cpu.pct
+            - name: cpuacct
+              type: group
+              fields:
+                - name: control_group
+                  type: long
+                - name: usage.ns
+                  type: long
+            - name: cpu
+              type: group
+              fields:
+                - name: control_group
+                  type: long
+                - name: cfs
+                  type: group
+                  fields:
+                    - name: period.us
+                      type: long
+                    - name: quota.us
+                      type: long
+                - name: stat
+                  type: group
+                  fields:
+                    - name: elapsed_periods.count
+                      type: long
+                    - name: times_throttled.count
+                      type: long
+                    - name: time_throttled.ns
+                      type: long
+            - name: memory
+              type: group
+              fields:
+                - name: control_group
+                  type: long
+                - name: limit.bytes
+                  type: long
+                  format: bytes
+                - name: usage.bytes
+                  type: long
+                  format: bytes
+    - name: process
+      type: group
+      fields:
+        - name: cpu.pct
+          type: long
+          format: percent
+        - name: file_descriptors
+          type: group
+          fields:
+            - name: max.count
               type: long
-              format: percent
-            - name: file_descriptors
-              type: group
-              fields:
-                - name: max.count
-                  type: long
-                - name: open.count
-                  type: long
-        - name: thread_pool
+            - name: open.count
+              type: long
+    - name: thread_pool
+      type: group
+      fields:
+        - name: bulk
           type: group
           fields:
-            - name: bulk
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: generic
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: get
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: index
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: management
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: search
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: watcher
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
-            - name: write
-              type: group
-              fields:
-                - name: queue.count
-                  type: long
-                - name: rejected.count
-                  type: long
-                - name: threads.count
-                  type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: generic
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: get
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: index
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: management
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: watcher
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
+        - name: write
+          type: group
+          fields:
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+            - name: threads.count
+              type: long
 
 
 

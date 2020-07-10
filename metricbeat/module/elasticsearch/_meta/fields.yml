@@ -14,18 +14,14 @@
           type: keyword
           description: >
             Elasticsearch cluster name.
-
         - name: cluster.id
           type: keyword
           description: >
             Elasticsearch cluster id.
-
-
         - name: cluster.state.id
           type: keyword
           description: >
             Elasticsearch state id.
-
         - name: node
           type: group
           fields:
@@ -33,30 +29,22 @@
               type: keyword
               description: >
                 Node ID
-
             - name: name
               type: keyword
               description: >
                 Node name.
-
             - name: master
               type: boolean
               description: >
                 Is the node the master node?
-
             - name: mlockall
               type: boolean
               description: >
                 Is mlockall enabled on the node?
-
-
-
-      # Field aliases for migration from legacy structure
-
+    # Field aliases for migration from legacy structure
     - name: cluster_uuid
       type: alias
       path: elasticsearch.cluster.id
-
     - name: node_stats
       type: group
       fields:
@@ -75,7 +63,6 @@
                 - name: total_in_bytes
                   path: elasticsearch.node.stats.fs.summary.total.bytes
                   type: alias
-
             - name: io_stats
               type: group
               fields:
@@ -97,7 +84,6 @@
                     - name: write_operations
                       path: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
                       type: alias
-
         - name: indices
           type: group
           fields:
@@ -119,14 +105,12 @@
                 - name: total_time_in_millis
                   path: elasticsearch.node.stats.indices.bulk.total_time.ms
                   type: alias
-
             - name: docs
               type: group
               fields:
                 - name: count
                   path: elasticsearch.node.stats.indices.docs.count
                   type: alias
-
             - name: fielddata
               type: group
               fields:
@@ -136,7 +120,6 @@
                 - name: memory_size_in_bytes
                   path: elasticsearch.node.stats.indices.fielddata.memory.bytes
                   type: alias
-
             - name: indexing
               type: group
               fields:
@@ -149,7 +132,6 @@
                 - name: throttle_time_in_millis
                   path: elasticsearch.node.stats.indices.indexing.throttle_time.ms
                   type: alias
-
             - name: query_cache
               type: group
               fields:
@@ -181,7 +163,6 @@
                 - name: miss_count
                   path: elasticsearch.node.stats.indices.request_cache.misses.count
                   type: alias
-
             - name: search
               type: group
               fields:
@@ -191,7 +172,6 @@
                 - name: query_total
                   path: elasticsearch.node.stats.indices.search.query_total.count
                   type: alias
-
             - name: segments
               type: group
               fields:
@@ -228,14 +208,12 @@
                 - name: version_map_memory_in_bytes
                   path: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
                   type: alias
-
             - name: store
               type: group
               fields:
                 - name: size_in_bytes
                   path: elasticsearch.node.stats.indices.store.size.bytes
                   type: alias
-
         - name: jvm
           type: group
           fields:
@@ -254,7 +232,6 @@
                         - name: collection_time_in_millis
                           path: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
                           type: alias
-
                     - name: young
                       type: group
                       fields:
@@ -264,7 +241,6 @@
                         - name: collection_time_in_millis
                           path: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
                           type: alias
-
             - name: mem
               type: group
               fields:
@@ -277,7 +253,6 @@
                 - name: heap_used_percent
                   path: elasticsearch.node.stats.jvm.mem.heap.used.pct
                   type: alias
-
         - name: mlockall
           path: elasticsearch.node.mlockall
           type: alias
@@ -305,7 +280,6 @@
                     - name: 15m
                       path: elasticsearch.node.stats.os.cpu.load_avg.15m
                       type: alias
-
             - name: cgroup
               type: group
               fields:
@@ -318,7 +292,6 @@
                     - name: usage_nanos
                       path: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
                       type: alias
-
                 - name: cpu
                   type: group
                   fields:
@@ -343,7 +316,6 @@
                         - name: time_throttled_nanos
                           path: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
                           type: alias
-
                 - name: memory
                   type: group
                   fields:
@@ -356,7 +328,6 @@
                     - name: usage_in_bytes
                       path: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
                       type: alias
-
         - name: process
           type: group
           fields:
@@ -387,7 +358,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.bulk.threads.count
                   type: alias
-
             - name: generic
               type: group
               fields:
@@ -400,7 +370,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.generic.threads.count
                   type: alias
-
             - name: get
               type: group
               fields:
@@ -413,7 +382,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.get.threads.count
                   type: alias
-
             - name: index
               type: group
               fields:
@@ -426,7 +394,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.index.threads.count
                   type: alias
-
             - name: management
               type: group
               fields:
@@ -439,7 +406,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.management.threads.count
                   type: alias
-
             - name: search
               type: group
               fields:
@@ -452,7 +418,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.search.threads.count
                   type: alias
-
             - name: watcher
               type: group
               fields:
@@ -465,7 +430,6 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.watcher.threads.count
                   type: alias
-
             - name: write
               type: group
               fields:
@@ -478,4 +442,3 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.write.threads.count
                   type: alias
-
