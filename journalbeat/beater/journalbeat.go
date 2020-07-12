@@ -27,8 +27,10 @@ import (
 	"github.com/elastic/beats/v7/journalbeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 
 	"github.com/elastic/beats/v7/journalbeat/config"
 	_ "github.com/elastic/beats/v7/journalbeat/include"
@@ -67,7 +69,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {
-		i, err := input.New(c, b, done, cp.States())
+		i, err := input.New(c, b.Info, done, cp.States())
 		if err != nil {
 			return nil, err
 		}
@@ -91,24 +93,18 @@ func (bt *Journalbeat) Run(b *beat.Beat) error {
 	bt.logger.Info("journalbeat is running! Hit CTRL-C to stop it.")
 	defer bt.logger.Info("journalbeat is stopping")
 
-	err := bt.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKLastEvents: func(data []interface{}) {
-			for _, datum := range data {
-				if st, ok := datum.(checkpoint.JournalState); ok {
-					bt.checkpoint.PersistState(st)
-				}
-			}
-		},
-	})
-	if err != nil {
-		return err
-	}
 	defer bt.checkpoint.Shutdown()
+
+	pipeline := pipetool.WithACKer(b.Publisher, acker.LastEventPrivateReporter(func(_ int, private interface{}) {
+		if st, ok := private.(checkpoint.JournalState); ok {
+			bt.checkpoint.PersistState(st)
+		}
+	}))
 
 	var wg sync.WaitGroup
 	for _, i := range bt.inputs {
 		wg.Add(1)
-		go bt.runInput(i, &wg)
+		go bt.runInput(i, &wg, pipeline)
 	}
 
 	wg.Wait()
@@ -116,9 +112,9 @@ func (bt *Journalbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (bt *Journalbeat) runInput(i *input.Input, wg *sync.WaitGroup) {
+func (bt *Journalbeat) runInput(i *input.Input, wg *sync.WaitGroup, pipeline beat.Pipeline) {
 	defer wg.Done()
-	i.Run()
+	i.Run(pipeline)
 }
 
 // Stop stops the beat and its inputs.

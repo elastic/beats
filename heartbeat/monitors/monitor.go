@@ -62,8 +62,7 @@ type Monitor struct {
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
-	stats           registryRecorder
-	factoryMetadata *common.MapStrPointer
+	stats registryRecorder
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -73,7 +72,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
-	m, err := newMonitor(config, registrar, nil, nil, allowWatches, nil)
+	m, err := newMonitor(config, registrar, nil, nil, allowWatches)
 	if m != nil {
 		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	}
@@ -101,9 +100,8 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-	factoryMetadata *common.MapStrPointer,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches, factoryMetadata)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -118,7 +116,6 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-	factoryMetadata *common.MapStrPointer,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -145,7 +142,6 @@ func newMonitorUnsafe(
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             monitorPlugin.stats,
-		factoryMetadata:   factoryMetadata,
 	}
 
 	if m.id != "" {

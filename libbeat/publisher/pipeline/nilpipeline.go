@@ -24,10 +24,8 @@ import (
 type nilPipeline struct{}
 
 type nilClient struct {
-	eventer      beat.ClientEventer
-	ackCount     func(int)
-	ackEvents    func([]interface{})
-	ackLastEvent func(interface{})
+	eventer beat.ClientEventer
+	acker   beat.ACKer
 }
 
 var _nilPipeline = (*nilPipeline)(nil)
@@ -44,10 +42,8 @@ func (p *nilPipeline) Connect() (beat.Client, error) {
 
 func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return &nilClient{
-		eventer:      cfg.Events,
-		ackCount:     cfg.ACKCount,
-		ackEvents:    cfg.ACKEvents,
-		ackLastEvent: cfg.ACKLastEvent,
+		eventer: cfg.Events,
+		acker:   cfg.ACKHandler,
 	}, nil
 }
 
@@ -61,18 +57,11 @@ func (c *nilClient) PublishAll(events []beat.Event) {
 		return
 	}
 
-	if c.ackLastEvent != nil {
-		c.ackLastEvent(events[L-1].Private)
-	}
-	if c.ackEvents != nil {
-		tmp := make([]interface{}, L)
-		for i := range events {
-			tmp[i] = events[i].Private
+	if c.acker != nil {
+		for _, event := range events {
+			c.acker.AddEvent(event, true)
 		}
-		c.ackEvents(tmp)
-	}
-	if c.ackCount != nil {
-		c.ackCount(L)
+		c.acker.ACKEvents(len(events))
 	}
 }
 
