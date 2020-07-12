@@ -41,13 +41,14 @@ const (
 )
 
 var eventLoggingConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"ignore_older", "read_buffer_size", "format_buffer_size")...)
+	"ignore_older", "read_buffer_size", "format_buffer_size", "language")...)
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`
 	IgnoreOlder      time.Duration `config:"ignore_older"`
 	ReadBufferSize   uint          `config:"read_buffer_size"   validate:"min=1"`
 	FormatBufferSize uint          `config:"format_buffer_size" validate:"min=1"`
+	EventLanguage    uint32        `config:"language"`
 }
 
 // Validate validates the eventLoggingConfig data and returns an error
@@ -168,7 +169,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 
 	l.readBuf = l.readBuf[0:numBytesRead]
 	events, _, err := win.RenderEvents(
-		l.readBuf[:numBytesRead], 0, l.formatBuf, &l.insertBuf, l.handles.get)
+		l.readBuf[:numBytesRead], l.config.EventLanguage, l.formatBuf, &l.insertBuf, l.handles.get)
 	if err != nil {
 		return nil, err
 	}
