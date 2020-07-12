@@ -105,6 +105,10 @@ so the `period` for `container_service` metricset  should be `300s` or multiples
 This metricset will collect relevant metrics from specified database accounts, these metrics will have a timegrain every 5 minutes,
 so the `period` for `database_account` metricset  should be `300s` or multiples of `300s`.
 
+[float]
+=== `app_insights`
+This metricset will collect application insights metrics, these metrics will have a timegrain every 5 minutes,
+so the `period` for `app-insights` metricset  should be `300s` or multiples of `300s`.
 
 [float]
 == Additional notes about metrics and costs
@@ -198,7 +202,6 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
-
 - module: azure
   metricsets:
   - database_account
@@ -209,12 +212,22 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+- module: azure
+  metricsets:
+    - app_insights
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
+
 ----
 
 [float]
 === Metricsets
 
 The following metricsets are available:
+
+* <<metricbeat-metricset-azure-app_insights,app_insights>>
 
 * <<metricbeat-metricset-azure-compute_vm,compute_vm>>
 
@@ -231,6 +244,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-azure-monitor,monitor>>
 
 * <<metricbeat-metricset-azure-storage,storage>>
+
+include::azure/app_insights.asciidoc[]
 
 include::azure/compute_vm.asciidoc[]
 
