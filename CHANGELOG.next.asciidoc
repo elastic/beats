@@ -231,6 +231,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+- Fix memory leak in tcp and unix input sources. {pull}19459[19459]
+- Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
 
@@ -308,8 +310,10 @@ field. You can revert this change by configuring tags for the module and omittin
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 
 *Packetbeat*
 
@@ -383,6 +387,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
+- Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
+- Add support to trim captured values in the dissect processor. {pull}19464[19464]
 
 *Auditbeat*
 
@@ -506,6 +513,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 - Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
+- Add automatic retries and exponential backoff to httpjson input. {pull}18956[18956]
 - Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
 
 *Heartbeat*
@@ -612,7 +620,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 - Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
 - The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
+- Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
 - The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
+- Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
 
 *Packetbeat*
 

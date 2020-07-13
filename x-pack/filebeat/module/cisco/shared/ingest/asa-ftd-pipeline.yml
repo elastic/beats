@@ -289,11 +289,11 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313008'"
       field: "message"
-      pattern: "%{event.outcome} %{network.transport} type=%{_temp_.cisco.icmp_type} , code=%{_temp_.cisco.icmp_code} from %{source.address} on interface %{_temp_.cisco.source_interface}"
+      pattern: "%{event.outcome} %{network.transport} type=%{_temp_.cisco.icmp_type}, code=%{_temp_.cisco.icmp_code} from %{source.address} on interface %{_temp_.cisco.source_interface}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313009'"
       field: "message"
-      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code} , for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}"
+      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code}, for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '322001'"
       field: "message"
