@@ -53,7 +53,7 @@ If `api_key` is set then `secret_token` will be ignored.
 [float]
 ==== `secret_token`
 
-{apm-server-ref-v}secret-token.html[Secret token] used to secure communication with the APM Server(s).
+{apm-server-ref-v}/secret-token.html[Secret token] used to secure communication with the APM Server(s).
 
 [float]
 ==== `profiling.cpu.enabled`
