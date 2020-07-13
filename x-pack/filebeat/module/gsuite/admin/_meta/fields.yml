@@ -245,3 +245,27 @@
     - name: request.id
       type: keyword
       description: The request ID.
+    - name: mobile.action.id
+      type: keyword
+      description: The mobile device action's ID.
+    - name: mobile.action.type
+      type: keyword
+      description: >
+        The mobile device action's type.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
+    - name: mobile.certificate.name
+      type: keyword
+      description: The mobile certificate common name.
+    - name: mobile.company_owned_devices
+      type: long
+      description: The number of devices a company owns.
+    - name: distribution.entity.name
+      type: keyword
+      description: >
+        The distribution entity value, which can be a group name or an org-unit name.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
+    - name: distribution.entity.type
+      type: keyword
+      description: >
+        The distribution entity type, which can be a group or an org-unit.
+        For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings

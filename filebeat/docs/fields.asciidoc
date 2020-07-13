@@ -62154,6 +62154,63 @@ type: keyword
 
 --
 
+*`gsuite.admin.mobile.action.id`*::
++
+--
+The mobile device action's ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.mobile.action.type`*::
++
+--
+The mobile device action's type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.mobile.certificate.name`*::
++
+--
+The mobile certificate common name.
+
+type: keyword
+
+--
+
+*`gsuite.admin.mobile.company_owned_devices`*::
++
+--
+The number of devices a company owns.
+
+type: long
+
+--
+
+*`gsuite.admin.distribution.entity.name`*::
++
+--
+The distribution entity value, which can be a group name or an org-unit name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
+
+
+type: keyword
+
+--
+
+*`gsuite.admin.distribution.entity.type`*::
++
+--
+The distribution entity type, which can be a group or an org-unit. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
+
+
+type: keyword
+
+--
+
 
 *`gsuite.login.affected_email_address`*::
 +

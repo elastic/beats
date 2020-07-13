@@ -161,6 +161,22 @@ var login = (function () {
             case "UPDATE_DOMAIN_SECONDARY_EMAIL":
             case "CHANGE_SSO_SETTINGS":
             case "UPDATE_RULE":
+            case "ADD_MOBILE_CERTIFICATE":
+            case "COMPANY_OWNED_DEVICE_BLOCKED":
+            case "COMPANY_OWNED_DEVICE_UNBLOCKED":
+            case "COMPANY_OWNED_DEVICE_WIPED":
+            case "CHANGE_MOBILE_APPLICATION_PERMISSION_GRANT":
+            case "CHANGE_MOBILE_APPLICATION_PRIORITY_ORDER":
+            case "REMOVE_MOBILE_APPLICATION_FROM_WHITELIST":
+            case "CHANGE_MOBILE_APPLICATION_SETTINGS":
+            case "ADD_MOBILE_APPLICATION_TO_WHITELIST":
+            case "CHANGE_MOBILE_SETTING":
+            case "CHANGE_ADMIN_RESTRICTIONS_PIN":
+            case "CHANGE_MOBILE_WIRELESS_NETWORK":
+            case "ADD_MOBILE_WIRELESS_NETWORK":
+            case "REMOVE_MOBILE_WIRELESS_NETWORK":
+            case "CHANGE_MOBILE_WIRELESS_NETWORK_PASSWORD":
+            case "REMOVE_MOBILE_CERTIFICATE":
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
@@ -185,6 +201,7 @@ var login = (function () {
             case "REGENERATE_OAUTH_CONSUMER_SECRET":
             case "CREATE_RULE":
             case "GENERATE_PIN":
+            case "COMPANY_DEVICES_BULK_CREATION":
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
@@ -204,6 +221,7 @@ var login = (function () {
             case "DELETE_ALERT":
             case "DELETE_PLAY_FOR_WORK_TOKEN":
             case "DELETE_RULE":
+            case "COMPANY_DEVICE_DELETION":
                 evt.Put("event.type", ["deletion"]);
                 break;
             case "DELETE_GROUP":
@@ -278,6 +296,12 @@ var login = (function () {
             case "UNARCHIVE_USER":
             case "UNSUSPEND_USER":
             case "UPGRADE_USER_TO_GPLUS":
+            case "MOBILE_DEVICE_APPROVE":
+            case "MOBILE_DEVICE_BLOCK":
+            case "MOBILE_DEVICE_WIPE":
+            case "MOBILE_ACCOUNT_WIPE":
+            case "MOBILE_DEVICE_CANCEL_WIPE_THEN_APPROVE":
+            case "MOBILE_DEVICE_CANCEL_WIPE_THEN_BLOCK":
                 evt.Put("event.type", ["user", "change"]);
                 break;
             case "DELETE_2SV_SCRATCH_CODES":
@@ -285,6 +309,7 @@ var login = (function () {
             case "DELETE_EMAIL_MONITOR":
             case "DELETE_MAILBOX_DUMP":
             case "DELETE_USER":
+            case "MOBILE_DEVICE_DELETE":
                 evt.Put("event.type", ["user", "deletion"]);
                 break;
             case "GENERATE_2SV_SCRATCH_CODES":
@@ -311,6 +336,10 @@ var login = (function () {
             case "DOWNLOAD_PENDING_INVITES_LIST":
             case "DOWNLOAD_USERLIST_CSV":
             case "USERS_BULK_UPLOAD":
+            case "ENROLL_FOR_GOOGLE_DEVICE_MANAGEMENT":
+            case "USE_GOOGLE_MOBILE_MANAGEMENT":
+            case "USE_GOOGLE_MOBILE_MANAGEMENT_FOR_NON_IOS":
+            case "USE_GOOGLE_MOBILE_MANAGEMENT_FOR_IOS":
                 evt.Put("event.type", ["info"]);
                 break;
             case "GROUP_LIST_DOWNLOAD":
@@ -324,6 +353,8 @@ var login = (function () {
             case "USER_INVITE":
             case "VIEW_TEMP_PASSWORD":
             case "USERS_BULK_UPLOAD_NOTIFICATION_SENT":
+            case "ACTION_CANCELLED":
+            case "ACTION_REQUESTED":
                 evt.Put("event.type", ["user", "info"]);
                 break;
         }
@@ -819,6 +850,55 @@ var login = (function () {
                 {
                     from: "gsuite.admin.BIRTHDATE",
                     to: "gsuite.admin.user.birthdate",
+                },
+                {
+                    from: "gsuite.admin.ACTION_ID",
+                    to: "gsuite.admin.mobile.action.id",
+                },
+                {
+                    from: "gsuite.admin.ACTION_TYPE",
+                    to: "gsuite.admin.mobile.action.type",
+                },
+                {
+                    from: "gsuite.admin.MOBILE_CERTIFICATE_COMMON_NAME",
+                    to: "gsuite.admin.mobile.certificate.name",
+                },
+                {
+                    from: "gsuite.admin.NUMBER_OF_COMPANY_OWNED_DEVICES",
+                    to: "gsuite.admin.mobile.company_owned_devices",
+                    type: "long",
+                },
+                {
+                    from: "gsuite.admin.COMPANY_DEVICE_ID",
+                    to: "gsuite.admin.device.id",
+                },
+                {
+                    from: "gsuite.admin.DISTRIBUTION_ENTITY_NAME",
+                    to: "gsuite.admin.distribution.entity.name",
+                },
+                {
+                    from: "gsuite.admin.DISTRIBUTION_ENTITY_TYPE",
+                    to: "gsuite.admin.distribution.entity.type",
+                },
+                {
+                    from: "gsuite.admin.MOBILE_APP_PACKAGE_ID",
+                    to: "gsuite.admin.application.package_id",
+                },
+                {
+                    from: "gsuite.admin.NEW_PERMISSION_GRANT_STATE",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.OLD_PERMISSION_GRANT_STATE",
+                    to: "gsuite.admin.old_value",
+                },
+                {
+                    from: "gsuite.admin.PERMISSION_GROUP_NAME",
+                    to: "gsuite.admin.setting.name",
+                },
+                {
+                    from: "gsuite.admin.MOBILE_WIRELESS_NETWORK_NAME",
+                    to: "network.name",
                 },
             ],
             mode: "rename",
