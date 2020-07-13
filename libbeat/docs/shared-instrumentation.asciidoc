@@ -58,7 +58,7 @@ If `api_key` is set then `secret_token` will be ignored.
 [float]
 ==== `profiling.cpu.enabled`
 
-Enable profiling of the server, recording profile samples as events.
+Set to `true` to enable CPU profiling, where profile samples are recorded as events.
 
 This feature is experimental.
 
@@ -79,7 +79,7 @@ This feature is experimental.
 [float]
 ==== `profiling.heap.enabled`
 
-Set to true to enable heap profiling.
+Set to `true` to enable heap profiling.
 
 This feature is experimental.
 
