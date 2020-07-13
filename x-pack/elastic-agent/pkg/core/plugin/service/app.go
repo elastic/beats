@@ -305,7 +305,7 @@ func (a *Application) cleanUp() {
 }
 
 func (a *Application) startCredsListener() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", a.credsPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", a.credsPort))
 	if err != nil {
 		return errors.New(err, "failed to start connection credentials listener")
 	}
