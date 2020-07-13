@@ -12,7 +12,7 @@ pipeline {
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     SNAPSHOT = "true"
-    PIPELINE_LOG_LEVEL = "INFO"
+    PIPELINE_LOG_LEVEL = "DEBUG"
   }
   options {
     timeout(time: 3, unit: 'HOURS')
@@ -39,7 +39,15 @@ pipeline {
         beforeAgent true
         expression {
           echo "C: ${isCommentTrigger()} - U: ${isUserTrigger()} - UP: ${isUpstreamTrigger()}"
-          return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
+
+          def ret = isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
+          if(!ret){
+            currentBuild.result = 'NOT_BUILT'
+            currentBuild.description = "The build has been skipped"
+            currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+            echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+          }
+          return ret
         }
       }
       stages {
