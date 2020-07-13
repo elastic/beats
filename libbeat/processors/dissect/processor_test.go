@@ -410,3 +410,48 @@ func TestOverwriteKeys(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessorConvert(t *testing.T) {
+	tests := []struct {
+		name   string
+		c      map[string]interface{}
+		fields common.MapStr
+		values map[string]interface{}
+	}{
+		{
+			name:   "extract integer",
+			c:      map[string]interface{}{"tokenizer": "userid=%{user_id|integer}"},
+			fields: common.MapStr{"message": "userid=7736"},
+			values: map[string]interface{}{"dissect.user_id": int32(7736)},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			newEvent, err := processor.Run(&e)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			for field, value := range test.values {
+				v, err := newEvent.GetValue(field)
+				if !assert.NoError(t, err) {
+					return
+				}
+
+				assert.Equal(t, value, v)
+			}
+		})
+	}
+}
