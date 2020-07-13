@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -22,10 +23,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 )
 
 const (
@@ -41,6 +44,7 @@ func init() {
 	}
 }
 
+// HttpjsonInput struct has the HttpJsonInput configuration and other userful info.
 type HttpjsonInput struct {
 	config
 	log      *logp.Logger
@@ -53,10 +57,25 @@ type HttpjsonInput struct {
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
 }
 
+// RequestInfo struct has the information for generating an HTTP request
 type RequestInfo struct {
 	URL        string
 	ContentMap common.MapStr
 	Headers    common.MapStr
+}
+
+type retryLogger struct {
+	log *logp.Logger
+}
+
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+	}
+}
+
+func (l *retryLogger) Printf(s string, args ...interface{}) {
+	l.log.Debugf(s, args...)
 }
 
 // NewInput creates a new httpjson input
@@ -444,30 +463,31 @@ func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error
 		return nil, err
 	}
 
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return nil, err
-	}
-
-	// Make transport client
-	client := &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			TLSClientConfig:   tlsConfig.ToConfig(),
-			DisableKeepAlives: true,
+	// Make retryable HTTP client
+	var client *retryablehttp.Client = &retryablehttp.Client{
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: in.config.HTTPClientTimeout,
+				}).DialContext,
+				TLSClientConfig:   tlsConfig.ToConfig(),
+				DisableKeepAlives: true,
+			},
+			Timeout: in.config.HTTPClientTimeout,
 		},
-		Timeout: in.config.HTTPClientTimeout,
+		Logger:       newRetryLogger(),
+		RetryWaitMin: in.config.RetryWaitMin,
+		RetryWaitMax: in.config.RetryWaitMax,
+		RetryMax:     in.config.RetryMax,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
 	}
 
 	if in.config.OAuth2.IsEnabled() {
-		return in.config.OAuth2.Client(ctx, client)
+		return in.config.OAuth2.Client(ctx, client.StandardClient())
 	}
 
-	return client, nil
+	return client.StandardClient(), nil
 }
 
 func makeEvent(body string) beat.Event {
