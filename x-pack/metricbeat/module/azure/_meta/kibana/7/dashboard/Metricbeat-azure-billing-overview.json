@@ -263,7 +263,7 @@
       },
       "id": "82a51dd0-c1d7-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [
         {
@@ -360,7 +360,7 @@
       },
       "id": "6ffa7e20-c1da-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [
         {
@@ -438,7 +438,7 @@
       },
       "id": "b18053b0-c1da-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [
         {
@@ -516,7 +516,7 @@
       },
       "id": "c8016f70-c1da-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [
         {
@@ -651,7 +651,7 @@
       },
       "id": "9142aca0-c1c7-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
@@ -748,7 +748,7 @@
       },
       "id": "05d5b3e0-c1c9-11ea-b7e7-0f48178cdb3c",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
