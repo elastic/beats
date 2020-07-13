@@ -32824,6 +32824,48 @@ type: long
 
 
 [float]
+=== rows
+
+
+
+
+*`mysql.status.innodb.rows.reads`*::
++
+--
+The number of rows reads into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.inserted`*::
++
+--
+The number of rows inserted into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.deleted`*::
++
+--
+The number of rows deleted into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.updated`*::
++
+--
+The number of rows updated into InnoDB tables.
+
+type: long
+
+--
+
+[float]
 === buffer_pool
 
 

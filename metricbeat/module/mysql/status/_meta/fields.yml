@@ -337,6 +337,22 @@
       type: group
       description: >
       fields:
+      - name: rows
+        type: group
+        description: >
+        fields:
+          - name: reads
+            type: long
+            description: The number of rows reads into InnoDB tables.
+          - name: inserted
+            type: long
+            description: The number of rows inserted into InnoDB tables.
+          - name: deleted
+            type: long
+            description: The number of rows deleted into InnoDB tables.
+          - name: updated
+            type: long
+            description: The number of rows updated into InnoDB tables.
       - name: buffer_pool
         type: group
         description: >

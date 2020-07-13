@@ -125,6 +125,12 @@ var (
 				},
 				"write_requests": c.Int("Innodb_buffer_pool_write_requests"),
 			},
+			"rows": s.Object{
+				"reads":    c.Int("Innodb_rows_read"),
+				"updated":  c.Int("Innodb_rows_updated"),
+				"deleted":  c.Int("Innodb_rows_deleted"),
+				"inserted": c.Int("Innodb_rows_inserted"),
+			},
 		},
 		"cache": s.Object{
 			"table": s.Object{
