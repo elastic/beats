@@ -32035,6 +32035,123 @@ type: long
 --
 
 [float]
+=== performance
+
+`performance` contains metrics related to the performance of a MySQL instance
+
+
+
+[float]
+=== events_statements
+
+Records statement events summarized by schema and digest
+
+
+*`mysql.performance.events_statements.max.timer.wait`*::
++
+--
+Maximum wait time of the summarized events that are timed
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.last.seen`*::
++
+--
+Time at which the digest was most recently seen
+
+type: date
+
+--
+
+*`mysql.performance.events_statements.quantile.95`*::
++
+--
+The 95th percentile of the statement latency, in picoseconds
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.digest`*::
++
+--
+Performance schema digest
+
+type: text
+
+--
+
+*`mysql.performance.events_statements.count.star`*::
++
+--
+Number of summarized events
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.avg.timer.wait`*::
++
+--
+Average wait time of the summarized events that are timed
+
+type: long
+
+--
+
+[float]
+=== table_io_waits
+
+Records table I/O waits by index
+
+
+
+*`mysql.performance.table_io_waits.object.schema`*::
++
+--
+Schema name
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.object.name`*::
++
+--
+Table name
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.index.name`*::
++
+--
+Name of the index that was used when the table I/O wait event was recorded. PRIMARY indicates that table I/O used the primary index. NULL means that table I/O used no index. Inserts are counted against INDEX_NAME = NULL
+
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.count.fetch`*::
++
+--
+Number of all fetch operations > 0
+
+type: long
+
+--
+
+[float]
+=== query
+
+`query` metricset fetches custom queries from the user to a MySQL instance.
+
+
+[float]
 === status
 
 `status` contains the metrics that were obtained by the status SQL query.
@@ -37139,6 +37256,16 @@ type: object
 +
 --
 Non-numeric values collected.
+
+
+type: object
+
+--
+
+*`sql.metrics.boolean.*`*::
++
+--
+Boolean values collected.
 
 
 type: object
