@@ -1,5 +1,5 @@
 name: Endpoint Host
-
+revision: 5
 outputs:
   default:
     type: elasticsearch
