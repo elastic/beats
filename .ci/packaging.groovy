@@ -39,7 +39,6 @@ pipeline {
         beforeAgent true
         expression {
           echo "C: ${isCommentTrigger()} - U: ${isUserTrigger()} - UP: ${isUpstreamTrigger()}"
-
           def ret = isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
           if(!ret){
             currentBuild.result = 'NOT_BUILT'

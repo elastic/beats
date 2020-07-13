@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -28,11 +29,15 @@ type operatorStream struct {
 }
 
 func (b *operatorStream) Close() error {
-	return b.configHandler.HandleConfig(&configRequest{})
+	return b.configHandler.Close()
 }
 
-func (b *operatorStream) Execute(cfg *configRequest) error {
+func (b *operatorStream) Execute(cfg configrequest.Request) error {
 	return b.configHandler.HandleConfig(cfg)
+}
+
+func (b *operatorStream) Shutdown() {
+	b.configHandler.Shutdown()
 }
 
 func streamFactory(ctx context.Context, cfg *config.Config, srv *server.Server, r state.Reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
