@@ -23,8 +23,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -119,8 +119,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -167,8 +167,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -198,8 +198,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870325.850      9 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 379,
         "observer.product": "Proxy",
@@ -248,8 +248,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870326.168     95 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 498,
         "observer.product": "Proxy",
@@ -267,8 +267,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -298,8 +298,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870326.810    124 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 617,
         "observer.product": "Proxy",
@@ -317,8 +317,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -348,8 +348,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870327.186    169 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 736,
         "observer.product": "Proxy",
@@ -367,8 +367,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -398,8 +398,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870327.634     71 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 855,
         "observer.product": "Proxy",
@@ -417,8 +417,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -448,8 +448,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870327.842      1 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 974,
         "observer.product": "Proxy",
@@ -516,8 +516,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -835,8 +835,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870772.279 155623 192.168.0.35 TCP_MISS/503 3310 GET http://clients2.google.com/service/update2/crx? - DIRECT/clients2.google.com text/html",
+        "file.name": "crx",
         "fileset.name": "log",
-        "http.response.body.content": "crx",
         "input.type": "log",
         "log.offset": 1774,
         "observer.product": "Proxy",
@@ -902,8 +902,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -933,8 +933,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870947.061     39 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 2013,
         "observer.product": "Proxy",
@@ -952,8 +952,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -983,8 +983,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870947.797    268 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 2132,
         "observer.product": "Proxy",
@@ -1033,8 +1033,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870949.342    163 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 2251,
         "observer.product": "Proxy",
@@ -1083,8 +1083,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870949.733    191 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 2370,
         "observer.product": "Proxy",
@@ -1102,8 +1102,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1133,8 +1133,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348870950.054    120 192.168.0.35 TCP_MISS/000 0 GET http://www.google.com/complete/search? - DIRECT/www.google.com -",
+        "file.name": "search",
         "fileset.name": "log",
-        "http.response.body.content": "search",
         "input.type": "log",
         "log.offset": 2489,
         "observer.product": "Proxy",
@@ -1152,8 +1152,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "000",
@@ -1298,8 +1298,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "503",
@@ -1346,8 +1346,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "503",
@@ -1395,8 +1395,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "503",
@@ -1442,8 +1442,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.131.147"
+            "74.125.131.147",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -1454,8 +1454,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1494,8 +1494,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348871190.364     26 192.168.0.35 TCP_MISS/304 290 GET http://www.google.com/images/srpr/logo3w.png - DIRECT/74.125.131.147 -",
+        "file.name": "logo3w.png",
         "fileset.name": "log",
-        "http.response.body.content": "logo3w.png",
         "input.type": "log",
         "log.offset": 3229,
         "observer.product": "Proxy",
@@ -1554,16 +1554,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348871190.477    136 192.168.0.35 TCP_MISS/200 166258 GET http://www.google.com/xjs/_/js/s/s,jsa,c,sb,hv,wta,cr,cdos,nos,tbpr,tbui,rsn,ob,cb,mb,lc,du,ada,amcl,klc,kat,aut,esp,bihu,ifl,kp,lu,m,rtis,shb,sfa,tng,hsm,j,p,pcc,csi/rt=j/ver=P7Lew-MRiXo.en_US./d=1/sv=1/rs=AItRSTNwfvJBHcoKbi4wjkZ-Mr1w-Pv9LA - DIRECT/74.125.131.147 text/javascript",
+        "file.name": "rs=AItRSTNwfvJBHcoKbi4wjkZ-Mr1w-Pv9LA",
         "fileset.name": "log",
-        "http.response.body.content": "rs=AItRSTNwfvJBHcoKbi4wjkZ-Mr1w-Pv9LA",
         "input.type": "log",
         "log.offset": 3356,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.131.147"
+            "74.125.131.147",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -1574,8 +1574,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -1614,8 +1614,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348871190.671     50 192.168.0.35 TCP_MISS/200 20129 GET http://www.google.com/extern_chrome/359533f6f71ee9c1.js - DIRECT/74.125.131.147 text/javascript",
+        "file.name": "359533f6f71ee9c1.js",
         "fileset.name": "log",
-        "http.response.body.content": "359533f6f71ee9c1.js",
         "input.type": "log",
         "log.offset": 3697,
         "observer.product": "Proxy",
@@ -1634,8 +1634,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -1674,8 +1674,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1348871190.763     36 192.168.0.35 TCP_MISS/204 369 GET http://www.google.com/csi? - DIRECT/74.125.131.147 image/gif",
+        "file.name": "csi",
         "fileset.name": "log",
-        "http.response.body.content": "csi",
         "input.type": "log",
         "log.offset": 3851,
         "observer.product": "Proxy",
@@ -1799,8 +1799,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.3",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.3"
         ],
         "related.user": [
             "-"
@@ -1868,8 +1868,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1926,8 +1926,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1984,8 +1984,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2031,8 +2031,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.14",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.14"
         ],
         "related.user": [
             "-"
@@ -2042,8 +2042,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2100,8 +2100,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2205,8 +2205,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.14",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.14"
         ],
         "related.user": [
             "-"
@@ -2216,8 +2216,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2321,8 +2321,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2332,8 +2332,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2379,8 +2379,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2390,8 +2390,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2437,8 +2437,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.14"
+            "74.125.228.14",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2488,16 +2488,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057385.253    170 192.168.0.35 TCP_MISS/200 574 GET http://clients1.google.com/tools/swg2/update? - DIRECT/74.125.228.97 text/plain",
+        "file.name": "update",
         "fileset.name": "log",
-        "http.response.body.content": "update",
         "input.type": "log",
         "log.offset": 5343,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.97",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.97"
         ],
         "related.user": [
             "-"
@@ -2555,8 +2555,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "23.11.236.224"
+            "23.11.236.224",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2613,8 +2613,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "23.11.236.224"
+            "23.11.236.224",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2671,8 +2671,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.100"
+            "74.125.228.100",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2682,8 +2682,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2845,8 +2845,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "173.194.73.104"
+            "173.194.73.104",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -2856,8 +2856,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2903,8 +2903,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -2914,8 +2914,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -2961,8 +2961,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -2972,8 +2972,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -3019,8 +3019,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "74.125.228.100"
+            "74.125.228.100",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3070,8 +3070,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057466.259    467 192.168.0.35 TCP_MISS/200 161462 GET http://swcatalog.apple.com/content/catalogs/others/index-windows-1.sucatalog - DIRECT/208.44.23.184 application/x-apple-plist",
+        "file.name": "index-windows-1.sucatalog",
         "fileset.name": "log",
-        "http.response.body.content": "index-windows-1.sucatalog",
         "input.type": "log",
         "log.offset": 6476,
         "observer.product": "Proxy",
@@ -3090,8 +3090,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-apple-plist",
         "rsa.misc.result_code": "200",
@@ -3130,8 +3130,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057469.784    470 192.168.0.35 TCP_MISS/200 6546 GET http://swcdn.apple.com/content/downloads/61/34/061-8153/WgWXrHyJVmFn9KrXRg3w2XPXNFXxhnZFS6/061-8153.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-8153.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-8153.English.dist",
         "input.type": "log",
         "log.offset": 6661,
         "observer.product": "Proxy",
@@ -3190,16 +3190,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057470.770    334 192.168.0.35 TCP_MISS/200 31622 GET http://swcdn.apple.com/content/downloads/02/58/061-3418/n6BBhLszLr6SN3XDXWT9N3YgpfHChbQTgb/061-3418.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "061-3418.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-3418.English.dist",
         "input.type": "log",
         "log.offset": 6863,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3210,8 +3210,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -3250,8 +3250,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057470.907    109 192.168.0.35 TCP_MISS/200 3798 GET http://swcdn.apple.com/content/downloads/25/60/061-6867/WjSJ6JqjV34mZLtS944ndrx9RYQZJX6qHY/061-6867.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-6867.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-6867.English.dist",
         "input.type": "log",
         "log.offset": 7068,
         "observer.product": "Proxy",
@@ -3310,8 +3310,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057472.794    219 192.168.0.35 TCP_MISS/200 7217 GET http://swcdn.apple.com/content/downloads/21/23/061-4512/BKYTZyKmtNr5wpxQCTy9f8xDSYPZ5MTGf4/061-4512.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "061-4512.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-4512.English.dist",
         "input.type": "log",
         "log.offset": 7270,
         "observer.product": "Proxy",
@@ -3370,8 +3370,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057472.980    109 192.168.0.35 TCP_MISS/200 7370 GET http://swcdn.apple.com/content/downloads/20/63/061-7511/XJqPCzWtXgkNgSZXp6DTn7gjNvHQVMZ4dP/061-7511.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-7511.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-7511.English.dist",
         "input.type": "log",
         "log.offset": 7474,
         "observer.product": "Proxy",
@@ -3430,16 +3430,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057473.173    110 192.168.0.35 TCP_MISS/200 6939 GET http://swcdn.apple.com/content/downloads/27/49/061-4514/Tcfqf4NdtQTpYj7Pn8qwLgWgj6kYcy26Zf/061-4514.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-4514.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-4514.English.dist",
         "input.type": "log",
         "log.offset": 7676,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -3490,16 +3490,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057473.340    111 192.168.0.35 TCP_MISS/200 5451 GET http://swcdn.apple.com/content/downloads/57/25/061-7340/TJXt7nNzc4cS57fvwx8zg3GScrcLBWtdpR/061-7340.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "061-7340.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-7340.English.dist",
         "input.type": "log",
         "log.offset": 7878,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3550,8 +3550,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057473.825    330 192.168.0.35 TCP_MISS/200 18008 GET http://swcdn.apple.com/content/downloads/56/25/041-3097/SrjbZVKzSxP5VNSHnnDMQrb78YZz66DYww/041-3097.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "041-3097.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-3097.English.dist",
         "input.type": "log",
         "log.offset": 8082,
         "observer.product": "Proxy",
@@ -3610,16 +3610,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057474.139    221 192.168.0.35 TCP_MISS/200 6992 GET http://swcdn.apple.com/content/downloads/51/48/061-9539/XzrZsqWRT9FLLVN6tBfk4mjVmtqvNDHwC7/061-9539.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-9539.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-9539.English.dist",
         "input.type": "log",
         "log.offset": 8287,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -3630,8 +3630,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3670,16 +3670,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057474.330    112 192.168.0.35 TCP_MISS/200 4197 GET http://swcdn.apple.com/content/downloads/51/08/zzz061-3452/5bxNyT8NCFYPz9qff69kBjH4y3zxqSFt5B/061-3452.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-3452.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-3452.English.dist",
         "input.type": "log",
         "log.offset": 8489,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -3690,8 +3690,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3730,8 +3730,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057474.842    329 192.168.0.35 TCP_MISS/200 19447 GET http://swcdn.apple.com/content/downloads/28/51/041-0517/cvDMxJL5q6TQ2t8899HH8mvzjdHkDFwr99/041-0517.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-0517.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-0517.English.dist",
         "input.type": "log",
         "log.offset": 8694,
         "observer.product": "Proxy",
@@ -3790,16 +3790,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057475.092    221 192.168.0.35 TCP_MISS/200 7370 GET http://swcdn.apple.com/content/downloads/28/43/061-7509/P7wtsjhJPsT9FM8Zff4FKg6FYM4W2yGP5B/061-7509.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-7509.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-7509.English.dist",
         "input.type": "log",
         "log.offset": 8897,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -3810,8 +3810,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -3850,8 +3850,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057475.582    434 192.168.0.35 TCP_MISS/200 5297 GET http://swcdn.apple.com/content/downloads/01/21/041-1673/s6XjZyFGmdTf5YHq6C8CPWjJ4sWz9pz3vX/041-1673.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-1673.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-1673.English.dist",
         "input.type": "log",
         "log.offset": 9099,
         "observer.product": "Proxy",
@@ -3910,8 +3910,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057475.860    217 192.168.0.35 TCP_MISS/200 6480 GET http://swcdn.apple.com/content/downloads/12/45/061-4249/7ck27nGQBsHQNcnMMjtmLbDJm2zPbRxj4h/061-4249.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-4249.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-4249.English.dist",
         "input.type": "log",
         "log.offset": 9301,
         "observer.product": "Proxy",
@@ -3970,16 +3970,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057476.242    331 192.168.0.35 TCP_MISS/200 18211 GET http://swcdn.apple.com/content/downloads/54/37/061-5790/mxbPrKRvB9G6cvrjY2QPNVQPYj3nrjwbgX/061-5790.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-5790.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-5790.English.dist",
         "input.type": "log",
         "log.offset": 9503,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4030,16 +4030,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057476.800    543 192.168.0.35 TCP_MISS/200 6525 GET http://swcdn.apple.com/content/downloads/26/11/061-8155/wdTHYKkFWMCC8dDLHkycj3BLMxvq2wjwYD/061-8155.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "061-8155.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-8155.English.dist",
         "input.type": "log",
         "log.offset": 9706,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4090,8 +4090,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057477.417    552 192.168.0.35 TCP_MISS/200 19458 GET http://swcdn.apple.com/content/downloads/59/27/041-0516/rRmQxLKryPBcF33yFvzhw7SYLDRntjXj9K/041-0516.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "041-0516.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-0516.English.dist",
         "input.type": "log",
         "log.offset": 9910,
         "observer.product": "Proxy",
@@ -4150,16 +4150,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057478.304    870 192.168.0.35 TCP_MISS/200 18041 GET http://swcdn.apple.com/content/downloads/50/36/061-9848/kJvM5Qq2gBCSHSrxsdNfyn7NPjVYNHX7ZR/061-9848.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-9848.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-9848.English.dist",
         "input.type": "log",
         "log.offset": 10115,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -4210,8 +4210,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057478.759    437 192.168.0.35 TCP_MISS/200 17576 GET http://swcdn.apple.com/content/downloads/45/03/041-1676/ZMjp6WLTqS9GDRdnzdLqHXgS838bwRNVn6/041-1676.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "041-1676.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-1676.English.dist",
         "input.type": "log",
         "log.offset": 10318,
         "observer.product": "Proxy",
@@ -4270,8 +4270,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057478.905    111 192.168.0.35 TCP_MISS/200 6991 GET http://swcdn.apple.com/content/downloads/03/00/061-9537/xkqVg9ZybxffPsFvSjqgxnHK7HGJ4b9zLy/061-9537.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-9537.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-9537.English.dist",
         "input.type": "log",
         "log.offset": 10523,
         "observer.product": "Proxy",
@@ -4330,16 +4330,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057479.343    332 192.168.0.35 TCP_MISS/200 25935 GET http://swcdn.apple.com/content/downloads/41/25/041-4336/M2r89dmfRR9jmgt2Gr4ZB7wftMfHSmhpnX/041-4336.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-4336.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-4336.English.dist",
         "input.type": "log",
         "log.offset": 10725,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4350,8 +4350,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4390,8 +4390,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057479.593    223 192.168.0.35 TCP_MISS/200 18205 GET http://swcdn.apple.com/content/downloads/10/51/061-5850/6T9D3ShR4mRKT3YgFK7JG5sDytGYDYCJ3L/061-5850.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-5850.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-5850.English.dist",
         "input.type": "log",
         "log.offset": 10928,
         "observer.product": "Proxy",
@@ -4450,16 +4450,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057479.728    110 192.168.0.35 TCP_MISS/200 7326 GET http://swcdn.apple.com/content/downloads/10/26/061-4513/nY7s8PkHbJYHKKDtjh7FJQr7JYBTzHvnr2/061-4513.English.dist - DIRECT/208.44.23.185 text/plain",
+        "file.name": "061-4513.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-4513.English.dist",
         "input.type": "log",
         "log.offset": 11131,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4470,8 +4470,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -4510,8 +4510,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057479.893    111 192.168.0.35 TCP_MISS/200 6973 GET http://swcdn.apple.com/content/downloads/29/33/061-7306/hwpP4sYb2wmfHdYHjsQ23VrSbXXGKCK378/061-7306.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-7306.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-7306.English.dist",
         "input.type": "log",
         "log.offset": 11335,
         "observer.product": "Proxy",
@@ -4570,8 +4570,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057480.599    679 192.168.0.35 TCP_MISS/200 6748 GET http://swcdn.apple.com/content/downloads/07/44/061-4200/3DtF5LrT3BL2b86P57Kyrs5dH9NTs9ctNV/061-4200.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "061-4200.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "061-4200.English.dist",
         "input.type": "log",
         "log.offset": 11537,
         "observer.product": "Proxy",
@@ -4590,8 +4590,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4630,16 +4630,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057481.530    889 192.168.0.35 TCP_MISS/200 19858 GET http://swcdn.apple.com/content/downloads/37/12/041-0255/lfinb0xmk5ten4ojrimcebpl6561xez6xk/041-0255.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-0255.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-0255.English.dist",
         "input.type": "log",
         "log.offset": 11739,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4650,8 +4650,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4690,16 +4690,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057482.097    550 192.168.0.35 TCP_MISS/200 19848 GET http://swcdn.apple.com/content/downloads/06/39/041-0256/orwba7zrt5npsr5wvhsljprdyd1jtt62oz/041-0256.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-0256.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-0256.English.dist",
         "input.type": "log",
         "log.offset": 11942,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4750,16 +4750,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057483.427    771 192.168.0.35 TCP_MISS/200 38188 GET http://swcdn.apple.com/content/downloads/32/19/041-6756/gntu51zjuiyzu4l94ezxy3g1tb3jfpaoit/041-6756.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-6756.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-6756.English.dist",
         "input.type": "log",
         "log.offset": 12145,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4810,16 +4810,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057483.787    320 192.168.0.35 TCP_MISS/200 8913 GET http://swcdn.apple.com/content/downloads/40/54/041-6905/v0fukt9lmfcv18d4wczh49ap9z6r5p5c0c/041-6905.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-6905.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-6905.English.dist",
         "input.type": "log",
         "log.offset": 12348,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "208.44.23.185",
-            "192.168.0.35"
+            "192.168.0.35",
+            "208.44.23.185"
         ],
         "related.user": [
             "-"
@@ -4870,8 +4870,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057484.139    222 192.168.0.35 TCP_MISS/200 8113 GET http://swcdn.apple.com/content/downloads/23/10/041-6906/nr0v270bqzt428sd57s1slz78hgkzg38tc/041-6906.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-6906.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-6906.English.dist",
         "input.type": "log",
         "log.offset": 12550,
         "observer.product": "Proxy",
@@ -4930,8 +4930,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057486.034   1694 192.168.0.35 TCP_MISS/200 31969 GET http://swcdn.apple.com/content/downloads/00/31/041-1612/xqbjtqo1qzy7cz1v2yflklj5kg1v2tlncj/041-1612.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-1612.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-1612.English.dist",
         "input.type": "log",
         "log.offset": 12752,
         "observer.product": "Proxy",
@@ -4990,16 +4990,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057486.672    550 192.168.0.35 TCP_MISS/200 31972 GET http://swcdn.apple.com/content/downloads/30/32/041-1613/nysxhnpjpllehg0d54krf0yr8fa17jymjf/041-1613.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-1613.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-1613.English.dist",
         "input.type": "log",
         "log.offset": 12955,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "208.44.23.185"
+            "208.44.23.185",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -5050,8 +5050,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1349057487.172    436 192.168.0.35 TCP_MISS/200 23087 GET http://swcdn.apple.com/content/downloads/01/20/041-5328/74a52anhihangc837n25490jxt30a59gid/041-5328.English.dist - DIRECT/208.44.23.185 text/xml",
+        "file.name": "041-5328.English.dist",
         "fileset.name": "log",
-        "http.response.body.content": "041-5328.English.dist",
         "input.type": "log",
         "log.offset": 13158,
         "observer.product": "Proxy",
@@ -5070,8 +5070,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -5128,8 +5128,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5175,8 +5175,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.100",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.100"
         ],
         "related.user": [
             "-"
@@ -5233,8 +5233,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "74.125.228.96",
-            "192.168.0.35"
+            "192.168.0.35",
+            "74.125.228.96"
         ],
         "related.user": [
             "-"
@@ -5302,8 +5302,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5360,8 +5360,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5407,8 +5407,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "192.168.0.35",
-            "69.171.228.74"
+            "69.171.228.74",
+            "192.168.0.35"
         ],
         "related.user": [
             "-"
@@ -5419,8 +5419,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -5593,8 +5593,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",

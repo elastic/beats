@@ -22,8 +22,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "209.73.177.115",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.73.177.115"
         ],
         "related.user": [
             "badeyek"
@@ -138,8 +138,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689320.343   1357 10.105.21.199 TCP_REFRESH_HIT/304 214 GET http://www.goonernews.com/styles.css badeyek DIRECT/207.58.145.61 -",
+        "file.name": "styles.css",
         "fileset.name": "log",
-        "http.response.body.content": "styles.css",
         "input.type": "log",
         "log.offset": 240,
         "observer.product": "Proxy",
@@ -158,8 +158,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -189,8 +189,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689321.315      1 10.105.21.199 TCP_HIT/200 1464 GET http://www.goonernews.com/styles.css badeyek NONE/- text/css",
+        "file.name": "styles.css",
         "fileset.name": "log",
-        "http.response.body.content": "styles.css",
         "input.type": "log",
         "log.offset": 372,
         "observer.product": "Proxy",
@@ -208,8 +208,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -239,8 +239,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689322.780   1464 10.105.21.199 TCP_HIT/200 5626 GET http://www.google-analytics.com/urchin.js badeyek NONE/- text/javascript",
+        "file.name": "urchin.js",
         "fileset.name": "log",
-        "http.response.body.content": "urchin.js",
         "input.type": "log",
         "log.offset": 490,
         "observer.product": "Proxy",
@@ -308,8 +308,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -320,8 +320,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -360,8 +360,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689324.156   1372 10.105.21.199 TCP_MISS/200 399 GET http://www.google-analytics.com/__utm.gif? badeyek DIRECT/66.102.9.147 image/gif",
+        "file.name": "__utm.gif",
         "fileset.name": "log",
-        "http.response.body.content": "__utm.gif",
         "input.type": "log",
         "log.offset": 745,
         "observer.product": "Proxy",
@@ -423,8 +423,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689324.266   1457 10.105.21.199 TCP_REFRESH_HIT/304 215 GET http://www.goonernews.com/graphics/newslogo.gif badeyek DIRECT/207.58.145.61 -",
+        "file.name": "newslogo.gif",
         "fileset.name": "log",
-        "http.response.body.content": "newslogo.gif",
         "input.type": "log",
         "log.offset": 883,
         "observer.product": "Proxy",
@@ -443,8 +443,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -486,8 +486,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689324.281   1465 10.105.21.199 TCP_REFRESH_HIT/304 215 GET http://www.goonernews.com/shop/arsenal_shop_ad.jpg badeyek DIRECT/207.58.145.61 -",
+        "file.name": "arsenal_shop_ad.jpg",
         "fileset.name": "log",
-        "http.response.body.content": "arsenal_shop_ad.jpg",
         "input.type": "log",
         "log.offset": 1026,
         "observer.product": "Proxy",
@@ -549,8 +549,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689325.734   1452 10.105.21.199 TCP_REFRESH_HIT/304 214 GET http://www.goonernews.com/flags/FUS.gif badeyek DIRECT/207.58.145.61 -",
+        "file.name": "FUS.gif",
         "fileset.name": "log",
-        "http.response.body.content": "FUS.gif",
         "input.type": "log",
         "log.offset": 1172,
         "observer.product": "Proxy",
@@ -600,8 +600,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689325.736      2 10.105.21.199 TCP_HIT/200 1353 GET http://www.goonernews.com/flags/FGB.gif badeyek NONE/- image/gif",
+        "file.name": "FGB.gif",
         "fileset.name": "log",
-        "http.response.body.content": "FGB.gif",
         "input.type": "log",
         "log.offset": 1307,
         "observer.product": "Proxy",
@@ -619,8 +619,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -662,8 +662,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689325.953   2603 10.105.21.199 TCP_MISS/200 1013 GET http://as.casalemedia.com/s? badeyek DIRECT/209.85.16.38 text/html",
+        "file.name": "s",
         "fileset.name": "log",
-        "http.response.body.content": "s",
         "input.type": "log",
         "log.offset": 1429,
         "observer.product": "Proxy",
@@ -778,16 +778,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689327.312   1356 10.105.21.199 TCP_MISS/302 729 GET http://impgb.tradedoubler.com/imp/img/16349696/992098 badeyek DIRECT/217.212.240.172 text/html",
+        "file.name": "992098",
         "fileset.name": "log",
-        "http.response.body.content": "992098",
         "input.type": "log",
         "log.offset": 1668,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "217.212.240.172"
+            "217.212.240.172",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -841,16 +841,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689327.751   3484 10.105.21.199 TCP_MISS/200 1577 GET http://4.adbrite.com/mb/text_group.php? badeyek DIRECT/206.169.136.22 text/html",
+        "file.name": "text_group.php",
         "fileset.name": "log",
-        "http.response.body.content": "text_group.php",
         "input.type": "log",
         "log.offset": 1820,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "206.169.136.22"
+            "206.169.136.22",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -861,8 +861,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -892,8 +892,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689327.803      9 10.105.21.199 TCP_HIT/200 1353 GET http://www.goonernews.com/flags/FFR.gif badeyek NONE/- image/gif",
+        "file.name": "FFR.gif",
         "fileset.name": "log",
-        "http.response.body.content": "FFR.gif",
         "input.type": "log",
         "log.offset": 1958,
         "observer.product": "Proxy",
@@ -911,8 +911,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -954,16 +954,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689329.234   1431 10.105.21.199 TCP_REFRESH_HIT/304 214 GET http://www.goonernews.com/flags/FAU.gif badeyek DIRECT/207.58.145.61 -",
+        "file.name": "FAU.gif",
         "fileset.name": "log",
-        "http.response.body.content": "FAU.gif",
         "input.type": "log",
         "log.offset": 2080,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1017,16 +1017,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689329.280   1414 10.105.21.199 TCP_REFRESH_HIT/304 213 GET http://www.goonernews.com/graphics/spacer.gif badeyek DIRECT/207.58.145.61 -",
+        "file.name": "spacer.gif",
         "fileset.name": "log",
-        "http.response.body.content": "spacer.gif",
         "input.type": "log",
         "log.offset": 2215,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -1037,8 +1037,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1075,16 +1075,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689330.920   1686 10.105.21.199 TCP_MISS/200 1784 GET http://4.adbrite.com/mb/text_group.php? badeyek DIRECT/64.127.126.178 text/html",
+        "file.name": "text_group.php",
         "fileset.name": "log",
-        "http.response.body.content": "text_group.php",
         "input.type": "log",
         "log.offset": 2356,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "64.127.126.178",
-            "10.105.21.199"
+            "10.105.21.199",
+            "64.127.126.178"
         ],
         "related.user": [
             "badeyek"
@@ -1095,8 +1095,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1138,8 +1138,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689331.313   3997 10.105.21.199 TCP_MISS/302 851 GET http://ff.connextra.com/Ladbrokes/selector/image? badeyek DIRECT/213.160.98.161 -",
+        "file.name": "image",
         "fileset.name": "log",
-        "http.response.body.content": "image",
         "input.type": "log",
         "log.offset": 2494,
         "observer.product": "Proxy",
@@ -1201,8 +1201,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689335.275   3962 10.105.21.199 TCP_MISS/200 30904 GET http://dd.connextra.com/servlet/controller? badeyek DIRECT/213.160.98.160 image/gif",
+        "file.name": "controller",
         "fileset.name": "log",
-        "http.response.body.content": "controller",
         "input.type": "log",
         "log.offset": 2633,
         "observer.product": "Proxy",
@@ -1328,8 +1328,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1359,8 +1359,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689343.106      1 10.105.33.214 TCP_DENIED/407 1752 GET http://update.messenger.yahoo.com/msgrcli7.html - NONE/- text/html",
+        "file.name": "msgrcli7.html",
         "fileset.name": "log",
-        "http.response.body.content": "msgrcli7.html",
         "input.type": "log",
         "log.offset": 2986,
         "observer.product": "Proxy",
@@ -1378,8 +1378,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1436,8 +1436,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1541,8 +1541,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689344.798   1631 10.105.47.218 TCP_MISS/200 5930 GET http://hi5.com/friend/styles/homepage.css nazsoau DIRECT/204.13.51.238 text/css",
+        "file.name": "homepage.css",
         "fileset.name": "log",
-        "http.response.body.content": "homepage.css",
         "input.type": "log",
         "log.offset": 3370,
         "observer.product": "Proxy",
@@ -1561,8 +1561,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -1608,8 +1608,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -1650,8 +1650,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689346.267    880 10.105.37.58 TCP_DENIED/407 1812 GET http://rms.adobe.com/read/0600/win_/ENU/read0600win_ENUadbe0000.xml - NONE/- text/html",
+        "file.name": "read0600win_ENUadbe0000.xml",
         "fileset.name": "log",
-        "http.response.body.content": "read0600win_ENUadbe0000.xml",
         "input.type": "log",
         "log.offset": 3652,
         "observer.product": "Proxy",
@@ -1700,8 +1700,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689347.190     10 10.105.47.218 TCP_IMS_HIT/304 217 GET http://images.hi5.com/styles/style.css nazsoau NONE/- text/css",
+        "file.name": "style.css",
         "fileset.name": "log",
-        "http.response.body.content": "style.css",
         "input.type": "log",
         "log.offset": 3798,
         "observer.product": "Proxy",
@@ -1750,8 +1750,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689347.307    116 10.105.47.218 TCP_IMS_HIT/304 217 GET http://images.hi5.com/friend/styles/buttons_en_us.css nazsoau NONE/- text/css",
+        "file.name": "buttons_en_us.css",
         "fileset.name": "log",
-        "http.response.body.content": "buttons_en_us.css",
         "input.type": "log",
         "log.offset": 3921,
         "observer.product": "Proxy",
@@ -1874,16 +1874,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689349.064   1758 10.105.47.218 TCP_MISS/200 4470 GET http://hi5.com/friend/styles/headernav.css nazsoau DIRECT/204.13.51.238 text/css",
+        "file.name": "headernav.css",
         "fileset.name": "log",
-        "http.response.body.content": "headernav.css",
         "input.type": "log",
         "log.offset": 4173,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1952,8 +1952,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2009,8 +2009,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2049,16 +2049,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689353.939   4899 10.105.33.214 TCP_MISS/200 22964 GET http://radio.launch.yahoo.com/radio/play/playmessenger.asp adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "playmessenger.asp",
         "fileset.name": "log",
-        "http.response.body.content": "playmessenger.asp",
         "input.type": "log",
         "log.offset": 4592,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2069,8 +2069,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2165,16 +2165,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689355.517   1578 10.105.33.214 TCP_MISS/200 699 GET http://address.yahoo.com/yab/us? adeolaegbedokun DIRECT/209.191.93.51 text/xml",
+        "file.name": "us",
         "fileset.name": "log",
-        "http.response.body.content": "us",
         "input.type": "log",
         "log.offset": 4901,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "209.191.93.51",
-            "10.105.33.214"
+            "10.105.33.214",
+            "209.191.93.51"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2228,16 +2228,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689356.907   6741 10.105.21.199 TCP_MISS/302 734 GET http://fxfeeds.mozilla.org/rss20.xml badeyek DIRECT/63.245.209.21 text/html",
+        "file.name": "rss20.xml",
         "fileset.name": "log",
-        "http.response.body.content": "rss20.xml",
         "input.type": "log",
         "log.offset": 5037,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "63.245.209.21",
-            "10.105.21.199"
+            "10.105.21.199",
+            "63.245.209.21"
         ],
         "related.user": [
             "badeyek"
@@ -2248,8 +2248,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -2352,8 +2352,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2443,8 +2443,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689358.174      0 10.105.37.17 TCP_DENIED/407 1767 POST http://us.mcafee.com/apps/agent/submgr/appinstru.asp - NONE/- text/html",
+        "file.name": "appinstru.asp",
         "fileset.name": "log",
-        "http.response.body.content": "appinstru.asp",
         "input.type": "log",
         "log.offset": 5561,
         "observer.product": "Proxy",
@@ -2461,8 +2461,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2492,8 +2492,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689358.174      0 10.105.37.17 TCP_DENIED/407 1761 POST http://us.mcafee.com/apps/agent/submgr/appsync.asp - NONE/- text/html",
+        "file.name": "appsync.asp",
         "fileset.name": "log",
-        "http.response.body.content": "appsync.asp",
         "input.type": "log",
         "log.offset": 5693,
         "observer.product": "Proxy",
@@ -2598,8 +2598,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689358.486    711 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "btn_stations.gif",
         "fileset.name": "log",
-        "http.response.body.content": "btn_stations.gif",
         "input.type": "log",
         "log.offset": 5923,
         "observer.product": "Proxy",
@@ -2666,8 +2666,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2706,16 +2706,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689359.199    713 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations_over.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "btn_stations_over.gif",
         "fileset.name": "log",
-        "http.response.body.content": "btn_stations_over.gif",
         "input.type": "log",
         "log.offset": 6202,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2773,8 +2773,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2784,8 +2784,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2824,16 +2824,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689359.924    725 10.105.33.214 TCP_REFRESH_HIT/304 511 GET http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_left.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "bg_left.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_left.gif",
         "input.type": "log",
         "log.offset": 6529,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2844,8 +2844,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -2884,8 +2884,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689360.611    687 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/launchcast_radio.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "launchcast_radio.gif",
         "fileset.name": "log",
-        "http.response.body.content": "launchcast_radio.gif",
         "input.type": "log",
         "log.offset": 6711,
         "observer.product": "Proxy",
@@ -2935,8 +2935,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689360.980      1 10.105.47.191 TCP_DENIED/407 1767 POST http://us.mcafee.com/apps/agent/submgr/appinstru.asp - NONE/- text/html",
+        "file.name": "appinstru.asp",
         "fileset.name": "log",
-        "http.response.body.content": "appinstru.asp",
         "input.type": "log",
         "log.offset": 6894,
         "observer.product": "Proxy",
@@ -2953,8 +2953,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2984,8 +2984,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689361.188      1 10.105.47.191 TCP_DENIED/407 1761 POST http://us.mcafee.com/apps/agent/submgr/appsync.asp - NONE/- text/html",
+        "file.name": "appsync.asp",
         "fileset.name": "log",
-        "http.response.body.content": "appsync.asp",
         "input.type": "log",
         "log.offset": 7027,
         "observer.product": "Proxy",
@@ -3002,8 +3002,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3042,8 +3042,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689361.393    783 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_right.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "bg_right.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_right.gif",
         "input.type": "log",
         "log.offset": 7158,
         "observer.product": "Proxy",
@@ -3102,8 +3102,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689361.564   2242 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_center.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "bg_center.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_center.gif",
         "input.type": "log",
         "log.offset": 7341,
         "observer.product": "Proxy",
@@ -3122,8 +3122,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3162,16 +3162,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689362.220    827 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_off.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "bg_controls_off.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_controls_off.gif",
         "input.type": "log",
         "log.offset": 7525,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3182,8 +3182,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3222,16 +3222,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689362.315    751 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "t.gif",
         "fileset.name": "log",
-        "http.response.body.content": "t.gif",
         "input.type": "log",
         "log.offset": 7715,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3273,8 +3273,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689362.318      3 10.105.33.214 TCP_IMS_HIT/304 218 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_off_state_station.gif adeolaegbedokun NONE/- image/gif",
+        "file.name": "btn_off_state_station.gif",
         "fileset.name": "log",
-        "http.response.body.content": "btn_off_state_station.gif",
         "input.type": "log",
         "log.offset": 7891,
         "observer.product": "Proxy",
@@ -3292,8 +3292,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3323,8 +3323,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689362.332     13 10.105.33.214 TCP_IMS_HIT/304 218 GET http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_fill.gif adeolaegbedokun NONE/- image/gif",
+        "file.name": "bg_controls_fill.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_controls_fill.gif",
         "input.type": "log",
         "log.offset": 8068,
         "observer.product": "Proxy",
@@ -3373,8 +3373,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689362.341      8 10.105.33.214 TCP_HIT/200 2263 GET http://us.i1.yimg.com/us.yimg.com/i/us/toolbar50x50.gif adeolaegbedokun NONE/- image/gif",
+        "file.name": "toolbar50x50.gif",
         "fileset.name": "log",
-        "http.response.body.content": "toolbar50x50.gif",
         "input.type": "log",
         "log.offset": 8248,
         "observer.product": "Proxy",
@@ -3392,8 +3392,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3432,16 +3432,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689363.423   6517 10.105.21.199 TCP_REFRESH_MISS/200 17396 GET http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml badeyek DIRECT/212.58.226.33 application/xml",
+        "file.name": "rss.xml",
         "fileset.name": "log",
-        "http.response.body.content": "rss.xml",
         "input.type": "log",
         "log.offset": 8394,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.21.199",
-            "212.58.226.33"
+            "212.58.226.33",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -3452,8 +3452,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_MISS"
+            "TCP_REFRESH_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "application/xml",
         "rsa.misc.result_code": "200",
@@ -3492,8 +3492,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689364.361   2140 10.105.33.214 TCP_MISS/200 407 GET http://insider.msg.yahoo.com/ycontent/beacon.php adeolaegbedokun DIRECT/68.142.231.252 image/gif",
+        "file.name": "beacon.php",
         "fileset.name": "log",
-        "http.response.body.content": "beacon.php",
         "input.type": "log",
         "log.offset": 8579,
         "observer.product": "Proxy",
@@ -3512,8 +3512,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3543,8 +3543,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689364.402      7 10.105.33.214 TCP_IMS_HIT/304 219 GET http://us.ent1.yimg.com/images.launch.yahoo.com/000/032/457/32457654.jpg adeolaegbedokun NONE/- image/jpeg",
+        "file.name": "32457654.jpg",
         "fileset.name": "log",
-        "http.response.body.content": "32457654.jpg",
         "input.type": "log",
         "log.offset": 8733,
         "observer.product": "Proxy",
@@ -3593,8 +3593,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689364.411      8 10.105.33.214 TCP_HIT/200 10593 GET http://us.news1.yimg.com/us.yimg.com/p/ap/20060906/thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg adeolaegbedokun NONE/- image/jpeg",
+        "file.name": "thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
         "fileset.name": "log",
-        "http.response.body.content": "thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
         "input.type": "log",
         "log.offset": 8900,
         "observer.product": "Proxy",
@@ -3612,8 +3612,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3652,16 +3652,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689365.312   2420 10.105.33.214 TCP_MISS/302 1270 POST http://radio.launch.yahoo.com/radio/play/authplay.asp adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "authplay.asp",
         "fileset.name": "log",
-        "http.response.body.content": "authplay.asp",
         "input.type": "log",
         "log.offset": 9113,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3714,8 +3714,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689366.377   1966 10.105.33.214 TCP_MISS/200 10519 GET http://us.news1.yimg.com/us.yimg.com/p/ap/20060908/thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg adeolaegbedokun DIRECT/213.160.98.159 image/jpeg",
+        "file.name": "thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
         "fileset.name": "log",
-        "http.response.body.content": "thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
         "input.type": "log",
         "log.offset": 9274,
         "observer.product": "Proxy",
@@ -3734,8 +3734,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3774,16 +3774,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689368.080   1703 10.105.33.214 TCP_MISS/200 515 GET http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp? adeolaegbedokun DIRECT/68.142.219.132 text/xml",
+        "file.name": "initstationfeed.asp",
         "fileset.name": "log",
-        "http.response.body.content": "initstationfeed.asp",
         "input.type": "log",
         "log.offset": 9504,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3834,16 +3834,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689368.370   3057 10.105.33.214 TCP_MISS/200 14411 GET http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp? adeolaegbedokun DIRECT/68.142.219.132 text/xml",
+        "file.name": "initstationfeed.asp",
         "fileset.name": "log",
-        "http.response.body.content": "initstationfeed.asp",
         "input.type": "log",
         "log.offset": 9677,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3894,8 +3894,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689368.889    808 10.105.33.214 TCP_MISS/200 1627 GET http://radio.launch.yahoo.com/radio/play/authplay.asp? adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "authplay.asp",
         "fileset.name": "log",
-        "http.response.body.content": "authplay.asp",
         "input.type": "log",
         "log.offset": 9852,
         "observer.product": "Proxy",
@@ -3914,8 +3914,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -3945,8 +3945,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689369.097   1226 10.105.37.65 TCP_DENIED/407 1728 GET http://natrocket.kmip.net:5288/iesocks? - NONE/- text/html",
+        "file.name": "iesocks",
         "fileset.name": "log",
-        "http.response.body.content": "iesocks",
         "input.type": "log",
         "log.offset": 10013,
         "observer.product": "Proxy",
@@ -3995,8 +3995,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689369.702      0 10.105.37.65 TCP_DENIED/407 1725 GET http://natrocket.kmip.net:5288/return? - NONE/- text/html",
+        "file.name": "return",
         "fileset.name": "log",
-        "http.response.body.content": "return",
         "input.type": "log",
         "log.offset": 10131,
         "observer.product": "Proxy",
@@ -4057,8 +4057,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689370.125   1202 10.105.33.214 TCP_MISS/200 13124 GET http://us.news1.yimg.com/us.yimg.com/p/ap/20060907/thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg adeolaegbedokun DIRECT/213.160.98.159 image/jpeg",
+        "file.name": "thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
         "fileset.name": "log",
-        "http.response.body.content": "thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
         "input.type": "log",
         "log.offset": 10248,
         "observer.product": "Proxy",
@@ -4077,8 +4077,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4117,8 +4117,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689370.862    736 10.105.33.214 TCP_MISS/302 912 GET http://radio.launch.yahoo.com/radio/clientdata/515/starter.asp? adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "starter.asp",
         "fileset.name": "log",
-        "http.response.body.content": "starter.asp",
         "input.type": "log",
         "log.offset": 10482,
         "observer.product": "Proxy",
@@ -4137,8 +4137,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4177,16 +4177,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689371.690    828 10.105.33.214 TCP_MISS/200 1450 GET http://radio.launch.yahoo.com/radio/player/default.asp? adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "default.asp",
         "fileset.name": "log",
-        "http.response.body.content": "default.asp",
         "input.type": "log",
         "log.offset": 10651,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4197,8 +4197,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4240,8 +4240,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689371.987   3617 10.105.33.214 TCP_MISS/200 30432 GET http://us.a2.yimg.com/us.yimg.com/a/ya/yahoo_messenger/081106_lrec_msgr_interophitchhiker.swf? adeolaegbedokun DIRECT/213.160.98.152 application/x-shockwave-flash",
+        "file.name": "081106_lrec_msgr_interophitchhiker.swf",
         "fileset.name": "log",
-        "http.response.body.content": "081106_lrec_msgr_interophitchhiker.swf",
         "input.type": "log",
         "log.offset": 10813,
         "observer.product": "Proxy",
@@ -4300,8 +4300,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689373.315   1626 10.105.33.214 TCP_MISS/200 14643 GET http://radio.launch.yahoo.com/radio/player/stickwall.asp? adeolaegbedokun DIRECT/68.142.219.132 text/html",
+        "file.name": "stickwall.asp",
         "fileset.name": "log",
-        "http.response.body.content": "stickwall.asp",
         "input.type": "log",
         "log.offset": 11035,
         "observer.product": "Proxy",
@@ -4358,8 +4358,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689374.065   2078 10.105.33.214 TCP_MISS/200 425 GET http://us.bc.yahoo.com/b? adeolaegbedokun DIRECT/68.142.213.132 image/gif",
+        "file.name": "b",
         "fileset.name": "log",
-        "http.response.body.content": "b",
         "input.type": "log",
         "log.offset": 11200,
         "observer.product": "Proxy",
@@ -4378,8 +4378,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4416,16 +4416,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689376.221   2130 10.105.33.214 TCP_MISS/200 407 GET http://insider.msg.yahoo.com/ycontent/beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw? adeolaegbedokun DIRECT/68.142.194.14 image/gif",
+        "file.name": "beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw",
         "fileset.name": "log",
-        "http.response.body.content": "beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw",
         "input.type": "log",
         "log.offset": 11331,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4481,8 +4481,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "216.109.124.55"
+            "216.109.124.55",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4523,8 +4523,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689377.191     11 10.105.33.214 TCP_IMS_HIT/304 233 GET http://a1568.g.akamai.net/7/1568/1600/20051025184124/radio.launch.yahoo.com/radioapi/includes/js/compVersionedJS/rapiBridge_1_4.js adeolaegbedokun NONE/- application/x-javascript",
+        "file.name": "rapiBridge_1_4.js",
         "fileset.name": "log",
-        "http.response.body.content": "rapiBridge_1_4.js",
         "input.type": "log",
         "log.offset": 11683,
         "observer.product": "Proxy",
@@ -4585,8 +4585,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689377.424   1159 10.105.33.214 TCP_MISS/304 236 GET http://a1568.g.akamai.net/7/1568/1600/20040405222754/radio.launch.yahoo.com/radio/clientdata/515/other.css adeolaegbedokun DIRECT/213.160.98.159 text/css",
+        "file.name": "other.css",
         "fileset.name": "log",
-        "http.response.body.content": "other.css",
         "input.type": "log",
         "log.offset": 11922,
         "observer.product": "Proxy",
@@ -4648,16 +4648,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689378.221    797 10.105.33.214 TCP_MISS/304 238 GET http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_left.gif adeolaegbedokun DIRECT/213.160.98.159 image/gif",
+        "file.name": "bg_left.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_left.gif",
         "input.type": "log",
         "log.offset": 12133,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4668,8 +4668,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4715,8 +4715,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "209.73.177.115",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.73.177.115"
         ],
         "related.user": [
             "badeyek"
@@ -4726,8 +4726,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4769,16 +4769,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689378.909   1405 10.105.33.214 TCP_MISS/304 136 GET http://a1568.g.akamai.net/7/1568/1600/20050829181418/radio.launch.yahoo.com/radio/common_radio/resources/images/noaccess_msgr_uk.gif adeolaegbedokun DIRECT/213.160.98.167 -",
+        "file.name": "noaccess_msgr_uk.gif",
         "fileset.name": "log",
-        "http.response.body.content": "noaccess_msgr_uk.gif",
         "input.type": "log",
         "log.offset": 12476,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.167"
+            "213.160.98.167",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4789,8 +4789,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -4832,8 +4832,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689378.924    702 10.105.33.214 TCP_MISS/304 237 GET http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_right.gif adeolaegbedokun DIRECT/213.160.98.159 image/gif",
+        "file.name": "bg_right.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_right.gif",
         "input.type": "log",
         "log.offset": 12706,
         "observer.product": "Proxy",
@@ -4852,8 +4852,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4883,8 +4883,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689378.929      4 10.105.33.214 TCP_IMS_HIT/304 218 GET http://a1568.g.akamai.net/7/1568/1600/20040405222807/radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif adeolaegbedokun NONE/- image/gif",
+        "file.name": "t.gif",
         "fileset.name": "log",
-        "http.response.body.content": "t.gif",
         "input.type": "log",
         "log.offset": 12936,
         "observer.product": "Proxy",
@@ -4902,8 +4902,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4945,16 +4945,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689379.472    563 10.105.33.214 TCP_MISS/304 238 GET http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_off.gif adeolaegbedokun DIRECT/213.160.98.167 image/gif",
+        "file.name": "bg_controls_off.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_controls_off.gif",
         "input.type": "log",
         "log.offset": 13147,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.167",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.167"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5008,16 +5008,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689379.488    560 10.105.33.214 TCP_MISS/304 238 GET http://a1568.g.akamai.net/7/1568/1600/20040405222756/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_center.gif adeolaegbedokun DIRECT/213.160.98.159 image/gif",
+        "file.name": "bg_center.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_center.gif",
         "input.type": "log",
         "log.offset": 13384,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5071,8 +5071,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689380.159    685 10.105.33.214 TCP_MISS/304 238 GET http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_fill.gif adeolaegbedokun DIRECT/213.160.98.167 image/gif",
+        "file.name": "bg_controls_fill.gif",
         "fileset.name": "log",
-        "http.response.body.content": "bg_controls_fill.gif",
         "input.type": "log",
         "log.offset": 13615,
         "observer.product": "Proxy",
@@ -5122,8 +5122,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689381.267      1 10.105.37.180 TCP_DENIED/407 1728 GET http://www.google.com/supported_domains - NONE/- text/html",
+        "file.name": "supported_domains",
         "fileset.name": "log",
-        "http.response.body.content": "supported_domains",
         "input.type": "log",
         "log.offset": 13853,
         "observer.product": "Proxy",
@@ -5141,8 +5141,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5172,8 +5172,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689381.659      0 10.105.47.191 TCP_DENIED/407 1782 GET http://us.mcafee.com/apps/agent/en-us/agent5/chknews.asp? - NONE/- text/html",
+        "file.name": "chknews.asp",
         "fileset.name": "log",
-        "http.response.body.content": "chknews.asp",
         "input.type": "log",
         "log.offset": 13972,
         "observer.product": "Proxy",
@@ -5191,8 +5191,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5229,16 +5229,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689381.660   2171 10.105.33.214 TCP_MISS/200 449 GET http://launch.adserver.yahoo.com/l? adeolaegbedokun DIRECT/216.109.125.112 image/gif",
+        "file.name": "l",
         "fileset.name": "log",
-        "http.response.body.content": "l",
         "input.type": "log",
         "log.offset": 14109,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "216.109.125.112",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.109.125.112"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5249,8 +5249,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5289,16 +5289,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689382.173   3700 10.105.21.199 TCP_MISS/200 11746 GET http://uk.f250.mail.yahoo.com/dc/launch? badeyek DIRECT/217.12.10.96 text/html",
+        "file.name": "launch",
         "fileset.name": "log",
-        "http.response.body.content": "launch",
         "input.type": "log",
         "log.offset": 14251,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "217.12.10.96",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.12.10.96"
         ],
         "related.user": [
             "badeyek"
@@ -5309,8 +5309,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -5400,8 +5400,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689384.316   2828 10.105.21.199 TCP_SWAPFAIL_MISS/200 633 GET http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/77cf3e56414f974dfd8616f56f0f632c_1.js badeyek DIRECT/213.160.98.169 application/x-javascript",
+        "file.name": "77cf3e56414f974dfd8616f56f0f632c_1.js",
         "fileset.name": "log",
-        "http.response.body.content": "77cf3e56414f974dfd8616f56f0f632c_1.js",
         "input.type": "log",
         "log.offset": 14491,
         "observer.product": "Proxy",
@@ -5420,8 +5420,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_SWAPFAIL_MISS"
+            "TCP_SWAPFAIL_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -5451,8 +5451,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689385.714   1397 10.105.21.199 TCP_HIT/200 1742 GET http://us.js1.yimg.com/us.yimg.com/lib/hdr/ygma5.css badeyek NONE/- text/css",
+        "file.name": "ygma5.css",
         "fileset.name": "log",
-        "http.response.body.content": "ygma5.css",
         "input.type": "log",
         "log.offset": 14714,
         "observer.product": "Proxy",
@@ -5513,16 +5513,16 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689387.690   1977 10.105.21.199 TCP_MISS/200 14561 GET http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/f7fc76100697c9c2d25dd0ec35e563b0_1.js badeyek DIRECT/213.160.98.169 application/x-javascript",
+        "file.name": "f7fc76100697c9c2d25dd0ec35e563b0_1.js",
         "fileset.name": "log",
-        "http.response.body.content": "f7fc76100697c9c2d25dd0ec35e563b0_1.js",
         "input.type": "log",
         "log.offset": 14848,
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.ip": [
-            "213.160.98.169",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.169"
         ],
         "related.user": [
             "badeyek"
@@ -5564,8 +5564,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689387.771     80 10.105.21.199 TCP_HIT/200 68733 GET http://us.js1.yimg.com/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js badeyek NONE/- application/x-javascript",
+        "file.name": "ac.js",
         "fileset.name": "log",
-        "http.response.body.content": "ac.js",
         "input.type": "log",
         "log.offset": 15064,
         "observer.product": "Proxy",
@@ -5583,8 +5583,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -5614,8 +5614,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689387.830      1 10.105.21.199 TCP_HIT/200 898 GET http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js badeyek NONE/- application/x-javascript",
+        "file.name": "yahoo_2.0.0-b4.js",
         "fileset.name": "log",
-        "http.response.body.content": "yahoo_2.0.0-b4.js",
         "input.type": "log",
         "log.offset": 15231,
         "observer.product": "Proxy",
@@ -5633,8 +5633,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -5664,8 +5664,8 @@
         "event.dataset": "squid.log",
         "event.module": "squid",
         "event.original": "1157689387.832     60 10.105.21.199 TCP_HIT/200 26803 GET http://us.i1.yimg.com/us.yimg.com/i/us/pim/dclient/d/img/liam_ball_1.gif badeyek NONE/- image/gif",
+        "file.name": "liam_ball_1.gif",
         "fileset.name": "log",
-        "http.response.body.content": "liam_ball_1.gif",
         "input.type": "log",
         "log.offset": 15402,
         "observer.product": "Proxy",
@@ -5683,8 +5683,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",

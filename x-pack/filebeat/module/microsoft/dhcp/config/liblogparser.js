@@ -960,7 +960,7 @@ var ecs_mappings = {
     "event_type": {to:[{field: "event.action", setter: fld_prio, prio: 1}]},
     "extension": {to:[{field: "file.extension", setter: fld_prio, prio: 1}]},
     "file.attributes": {to:[{field: "file.attributes", setter: fld_set}]},
-    "filename": {to:[{field: "file.name", setter: fld_set}]},
+    "filename": {to:[{field: "file.name", setter: fld_prio, prio: 0}]},
     "filename_size": {convert: to_long, to:[{field: "file.size", setter: fld_set}]},
     "filepath": {to:[{field: "file.path", setter: fld_set}]},
     "filetype": {to:[{field: "file.type", setter: fld_set}]},
@@ -1050,7 +1050,7 @@ var ecs_mappings = {
     "web_query": {to:[{field: "url.query", setter: fld_prio, prio: 1}]},
     "web_referer": {to:[{field: "http.request.referrer", setter: fld_prio, prio: 0}]},
     "web_root": {to:[{field: "url.path", setter: fld_set}]},
-    "webpage": {to:[{field: "http.response.body.content", setter: fld_set}]},
+    "webpage": {to:[{field: "file.name", setter: fld_prio, prio: 1}]},
 };
 
 var rsa_mappings = {
