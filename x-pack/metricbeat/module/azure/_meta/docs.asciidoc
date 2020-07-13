@@ -99,8 +99,7 @@ so the `period` for `database_account` metricset  should be `300s` or multiples 
 
 [float]
 === `app_insights`
-This metricset will collect application insights metrics, these metrics will have a timegrain every 5 minutes,
-so the `period` for `app-insights` metricset  should be `300s` or multiples of `300s`.
+This metricset will collect application insights metrics, the `period` (interval) for the `app-insights` metricset is set by default at `300s`.
 
 [float]
 == Additional notes about metrics and costs
