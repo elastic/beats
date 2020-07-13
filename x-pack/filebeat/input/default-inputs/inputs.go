@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
 )
 
 func Init(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
@@ -23,5 +24,6 @@ func Init(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin
 func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
 	return []v2.Plugin{
 		cloudfoundry.Plugin(),
+		o365audit.Plugin(log, store),
 	}
 }
