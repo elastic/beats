@@ -261,6 +261,21 @@ This specifies the field in the HTTP Header of the response that specifies the
 epoch time when the rate limit will reset.
 
 [float]
+==== `retry.max_attempts`
+
+This specifies the maximum number of retries for the retryable HTTP client. Default: 5.
+
+[float]
+==== `retry.wait_min`
+
+This specifies the minimum time to wait before a retry is attempted. Default: 1s.
+
+[float]
+==== `retry.wait_max`
+
+This specifies the maximum time to wait before a retry is attempted. Default: 60s.
+
+[float]
 ==== `ssl`
 
 This specifies SSL/TLS configuration. If the ssl section is missing, the host's
