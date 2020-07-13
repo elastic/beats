@@ -93,12 +93,15 @@ This is a list of GSuite Reports fields that are mapped to ECS.
 | items[].id.applicationName | event.provider                                          |
 | items[].events[].name      | event.action                                            |
 | items[].customerId         | organization.id                                         |
-| items[].ipAddress          | client.ip, related.ip, client.as.*, client.geo.*        |
-| items[].actor.email        | client.user.email, client.user.name, client.user.domain |
-| items[].actor.profileId    | client.user.id                                          |
+| items[].ipAddress          | source.ip, related.ip, source.as.*, source.geo.*        |
+| items[].actor.email        | source.user.email, source.user.name, source.user.domain |
+| items[].actor.profileId    | source.user.id                                          |
 |=======================================================================================
 
 These are the common ones to all filesets.
+
+Note: GSuite defaults to a 2 hours polling interval because Google admin lag times can go from
+some minutes up to 3 days. For more details on this, please read more https://support.google.com/a/answer/7061566[here].
 
 :has-dashboards!:
 
