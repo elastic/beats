@@ -4520,6 +4520,53 @@ type: object
 
 --
 
+[float]
+=== app_insights
+
+application insights
+
+
+
+*`azure.app_insights.application_id`*::
++
+--
+The application ID
+
+
+type: keyword
+
+--
+
+*`azure.app_insights.start_date`*::
++
+--
+The start date
+
+
+type: date
+
+--
+
+*`azure.app_insights.end_date`*::
++
+--
+The end date
+
+
+type: date
+
+--
+
+*`azure.app_insights.metrics.*.*`*::
++
+--
+The metrics
+
+
+type: object
+
+--
+
 *`azure.compute_vm.*.*`*::
 +
 --
