@@ -45,9 +45,15 @@
   - name: dst_ip
     description: Destination IP address
     example: 192.168.0.1
+  - name: read_timestamp
+    description: time of reading log
+    example: "2020-07-12"
   - name: content_type
     description:  Content Type
     example: application/octet-stream
+  - name: original_message
+    description: original message log
+    example: "12345 404 log.file 12.34.56.78"
   - name: request_url_port
     description: Request url port
     example: 34052
@@ -56,27 +62,28 @@
     type: group
     fields:
       - name: continent_name
-        type: alias
-        path: squid.access.geoip.continent_name
+        type: keyword
+        path: destination.geo.continent_name
         migration: true
       - name: country_iso_code
-        type: alias
+        type: keyword
         path: squid.access.geoip.country_iso_code
         migration: true
       - name: location
-        type: alias
-        path: squid.access.geoip.location
+        type: geo_point
+        description: geo_point details
+        example: "-1,-2"
         migration: true
       - name: region_name
-        type: alias
+        type: keyword
         path: squid.access.geoip.region_name
         migration: true
       - name: city_name
-        type: alias
+        type: keyword
         path: squid.access.geoip.city_name
         migration: true
       - name: region_iso_code
-        type: alias
+        type: keyword
         path: squid.access.geoip.region_iso_code
         migration: true
 
