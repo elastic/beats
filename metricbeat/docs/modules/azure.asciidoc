@@ -35,9 +35,13 @@ The virtual machine scale sets dashboard is similar to the VM dashboard and show
 
 image::./images/metricbeat-azure-vmss-overview.png[]
 
-The Azure storage dashboards dashboards show all relevant metrics for the blob, file, table and queue storage services:
+The Azure storage dashboards show all relevant metrics for the blob, file, table and queue storage services:
 
 image::./images/metricbeat-azure-storage-overview.png[]
+
+The Azure billing dashboards show relevant usage and forecast information:
+
+image::./images/metricbeat-azure-billing-overview.png[]
 
 [float]
 === Module-specific configuration notes
@@ -104,6 +108,11 @@ so the `period` for `container_service` metricset  should be `300s` or multiples
 === `database_account`
 This metricset will collect relevant metrics from specified database accounts, these metrics will have a timegrain every 5 minutes,
 so the `period` for `database_account` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `billing`
+This metricset will collect relevant usage data and forecast information from a specific subscription, these metrics will have a timegrain every 24 hours,
+so the `period` for `billing` metricset  should be `24h` or multiples of `24h`.
 
 [float]
 === `app_insights`
@@ -213,6 +222,16 @@ metricbeat.modules:
 
 - module: azure
   metricsets:
+    - billing
+  enabled: true
+  period: 24h
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
     - app_insights
   enabled: true
   period: 300s
@@ -227,6 +246,8 @@ metricbeat.modules:
 The following metricsets are available:
 
 * <<metricbeat-metricset-azure-app_insights,app_insights>>
+
+* <<metricbeat-metricset-azure-billing,billing>>
 
 * <<metricbeat-metricset-azure-compute_vm,compute_vm>>
 
@@ -245,6 +266,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-azure-storage,storage>>
 
 include::azure/app_insights.asciidoc[]
+
+include::azure/billing.asciidoc[]
 
 include::azure/compute_vm.asciidoc[]
 
