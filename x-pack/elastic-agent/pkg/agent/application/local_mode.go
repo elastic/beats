@@ -103,7 +103,15 @@ func newLocal(
 	localApplication.router = router
 
 	discover := discoverer(pathConfigFile, c.Management.Path)
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
+	emit := emitter(
+		log,
+		router,
+		&configModifiers{
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+		},
+		monitor,
+	)
 
 	var cfgSource source
 	if !c.Management.Reload.Enabled {
