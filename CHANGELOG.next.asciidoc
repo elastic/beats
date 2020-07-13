@@ -232,6 +232,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
+- Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
 
