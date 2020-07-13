@@ -25,7 +25,29 @@ The `dissect` processor has the following configuration settings:
 `target_prefix`:: (Optional) The name of the field where the values will be extracted. When an empty
 string is defined, the processor will create the keys at the root of the event. Default is
 `dissect`. When the target key already exists in the event, the processor won't replace it and log
-an error; you need to either drop or rename the key before using dissect.
+an error; you need to either drop or rename the key before using dissect, or
+enable the `overwrite_keys` flag.
+
+`ignore_failure`:: (Optional) Flag to control whether the processor returns an error if the
+tokenizer fails to match the message field. If set to true, the processor will silently restore
+the original event, allowing execution of subsequent processors (if any). If set to false
+(default), the processor will log an error, preventing execution of other processors.
+
+`overwrite_keys`:: (Optional) When set to true, the processor will overwrite
+existing keys in the event. The default is false, which causes the processor
+to fail when a key already exists.
+
+`trim_values`:: (Optional) Enables the trimming of the extracted values. Useful
+to remove leading and/or trailing spaces. Possible values are:
+- `none`: (default) no trimming is performed.
+- `left`: values are trimmed on the left (leading).
+- `right`: values are trimmed on the right (trailing).
+- `all`: values are trimmed for leading and trailing.
+
+`trim_chars`:: (Optional) Set of characters to trim from values, when trimming
+is enabled. The default is to trim the space character (`" "`). To trim multiple
+characters, simply set it to a string containing all characters to trim. For example,
+`trim_chars: " \t"` will trim spaces and/or tabs.
 
 For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
 found an error will be logged and no modification is done on the original event.
