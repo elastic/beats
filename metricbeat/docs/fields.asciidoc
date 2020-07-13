@@ -32069,6 +32069,153 @@ type: long
 --
 
 [float]
+=== connection
+
+
+
+
+[float]
+=== errors
+
+
+
+
+*`mysql.status.connection.errors.peer_address`*::
++
+--
+The number of errors that occurred while searching for connecting client IP addresses.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.accept`*::
++
+--
+The number of errors that occurred during calls to accept() on the listening port.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.internal`*::
++
+--
+The number of connections refused due to internal errors in the server, such as failure to start a new thread or an out-of-memory condition.
+
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.max_connections`*::
++
+--
+The number of connections refused because the server max_connections limit was reached. thread or an out-of-memory condition.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.tcpwrap`*::
++
+--
+The number of connections refused by the libwrap library.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.select`*::
++
+--
+The number of errors that occurred during calls to select() or poll() on the listening port. (Failure of this operation does not necessarily means a client connection was rejected.)
+
+
+type: long
+
+--
+
+[float]
+=== cache
+
+
+
+
+[float]
+=== ssl.session
+
+SSL session cache hits and misses.
+
+
+*`mysql.status.cache.ssl.session.hits`*::
++
+--
+The number of SSL session cache hits.
+
+type: long
+
+--
+
+*`mysql.status.cache.ssl.session.misses`*::
++
+--
+The number of SSL session cache misses.
+
+type: long
+
+--
+
+*`mysql.status.cache.ssl.session.size`*::
++
+--
+The SSL session cache size.
+
+type: long
+
+--
+
+[float]
+=== table
+
+
+
+
+[float]
+=== open_cache
+
+
+
+
+*`mysql.status.cache.table.open_cache.hits`*::
++
+--
+The number of hits for open tables cache lookups.
+
+type: long
+
+--
+
+*`mysql.status.cache.table.open_cache.misses`*::
++
+--
+The number of misses for open tables cache lookups.
+
+type: long
+
+--
+
+*`mysql.status.cache.table.open_cache.overflows`*::
++
+--
+Number of times, after a table is opened or closed, a cache instance has an unused entry and the size of the instance is larger than table_open_cache / table_open_cache_instances
+
+
+type: long
+
+--
+
+[float]
 === binlog
 
 
@@ -32456,7 +32603,7 @@ type: long
 *`mysql.status.handler.read.last`*::
 +
 --
-The number of requests to read the last key in an index. 
+The number of requests to read the last key in an index.
 
 
 type: long
@@ -32486,7 +32633,7 @@ type: long
 *`mysql.status.handler.read.rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 type: long
@@ -32496,7 +32643,7 @@ type: long
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-The number of requests to read the next row in the data file. 
+The number of requests to read the next row in the data file.
 
 
 type: long
@@ -32594,7 +32741,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-The total number of bytes in the InnoDB buffer pool containing data. 
+The total number of bytes in the InnoDB buffer pool containing data.
 
 
 type: long
