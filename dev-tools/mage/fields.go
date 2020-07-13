@@ -102,6 +102,7 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 	}
 
 	cmd := []string{"run",
+		"-mod=readonly",
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
@@ -127,6 +128,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 	}
 
 	cmd := []string{"run",
+		"-mod=readonly",
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
