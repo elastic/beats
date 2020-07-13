@@ -1,0 +1,48 @@
+{
+    "@timestamp": "2020-07-13T16:17:05.874Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "address": "tcp(172.17.0.2:3306)/",
+        "type": "mysql"
+    },
+    "mysql": {
+        "process": {
+            "list": {
+                "time": 22338,
+                "state": "",
+                "db": "users",
+                "id": 17,
+                "user": "root",
+                "host": "172.17.0.1:57750",
+                "command": "Sleep",
+                "info": "SHOW PROCESSLIST"
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "ephemeral_id": "f22c76a2-4647-4a7f-964a-8095b588989d",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0"
+    },
+    "event": {
+        "module": "mysql",
+        "duration": 655786,
+        "dataset": "mysql.process_list"
+    },
+    "metricset": {
+        "name": "process_list",
+        "period": 10000
+    }
+}

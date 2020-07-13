@@ -1,0 +1,33 @@
+- name: process_list
+  type: group
+  description: >
+    `process_list` show the output of the SHOW PROCESSLIST query
+  release: beta
+  fields:
+    - name: process.list
+      type: group
+      fields:
+        - name: time
+          type: long
+          description: The time in seconds that the thread has been in its current state.
+        - name: state
+          type: keyword
+          description: An action, event, or state that indicates what the thread is doing.
+        - name: db
+          type: keyword
+          description: The default database for the thread, or NULL if none has been selected.
+        - name: id
+          type: long
+          description: Connection identifier.
+        - name: user
+          type: keyword
+          description: The MySQL user who issued the statement.
+        - name: host
+          type: keyword
+          description: The host name of the client issuing the statement.
+        - name: command
+          type: keyword
+          description: The type of command the thread is executing on behalf of the client, or Sleep if the session is idle.
+        - name: info
+          type: text
+          description: The statement the thread is executing, or NULL if it is executing no statement.

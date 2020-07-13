@@ -32146,6 +32146,86 @@ type: long
 --
 
 [float]
+=== process_list
+
+`process_list` show the output of the SHOW PROCESSLIST query
+
+
+
+
+*`mysql.process_list.process.list.time`*::
++
+--
+The time in seconds that the thread has been in its current state.
+
+type: long
+
+--
+
+*`mysql.process_list.process.list.state`*::
++
+--
+An action, event, or state that indicates what the thread is doing.
+
+type: keyword
+
+--
+
+*`mysql.process_list.process.list.db`*::
++
+--
+The default database for the thread, or NULL if none has been selected.
+
+type: keyword
+
+--
+
+*`mysql.process_list.process.list.id`*::
++
+--
+Connection identifier.
+
+type: long
+
+--
+
+*`mysql.process_list.process.list.user`*::
++
+--
+The MySQL user who issued the statement.
+
+type: keyword
+
+--
+
+*`mysql.process_list.process.list.host`*::
++
+--
+The host name of the client issuing the statement.
+
+type: keyword
+
+--
+
+*`mysql.process_list.process.list.command`*::
++
+--
+The type of command the thread is executing on behalf of the client, or Sleep if the session is idle.
+
+type: keyword
+
+--
+
+*`mysql.process_list.process.list.info`*::
++
+--
+The statement the thread is executing, or NULL if it is executing no statement.
+
+type: text
+
+--
+
+[float]
 === query
 
 `query` metricset fetches custom queries from the user to a MySQL instance.

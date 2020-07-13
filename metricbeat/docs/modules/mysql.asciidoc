@@ -88,6 +88,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-mysql-performance,performance>>
 
+* <<metricbeat-metricset-mysql-process_list,process_list>>
+
 * <<metricbeat-metricset-mysql-query,query>>
 
 * <<metricbeat-metricset-mysql-status,status>>
@@ -95,6 +97,8 @@ The following metricsets are available:
 include::mysql/galera_status.asciidoc[]
 
 include::mysql/performance.asciidoc[]
+
+include::mysql/process_list.asciidoc[]
 
 include::mysql/query.asciidoc[]
 

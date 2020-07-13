@@ -1,0 +1,11 @@
+default: true
+input:
+  module: mysql
+  metricset: query
+  defaults:
+    namespace: process
+    queries:
+      - query: SHOW PROCESSLIST
+        query_namespace: list
+        response_format: table
+        replace_underscores: true
