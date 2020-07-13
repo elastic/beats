@@ -362,7 +362,7 @@ If you want to launch two or more queries, you need to specify them with their f
   driver: "postgres"
   sql_query: "SELECT * FROM pg_catalog.pg_tables pt WHERE schemaname ='pg_catalog'"
   sql_response_format: table
----
+----
 
 
 [float]
