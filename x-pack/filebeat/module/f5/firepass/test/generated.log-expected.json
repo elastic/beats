@@ -18,7 +18,6 @@
         ],
         "rsa.internal.messageid": "ntpdate",
         "rsa.time.duration_str": "tur",
-        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -44,7 +43,6 @@
         "rsa.internal.messageid": "ntpd",
         "rsa.network.interface": "lo4377",
         "rsa.network.network_port": 4819,
-        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -69,7 +67,6 @@
             "uii"
         ],
         "rsa.internal.messageid": "sshd",
-        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.36.11.87"
@@ -154,7 +151,6 @@
         "rsa.internal.event_desc": "emape",
         "rsa.internal.messageid": "EndpointSecurity",
         "rsa.investigations.ec_theme": "Communication",
-        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -192,7 +188,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "roinBCS",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -212,7 +207,6 @@
         "observer.vendor": "F5",
         "rsa.internal.event_desc": "equat",
         "rsa.internal.messageid": "firepass",
-        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -236,7 +230,6 @@
         "rsa.db.index": "mipsu",
         "rsa.internal.messageid": "EndpointSecurity",
         "rsa.investigations.ec_theme": "Communication",
-        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.171.204.166"
@@ -312,7 +305,6 @@
             "onev"
         ],
         "rsa.internal.messageid": "firepass",
-        "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -334,7 +326,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "doloreeu",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2019-08-02T03:43:25.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -443,7 +434,6 @@
             "riat"
         ],
         "rsa.internal.messageid": "sshd",
-        "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.37.79.163"
@@ -571,7 +561,6 @@
             "taevi"
         ],
         "rsa.internal.messageid": "Miscellaneous",
-        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -621,7 +610,6 @@
             "labor"
         ],
         "rsa.internal.messageid": "sshd",
-        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.0.3.58"
@@ -645,7 +633,6 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "rsa.internal.messageid": "GarbageCollection",
-        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -694,7 +681,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "omm",
         "rsa.internal.messageid": "kernel",
-        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -745,7 +731,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.investigations.ec_subject": "Message",
         "rsa.investigations.ec_theme": "Communication",
-        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -788,12 +773,11 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.117.146.33",
-            "10.46.158.31"
+            "10.46.158.31",
+            "10.117.146.33"
         ],
         "rsa.db.index": "dun",
         "rsa.internal.messageid": "kernel",
-        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.117.146.33"
@@ -828,7 +812,6 @@
         "rsa.misc.action": [
             "block"
         ],
-        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.196.136.214"
@@ -857,7 +840,6 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "Communication",
         "rsa.misc.log_session_id": "dtem",
-        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -908,7 +890,6 @@
         "rsa.misc.action": [
             "cancel"
         ],
-        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -929,7 +910,6 @@
         "observer.vendor": "F5",
         "rsa.internal.event_desc": "erc",
         "rsa.internal.messageid": "snmp",
-        "rsa.time.event_time": "2019-07-11T04:45:07.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -968,7 +948,6 @@
         "rsa.internal.event_desc": "uasia",
         "rsa.internal.messageid": "EndpointSecurity",
         "rsa.investigations.ec_theme": "Communication",
-        "rsa.time.event_time": "2019-08-08T18:50:15.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -989,7 +968,6 @@
         "rsa.internal.event_desc": "uames",
         "rsa.internal.messageid": "EndpointSecurity",
         "rsa.investigations.ec_theme": "Communication",
-        "rsa.time.event_time": "2019-08-23T01:52:50.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1042,7 +1020,6 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "Communication",
         "rsa.misc.log_session_id": "isno",
-        "rsa.time.event_time": "2019-09-20T15:57:58.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1087,7 +1064,6 @@
             "amvolup"
         ],
         "rsa.internal.messageid": "sshd",
-        "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.86.63.253"
@@ -1138,7 +1114,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "run-crons",
         "rsa.misc.result_code": "siarchi",
-        "rsa.time.event_time": "2019-11-16T20:08:15.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1186,7 +1161,6 @@
         "rsa.misc.action": [
             "deny"
         ],
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1232,7 +1206,6 @@
         ],
         "rsa.internal.messageid": "ntpdate",
         "rsa.time.duration_str": "hitect",
-        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1275,7 +1248,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "texp",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1374,7 +1346,6 @@
             "edol"
         ],
         "rsa.internal.messageid": "sshd",
-        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.26.196.144"
@@ -1399,7 +1370,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "run-crons",
         "rsa.misc.result_code": "xerc",
-        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1492,7 +1462,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "uptate",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1514,7 +1483,6 @@
             "aliquam"
         ],
         "rsa.internal.messageid": "Miscellaneous",
-        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1632,7 +1600,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "run-crons",
         "rsa.misc.result_code": "intocc",
-        "rsa.time.event_time": "2019-09-13T00:02:15.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1710,7 +1677,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "run-crons",
         "rsa.misc.result_code": "rem",
-        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1774,7 +1740,6 @@
         ],
         "rsa.internal.messageid": "ntpdate",
         "rsa.time.duration_str": "ese",
-        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1794,7 +1759,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "ntocc",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1833,7 +1797,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "ntpd",
         "rsa.time.duration_str": "epte",
-        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -1903,7 +1866,6 @@
         ],
         "rsa.internal.messageid": "maintenance",
         "rsa.network.network_port": 6980,
-        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
         "rsa.web.fqdn": "ipsumd6116.local",
         "service.type": "f5",
         "tags": [
@@ -1998,7 +1960,6 @@
         ],
         "rsa.internal.messageid": "ntpdate",
         "rsa.time.duration_str": "utlabor",
-        "rsa.time.event_time": "2020-05-13T23:45:57.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2026,7 +1987,6 @@
         "rsa.network.alias_host": [
             "eufugi2923.internal.host"
         ],
-        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2078,7 +2038,6 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "Communication",
         "rsa.misc.log_session_id": "con",
-        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2105,7 +2064,6 @@
         "rsa.misc.action": [
             "cancel"
         ],
-        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2145,7 +2103,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "oremi",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2165,7 +2122,6 @@
         "observer.vendor": "F5",
         "rsa.db.index": "mquelau",
         "rsa.internal.messageid": "heartbeat",
-        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2185,7 +2141,6 @@
         "observer.vendor": "F5",
         "rsa.internal.messageid": "run-crons",
         "rsa.misc.result_code": "idolo",
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2212,7 +2167,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.investigations.ec_subject": "User",
         "rsa.investigations.ec_theme": "Policy",
-        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",
@@ -2275,12 +2229,11 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.65.175.9",
-            "10.225.181.30"
+            "10.225.181.30",
+            "10.65.175.9"
         ],
         "rsa.db.index": "uia",
         "rsa.internal.messageid": "kernel",
-        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "f5",
         "source.ip": [
             "10.65.175.9"
@@ -2322,7 +2275,6 @@
         "observer.vendor": "F5",
         "rsa.internal.event_desc": "snmp:",
         "rsa.internal.messageid": "snmp",
-        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "service.type": "f5",
         "tags": [
             "f5.firepass",

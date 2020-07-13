@@ -83,7 +83,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -157,7 +156,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "iciadese",
         "rsa.internal.messageid": "Migration",
-        "rsa.time.event_time": "2016-05-22T04:30:33.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -284,7 +282,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2016-08-30T05:48:33.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -357,7 +354,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2016-10-26T09:58:50.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -394,7 +390,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -436,7 +431,6 @@
         "rsa.misc.action": [
             "Shutting down"
         ],
-        "rsa.time.event_time": "2016-12-23T14:09:07.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -455,7 +449,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -475,7 +468,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "atnulapa",
         "rsa.internal.messageid": "Migration",
-        "rsa.time.event_time": "2017-01-20T04:14:16.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -621,7 +613,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "oloreeu",
         "rsa.internal.messageid": "Activation",
-        "rsa.time.event_time": "2017-05-14T12:34:50.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -640,7 +631,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -660,7 +650,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "tect",
         "rsa.internal.messageid": "Error",
-        "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -683,7 +672,6 @@
         "rsa.misc.action": [
             "Upgrading database"
         ],
-        "rsa.time.event_time": "2017-06-26T09:42:33.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -702,7 +690,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -740,7 +727,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "cin",
         "rsa.internal.messageid": "An",
-        "rsa.time.event_time": "2017-08-08T06:50:15.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -760,7 +746,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "natuserr",
         "rsa.internal.messageid": "PostgreSQL",
-        "rsa.time.event_time": "2017-08-22T13:52:50.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -779,7 +764,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -799,7 +783,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "eruntmo",
         "rsa.internal.messageid": "Remapped",
-        "rsa.time.event_time": "2017-09-20T15:57:58.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -854,7 +837,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -947,7 +929,6 @@
         "rsa.internal.event_desc": "com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout is not configured",
         "rsa.internal.messageid": "com.rapid7.nexpose.comms.clientConnectionProvider.autoPairTimeout",
         "rsa.misc.result_code": "exeacomm",
-        "rsa.time.event_time": "2018-01-12T12:18:32.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1003,7 +984,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "quamqua",
         "rsa.internal.messageid": "Establishing",
-        "rsa.time.event_time": "2018-02-24T09:26:15.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1023,7 +1003,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "ntut",
         "rsa.internal.messageid": "Deleted",
-        "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1043,7 +1022,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "edqui",
         "rsa.internal.messageid": "Error",
-        "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1081,7 +1059,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "moen",
         "rsa.internal.messageid": "0.16",
-        "rsa.time.event_time": "2018-04-23T01:36:32.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1123,7 +1100,6 @@
         "rsa.internal.messageid": "Renamed",
         "rsa.investigations.ec_activity": "Modify",
         "rsa.investigations.ec_outcome": "Success",
-        "rsa.time.event_time": "2018-05-21T03:41:41.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1178,7 +1154,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1251,7 +1226,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2018-08-29T04:59:40.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1328,7 +1302,6 @@
         "rsa.misc.action": [
             "accept"
         ],
-        "rsa.time.event_time": "2018-10-25T09:09:57.000Z",
         "service.name": "fld1",
         "service.type": "rapid7",
         "tags": [
@@ -1367,7 +1340,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "maveni",
         "rsa.internal.messageid": "loading",
-        "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1387,7 +1359,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "Closing connection to scan engine",
         "rsa.internal.messageid": "Closing",
-        "rsa.time.event_time": "2018-12-07T06:17:40.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1424,7 +1395,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2019-01-05T08:22:49.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1462,7 +1432,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "laud",
         "rsa.internal.messageid": "removing",
-        "rsa.time.event_time": "2019-02-02T10:27:57.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1481,7 +1450,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1500,7 +1468,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1520,7 +1487,6 @@
         "observer.vendor": "Rapid7",
         "rsa.db.index": "isq",
         "rsa.internal.messageid": "Setting",
-        "rsa.time.event_time": "2019-03-17T07:35:40.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1615,7 +1581,6 @@
         "rsa.misc.action": [
             "allow"
         ],
-        "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.name": "fld1",
         "service.type": "rapid7",
         "tags": [
@@ -1658,7 +1623,6 @@
         "rsa.misc.action": [
             "Shutting down"
         ],
-        "rsa.time.event_time": "2019-06-25T08:53:40.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1733,7 +1697,6 @@
         "rsa.db.index": "stlaboru",
         "rsa.internal.event_desc": "Job execution threads will use class loader",
         "rsa.internal.messageid": "Job",
-        "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1754,7 +1717,6 @@
         "rsa.internal.event_desc": "com.rapid7.nexpose.datastore.connection.evictionThreadTime is not configured",
         "rsa.internal.messageid": "com.rapid7.nexpose.datastore.connection.evictionThreadTime",
         "rsa.misc.result_code": "uaer",
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1774,7 +1736,6 @@
         "observer.vendor": "Rapid7",
         "rsa.internal.event_desc": "iono",
         "rsa.internal.messageid": "Restarting",
-        "rsa.time.event_time": "2019-09-19T03:09:05.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",
@@ -1865,7 +1826,6 @@
         "observer.type": "Vulnerability",
         "observer.vendor": "Rapid7",
         "rsa.internal.messageid": "[Site:",
-        "rsa.time.event_time": "2019-11-30T14:21:57.000Z",
         "service.type": "rapid7",
         "tags": [
             "rapid7.nexpose",

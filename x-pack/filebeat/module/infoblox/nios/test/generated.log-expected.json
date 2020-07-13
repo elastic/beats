@@ -17,7 +17,6 @@
         "rsa.misc.event_source": "volup208.invalid",
         "rsa.misc.version": "1.5191",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -54,7 +53,6 @@
             "atio5608.www5.localhost"
         ],
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
         "rsa.time.month": "Feb",
         "service.type": "infoblox",
         "tags": [
@@ -84,7 +82,6 @@
         "rsa.misc.device_name": "scivel",
         "rsa.misc.event_source": "ptass3168.www5.example",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "rsa.time.month": "Feb",
         "service.type": "infoblox",
         "tags": [
@@ -106,7 +103,6 @@
         "rsa.internal.messageid": "purge_scheduled_tasks",
         "rsa.misc.event_source": "rmagni1998.internal.host",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-03-12T05:17:42.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -132,7 +128,6 @@
         "rsa.misc.device_name": "pori",
         "rsa.misc.event_source": "Cice513.api.local",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-03-26T12:20:16.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -156,7 +151,6 @@
         "rsa.internal.messageid": "speedstep_control",
         "rsa.misc.event_source": "uid545.www5.localhost",
         "rsa.time.day": "9",
-        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -179,7 +173,6 @@
         "rsa.misc.event_source": "nibusBon7400.localhost",
         "rsa.misc.result": "success",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-04-24T02:25:25.000Z",
         "rsa.time.month": "Apr",
         "service.type": "infoblox",
         "tags": [
@@ -202,7 +195,6 @@
         "rsa.internal.messageid": "ntpd_initres",
         "rsa.misc.event_source": "iat1852.api.localdomain",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
@@ -229,7 +221,6 @@
         "rsa.misc.event_source": "mquisnos5771.example",
         "rsa.time.day": "22",
         "rsa.time.duration_time": 61.614,
-        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "source.ip": [
@@ -255,7 +246,6 @@
         "rsa.internal.messageid": "phonehome",
         "rsa.misc.event_source": "moll2902.www.local",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
@@ -279,7 +269,6 @@
         "rsa.internal.messageid": "debug_mount",
         "rsa.misc.event_source": "onse1664.internal.domain",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2020-06-20T06:35:42.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
@@ -310,7 +299,6 @@
         "rsa.misc.result": "success",
         "rsa.misc.result_code": "dun",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-07-04T13:38:16.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -334,7 +322,6 @@
         "rsa.internal.messageid": "sSMTP",
         "rsa.misc.event_source": "ali6446.localhost",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -357,7 +344,6 @@
         "rsa.internal.messageid": "shutdown",
         "rsa.misc.event_source": "edquiano6061.internal.invalid",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2019-08-02T03:43:25.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -387,7 +373,6 @@
         "rsa.internal.messageid": "tacacs_acct",
         "rsa.misc.event_source": "cup1793.local",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2019-08-16T10:45:59.000Z",
         "rsa.time.month": "Aug",
         "service.type": "infoblox",
         "tags": [
@@ -411,7 +396,6 @@
         "rsa.internal.messageid": "controld",
         "rsa.misc.event_source": "ostr4979.www5.host",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2019-08-30T17:48:33.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -434,7 +418,6 @@
         "rsa.internal.messageid": "ntpdate",
         "rsa.misc.event_source": "adm987.www.test",
         "rsa.time.day": "13",
-        "rsa.time.event_time": "2019-09-14T00:51:07.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -458,7 +441,6 @@
         "rsa.internal.messageid": "syslog",
         "rsa.misc.event_source": "isaute811.www.home",
         "rsa.time.day": "28",
-        "rsa.time.event_time": "2019-09-28T07:53:42.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -482,7 +464,6 @@
         "rsa.internal.messageid": "validate_dhcpd",
         "rsa.misc.event_source": "inima5444.www5.lan",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -506,7 +487,6 @@
         "rsa.internal.messageid": "debug_mount",
         "rsa.misc.event_source": "erc3217.internal.lan",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2019-10-26T21:58:50.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -531,7 +511,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.misc.event_source": "iadese6958.www5.local",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2019-11-10T05:01:24.000Z",
         "rsa.time.month": "Nov",
         "service.type": "infoblox",
         "tags": [
@@ -554,7 +533,6 @@
         "rsa.internal.messageid": "validate_dhcpd",
         "rsa.misc.event_source": "CSed2857.www5.example",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2019-11-24T12:03:59.000Z",
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
@@ -581,7 +559,6 @@
         "rsa.misc.event_source": "uatD2509.mail.domain",
         "rsa.time.day": "8",
         "rsa.time.duration_time": 66.44,
-        "rsa.time.event_time": "2019-12-08T19:06:33.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "source.ip": [
@@ -609,7 +586,6 @@
         "rsa.misc.event_source": "datatn5076.internal.example",
         "rsa.misc.version": "1.2807",
         "rsa.time.day": "23",
-        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
@@ -633,7 +609,6 @@
         "rsa.internal.messageid": "rsyncd",
         "rsa.misc.event_source": "ercit2385.internal.home",
         "rsa.time.day": "6",
-        "rsa.time.event_time": "2020-01-06T09:11:41.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -656,7 +631,6 @@
         "rsa.internal.messageid": "httpd",
         "rsa.misc.event_source": "quisnos4590.mail.domain",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -680,7 +654,6 @@
         "rsa.internal.messageid": "restarting",
         "rsa.misc.event_source": "wri2784.api.domain",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
@@ -704,7 +677,6 @@
         "rsa.internal.messageid": "rc3",
         "rsa.misc.event_source": "asun1250.api.localdomain",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-02-18T06:19:24.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
@@ -729,7 +701,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.misc.event_source": "iae1637.local",
         "rsa.time.day": "04",
-        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
         "rsa.time.month": "Mar",
         "service.type": "infoblox",
         "tags": [
@@ -753,7 +724,6 @@
         "rsa.internal.messageid": "controld",
         "rsa.misc.event_source": "boris5916.www5.example",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2020-03-18T20:24:33.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -776,7 +746,6 @@
         "rsa.internal.messageid": "phonehome",
         "rsa.misc.event_source": "temqu3331.api.host",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -801,7 +770,6 @@
         "rsa.internal.data": "liquide",
         "rsa.internal.messageid": "db_jnld",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -827,7 +795,6 @@
         "rsa.misc.event_source": "radi1512.mail.example",
         "rsa.misc.result_code": "lor",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -850,7 +817,6 @@
         "rsa.internal.messageid": "speedstep_control",
         "rsa.misc.event_source": "bore6534.internal.localhost",
         "rsa.time.day": "14",
-        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
@@ -873,7 +839,6 @@
         "rsa.internal.messageid": "ipmievd",
         "rsa.misc.event_source": "eveli265.www5.localdomain",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
@@ -910,7 +875,6 @@
             "uptatema6843.www.host"
         ],
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
         "rsa.time.month": "Jun",
         "service.type": "infoblox",
         "tags": [
@@ -936,7 +900,6 @@
         "rsa.investigations.ec_outcome": "Failure",
         "rsa.misc.event_source": "Utenima1612.www5.domain",
         "rsa.time.day": "26",
-        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "rsa.time.month": "Jun",
         "service.type": "infoblox",
         "tags": [
@@ -959,7 +922,6 @@
         "rsa.internal.messageid": "ntpd_initres",
         "rsa.misc.event_source": "tco1842.www.localhost",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2019-07-11T04:45:07.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -984,7 +946,6 @@
         "rsa.misc.client": "tev",
         "rsa.misc.event_source": "turadip3427.api.corp",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -1007,7 +968,6 @@
         "rsa.internal.messageid": "smart_check_io",
         "rsa.misc.event_source": "nonn839.api.corp",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2019-08-08T18:50:15.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -1030,7 +990,6 @@
         "rsa.internal.messageid": "rcsysinit",
         "rsa.misc.event_source": "adm7744.mail.domain",
         "rsa.time.day": "22",
-        "rsa.time.event_time": "2019-08-23T01:52:50.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -1057,7 +1016,6 @@
         ],
         "rsa.misc.event_source": "ios6980.example",
         "rsa.time.day": "6",
-        "rsa.time.event_time": "2019-09-06T08:55:24.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -1081,7 +1039,6 @@
         "rsa.internal.messageid": "diskcheck",
         "rsa.misc.event_source": "osquira6030.internal.corp",
         "rsa.time.day": "20",
-        "rsa.time.event_time": "2019-09-20T15:57:58.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -1105,7 +1062,6 @@
         "rsa.internal.messageid": "watchdog",
         "rsa.misc.event_source": "squirati63.mail.lan",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2019-10-04T23:00:32.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -1129,7 +1085,6 @@
         "rsa.misc.client": "tvolupt",
         "rsa.misc.event_source": "lup2134.www.localhost",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -1153,7 +1108,6 @@
         "rsa.internal.messageid": "snmptrapd",
         "rsa.misc.event_source": "umdo4017.www.local",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2019-11-02T13:05:41.000Z",
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
@@ -1176,7 +1130,6 @@
         "rsa.internal.messageid": "snmptrapd",
         "rsa.misc.event_source": "loreme853.www5.localdomain",
         "rsa.time.day": "16",
-        "rsa.time.event_time": "2019-11-16T20:08:15.000Z",
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
@@ -1203,7 +1156,6 @@
         "rsa.misc.event_source": "orumSe728.internal.test",
         "rsa.misc.result_code": "molli",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2019-12-01T03:10:49.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
@@ -1227,7 +1179,6 @@
         "rsa.internal.messageid": "acpid",
         "rsa.misc.event_source": "oremi7400.www.local",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
@@ -1253,7 +1204,6 @@
         "rsa.internal.messageid": "in.tftpd",
         "rsa.misc.event_source": "ess651.test",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2019-12-29T17:15:58.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "source.ip": [
@@ -1288,7 +1238,6 @@
         "rsa.investigations.ec_theme": "Authentication",
         "rsa.misc.event_source": "epre6970.www.example",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -1312,7 +1261,6 @@
         "rsa.internal.messageid": "httpd",
         "rsa.misc.event_source": "tali7803.www.localdomain",
         "rsa.time.day": "27",
-        "rsa.time.event_time": "2020-01-27T07:21:06.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -1336,7 +1284,6 @@
         "rsa.misc.event_source": "siut5663.local",
         "rsa.misc.version": "1.271",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
@@ -1363,7 +1310,6 @@
         "rsa.internal.messageid": "INFOBLOX-Grid",
         "rsa.misc.event_source": "elitse6672.internal.localdomain",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2020-02-24T21:26:15.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "source.ip": [
@@ -1390,7 +1336,6 @@
         "rsa.internal.messageid": "openvpn-member",
         "rsa.misc.event_source": "tpersp55.api.invalid",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -1413,7 +1358,6 @@
         "rsa.internal.messageid": "init",
         "rsa.misc.event_source": "uptate6077.www5.corp",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -1436,7 +1380,6 @@
         "rsa.internal.messageid": "syslog-ng",
         "rsa.misc.event_source": "odoconse228.mail.localdomain",
         "rsa.time.day": "8",
-        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -1460,7 +1403,6 @@
         "rsa.internal.messageid": "diskcheck",
         "rsa.misc.event_source": "tdol5310.domain",
         "rsa.time.day": "22",
-        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -1485,7 +1427,6 @@
         "rsa.internal.messageid": "in.tftpd",
         "rsa.misc.event_source": "ica7215.mail.home",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2020-05-07T08:39:06.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "source.ip": [
@@ -1513,7 +1454,6 @@
         "rsa.misc.client": "porinc",
         "rsa.misc.event_source": "veniamqu7284.mail.invalid",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2020-05-21T15:41:41.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
@@ -1540,7 +1480,6 @@
         "rsa.internal.messageid": "in.tftpd",
         "rsa.misc.event_source": "eumfugi28.api.test",
         "rsa.time.day": "4",
-        "rsa.time.event_time": "2020-06-04T22:44:15.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "source.ip": [
@@ -1566,7 +1505,6 @@
         "rsa.internal.messageid": "diskcheck",
         "rsa.misc.event_source": "sequatD5469.www5.lan",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
@@ -1589,7 +1527,6 @@
         "rsa.internal.messageid": "purge_scheduled_tasks",
         "rsa.misc.event_source": "tla4765.api.host",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -1612,7 +1549,6 @@
         "rsa.internal.messageid": "syslog-ng",
         "rsa.misc.event_source": "itationu3575.www.invalid",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2019-07-17T19:51:58.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -1636,7 +1572,6 @@
         "rsa.misc.event_source": "mmodoc4947.internal.test",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "01",
-        "rsa.time.event_time": "2019-08-01T02:54:32.000Z",
         "rsa.time.month": "Aug",
         "service.type": "infoblox",
         "tags": [
@@ -1659,7 +1594,6 @@
         "rsa.internal.messageid": "ntpd_initres",
         "rsa.misc.event_source": "olorem2760.www5.test",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2019-08-15T09:57:06.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -1685,7 +1619,6 @@
         "rsa.misc.event_source": "dol3346.www.lan",
         "rsa.misc.result": "unknown",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2019-08-29T16:59:40.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -1710,7 +1643,6 @@
         "rsa.misc.device_name": "midestl",
         "rsa.misc.event_source": "ercit6496.api.local",
         "rsa.time.day": "12",
-        "rsa.time.event_time": "2019-09-13T00:02:15.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -1734,7 +1666,6 @@
         "rsa.internal.messageid": "smart_check_io",
         "rsa.misc.event_source": "tlaboree6412.internal.home",
         "rsa.time.day": "27",
-        "rsa.time.event_time": "2019-09-27T07:04:49.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -1757,7 +1688,6 @@
         "rsa.internal.messageid": "init",
         "rsa.misc.event_source": "mipsamvo4282.api.home",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2019-10-11T14:07:23.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -1781,7 +1711,6 @@
         "rsa.misc.client": "hitec",
         "rsa.misc.event_source": "ugit5828.www5.test",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2019-10-25T21:09:57.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -1807,7 +1736,6 @@
         "rsa.misc.event_source": "itanim4024.api.example",
         "rsa.time.day": "9",
         "rsa.time.duration_time": 98.036,
-        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "source.ip": [
@@ -1837,7 +1765,6 @@
         "rsa.internal.messageid": "dhcpd",
         "rsa.misc.event_source": "ation6657.www.home",
         "rsa.time.day": "23",
-        "rsa.time.event_time": "2019-11-23T11:15:06.000Z",
         "rsa.time.month": "Nov",
         "service.type": "infoblox",
         "source.ip": [
@@ -1864,7 +1791,6 @@
         "rsa.internal.messageid": "kernel",
         "rsa.misc.event_source": "tas2266.internal.example",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2019-12-07T18:17:40.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
@@ -1888,7 +1814,6 @@
         "rsa.internal.messageid": "rcsysinit",
         "rsa.misc.event_source": "oremquel3992.mail.host",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
@@ -1912,7 +1837,6 @@
         "rsa.internal.messageid": "dhcpdv6",
         "rsa.misc.event_source": "atuse5193.www.local",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "rsa.time.month": "Jan",
         "service.type": "infoblox",
         "tags": [
@@ -1936,7 +1860,6 @@
         "rsa.internal.messageid": "speedstep_control",
         "rsa.misc.event_source": "ratv2649.www.host",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2020-01-19T15:25:23.000Z",
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
@@ -1960,7 +1883,6 @@
         "rsa.internal.messageid": "syslog-ng",
         "rsa.misc.event_source": "nculpaq3821.www5.invalid",
         "rsa.time.day": "2",
-        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
@@ -1984,7 +1906,6 @@
         "rsa.internal.messageid": "diskcheck",
         "rsa.misc.event_source": "obea5700.mail.lan",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2020-02-17T05:30:32.000Z",
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
@@ -2010,7 +1931,6 @@
         "rsa.misc.device_name": "pisc",
         "rsa.misc.event_source": "ntmo3423.mail.home",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -2033,7 +1953,6 @@
         "rsa.misc.client": "amvolu",
         "rsa.misc.event_source": "qui3176.internal.example",
         "rsa.time.day": "17",
-        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
@@ -2057,7 +1976,6 @@
         "rsa.internal.messageid": "snmptrapd",
         "rsa.misc.event_source": "pta6801.mail.invalid",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2020-04-01T02:38:14.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -2080,7 +1998,6 @@
         "rsa.internal.messageid": "httpd",
         "rsa.misc.event_source": "scivel2614.www5.invalid",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
@@ -2107,7 +2024,6 @@
         "rsa.internal.messageid": "INFOBLOX-Grid",
         "rsa.misc.event_source": "ntmoll7616.api.localhost",
         "rsa.time.day": "29",
-        "rsa.time.event_time": "2020-04-29T16:43:23.000Z",
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "source.ip": [
@@ -2156,7 +2072,6 @@
         "rsa.internal.messageid": "debug",
         "rsa.misc.event_source": "velill2874.internal.invalid",
         "rsa.time.day": "28",
-        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
@@ -2179,7 +2094,6 @@
         "rsa.internal.messageid": "python",
         "rsa.misc.event_source": "ict2699.internal.localhost",
         "rsa.time.day": "11",
-        "rsa.time.event_time": "2020-06-11T13:51:06.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
@@ -2203,7 +2117,6 @@
         "rsa.internal.messageid": "kernel",
         "rsa.misc.event_source": "reseosq3558.www5.invalid",
         "rsa.time.day": "25",
-        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
@@ -2226,7 +2139,6 @@
         "rsa.internal.messageid": "purge_scheduled_tasks",
         "rsa.misc.event_source": "saqu320.api.test",
         "rsa.time.day": "10",
-        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -2249,7 +2161,6 @@
         "rsa.misc.client": "ommo",
         "rsa.misc.event_source": "sequat4596.api.domain",
         "rsa.time.day": "24",
-        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
@@ -2272,7 +2183,6 @@
         "rsa.internal.messageid": "diskcheck",
         "rsa.misc.event_source": "olu5333.www.domain",
         "rsa.time.day": "7",
-        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -2295,7 +2205,6 @@
         "rsa.internal.messageid": "init",
         "rsa.misc.event_source": "dtemp1362.internal.example",
         "rsa.time.day": "21",
-        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
@@ -2319,7 +2228,6 @@
         "rsa.internal.messageid": "snmptrapd",
         "rsa.misc.event_source": "odt5505.www5.localdomain",
         "rsa.time.day": "5",
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -2343,7 +2251,6 @@
         "observer.vendor": "Infoblox",
         "rsa.internal.messageid": "db_jnld",
         "rsa.time.day": "19",
-        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
@@ -2367,7 +2274,6 @@
         "rsa.internal.messageid": "syslog",
         "rsa.misc.event_source": "itse522.internal.localdomain",
         "rsa.time.day": "3",
-        "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -2390,7 +2296,6 @@
         "rsa.internal.messageid": "acpid",
         "rsa.misc.event_source": "oquisqu1528.invalid",
         "rsa.time.day": "18",
-        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
@@ -2413,7 +2318,6 @@
         "rsa.internal.messageid": "acpid",
         "rsa.misc.event_source": "quu2203.internal.invalid",
         "rsa.time.day": "1",
-        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
@@ -2437,7 +2341,6 @@
         "rsa.internal.messageid": "debug",
         "rsa.misc.event_source": "quunt3116.localhost",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "rsa.time.month": "Nov",
         "service.type": "infoblox",
         "tags": [
@@ -2461,7 +2364,6 @@
         "rsa.internal.messageid": "debug",
         "rsa.misc.event_source": "texpli7157.mail.invalid",
         "rsa.time.day": "30",
-        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "rsa.time.month": "Nov",
         "service.type": "infoblox",
         "tags": [
@@ -2485,7 +2387,6 @@
         "rsa.internal.messageid": "openvpn-master",
         "rsa.misc.event_source": "odoc7856.api.example",
         "rsa.time.day": "14",
-        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
