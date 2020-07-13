@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const Unlimited = 0
+const unlimited = 0
 
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
