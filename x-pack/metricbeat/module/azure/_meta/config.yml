@@ -90,3 +90,11 @@
 #  tenant_id: '${AZURE_TENANT_ID:""}'
 #  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 #  refresh_list_interval: 600s
+
+#- module: azure
+#  metricsets:
+#    - app_insights
+#  enabled: true
+#  period: 300s
+#  application_id: ''
+#  api_key: ''
