@@ -33,7 +33,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
 |<<metricbeat-module-azure,Azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
+.9+| .9+|  |<<metricbeat-metricset-azure-app_insights,app_insights>> beta[]  
+|<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>   
 |<<metricbeat-metricset-azure-container_instance,container_instance>>   
 |<<metricbeat-metricset-azure-container_registry,container_registry>>   
