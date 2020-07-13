@@ -148,7 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
-- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
+- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
 - file_integrity: Create fsnotify watcher only when starting file_integrity module {pull}19505[19505]
@@ -270,6 +270,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 
 *Packetbeat*
 
@@ -324,6 +325,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add data type conversion in `dissect` processor for converting string values to other basic data types. {pull}18683[18683]
 - Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
 - Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
@@ -438,6 +440,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 - Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
+- Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
 
 *Heartbeat*
 
@@ -539,7 +542,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 - Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
 - The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
+- Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
 - The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
+- Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
 
 *Packetbeat*
 
@@ -559,6 +564,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
+
+*Elastic Log Driver*
+- Add support for `docker logs` command {pull}19531[19531]
 
 ==== Deprecated
 
