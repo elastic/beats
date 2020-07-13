@@ -12,11 +12,11 @@ input:
             LIMIT 10
         query_namespace: events_statements
         response_format: table
-        replace_underscores: false
+        replace_underscores: true
       - query: >
           SELECT object_schema, object_name, index_name, count_fetch
           FROM performance_schema.table_io_waits_summary_by_index_usage
           WHERE count_fetch > 0
         query_namespace: table_io_waits
         response_format: table
-        replace_underscores: false
+        replace_underscores: true
