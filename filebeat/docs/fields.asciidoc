@@ -61509,6 +61509,33 @@ type: keyword
 
 --
 
+*`gsuite.admin.application.id`*::
++
+--
+The application ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.application.asp_id`*::
++
+--
+The application specific password ID.
+
+type: keyword
+
+--
+
+*`gsuite.admin.application.package_id`*::
++
+--
+The mobile application package ID.
+
+type: keyword
+
+--
+
 *`gsuite.admin.group.email`*::
 +
 --
@@ -61626,15 +61653,6 @@ type: keyword
 
 --
 
-*`gsuite.admin.app.package_id`*::
-+
---
-The mobile application package ID.
-
-type: keyword
-
---
-
 *`gsuite.admin.non_featured_services_selection`*::
 +
 --
@@ -61672,19 +61690,28 @@ type: keyword
 
 --
 
-*`gsuite.admin.gateway.name`*::
+*`gsuite.admin.user.nickname`*::
 +
 --
-Gateway name. Present on some chat settings.
+The user's nickname.
 
 type: keyword
 
 --
 
-*`gsuite.admin.app.id`*::
+*`gsuite.admin.user.birthdate`*::
 +
 --
-The application ID.
+The user's birth date.
+
+type: date
+
+--
+
+*`gsuite.admin.gateway.name`*::
++
+--
+Gateway name. Present on some chat settings.
 
 type: keyword
 
@@ -61704,6 +61731,13 @@ type: keyword
 --
 Device serial number.
 
+type: keyword
+
+--
+
+*`gsuite.admin.device.id`*::
++
+--
 type: keyword
 
 --
@@ -61808,7 +61842,7 @@ type: keyword
 
 --
 
-*`gsuite.admin.group.bulk_upload.failed`*::
+*`gsuite.admin.bulk_upload.failed`*::
 +
 --
 Number of failed records in bulk upload operation.
@@ -61817,7 +61851,7 @@ type: long
 
 --
 
-*`gsuite.admin.group.bulk_upload.total`*::
+*`gsuite.admin.bulk_upload.total`*::
 +
 --
 Number of total records in bulk upload operation.
@@ -62034,6 +62068,87 @@ type: keyword
 --
 This will be used to state what kind of information was changed. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
 
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_monitor.dest_email`*::
++
+--
+The destination address of the email monitor.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_monitor.level.chat`*::
++
+--
+The chat email monitor level.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_monitor.level.draft`*::
++
+--
+The draft email monitor level.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_monitor.level.incoming`*::
++
+--
+The incoming email monitor level.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_monitor.level.outgoing`*::
++
+--
+The outgoing email monitor level.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_dump.include_deleted`*::
++
+--
+Indicates if deleted emails are included in the export.
+
+type: boolean
+
+--
+
+*`gsuite.admin.email_dump.package_content`*::
++
+--
+The contents of the mailbox package.
+
+type: keyword
+
+--
+
+*`gsuite.admin.email_dump.query`*::
++
+--
+The search query used for the dump.
+
+type: keyword
+
+--
+
+*`gsuite.admin.request.id`*::
++
+--
+The request ID.
 
 type: keyword
 

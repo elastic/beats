@@ -225,6 +225,75 @@ var login = (function () {
             case "WHITELISTED_GROUPS_UPDATED":
                 evt.Put("event.type", ["group", "change"]);
                 break;
+            case "REVOKE_3LO_DEVICE_TOKENS":
+            case "REVOKE_3LO_TOKEN":
+            case "ADD_RECOVERY_EMAIL":
+            case "ADD_RECOVERY_PHONE":
+            case "GRANT_ADMIN_PRIVILEGE":
+            case "REVOKE_ADMIN_PRIVILEGE":
+            case "REVOKE_ASP":
+            case "TOGGLE_AUTOMATIC_CONTACT_SHARING":
+            case "CANCEL_USER_INVITE":
+            case "CHANGE_USER_CUSTOM_FIELD":
+            case "CHANGE_USER_EXTERNAL_ID":
+            case "CHANGE_USER_GENDER":
+            case "CHANGE_USER_IM":
+            case "ENABLE_USER_IP_WHITELIST":
+            case "CHANGE_USER_KEYWORD":
+            case "CHANGE_USER_LANGUAGE":
+            case "CHANGE_USER_LOCATION":
+            case "CHANGE_USER_ORGANIZATION":
+            case "CHANGE_USER_PHONE_NUMBER":
+            case "CHANGE_RECOVERY_EMAIL":
+            case "CHANGE_RECOVERY_PHONE":
+            case "CHANGE_USER_RELATION":
+            case "CHANGE_USER_ADDRESS":
+            case "GRANT_DELEGATED_ADMIN_PRIVILEGES":
+            case "CHANGE_FIRST_NAME":
+            case "GMAIL_RESET_USER":
+            case "CHANGE_LAST_NAME":
+            case "MAIL_ROUTING_DESTINATION_ADDED":
+            case "MAIL_ROUTING_DESTINATION_REMOVED":
+            case "ADD_NICKNAME":
+            case "REMOVE_NICKNAME":
+            case "CHANGE_PASSWORD":
+            case "CHANGE_PASSWORD_ON_NEXT_LOGIN":
+            case "REMOVE_RECOVERY_EMAIL":
+            case "REMOVE_RECOVERY_PHONE":
+            case "RESET_SIGNIN_COOKIES":
+            case "SECURITY_KEY_REGISTERED_FOR_USER":
+            case "REVOKE_SECURITY_KEY":
+            case "TURN_OFF_2_STEP_VERIFICATION":
+            case "UNBLOCK_USER_SESSION":
+            case "UNENROLL_USER_FROM_TITANIUM":
+            case "ARCHIVE_USER":
+            case "UPDATE_BIRTHDATE":
+            case "DOWNGRADE_USER_FROM_GPLUS":
+            case "USER_ENROLLED_IN_TWO_STEP_VERIFICATION":
+            case "MOVE_USER_TO_ORG_UNIT":
+            case "USER_PUT_IN_TWO_STEP_VERIFICATION_GRACE_PERIOD":
+            case "RENAME_USER":
+            case "UNENROLL_USER_FROM_STRONG_AUTH":
+            case "SUSPEND_USER":
+            case "UNARCHIVE_USER":
+            case "UNSUSPEND_USER":
+            case "UPGRADE_USER_TO_GPLUS":
+                evt.Put("event.type", ["user", "change"]);
+                break;
+            case "DELETE_2SV_SCRATCH_CODES":
+            case "DELETE_ACCOUNT_INFO_DUMP":
+            case "DELETE_EMAIL_MONITOR":
+            case "DELETE_MAILBOX_DUMP":
+            case "DELETE_USER":
+                evt.Put("event.type", ["user", "deletion"]);
+                break;
+            case "GENERATE_2SV_SCRATCH_CODES":
+            case "CREATE_EMAIL_MONITOR":
+            case "CREATE_DATA_TRANSFER_REQUEST":
+            case "CREATE_USER":
+            case "UNDELETE_USER":
+                evt.Put("event.type", ["user", "creation"]);
+                break;
             case "ISSUE_DEVICE_COMMAND":
             case "DRIVE_DATA_RESTORE":
             case "VIEW_SITE_DETAILS":
@@ -238,11 +307,24 @@ var login = (function () {
             case "SKIP_SECONDARY_DOMAIN_MX":
             case "VERIFY_SECONDARY_DOMAIN_MX":
             case "VERIFY_SECONDARY_DOMAIN":
+            case "BULK_UPLOAD":
+            case "DOWNLOAD_PENDING_INVITES_LIST":
+            case "DOWNLOAD_USERLIST_CSV":
+            case "USERS_BULK_UPLOAD":
                 evt.Put("event.type", ["info"]);
                 break;
             case "GROUP_LIST_DOWNLOAD":
             case "GROUP_MEMBERS_DOWNLOAD":
                 evt.Put("event.type", ["group", "info"]);
+                break;
+            case "REQUEST_ACCOUNT_INFO":
+            case "REQUEST_MAILBOX_DUMP":
+            case "RESEND_USER_INVITE":
+            case "BULK_UPLOAD_NOTIFICATION_SENT":
+            case "USER_INVITE":
+            case "VIEW_TEMP_PASSWORD":
+            case "USERS_BULK_UPLOAD_NOTIFICATION_SENT":
+                evt.Put("event.type", ["user", "info"]);
                 break;
         }
     };
@@ -422,7 +504,7 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.MOBILE_APP_PACKAGE_ID",
-                    to: "gsuite.admin.app.package_id",
+                    to: "gsuite.admin.application.package_id",
                 },
                 {
                     from: "gsuite.admin.FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTION",
@@ -446,7 +528,11 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.APP_ID",
-                    to: "gsuite.admin.app.id",
+                    to: "gsuite.admin.application.id",
+                },
+                {
+                    from: "gsuite.admin.ASP_ID",
+                    to: "gsuite.admin.application.asp_id",
                 },
                 {
                     from: "gsuite.admin.CHROME_OS_SESSION_TYPE",
@@ -463,6 +549,10 @@ var login = (function () {
                 {
                     from: "gsuite.admin.DEVICE_SERIAL_NUMBER",
                     to: "gsuite.admin.device.serial_number",
+                },
+                {
+                    from: "gsuite.admin.DEVICE_ID",
+                    to: "gsuite.admin.device.id",
                 },
                 {
                     from: "gsuite.admin.DEVICE_TYPE",
@@ -542,12 +632,22 @@ var login = (function () {
                 },
                 {
                     from: "gsuite.admin.GROUP_MEMBER_BULK_UPLOAD_FAILED_NUMBER",
-                    to: "gsuite.admin.group.bulk_upload.failed",
+                    to: "gsuite.admin.bulk_upload.failed",
                     type: "long",
                 },
                 {
                     from: "gsuite.admin.GROUP_MEMBER_BULK_UPLOAD_TOTAL_NUMBER",
-                    to: "gsuite.admin.group.bulk_upload.total",
+                    to: "gsuite.admin.bulk_upload.total",
+                    type: "long",
+                },
+                {
+                    from: "gsuite.admin.BULK_UPLOAD_FAIL_USERS_NUMBER",
+                    to: "gsuite.admin.bulk_upload.failed",
+                    type: "long",
+                },
+                {
+                    from: "gsuite.admin.BULK_UPLOAD_TOTAL_USERS_NUMBER",
+                    to: "gsuite.admin.bulk_upload.total",
                     type: "long",
                 },
                 {
@@ -663,6 +763,62 @@ var login = (function () {
                 {
                     from: "gsuite.admin.RULE_NAME",
                     to: "gsuite.admin.rule.name",
+                },
+                {
+                    from: "gsuite.admin.USER_CUSTOM_FIELD",
+                    to: "gsuite.admin.setting.name",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_MONITOR_DEST_EMAIL",
+                    to: "gsuite.admin.email_monitor.dest_email",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_MONITOR_LEVEL_CHAT",
+                    to: "gsuite.admin.email_monitor.level.chat",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_MONITOR_LEVEL_DRAFT_EMAIL",
+                    to: "gsuite.admin.email_monitor.level.draft",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_MONITOR_LEVEL_INCOMING_EMAIL",
+                    to: "gsuite.admin.email_monitor.level.incoming",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_MONITOR_LEVEL_OUTGOING_EMAIL",
+                    to: "gsuite.admin.email_monitor.level.outgoing",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_EXPORT_INCLUDE_DELETED",
+                    to: "gsuite.admin.email_dump.include_deleted",
+                },
+                {
+                    from: "gsuite.admin.EMAIL_EXPORT_PACKAGE_CONTENT",
+                    to: "gsuite.admin.email_dump.package_content",
+                },
+                {
+                    from: "gsuite.admin.SEARCH_QUERY_FOR_DUMP",
+                    to: "gsuite.admin.email_dump.query",
+                },
+                {
+                    from: "gsuite.admin.DESTINATION_USER_EMAIL",
+                    to: "gsuite.admin.new_value",
+                },
+                {
+                    from: "gsuite.admin.REQUEST_ID",
+                    to: "gsuite.admin.request.id",
+                },
+                {
+                    from: "gsuite.admin.GMAIL_RESET_REASON",
+                    to: "message",
+                },
+                {
+                    from: "gsuite.admin.USER_NICKNAME",
+                    to: "gsuite.admin.user.nickname",
+                },
+                {
+                    from: "gsuite.admin.BIRTHDATE",
+                    to: "gsuite.admin.user.birthdate",
                 },
             ],
             mode: "rename",

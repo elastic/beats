@@ -495,7 +495,6 @@
         "event.id": "1",
         "event.module": "gsuite",
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"GROUP_SETTINGS\",\"name\":\"GROUP_MEMBER_BULK_UPLOAD\",\"parameters\":[{\"name\":\"GROUP_MEMBER_BULK_UPLOAD_FAILED_NUMBER\",\"value\":\"0\"},{\"name\":\"GROUP_MEMBER_BULK_UPLOAD_TOTAL_NUMBER\",\"value\":\"10\"}]}}",
-        "event.outcome": "success",
         "event.provider": "admin",
         "event.type": [
             "group",
@@ -503,8 +502,8 @@
         ],
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
-        "gsuite.admin.group.bulk_upload.failed": 0,
-        "gsuite.admin.group.bulk_upload.total": 10,
+        "gsuite.admin.bulk_upload.failed": 0,
+        "gsuite.admin.bulk_upload.total": 10,
         "gsuite.event.type": "GROUP_SETTINGS",
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",

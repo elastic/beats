@@ -16,6 +16,15 @@
     - name: application.licences_purchased
       type: keyword
       description: Number of licences purchased.
+    - name: application.id
+      type: keyword
+      description: The application ID.
+    - name: application.asp_id
+      type: keyword
+      description: The application specific password ID.
+    - name: application.package_id
+      type: keyword
+      description: The mobile application package ID.
     - name: group.email
       type: keyword
       description: The group's primary email address.
@@ -55,9 +64,6 @@
     - name: managed_configuration
       type: keyword
       description: The name of the managed configuration.
-    - name: app.package_id
-      type: keyword
-      description: The mobile application package ID.
     - name: non_featured_services_selection
       type: keyword
       description: >
@@ -72,18 +78,23 @@
     - name: user.email
       type: keyword
       description: The user's primary email address.
+    - name: user.nickname
+      type: keyword
+      description: The user's nickname.
+    - name: user.birthdate
+      type: date
+      description: The user's birth date.
     - name: gateway.name
       type: keyword
       description: Gateway name. Present on some chat settings.
-    - name: app.id
-      type: keyword
-      description: The application ID.
     - name: chrome_os.session_type
       type: keyword
       description: Chrome OS session type.
     - name: device.serial_number
       type: keyword
       description: Device serial number.
+    - name: device.id
+      type: keyword
     - name: device.type
       type: keyword
       description: Device type.
@@ -119,10 +130,10 @@
     - name: product.sku
       type: keyword
       description: The product SKU.
-    - name: group.bulk_upload.failed
+    - name: bulk_upload.failed
       type: long
       description: Number of failed records in bulk upload operation.
-    - name: group.bulk_upload.total
+    - name: bulk_upload.total
       type: long
       description: Number of total records in bulk upload operation.
     - name: group.allowed_list
@@ -207,3 +218,30 @@
       description: >
         This will be used to state what kind of information was changed.
         For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
+    - name: email_monitor.dest_email
+      type: keyword
+      description: The destination address of the email monitor.
+    - name: email_monitor.level.chat
+      type: keyword
+      description: The chat email monitor level.
+    - name: email_monitor.level.draft
+      type: keyword
+      description: The draft email monitor level.
+    - name: email_monitor.level.incoming
+      type: keyword
+      description: The incoming email monitor level.
+    - name: email_monitor.level.outgoing
+      type: keyword
+      description: The outgoing email monitor level.
+    - name: email_dump.include_deleted
+      type: boolean
+      description: Indicates if deleted emails are included in the export.
+    - name: email_dump.package_content
+      type: keyword
+      description: The contents of the mailbox package.
+    - name: email_dump.query
+      type: keyword
+      description: The search query used for the dump.
+    - name: request.id
+      type: keyword
+      description: The request ID.
