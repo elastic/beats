@@ -150,9 +150,9 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (common.MapStr, error) {
 	return r, nil
 }
 
-// ToDotKeys takes the root keys of a common.Mapstr and rewrites them replacing underscores with dots. Check tests
+// ReplaceUnderscores takes the root keys of a common.Mapstr and rewrites them replacing underscores with dots. Check tests
 // to see an example.
-func ToDotKeys(ms common.MapStr) common.MapStr {
+func ReplaceUnderscores(ms common.MapStr) common.MapStr {
 	dotMap := common.MapStr{}
 	for k, v := range ms {
 		dotMap.Put(strings.Replace(k, "_", ".", -1), v)

@@ -180,7 +180,7 @@ func checkValue(t *testing.T, res kv, ms common.MapStr) {
 
 func TestToDotKeys(t *testing.T) {
 	ms := common.MapStr{"key_value": "value"}
-	ms = ToDotKeys(ms)
+	ms = ReplaceUnderscores(ms)
 
 	if ms["key"].(common.MapStr)["value"] != "value" {
 		t.Fail()

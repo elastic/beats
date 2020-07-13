@@ -41,10 +41,15 @@ func init() {
 }
 
 type query struct {
-	Namespace          string `config:"query_namespace"`
-	Query              string `config:"query" validate:"nonzero,required"`
-	ResponseFormat     string `config:"response_format" validate:"nonzero,required"`
-	ReplaceUnderscores bool   `config:"replace_underscores"`
+	// Namespace for the mysql event. It effectively names the metricset. For example using `performance` will name
+	// all events `mysql.performance.*`
+	Namespace string `config:"query_namespace"`
+	// Query to execute that must return the metrics Metricbeat wants to push to Elasticsearch
+	Query string `config:"query" validate:"nonzero,required"`
+	// ResponseFormat has 2 possible values: table and variable. Explained in the SQL helper on Metricbeat
+	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
+	// If the query returns keys with underscores like `foo_bar` it will replace that with a `.` to get `foo.bar` JSON key
+	ReplaceUnderscores bool `config:"replace_underscores"`
 }
 
 // MetricSet for fetching MySQL server status.
@@ -119,7 +124,7 @@ func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Eve
 
 	data := ms
 	if query.ReplaceUnderscores {
-		data = sql.ToDotKeys(ms)
+		data = sql.ReplaceUnderscores(ms)
 	}
 
 	if query.Namespace != "" {
