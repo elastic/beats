@@ -36,5 +36,6 @@ func DefaultSettingsConfig() *SettingsConfig {
 		LoggingConfig:    logger.DefaultLoggingConfig(),
 		MonitoringConfig: monitoringCfg.DefaultConfig(),
 		GRPC:             server.DefaultGRPCConfig(),
+		Reload:           DefaultReloadConfig(),
 	}
 }

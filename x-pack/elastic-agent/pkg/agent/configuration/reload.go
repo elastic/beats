@@ -28,3 +28,10 @@ func (r *ReloadConfig) Validate() error {
 	}
 	return nil
 }
+
+func DefaultReloadConfig() *ReloadConfig {
+	return &ReloadConfig{
+		Enabled: true,
+		Period:  10 * time.Second,
+	}
+}

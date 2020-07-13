@@ -32,6 +32,7 @@ func NewFromConfig(cfg *config.Config) (*Configuration, error) {
 	if err := cfg.Unpack(c); err != nil {
 		return nil, errors.New(err, errors.TypeConfig)
 	}
+
 	return c, nil
 }
 

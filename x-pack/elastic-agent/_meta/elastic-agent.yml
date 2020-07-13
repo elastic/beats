@@ -30,27 +30,27 @@ inputs:
 #   # Default is local.
 #   mode: "local"
 
-#   fleet:
-#     access_api_key: ""
-#     kibana:
-#       # kibana minimal configuration
-#       host: "localhost:5601"
-#       ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+# fleet:
+#   access_api_key: ""
+#   kibana:
+#     # kibana minimal configuration
+#     host: "localhost:5601"
+#     ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-#       # optional values
-#       #protocol: "https"
-#       #username: "elastic"
-#       #password: "changeme"
-#       #path: ""
-#       #ssl.verification_mode: full
-#       #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-#       #ssl.cipher_suites: []
-#       #ssl.curve_types: []
-#     reporting:
-#       # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
-#       #reporting_threshold: 10000
-#       # Frequency used to check the queue of events to be sent out to fleet.
-#       #reporting_check_frequency_sec: 30
+#     # optional values
+#     #protocol: "https"
+#     #username: "elastic"
+#     #password: "changeme"
+#     #path: ""
+#     #ssl.verification_mode: full
+#     #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+#     #ssl.cipher_suites: []
+#     #ssl.curve_types: []
+#   reporting:
+#     # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
+#     #reporting_threshold: 10000
+#     # Frequency used to check the queue of events to be sent out to fleet.
+#     #reporting_check_frequency_sec: 30
 
 # agent.download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries
@@ -125,7 +125,7 @@ inputs:
 #agent.logging.selectors: [ ]
 
 # Send all logging output to stderr. The default is false.
-logging.to_stderr: true
+agent.logging.to_stderr: true
 
 # Send all logging output to syslog. The default is false.
 #agent.logging.to_syslog: false

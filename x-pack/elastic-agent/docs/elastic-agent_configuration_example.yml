@@ -46,7 +46,7 @@ agent.monitoring:
 #agent.logging.selectors: [ ]
 
 # Send all logging output to stderr. The default is false.
-logging.to_stderr: true
+agent.logging.to_stderr: true
 
 # Send all logging output to syslog. The default is false.
 #agent.logging.to_syslog: false
