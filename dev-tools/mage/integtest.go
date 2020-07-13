@@ -236,7 +236,7 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	// Create the custom env for the runner.
 	env := map[string]string{
 		insideIntegrationTestEnvVar: "true",
-		"GOFLAGS":                   "-mod=vendor",
+		"GOFLAGS":                   "-mod=readonly",
 	}
 	for name, value := range passInEnv {
 		env[name] = value
