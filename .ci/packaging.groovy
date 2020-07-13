@@ -38,6 +38,7 @@ pipeline {
       when {
         beforeAgent true
         expression {
+          echo "C: ${isCommentTrigger()} - U: ${isUserTrigger()} - UP: ${isUpstreamTrigger()}"
           return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
         }
       }
