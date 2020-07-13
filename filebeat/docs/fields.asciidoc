@@ -120451,7 +120451,7 @@ type: keyword
 Date (yyyy-mm-dd) when the event occurred
 
 
-type: keyword
+type: date
 
 --
 
@@ -120561,7 +120561,7 @@ type: keyword
 Durability of traffic (seconds)
 
 
-type: keyword
+type: long
 
 --
 
@@ -120741,7 +120741,7 @@ type: keyword
 Original source IP address of traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -120771,7 +120771,7 @@ type: keyword
 Original destination IP address of traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -120841,7 +120841,7 @@ type: keyword
 Total number of packets sent
 
 
-type: keyword
+type: long
 
 --
 
@@ -120851,7 +120851,7 @@ type: keyword
 Total number of packets received
 
 
-type: integer
+type: long
 
 --
 
@@ -120861,7 +120861,7 @@ type: integer
 Total number of bytes sent
 
 
-type: integer
+type: long
 
 --
 
@@ -120871,7 +120871,7 @@ type: integer
 Total number of bytes received
 
 
-type: integer
+type: long
 
 --
 
@@ -120881,7 +120881,7 @@ type: integer
 Translated source IP address for outgoing traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -120901,7 +120901,7 @@ type: integer
 Translated destination IP address for outgoing traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -121121,7 +121121,7 @@ type: keyword
 Original source IP address of traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -121131,7 +121131,7 @@ type: keyword
 Original destination IP address of traffic
 
 
-type: keyword
+type: ip
 
 --
 
@@ -121461,7 +121461,7 @@ type: keyword
 code of HTTP response
 
 
-type: keyword
+type: long
 
 --
 
@@ -121891,7 +121891,7 @@ type: keyword
 Starttime
 
 
-type: keyword
+type: date
 
 --
 
@@ -121901,7 +121901,7 @@ type: keyword
 Remote IP
 
 
-type: keyword
+type: ip
 
 --
 
@@ -121911,7 +121911,7 @@ type: keyword
 timestamp
 
 
-type: keyword
+type: date
 
 --
 
@@ -121971,7 +121971,7 @@ type: keyword
 Responsetime
 
 
-type: keyword
+type: long
 
 --
 
@@ -122021,7 +122021,7 @@ type: keyword
 Start time
 
 
-type: keyword
+type: date
 
 --
 
@@ -122031,7 +122031,7 @@ type: keyword
 Event time
 
 
-type: keyword
+type: date
 
 --
 
@@ -122061,7 +122061,7 @@ type: keyword
 updatedip
 
 
-type: keyword
+type: ip
 
 --
 
@@ -122161,7 +122161,7 @@ type: keyword
 received kbits
 
 
-type: keyword
+type: long
 
 --
 
@@ -122171,7 +122171,7 @@ type: keyword
 transmitted kbits
 
 
-type: keyword
+type: long
 
 --
 
@@ -122181,7 +122181,7 @@ type: keyword
 transmitted drops
 
 
-type: keyword
+type: long
 
 --
 
@@ -122191,7 +122191,7 @@ type: keyword
 received drops
 
 
-type: keyword
+type: long
 
 --
 
@@ -122201,7 +122201,7 @@ type: keyword
 collisions
 
 
-type: keyword
+type: long
 
 --
 

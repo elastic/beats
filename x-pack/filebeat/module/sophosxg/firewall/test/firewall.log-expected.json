@@ -246,7 +246,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -326,7 +326,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -346,6 +346,9 @@
         "related.ip": [
             "10.82.234.6",
             "192.168.0.1"
+        ],
+        "related.user": [
+            "elastic@user.local"
         ],
         "rule.id": "29",
         "rule.ruleset": "1",
@@ -414,7 +417,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -503,7 +506,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -523,6 +526,9 @@
         "related.ip": [
             "172.17.35.101",
             "192.168.5.11"
+        ],
+        "related.user": [
+            "elastic@user.local"
         ],
         "rule.id": "29",
         "rule.ruleset": "1",
@@ -587,7 +593,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -666,7 +672,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -769,6 +775,9 @@
         "related.ip": [
             "10.84.234.7",
             "172.16.34.50"
+        ],
+        "related.user": [
+            "elastic@user.local"
         ],
         "rule.id": "61",
         "rule.ruleset": "2",
@@ -1007,7 +1016,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1084,7 +1093,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1161,7 +1170,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1241,7 +1250,7 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1317,7 +1326,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1400,7 +1409,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1477,7 +1486,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1554,7 +1563,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",
@@ -1642,7 +1651,7 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "fileset.name": "firewall",

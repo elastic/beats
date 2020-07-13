@@ -59,7 +59,7 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "file.hash.sha1": "83cd339302bf5e8ed5240ca6383418089c337a81",
@@ -219,7 +219,7 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
@@ -278,7 +278,7 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "diened",
+            "denied",
             "connection"
         ],
         "file.hash.sha1": "d910c4a81122c360fe57f67a04999425a65249db",
