@@ -270,6 +270,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 
 *Packetbeat*
 
@@ -541,6 +542,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
 - Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
 - The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
+- Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
 - The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
 
 *Packetbeat*
