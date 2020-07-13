@@ -4567,6 +4567,123 @@ type: object
 
 --
 
+[float]
+=== billing
+
+billing and usage details
+
+
+
+*`azure.billing.currency`*::
++
+--
+The currency
+
+
+type: keyword
+
+--
+
+*`azure.billing.pretax_cost`*::
++
+--
+Cost
+
+
+type: float
+
+--
+
+*`azure.billing.department_name`*::
++
+--
+The department name
+
+
+type: keyword
+
+--
+
+*`azure.billing.product`*::
++
+--
+The product type
+
+
+type: keyword
+
+--
+
+*`azure.billing.usage_start`*::
++
+--
+The usage start date
+
+
+type: date
+
+--
+
+*`azure.billing.usage_end`*::
++
+--
+The usage end date
+
+
+type: date
+
+--
+
+*`azure.billing.billing_period_id`*::
++
+--
+The billing period id
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_name`*::
++
+--
+The billing account name
+
+
+type: keyword
+
+--
+
+*`azure.billing.actual_cost`*::
++
+--
+The actual cost
+
+
+type: float
+
+--
+
+*`azure.billing.forecast_cost`*::
++
+--
+The forecast cost
+
+
+type: float
+
+--
+
+*`azure.billing.usage_date`*::
++
+--
+The usage date
+
+
+type: date
+
+--
+
 *`azure.compute_vm.*.*`*::
 +
 --
