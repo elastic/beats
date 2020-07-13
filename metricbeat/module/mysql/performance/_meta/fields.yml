@@ -16,7 +16,7 @@
           description: Time at which the digest was most recently seen
         - name: 'quantile.95'
           type: long
-          description: TODO
+          description: The 95th percentile of the statement latency, in picoseconds
         - name: digest
           type: text
           description: Performance schema digest

@@ -32068,7 +32068,7 @@ type: date
 *`mysql.performance.events_statements.quantile.95`*::
 +
 --
-TODO
+The 95th percentile of the statement latency, in picoseconds
 
 type: long
 
