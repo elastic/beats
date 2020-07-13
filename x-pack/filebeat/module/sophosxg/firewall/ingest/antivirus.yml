@@ -329,15 +329,6 @@ processors:
 ## Cleanup ##
 #############
 - lowercase:
-      field: network.protocol
-      ignore_failure: true
-- lowercase:
-      field: network.transport
-      ignore_failure: true
-- lowercase:
-      field: event.action
-      ignore_failure: true
-- lowercase:
       field: event.info
       ignore_failure: true
 - remove:

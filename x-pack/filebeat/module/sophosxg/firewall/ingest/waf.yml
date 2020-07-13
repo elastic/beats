@@ -137,9 +137,11 @@ processors:
     target_field: http.request.referrer
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.referer != null"
-- rename:
+- convert:
     field: sophosxg.firewall.httpstatus
-    target_field: http.response.status_code
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.sophosxg?.firewall?.httpstatus != null"
 - rename:
@@ -268,6 +270,7 @@ processors:
     field:
      - sophosxg.firewall.bytesrcv
      - sophosxg.firewall.bytessent
+     - sophosxg.firewall.httpstatus
     ignore_missing: true
 on_failure:
 - set:

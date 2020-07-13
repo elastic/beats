@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-01-31T14:52:11.000-02:00",
-        "event.action": "allowed",
+        "event.action": "Allowed",
         "event.category": [
             "network"
         ],
@@ -18,7 +18,7 @@
             "end",
             "connection"
         ],
-        "file.size": "0",
+        "file.size": 0,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
@@ -45,7 +45,7 @@
     {
         "@timestamp": "2017-01-31T14:52:11.000-02:00",
         "client.ip": "10.198.47.112",
-        "event.action": "denied",
+        "event.action": "Denied",
         "event.category": [
             "malware",
             "network"
@@ -62,9 +62,9 @@
             "diened",
             "connection"
         ],
-        "file.extension": "application/octet-stream",
         "file.hash.sha1": "83cd339302bf5e8ed5240ca6383418089c337a81",
-        "file.size": "153006",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153006,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
@@ -103,7 +103,7 @@
     },
     {
         "@timestamp": "2017-01-31T15:28:25.000-02:00",
-        "event.action": "allowed",
+        "event.action": "Allowed",
         "event.category": [
             "network"
         ],
@@ -120,7 +120,7 @@
             "end",
             "connection"
         ],
-        "file.size": "0",
+        "file.size": 0,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
@@ -147,7 +147,7 @@
     {
         "@timestamp": "2017-01-31T15:28:25.000-02:00",
         "client.ip": "10.198.47.112",
-        "event.action": "pending",
+        "event.action": "Pending",
         "event.category": [
             "network"
         ],
@@ -163,9 +163,9 @@
             "start",
             "connection"
         ],
-        "file.extension": "application/octet-stream",
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
-        "file.size": "153010",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153010,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
@@ -205,7 +205,7 @@
     {
         "@timestamp": "2017-01-31T15:28:25.000-02:00",
         "client.ip": "10.198.47.112",
-        "event.action": "denied",
+        "event.action": "Denied",
         "event.category": [
             "malware",
             "network"
@@ -222,9 +222,9 @@
             "diened",
             "connection"
         ],
-        "file.extension": "application/octet-stream",
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
-        "file.size": "153010",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153010,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
@@ -264,7 +264,7 @@
     {
         "@timestamp": "2020-05-18T14:38:36.000-02:00",
         "client.ip": "172.16.34.24",
-        "event.action": "denied",
+        "event.action": "Denied",
         "event.category": [
             "malware",
             "network"
@@ -281,9 +281,9 @@
             "diened",
             "connection"
         ],
-        "file.extension": "application/pdf",
         "file.hash.sha1": "d910c4a81122c360fe57f67a04999425a65249db",
-        "file.size": "1124",
+        "file.mime_type": "application/pdf",
+        "file.size": 1124,
         "fileset.name": "firewall",
         "host.name": "firewall.localgroup.local",
         "input.type": "log",

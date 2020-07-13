@@ -227,14 +227,6 @@ processors:
 #############
 ## Cleanup ##
 #############
-- lowercase:
-      field: network.protocol
-      ignore_failure: true
-- lowercase:
-      field: network.transport
-      ignore_failure: true
-- lowercase:
-      field: event.action
 - remove:
     field:
     - sophosxg.firewall.dst_port

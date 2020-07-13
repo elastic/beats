@@ -6,7 +6,7 @@
         "destination.bytes": 0,
         "destination.port": 0,
         "destination.user.email": "Sysadmin@elasticuser.com",
-        "event.action": "allowed",
+        "event.action": "Allowed",
         "event.category": [
             "network"
         ],
@@ -27,7 +27,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -77,7 +77,7 @@
         "destination.ip": "185.8.209.194",
         "destination.port": 25,
         "destination.user.email": "info@pelasticuser.com",
-        "event.action": "clean",
+        "event.action": "Clean",
         "event.category": [
             "network"
         ],
@@ -98,7 +98,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 748,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -161,7 +161,7 @@
         "destination.ip": "185.8.209.194",
         "destination.port": 25,
         "destination.user.email": "hein.mueck@elasticuser.de",
-        "event.action": "spam",
+        "event.action": "Spam",
         "event.category": [
             "malware",
             "network"
@@ -184,7 +184,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 1540,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -247,7 +247,7 @@
         "destination.ip": "185.8.209.194",
         "destination.port": 25,
         "destination.user.email": "info@elasticuser.com",
-        "event.action": "probable spam",
+        "event.action": "Probable Spam",
         "event.category": [
             "malware",
             "network"
@@ -270,7 +270,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 2295,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -321,7 +321,7 @@
         "destination.ip": "10.198.233.61",
         "destination.port": 25,
         "destination.user.email": " gaurav2@iview.com",
-        "event.action": "outbound spam",
+        "event.action": "Outbound Spam",
         "event.category": [
             "malware",
             "network"
@@ -344,7 +344,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 3123,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
@@ -389,7 +389,7 @@
         "destination.ip": "10.198.234.240",
         "destination.port": 25,
         "destination.user.email": "pankhil1@Postman.local",
-        "event.action": "outbound probable spam",
+        "event.action": "Outbound Probable Spam",
         "event.category": [
             "malware",
             "network"
@@ -412,7 +412,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 3852,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -457,7 +457,7 @@
         "destination.ip": "10.198.17.121",
         "destination.port": 25,
         "destination.user.email": "pankhil1@Postman. local",
-        "event.action": "dlp",
+        "event.action": "DLP",
         "event.category": [
             "malware",
             "network"
@@ -480,7 +480,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4627,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -525,7 +525,7 @@
         "destination.ip": "10.198.16.204",
         "destination.port": 25,
         "destination.user.email": "pankhil1@Postman.local",
-        "event.action": "spx",
+        "event.action": "SPX",
         "event.category": [
             "network"
         ],
@@ -546,7 +546,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5389,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -590,7 +590,7 @@
         "destination.bytes": 0,
         "destination.ip": "10.198.17.121",
         "destination.port": 25,
-        "event.action": "dos",
+        "event.action": "Dos",
         "event.category": [
             "intrusion_detection",
             "network"
@@ -613,7 +613,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6143,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -654,7 +654,7 @@
         "destination.ip": "10.198.17.121",
         "destination.port": 25,
         "destination.user.email": "pankhil@postman. local",
-        "event.action": "denied",
+        "event.action": "Denied",
         "event.category": [
             "malware",
             "network"
@@ -677,7 +677,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6740,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -721,7 +721,7 @@
         "destination.ip": "10.198.233.61",
         "destination.port": 110,
         "destination.user.email": "gaurav2@iview. com",
-        "event.action": "spam",
+        "event.action": "Spam",
         "event.category": [
             "malware",
             "network"
@@ -744,7 +744,7 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 7445,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",

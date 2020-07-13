@@ -16,7 +16,7 @@
         "destination.geo.region_name": "Washington",
         "destination.ip": "13.226.155.93",
         "destination.port": 80,
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -40,7 +40,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 0,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -93,7 +93,7 @@
         "destination.geo.region_name": "Washington",
         "destination.ip": "13.226.155.18",
         "destination.port": 80,
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -117,7 +117,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 673,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -168,7 +168,7 @@
         "destination.ip": "186.8.209.194",
         "destination.port": 25,
         "destination.user.email": "info@elastic-user.local",
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -191,7 +191,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 1340,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
@@ -251,7 +251,7 @@
         "destination.ip": "185.7.209.194",
         "destination.port": 25,
         "destination.user.email": "info@elastic-user.local",
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -274,7 +274,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 2118,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -331,7 +331,7 @@
         "destination.ip": "10.198.234.240",
         "destination.port": 995,
         "destination.user.email": "pankhil@postman.local",
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -354,7 +354,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 2867,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -402,7 +402,7 @@
         "destination.ip": "10.198.234.240",
         "destination.port": 993,
         "destination.user.email": "ganga@postman.local",
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -425,7 +425,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 3583,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
@@ -472,7 +472,7 @@
         "destination.bytes": 0,
         "destination.ip": "10.8.142.181",
         "destination.port": 21,
-        "event.action": "virus",
+        "event.action": "Virus",
         "event.category": [
             "malware",
             "network"
@@ -498,7 +498,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 4309,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",
@@ -539,7 +539,7 @@
         "destination.bytes": 19926248,
         "destination.ip": "10.8.142.181",
         "destination.port": 21,
-        "event.action": "allowed",
+        "event.action": "Allowed",
         "event.category": [
             "network"
         ],
@@ -563,7 +563,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4959,
-        "network.transport": "tcp",
+        "network.transport": "TCP",
         "observer.product": "XG",
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",

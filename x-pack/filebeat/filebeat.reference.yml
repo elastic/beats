@@ -1322,8 +1322,8 @@ filebeat.modules:
     
     # known firewalls
     #var.known_devices:
-    #   "my_device_a": "a.host.local"
-    #   "my_device_b": "b.host.local"
+    #   "device1_serialnumber": "a.host.local"
+    #   "device2_serialnumber": "b.host.local"
 
 
 #-------------------------------- Squid Module --------------------------------

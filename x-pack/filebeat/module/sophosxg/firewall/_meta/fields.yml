@@ -11,7 +11,7 @@
         device
     
     - name: date
-      type: keyword
+      type: date
       description: >
         Date (yyyy-mm-dd) when the event occurred
 
@@ -66,7 +66,7 @@
         Ultimate status of traffic – Allowed or Denied
 
     - name: duration
-      type: keyword
+      type: long
       description: >
         Durability of traffic (seconds)
     
@@ -156,7 +156,7 @@
         Interface for outgoing traffic, e.g., Port B
     
     - name: src_ip
-      type: keyword
+      type: ip
       description: >
         Original source IP address of traffic
 
@@ -171,7 +171,7 @@
         Code of the country to which the source IP belongs
     
     - name: dst_ip
-      type: keyword
+      type: ip
       description: >
         Original destination IP address of traffic
     
@@ -206,22 +206,22 @@
         ICMP code of ICMP traffic
     
     - name: sent_pkts
-      type: keyword
+      type: long
       description: >
         Total number of packets sent
     
     - name: received_pkts
-      type: integer
+      type: long
       description: >
         Total number of packets received
     
     - name: sent_bytes
-      type: integer
+      type: long
       description: >
         Total number of bytes sent
 
     - name: recv_bytes
-      type: integer
+      type: long
       description: >
         Total number of bytes received
 

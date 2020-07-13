@@ -8,7 +8,7 @@ processors:
     value: event
 - set:
     field: event.outcome
-    value: succes
+    value: success
     if: 'ctx?.sophosxg?.firewall?.log_type == "Wireless Protection"'
 
 #############
