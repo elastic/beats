@@ -21,17 +21,6 @@ Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
 {beatname_uc}.
 
-[WARNING]
-=======================================
-Some filesets in this module make extensive use of ingest pipeline scripts.
-This can cause their ingest pipelines to fail loading due to exceeding the
-default compilation limits:
-
-`[script] Too many dynamic script compilations within, max: [75/5m]`
-
-Check the <<dynamic-script-compilations>> section for more information.
-=======================================
-
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
