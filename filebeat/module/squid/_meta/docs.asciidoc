@@ -3,7 +3,8 @@
 
 == squid module
 
-This is the squid module.
+The +{modulename}+ module parses access logs created by the
+https://squid.org[Squid Proxy] server.
 
 include::../include/what-happens.asciidoc[]
 
@@ -12,32 +13,46 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+The +{modulename}+ module was tested with logs from versions 3.5.20.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Squid Proxy Server access logs:
 
-:fileset_ex: {fileset}
+["source","yaml",subs="attributes"]
+-----
+- module: squid
+  access:
+    enabled: true
+    var.paths: ["/path/to/log/squid/access.log*"]
+-----
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "squid.access.var.paths=[/path/to/squid/access.log*]"
+-----
+
+:fileset_ex: access
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
 [float]
-==== `{fileset}` log fileset settings
+==== `access` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
 
 [float]
 === Example dashboard
 
 This module comes with a sample dashboard. For example:
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+[role="screenshot"]
+image::./images/kibana-squid.png[]
 
 :has-dashboards!:
 
