@@ -284,6 +284,7 @@ func newEventLogging(options *common.Config) (EventLog, error) {
 	c := eventLoggingConfig{
 		ReadBufferSize:   win.MaxEventBufferSize,
 		FormatBufferSize: win.MaxFormatMessageBufferSize,
+		EventLanguage: 0,
 	}
 	if err := readConfig(options, &c, eventLoggingConfigKeys); err != nil {
 		return nil, err
