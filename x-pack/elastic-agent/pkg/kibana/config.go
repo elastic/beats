@@ -19,6 +19,7 @@ type Config struct {
 	Password string            `config:"password" yaml:"password,omitempty"`
 	Path     string            `config:"path" yaml:"path,omitempty"`
 	Host     string            `config:"host" yaml:"host,omitempty"`
+	Hosts    []string          `config:"hosts" yaml:"hosts,omitempty"`
 	Timeout  time.Duration     `config:"timeout" yaml:"timeout,omitempty"`
 	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
 }
@@ -36,6 +37,7 @@ func (p *Protocol) Unpack(from string) error {
 	return nil
 }
 
+// DefaultClientConfig creates default configuration for kibana client.
 func DefaultClientConfig() *Config {
 	return &Config{
 		Protocol: Protocol("http"),
@@ -52,4 +54,14 @@ func DefaultClientConfig() *Config {
 // IsBasicAuth returns true if the username and password are both defined.
 func (c *Config) IsBasicAuth() bool {
 	return len(c.Username) > 0 && len(c.Password) > 0
+}
+
+// GetHosts returns the hosts to connect to kibana.
+//
+// This looks first at `Hosts` and then at `Host` when `Hosts` is not defined.
+func (c *Config) GetHosts() []string {
+	if len(c.Hosts) > 0 {
+		return c.Hosts
+	}
+	return []string{c.Host}
 }

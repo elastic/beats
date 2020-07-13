@@ -10,7 +10,7 @@ type Config struct {
 	ReportingCheckFrequency int `yaml:"check_frequency_sec" config:"check_frequency_sec" validate:"min=1"`
 }
 
-// DefaultFleetManagementConfig initiates FleetManagementConfig with default values
+// DefaultConfig initiates FleetManagementConfig with default values
 func DefaultConfig() *Config {
 	return &Config{
 		Threshold:               10000,

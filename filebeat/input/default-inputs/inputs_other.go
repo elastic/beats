@@ -28,5 +28,5 @@ import (
 type osComponents interface{}
 
 func osInputs(info beat.Info, log *logp.Logger, components osComponents) []v2.Plugin {
-	return nil
+	return []v2.Plugin{}
 }

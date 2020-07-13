@@ -937,14 +937,12 @@ func (r *MapRule) Apply(ast *AST) error {
 				node,
 			)
 		}
-	default:
-		return fmt.Errorf(
-			"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
-			node,
-		)
 	}
 
-	return nil
+	return fmt.Errorf(
+		"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
+		node,
+	)
 }
 
 func mapList(r *MapRule, l *List) error {

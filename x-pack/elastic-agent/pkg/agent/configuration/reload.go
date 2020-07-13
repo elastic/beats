@@ -15,11 +15,13 @@ var (
 	ErrInvalidPeriod = errors.New("period must be higher than zero")
 )
 
+// ReloadConfig defines behavior of a reloader for standalone configuration.
 type ReloadConfig struct {
 	Enabled bool          `config:"enabled" yaml:"enabled"`
 	Period  time.Duration `config:"period" yaml:"period"`
 }
 
+// Validate validates settings of configuration.
 func (r *ReloadConfig) Validate() error {
 	if r.Enabled {
 		if r.Period <= 0 {
@@ -29,6 +31,7 @@ func (r *ReloadConfig) Validate() error {
 	return nil
 }
 
+// DefaultReloadConfig creates a default configuration for standalone mode.
 func DefaultReloadConfig() *ReloadConfig {
 	return &ReloadConfig{
 		Enabled: true,

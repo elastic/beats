@@ -1,3 +1,4 @@
+revision: 5
 name: Endpoint Host
 fleet:
   agent:

@@ -18,118 +18,97 @@
 package unix
 
 import (
+	"bufio"
 	"fmt"
-	"sync"
+	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
-func init() {
-	err := input.Register("unix", NewInput)
-	if err != nil {
-		panic(err)
+type server struct {
+	config
+	splitFunc bufio.SplitFunc
+}
+
+func Plugin() input.Plugin {
+	return input.Plugin{
+		Name:       "unix",
+		Stability:  feature.Beta,
+		Deprecated: false,
+		Info:       "unix socket server",
+		Manager:    stateless.NewInputManager(configure),
 	}
 }
 
-// Input for Unix socket connection
-type Input struct {
-	mutex   sync.Mutex
-	server  *unix.Server
-	started bool
-	outlet  channel.Outleter
-	config  *config
-	log     *logp.Logger
+func configure(cfg *common.Config) (stateless.Input, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	return newServer(config)
 }
 
-// NewInput creates a new Unix socket input
-func NewInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	context input.Context,
-) (input.Input, error) {
-	cfgwarn.Beta("Unix socket support is beta.")
-
-	out, err := connector.Connect(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	forwarder := harvester.NewForwarder(out)
-
-	config := defaultConfig
-	err = cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		forwarder.Send(beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"message": string(data),
-			},
-		})
-	}
-
+func newServer(config config) (*server, error) {
 	splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
 	if splitFunc == nil {
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	logger := logp.NewLogger("input.unix").With("path", config.Config.Path)
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logger, unix.MetadataCallback, cb, splitFunc)
+	return &server{config: config, splitFunc: splitFunc}, nil
+}
 
-	server, err := unix.New(&config.Config, factory)
+func (s *server) Name() string { return "unix" }
+
+func (s *server) Test(_ input.TestContext) error {
+	l, err := net.Listen("unix", s.config.Path)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	return l.Close()
+}
+
+func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
+	log := ctx.Logger.Named("input.unix").With("path", s.config.Config.Path)
+
+	log.Info("Starting Unix socket input")
+	defer log.Info("Unix socket input stopped")
+
+	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
+		event := createEvent(data, metadata)
+		publisher.Publish(event)
+	}
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, log, unix.MetadataCallback, cb, s.splitFunc)
+	server, err := unix.New(&s.config.Config, factory)
+	if err != nil {
+		return err
 	}
 
-	return &Input{
-		server:  server,
-		started: false,
-		outlet:  out,
-		config:  &config,
-		log:     logger,
-	}, nil
-}
+	log.Debugf("TCP Input '%v' initialized", ctx.ID)
 
-// Run start a Unix socket input
-func (p *Input) Run() {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 
-	if !p.started {
-		p.log.Info("Starting Unix socket input")
-		err := p.server.Start()
-		if err != nil {
-			p.log.Errorw("Error starting the Unix socket server", "error", err)
-		}
-		p.started = true
+	// ignore error from 'Run' in case shutdown was signaled.
+	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
+		err = ctxerr
 	}
+	return err
 }
 
-// Stop stops Unix socket server
-func (p *Input) Stop() {
-	defer p.outlet.Close()
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	p.log.Info("Stopping Unix socket input")
-	p.server.Stop()
-	p.started = false
-}
-
-// Wait stop the current server
-func (p *Input) Wait() {
-	p.Stop()
+func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
+	return beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"message": string(raw),
+		},
+	}
 }

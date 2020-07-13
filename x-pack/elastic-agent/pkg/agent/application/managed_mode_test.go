@@ -240,7 +240,7 @@ const fleetResponse = `
 						]
 					},
 					{
-						"type": "logs",
+						"type": "logfile",
 						"enabled": true,
 						"streams": [{
 								"id": "logs-system.auth",
