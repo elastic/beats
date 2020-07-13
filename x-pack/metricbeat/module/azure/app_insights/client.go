@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/Microsoft/go-winio/pkg/guid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -62,7 +63,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 				Orderby:     &metrics.OrderBy,
 				Filter:      &metrics.Filter,
 			}
-			id, err := guid.NewV4()
+			id, err := uuid.NewV4()
 			if err != nil {
 				return result, errors.Wrap(err, "could not generate identifier in client")
 			}
