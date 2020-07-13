@@ -3,12 +3,11 @@ fleet:
   enabled: true
   agent:
     id: fleet-agent-id
-  api:
-    access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-    kibana:
-      protocol: https
-      host: localhost:5601
-      timeout: 30s
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  kibana:
+    protocol: https
+    host: localhost:5601
+    timeout: 30s
 
 outputs:
   default:
