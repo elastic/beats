@@ -106,6 +106,9 @@ so the `period` for `database_account` metricset  should be `300s` or multiples 
 This metricset will collect relevant usage data and forecast information from a specific subscription, these metrics will have a timegrain every 24 hours,
 so the `period` for `billing` metricset  should be `24h` or multiples of `24h`.
 
+[float]
+=== `app_insights`
+This metricset will collect application insights metrics, the `period` (interval) for the `app-insights` metricset is set by default at `300s`.
 
 [float]
 == Additional notes about metrics and costs

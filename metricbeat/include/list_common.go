@@ -112,6 +112,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/munin/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/v7/metricbeat/module/mysql/galera_status"
+	_ "github.com/elastic/beats/v7/metricbeat/module/mysql/query"
 	_ "github.com/elastic/beats/v7/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/connections"
