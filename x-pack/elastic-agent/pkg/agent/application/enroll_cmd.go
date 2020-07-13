@@ -162,9 +162,15 @@ func (c *EnrollCmd) Execute() error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, resp.Item.AccessAPIKey, c.kibanaConfig)
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	configToStore := map[string]interface{}{
+		"fleet": fleetConfig,
+		"agent": map[string]interface{}{
+			"id": resp.Item.ID,
+		},
+	}
 
-	reader, err := yamlToReader(fleetConfig)
+	reader, err := yamlToReader(configToStore)
 	if err != nil {
 		return err
 	}

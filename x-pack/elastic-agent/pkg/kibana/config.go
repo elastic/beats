@@ -36,8 +36,8 @@ func (p *Protocol) Unpack(from string) error {
 	return nil
 }
 
-func defaultClientConfig() Config {
-	return Config{
+func DefaultClientConfig() *Config {
+	return &Config{
 		Protocol: Protocol("http"),
 		Host:     "localhost:5601",
 		Path:     "",

@@ -91,6 +91,13 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
+	if err := cfg.Fleet.Valid(); err != nil {
+		return nil, errors.New(err,
+			"fleet configuration is invalid",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
 	client, err := fleetapi.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
 	if err != nil {
 		return nil, errors.New(err,

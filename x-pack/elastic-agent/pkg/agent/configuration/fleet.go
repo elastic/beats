@@ -20,8 +20,8 @@ type FleetAgentConfig struct {
 	Info         *AgentInfo            `config:"agent" yaml:"agent"`
 }
 
-// Validate validates the required fields for accessing the API.
-func (e *FleetAgentConfig) Validate() error {
+// Valid validates the required fields for accessing the API.
+func (e *FleetAgentConfig) Valid() error {
 	if e.Enabled {
 		if len(e.AccessAPIKey) == 0 {
 			return errors.New("empty access token", errors.TypeConfig)
@@ -39,6 +39,7 @@ func (e *FleetAgentConfig) Validate() error {
 func DefaultFleetAgentConfig() *FleetAgentConfig {
 	return &FleetAgentConfig{
 		Enabled:   false,
+		Kibana:    kibana.DefaultClientConfig(),
 		Reporting: fleetreporter.DefaultConfig(),
 		Info:      &AgentInfo{},
 	}

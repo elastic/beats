@@ -27,7 +27,8 @@ type Config = logp.Config
 
 // New returns a configured ECS Logger
 func New(name string) (*Logger, error) {
-	return new(name, DefaultLoggingConfig())
+	defaultCfg := DefaultLoggingConfig()
+	return new(name, defaultCfg)
 }
 
 // NewWithLogpLevel returns a configured logp Logger with specified level.
@@ -35,7 +36,7 @@ func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
 	defaultCfg := DefaultLoggingConfig()
 	defaultCfg.Level = level
 
-	return new(name, &Config{Level: level})
+	return new(name, defaultCfg)
 }
 
 //NewFromConfig takes the user configuration and generate the right logger.

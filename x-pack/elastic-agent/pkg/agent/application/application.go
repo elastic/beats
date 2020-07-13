@@ -63,8 +63,5 @@ func createApplication(
 
 // missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
 func isStandalone(cfg *configuration.FleetAgentConfig) bool {
-	return cfg == nil ||
-		!cfg.Enabled ||
-		len(cfg.AccessAPIKey) == 0 ||
-		cfg.Kibana == nil
+	return cfg == nil || !cfg.Enabled
 }

@@ -66,6 +66,27 @@ func loadConfig(configPath string) (*config.Config, error) {
 		return nil, err
 	}
 
+	path := info.AgentConfigFile()
+
+	store := storage.NewDiskStore(path)
+	reader, err := store.Load()
+	if err != nil {
+		return nil, errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	// merge local configuration and configuration persisted from fleet.
+	rawConfig.Merge(config)
+
 	if err := InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}

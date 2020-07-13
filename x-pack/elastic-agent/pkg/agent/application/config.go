@@ -15,14 +15,13 @@ type localConfig struct {
 	Settings *configuration.SettingsConfig   `config:"agent" yaml:"agent"`
 }
 
-func createFleetConfigFromEnroll(agentID string, accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.AccessAPIKey = accessAPIKey
 	cfg.Kibana = kbn
-	cfg.Info.ID = agentID
 
-	if err := cfg.Validate(); err != nil {
+	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
 	return cfg, nil
