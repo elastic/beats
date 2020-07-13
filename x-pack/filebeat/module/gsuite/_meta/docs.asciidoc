@@ -45,6 +45,10 @@ you can set up your module:
     enabled: true
     var.jwt_file: "./credentials_file.json"
     var.delegated_account: "user@example.com"
+  login:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
 ----
 
 Every fileset has the following configuration options:
