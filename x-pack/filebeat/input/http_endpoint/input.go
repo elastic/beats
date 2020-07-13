@@ -93,6 +93,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	handler := &httpHandler{
 		log:          log,
 		publisher:    publisher,
+		messageField: e.config.Prefix,
 		responseCode: e.config.ResponseCode,
 		responseBody: e.config.ResponseBody,
 	}

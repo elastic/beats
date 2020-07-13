@@ -37,7 +37,7 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	obj, status, err := httpReadJsonObject(r.Body)
 	if err != nil {
 		w.Header().Add("Content-Type", "application/json")
-		h.sendErrorResponse(w, status, err)
+		sendErrorResponse(w, status, err)
 		return
 	}
 
@@ -51,11 +51,6 @@ func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message st
 	io.WriteString(w, message)
 }
 
-func (h *httpHandler) sendErrorResponse(w http.ResponseWriter, status int, err error) {
-	w.WriteHeader(status)
-	fmt.Fprintf(w, `{"message": %q}`, err.Error())
-}
-
 func (h *httpHandler) publishEvent(obj common.MapStr) {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
@@ -65,6 +60,22 @@ func (h *httpHandler) publishEvent(obj common.MapStr) {
 	}
 
 	h.publisher.Publish(event)
+}
+
+func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if status, err := v.ValidateHeader(r); status != 0 && err != nil {
+			sendErrorResponse(w, status, err)
+		} else {
+			handler(w, r)
+		}
+	}
+}
+
+func sendErrorResponse(w http.ResponseWriter, status int, err error) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+	fmt.Fprintf(w, `{"message": %q}`, err.Error())
 }
 
 func httpReadJsonObject(body io.Reader) (obj common.MapStr, status int, err error) {
