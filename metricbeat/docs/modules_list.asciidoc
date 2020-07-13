@@ -191,7 +191,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+.4+| .4+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+|<<metricbeat-metricset-mysql-performance,performance>> beta[]  
+|<<metricbeat-metricset-mysql-query,query>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   
