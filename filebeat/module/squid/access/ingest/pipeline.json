@@ -1,10 +1,70 @@
 {
-  "description": "Pipeline for parsing squid access logs",
-  "processors": [
-    ],
+  "description": "Pipeline for parsing Squid access logs. Requires the geoip and user_agent plugins.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{NUMBER:squid.access.timestamp}%{SPACE}%{NUMBER:squid.access.response_time} %{IP:squid.access.src_ip} %{DATA:squid.access.squid_request_status}/%{NUMBER:squid.access.http_status_code} %{NUMBER:squid.access.reply_size_include_header} %{DATA:squid.access.http_method} %{DATA:squid.access.http_protocol}://%{IPORHOST:squid.access.dst_host}%{NOTSPACE:squid.access.request_url} %{NOTSPACE:squid.access.user} %{DATA:squid.access.hierarchy_code}/(?:-|%{IP:squid.access.dst_ip}) %{NOTSPACE:squid.access.content_type}",
+        "%{NUMBER:squid.access.timestamp}%{SPACE}%{NUMBER:squid.access.response_time} %{IP:squid.access.src_ip} %{DATA:squid.access.squid_request_status}/%{NUMBER:squid.access.http_status_code} %{NUMBER:squid.access.reply_size_include_header} %{DATA:squid.access.http_method} %{IPORHOST:squid.access.request_url}:%{NUMBER:squid.access.request_url_port} %{NOTSPACE:squid.access.user} %{DATA:squid.access.hierarchy_code}/(?:-|%{IP:squid.access.dst_ip})"
+        ],
+      "ignore_missing": true
+    }
+  },{
+    "rename":{
+      "field": "message",
+      "target_field": "squid.access.original_message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "squid.access.timestamp",
+      "target_field": "@timestamp",
+      "formats": ["UNIX", "dd MMM H:m:s.SSS"]
+    }
+  }, {
+    "remove": {
+      "field": "squid.access.timestamp"
+    }
+  }, {
+    "convert": {
+      "field": "squid.access.response_time",
+      "type": "float"
+    }
+  }, {
+    "convert": {
+      "field": "squid.access.reply_size_include_header",
+      "type": "float"
+    }
+  }, {
+    "script": {
+      "lang": "painless",
+      "inline": "if (ctx.squid.access.dst_ip == null && ctx.squid.access.squid_request_status.endsWith('_HIT')) {     ctx.squid.access.dst_ip = '127.0.0.1';   } else if (ctx.squid.access.dst_ip == null) {     ctx.squid.access.dst_ip = ctx.squid.access.request_url;   }   "
+    }
+  }, {
+    "geoip": {
+      "field": "squid.access.dst_ip",
+      "target_field": "squid.access.geoip",
+      "ignore_missing": true
+    }
+  }, {
+    "geoip": {
+      "database_file": "GeoLite2-ASN.mmdb",
+      "field": "source.ip",
+      "target_field": "source.as",
+      "properties": [
+          "asn",
+          "organization_name"
+      ],
+      "ignore_missing": true
+    }
+  }],
   "on_failure" : [{
     "set" : {
-      "field" : "error.message",
+      "field" : "squid.access.error.message",
       "value" : "{{ _ingest.on_failure_message }}"
     }
   }]

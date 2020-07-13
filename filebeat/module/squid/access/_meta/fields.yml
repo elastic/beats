@@ -1,0 +1,82 @@
+- name: access
+  description: Squid Access log
+  example: Groups Squid fields
+  type: group
+  fields:
+  - name: response_time
+    description: Response Time.
+    example: 823
+    type: long
+  - name: src_ip
+    description: Source request IP
+  - name: squid_request_status
+    description: TAG_NONE
+    type: text
+  - name: http_status_code
+    description: HTTP Status Code
+    example: 200
+    type: long
+  - name: reply_size_include_header
+    description: Reply size including header.
+    example: 10940
+    type: long
+  - name: http_method
+    description: The request HTTP method.
+    example: GET
+    type: text
+  - name: http_protocol
+    description: HTTP Protocol
+    example: http
+    type: text
+  - name: dst_host
+    description: Destination host
+    example: github.com
+    type: keyword
+  - name: request_url
+    description: The requested HTTP URL.
+    example: http://github.com/molu8bits
+  - name: user
+    description: Squid username
+    example: molu8bits
+  - name: hierarchy_code
+    description: Hierarchy Code
+    example: ORIGINAL_DST
+    type: text
+  - name: dst_ip
+    description: Destination IP address
+    example: 192.168.0.1
+  - name: content_type
+    description:  Content Type
+    example: application/octet-stream
+  - name: request_url_port
+    description: Request url port
+    example: 34052
+    type: long
+  - name: geoip
+    type: group
+    fields:
+      - name: continent_name
+        type: alias
+        path: squid.access.geoip.continent_name
+        migration: true
+      - name: country_iso_code
+        type: alias
+        path: squid.access.geoip.country_iso_code
+        migration: true
+      - name: location
+        type: alias
+        path: squid.access.geoip.location
+        migration: true
+      - name: region_name
+        type: alias
+        path: squid.access.geoip.region_name
+        migration: true
+      - name: city_name
+        type: alias
+        path: squid.access.geoip.city_name
+        migration: true
+      - name: region_iso_code
+        type: alias
+        path: squid.access.geoip.region_iso_code
+        migration: true
+

@@ -3,11 +3,18 @@ module_version: 1.0
 var:
   - name: paths
     default:
-      - /example/test.log*
+      - /var/log/squid/access.log*
     os.darwin:
-      - /usr/local/example/test.log*
+      - /var/log/squid/access.log*
     os.windows:
-      - c:/programdata/example/logs/test.log*
+      - c:/squid/var/log/access.log*
 
 ingest_pipeline: ingest/pipeline.json
 input: config/access.yml
+
+require.processors:
+  - name: user_agent
+    plugin: ingest-user-agent
+  - name: geoip
+    plugin: ingest-geoip
+  

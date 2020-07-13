@@ -1,0 +1,389 @@
+{
+	  "objects": [
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"*\",\n        \"analyze_wildcard\": true\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": [],\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "TOP Method [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"isDonut\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"3\",\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.http_method\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {},\n  \"title\": \"TOP Method [Squid]\"\n}"
+    },
+    "id": "TOP Method [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T20:13:30.759Z",
+    "version": "WzMwMjMsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"*\",\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": [],\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "TOP Request Status [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"title\": \"TOP Request Status [Squid]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"isDonut\": false,\n    \"type\": \"pie\",\n    \"legendPosition\": \"right\",\n    \"labels\": {\n      \"show\": false,\n      \"values\": true,\n      \"last_level\": true,\n      \"truncate\": 100\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.squid_request_status\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ]\n}"
+    },
+    "id": "TOP Request Status [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T20:17:59.520Z",
+    "version": "WzMwMjYsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+      },
+      "title": "Destination [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"title\":\"Destination [Squid]\",\"type\":\"tile_map\",\"params\":{\"addTooltip\":true,\"heatBlur\":15,\"heatClusterSize\":1.5,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatNormalizeData\":true,\"heatRadius\":25,\"isDesaturated\":false,\"legendPosition\":\"bottomright\",\"mapCenter\":[0,0],\"mapType\":\"Scaled Circle Markers\",\"mapZoom\":2,\"wms\":{\"baseLayersAreLoaded\":{\"_c\":[],\"_d\":true,\"_h\":0,\"_n\":false,\"_s\":1,\"_v\":true},\"enabled\":false,\"options\":{\"format\":\"image/png\",\"transparent\":true},\"selectedTmsLayer\":{\"attribution\":\"\",\"id\":\"TMS in config/kibana.yml\",\"maxZoom\":18,\"minZoom\":0,\"url\":\"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png\"},\"tmsLayers\":[{\"attribution\":\"\",\"id\":\"TMS in config/kibana.yml\",\"maxZoom\":18,\"minZoom\":0,\"url\":\"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png\"},{\"attribution\":\"<p>&#169; <a href=\\\"http://www.openstreetmap.org/copyright\\\">OpenStreetMap</a> contributors | <a href=\\\"https://www.elastic.co/elastic-maps-service\\\">Elastic Maps Service</a></p>&#10;\",\"id\":\"road_map\",\"maxZoom\":10,\"minZoom\":0,\"subdomains\":[],\"url\":\"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.2.4\"}]},\"colorSchema\":\"Yellow to Red\",\"dimensions\":{\"metric\":{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"cardinality\"},\"geohash\":{\"accessor\":1,\"format\":{\"id\":\"string\"},\"params\":{\"precision\":2,\"useGeocentroid\":true},\"aggType\":\"geohash_grid\"},\"geocentroid\":{\"accessor\":3,\"format\":{\"id\":\"string\"},\"params\":{},\"aggType\":\"geo_centroid\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"squid.access.geoip.location\",\"autoPrecision\":true,\"precision\":2,\"useGeocentroid\":true,\"isFilteredByCollar\":true,\"mapZoom\":2,\"mapCenter\":{\"lon\":0,\"lat\":0},\"mapBounds\":{\"bottom_right\":{\"lat\":-81.5182718765338,\"lon\":260.50781250000006},\"top_left\":{\"lat\":81.5182718765338,\"lon\":-260.50781250000006}}}}]}"
+    },
+    "id": "Squid_DST",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-22T18:03:16.889Z",
+    "version": "WzM4NTksN10="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"*\",\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": [],\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "TOP HTTP Status Code [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"title\": \"TOP HTTP Status Code [Squid]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"isDonut\": false,\n    \"type\": \"pie\",\n    \"legendPosition\": \"right\",\n    \"labels\": {\n      \"show\": false,\n      \"values\": true,\n      \"last_level\": true,\n      \"truncate\": 100\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.http_status_code\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ]\n}"
+    },
+    "id": "TOP HTTP Status Code [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T20:17:35.899Z",
+    "version": "WzMwMjUsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"query\": {\n    \"language\": \"lucene\",\n    \"query\": {\n      \"query_string\": {\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\",\n        \"query\": \"*\"\n      }\n    }\n  },\n  \"filter\": [],\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "Blocked Requests [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"title\": \"Blocked Requests [Squid]\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"categoryAxes\": [\n      {\n        \"id\": \"CategoryAxis-1\",\n        \"labels\": {\n          \"show\": true,\n          \"truncate\": 100\n        },\n        \"position\": \"bottom\",\n        \"scale\": {\n          \"type\": \"linear\"\n        },\n        \"show\": true,\n        \"style\": {},\n        \"title\": {},\n        \"type\": \"category\"\n      }\n    ],\n    \"defaultYExtents\": false,\n    \"grid\": {\n      \"categoryLines\": false,\n      \"style\": {\n        \"color\": \"#eee\"\n      }\n    },\n    \"legendPosition\": \"right\",\n    \"mode\": \"stacked\",\n    \"scale\": \"linear\",\n    \"seriesParams\": [\n      {\n        \"data\": {\n          \"id\": \"2\",\n          \"label\": \"Count\"\n        },\n        \"mode\": \"stacked\",\n        \"show\": true,\n        \"type\": \"histogram\",\n        \"valueAxis\": \"ValueAxis-1\"\n      }\n    ],\n    \"setYExtents\": false,\n    \"shareYAxis\": true,\n    \"spyPerPage\": 10,\n    \"times\": [],\n    \"type\": \"histogram\",\n    \"valueAxes\": [\n      {\n        \"id\": \"ValueAxis-1\",\n        \"labels\": {\n          \"filter\": false,\n          \"rotate\": 0,\n          \"show\": true,\n          \"truncate\": 100\n        },\n        \"name\": \"LeftAxis-1\",\n        \"position\": \"left\",\n        \"scale\": {\n          \"defaultYExtents\": false,\n          \"mode\": \"normal\",\n          \"setYExtents\": false,\n          \"type\": \"linear\"\n        },\n        \"show\": true,\n        \"style\": {},\n        \"title\": {\n          \"text\": \"Count\"\n        },\n        \"type\": \"value\"\n      }\n    ],\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.src_ip\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"2\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"4\",\n      \"enabled\": true,\n      \"type\": \"filters\",\n      \"schema\": \"split\",\n      \"params\": {\n        \"filters\": [\n          {\n            \"input\": {\n              \"query\": \"squid.access.squid_request_status: \\\"TCP_DENIED\\\"\",\n              \"language\": \"lucene\"\n            }\n          }\n        ],\n        \"row\": true\n      }\n    },\n    {\n      \"id\": \"5\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"squid.access.dst_host\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"exclude\": \"scorecardresearch.com|udm.scorecardresearch.com\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"2\"\n      }\n    }\n  ]\n}"
+    },
+    "id": "Blocked Requests [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T20:13:01.163Z",
+    "version": "WzMwMjIsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"*\",\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": [],\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "TOP TCP_MISS Request [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"title\": \"TOP TCP_MISS Request [Squid]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"isDonut\": false,\n    \"type\": \"pie\",\n    \"legendPosition\": \"right\",\n    \"labels\": {\n      \"show\": false,\n      \"values\": true,\n      \"last_level\": true,\n      \"truncate\": 100\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"filters\",\n      \"schema\": \"split\",\n      \"params\": {\n        \"filters\": [\n          {\n            \"input\": {\n              \"query\": \"squid.access.squid_request_status: \\\"TCP_MISS\\\"\",\n              \"language\": \"lucene\"\n            }\n          }\n        ],\n        \"row\": true\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.request_url\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ]\n}"
+    },
+    "id": "TOP TCP_MISS Request [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T21:25:31.307Z",
+    "version": "WzM4MzMsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\n  \"filter\": [],\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  },\n  \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"\n}"
+      },
+      "title": "TOP Destination [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\n  \"title\": \"TOP Destination [Squid]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"type\": \"pie\",\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": false,\n    \"labels\": {\n      \"show\": false,\n      \"values\": true,\n      \"last_level\": true,\n      \"truncate\": 100\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"squid.access.dst_host\",\n        \"otherBucket\": false,\n        \"otherBucketLabel\": \"Other\",\n        \"missingBucket\": false,\n        \"missingBucketLabel\": \"Missing\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ]\n}"
+    },
+    "id": "TOP Destination [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-14T20:07:15.809Z",
+    "version": "WzMwMTgsNl0="
+  },
+  {
+    "attributes": {
+      "columns": [
+        "squid.access.src_ip",
+        "squid.access.http_method",
+        "squid.access.http_protocol",
+        "squid.access.dst_host",
+        "squid.access.request_url",
+        "squid.access.squid_request_status"
+      ],
+      "description": "",
+      "hits": 0,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query\":\"_exists_:squid.access\",\"language\":\"lucene\"},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"highlightAll\":true,\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+      },
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "title": "Access Log [Squid]",
+      "version": 1
+    },
+    "id": "Squid-Proxy-Access",
+    "migrationVersion": {
+      "search": "7.0.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "search",
+    "updated_at": "2019-09-14T20:31:48.914Z",
+    "version": "WzMwNDAsNl0="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+      },
+      "title": "TOP 10 Source Download",
+      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+      "version": 1,
+      "visState": "{\"title\":\"TOP 10 Source Download\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"sum\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"squid.access.reply_size_include_header\",\"customLabel\":\"Downloaded bytes\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"squid.access.src_ip\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+    },
+    "id": "7d24aff0-d7f0-11e9-b8c5-172f66c626ae",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-15T19:39:10.319Z",
+    "version": "WzM4MzksN10="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+      },
+      "savedSearchRefName": "search_0",
+      "title": "HTTP Method [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"title\":\"HTTP Method [Squid]\",\"type\":\"line\",\"params\":{\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"valueAxis\":null},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"lineWidth\":3,\"interpolate\":\"cardinal\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"YYYY-MM-DD HH:mm\"}},\"params\":{\"date\":true,\"interval\":\"PT3H\",\"format\":\"YYYY-MM-DD HH:mm\",\"bounds\":{\"min\":\"2019-09-15T16:57:26.349Z\",\"max\":\"2019-09-22T16:57:26.349Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-7d\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"squid.access.http_method\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":true,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+    },
+    "id": "2d74b850-dd5a-11e9-b8c5-172f66c626ae",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "Squid-Proxy-Access",
+        "name": "search_0",
+        "type": "search"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-22T16:58:19.092Z",
+    "version": "WzM4NTIsN10="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+      },
+      "title": "HTTP Status Code [Squid]",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"title\":\"HTTP Status Code [Squid]\",\"type\":\"line\",\"params\":{\"type\":\"line\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"lineWidth\":3}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"YYYY-MM-DD HH:mm\"}},\"params\":{\"date\":true,\"interval\":\"PT3H\",\"format\":\"YYYY-MM-DD HH:mm\",\"bounds\":{\"min\":\"2019-09-15T18:00:25.359Z\",\"max\":\"2019-09-22T18:00:25.359Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"number\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-7d\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"squid.access.http_status_code\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"HTTP Status Code\"}}]}"
+    },
+    "id": "HTTP Status Code [Squid]",
+    "migrationVersion": {
+      "visualization": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "filebeat-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization",
+    "updated_at": "2019-09-22T18:01:05.728Z",
+    "version": "WzM4NTcsN10="
+  },
+  {
+    "attributes": {
+      "description": "",
+      "hits": 0,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\",\"time_zone\":\"Europe/Warsaw\"}}},\"highlightAll\":true,\"version\":true}"
+      },
+      "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+      "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"1\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"2\",\"w\":12,\"x\":12,\"y\":0},\"panelIndex\":\"2\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":16,\"i\":\"4\",\"w\":24,\"x\":24,\"y\":0},\"panelIndex\":\"4\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"5\",\"w\":12,\"x\":12,\"y\":8},\"panelIndex\":\"5\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_3\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"6\",\"w\":24,\"x\":0,\"y\":16},\"panelIndex\":\"6\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_4\"},{\"embeddableConfig\":{\"vis\":{\"legendOpen\":true}},\"gridData\":{\"h\":8,\"i\":\"7\",\"w\":12,\"x\":24,\"y\":16},\"panelIndex\":\"7\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_5\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"8\",\"w\":12,\"x\":0,\"y\":8},\"panelIndex\":\"8\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_6\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":16,\"i\":\"9\",\"w\":48,\"x\":0,\"y\":24},\"panelIndex\":\"9\",\"version\":\"7.3.0\",\"panelRefName\":\"panel_7\"},{\"gridData\":{\"w\":24,\"h\":15,\"x\":0,\"y\":40,\"i\":\"10\"},\"version\":\"7.3.0\",\"panelIndex\":\"10\",\"embeddableConfig\":{},\"panelRefName\":\"panel_8\"},{\"gridData\":{\"w\":24,\"h\":15,\"x\":24,\"y\":40,\"i\":\"11\"},\"version\":\"7.3.0\",\"panelIndex\":\"11\",\"embeddableConfig\":{},\"panelRefName\":\"panel_9\"},{\"gridData\":{\"w\":24,\"h\":15,\"x\":0,\"y\":55,\"i\":\"12\"},\"version\":\"7.3.0\",\"panelIndex\":\"12\",\"embeddableConfig\":{},\"panelRefName\":\"panel_10\"}]",
+      "refreshInterval": {
+        "pause": true,
+        "value": 0
+      },
+      "timeFrom": "now-7d",
+      "timeRestore": true,
+      "timeTo": "now",
+      "title": "[Filebeat Squid] Access log",
+      "version": 1
+    },
+    "id": "438945b0-d0c3-11e8-ae55-1341dd405740",
+    "migrationVersion": {
+      "dashboard": "7.3.0"
+    },
+    "references": [
+      {
+        "id": "TOP Method [Squid]",
+        "name": "panel_0",
+        "type": "visualization"
+      },
+      {
+        "id": "TOP Request Status [Squid]",
+        "name": "panel_1",
+        "type": "visualization"
+      },
+      {
+        "id": "Squid_DST",
+        "name": "panel_2",
+        "type": "visualization"
+      },
+      {
+        "id": "TOP HTTP Status Code [Squid]",
+        "name": "panel_3",
+        "type": "visualization"
+      },
+      {
+        "id": "Blocked Requests [Squid]",
+        "name": "panel_4",
+        "type": "visualization"
+      },
+      {
+        "id": "TOP TCP_MISS Request [Squid]",
+        "name": "panel_5",
+        "type": "visualization"
+      },
+      {
+        "id": "TOP Destination [Squid]",
+        "name": "panel_6",
+        "type": "visualization"
+      },
+      {
+        "id": "Squid-Proxy-Access",
+        "name": "panel_7",
+        "type": "search"
+      },
+      {
+        "id": "7d24aff0-d7f0-11e9-b8c5-172f66c626ae",
+        "name": "panel_8",
+        "type": "visualization"
+      },
+      {
+        "id": "2d74b850-dd5a-11e9-b8c5-172f66c626ae",
+        "name": "panel_9",
+        "type": "visualization"
+      },
+      {
+        "id": "HTTP Status Code [Squid]",
+        "name": "panel_10",
+        "type": "visualization"
+      }
+    ],
+    "type": "dashboard",
+    "updated_at": "2019-09-22T18:01:58.289Z",
+    "version": "WzM4NTgsN10="
+  }
+],
+  "version": "7.8.0"
+  }
+
+

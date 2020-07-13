@@ -1,3 +1,4 @@
 dashboards:
-- id: Filebeat-squid-access-Dashboard
+#- id: Filebeat-squid-access-Dashboard
+- id: 438945b0-d0c3-11e8-ae55-1341dd405740
   file: Filebeat-squid-access.json
