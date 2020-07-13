@@ -86,13 +86,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+- Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix potential race condition in fingerprint processor. {pull}18738[18738]
 
 *Auditbeat*
 
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
-- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
+- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 
 *Filebeat*
@@ -116,6 +120,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
+- Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
+- Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
+- Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+- Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 
 *Heartbeat*
 
@@ -160,6 +169,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 - Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
+- Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Fix config example in the perfmon configuration files. {pull}19539[19539]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 
 *Packetbeat*
 
