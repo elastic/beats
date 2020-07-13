@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@fix/isCommentTrigger') _
 
 pipeline {
   agent none
