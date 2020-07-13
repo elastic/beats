@@ -42,7 +42,7 @@ processors:
 - append:
     field: event.type
     value:
-      - diened
+      - denied
       - connection
     if: "ctx.sophosxg?.firewall?.status == 'Deny'"
 - rename:
@@ -395,21 +395,25 @@ processors:
 ## ECS Related Mapping ##
 #########################
 - append:
-    if: 'ctx?.source?.ip != null'
     field: related.ip
     value: '{{source.ip}}'
+    if: 'ctx?.source?.ip != null'
 - append:
-    if: 'ctx?.destination?.ip != null'
     field: related.ip
     value: '{{destination.ip}}'
+    if: 'ctx?.destination?.ip != null'
 - append:
-    if: 'ctx?.source?.nat?.ip != null'
     field: related.ip
     value: '{{source.nat.ip}}'
+    if: 'ctx?.source?.nat?.ip != null'
 - append:
-    if: 'ctx?.destination?.nat?.ip != null'
     field: related.ip
     value: '{{destination.nat.ip}}'
+    if: 'ctx?.destination?.nat?.ip != null'
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    if: "ctx.source?.user?.name != null"
 
 #############
 ## Cleanup ##

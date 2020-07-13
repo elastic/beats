@@ -226,7 +226,7 @@
         Total number of bytes received
 
     - name: trans_src_ ip
-      type: keyword
+      type: ip
       description: >
         Translated source IP address for outgoing traffic
 
@@ -236,7 +236,7 @@
         Translated source port for outgoing traffic
     
     - name: trans_dst_ip
-      type: keyword
+      type: ip
       description: >
         Translated destination IP address for outgoing traffic
 
@@ -346,12 +346,12 @@
         ATP threatname
 
     - name: sourceip
-      type: keyword
+      type: ip
       description: >
         Original source IP address of traffic
 
     - name: destinationip
-      type: keyword
+      type: ip
       description: >
         Original destination IP address of traffic
 
@@ -516,7 +516,7 @@
         Upload file name
 
     - name: httpresponsecode
-      type: keyword
+      type: long
       description: >
         code of HTTP response
 
@@ -731,17 +731,17 @@
         Sessionid
 
     - name: starttime
-      type: keyword
+      type: date
       description: >
         Starttime
 
     - name: remote_ip
-      type: keyword
+      type: ip
       description: >
         Remote IP
 
     - name: timestamp
-      type: keyword
+      type: date
       description: >
         timestamp
 
@@ -771,7 +771,7 @@
         Host
 
     - name: responsetime
-      type: keyword
+      type: long
       description: >
         Responsetime
 
@@ -796,12 +796,12 @@
         PHPSESSID
 
     - name: start_time
-      type: keyword
+      type: date
       description: >
         Start time
 
     - name: eventtime
-      type: keyword
+      type: date
       description: >
         Event time
 
@@ -816,7 +816,7 @@
         Branch Name
 
     - name: updatedip
-      type: keyword
+      type: ip
       description: >
         updatedip
 
@@ -866,27 +866,27 @@
         received errors
 
     - name: receivedkbits
-      type: keyword
+      type: long
       description: >
         received kbits
 
     - name: transmittedkbits
-      type: keyword
+      type: long
       description: >
         transmitted kbits
 
     - name: transmitteddrops
-      type: keyword
+      type: long
       description: >
         transmitted drops
 
     - name: receiveddrops
-      type: keyword
+      type: long
       description: >
         received drops
 
     - name: collisions
-      type: keyword
+      type: long
       description: >
         collisions
 

@@ -8,7 +8,7 @@ processors:
     value: event
 - set:
     field: event.outcome
-    value: succes
+    value: success
     if: 'ctx?.sophosxg?.firewall?.log_subtype == "Authentication" && ctx?.sophosxg?.firewall?.status == "Successful"'
 - set:
     field: event.outcome
@@ -16,7 +16,7 @@ processors:
     if: 'ctx?.sophosxg?.firewall?.log_subtype == "Authentication" && ctx?.sophosxg?.firewall?.status == "Failed"'
 - set:
     field: event.outcome
-    value: succes
+    value: success
     if: 'ctx?.sophosxg?.firewall?.log_subtype == "Admin" && ctx?.sophosxg?.firewall?.status == "Successful" && ctx?.sophosxg?.firewall?.message_id == "17507"'
 - set:
     field: event.outcome

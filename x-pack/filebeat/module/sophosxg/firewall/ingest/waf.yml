@@ -43,7 +43,7 @@ processors:
 - append:
     field: event.type
     value:
-      - diened
+      - denied
       - connection
     if: 'ctx.sophosxg?.firewall?.reason != "-"'
 
@@ -263,9 +263,6 @@ processors:
 #############
 ## Cleanup ##
 #############
-- lowercase:
-      field: http.request.method
-      ignore_failure: true
 - remove:
     field:
      - sophosxg.firewall.bytesrcv

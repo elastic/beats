@@ -47,7 +47,7 @@ processors:
 - append:
     field: event.type
     value:
-      - diened
+      - denied
       - connection
     if: "ctx.sophosxg?.firewall?.log_subtype == 'Denied'"
 - rename:
