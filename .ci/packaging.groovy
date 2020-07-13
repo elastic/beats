@@ -12,7 +12,7 @@ pipeline {
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     SNAPSHOT = "true"
-    PIPELINE_LOG_LEVEL = "DEBUG"
+    PIPELINE_LOG_LEVEL = "INFO"
   }
   options {
     timeout(time: 3, unit: 'HOURS')
