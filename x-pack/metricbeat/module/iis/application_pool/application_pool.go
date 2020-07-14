@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := newReader()
+	reader, err := newReader(config)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger("application pool"),
 		reader:        reader,
 	}
-	if err := ms.reader.initCounters(config.Names); err != nil {
-		return ms, err
-	}
+
 	return ms, nil
 }
 
@@ -65,12 +63,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	var config Config
-	if err := m.Module().UnpackConfig(&config); err != nil {
-		return nil
+	// refresh performance counter list
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
+	if m.reader.executed {
+		err := m.reader.initAppPools()
+		if err != nil {
+			return errors.Wrap(err, "failed retrieving counters")
+		}
 	}
-
-	events, err := m.reader.fetch(config.Names)
+	events, err := m.reader.read()
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
 	}
@@ -81,6 +84,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
+
 	return nil
 }
 

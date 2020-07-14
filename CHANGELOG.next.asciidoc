@@ -265,6 +265,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Stop counterCache only when already started {pull}19103[19103]
+- Fix empty field name errors in the application pool metricset. {pull}19537[19537]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 - Fix mapping of service start type in the service metricset, windows module. {pull}19551[19551]
