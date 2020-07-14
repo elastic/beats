@@ -128,7 +128,7 @@ This is a list of FortiOS fields that are mapped to ECS.
 :fileset_ex!:
 
 [float]
-[[dynamic-script-compilations]]
+[[dynamic-script-compilations-sophosxg]]
 === Dynamic Script Compilations
 
 The `sophosxg` filesets are based on Elasticsearch ingest pipelines and
