@@ -34,15 +34,18 @@ pipeline {
       agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
-        expression {
-          def ret = isCommentTrigger() || isUserTrigger()
-          if(!ret){
-            currentBuild.result = 'NOT_BUILT'
-            currentBuild.description = "The build has been skipped"
-            currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
-            echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, and GitHub comment")
+        anyOf {
+          triggeredBy cause: "IssueCommentCause"
+          expression {
+            def ret = isUserTrigger() || isUpstreamTrigger()
+            if(!ret){
+              currentBuild.result = 'NOT_BUILT'
+              currentBuild.description = "The build has been skipped"
+              currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+              echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+            }
+            return ret
           }
-          return ret
         }
       }
       /**
