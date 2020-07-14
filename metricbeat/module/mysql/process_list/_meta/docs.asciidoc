@@ -1,0 +1,15 @@
+This metricset pushes into Elasticsearch information about the process list of a MySQL instance:
+
+[source,json]
+----
+{
+    "id" : 5,
+    "user" : "event_scheduler",
+    "host" : "localhost",
+    "db" : null,
+    "command" : "Daemon",
+    "time" : 31686,
+    "state" : "Waiting on empty queue",
+    "info" : null
+}
+----

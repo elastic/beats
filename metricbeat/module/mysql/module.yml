@@ -4,3 +4,4 @@ dashboards:
 name: mysql
 metricsets:
   - performance
+  - process_list
