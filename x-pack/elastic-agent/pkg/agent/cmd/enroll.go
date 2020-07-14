@@ -101,7 +101,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		URL:                  url,
 		CAs:                  CAs,
 		CASha256:             caSHA256,
-		Insecure:			  insecure,
+		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 	}
 
