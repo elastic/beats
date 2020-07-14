@@ -44,6 +44,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-microsoft>>
 * <<exported-fields-misp>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
@@ -25736,6 +25737,197 @@ alias to: log.level
 type: alias
 
 alias to: event.duration
+
+--
+
+[[exported-fields-microsoft]]
+== Microsoft fields
+
+Microsoft Module
+
+
+
+[float]
+=== microsoft
+
+Fields from Microsoft ATP
+
+
+
+[float]
+=== defender_atp
+
+Module for ingesting Microsoft Defender ATP.
+
+
+
+*`microsoft.defender_atp.lastUpdateTime`*::
++
+--
+The date and time (in UTC) the alert was last updated.
+
+
+type: date
+
+--
+
+*`microsoft.defender_atp.resolvedTime`*::
++
+--
+The date and time in which the status of the alert was changed to 'Resolved'.
+
+
+type: date
+
+--
+
+*`microsoft.defender_atp.incidentId`*::
++
+--
+The Incident ID of the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationId`*::
++
+--
+The Investigation ID related to the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationState`*::
++
+--
+The current state of the Investigation.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.assignedTo`*::
++
+--
+Owner of the alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.status`*::
++
+--
+Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.classification`*::
++
+--
+Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.determination`*::
++
+--
+Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.threatFamilyName`*::
++
+--
+Threat family.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.rbacGroupName`*::
++
+--
+User group related to the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.domainName`*::
++
+--
+Domain name related to the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.ipAddress`*::
++
+--
+IP address involved in the alert
+
+
+type: ip
+
+--
+
+*`microsoft.defender_atp.evidence.aadUserId`*::
++
+--
+ID of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.accountName`*::
++
+--
+Username of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.entityType`*::
++
+--
+The type of evidence
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.userPrincipalName`*::
++
+--
+Principal name of the user involved in the alert
+
+
+type: keyword
 
 --
 
