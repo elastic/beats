@@ -21,46 +21,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 )
 
 func TestMakeClientParams(t *testing.T) {
-	tests := map[string]struct {
-		format   report.Format
-		params   map[string]string
-		expected map[string]string
-	}{
-		"format_bulk": {
-			report.FormatBulk,
-			map[string]string{
-				"foo": "bar",
-			},
-			map[string]string{
-				"foo": "bar",
-			},
-		},
-		"format_xpack_monitoring_bulk": {
-			report.FormatXPackMonitoringBulk,
-			map[string]string{
-				"foo": "bar",
-			},
-			map[string]string{
-				"foo":                "bar",
-				"system_id":          "beats",
-				"system_api_version": "7",
-			},
-		},
+	var params, expected map[string]string
+	params = map[string]string{
+		"foo": "bar",
+	}
+	expected = map[string]string{
+		"foo": "bar",
 	}
 
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			params := makeClientParams(config{
-				Format: test.format,
-				Params: test.params,
-			})
+	p := makeClientParams(config{
+		Params: params,
+	})
 
-			require.Equal(t, test.expected, params)
-		})
-	}
+	require.Equal(t, expected, p)
 }
