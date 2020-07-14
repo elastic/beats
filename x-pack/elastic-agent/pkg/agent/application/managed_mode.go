@@ -95,13 +95,7 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
-<<<<<<< HEAD
-	// Extract only management related configuration.
-	managementCfg := &managementCfg{}
-	if err := rawConfig.Unpack(managementCfg); err != nil {
-=======
 	if err := cfg.Fleet.Valid(); err != nil {
->>>>>>> f439bccfe... [Ingest Manager] Agent config cleanup (#19848)
 		return nil, errors.New(err,
 			"fleet configuration is invalid",
 			errors.TypeFilesystem,
