@@ -57,7 +57,7 @@ func (o *operationInstall) Check(ctx context.Context, _ Application) (bool, erro
 func (o *operationInstall) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 
