@@ -67,8 +67,9 @@ func Configure(cfg Config) error {
 	return ConfigureWithOutputs(cfg)
 }
 
-// Configure configures the logp package also sets up the following outputs to also be used
-// by the logger.
+// Configure configures the logger from passed in config and also adds the passed outputs to the logger.
+//
+// When passing in outputs the logger will log to each output.
 func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 	var (
 		sink         zapcore.Core
