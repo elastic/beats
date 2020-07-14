@@ -25,6 +25,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-kafka>>
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
+  * <<filebeat-module-microsoft>>
   * <<filebeat-module-misp>>
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
@@ -71,6 +72,7 @@ include::modules/iptables.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
+include::modules/microsoft.asciidoc[]
 include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
