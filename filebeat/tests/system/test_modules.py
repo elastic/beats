@@ -282,6 +282,11 @@ def clean_keys(obj):
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
 
+    # Remove event.ingested from testing, as it will never be the same.
+    if obj["event.dataset"] == "microsoft.defender_atp":
+        delete_key(obj, "event.ingested")
+        delete_key(obj, "@timestamp")
+
 
 def delete_key(obj, key):
     if key in obj:
