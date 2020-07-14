@@ -382,9 +382,9 @@ func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 		return nil, err
 	}
 
-	cfg := configuration.DefaultFleetAgentConfig()
+	cfg := configuration.DefaultConfiguration()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}
-	return cfg, nil
+	return cfg.Fleet, nil
 }
