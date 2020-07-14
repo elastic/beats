@@ -41,7 +41,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
-	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection")
+	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
 
 	return cmd
 }
