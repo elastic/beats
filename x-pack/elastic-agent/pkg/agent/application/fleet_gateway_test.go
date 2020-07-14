@@ -468,7 +468,7 @@ func TestRetriesOnFailures(t *testing.T) {
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
-	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultFleetManagementConfig())
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
 	}

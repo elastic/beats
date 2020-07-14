@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -572,13 +572,11 @@ func TestServer_PerformAction(t *testing.T) {
 
 func newErrorLogger(t *testing.T) *logger.Logger {
 	t.Helper()
-	cfg, err := config.NewConfigFrom(map[string]interface{}{
-		"logging": map[string]interface{}{
-			"level": "error",
-		},
-	})
-	require.NoError(t, err)
-	log, err := logger.NewFromConfig("", cfg)
+
+	loggerCfg := logger.DefaultLoggingConfig()
+	loggerCfg.Level = logp.ErrorLevel
+
+	log, err := logger.NewFromConfig("", loggerCfg)
 	require.NoError(t, err)
 	return log
 }
