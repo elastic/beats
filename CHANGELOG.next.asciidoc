@@ -390,6 +390,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
 - Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
+- Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 
 *Auditbeat*
 
