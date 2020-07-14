@@ -38,7 +38,10 @@ func init() {
 			"leader_election_master_status":      prometheus.BooleanMetric("leader.is_master"),
 			"scheduler_e2e_scheduling_duration_seconds": prometheus.Metric("scheduling.e2e.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
-			"scheduler_pod_preemption_victims":      prometheus.Metric("scheduling.pod.preemption.victims.count"),
+			"scheduler_pod_preemption_victims": prometheus.Metric("scheduling.pod.preemption.victims",
+				// this is needed in order to solve compatibility issue of different
+				// different k8s versions, issue: https://github.com/elastic/beats/issues/19332
+				prometheus.OpSetNumericMetricSuffix("count")),
 			"scheduler_schedule_attempts_total":     prometheus.Metric("scheduling.pod.attempts.count"),
 			"scheduler_scheduling_duration_seconds": prometheus.Metric("scheduling.duration.seconds"),
 		},

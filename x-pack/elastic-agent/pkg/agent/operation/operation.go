@@ -38,6 +38,7 @@ type Application interface {
 	Started() bool
 	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
+	Shutdown()
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
 	State() state.State

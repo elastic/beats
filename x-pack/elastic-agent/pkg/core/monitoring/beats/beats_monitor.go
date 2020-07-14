@@ -66,6 +66,13 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 	return nil
 }
 
+// Close disables monitoring
+func (b *Monitor) Close() {
+	b.config.Enabled = false
+	b.config.MonitorMetrics = false
+	b.config.MonitorLogs = false
+}
+
 // IsMonitoringEnabled returns true if monitoring is enabled.
 func (b *Monitor) IsMonitoringEnabled() bool { return b.config.Enabled }
 
@@ -115,7 +122,7 @@ func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSideca
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
-			"-E", "logging.files.permission=0644",
+			"-E", "logging.files.permission=0640",
 			"-E", "logging.files.interval=1h",
 		)
 	}

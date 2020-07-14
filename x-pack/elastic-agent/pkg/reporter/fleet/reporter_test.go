@@ -209,7 +209,7 @@ func getEvents(count int) []reporter.Event {
 }
 
 func newTestReporter(frequency time.Duration, threshold int) *Reporter {
-	log, _ := logger.New()
+	log, _ := logger.New("")
 	r := &Reporter{
 		info:      &testInfo{},
 		queue:     make([]fleetapi.SerializableEvent, 0),

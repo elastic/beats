@@ -67,7 +67,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
-	logger, err := logger.NewFromConfig(config)
+	logger, err := logger.NewFromConfig("", config)
 	if err != nil {
 		return err
 	}
