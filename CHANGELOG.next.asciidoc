@@ -233,6 +233,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
+- Fix bug with empty filter values in system/service {pull}19812[19812]
 
 *Heartbeat*
 
