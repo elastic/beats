@@ -24,6 +24,7 @@ It is compatible with a subset of applications under the https://developers.goog
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml[SAML Audit Activity Events]
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts[User Accounts Activity Events]
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login[Login Audit Activity Events]
+- https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings[Admin Audit Activity Events]
 
 === Configure the module
 
