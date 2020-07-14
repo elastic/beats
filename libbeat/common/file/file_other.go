@@ -68,3 +68,8 @@ func IsRemoved(f *os.File) bool {
 	_, err := os.Stat(f.Name())
 	return err != nil
 }
+
+// InodeString returns the inode in string.
+func (s *StateOS) InodeString() string {
+	return strconv.FormatUint(s.Inode, 10)
+}

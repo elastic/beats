@@ -265,7 +265,7 @@ const fleetResponse = `
 				],
 
 				"revision": 3,
-				"settings.monitoring": {
+				"agent.monitoring": {
 					"use_output": "default",
 					"enabled": true,
 					"logs": true,

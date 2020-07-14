@@ -114,7 +114,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
-		return fmt.Errorf("Error loading state: %v", err)
+		return fmt.Errorf("error loading state: %v", err)
 	}
 
 	r.wg.Add(1)
@@ -302,7 +302,7 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 
 func writeStates(store *statestore.Store, states []file.State) error {
 	for i := range states {
-		key := fileStatePrefix + states[i].ID()
+		key := fileStatePrefix + states[i].Id
 		if err := store.Set(key, states[i]); err != nil {
 			return err
 		}
