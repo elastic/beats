@@ -18398,10 +18398,10 @@ type: object
 
 --
 
-*`googlecloud.stackdriver.*.*.*.*`*::
+*`googlecloud.metrics.*.*.*.*`*::
 +
 --
-Metrics that returned from StackDriver API query.
+Metrics that returned from Google Cloud API query.
 
 
 type: object

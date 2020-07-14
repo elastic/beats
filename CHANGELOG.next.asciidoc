@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
+- Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
 
 *Packetbeat*
 
