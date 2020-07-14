@@ -13,14 +13,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -44,7 +43,7 @@ type Operator struct {
 	bgContext     context.Context
 	pipelineID    string
 	logger        *logger.Logger
-	config        *operatorCfg.Config
+	config        *configuration.SettingsConfig
 	handlers      map[string]handleFunc
 	stateResolver *stateresolver.StateResolver
 	srv           *server.Server
@@ -68,7 +67,7 @@ func NewOperator(
 	ctx context.Context,
 	logger *logger.Logger,
 	pipelineID string,
-	config *config.Config,
+	config *configuration.SettingsConfig,
 	fetcher download.Downloader,
 	verifier download.Verifier,
 	installer install.InstallerChecker,
@@ -77,19 +76,13 @@ func NewOperator(
 	srv *server.Server,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Operator, error) {
-
-	operatorConfig := operatorCfg.DefaultConfig()
-	if err := config.Unpack(&operatorConfig); err != nil {
-		return nil, err
-	}
-
-	if operatorConfig.DownloadConfig == nil {
+	if config.DownloadConfig == nil {
 		return nil, fmt.Errorf("artifacts configuration not provided")
 	}
 
 	operator := &Operator{
 		bgContext:     ctx,
-		config:        operatorConfig,
+		config:        config,
 		pipelineID:    pipelineID,
 		logger:        logger,
 		downloader:    fetcher,
@@ -105,8 +98,8 @@ func NewOperator(
 
 	operator.initHandlerMap()
 
-	os.MkdirAll(operatorConfig.DownloadConfig.TargetDirectory, 0755)
-	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
+	os.MkdirAll(config.DownloadConfig.TargetDirectory, 0755)
+	os.MkdirAll(config.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
 }
