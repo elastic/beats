@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
 	if m.reader.executed {
-		err := m.reader.refreshCounterPaths()
+		err := m.reader.initAppPools()
 		if err != nil {
 			return errors.Wrap(err, "failed retrieving counters")
 		}

@@ -74,47 +74,16 @@ func newReader(config Config) (*Reader, error) {
 		config:          config,
 		workerProcesses: make(map[string]string),
 	}
-	apps, err := getApplicationPools(config.Names)
+
+	err := r.initAppPools()
 	if err != nil {
-		return r, errors.Wrap(err, "failed retrieving running worker processes")
+		return nil, errors.Wrap(err, "error loading counters for existing app pools")
 	}
-	if len(apps) == 0 {
-		r.log.Info("no running application pools found")
-		return r, nil
-	}
-	r.applicationPools = apps
-
-	for key, value := range appPoolCounters {
-		childQueries, err := query.GetCounterPaths(value)
-		if err != nil {
-			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
-				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("application pool"), "query", value)
-				continue
-			} else {
-				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, value)
-			}
-		}
-		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
-		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
-			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
-			r.log.Debugw("No counter paths returned but PdhExpandWildCardPathW returned no errors", "initial query", value,
-				logp.Namespace("application pool"), "expanded query", childQueries)
-			continue
-		}
-		for _, v := range childQueries {
-			if err := query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
-				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, v)
-			}
-			r.workerProcesses[v] = key
-		}
-	}
-
 	return r, nil
 }
 
-// refreshCounterPaths will recheck for any new instances and add them to the counter list
-func (r *Reader) refreshCounterPaths() error {
+// initAppPools will check for any new instances and add them to the counter list
+func (r *Reader) initAppPools() error {
 	apps, err := getApplicationPools(r.config.Names)
 	if err != nil {
 		return errors.Wrap(err, "failed retrieving running worker processes")
@@ -124,7 +93,6 @@ func (r *Reader) refreshCounterPaths() error {
 		r.log.Info("no running application pools found")
 		return nil
 	}
-
 	var newQueries []string
 	r.workerProcesses = make(map[string]string)
 	for key, value := range appPoolCounters {
@@ -226,7 +194,6 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 
 		}
 	}
-
 	return events
 }
 
