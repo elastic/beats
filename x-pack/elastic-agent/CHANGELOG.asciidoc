@@ -12,6 +12,8 @@
 - Rename agent to elastic-agent {pull}17391[17391]
 - Change fleet.yml structure, causes upgraded agent to register as new agent {pull}19248[19248]
 - Remove obfuscation of fleet.yml, causes re-enroll of agent to Fleet {pull}19678[19678]
+- Rename enroll --ca_sha256 to --ca-sha256 {pull}19900[19900]
+- Rename enroll --certificate_authorities to --certificate-authorities {pull}19900[19900]
 
 ==== Bugfixes
 
@@ -83,3 +85,4 @@
 - Agent now load balances across multiple Kibana instances {pull}19628[19628]
 - Configuration cleanup {pull}19848[19848]
 - Agent now sends its own logs to elasticsearch {pull}19811[19811]
+- Add --insecure option to enroll command {pull}19900[19900]
