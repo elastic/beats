@@ -695,6 +695,9 @@ func TestGenerateHints(t *testing.T) {
 		err := paths.InitPaths(&paths.Path{
 			Home: abs,
 		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		l, err := NewLogHints(test.config)
 		if err != nil {
@@ -930,6 +933,9 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		err := paths.InitPaths(&paths.Path{
 			Home: abs,
 		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		l, err := NewLogHints(cfg)
 		if err != nil {

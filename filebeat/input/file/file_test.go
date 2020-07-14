@@ -34,9 +34,11 @@ func TestIsSameFile(t *testing.T) {
 	assert.Nil(t, err)
 
 	fileInfo1, err := os.Stat(absPath + "/logs/test.log")
-	fileInfo2, err := os.Stat(absPath + "/logs/system.log")
-
 	assert.Nil(t, err)
+
+	fileInfo2, err := os.Stat(absPath + "/logs/system.log")
+	assert.Nil(t, err)
+
 	assert.NotNil(t, fileInfo1)
 	assert.NotNil(t, fileInfo2)
 
