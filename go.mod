@@ -175,6 +175,7 @@ require (
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
+	gotest.tools v2.2.0+incompatible
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.18.3
 	k8s.io/apimachinery v0.18.3
