@@ -85655,13 +85655,197 @@ alias to: event.duration
 --
 
 [[exported-fields-microsoft]]
-== Microsoft DHCP fields
+== Microsoft fields
 
-microsoft fields.
+Microsoft Module
 
 
 
-*`network.interface.name`*::
+[float]
+=== microsoft
+
+Fields from Microsoft ATP
+
+
+
+[float]
+=== defender_atp
+
+Module for ingesting Microsoft Defender ATP.
+
+
+
+*`microsoft.defender_atp.lastUpdateTime`*::
++
+--
+The date and time (in UTC) the alert was last updated.
+
+
+type: date
+
+--
+
+*`microsoft.defender_atp.resolvedTime`*::
++
+--
+The date and time in which the status of the alert was changed to 'Resolved'.
+
+
+type: date
+
+--
+
+*`microsoft.defender_atp.incidentId`*::
++
+--
+The Incident ID of the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationId`*::
++
+--
+The Investigation ID related to the Alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.investigationState`*::
++
+--
+The current state of the Investigation.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.assignedTo`*::
++
+--
+Owner of the alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.status`*::
++
+--
+Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.classification`*::
++
+--
+Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.determination`*::
++
+--
+Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.threatFamilyName`*::
++
+--
+Threat family.
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.rbacGroupName`*::
++
+--
+User group related to the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.domainName`*::
++
+--
+Domain name related to the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.ipAddress`*::
++
+--
+IP address involved in the alert
+
+
+type: ip
+
+--
+
+*`microsoft.defender_atp.evidence.aadUserId`*::
++
+--
+ID of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.accountName`*::
++
+--
+Username of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.entityType`*::
++
+--
+The type of evidence
+
+
+type: keyword
+
+--
+
+*`microsoft.defender_atp.evidence.userPrincipalName`*::
++
+--
+Principal name of the user involved in the alert
+
+
+type: keyword
+
+--
+
+*`microsoft.network.interface.name`*::
 +
 --
 Name of the network interface where the traffic has been observed.
@@ -85673,7 +85857,7 @@ type: keyword
 
 
 
-*`rsa.internal.msg`*::
+*`microsoft.rsa.internal.msg`*::
 +
 --
 This key is used to capture the raw message that comes into the Log Decoder
@@ -85682,21 +85866,21 @@ type: keyword
 
 --
 
-*`rsa.internal.messageid`*::
+*`microsoft.rsa.internal.messageid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.internal.event_desc`*::
+*`microsoft.rsa.internal.event_desc`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.internal.message`*::
+*`microsoft.rsa.internal.message`*::
 +
 --
 This key captures the contents of instant messages
@@ -85705,7 +85889,7 @@ type: keyword
 
 --
 
-*`rsa.internal.time`*::
+*`microsoft.rsa.internal.time`*::
 +
 --
 This is the time at which a session hits a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness.
@@ -85714,7 +85898,7 @@ type: date
 
 --
 
-*`rsa.internal.level`*::
+*`microsoft.rsa.internal.level`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85723,7 +85907,7 @@ type: long
 
 --
 
-*`rsa.internal.msg_id`*::
+*`microsoft.rsa.internal.msg_id`*::
 +
 --
 This is the Message ID1 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85732,7 +85916,7 @@ type: keyword
 
 --
 
-*`rsa.internal.msg_vid`*::
+*`microsoft.rsa.internal.msg_vid`*::
 +
 --
 This is the Message ID2 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85741,7 +85925,7 @@ type: keyword
 
 --
 
-*`rsa.internal.data`*::
+*`microsoft.rsa.internal.data`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85750,7 +85934,7 @@ type: keyword
 
 --
 
-*`rsa.internal.obj_server`*::
+*`microsoft.rsa.internal.obj_server`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85759,7 +85943,7 @@ type: keyword
 
 --
 
-*`rsa.internal.obj_val`*::
+*`microsoft.rsa.internal.obj_val`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85768,7 +85952,7 @@ type: keyword
 
 --
 
-*`rsa.internal.resource`*::
+*`microsoft.rsa.internal.resource`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85777,7 +85961,7 @@ type: keyword
 
 --
 
-*`rsa.internal.obj_id`*::
+*`microsoft.rsa.internal.obj_id`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85786,7 +85970,7 @@ type: keyword
 
 --
 
-*`rsa.internal.statement`*::
+*`microsoft.rsa.internal.statement`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85795,7 +85979,7 @@ type: keyword
 
 --
 
-*`rsa.internal.audit_class`*::
+*`microsoft.rsa.internal.audit_class`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85804,7 +85988,7 @@ type: keyword
 
 --
 
-*`rsa.internal.entry`*::
+*`microsoft.rsa.internal.entry`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85813,7 +85997,7 @@ type: keyword
 
 --
 
-*`rsa.internal.hcode`*::
+*`microsoft.rsa.internal.hcode`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85822,7 +86006,7 @@ type: keyword
 
 --
 
-*`rsa.internal.inode`*::
+*`microsoft.rsa.internal.inode`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85831,7 +86015,7 @@ type: long
 
 --
 
-*`rsa.internal.resource_class`*::
+*`microsoft.rsa.internal.resource_class`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85840,7 +86024,7 @@ type: keyword
 
 --
 
-*`rsa.internal.dead`*::
+*`microsoft.rsa.internal.dead`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85849,7 +86033,7 @@ type: long
 
 --
 
-*`rsa.internal.feed_desc`*::
+*`microsoft.rsa.internal.feed_desc`*::
 +
 --
 This is used to capture the description of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85858,7 +86042,7 @@ type: keyword
 
 --
 
-*`rsa.internal.feed_name`*::
+*`microsoft.rsa.internal.feed_name`*::
 +
 --
 This is used to capture the name of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85867,7 +86051,7 @@ type: keyword
 
 --
 
-*`rsa.internal.cid`*::
+*`microsoft.rsa.internal.cid`*::
 +
 --
 This is the unique identifier used to identify a NetWitness Concentrator. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85876,7 +86060,7 @@ type: keyword
 
 --
 
-*`rsa.internal.device_class`*::
+*`microsoft.rsa.internal.device_class`*::
 +
 --
 This is the Classification of the Log Event Source under a predefined fixed set of Event Source Classifications. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85885,7 +86069,7 @@ type: keyword
 
 --
 
-*`rsa.internal.device_group`*::
+*`microsoft.rsa.internal.device_group`*::
 +
 --
 This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85894,7 +86078,7 @@ type: keyword
 
 --
 
-*`rsa.internal.device_host`*::
+*`microsoft.rsa.internal.device_host`*::
 +
 --
 This is the Hostname of the log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85903,7 +86087,7 @@ type: keyword
 
 --
 
-*`rsa.internal.device_ip`*::
+*`microsoft.rsa.internal.device_ip`*::
 +
 --
 This is the IPv4 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85912,7 +86096,7 @@ type: ip
 
 --
 
-*`rsa.internal.device_ipv6`*::
+*`microsoft.rsa.internal.device_ipv6`*::
 +
 --
 This is the IPv6 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85921,7 +86105,7 @@ type: ip
 
 --
 
-*`rsa.internal.device_type`*::
+*`microsoft.rsa.internal.device_type`*::
 +
 --
 This is the name of the log parser which parsed a given session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85930,7 +86114,7 @@ type: keyword
 
 --
 
-*`rsa.internal.device_type_id`*::
+*`microsoft.rsa.internal.device_type_id`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85939,7 +86123,7 @@ type: long
 
 --
 
-*`rsa.internal.did`*::
+*`microsoft.rsa.internal.did`*::
 +
 --
 This is the unique identifier used to identify a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85948,7 +86132,7 @@ type: keyword
 
 --
 
-*`rsa.internal.entropy_req`*::
+*`microsoft.rsa.internal.entropy_req`*::
 +
 --
 This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration
@@ -85957,7 +86141,7 @@ type: long
 
 --
 
-*`rsa.internal.entropy_res`*::
+*`microsoft.rsa.internal.entropy_res`*::
 +
 --
 This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration
@@ -85966,7 +86150,7 @@ type: long
 
 --
 
-*`rsa.internal.event_name`*::
+*`microsoft.rsa.internal.event_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -85975,7 +86159,7 @@ type: keyword
 
 --
 
-*`rsa.internal.feed_category`*::
+*`microsoft.rsa.internal.feed_category`*::
 +
 --
 This is used to capture the category of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -85984,7 +86168,7 @@ type: keyword
 
 --
 
-*`rsa.internal.forward_ip`*::
+*`microsoft.rsa.internal.forward_ip`*::
 +
 --
 This key should be used to capture the IPV4 address of a relay system which forwarded the events from the original system to NetWitness.
@@ -85993,7 +86177,7 @@ type: ip
 
 --
 
-*`rsa.internal.forward_ipv6`*::
+*`microsoft.rsa.internal.forward_ipv6`*::
 +
 --
 This key is used to capture the IPV6 address of a relay system which forwarded the events from the original system to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86002,7 +86186,7 @@ type: ip
 
 --
 
-*`rsa.internal.header_id`*::
+*`microsoft.rsa.internal.header_id`*::
 +
 --
 This is the Header ID value that identifies the exact log parser header definition that parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86011,7 +86195,7 @@ type: keyword
 
 --
 
-*`rsa.internal.lc_cid`*::
+*`microsoft.rsa.internal.lc_cid`*::
 +
 --
 This is a unique Identifier of a Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86020,7 +86204,7 @@ type: keyword
 
 --
 
-*`rsa.internal.lc_ctime`*::
+*`microsoft.rsa.internal.lc_ctime`*::
 +
 --
 This is the time at which a log is collected in a NetWitness Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86029,7 +86213,7 @@ type: date
 
 --
 
-*`rsa.internal.mcb_req`*::
+*`microsoft.rsa.internal.mcb_req`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte request is simply which byte for each side (0 thru 255) was seen the most
@@ -86038,7 +86222,7 @@ type: long
 
 --
 
-*`rsa.internal.mcb_res`*::
+*`microsoft.rsa.internal.mcb_res`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte response is simply which byte for each side (0 thru 255) was seen the most
@@ -86047,7 +86231,7 @@ type: long
 
 --
 
-*`rsa.internal.mcbc_req`*::
+*`microsoft.rsa.internal.mcbc_req`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams
@@ -86056,7 +86240,7 @@ type: long
 
 --
 
-*`rsa.internal.mcbc_res`*::
+*`microsoft.rsa.internal.mcbc_res`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams
@@ -86065,7 +86249,7 @@ type: long
 
 --
 
-*`rsa.internal.medium`*::
+*`microsoft.rsa.internal.medium`*::
 +
 --
 This key is used to identify if it’s a log/packet session or Layer 2 Encapsulation Type. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness. 32 = log, 33 = correlation session, &lt; 32 is packet session
@@ -86074,7 +86258,7 @@ type: long
 
 --
 
-*`rsa.internal.node_name`*::
+*`microsoft.rsa.internal.node_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -86083,7 +86267,7 @@ type: keyword
 
 --
 
-*`rsa.internal.nwe_callback_id`*::
+*`microsoft.rsa.internal.nwe_callback_id`*::
 +
 --
 This key denotes that event is endpoint related
@@ -86092,7 +86276,7 @@ type: keyword
 
 --
 
-*`rsa.internal.parse_error`*::
+*`microsoft.rsa.internal.parse_error`*::
 +
 --
 This is a special key that stores any Meta key validation error found while parsing a log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86101,7 +86285,7 @@ type: keyword
 
 --
 
-*`rsa.internal.payload_req`*::
+*`microsoft.rsa.internal.payload_req`*::
 +
 --
 This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep
@@ -86110,7 +86294,7 @@ type: long
 
 --
 
-*`rsa.internal.payload_res`*::
+*`microsoft.rsa.internal.payload_res`*::
 +
 --
 This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep
@@ -86119,7 +86303,7 @@ type: long
 
 --
 
-*`rsa.internal.process_vid_dst`*::
+*`microsoft.rsa.internal.process_vid_dst`*::
 +
 --
 Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the target process.
@@ -86128,7 +86312,7 @@ type: keyword
 
 --
 
-*`rsa.internal.process_vid_src`*::
+*`microsoft.rsa.internal.process_vid_src`*::
 +
 --
 Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the source process.
@@ -86137,7 +86321,7 @@ type: keyword
 
 --
 
-*`rsa.internal.rid`*::
+*`microsoft.rsa.internal.rid`*::
 +
 --
 This is a special ID of the Remote Session created by NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86146,7 +86330,7 @@ type: long
 
 --
 
-*`rsa.internal.session_split`*::
+*`microsoft.rsa.internal.session_split`*::
 +
 --
 This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86155,7 +86339,7 @@ type: keyword
 
 --
 
-*`rsa.internal.site`*::
+*`microsoft.rsa.internal.site`*::
 +
 --
 Deprecated key defined only in table map.
@@ -86164,7 +86348,7 @@ type: keyword
 
 --
 
-*`rsa.internal.size`*::
+*`microsoft.rsa.internal.size`*::
 +
 --
 This is the size of the session as seen by the NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86173,7 +86357,7 @@ type: long
 
 --
 
-*`rsa.internal.sourcefile`*::
+*`microsoft.rsa.internal.sourcefile`*::
 +
 --
 This is the name of the log file or PCAPs that can be imported into NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -86182,7 +86366,7 @@ type: keyword
 
 --
 
-*`rsa.internal.ubc_req`*::
+*`microsoft.rsa.internal.ubc_req`*::
 +
 --
 This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once
@@ -86191,7 +86375,7 @@ type: long
 
 --
 
-*`rsa.internal.ubc_res`*::
+*`microsoft.rsa.internal.ubc_res`*::
 +
 --
 This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once
@@ -86200,7 +86384,7 @@ type: long
 
 --
 
-*`rsa.internal.word`*::
+*`microsoft.rsa.internal.word`*::
 +
 --
 This is used by the Word Parsing technology to capture the first 5 character of every word in an unparsed log
@@ -86210,7 +86394,7 @@ type: keyword
 --
 
 
-*`rsa.time.event_time`*::
+*`microsoft.rsa.time.event_time`*::
 +
 --
 This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form
@@ -86219,7 +86403,7 @@ type: date
 
 --
 
-*`rsa.time.duration_time`*::
+*`microsoft.rsa.time.duration_time`*::
 +
 --
 This key is used to capture the normalized duration/lifetime in seconds.
@@ -86228,7 +86412,7 @@ type: double
 
 --
 
-*`rsa.time.event_time_str`*::
+*`microsoft.rsa.time.event_time_str`*::
 +
 --
 This key is used to capture the incomplete time mentioned in a session as a string
@@ -86237,7 +86421,7 @@ type: keyword
 
 --
 
-*`rsa.time.starttime`*::
+*`microsoft.rsa.time.starttime`*::
 +
 --
 This key is used to capture the Start time mentioned in a session in a standard form
@@ -86246,21 +86430,21 @@ type: date
 
 --
 
-*`rsa.time.month`*::
+*`microsoft.rsa.time.month`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.day`*::
+*`microsoft.rsa.time.day`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.endtime`*::
+*`microsoft.rsa.time.endtime`*::
 +
 --
 This key is used to capture the End time mentioned in a session in a standard form
@@ -86269,7 +86453,7 @@ type: date
 
 --
 
-*`rsa.time.timezone`*::
+*`microsoft.rsa.time.timezone`*::
 +
 --
 This key is used to capture the timezone of the Event Time
@@ -86278,7 +86462,7 @@ type: keyword
 
 --
 
-*`rsa.time.duration_str`*::
+*`microsoft.rsa.time.duration_str`*::
 +
 --
 A text string version of the duration
@@ -86287,21 +86471,21 @@ type: keyword
 
 --
 
-*`rsa.time.date`*::
+*`microsoft.rsa.time.date`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.year`*::
+*`microsoft.rsa.time.year`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.recorded_time`*::
+*`microsoft.rsa.time.recorded_time`*::
 +
 --
 The event time as recorded by the system the event is collected from. The usage scenario is a multi-tier application where the management layer of the system records it's own timestamp at the time of collection from its child nodes. Must be in timestamp format.
@@ -86310,14 +86494,14 @@ type: date
 
 --
 
-*`rsa.time.datetime`*::
+*`microsoft.rsa.time.datetime`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.effective_time`*::
+*`microsoft.rsa.time.effective_time`*::
 +
 --
 This key is the effective time referenced by an individual event in a Standard Timestamp format
@@ -86326,7 +86510,7 @@ type: date
 
 --
 
-*`rsa.time.expire_time`*::
+*`microsoft.rsa.time.expire_time`*::
 +
 --
 This key is the timestamp that explicitly refers to an expiration.
@@ -86335,7 +86519,7 @@ type: date
 
 --
 
-*`rsa.time.process_time`*::
+*`microsoft.rsa.time.process_time`*::
 +
 --
 Deprecated, use duration.time
@@ -86344,28 +86528,28 @@ type: keyword
 
 --
 
-*`rsa.time.hour`*::
+*`microsoft.rsa.time.hour`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.min`*::
+*`microsoft.rsa.time.min`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.timestamp`*::
+*`microsoft.rsa.time.timestamp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.event_queue_time`*::
+*`microsoft.rsa.time.event_queue_time`*::
 +
 --
 This key is the Time that the event was queued.
@@ -86374,77 +86558,77 @@ type: date
 
 --
 
-*`rsa.time.p_time1`*::
+*`microsoft.rsa.time.p_time1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.tzone`*::
+*`microsoft.rsa.time.tzone`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.eventtime`*::
+*`microsoft.rsa.time.eventtime`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.gmtdate`*::
+*`microsoft.rsa.time.gmtdate`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.gmttime`*::
+*`microsoft.rsa.time.gmttime`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.p_date`*::
+*`microsoft.rsa.time.p_date`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.p_month`*::
+*`microsoft.rsa.time.p_month`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.p_time`*::
+*`microsoft.rsa.time.p_time`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.p_time2`*::
+*`microsoft.rsa.time.p_time2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.p_year`*::
+*`microsoft.rsa.time.p_year`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.time.expire_time_str`*::
+*`microsoft.rsa.time.expire_time_str`*::
 +
 --
 This key is used to capture incomplete timestamp that explicitly refers to an expiration.
@@ -86453,7 +86637,7 @@ type: keyword
 
 --
 
-*`rsa.time.stamp`*::
+*`microsoft.rsa.time.stamp`*::
 +
 --
 Deprecated key defined only in table map.
@@ -86463,14 +86647,14 @@ type: date
 --
 
 
-*`rsa.misc.action`*::
+*`microsoft.rsa.misc.action`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.result`*::
+*`microsoft.rsa.misc.result`*::
 +
 --
 This key is used to capture the outcome/result string value of an action in a session.
@@ -86479,7 +86663,7 @@ type: keyword
 
 --
 
-*`rsa.misc.severity`*::
+*`microsoft.rsa.misc.severity`*::
 +
 --
 This key is used to capture the severity given the session
@@ -86488,7 +86672,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_type`*::
+*`microsoft.rsa.misc.event_type`*::
 +
 --
 This key captures the event category type as specified by the event source.
@@ -86497,7 +86681,7 @@ type: keyword
 
 --
 
-*`rsa.misc.reference_id`*::
+*`microsoft.rsa.misc.reference_id`*::
 +
 --
 This key is used to capture an event id from the session directly
@@ -86506,7 +86690,7 @@ type: keyword
 
 --
 
-*`rsa.misc.version`*::
+*`microsoft.rsa.misc.version`*::
 +
 --
 This key captures Version of the application or OS which is generating the event.
@@ -86515,7 +86699,7 @@ type: keyword
 
 --
 
-*`rsa.misc.disposition`*::
+*`microsoft.rsa.misc.disposition`*::
 +
 --
 This key captures the The end state of an action.
@@ -86524,7 +86708,7 @@ type: keyword
 
 --
 
-*`rsa.misc.result_code`*::
+*`microsoft.rsa.misc.result_code`*::
 +
 --
 This key is used to capture the outcome/result numeric value of an action in a session
@@ -86533,7 +86717,7 @@ type: keyword
 
 --
 
-*`rsa.misc.category`*::
+*`microsoft.rsa.misc.category`*::
 +
 --
 This key is used to capture the category of an event given by the vendor in the session
@@ -86542,7 +86726,7 @@ type: keyword
 
 --
 
-*`rsa.misc.obj_name`*::
+*`microsoft.rsa.misc.obj_name`*::
 +
 --
 This is used to capture name of object
@@ -86551,7 +86735,7 @@ type: keyword
 
 --
 
-*`rsa.misc.obj_type`*::
+*`microsoft.rsa.misc.obj_type`*::
 +
 --
 This is used to capture type of object
@@ -86560,7 +86744,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_source`*::
+*`microsoft.rsa.misc.event_source`*::
 +
 --
 This key captures Source of the event that’s not a hostname
@@ -86569,7 +86753,7 @@ type: keyword
 
 --
 
-*`rsa.misc.log_session_id`*::
+*`microsoft.rsa.misc.log_session_id`*::
 +
 --
 This key is used to capture a sessionid from the session directly
@@ -86578,7 +86762,7 @@ type: keyword
 
 --
 
-*`rsa.misc.group`*::
+*`microsoft.rsa.misc.group`*::
 +
 --
 This key captures the Group Name value
@@ -86587,7 +86771,7 @@ type: keyword
 
 --
 
-*`rsa.misc.policy_name`*::
+*`microsoft.rsa.misc.policy_name`*::
 +
 --
 This key is used to capture the Policy Name only.
@@ -86596,7 +86780,7 @@ type: keyword
 
 --
 
-*`rsa.misc.rule_name`*::
+*`microsoft.rsa.misc.rule_name`*::
 +
 --
 This key captures the Rule Name
@@ -86605,7 +86789,7 @@ type: keyword
 
 --
 
-*`rsa.misc.context`*::
+*`microsoft.rsa.misc.context`*::
 +
 --
 This key captures Information which adds additional context to the event.
@@ -86614,7 +86798,7 @@ type: keyword
 
 --
 
-*`rsa.misc.change_new`*::
+*`microsoft.rsa.misc.change_new`*::
 +
 --
 This key is used to capture the new values of the attribute that’s changing in a session
@@ -86623,14 +86807,14 @@ type: keyword
 
 --
 
-*`rsa.misc.space`*::
+*`microsoft.rsa.misc.space`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.client`*::
+*`microsoft.rsa.misc.client`*::
 +
 --
 This key is used to capture only the name of the client application requesting resources of the server. See the user.agent meta key for capture of the specific user agent identifier or browser identification string.
@@ -86639,21 +86823,21 @@ type: keyword
 
 --
 
-*`rsa.misc.msgIdPart1`*::
+*`microsoft.rsa.misc.msgIdPart1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.msgIdPart2`*::
+*`microsoft.rsa.misc.msgIdPart2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.change_old`*::
+*`microsoft.rsa.misc.change_old`*::
 +
 --
 This key is used to capture the old value of the attribute that’s changing in a session
@@ -86662,7 +86846,7 @@ type: keyword
 
 --
 
-*`rsa.misc.operation_id`*::
+*`microsoft.rsa.misc.operation_id`*::
 +
 --
 An alert number or operation number. The values should be unique and non-repeating.
@@ -86671,7 +86855,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_state`*::
+*`microsoft.rsa.misc.event_state`*::
 +
 --
 This key captures the current state of the object/item referenced within the event. Describing an on-going event.
@@ -86680,7 +86864,7 @@ type: keyword
 
 --
 
-*`rsa.misc.group_object`*::
+*`microsoft.rsa.misc.group_object`*::
 +
 --
 This key captures a collection/grouping of entities. Specific usage
@@ -86689,7 +86873,7 @@ type: keyword
 
 --
 
-*`rsa.misc.node`*::
+*`microsoft.rsa.misc.node`*::
 +
 --
 Common use case is the node name within a cluster. The cluster name is reflected by the host name.
@@ -86698,7 +86882,7 @@ type: keyword
 
 --
 
-*`rsa.misc.rule`*::
+*`microsoft.rsa.misc.rule`*::
 +
 --
 This key captures the Rule number
@@ -86707,7 +86891,7 @@ type: keyword
 
 --
 
-*`rsa.misc.device_name`*::
+*`microsoft.rsa.misc.device_name`*::
 +
 --
 This is used to capture name of the Device associated with the node Like: a physical disk, printer, etc
@@ -86716,7 +86900,7 @@ type: keyword
 
 --
 
-*`rsa.misc.param`*::
+*`microsoft.rsa.misc.param`*::
 +
 --
 This key is the parameters passed as part of a command or application, etc.
@@ -86725,7 +86909,7 @@ type: keyword
 
 --
 
-*`rsa.misc.change_attrib`*::
+*`microsoft.rsa.misc.change_attrib`*::
 +
 --
 This key is used to capture the name of the attribute that’s changing in a session
@@ -86734,7 +86918,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_computer`*::
+*`microsoft.rsa.misc.event_computer`*::
 +
 --
 This key is a windows only concept, where this key is used to capture fully qualified domain name in a windows log.
@@ -86743,7 +86927,7 @@ type: keyword
 
 --
 
-*`rsa.misc.reference_id1`*::
+*`microsoft.rsa.misc.reference_id1`*::
 +
 --
 This key is for Linked ID to be used as an addition to "reference.id"
@@ -86752,7 +86936,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_log`*::
+*`microsoft.rsa.misc.event_log`*::
 +
 --
 This key captures the Name of the event log
@@ -86761,7 +86945,7 @@ type: keyword
 
 --
 
-*`rsa.misc.OS`*::
+*`microsoft.rsa.misc.OS`*::
 +
 --
 This key captures the Name of the Operating System
@@ -86770,7 +86954,7 @@ type: keyword
 
 --
 
-*`rsa.misc.terminal`*::
+*`microsoft.rsa.misc.terminal`*::
 +
 --
 This key captures the Terminal Names only
@@ -86779,14 +86963,14 @@ type: keyword
 
 --
 
-*`rsa.misc.msgIdPart3`*::
+*`microsoft.rsa.misc.msgIdPart3`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.filter`*::
+*`microsoft.rsa.misc.filter`*::
 +
 --
 This key captures Filter used to reduce result set
@@ -86795,7 +86979,7 @@ type: keyword
 
 --
 
-*`rsa.misc.serial_number`*::
+*`microsoft.rsa.misc.serial_number`*::
 +
 --
 This key is the Serial number associated with a physical asset.
@@ -86804,7 +86988,7 @@ type: keyword
 
 --
 
-*`rsa.misc.checksum`*::
+*`microsoft.rsa.misc.checksum`*::
 +
 --
 This key is used to capture the checksum or hash of the entity such as a file or process. Checksum should be used over checksum.src or checksum.dst when it is unclear whether the entity is a source or target of an action.
@@ -86813,7 +86997,7 @@ type: keyword
 
 --
 
-*`rsa.misc.event_user`*::
+*`microsoft.rsa.misc.event_user`*::
 +
 --
 This key is a windows only concept, where this key is used to capture combination of domain name and username in a windows log.
@@ -86822,7 +87006,7 @@ type: keyword
 
 --
 
-*`rsa.misc.virusname`*::
+*`microsoft.rsa.misc.virusname`*::
 +
 --
 This key captures the name of the virus
@@ -86831,7 +87015,7 @@ type: keyword
 
 --
 
-*`rsa.misc.content_type`*::
+*`microsoft.rsa.misc.content_type`*::
 +
 --
 This key is used to capture Content Type only.
@@ -86840,7 +87024,7 @@ type: keyword
 
 --
 
-*`rsa.misc.group_id`*::
+*`microsoft.rsa.misc.group_id`*::
 +
 --
 This key captures Group ID Number (related to the group name)
@@ -86849,7 +87033,7 @@ type: keyword
 
 --
 
-*`rsa.misc.policy_id`*::
+*`microsoft.rsa.misc.policy_id`*::
 +
 --
 This key is used to capture the Policy ID only, this should be a numeric value, use policy.name otherwise
@@ -86858,7 +87042,7 @@ type: keyword
 
 --
 
-*`rsa.misc.vsys`*::
+*`microsoft.rsa.misc.vsys`*::
 +
 --
 This key captures Virtual System Name
@@ -86867,7 +87051,7 @@ type: keyword
 
 --
 
-*`rsa.misc.connection_id`*::
+*`microsoft.rsa.misc.connection_id`*::
 +
 --
 This key captures the Connection ID
@@ -86876,7 +87060,7 @@ type: keyword
 
 --
 
-*`rsa.misc.reference_id2`*::
+*`microsoft.rsa.misc.reference_id2`*::
 +
 --
 This key is for the 2nd Linked ID. Can be either linked to "reference.id" or "reference.id1" value but should not be used unless the other two variables are in play.
@@ -86885,7 +87069,7 @@ type: keyword
 
 --
 
-*`rsa.misc.sensor`*::
+*`microsoft.rsa.misc.sensor`*::
 +
 --
 This key captures Name of the sensor. Typically used in IDS/IPS based devices
@@ -86894,7 +87078,7 @@ type: keyword
 
 --
 
-*`rsa.misc.sig_id`*::
+*`microsoft.rsa.misc.sig_id`*::
 +
 --
 This key captures IDS/IPS Int Signature ID
@@ -86903,7 +87087,7 @@ type: long
 
 --
 
-*`rsa.misc.port_name`*::
+*`microsoft.rsa.misc.port_name`*::
 +
 --
 This key is used for Physical or logical port connection but does NOT include a network port. (Example: Printer port name).
@@ -86912,7 +87096,7 @@ type: keyword
 
 --
 
-*`rsa.misc.rule_group`*::
+*`microsoft.rsa.misc.rule_group`*::
 +
 --
 This key captures the Rule group name
@@ -86921,7 +87105,7 @@ type: keyword
 
 --
 
-*`rsa.misc.risk_num`*::
+*`microsoft.rsa.misc.risk_num`*::
 +
 --
 This key captures a Numeric Risk value
@@ -86930,7 +87114,7 @@ type: double
 
 --
 
-*`rsa.misc.trigger_val`*::
+*`microsoft.rsa.misc.trigger_val`*::
 +
 --
 This key captures the Value of the trigger or threshold condition.
@@ -86939,7 +87123,7 @@ type: keyword
 
 --
 
-*`rsa.misc.log_session_id1`*::
+*`microsoft.rsa.misc.log_session_id1`*::
 +
 --
 This key is used to capture a Linked (Related) Session ID from the session directly
@@ -86948,7 +87132,7 @@ type: keyword
 
 --
 
-*`rsa.misc.comp_version`*::
+*`microsoft.rsa.misc.comp_version`*::
 +
 --
 This key captures the Version level of a sub-component of a product.
@@ -86957,7 +87141,7 @@ type: keyword
 
 --
 
-*`rsa.misc.content_version`*::
+*`microsoft.rsa.misc.content_version`*::
 +
 --
 This key captures Version level of a signature or database content.
@@ -86966,7 +87150,7 @@ type: keyword
 
 --
 
-*`rsa.misc.hardware_id`*::
+*`microsoft.rsa.misc.hardware_id`*::
 +
 --
 This key is used to capture unique identifier for a device or system (NOT a Mac address)
@@ -86975,7 +87159,7 @@ type: keyword
 
 --
 
-*`rsa.misc.risk`*::
+*`microsoft.rsa.misc.risk`*::
 +
 --
 This key captures the non-numeric risk value
@@ -86984,28 +87168,28 @@ type: keyword
 
 --
 
-*`rsa.misc.event_id`*::
+*`microsoft.rsa.misc.event_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.reason`*::
+*`microsoft.rsa.misc.reason`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.status`*::
+*`microsoft.rsa.misc.status`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.mail_id`*::
+*`microsoft.rsa.misc.mail_id`*::
 +
 --
 This key is used to capture the mailbox id/name
@@ -87014,7 +87198,7 @@ type: keyword
 
 --
 
-*`rsa.misc.rule_uid`*::
+*`microsoft.rsa.misc.rule_uid`*::
 +
 --
 This key is the Unique Identifier for a rule.
@@ -87023,7 +87207,7 @@ type: keyword
 
 --
 
-*`rsa.misc.trigger_desc`*::
+*`microsoft.rsa.misc.trigger_desc`*::
 +
 --
 This key captures the Description of the trigger or threshold condition.
@@ -87032,35 +87216,35 @@ type: keyword
 
 --
 
-*`rsa.misc.inout`*::
+*`microsoft.rsa.misc.inout`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_msgid`*::
+*`microsoft.rsa.misc.p_msgid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.data_type`*::
+*`microsoft.rsa.misc.data_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.msgIdPart4`*::
+*`microsoft.rsa.misc.msgIdPart4`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.error`*::
+*`microsoft.rsa.misc.error`*::
 +
 --
 This key captures All non successful Error codes or responses
@@ -87069,14 +87253,14 @@ type: keyword
 
 --
 
-*`rsa.misc.index`*::
+*`microsoft.rsa.misc.index`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.listnum`*::
+*`microsoft.rsa.misc.listnum`*::
 +
 --
 This key is used to capture listname or listnumber, primarily for collecting access-list
@@ -87085,14 +87269,14 @@ type: keyword
 
 --
 
-*`rsa.misc.ntype`*::
+*`microsoft.rsa.misc.ntype`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.observed_val`*::
+*`microsoft.rsa.misc.observed_val`*::
 +
 --
 This key captures the Value observed (from the perspective of the device generating the log).
@@ -87101,7 +87285,7 @@ type: keyword
 
 --
 
-*`rsa.misc.policy_value`*::
+*`microsoft.rsa.misc.policy_value`*::
 +
 --
 This key captures the contents of the policy. This contains details about the policy
@@ -87110,7 +87294,7 @@ type: keyword
 
 --
 
-*`rsa.misc.pool_name`*::
+*`microsoft.rsa.misc.pool_name`*::
 +
 --
 This key captures the name of a resource pool
@@ -87119,7 +87303,7 @@ type: keyword
 
 --
 
-*`rsa.misc.rule_template`*::
+*`microsoft.rsa.misc.rule_template`*::
 +
 --
 A default set of parameters which are overlayed onto a rule (or rulename) which efffectively constitutes a template
@@ -87128,35 +87312,35 @@ type: keyword
 
 --
 
-*`rsa.misc.count`*::
+*`microsoft.rsa.misc.count`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.number`*::
+*`microsoft.rsa.misc.number`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sigcat`*::
+*`microsoft.rsa.misc.sigcat`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.type`*::
+*`microsoft.rsa.misc.type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.comments`*::
+*`microsoft.rsa.misc.comments`*::
 +
 --
 Comment information provided in the log message
@@ -87165,7 +87349,7 @@ type: keyword
 
 --
 
-*`rsa.misc.doc_number`*::
+*`microsoft.rsa.misc.doc_number`*::
 +
 --
 This key captures File Identification number
@@ -87174,7 +87358,7 @@ type: long
 
 --
 
-*`rsa.misc.expected_val`*::
+*`microsoft.rsa.misc.expected_val`*::
 +
 --
 This key captures the Value expected (from the perspective of the device generating the log).
@@ -87183,7 +87367,7 @@ type: keyword
 
 --
 
-*`rsa.misc.job_num`*::
+*`microsoft.rsa.misc.job_num`*::
 +
 --
 This key captures the Job Number
@@ -87192,7 +87376,7 @@ type: keyword
 
 --
 
-*`rsa.misc.spi_dst`*::
+*`microsoft.rsa.misc.spi_dst`*::
 +
 --
 Destination SPI Index
@@ -87201,7 +87385,7 @@ type: keyword
 
 --
 
-*`rsa.misc.spi_src`*::
+*`microsoft.rsa.misc.spi_src`*::
 +
 --
 Source SPI Index
@@ -87210,14 +87394,14 @@ type: keyword
 
 --
 
-*`rsa.misc.code`*::
+*`microsoft.rsa.misc.code`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.agent_id`*::
+*`microsoft.rsa.misc.agent_id`*::
 +
 --
 This key is used to capture agent id
@@ -87226,7 +87410,7 @@ type: keyword
 
 --
 
-*`rsa.misc.message_body`*::
+*`microsoft.rsa.misc.message_body`*::
 +
 --
 This key captures the The contents of the message body.
@@ -87235,14 +87419,14 @@ type: keyword
 
 --
 
-*`rsa.misc.phone`*::
+*`microsoft.rsa.misc.phone`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sig_id_str`*::
+*`microsoft.rsa.misc.sig_id_str`*::
 +
 --
 This key captures a string object of the sigid variable.
@@ -87251,28 +87435,28 @@ type: keyword
 
 --
 
-*`rsa.misc.cmd`*::
+*`microsoft.rsa.misc.cmd`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.misc`*::
+*`microsoft.rsa.misc.misc`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.name`*::
+*`microsoft.rsa.misc.name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cpu`*::
+*`microsoft.rsa.misc.cpu`*::
 +
 --
 This key is the CPU time used in the execution of the event being recorded.
@@ -87281,7 +87465,7 @@ type: long
 
 --
 
-*`rsa.misc.event_desc`*::
+*`microsoft.rsa.misc.event_desc`*::
 +
 --
 This key is used to capture a description of an event available directly or inferred
@@ -87290,7 +87474,7 @@ type: keyword
 
 --
 
-*`rsa.misc.sig_id1`*::
+*`microsoft.rsa.misc.sig_id1`*::
 +
 --
 This key captures IDS/IPS Int Signature ID. This must be linked to the sig.id
@@ -87299,42 +87483,42 @@ type: long
 
 --
 
-*`rsa.misc.im_buddyid`*::
+*`microsoft.rsa.misc.im_buddyid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_client`*::
+*`microsoft.rsa.misc.im_client`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_userid`*::
+*`microsoft.rsa.misc.im_userid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.pid`*::
+*`microsoft.rsa.misc.pid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.priority`*::
+*`microsoft.rsa.misc.priority`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.context_subject`*::
+*`microsoft.rsa.misc.context_subject`*::
 +
 --
 This key is to be used in an audit context where the subject is the object being identified
@@ -87343,14 +87527,14 @@ type: keyword
 
 --
 
-*`rsa.misc.context_target`*::
+*`microsoft.rsa.misc.context_target`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cve`*::
+*`microsoft.rsa.misc.cve`*::
 +
 --
 This key captures CVE (Common Vulnerabilities and Exposures) - an identifier for known information security vulnerabilities.
@@ -87359,7 +87543,7 @@ type: keyword
 
 --
 
-*`rsa.misc.fcatnum`*::
+*`microsoft.rsa.misc.fcatnum`*::
 +
 --
 This key captures Filter Category Number. Legacy Usage
@@ -87368,7 +87552,7 @@ type: keyword
 
 --
 
-*`rsa.misc.library`*::
+*`microsoft.rsa.misc.library`*::
 +
 --
 This key is used to capture library information in mainframe devices
@@ -87377,7 +87561,7 @@ type: keyword
 
 --
 
-*`rsa.misc.parent_node`*::
+*`microsoft.rsa.misc.parent_node`*::
 +
 --
 This key captures the Parent Node Name. Must be related to node variable.
@@ -87386,7 +87570,7 @@ type: keyword
 
 --
 
-*`rsa.misc.risk_info`*::
+*`microsoft.rsa.misc.risk_info`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -87395,7 +87579,7 @@ type: keyword
 
 --
 
-*`rsa.misc.tcp_flags`*::
+*`microsoft.rsa.misc.tcp_flags`*::
 +
 --
 This key is captures the TCP flags set in any packet of session
@@ -87404,7 +87588,7 @@ type: long
 
 --
 
-*`rsa.misc.tos`*::
+*`microsoft.rsa.misc.tos`*::
 +
 --
 This key describes the type of service
@@ -87413,7 +87597,7 @@ type: long
 
 --
 
-*`rsa.misc.vm_target`*::
+*`microsoft.rsa.misc.vm_target`*::
 +
 --
 VMWare Target **VMWARE** only varaible.
@@ -87422,7 +87606,7 @@ type: keyword
 
 --
 
-*`rsa.misc.workspace`*::
+*`microsoft.rsa.misc.workspace`*::
 +
 --
 This key captures Workspace Description
@@ -87431,91 +87615,91 @@ type: keyword
 
 --
 
-*`rsa.misc.command`*::
+*`microsoft.rsa.misc.command`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.event_category`*::
+*`microsoft.rsa.misc.event_category`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.facilityname`*::
+*`microsoft.rsa.misc.facilityname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.forensic_info`*::
+*`microsoft.rsa.misc.forensic_info`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.jobname`*::
+*`microsoft.rsa.misc.jobname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.mode`*::
+*`microsoft.rsa.misc.mode`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.policy`*::
+*`microsoft.rsa.misc.policy`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.policy_waiver`*::
+*`microsoft.rsa.misc.policy_waiver`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.second`*::
+*`microsoft.rsa.misc.second`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.space1`*::
+*`microsoft.rsa.misc.space1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.subcategory`*::
+*`microsoft.rsa.misc.subcategory`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.tbdstr2`*::
+*`microsoft.rsa.misc.tbdstr2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.alert_id`*::
+*`microsoft.rsa.misc.alert_id`*::
 +
 --
 Deprecated, New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -87524,7 +87708,7 @@ type: keyword
 
 --
 
-*`rsa.misc.checksum_dst`*::
+*`microsoft.rsa.misc.checksum_dst`*::
 +
 --
 This key is used to capture the checksum or hash of the the target entity such as a process or file.
@@ -87533,7 +87717,7 @@ type: keyword
 
 --
 
-*`rsa.misc.checksum_src`*::
+*`microsoft.rsa.misc.checksum_src`*::
 +
 --
 This key is used to capture the checksum or hash of the source entity such as a file or process.
@@ -87542,7 +87726,7 @@ type: keyword
 
 --
 
-*`rsa.misc.fresult`*::
+*`microsoft.rsa.misc.fresult`*::
 +
 --
 This key captures the Filter Result
@@ -87551,7 +87735,7 @@ type: long
 
 --
 
-*`rsa.misc.payload_dst`*::
+*`microsoft.rsa.misc.payload_dst`*::
 +
 --
 This key is used to capture destination payload
@@ -87560,7 +87744,7 @@ type: keyword
 
 --
 
-*`rsa.misc.payload_src`*::
+*`microsoft.rsa.misc.payload_src`*::
 +
 --
 This key is used to capture source payload
@@ -87569,7 +87753,7 @@ type: keyword
 
 --
 
-*`rsa.misc.pool_id`*::
+*`microsoft.rsa.misc.pool_id`*::
 +
 --
 This key captures the identifier (typically numeric field) of a resource pool
@@ -87578,7 +87762,7 @@ type: keyword
 
 --
 
-*`rsa.misc.process_id_val`*::
+*`microsoft.rsa.misc.process_id_val`*::
 +
 --
 This key is a failure key for Process ID when it is not an integer value
@@ -87587,7 +87771,7 @@ type: keyword
 
 --
 
-*`rsa.misc.risk_num_comm`*::
+*`microsoft.rsa.misc.risk_num_comm`*::
 +
 --
 This key captures Risk Number Community
@@ -87596,7 +87780,7 @@ type: double
 
 --
 
-*`rsa.misc.risk_num_next`*::
+*`microsoft.rsa.misc.risk_num_next`*::
 +
 --
 This key captures Risk Number NextGen
@@ -87605,7 +87789,7 @@ type: double
 
 --
 
-*`rsa.misc.risk_num_sand`*::
+*`microsoft.rsa.misc.risk_num_sand`*::
 +
 --
 This key captures Risk Number SandBox
@@ -87614,7 +87798,7 @@ type: double
 
 --
 
-*`rsa.misc.risk_num_static`*::
+*`microsoft.rsa.misc.risk_num_static`*::
 +
 --
 This key captures Risk Number Static
@@ -87623,7 +87807,7 @@ type: double
 
 --
 
-*`rsa.misc.risk_suspicious`*::
+*`microsoft.rsa.misc.risk_suspicious`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -87632,7 +87816,7 @@ type: keyword
 
 --
 
-*`rsa.misc.risk_warning`*::
+*`microsoft.rsa.misc.risk_warning`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -87641,7 +87825,7 @@ type: keyword
 
 --
 
-*`rsa.misc.snmp_oid`*::
+*`microsoft.rsa.misc.snmp_oid`*::
 +
 --
 SNMP Object Identifier
@@ -87650,7 +87834,7 @@ type: keyword
 
 --
 
-*`rsa.misc.sql`*::
+*`microsoft.rsa.misc.sql`*::
 +
 --
 This key captures the SQL query
@@ -87659,7 +87843,7 @@ type: keyword
 
 --
 
-*`rsa.misc.vuln_ref`*::
+*`microsoft.rsa.misc.vuln_ref`*::
 +
 --
 This key captures the Vulnerability Reference details
@@ -87668,1547 +87852,1547 @@ type: keyword
 
 --
 
-*`rsa.misc.acl_id`*::
+*`microsoft.rsa.misc.acl_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.acl_op`*::
+*`microsoft.rsa.misc.acl_op`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.acl_pos`*::
+*`microsoft.rsa.misc.acl_pos`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.acl_table`*::
+*`microsoft.rsa.misc.acl_table`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.admin`*::
+*`microsoft.rsa.misc.admin`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.alarm_id`*::
+*`microsoft.rsa.misc.alarm_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.alarmname`*::
+*`microsoft.rsa.misc.alarmname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.app_id`*::
+*`microsoft.rsa.misc.app_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.audit`*::
+*`microsoft.rsa.misc.audit`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.audit_object`*::
+*`microsoft.rsa.misc.audit_object`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.auditdata`*::
+*`microsoft.rsa.misc.auditdata`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.benchmark`*::
+*`microsoft.rsa.misc.benchmark`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.bypass`*::
+*`microsoft.rsa.misc.bypass`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cache`*::
+*`microsoft.rsa.misc.cache`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cache_hit`*::
+*`microsoft.rsa.misc.cache_hit`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cefversion`*::
+*`microsoft.rsa.misc.cefversion`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cfg_attr`*::
+*`microsoft.rsa.misc.cfg_attr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cfg_obj`*::
+*`microsoft.rsa.misc.cfg_obj`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cfg_path`*::
+*`microsoft.rsa.misc.cfg_path`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.changes`*::
+*`microsoft.rsa.misc.changes`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.client_ip`*::
+*`microsoft.rsa.misc.client_ip`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.clustermembers`*::
+*`microsoft.rsa.misc.clustermembers`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_acttimeout`*::
+*`microsoft.rsa.misc.cn_acttimeout`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_asn_src`*::
+*`microsoft.rsa.misc.cn_asn_src`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_bgpv4nxthop`*::
+*`microsoft.rsa.misc.cn_bgpv4nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_ctr_dst_code`*::
+*`microsoft.rsa.misc.cn_ctr_dst_code`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_dst_tos`*::
+*`microsoft.rsa.misc.cn_dst_tos`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_dst_vlan`*::
+*`microsoft.rsa.misc.cn_dst_vlan`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_engine_id`*::
+*`microsoft.rsa.misc.cn_engine_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_engine_type`*::
+*`microsoft.rsa.misc.cn_engine_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_f_switch`*::
+*`microsoft.rsa.misc.cn_f_switch`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_flowsampid`*::
+*`microsoft.rsa.misc.cn_flowsampid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_flowsampintv`*::
+*`microsoft.rsa.misc.cn_flowsampintv`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_flowsampmode`*::
+*`microsoft.rsa.misc.cn_flowsampmode`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_inacttimeout`*::
+*`microsoft.rsa.misc.cn_inacttimeout`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_inpermbyts`*::
+*`microsoft.rsa.misc.cn_inpermbyts`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_inpermpckts`*::
+*`microsoft.rsa.misc.cn_inpermpckts`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_invalid`*::
+*`microsoft.rsa.misc.cn_invalid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_ip_proto_ver`*::
+*`microsoft.rsa.misc.cn_ip_proto_ver`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_ipv4_ident`*::
+*`microsoft.rsa.misc.cn_ipv4_ident`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_l_switch`*::
+*`microsoft.rsa.misc.cn_l_switch`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_log_did`*::
+*`microsoft.rsa.misc.cn_log_did`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_log_rid`*::
+*`microsoft.rsa.misc.cn_log_rid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_max_ttl`*::
+*`microsoft.rsa.misc.cn_max_ttl`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_maxpcktlen`*::
+*`microsoft.rsa.misc.cn_maxpcktlen`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_min_ttl`*::
+*`microsoft.rsa.misc.cn_min_ttl`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_minpcktlen`*::
+*`microsoft.rsa.misc.cn_minpcktlen`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_1`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_10`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_10`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_2`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_3`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_3`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_4`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_4`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_5`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_5`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_6`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_6`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_7`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_7`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_8`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_8`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mpls_lbl_9`*::
+*`microsoft.rsa.misc.cn_mpls_lbl_9`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mplstoplabel`*::
+*`microsoft.rsa.misc.cn_mplstoplabel`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mplstoplabip`*::
+*`microsoft.rsa.misc.cn_mplstoplabip`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mul_dst_byt`*::
+*`microsoft.rsa.misc.cn_mul_dst_byt`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_mul_dst_pks`*::
+*`microsoft.rsa.misc.cn_mul_dst_pks`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_muligmptype`*::
+*`microsoft.rsa.misc.cn_muligmptype`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_sampalgo`*::
+*`microsoft.rsa.misc.cn_sampalgo`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_sampint`*::
+*`microsoft.rsa.misc.cn_sampint`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_seqctr`*::
+*`microsoft.rsa.misc.cn_seqctr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_spackets`*::
+*`microsoft.rsa.misc.cn_spackets`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_src_tos`*::
+*`microsoft.rsa.misc.cn_src_tos`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_src_vlan`*::
+*`microsoft.rsa.misc.cn_src_vlan`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_sysuptime`*::
+*`microsoft.rsa.misc.cn_sysuptime`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_template_id`*::
+*`microsoft.rsa.misc.cn_template_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_totbytsexp`*::
+*`microsoft.rsa.misc.cn_totbytsexp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_totflowexp`*::
+*`microsoft.rsa.misc.cn_totflowexp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_totpcktsexp`*::
+*`microsoft.rsa.misc.cn_totpcktsexp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_unixnanosecs`*::
+*`microsoft.rsa.misc.cn_unixnanosecs`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_v6flowlabel`*::
+*`microsoft.rsa.misc.cn_v6flowlabel`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cn_v6optheaders`*::
+*`microsoft.rsa.misc.cn_v6optheaders`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.comp_class`*::
+*`microsoft.rsa.misc.comp_class`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.comp_name`*::
+*`microsoft.rsa.misc.comp_name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.comp_rbytes`*::
+*`microsoft.rsa.misc.comp_rbytes`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.comp_sbytes`*::
+*`microsoft.rsa.misc.comp_sbytes`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cpu_data`*::
+*`microsoft.rsa.misc.cpu_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.criticality`*::
+*`microsoft.rsa.misc.criticality`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_agency_dst`*::
+*`microsoft.rsa.misc.cs_agency_dst`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_analyzedby`*::
+*`microsoft.rsa.misc.cs_analyzedby`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_av_other`*::
+*`microsoft.rsa.misc.cs_av_other`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_av_primary`*::
+*`microsoft.rsa.misc.cs_av_primary`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_av_secondary`*::
+*`microsoft.rsa.misc.cs_av_secondary`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_bgpv6nxthop`*::
+*`microsoft.rsa.misc.cs_bgpv6nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_bit9status`*::
+*`microsoft.rsa.misc.cs_bit9status`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_context`*::
+*`microsoft.rsa.misc.cs_context`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_control`*::
+*`microsoft.rsa.misc.cs_control`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_data`*::
+*`microsoft.rsa.misc.cs_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_datecret`*::
+*`microsoft.rsa.misc.cs_datecret`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_dst_tld`*::
+*`microsoft.rsa.misc.cs_dst_tld`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_eth_dst_ven`*::
+*`microsoft.rsa.misc.cs_eth_dst_ven`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_eth_src_ven`*::
+*`microsoft.rsa.misc.cs_eth_src_ven`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_event_uuid`*::
+*`microsoft.rsa.misc.cs_event_uuid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_filetype`*::
+*`microsoft.rsa.misc.cs_filetype`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_fld`*::
+*`microsoft.rsa.misc.cs_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_if_desc`*::
+*`microsoft.rsa.misc.cs_if_desc`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_if_name`*::
+*`microsoft.rsa.misc.cs_if_name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_ip_next_hop`*::
+*`microsoft.rsa.misc.cs_ip_next_hop`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_ipv4dstpre`*::
+*`microsoft.rsa.misc.cs_ipv4dstpre`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_ipv4srcpre`*::
+*`microsoft.rsa.misc.cs_ipv4srcpre`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_lifetime`*::
+*`microsoft.rsa.misc.cs_lifetime`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_log_medium`*::
+*`microsoft.rsa.misc.cs_log_medium`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_loginname`*::
+*`microsoft.rsa.misc.cs_loginname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_modulescore`*::
+*`microsoft.rsa.misc.cs_modulescore`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_modulesign`*::
+*`microsoft.rsa.misc.cs_modulesign`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_opswatresult`*::
+*`microsoft.rsa.misc.cs_opswatresult`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_payload`*::
+*`microsoft.rsa.misc.cs_payload`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_registrant`*::
+*`microsoft.rsa.misc.cs_registrant`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_registrar`*::
+*`microsoft.rsa.misc.cs_registrar`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_represult`*::
+*`microsoft.rsa.misc.cs_represult`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_rpayload`*::
+*`microsoft.rsa.misc.cs_rpayload`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_sampler_name`*::
+*`microsoft.rsa.misc.cs_sampler_name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_sourcemodule`*::
+*`microsoft.rsa.misc.cs_sourcemodule`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_streams`*::
+*`microsoft.rsa.misc.cs_streams`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_targetmodule`*::
+*`microsoft.rsa.misc.cs_targetmodule`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_v6nxthop`*::
+*`microsoft.rsa.misc.cs_v6nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_whois_server`*::
+*`microsoft.rsa.misc.cs_whois_server`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.cs_yararesult`*::
+*`microsoft.rsa.misc.cs_yararesult`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.description`*::
+*`microsoft.rsa.misc.description`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.devvendor`*::
+*`microsoft.rsa.misc.devvendor`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.distance`*::
+*`microsoft.rsa.misc.distance`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.dstburb`*::
+*`microsoft.rsa.misc.dstburb`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.edomain`*::
+*`microsoft.rsa.misc.edomain`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.edomaub`*::
+*`microsoft.rsa.misc.edomaub`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.euid`*::
+*`microsoft.rsa.misc.euid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.facility`*::
+*`microsoft.rsa.misc.facility`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.finterface`*::
+*`microsoft.rsa.misc.finterface`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.flags`*::
+*`microsoft.rsa.misc.flags`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.gaddr`*::
+*`microsoft.rsa.misc.gaddr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.id3`*::
+*`microsoft.rsa.misc.id3`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_buddyname`*::
+*`microsoft.rsa.misc.im_buddyname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_croomid`*::
+*`microsoft.rsa.misc.im_croomid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_croomtype`*::
+*`microsoft.rsa.misc.im_croomtype`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_members`*::
+*`microsoft.rsa.misc.im_members`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.im_username`*::
+*`microsoft.rsa.misc.im_username`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.ipkt`*::
+*`microsoft.rsa.misc.ipkt`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.ipscat`*::
+*`microsoft.rsa.misc.ipscat`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.ipspri`*::
+*`microsoft.rsa.misc.ipspri`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.latitude`*::
+*`microsoft.rsa.misc.latitude`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.linenum`*::
+*`microsoft.rsa.misc.linenum`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.list_name`*::
+*`microsoft.rsa.misc.list_name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.load_data`*::
+*`microsoft.rsa.misc.load_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.location_floor`*::
+*`microsoft.rsa.misc.location_floor`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.location_mark`*::
+*`microsoft.rsa.misc.location_mark`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.log_id`*::
+*`microsoft.rsa.misc.log_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.log_type`*::
+*`microsoft.rsa.misc.log_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.logid`*::
+*`microsoft.rsa.misc.logid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.logip`*::
+*`microsoft.rsa.misc.logip`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.logname`*::
+*`microsoft.rsa.misc.logname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.longitude`*::
+*`microsoft.rsa.misc.longitude`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.lport`*::
+*`microsoft.rsa.misc.lport`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.mbug_data`*::
+*`microsoft.rsa.misc.mbug_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.misc_name`*::
+*`microsoft.rsa.misc.misc_name`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.msg_type`*::
+*`microsoft.rsa.misc.msg_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.msgid`*::
+*`microsoft.rsa.misc.msgid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.netsessid`*::
+*`microsoft.rsa.misc.netsessid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.num`*::
+*`microsoft.rsa.misc.num`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.number1`*::
+*`microsoft.rsa.misc.number1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.number2`*::
+*`microsoft.rsa.misc.number2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.nwwn`*::
+*`microsoft.rsa.misc.nwwn`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.object`*::
+*`microsoft.rsa.misc.object`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.operation`*::
+*`microsoft.rsa.misc.operation`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.opkt`*::
+*`microsoft.rsa.misc.opkt`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.orig_from`*::
+*`microsoft.rsa.misc.orig_from`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.owner_id`*::
+*`microsoft.rsa.misc.owner_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_action`*::
+*`microsoft.rsa.misc.p_action`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_filter`*::
+*`microsoft.rsa.misc.p_filter`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_group_object`*::
+*`microsoft.rsa.misc.p_group_object`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_id`*::
+*`microsoft.rsa.misc.p_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_msgid1`*::
+*`microsoft.rsa.misc.p_msgid1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_msgid2`*::
+*`microsoft.rsa.misc.p_msgid2`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.p_result1`*::
+*`microsoft.rsa.misc.p_result1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.password_chg`*::
+*`microsoft.rsa.misc.password_chg`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.password_expire`*::
+*`microsoft.rsa.misc.password_expire`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.permgranted`*::
+*`microsoft.rsa.misc.permgranted`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.permwanted`*::
+*`microsoft.rsa.misc.permwanted`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.pgid`*::
+*`microsoft.rsa.misc.pgid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.policyUUID`*::
+*`microsoft.rsa.misc.policyUUID`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.prog_asp_num`*::
+*`microsoft.rsa.misc.prog_asp_num`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.program`*::
+*`microsoft.rsa.misc.program`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.real_data`*::
+*`microsoft.rsa.misc.real_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.rec_asp_device`*::
+*`microsoft.rsa.misc.rec_asp_device`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.rec_asp_num`*::
+*`microsoft.rsa.misc.rec_asp_num`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.rec_library`*::
+*`microsoft.rsa.misc.rec_library`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.recordnum`*::
+*`microsoft.rsa.misc.recordnum`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.ruid`*::
+*`microsoft.rsa.misc.ruid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sburb`*::
+*`microsoft.rsa.misc.sburb`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sdomain_fld`*::
+*`microsoft.rsa.misc.sdomain_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sec`*::
+*`microsoft.rsa.misc.sec`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sensorname`*::
+*`microsoft.rsa.misc.sensorname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.seqnum`*::
+*`microsoft.rsa.misc.seqnum`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.session`*::
+*`microsoft.rsa.misc.session`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sessiontype`*::
+*`microsoft.rsa.misc.sessiontype`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.sigUUID`*::
+*`microsoft.rsa.misc.sigUUID`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.spi`*::
+*`microsoft.rsa.misc.spi`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.srcburb`*::
+*`microsoft.rsa.misc.srcburb`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.srcdom`*::
+*`microsoft.rsa.misc.srcdom`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.srcservice`*::
+*`microsoft.rsa.misc.srcservice`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.state`*::
+*`microsoft.rsa.misc.state`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.status1`*::
+*`microsoft.rsa.misc.status1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.svcno`*::
+*`microsoft.rsa.misc.svcno`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.system`*::
+*`microsoft.rsa.misc.system`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.tbdstr1`*::
+*`microsoft.rsa.misc.tbdstr1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.tgtdom`*::
+*`microsoft.rsa.misc.tgtdom`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.tgtdomain`*::
+*`microsoft.rsa.misc.tgtdomain`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.threshold`*::
+*`microsoft.rsa.misc.threshold`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.type1`*::
+*`microsoft.rsa.misc.type1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.udb_class`*::
+*`microsoft.rsa.misc.udb_class`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.url_fld`*::
+*`microsoft.rsa.misc.url_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.user_div`*::
+*`microsoft.rsa.misc.user_div`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.userid`*::
+*`microsoft.rsa.misc.userid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.username_fld`*::
+*`microsoft.rsa.misc.username_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.utcstamp`*::
+*`microsoft.rsa.misc.utcstamp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.v_instafname`*::
+*`microsoft.rsa.misc.v_instafname`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.virt_data`*::
+*`microsoft.rsa.misc.virt_data`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.vpnid`*::
+*`microsoft.rsa.misc.vpnid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.misc.autorun_type`*::
+*`microsoft.rsa.misc.autorun_type`*::
 +
 --
 This is used to capture Auto Run type
@@ -89217,7 +89401,7 @@ type: keyword
 
 --
 
-*`rsa.misc.cc_number`*::
+*`microsoft.rsa.misc.cc_number`*::
 +
 --
 Valid Credit Card Numbers only
@@ -89226,7 +89410,7 @@ type: long
 
 --
 
-*`rsa.misc.content`*::
+*`microsoft.rsa.misc.content`*::
 +
 --
 This key captures the content type from protocol headers
@@ -89235,7 +89419,7 @@ type: keyword
 
 --
 
-*`rsa.misc.ein_number`*::
+*`microsoft.rsa.misc.ein_number`*::
 +
 --
 Employee Identification Numbers only
@@ -89244,7 +89428,7 @@ type: long
 
 --
 
-*`rsa.misc.found`*::
+*`microsoft.rsa.misc.found`*::
 +
 --
 This is used to capture the results of regex match
@@ -89253,7 +89437,7 @@ type: keyword
 
 --
 
-*`rsa.misc.language`*::
+*`microsoft.rsa.misc.language`*::
 +
 --
 This is used to capture list of languages the client support and what it prefers
@@ -89262,7 +89446,7 @@ type: keyword
 
 --
 
-*`rsa.misc.lifetime`*::
+*`microsoft.rsa.misc.lifetime`*::
 +
 --
 This key is used to capture the session lifetime in seconds.
@@ -89271,7 +89455,7 @@ type: long
 
 --
 
-*`rsa.misc.link`*::
+*`microsoft.rsa.misc.link`*::
 +
 --
 This key is used to link the sessions together. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -89280,7 +89464,7 @@ type: keyword
 
 --
 
-*`rsa.misc.match`*::
+*`microsoft.rsa.misc.match`*::
 +
 --
 This key is for regex match name from search.ini
@@ -89289,7 +89473,7 @@ type: keyword
 
 --
 
-*`rsa.misc.param_dst`*::
+*`microsoft.rsa.misc.param_dst`*::
 +
 --
 This key captures the command line/launch argument of the target process or file
@@ -89298,7 +89482,7 @@ type: keyword
 
 --
 
-*`rsa.misc.param_src`*::
+*`microsoft.rsa.misc.param_src`*::
 +
 --
 This key captures source parameter
@@ -89307,7 +89491,7 @@ type: keyword
 
 --
 
-*`rsa.misc.search_text`*::
+*`microsoft.rsa.misc.search_text`*::
 +
 --
 This key captures the Search Text used
@@ -89316,7 +89500,7 @@ type: keyword
 
 --
 
-*`rsa.misc.sig_name`*::
+*`microsoft.rsa.misc.sig_name`*::
 +
 --
 This key is used to capture the Signature Name only.
@@ -89325,7 +89509,7 @@ type: keyword
 
 --
 
-*`rsa.misc.snmp_value`*::
+*`microsoft.rsa.misc.snmp_value`*::
 +
 --
 SNMP set request value
@@ -89334,7 +89518,7 @@ type: keyword
 
 --
 
-*`rsa.misc.streams`*::
+*`microsoft.rsa.misc.streams`*::
 +
 --
 This key captures number of streams in session
@@ -89344,7 +89528,7 @@ type: long
 --
 
 
-*`rsa.db.index`*::
+*`microsoft.rsa.db.index`*::
 +
 --
 This key captures IndexID of the index.
@@ -89353,7 +89537,7 @@ type: keyword
 
 --
 
-*`rsa.db.instance`*::
+*`microsoft.rsa.db.instance`*::
 +
 --
 This key is used to capture the database server instance name
@@ -89362,7 +89546,7 @@ type: keyword
 
 --
 
-*`rsa.db.database`*::
+*`microsoft.rsa.db.database`*::
 +
 --
 This key is used to capture the name of a database or an instance as seen in a session
@@ -89371,7 +89555,7 @@ type: keyword
 
 --
 
-*`rsa.db.transact_id`*::
+*`microsoft.rsa.db.transact_id`*::
 +
 --
 This key captures the SQL transantion ID of the current session
@@ -89380,7 +89564,7 @@ type: keyword
 
 --
 
-*`rsa.db.permissions`*::
+*`microsoft.rsa.db.permissions`*::
 +
 --
 This key captures permission or privilege level assigned to a resource.
@@ -89389,7 +89573,7 @@ type: keyword
 
 --
 
-*`rsa.db.table_name`*::
+*`microsoft.rsa.db.table_name`*::
 +
 --
 This key is used to capture the table name
@@ -89398,7 +89582,7 @@ type: keyword
 
 --
 
-*`rsa.db.db_id`*::
+*`microsoft.rsa.db.db_id`*::
 +
 --
 This key is used to capture the unique identifier for a database
@@ -89407,7 +89591,7 @@ type: keyword
 
 --
 
-*`rsa.db.db_pid`*::
+*`microsoft.rsa.db.db_pid`*::
 +
 --
 This key captures the process id of a connection with database server
@@ -89416,7 +89600,7 @@ type: long
 
 --
 
-*`rsa.db.lread`*::
+*`microsoft.rsa.db.lread`*::
 +
 --
 This key is used for the number of logical reads
@@ -89425,7 +89609,7 @@ type: long
 
 --
 
-*`rsa.db.lwrite`*::
+*`microsoft.rsa.db.lwrite`*::
 +
 --
 This key is used for the number of logical writes
@@ -89434,7 +89618,7 @@ type: long
 
 --
 
-*`rsa.db.pread`*::
+*`microsoft.rsa.db.pread`*::
 +
 --
 This key is used for the number of physical writes
@@ -89444,7 +89628,7 @@ type: long
 --
 
 
-*`rsa.network.alias_host`*::
+*`microsoft.rsa.network.alias_host`*::
 +
 --
 This key should be used when the source or destination context of a hostname is not clear.Also it captures the Device Hostname. Any Hostname that isnt ad.computer.
@@ -89453,14 +89637,14 @@ type: keyword
 
 --
 
-*`rsa.network.domain`*::
+*`microsoft.rsa.network.domain`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.host_dst`*::
+*`microsoft.rsa.network.host_dst`*::
 +
 --
 This key should only be used when it’s a Destination Hostname
@@ -89469,7 +89653,7 @@ type: keyword
 
 --
 
-*`rsa.network.network_service`*::
+*`microsoft.rsa.network.network_service`*::
 +
 --
 This is used to capture layer 7 protocols/service names
@@ -89478,7 +89662,7 @@ type: keyword
 
 --
 
-*`rsa.network.interface`*::
+*`microsoft.rsa.network.interface`*::
 +
 --
 This key should be used when the source or destination context of an interface is not clear
@@ -89487,7 +89671,7 @@ type: keyword
 
 --
 
-*`rsa.network.network_port`*::
+*`microsoft.rsa.network.network_port`*::
 +
 --
 Deprecated, use port. NOTE: There is a type discrepancy as currently used, TM: Int32, INDEX: UInt64 (why neither chose the correct UInt16?!)
@@ -89496,7 +89680,7 @@ type: long
 
 --
 
-*`rsa.network.eth_host`*::
+*`microsoft.rsa.network.eth_host`*::
 +
 --
 Deprecated, use alias.mac
@@ -89505,7 +89689,7 @@ type: keyword
 
 --
 
-*`rsa.network.sinterface`*::
+*`microsoft.rsa.network.sinterface`*::
 +
 --
 This key should only be used when it’s a Source Interface
@@ -89514,7 +89698,7 @@ type: keyword
 
 --
 
-*`rsa.network.dinterface`*::
+*`microsoft.rsa.network.dinterface`*::
 +
 --
 This key should only be used when it’s a Destination Interface
@@ -89523,7 +89707,7 @@ type: keyword
 
 --
 
-*`rsa.network.vlan`*::
+*`microsoft.rsa.network.vlan`*::
 +
 --
 This key should only be used to capture the ID of the Virtual LAN
@@ -89532,7 +89716,7 @@ type: long
 
 --
 
-*`rsa.network.zone_src`*::
+*`microsoft.rsa.network.zone_src`*::
 +
 --
 This key should only be used when it’s a Source Zone.
@@ -89541,7 +89725,7 @@ type: keyword
 
 --
 
-*`rsa.network.zone`*::
+*`microsoft.rsa.network.zone`*::
 +
 --
 This key should be used when the source or destination context of a Zone is not clear
@@ -89550,7 +89734,7 @@ type: keyword
 
 --
 
-*`rsa.network.zone_dst`*::
+*`microsoft.rsa.network.zone_dst`*::
 +
 --
 This key should only be used when it’s a Destination Zone.
@@ -89559,7 +89743,7 @@ type: keyword
 
 --
 
-*`rsa.network.gateway`*::
+*`microsoft.rsa.network.gateway`*::
 +
 --
 This key is used to capture the IP Address of the gateway
@@ -89568,7 +89752,7 @@ type: keyword
 
 --
 
-*`rsa.network.icmp_type`*::
+*`microsoft.rsa.network.icmp_type`*::
 +
 --
 This key is used to capture the ICMP type only
@@ -89577,7 +89761,7 @@ type: long
 
 --
 
-*`rsa.network.mask`*::
+*`microsoft.rsa.network.mask`*::
 +
 --
 This key is used to capture the device network IPmask.
@@ -89586,7 +89770,7 @@ type: keyword
 
 --
 
-*`rsa.network.icmp_code`*::
+*`microsoft.rsa.network.icmp_code`*::
 +
 --
 This key is used to capture the ICMP code only
@@ -89595,7 +89779,7 @@ type: long
 
 --
 
-*`rsa.network.protocol_detail`*::
+*`microsoft.rsa.network.protocol_detail`*::
 +
 --
 This key should be used to capture additional protocol information
@@ -89604,7 +89788,7 @@ type: keyword
 
 --
 
-*`rsa.network.dmask`*::
+*`microsoft.rsa.network.dmask`*::
 +
 --
 This key is used for Destionation Device network mask
@@ -89613,7 +89797,7 @@ type: keyword
 
 --
 
-*`rsa.network.port`*::
+*`microsoft.rsa.network.port`*::
 +
 --
 This key should only be used to capture a Network Port when the directionality is not clear
@@ -89622,7 +89806,7 @@ type: long
 
 --
 
-*`rsa.network.smask`*::
+*`microsoft.rsa.network.smask`*::
 +
 --
 This key is used for capturing source Network Mask
@@ -89631,7 +89815,7 @@ type: keyword
 
 --
 
-*`rsa.network.netname`*::
+*`microsoft.rsa.network.netname`*::
 +
 --
 This key is used to capture the network name associated with an IP range. This is configured by the end user.
@@ -89640,7 +89824,7 @@ type: keyword
 
 --
 
-*`rsa.network.paddr`*::
+*`microsoft.rsa.network.paddr`*::
 +
 --
 Deprecated
@@ -89649,91 +89833,91 @@ type: ip
 
 --
 
-*`rsa.network.faddr`*::
+*`microsoft.rsa.network.faddr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.lhost`*::
+*`microsoft.rsa.network.lhost`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.origin`*::
+*`microsoft.rsa.network.origin`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.remote_domain_id`*::
+*`microsoft.rsa.network.remote_domain_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.addr`*::
+*`microsoft.rsa.network.addr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_a_record`*::
+*`microsoft.rsa.network.dns_a_record`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_ptr_record`*::
+*`microsoft.rsa.network.dns_ptr_record`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.fhost`*::
+*`microsoft.rsa.network.fhost`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.fport`*::
+*`microsoft.rsa.network.fport`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.laddr`*::
+*`microsoft.rsa.network.laddr`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.linterface`*::
+*`microsoft.rsa.network.linterface`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.phost`*::
+*`microsoft.rsa.network.phost`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.ad_computer_dst`*::
+*`microsoft.rsa.network.ad_computer_dst`*::
 +
 --
 Deprecated, use host.dst
@@ -89742,7 +89926,7 @@ type: keyword
 
 --
 
-*`rsa.network.eth_type`*::
+*`microsoft.rsa.network.eth_type`*::
 +
 --
 This key is used to capture Ethernet Type, Used for Layer 3 Protocols Only
@@ -89751,7 +89935,7 @@ type: long
 
 --
 
-*`rsa.network.ip_proto`*::
+*`microsoft.rsa.network.ip_proto`*::
 +
 --
 This key should be used to capture the Protocol number, all the protocol nubers are converted into string in UI
@@ -89760,63 +89944,63 @@ type: long
 
 --
 
-*`rsa.network.dns_cname_record`*::
+*`microsoft.rsa.network.dns_cname_record`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_id`*::
+*`microsoft.rsa.network.dns_id`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_opcode`*::
+*`microsoft.rsa.network.dns_opcode`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_resp`*::
+*`microsoft.rsa.network.dns_resp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.dns_type`*::
+*`microsoft.rsa.network.dns_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.domain1`*::
+*`microsoft.rsa.network.domain1`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.host_type`*::
+*`microsoft.rsa.network.host_type`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.packet_length`*::
+*`microsoft.rsa.network.packet_length`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.network.host_orig`*::
+*`microsoft.rsa.network.host_orig`*::
 +
 --
 This is used to capture the original hostname in case of a Forwarding Agent or a Proxy in between.
@@ -89825,7 +90009,7 @@ type: keyword
 
 --
 
-*`rsa.network.rpayload`*::
+*`microsoft.rsa.network.rpayload`*::
 +
 --
 This key is used to capture the total number of payload bytes seen in the retransmitted packets.
@@ -89834,7 +90018,7 @@ type: keyword
 
 --
 
-*`rsa.network.vlan_name`*::
+*`microsoft.rsa.network.vlan_name`*::
 +
 --
 This key should only be used to capture the name of the Virtual LAN
@@ -89844,7 +90028,7 @@ type: keyword
 --
 
 
-*`rsa.investigations.ec_activity`*::
+*`microsoft.rsa.investigations.ec_activity`*::
 +
 --
 This key captures the particular event activity(Ex:Logoff)
@@ -89853,7 +90037,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.ec_theme`*::
+*`microsoft.rsa.investigations.ec_theme`*::
 +
 --
 This key captures the Theme of a particular Event(Ex:Authentication)
@@ -89862,7 +90046,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.ec_subject`*::
+*`microsoft.rsa.investigations.ec_subject`*::
 +
 --
 This key captures the Subject of a particular Event(Ex:User)
@@ -89871,7 +90055,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.ec_outcome`*::
+*`microsoft.rsa.investigations.ec_outcome`*::
 +
 --
 This key captures the outcome of a particular Event(Ex:Success)
@@ -89880,7 +90064,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.event_cat`*::
+*`microsoft.rsa.investigations.event_cat`*::
 +
 --
 This key captures the Event category number
@@ -89889,7 +90073,7 @@ type: long
 
 --
 
-*`rsa.investigations.event_cat_name`*::
+*`microsoft.rsa.investigations.event_cat_name`*::
 +
 --
 This key captures the event category name corresponding to the event cat code
@@ -89898,7 +90082,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.event_vcat`*::
+*`microsoft.rsa.investigations.event_vcat`*::
 +
 --
 This is a vendor supplied category. This should be used in situations where the vendor has adopted their own event_category taxonomy.
@@ -89907,7 +90091,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.analysis_file`*::
+*`microsoft.rsa.investigations.analysis_file`*::
 +
 --
 This is used to capture all indicators used in a File Analysis. This key should be used to capture an analysis of a file
@@ -89916,7 +90100,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.analysis_service`*::
+*`microsoft.rsa.investigations.analysis_service`*::
 +
 --
 This is used to capture all indicators used in a Service Analysis. This key should be used to capture an analysis of a service
@@ -89925,7 +90109,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.analysis_session`*::
+*`microsoft.rsa.investigations.analysis_session`*::
 +
 --
 This is used to capture all indicators used for a Session Analysis. This key should be used to capture an analysis of a session
@@ -89934,7 +90118,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.boc`*::
+*`microsoft.rsa.investigations.boc`*::
 +
 --
 This is used to capture behaviour of compromise
@@ -89943,7 +90127,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.eoc`*::
+*`microsoft.rsa.investigations.eoc`*::
 +
 --
 This is used to capture Enablers of Compromise
@@ -89952,7 +90136,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.inv_category`*::
+*`microsoft.rsa.investigations.inv_category`*::
 +
 --
 This used to capture investigation category
@@ -89961,7 +90145,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.inv_context`*::
+*`microsoft.rsa.investigations.inv_context`*::
 +
 --
 This used to capture investigation context
@@ -89970,7 +90154,7 @@ type: keyword
 
 --
 
-*`rsa.investigations.ioc`*::
+*`microsoft.rsa.investigations.ioc`*::
 +
 --
 This is key capture indicator of compromise
@@ -89980,7 +90164,7 @@ type: keyword
 --
 
 
-*`rsa.counters.dclass_c1`*::
+*`microsoft.rsa.counters.dclass_c1`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c1.str only
@@ -89989,7 +90173,7 @@ type: long
 
 --
 
-*`rsa.counters.dclass_c2`*::
+*`microsoft.rsa.counters.dclass_c2`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c2.str only
@@ -89998,7 +90182,7 @@ type: long
 
 --
 
-*`rsa.counters.event_counter`*::
+*`microsoft.rsa.counters.event_counter`*::
 +
 --
 This is used to capture the number of times an event repeated
@@ -90007,7 +90191,7 @@ type: long
 
 --
 
-*`rsa.counters.dclass_r1`*::
+*`microsoft.rsa.counters.dclass_r1`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r1.str only
@@ -90016,7 +90200,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_c3`*::
+*`microsoft.rsa.counters.dclass_c3`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c3.str only
@@ -90025,7 +90209,7 @@ type: long
 
 --
 
-*`rsa.counters.dclass_c1_str`*::
+*`microsoft.rsa.counters.dclass_c1_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c1 only
@@ -90034,7 +90218,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_c2_str`*::
+*`microsoft.rsa.counters.dclass_c2_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c2 only
@@ -90043,7 +90227,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_r1_str`*::
+*`microsoft.rsa.counters.dclass_r1_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r1 only
@@ -90052,7 +90236,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_r2`*::
+*`microsoft.rsa.counters.dclass_r2`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r2.str only
@@ -90061,7 +90245,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_c3_str`*::
+*`microsoft.rsa.counters.dclass_c3_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c3 only
@@ -90070,7 +90254,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_r3`*::
+*`microsoft.rsa.counters.dclass_r3`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r3.str only
@@ -90079,7 +90263,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_r2_str`*::
+*`microsoft.rsa.counters.dclass_r2_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r2 only
@@ -90088,7 +90272,7 @@ type: keyword
 
 --
 
-*`rsa.counters.dclass_r3_str`*::
+*`microsoft.rsa.counters.dclass_r3_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r3 only
@@ -90098,7 +90282,7 @@ type: keyword
 --
 
 
-*`rsa.identity.auth_method`*::
+*`microsoft.rsa.identity.auth_method`*::
 +
 --
 This key is used to capture authentication methods used only
@@ -90107,7 +90291,7 @@ type: keyword
 
 --
 
-*`rsa.identity.user_role`*::
+*`microsoft.rsa.identity.user_role`*::
 +
 --
 This key is used to capture the Role of a user only
@@ -90116,7 +90300,7 @@ type: keyword
 
 --
 
-*`rsa.identity.dn`*::
+*`microsoft.rsa.identity.dn`*::
 +
 --
 X.500 (LDAP) Distinguished Name
@@ -90125,7 +90309,7 @@ type: keyword
 
 --
 
-*`rsa.identity.logon_type`*::
+*`microsoft.rsa.identity.logon_type`*::
 +
 --
 This key is used to capture the type of logon method used.
@@ -90134,7 +90318,7 @@ type: keyword
 
 --
 
-*`rsa.identity.profile`*::
+*`microsoft.rsa.identity.profile`*::
 +
 --
 This key is used to capture the user profile
@@ -90143,7 +90327,7 @@ type: keyword
 
 --
 
-*`rsa.identity.accesses`*::
+*`microsoft.rsa.identity.accesses`*::
 +
 --
 This key is used to capture actual privileges used in accessing an object
@@ -90152,7 +90336,7 @@ type: keyword
 
 --
 
-*`rsa.identity.realm`*::
+*`microsoft.rsa.identity.realm`*::
 +
 --
 Radius realm or similar grouping of accounts
@@ -90161,7 +90345,7 @@ type: keyword
 
 --
 
-*`rsa.identity.user_sid_dst`*::
+*`microsoft.rsa.identity.user_sid_dst`*::
 +
 --
 This key captures Destination User Session ID
@@ -90170,7 +90354,7 @@ type: keyword
 
 --
 
-*`rsa.identity.dn_src`*::
+*`microsoft.rsa.identity.dn_src`*::
 +
 --
 An X.500 (LDAP) Distinguished name that is used in a context that indicates a Source dn
@@ -90179,7 +90363,7 @@ type: keyword
 
 --
 
-*`rsa.identity.org`*::
+*`microsoft.rsa.identity.org`*::
 +
 --
 This key captures the User organization
@@ -90188,7 +90372,7 @@ type: keyword
 
 --
 
-*`rsa.identity.dn_dst`*::
+*`microsoft.rsa.identity.dn_dst`*::
 +
 --
 An X.500 (LDAP) Distinguished name that used in a context that indicates a Destination dn
@@ -90197,7 +90381,7 @@ type: keyword
 
 --
 
-*`rsa.identity.firstname`*::
+*`microsoft.rsa.identity.firstname`*::
 +
 --
 This key is for First Names only, this is used for Healthcare predominantly to capture Patients information
@@ -90206,7 +90390,7 @@ type: keyword
 
 --
 
-*`rsa.identity.lastname`*::
+*`microsoft.rsa.identity.lastname`*::
 +
 --
 This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information
@@ -90215,7 +90399,7 @@ type: keyword
 
 --
 
-*`rsa.identity.user_dept`*::
+*`microsoft.rsa.identity.user_dept`*::
 +
 --
 User's Department Names only
@@ -90224,7 +90408,7 @@ type: keyword
 
 --
 
-*`rsa.identity.user_sid_src`*::
+*`microsoft.rsa.identity.user_sid_src`*::
 +
 --
 This key captures Source User Session ID
@@ -90233,7 +90417,7 @@ type: keyword
 
 --
 
-*`rsa.identity.federated_sp`*::
+*`microsoft.rsa.identity.federated_sp`*::
 +
 --
 This key is the Federated Service Provider. This is the application requesting authentication.
@@ -90242,7 +90426,7 @@ type: keyword
 
 --
 
-*`rsa.identity.federated_idp`*::
+*`microsoft.rsa.identity.federated_idp`*::
 +
 --
 This key is the federated Identity Provider. This is the server providing the authentication.
@@ -90251,7 +90435,7 @@ type: keyword
 
 --
 
-*`rsa.identity.logon_type_desc`*::
+*`microsoft.rsa.identity.logon_type_desc`*::
 +
 --
 This key is used to capture the textual description of an integer logon type as stored in the meta key 'logon.type'.
@@ -90260,7 +90444,7 @@ type: keyword
 
 --
 
-*`rsa.identity.middlename`*::
+*`microsoft.rsa.identity.middlename`*::
 +
 --
 This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information
@@ -90269,7 +90453,7 @@ type: keyword
 
 --
 
-*`rsa.identity.password`*::
+*`microsoft.rsa.identity.password`*::
 +
 --
 This key is for Passwords seen in any session, plain text or encrypted
@@ -90278,7 +90462,7 @@ type: keyword
 
 --
 
-*`rsa.identity.host_role`*::
+*`microsoft.rsa.identity.host_role`*::
 +
 --
 This key should only be used to capture the role of a Host Machine
@@ -90287,7 +90471,7 @@ type: keyword
 
 --
 
-*`rsa.identity.ldap`*::
+*`microsoft.rsa.identity.ldap`*::
 +
 --
 This key is for Uninterpreted LDAP values. Ldap Values that don’t have a clear query or response context
@@ -90296,7 +90480,7 @@ type: keyword
 
 --
 
-*`rsa.identity.ldap_query`*::
+*`microsoft.rsa.identity.ldap_query`*::
 +
 --
 This key is the Search criteria from an LDAP search
@@ -90305,7 +90489,7 @@ type: keyword
 
 --
 
-*`rsa.identity.ldap_response`*::
+*`microsoft.rsa.identity.ldap_response`*::
 +
 --
 This key is to capture Results from an LDAP search
@@ -90314,7 +90498,7 @@ type: keyword
 
 --
 
-*`rsa.identity.owner`*::
+*`microsoft.rsa.identity.owner`*::
 +
 --
 This is used to capture username the process or service is running as, the author of the task
@@ -90323,7 +90507,7 @@ type: keyword
 
 --
 
-*`rsa.identity.service_account`*::
+*`microsoft.rsa.identity.service_account`*::
 +
 --
 This key is a windows specific key, used for capturing name of the account a service (referenced in the event) is running under. Legacy Usage
@@ -90333,7 +90517,7 @@ type: keyword
 --
 
 
-*`rsa.email.email_dst`*::
+*`microsoft.rsa.email.email_dst`*::
 +
 --
 This key is used to capture the Destination email address only, when the destination context is not clear use email
@@ -90342,7 +90526,7 @@ type: keyword
 
 --
 
-*`rsa.email.email_src`*::
+*`microsoft.rsa.email.email_src`*::
 +
 --
 This key is used to capture the source email address only, when the source context is not clear use email
@@ -90351,7 +90535,7 @@ type: keyword
 
 --
 
-*`rsa.email.subject`*::
+*`microsoft.rsa.email.subject`*::
 +
 --
 This key is used to capture the subject string from an Email only.
@@ -90360,7 +90544,7 @@ type: keyword
 
 --
 
-*`rsa.email.email`*::
+*`microsoft.rsa.email.email`*::
 +
 --
 This key is used to capture a generic email address where the source or destination context is not clear
@@ -90369,7 +90553,7 @@ type: keyword
 
 --
 
-*`rsa.email.trans_from`*::
+*`microsoft.rsa.email.trans_from`*::
 +
 --
 Deprecated key defined only in table map.
@@ -90378,7 +90562,7 @@ type: keyword
 
 --
 
-*`rsa.email.trans_to`*::
+*`microsoft.rsa.email.trans_to`*::
 +
 --
 Deprecated key defined only in table map.
@@ -90388,7 +90572,7 @@ type: keyword
 --
 
 
-*`rsa.file.privilege`*::
+*`microsoft.rsa.file.privilege`*::
 +
 --
 Deprecated, use permissions
@@ -90397,7 +90581,7 @@ type: keyword
 
 --
 
-*`rsa.file.attachment`*::
+*`microsoft.rsa.file.attachment`*::
 +
 --
 This key captures the attachment file name
@@ -90406,14 +90590,14 @@ type: keyword
 
 --
 
-*`rsa.file.filesystem`*::
+*`microsoft.rsa.file.filesystem`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.file.binary`*::
+*`microsoft.rsa.file.binary`*::
 +
 --
 Deprecated key defined only in table map.
@@ -90422,7 +90606,7 @@ type: keyword
 
 --
 
-*`rsa.file.filename_dst`*::
+*`microsoft.rsa.file.filename_dst`*::
 +
 --
 This is used to capture name of the file targeted by the action
@@ -90431,7 +90615,7 @@ type: keyword
 
 --
 
-*`rsa.file.filename_src`*::
+*`microsoft.rsa.file.filename_src`*::
 +
 --
 This is used to capture name of the parent filename, the file which performed the action
@@ -90440,14 +90624,14 @@ type: keyword
 
 --
 
-*`rsa.file.filename_tmp`*::
+*`microsoft.rsa.file.filename_tmp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.file.directory_dst`*::
+*`microsoft.rsa.file.directory_dst`*::
 +
 --
 <span>This key is used to capture the directory of the target process or file</span>
@@ -90456,7 +90640,7 @@ type: keyword
 
 --
 
-*`rsa.file.directory_src`*::
+*`microsoft.rsa.file.directory_src`*::
 +
 --
 This key is used to capture the directory of the source process or file
@@ -90465,7 +90649,7 @@ type: keyword
 
 --
 
-*`rsa.file.file_entropy`*::
+*`microsoft.rsa.file.file_entropy`*::
 +
 --
 This is used to capture entropy vale of a file
@@ -90474,7 +90658,7 @@ type: double
 
 --
 
-*`rsa.file.file_vendor`*::
+*`microsoft.rsa.file.file_vendor`*::
 +
 --
 This is used to capture Company name of file located in version_info
@@ -90483,7 +90667,7 @@ type: keyword
 
 --
 
-*`rsa.file.task_name`*::
+*`microsoft.rsa.file.task_name`*::
 +
 --
 This is used to capture name of the task
@@ -90493,7 +90677,7 @@ type: keyword
 --
 
 
-*`rsa.web.fqdn`*::
+*`microsoft.rsa.web.fqdn`*::
 +
 --
 Fully Qualified Domain Names
@@ -90502,7 +90686,7 @@ type: keyword
 
 --
 
-*`rsa.web.web_cookie`*::
+*`microsoft.rsa.web.web_cookie`*::
 +
 --
 This key is used to capture the Web cookies specifically.
@@ -90511,14 +90695,14 @@ type: keyword
 
 --
 
-*`rsa.web.alias_host`*::
+*`microsoft.rsa.web.alias_host`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.reputation_num`*::
+*`microsoft.rsa.web.reputation_num`*::
 +
 --
 Reputation Number of an entity. Typically used for Web Domains
@@ -90527,7 +90711,7 @@ type: double
 
 --
 
-*`rsa.web.web_ref_domain`*::
+*`microsoft.rsa.web.web_ref_domain`*::
 +
 --
 Web referer's domain
@@ -90536,7 +90720,7 @@ type: keyword
 
 --
 
-*`rsa.web.web_ref_query`*::
+*`microsoft.rsa.web.web_ref_query`*::
 +
 --
 This key captures Web referer's query portion of the URL
@@ -90545,14 +90729,14 @@ type: keyword
 
 --
 
-*`rsa.web.remote_domain`*::
+*`microsoft.rsa.web.remote_domain`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.web_ref_page`*::
+*`microsoft.rsa.web.web_ref_page`*::
 +
 --
 This key captures Web referer's page information
@@ -90561,7 +90745,7 @@ type: keyword
 
 --
 
-*`rsa.web.web_ref_root`*::
+*`microsoft.rsa.web.web_ref_root`*::
 +
 --
 Web referer's root URL path
@@ -90570,77 +90754,77 @@ type: keyword
 
 --
 
-*`rsa.web.cn_asn_dst`*::
+*`microsoft.rsa.web.cn_asn_dst`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.cn_rpackets`*::
+*`microsoft.rsa.web.cn_rpackets`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.urlpage`*::
+*`microsoft.rsa.web.urlpage`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.urlroot`*::
+*`microsoft.rsa.web.urlroot`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.p_url`*::
+*`microsoft.rsa.web.p_url`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.p_user_agent`*::
+*`microsoft.rsa.web.p_user_agent`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.p_web_cookie`*::
+*`microsoft.rsa.web.p_web_cookie`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.p_web_method`*::
+*`microsoft.rsa.web.p_web_method`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.p_web_referer`*::
+*`microsoft.rsa.web.p_web_referer`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.web_extension_tmp`*::
+*`microsoft.rsa.web.web_extension_tmp`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.web.web_page`*::
+*`microsoft.rsa.web.web_page`*::
 +
 --
 type: keyword
@@ -90648,7 +90832,7 @@ type: keyword
 --
 
 
-*`rsa.threat.threat_category`*::
+*`microsoft.rsa.threat.threat_category`*::
 +
 --
 This key captures Threat Name/Threat Category/Categorization of alert
@@ -90657,7 +90841,7 @@ type: keyword
 
 --
 
-*`rsa.threat.threat_desc`*::
+*`microsoft.rsa.threat.threat_desc`*::
 +
 --
 This key is used to capture the threat description from the session directly or inferred
@@ -90666,7 +90850,7 @@ type: keyword
 
 --
 
-*`rsa.threat.alert`*::
+*`microsoft.rsa.threat.alert`*::
 +
 --
 This key is used to capture name of the alert
@@ -90675,7 +90859,7 @@ type: keyword
 
 --
 
-*`rsa.threat.threat_source`*::
+*`microsoft.rsa.threat.threat_source`*::
 +
 --
 This key is used to capture source of the threat
@@ -90685,7 +90869,7 @@ type: keyword
 --
 
 
-*`rsa.crypto.crypto`*::
+*`microsoft.rsa.crypto.crypto`*::
 +
 --
 This key is used to capture the Encryption Type or Encryption Key only
@@ -90694,7 +90878,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cipher_src`*::
+*`microsoft.rsa.crypto.cipher_src`*::
 +
 --
 This key is for Source (Client) Cipher
@@ -90703,7 +90887,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_subject`*::
+*`microsoft.rsa.crypto.cert_subject`*::
 +
 --
 This key is used to capture the Certificate organization only
@@ -90712,7 +90896,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.peer`*::
+*`microsoft.rsa.crypto.peer`*::
 +
 --
 This key is for Encryption peer's IP Address
@@ -90721,7 +90905,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cipher_size_src`*::
+*`microsoft.rsa.crypto.cipher_size_src`*::
 +
 --
 This key captures Source (Client) Cipher Size
@@ -90730,7 +90914,7 @@ type: long
 
 --
 
-*`rsa.crypto.ike`*::
+*`microsoft.rsa.crypto.ike`*::
 +
 --
 IKE negotiation phase.
@@ -90739,7 +90923,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.scheme`*::
+*`microsoft.rsa.crypto.scheme`*::
 +
 --
 This key captures the Encryption scheme used
@@ -90748,7 +90932,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.peer_id`*::
+*`microsoft.rsa.crypto.peer_id`*::
 +
 --
 This key is for Encryption peer’s identity
@@ -90757,7 +90941,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.sig_type`*::
+*`microsoft.rsa.crypto.sig_type`*::
 +
 --
 This key captures the Signature Type
@@ -90766,14 +90950,14 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_issuer`*::
+*`microsoft.rsa.crypto.cert_issuer`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.cert_host_name`*::
+*`microsoft.rsa.crypto.cert_host_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -90782,7 +90966,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_error`*::
+*`microsoft.rsa.crypto.cert_error`*::
 +
 --
 This key captures the Certificate Error String
@@ -90791,7 +90975,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cipher_dst`*::
+*`microsoft.rsa.crypto.cipher_dst`*::
 +
 --
 This key is for Destination (Server) Cipher
@@ -90800,7 +90984,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cipher_size_dst`*::
+*`microsoft.rsa.crypto.cipher_size_dst`*::
 +
 --
 This key captures Destination (Server) Cipher Size
@@ -90809,7 +90993,7 @@ type: long
 
 --
 
-*`rsa.crypto.ssl_ver_src`*::
+*`microsoft.rsa.crypto.ssl_ver_src`*::
 +
 --
 Deprecated, use version
@@ -90818,21 +91002,21 @@ type: keyword
 
 --
 
-*`rsa.crypto.d_certauth`*::
+*`microsoft.rsa.crypto.d_certauth`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.s_certauth`*::
+*`microsoft.rsa.crypto.s_certauth`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.ike_cookie1`*::
+*`microsoft.rsa.crypto.ike_cookie1`*::
 +
 --
 ID of the negotiation — sent for ISAKMP Phase One
@@ -90841,7 +91025,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.ike_cookie2`*::
+*`microsoft.rsa.crypto.ike_cookie2`*::
 +
 --
 ID of the negotiation — sent for ISAKMP Phase Two
@@ -90850,14 +91034,14 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_checksum`*::
+*`microsoft.rsa.crypto.cert_checksum`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.cert_host_cat`*::
+*`microsoft.rsa.crypto.cert_host_cat`*::
 +
 --
 This key is used for the hostname category value of a certificate
@@ -90866,7 +91050,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_serial`*::
+*`microsoft.rsa.crypto.cert_serial`*::
 +
 --
 This key is used to capture the Certificate serial number only
@@ -90875,7 +91059,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_status`*::
+*`microsoft.rsa.crypto.cert_status`*::
 +
 --
 This key captures Certificate validation status
@@ -90884,7 +91068,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.ssl_ver_dst`*::
+*`microsoft.rsa.crypto.ssl_ver_dst`*::
 +
 --
 Deprecated, use version
@@ -90893,35 +91077,35 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_keysize`*::
+*`microsoft.rsa.crypto.cert_keysize`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.cert_username`*::
+*`microsoft.rsa.crypto.cert_username`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.https_insact`*::
+*`microsoft.rsa.crypto.https_insact`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.https_valid`*::
+*`microsoft.rsa.crypto.https_valid`*::
 +
 --
 type: keyword
 
 --
 
-*`rsa.crypto.cert_ca`*::
+*`microsoft.rsa.crypto.cert_ca`*::
 +
 --
 This key is used to capture the Certificate signing authority only
@@ -90930,7 +91114,7 @@ type: keyword
 
 --
 
-*`rsa.crypto.cert_common`*::
+*`microsoft.rsa.crypto.cert_common`*::
 +
 --
 This key is used to capture the Certificate common name only
@@ -90940,7 +91124,7 @@ type: keyword
 --
 
 
-*`rsa.wireless.wlan_ssid`*::
+*`microsoft.rsa.wireless.wlan_ssid`*::
 +
 --
 This key is used to capture the ssid of a Wireless Session
@@ -90949,7 +91133,7 @@ type: keyword
 
 --
 
-*`rsa.wireless.access_point`*::
+*`microsoft.rsa.wireless.access_point`*::
 +
 --
 This key is used to capture the access point name.
@@ -90958,7 +91142,7 @@ type: keyword
 
 --
 
-*`rsa.wireless.wlan_channel`*::
+*`microsoft.rsa.wireless.wlan_channel`*::
 +
 --
 This is used to capture the channel names
@@ -90967,7 +91151,7 @@ type: long
 
 --
 
-*`rsa.wireless.wlan_name`*::
+*`microsoft.rsa.wireless.wlan_name`*::
 +
 --
 This key captures either WLAN number/name
@@ -90977,7 +91161,7 @@ type: keyword
 --
 
 
-*`rsa.storage.disk_volume`*::
+*`microsoft.rsa.storage.disk_volume`*::
 +
 --
 A unique name assigned to logical units (volumes) within a physical disk
@@ -90986,7 +91170,7 @@ type: keyword
 
 --
 
-*`rsa.storage.lun`*::
+*`microsoft.rsa.storage.lun`*::
 +
 --
 Logical Unit Number.This key is a very useful concept in Storage.
@@ -90995,7 +91179,7 @@ type: keyword
 
 --
 
-*`rsa.storage.pwwn`*::
+*`microsoft.rsa.storage.pwwn`*::
 +
 --
 This uniquely identifies a port on a HBA.
@@ -91005,7 +91189,7 @@ type: keyword
 --
 
 
-*`rsa.physical.org_dst`*::
+*`microsoft.rsa.physical.org_dst`*::
 +
 --
 This is used to capture the destination organization based on the GEOPIP Maxmind database.
@@ -91014,7 +91198,7 @@ type: keyword
 
 --
 
-*`rsa.physical.org_src`*::
+*`microsoft.rsa.physical.org_src`*::
 +
 --
 This is used to capture the source organization based on the GEOPIP Maxmind database.
@@ -91024,7 +91208,7 @@ type: keyword
 --
 
 
-*`rsa.healthcare.patient_fname`*::
+*`microsoft.rsa.healthcare.patient_fname`*::
 +
 --
 This key is for First Names only, this is used for Healthcare predominantly to capture Patients information
@@ -91033,7 +91217,7 @@ type: keyword
 
 --
 
-*`rsa.healthcare.patient_id`*::
+*`microsoft.rsa.healthcare.patient_id`*::
 +
 --
 This key captures the unique ID for a patient
@@ -91042,7 +91226,7 @@ type: keyword
 
 --
 
-*`rsa.healthcare.patient_lname`*::
+*`microsoft.rsa.healthcare.patient_lname`*::
 +
 --
 This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information
@@ -91051,7 +91235,7 @@ type: keyword
 
 --
 
-*`rsa.healthcare.patient_mname`*::
+*`microsoft.rsa.healthcare.patient_mname`*::
 +
 --
 This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information
@@ -91061,7 +91245,7 @@ type: keyword
 --
 
 
-*`rsa.endpoint.host_state`*::
+*`microsoft.rsa.endpoint.host_state`*::
 +
 --
 This key is used to capture the current state of the machine, such as <strong>blacklisted</strong>, <strong>infected</strong>, <strong>firewall disabled</strong> and so on
@@ -91070,7 +91254,7 @@ type: keyword
 
 --
 
-*`rsa.endpoint.registry_key`*::
+*`microsoft.rsa.endpoint.registry_key`*::
 +
 --
 This key captures the path to the registry key
@@ -91079,7 +91263,7 @@ type: keyword
 
 --
 
-*`rsa.endpoint.registry_value`*::
+*`microsoft.rsa.endpoint.registry_value`*::
 +
 --
 This key captures values or decorators used within a registry entry
