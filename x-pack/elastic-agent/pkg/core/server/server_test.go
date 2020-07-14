@@ -234,7 +234,6 @@ func TestServer_UpdateConfig(t *testing.T) {
 	cImpl := &StubClientImpl{}
 	c := newClientFromApplicationState(t, as, cImpl)
 	require.NoError(t, c.Start(context.Background()))
-	require.NoError(t, c.Start(context.Background()))
 	defer c.Stop()
 
 	// clients should get initial check-ins then set as healthy
