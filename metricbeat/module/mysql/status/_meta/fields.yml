@@ -38,7 +38,7 @@
               description: >
                 The number of connections refused due to internal errors in the server, such as failure to start a new
                 thread or an out-of-memory condition.
-            - name: max_connections
+            - name: max
               type: long
               description: The number of connections refused because the server max_connections limit was reached.
                 thread or an out-of-memory condition.

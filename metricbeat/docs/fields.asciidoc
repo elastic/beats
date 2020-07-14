@@ -32272,7 +32272,7 @@ type: long
 
 --
 
-*`mysql.status.connection.errors.max_connections`*::
+*`mysql.status.connection.errors.max`*::
 +
 --
 The number of connections refused because the server max_connections limit was reached. thread or an out-of-memory condition.
