@@ -18,12 +18,11 @@
 package collector
 
 import (
-	"math"
-	"strconv"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"math"
+	"strconv"
 
 	dto "github.com/prometheus/client_model/go"
 )

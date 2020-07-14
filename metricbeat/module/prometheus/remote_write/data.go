@@ -26,7 +26,18 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func samplesToEvents(metrics model.Samples) map[string]mb.Event {
+
+// DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
+func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error) {
+	return &remoteWriteEventGenerator{}, nil
+}
+
+type remoteWriteEventGenerator struct{}
+
+func (p *remoteWriteEventGenerator) Start() {}
+func (p *remoteWriteEventGenerator) Stop()  {}
+
+func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {

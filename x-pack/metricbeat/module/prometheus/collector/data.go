@@ -28,9 +28,9 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 		// to make sure that all counters are available between fetches
 		counters := NewCounterCache(base.Module().Config().Period * 5)
 
-		g := typedGenerator{
-			counterCache: counters,
-			rateCounters: config.RateCounters,
+		g := TypedGenerator{
+			CounterCache: counters,
+			RateCounters: config.RateCounters,
 		}
 
 		return &g, nil
@@ -39,29 +39,29 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 	return collector.DefaultPromEventsGeneratorFactory(base)
 }
 
-type typedGenerator struct {
-	counterCache CounterCache
-	rateCounters bool
+type TypedGenerator struct {
+	CounterCache CounterCache
+	RateCounters bool
 }
 
-func (g *typedGenerator) Start() {
+func (g *TypedGenerator) Start() {
 	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
 
-	if g.rateCounters {
+	if g.RateCounters {
 		cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental")
 	}
 
-	g.counterCache.Start()
+	g.CounterCache.Start()
 }
 
-func (g *typedGenerator) Stop() {
-	logp.Debug("prometheus.collector.cache", "stopping counterCache")
-	g.counterCache.Stop()
+func (g *TypedGenerator) Stop() {
+	logp.Debug("prometheus.collector.cache", "stopping CounterCache")
+	g.CounterCache.Stop()
 }
 
 // GeneratePromEvents stores all Prometheus metrics using
 // specific Elasticsearch data types.
-func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
+func (g *TypedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
 	name := *mf.Name
@@ -138,7 +138,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			events = append(events, collector.PromEvent{
 				Data: common.MapStr{
 					name: common.MapStr{
-						"histogram": promHistogramToES(g.counterCache, name, labels, histogram),
+						"histogram": PromHistogramToES(g.CounterCache, name, labels, histogram),
 					},
 				},
 				Labels: labels,
@@ -167,26 +167,26 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
+func (g *TypedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}
 
-	if g.rateCounters {
-		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
+	if g.RateCounters {
+		d["rate"], _ = g.CounterCache.RateUint64(name+labels.String(), value)
 	}
 
 	return d
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
+func (g *TypedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}
 
-	if g.rateCounters {
-		d["rate"], _ = g.counterCache.RateFloat64(name+labels.String(), value)
+	if g.RateCounters {
+		d["rate"], _ = g.CounterCache.RateFloat64(name+labels.String(), value)
 	}
 
 	return d

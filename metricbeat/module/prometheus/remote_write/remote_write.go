@@ -33,15 +33,33 @@ import (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("prometheus", "remote_write", New,
+	mb.Registry.MustAddMetricSet("prometheus", "remote_write",
+		MetricSetBuilder("prometheus", DefaultRemoteWriteEventsGeneratorFactory),
 		mb.WithHostParser(parse.EmptyHostParser),
 	)
 }
+
+// RemoteWriteEventsGenerator converts a Prometheus metric Samples mb.Event map
+type RemoteWriteEventsGenerator interface {
+	// Start must be called before using the generator
+	Start()
+
+	// converts a Prometheus metric family into a list of PromEvents
+	GenerateEvents(metrics model.Samples) map[string]mb.Event
+
+	// Stop must be called when the generator won't be used anymore
+	Stop()
+}
+
+// RemoteWriteEventsGeneratorFactory creates a PromEventsGenerator when instanciating a metricset
+type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error)
 
 type MetricSet struct {
 	mb.BaseMetricSet
 	server serverhelper.Server
 	events chan mb.Event
+	promEventsGen  RemoteWriteEventsGenerator
+	eventGenStarted bool
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -61,6 +79,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m.server = svc
 	return m, nil
 }
+
+// MetricSetBuilder returns a builder function for a new Prometheus metricset using
+// the given namespace and event generator
+func MetricSetBuilder(namespace string, genFactory RemoteWriteEventsGeneratorFactory) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		config := defaultConfig()
+		err := base.Module().UnpackConfig(&config)
+		if err != nil {
+			return nil, err
+		}
+
+		promEventsGen, err := genFactory(base)
+		if err != nil {
+			return nil, err
+		}
+
+		m := &MetricSet{
+			BaseMetricSet:   base,
+			promEventsGen:   promEventsGen,
+			eventGenStarted: false,
+		}
+		svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
+		if err != nil {
+			return nil, err
+		}
+		m.server = svc
+
+		return m, nil
+	}
+}
+
 
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
@@ -100,7 +149,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	samples := protoToSamples(&protoReq)
-	events := samplesToEvents(samples)
+	events := m.promEventsGen.GenerateEvents(samples)
 
 	for _, e := range events {
 		select {
