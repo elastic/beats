@@ -16,8 +16,8 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -71,7 +71,7 @@ func NewApplication(
 	credsPort int,
 	spec app.Specifier,
 	srv *server.Server,
-	cfg *config.Config,
+	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
