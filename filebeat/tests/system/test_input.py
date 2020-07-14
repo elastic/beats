@@ -695,20 +695,16 @@ class Test(BaseTest):
             input_raw="  file_identity.path: ~",
         )
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile = os.path.join(self.working_dir, "log", "test.log")
         self.__write_hello_word_to_test_input_file(testfile)
 
         proc = self.start_beat()
 
         # wait until the file is picked up
-        self.wait_until(lambda: self.log_contains("Start harvester for new file: " + testfile))
         self.wait_until(lambda: self.output_has(lines=1))
 
-        renamedfile = self.working_dir + "/log/renamed.log"
+        renamedfile = os.path.join(self.working_dir, "log", "renamed.log")
         os.rename(testfile, renamedfile)
-
-        # wait until the renamed file is picked up
-        self.wait_until(lambda: self.log_contains("Start harvester for new file: " + renamedfile))
 
         # wait until the both messages are received by the output
         self.wait_until(lambda: self.output_has(lines=2))
@@ -733,7 +729,7 @@ class Test(BaseTest):
             input_raw="  file_identity.inode_marker.path: " + marker_location,
         )
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile = os.path.join(self.working_dir, "log", "test.log")
         self.__write_hello_word_to_test_input_file(testfile)
 
         proc = self.start_beat()
@@ -766,7 +762,7 @@ class Test(BaseTest):
             input_raw="  file_identity.inode_marker.path: " + marker_location,
         )
 
-        testfile = self.working_dir + "/log/test.log"
+        testfile = os.path.join(self.working_dir, "log", "test.log")
         self.__write_hello_word_to_test_input_file(testfile)
 
         proc = self.start_beat()
