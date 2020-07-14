@@ -48,7 +48,15 @@ class BaseTest(TestCase):
     def get_registry(self, name=None, data_path=None, filter=None):
         reg = self.access_registry(name, data_path)
         self.wait_until(reg.exists)
-        return reg.load(filter=filter)
+
+        def parse_entry(entry):
+            extra, sec = entry["timestamp"]
+            nsec = extra & 0xFFFFFFFF
+            entry["timestamp"] = sec + (nsec / 1000000000)
+            return entry
+
+        entries = [parse_entry(entry) for entry in reg.load(filter=filter)]
+        return entries
 
     def get_registry_entry_by_path(self, path):
         """
