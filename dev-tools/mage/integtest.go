@@ -236,6 +236,7 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	// Create the custom env for the runner.
 	env := map[string]string{
 		insideIntegrationTestEnvVar: "true",
+		"GOFLAGS":                   "-mod=readonly",
 	}
 	for name, value := range passInEnv {
 		env[name] = value
@@ -244,9 +245,6 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	passThroughEnvs(env, defaultPassthroughEnvVars...)
 	if mg.Verbose() {
 		env["MAGEFILE_VERBOSE"] = "1"
-	}
-	if UseVendor {
-		env["GOFLAGS"] = "-mod=vendor"
 	}
 
 	runner := &IntegrationRunner{

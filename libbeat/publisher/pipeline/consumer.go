@@ -18,6 +18,9 @@
 package pipeline
 
 import (
+	"errors"
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -29,13 +32,12 @@ import (
 // is receiving cancelled batches from outputs to be closed on output reloading.
 type eventConsumer struct {
 	logger *logp.Logger
-	done   chan struct{}
-
-	ctx *batchContext
+	ctx    *batchContext
 
 	pause atomic.Bool
 	wait  atomic.Bool
 	sig   chan consumerSignal
+	wg    sync.WaitGroup
 
 	queue    queue.Queue
 	consumer queue.Consumer
@@ -55,7 +57,10 @@ const (
 	sigConsumerCheck consumerEventTag = iota
 	sigConsumerUpdateOutput
 	sigConsumerUpdateInput
+	sigStop
 )
+
+var errStopped = errors.New("stopped")
 
 func newEventConsumer(
 	log *logp.Logger,
@@ -64,7 +69,6 @@ func newEventConsumer(
 ) *eventConsumer {
 	c := &eventConsumer{
 		logger: log,
-		done:   make(chan struct{}),
 		sig:    make(chan consumerSignal, 3),
 		out:    nil,
 
@@ -74,13 +78,19 @@ func newEventConsumer(
 	}
 
 	c.pause.Store(true)
-	go c.loop(c.consumer)
+
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		c.loop(c.consumer)
+	}()
 	return c
 }
 
 func (c *eventConsumer) close() {
 	c.consumer.Close()
-	close(c.done)
+	c.sig <- consumerSignal{tag: sigStop}
+	c.wg.Wait()
 }
 
 func (c *eventConsumer) sigWait() {
@@ -142,8 +152,11 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		paused = true
 	)
 
-	handleSignal := func(sig consumerSignal) {
+	handleSignal := func(sig consumerSignal) error {
 		switch sig.tag {
+		case sigStop:
+			return errStopped
+
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
@@ -159,6 +172,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		} else {
 			out = nil
 		}
+		return nil
 	}
 
 	for {
@@ -182,17 +196,18 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 		select {
 		case sig := <-c.sig:
-			handleSignal(sig)
+			if err := handleSignal(sig); err != nil {
+				return
+			}
 			continue
 		default:
 		}
 
 		select {
-		case <-c.done:
-			log.Debug("stop pipeline event consumer")
-			return
 		case sig := <-c.sig:
-			handleSignal(sig)
+			if err := handleSignal(sig); err != nil {
+				return
+			}
 		case out <- batch:
 			batch = nil
 			if paused {

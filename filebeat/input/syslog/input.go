@@ -112,11 +112,7 @@ func NewInput(
 
 	log := logp.NewLogger("syslog")
 
-	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

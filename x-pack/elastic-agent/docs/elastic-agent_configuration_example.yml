@@ -110,6 +110,7 @@ inputs:
     name: epm/nginx
     version: 1.7.0
     dataset.namespace: prod
+    # constraints are still Experimental and should not be used in production.
     constraints?:
       # Contraints look are not final
       - os.platform: { in: "windows" }
@@ -129,6 +130,7 @@ inputs:
     name: epm/nginx
     version: 1.7.0
     dataset.namespace: prod
+    # constraints are still Experimental and should not be used in production.
     constraints?:
       # Contraints look are not final
       - os.platform: { in: "windows" }
@@ -348,7 +350,7 @@ inputs:
       dataset.name: aws.cloudwatch
       period: 5m
       name: ["CPUUtilization", "DiskWriteOps"]
-      tags.resource_type_filter: ec2:instance
+      resource_type: ec2:instance
       #dimensions:
       #  - name: InstanceId
       #    value: i-0686946e22cf9494a

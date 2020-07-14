@@ -369,6 +369,85 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Named port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"some": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.ports.some}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Named port in the hints should return the corresponding container port for complex hosts",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "http://${data.host}:${data.ports.prometheus}/metrics",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"http://1.2.3.4:3306/metrics"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "data.port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"port":  3306,
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.port}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
 			message: "Module with mutliple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",

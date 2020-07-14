@@ -22,24 +22,20 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 )
 
 type config struct {
-	unix.Config               `config:",inline"`
-	harvester.ForwarderConfig `config:",inline"`
-
+	unix.Config   `config:",inline"`
 	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
 }
 
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "unix",
-	},
-	Config: unix.Config{
-		Timeout:        time.Minute * 5,
-		MaxMessageSize: 20 * humanize.MiByte,
-	},
-	LineDelimiter: "\n",
+func defaultConfig() config {
+	return config{
+		Config: unix.Config{
+			Timeout:        time.Minute * 5,
+			MaxMessageSize: 20 * humanize.MiByte,
+		},
+		LineDelimiter: "\n",
+	}
 }

@@ -33,7 +33,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
 |<<metricbeat-module-azure,Azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
+.9+| .9+|  |<<metricbeat-metricset-azure-app_insights,app_insights>> beta[]  
+|<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>   
 |<<metricbeat-metricset-azure-container_instance,container_instance>>   
 |<<metricbeat-metricset-azure-container_registry,container_registry>>   
@@ -191,7 +192,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+.4+| .4+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+|<<metricbeat-metricset-mysql-performance,performance>> beta[]  
+|<<metricbeat-metricset-mysql-query,query>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   

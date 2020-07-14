@@ -219,7 +219,7 @@ metricbeat.modules:
           value: i-0686946e22cf9494a
     - namespace: AWS/EBS
     - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
       tags:
         - key: "Organization"
           value: "Engineering"
@@ -313,7 +313,6 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
-
 - module: azure
   metricsets:
   - database_account
@@ -323,6 +322,14 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - app_insights
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
 
 
 #--------------------------------- Beat Module ---------------------------------
@@ -1298,10 +1305,10 @@ metricbeat.modules:
 #  - object: 'Process'
 #    instance: ["*"]
 #    counters:
-#    - name: 'Disk Writes/sec'
-#      field: physical_disk.write.per_sec
+#    - name: '% Processor Time'
+#      field: cpu_usage
 #      format: "float"
-#    - name: "% Disk Write Time"
+#    - name: "Thread Count"
 
 - module: windows
   metricsets: ["service"]

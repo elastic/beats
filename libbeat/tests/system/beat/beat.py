@@ -571,7 +571,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     aliases.extend(subaliases)
                 else:
                     fields.append(newName)
-                    if field.get("type") in ["object", "geo_point"]:
+                    if field.get("type") in ["object", "geo_point", "flattened"]:
                         dictfields.append(newName)
 
                 if field.get("type") == "object" and field.get("object_type") == "histogram":
