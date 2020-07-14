@@ -7,6 +7,7 @@ package application
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -60,6 +61,7 @@ type EnrollCmdOption struct {
 	URL                  string
 	CAs                  []string
 	CASha256             []string
+	Insecure             bool
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 }
@@ -69,12 +71,20 @@ func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	if cfg.Protocol == kibana.ProtocolHTTP && !e.Insecure {
+		return nil, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+	}
 
 	// Add any SSL options from the CLI.
 	if len(e.CAs) > 0 || len(e.CASha256) > 0 {
 		cfg.TLS = &tlscommon.Config{
 			CAs:      e.CAs,
 			CASha256: e.CASha256,
+		}
+	}
+	if e.Insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
 		}
 	}
 
@@ -113,16 +123,16 @@ func NewEnrollCmdWithStore(
 
 	cfg, err := options.kibanaConfig()
 	if err != nil {
-		return nil, errors.New(err,
-			"invalid Kibana configuration",
+		return nil, errors.New(
+			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, options.URL))
 	}
 
 	client, err := fleetapi.NewWithConfig(log, cfg)
 	if err != nil {
-		return nil, errors.New(err,
-			"fail to create the API client",
+		return nil, errors.New(
+			err, "Error",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, options.URL))
 	}
