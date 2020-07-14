@@ -50,6 +50,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:

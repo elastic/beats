@@ -12,9 +12,9 @@ import (
 
 const (
 	// args: data path, pipeline name, application name
-	logFileFormat = "%s/logs/%s/%s"
+	logFileFormat = "%s/logs/%s/%s-json.log"
 	// args: data path, install path, pipeline name, application name
-	logFileFormatWin = "%s\\logs\\%s\\%s"
+	logFileFormatWin = "%s\\logs\\%s\\%s-json.log"
 
 	// args: pipeline name, application name
 	mbEndpointFileFormat = "unix:///tmp/elastic-agent/%s/%s/%s.sock"

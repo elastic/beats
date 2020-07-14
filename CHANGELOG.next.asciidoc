@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
+- Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
 
 *Packetbeat*
 
@@ -152,6 +153,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
 - file_integrity: Create fsnotify watcher only when starting file_integrity module {pull}19505[19505]
+- auditd: Fix spelling of anomaly in `event.category`.
+- auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
+- auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
 
 *Filebeat*
 
@@ -265,8 +269,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Stop counterCache only when already started {pull}19103[19103]
+- Fix empty field name errors in the application pool metricset. {pull}19537[19537]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Fix mapping of service start type in the service metricset, windows module. {pull}19551[19551]
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
@@ -347,6 +353,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
+- Add enrichment of auditd seccomp events with name of the architecture, syscall, and signal. {issue}14055[14055] {pull}19300[19300]
 
 *Filebeat*
 
@@ -441,6 +448,29 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 - Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
 - Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
+- Added Microsoft Defender ATP Module. {issue}17997[17997] {pull}19197[19197]
+- Add experimental dataset tomcat/log for Apache TomCat logs {pull}19713[19713]
+- Add experimental dataset netscout/sightline for Netscout Arbor Sightline logs {pull}19713[19713]
+- Add experimental dataset barracuda/waf for Barracuda Web Application Firewall logs {pull}19713[19713]
+- Add experimental dataset f5/bigipapm for F5 Big-IP Access Policy Manager logs {pull}19713[19713]
+- Add experimental dataset bluecoat/director for Bluecoat Director logs {pull}19713[19713]
+- Add experimental dataset cisco/nexus for Cisco Nexus logs {pull}19713[19713]
+- Add experimental dataset citrix/virtualapps for Citrix Virtual Apps logs {pull}19713[19713]
+- Add experimental dataset cylance/protect for Cylance Protect logs {pull}19713[19713]
+- Add experimental dataset f5/firepass for F5 FirePass SSL VPN logs {pull}19713[19713]
+- Add experimental dataset fortinet/clientendpoint for Fortinet FortiClient Endpoint Protection logs {pull}19713[19713]
+- Add experimental dataset imperva/securesphere for Imperva Secure Sphere logs {pull}19713[19713]
+- Add experimental dataset infoblox/nios for Infoblox Network Identity Operating System logs {pull}19713[19713]
+- Add experimental dataset juniper/junos for Juniper Junos OS logs {pull}19713[19713]
+- Add experimental dataset kaspersky/av for Kaspersky Anti-Virus logs {pull}19713[19713]
+- Add experimental dataset microsoft/dhcp for Microsoft DHCP Server logs {pull}19713[19713]
+- Add experimental dataset tenable/nessus_security for Tenable Nessus Security Scanner logs {pull}19713[19713]
+- Add experimental dataset rapid7/nexpose for Rapid7 Nexpose logs {pull}19713[19713]
+- Add experimental dataset radware/defensepro for Radware DefensePro logs {pull}19713[19713]
+- Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
+- Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
+- Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
+- Add initial support for configurable file identity tracking. {pull}18748[18748]
 
 *Heartbeat*
 
@@ -545,6 +575,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
 - The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
 - Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
+- Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 
 *Packetbeat*
 
