@@ -27,9 +27,16 @@ type Config struct {
 // Protocol define the protocol to use to make the connection. (Either HTTPS or HTTP)
 type Protocol string
 
+const (
+	// ProtocolHTTP is HTTP protocol connection to Kibana.
+	ProtocolHTTP Protocol = "http"
+	// ProtocolHTTPS is HTTPS protocol connection to Kibana.
+	ProtocolHTTPS Protocol = "https"
+)
+
 // Unpack the protocol.
 func (p *Protocol) Unpack(from string) error {
-	if from != "https" && from != "http" {
+	if Protocol(from) != ProtocolHTTPS && Protocol(from) != ProtocolHTTP {
 		return fmt.Errorf("invalid protocol %s, accepted values are 'http' and 'https'", from)
 	}
 
@@ -40,7 +47,7 @@ func (p *Protocol) Unpack(from string) error {
 // DefaultClientConfig creates default configuration for kibana client.
 func DefaultClientConfig() *Config {
 	return &Config{
-		Protocol: Protocol("http"),
+		Protocol: ProtocolHTTP,
 		Host:     "localhost:5601",
 		Path:     "",
 		SpaceID:  "",
