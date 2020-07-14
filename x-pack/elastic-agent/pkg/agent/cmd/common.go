@@ -52,6 +52,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 
 	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "", "c", defaultConfig, fmt.Sprintf(`Configuration file, relative to path.config (default "%s")`, defaultConfig))
 	cmd.PersistentFlags().StringVarP(&flags.PathConfig, "path.config", "", "${path.home}", "Configuration path")
