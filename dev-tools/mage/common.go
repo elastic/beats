@@ -49,8 +49,6 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Expand expands the given Go text/template string.
@@ -804,16 +802,6 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	minor, _ = strconv.Atoi(data["minor"])
 	patch, _ = strconv.Atoi(data["patch"])
 	return
-}
-
-// listModuleDir calls gotool.ListModuleVendorDir or
-// gotool.ListModuleCacheDir, depending on the value of
-// UseVendor.
-func listModuleDir(modpath string) (string, error) {
-	if UseVendor {
-		return gotool.ListModuleVendorDir(modpath)
-	}
-	return gotool.ListModuleCacheDir(modpath)
 }
 
 // ListMatchingEnvVars returns all of the environment variables names that begin

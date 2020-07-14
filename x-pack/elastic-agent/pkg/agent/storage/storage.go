@@ -12,6 +12,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/hectane/go-acl"
+
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
@@ -129,6 +131,13 @@ func (r *ReplaceOnSuccessStore) Save(in io.Reader) error {
 		}
 	}
 
+	if err := acl.Chmod(r.target, perms); err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not set permissions target file %s", r.target),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, r.target))
+	}
+
 	return nil
 }
 
@@ -174,6 +183,13 @@ func (d *DiskStore) Save(in io.Reader) error {
 	if err := file.SafeFileRotate(d.target, tmpFile); err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not replace target file %s", d.target),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, d.target))
+	}
+
+	if err := acl.Chmod(d.target, perms); err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not set permissions target file %s", d.target),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, d.target))
 	}

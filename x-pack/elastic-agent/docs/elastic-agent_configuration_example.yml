@@ -22,7 +22,7 @@ outputs:
     hosts: ["localhost:9200"]
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
-settings.monitoring:
+agent.monitoring:
   # enabled turns on monitoring of running processes
   enabled: true
   # enables log monitoring
@@ -38,41 +38,41 @@ settings.monitoring:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: info
+#agent.logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
 # Other available selectors are "beat", "publish", "service"
 # Multiple selectors can be chained.
-#logging.selectors: [ ]
+#agent.logging.selectors: [ ]
 
 # Send all logging output to stderr. The default is false.
-logging.to_stderr: true
+agent.logging.to_stderr: true
 
 # Send all logging output to syslog. The default is false.
-#logging.to_syslog: false
+#agent.logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
-#logging.to_eventlog: false
+#agent.logging.to_eventlog: false
 
-# If enabled, {{.BeatName | title}} periodically logs its internal metrics that have changed
+# If enabled, Elastic-Agent periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
-#logging.metrics.enabled: true
+#agent.logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.
-#logging.metrics.period: 30s
+#agent.logging.metrics.period: 30s
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
-#logging.to_files: true
-#logging.files:
+#agent.logging.to_files: true
+#agent.logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/{{.BeatName}}
+  #path: /var/log/elastic-agent
 
   # The name of the files where the logs are written to.
-  #name: {{.BeatName}}
+  #name: elastic-agent
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
@@ -97,12 +97,12 @@ logging.to_stderr: true
   # rotateonstartup: true
 
 # Set to true to log messages in JSON format.
-#logging.json: false
+#agent.logging.json: false
 
 # Set to true, to log messages with minimal required Elastic Common Schema (ECS)
 # information. Recommended to use in combination with `logging.json=true`
 # Defaults to false.
-#logging.ecs: false
+#agent.logging.ecs: false
 
 
 inputs:

@@ -45,6 +45,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 	for _, rule := range r.Rules {
 		var name string
 		switch rule.(type) {
+		case *SelectIntoRule:
+			name = "select_into"
 		case *CopyRule:
 			name = "copy"
 		case *CopyToListRule:
@@ -124,6 +126,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 		var r Rule
 		switch name {
+		case "select_into":
+			r = &SelectIntoRule{}
 		case "copy":
 			r = &CopyRule{}
 		case "copy_to_list":
@@ -168,6 +172,40 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	r.Rules = rules
 	return nil
+}
+
+// SelectIntoRule inserts selected paths into a new Dict node.
+type SelectIntoRule struct {
+	Selectors []Selector
+	Path      string
+}
+
+// Apply applies select into rule.
+func (r *SelectIntoRule) Apply(ast *AST) error {
+	target := &Dict{}
+
+	for _, selector := range r.Selectors {
+		lookupNode, ok := Lookup(ast.Clone(), selector)
+		if !ok {
+			continue
+		}
+
+		target.value = append(target.value, lookupNode.Clone())
+	}
+
+	if len(target.value) > 0 {
+		return Insert(ast, target, r.Path)
+	}
+
+	return nil
+}
+
+// SelectInto creates a SelectIntoRule
+func SelectInto(path string, selectors ...Selector) *SelectIntoRule {
+	return &SelectIntoRule{
+		Selectors: selectors,
+		Path:      path,
+	}
 }
 
 // RemoveKeyRule removes key from a dict.
@@ -882,14 +920,32 @@ func (r *MapRule) Apply(ast *AST) error {
 		)
 	}
 
-	l, ok := n.Value().(*List)
-	if !ok {
-		return fmt.Errorf(
-			"cannot iterate over node, invalid type expected 'List' received '%T'",
-			node,
-		)
+	switch t := n.Value().(type) {
+	case *List:
+		return mapList(r, t)
+	case *Dict:
+		return mapDict(r, t)
+	case *Key:
+		switch t := n.Value().(type) {
+		case *List:
+			return mapList(r, t)
+		case *Dict:
+			return mapDict(r, t)
+		default:
+			return fmt.Errorf(
+				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
+				node,
+			)
+		}
 	}
 
+	return fmt.Errorf(
+		"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
+		node,
+	)
+}
+
+func mapList(r *MapRule, l *List) error {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
@@ -902,6 +958,18 @@ func (r *MapRule) Apply(ast *AST) error {
 			values[idx] = newAST.root
 		}
 	}
+	return nil
+}
+
+func mapDict(r *MapRule, l *Dict) error {
+	newAST := &AST{root: l}
+	for _, rule := range r.Rules {
+		err := rule.Apply(newAST)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
