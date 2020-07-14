@@ -6,11 +6,15 @@ package logger
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/logp/configure"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -50,11 +54,13 @@ func new(name string, cfg *Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if err := configure.Logging("", commonCfg); err != nil {
+	internal, err := makeInternalFileOutput()
+	if err != nil {
+		return nil, err
+	}
+	if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
-
 	return logp.NewLogger(name), nil
 }
 
@@ -80,10 +86,34 @@ func toCommonConfig(cfg *Config) (*common.Config, error) {
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
-	cfg.ECSEnabled = true
 	cfg.Level = logp.DebugLevel
-	cfg.Files.Path = filepath.Join(paths.Home(), "data", "logs")
-	cfg.Files.Name = agentName
+	cfg.Files.Path = paths.Logs()
+	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
 
 	return &cfg
+}
+
+// makeInternalFileOutput creates a zapcore.Core logger that cannot be changed with configuration.
+//
+// This is the logger that the spawned filebeat expects to read the log file from and ship to ES.
+func makeInternalFileOutput() (zapcore.Core, error) {
+	// defaultCfg is used to set the defaults for the file rotation of the internal logging
+	// these settings cannot be changed by a user configuration
+	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
+	filename := filepath.Join(paths.Data(), "logs", fmt.Sprintf("%s-json.log", agentName))
+
+	rotator, err := file.NewFileRotator(filename,
+		file.MaxSizeBytes(defaultCfg.Files.MaxSize),
+		file.MaxBackups(defaultCfg.Files.MaxBackups),
+		file.Permissions(os.FileMode(defaultCfg.Files.Permissions)),
+		file.Interval(defaultCfg.Files.Interval),
+		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
+		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
+	)
+	if err != nil {
+		return nil, errors.New("failed to create internal file rotator")
+	}
+
+	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
 }
