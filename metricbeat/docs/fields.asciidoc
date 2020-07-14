@@ -32307,12 +32307,12 @@ type: long
 
 
 [float]
-=== ssl.session
+=== ssl
 
 SSL session cache hits and misses.
 
 
-*`mysql.status.cache.ssl.session.hits`*::
+*`mysql.status.cache.ssl.hits`*::
 +
 --
 The number of SSL session cache hits.
@@ -32321,7 +32321,7 @@ type: long
 
 --
 
-*`mysql.status.cache.ssl.session.misses`*::
+*`mysql.status.cache.ssl.misses`*::
 +
 --
 The number of SSL session cache misses.
@@ -32330,7 +32330,7 @@ type: long
 
 --
 
-*`mysql.status.cache.ssl.session.size`*::
+*`mysql.status.cache.ssl.size`*::
 +
 --
 The SSL session cache size.

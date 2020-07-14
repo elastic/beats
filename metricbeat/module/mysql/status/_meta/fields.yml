@@ -55,7 +55,7 @@
       type: group
       description: >
       fields:
-        - name: ssl.session
+        - name: ssl
           type: group
           description: SSL session cache hits and misses.
           fields:
