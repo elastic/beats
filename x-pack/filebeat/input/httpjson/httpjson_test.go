@@ -336,11 +336,22 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		"id": 100,
 	}
 	extraBodyContent := common.MapStr{"extra_body": "abc"}
-	ri, err := createRequestInfoFromBody(common.MapStr(m), "id", "pagination_id", extraBodyContent, "https://test-123", &RequestInfo{
-		URL:        "",
-		ContentMap: common.MapStr{},
-		Headers:    common.MapStr{},
-	})
+	config := &Pagination{
+		IDField:          "id",
+		RequestField:     "pagination_id",
+		ExtraBodyContent: extraBodyContent,
+		URL:              "https://test-123",
+	}
+	ri, err := createRequestInfoFromBody(
+		config,
+		common.MapStr(m),
+		common.MapStr(m),
+		&RequestInfo{
+			URL:        "",
+			ContentMap: common.MapStr{},
+			Headers:    common.MapStr{},
+		},
+	)
 	if ri.URL != "https://test-123" {
 		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
 	}

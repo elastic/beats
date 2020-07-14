@@ -61464,6 +61464,58 @@ type: keyword
 --
 
 
+*`gsuite.login.affected_email_address`*::
++
+--
+type: keyword
+
+--
+
+*`gsuite.login.challenge_method`*::
++
+--
+Login challenge method. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
+
+
+type: keyword
+
+--
+
+*`gsuite.login.failure_type`*::
++
+--
+Login failure type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
+
+
+type: keyword
+
+--
+
+*`gsuite.login.type`*::
++
+--
+Login credentials type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
+
+
+type: keyword
+
+--
+
+*`gsuite.login.is_second_factor`*::
++
+--
+type: boolean
+
+--
+
+*`gsuite.login.is_suspicious`*::
++
+--
+type: boolean
+
+--
+
+
 *`gsuite.saml.application_name`*::
 +
 --
