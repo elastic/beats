@@ -44,6 +44,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,
 		},
+		LoggingConfig: logger.DefaultLoggingConfig(),
 	}
 
 	l := getLogger()
