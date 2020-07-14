@@ -60,12 +60,6 @@ const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
-// default x-pack monitoring api parameters
-var defaultXPackParams = map[string]string{
-	"system_id":          "beats",
-	"system_api_version": "7",
-}
-
 func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
@@ -377,11 +371,6 @@ func getClusterUUID() string {
 func makeClientParams(config config) map[string]string {
 	params := map[string]string{}
 
-	if config.Format == report.FormatXPackMonitoringBulk {
-		for k, v := range defaultXPackParams {
-			params[k] = v
-		}
-	}
 	for k, v := range config.Params {
 		params[k] = v
 	}
