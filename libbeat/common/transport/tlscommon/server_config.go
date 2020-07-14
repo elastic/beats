@@ -113,6 +113,14 @@ func (c *ServerConfig) Unpack(cfg common.Config) error {
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *ServerConfig) Validate() error {
+	if c.IsEnabled() {
+		// c.Certificate.Validate() ensures that both a certificate and key
+		// are specified, or neither are specified. For server-side TLS we
+		// require both to be specified.
+		if c.Certificate.Certificate == "" {
+			return ErrCertificateUnspecified
+		}
+	}
 	return c.Certificate.Validate()
 }
 

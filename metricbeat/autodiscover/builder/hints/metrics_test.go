@@ -369,6 +369,85 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
+			message: "Named port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"some": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.ports.some}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Named port in the hints should return the corresponding container port for complex hosts",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "http://${data.host}:${data.ports.prometheus}/metrics",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"http://1.2.3.4:3306/metrics"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "data.port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"port":  3306,
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.port}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
 			message: "Module with mutliple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -409,6 +488,66 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		{
+			message: "Module with multiple hosts returns the right number of hints. Pod level hints need to be one per host",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090, ${data.host}:9091",
+					},
+				},
+			},
+			len: 2,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9091"},
+				},
+			},
+		},
+		{
+			message: "Module with multiple hosts and an exposed port creates a config for just the exposed port",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9091,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090, ${data.host}:9091",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9091"},
+				},
+			},
+		},
 	}
 	for _, test := range tests {
 		mockRegister := mb.NewRegister()
@@ -423,7 +562,7 @@ func TestGenerateHints(t *testing.T) {
 			logger:   logp.NewLogger("hints.builder"),
 		}
 		cfgs := m.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len)
+		assert.Equal(t, len(cfgs), test.len, test.message)
 
 		// The check below helps skipping config validation if there is no config supposed to be emitted.
 		if len(cfgs) == 0 {

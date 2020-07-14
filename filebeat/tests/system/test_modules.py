@@ -216,7 +216,11 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    host_keys = ["agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    # Strip host.name if event is not tagged as `forwarded`.
+    if "tags" not in obj or "forwarded" not in obj["tags"]:
+        host_keys.append("host.name")
+
     # The create timestamps area always new
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run
@@ -224,8 +228,24 @@ def clean_keys(obj):
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
-    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
-                        "system.auth", "system.syslog", "cef.log", "activemq.audit", "iptables.log", "cisco.asa", "cisco.ios"}
+    remove_timestamp = {
+        "activemq.audit",
+        "barracuda.waf",
+        "bluecoat.director",
+        "cef.log",
+        "cisco.asa",
+        "cisco.ios",
+        "f5.firepass",
+        "haproxy.log",
+        "icinga.startup",
+        "imperva.securesphere",
+        "infoblox.nios",
+        "iptables.log",
+        "rapid7.nexpose",
+        "redis.log",
+        "system.auth",
+        "system.syslog",
+    }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),
@@ -249,6 +269,8 @@ def clean_keys(obj):
     if obj["event.dataset"] in remove_timestamp:
         if not (obj['event.dataset'], filename) in remove_timestamp_exception:
             delete_key(obj, "@timestamp")
+            # Also remove alternate time field from rsa parsers.
+            delete_key(obj, "rsa.time.event_time")
         else:
             # excluded events need to have their filename saved to the expected.json
             # so that the exception mechanism can be triggered when the json is

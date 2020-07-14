@@ -28,10 +28,11 @@ func (p *periodic) Start() error {
 			p.log.Debugf("Failed to read configuration, error: %s", err)
 		}
 
+	WORK:
 		for {
 			select {
 			case <-p.done:
-				break
+				break WORK
 			case <-time.After(p.period):
 			}
 

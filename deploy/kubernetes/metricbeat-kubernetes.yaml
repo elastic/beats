@@ -239,6 +239,14 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
+    #- module: kubernetes
+    #  metricsets:
+    #    - apiserver
+    #  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+    #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    #  ssl.certificate_authorities:
+    #    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    #  period: 30s
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
 apiVersion: apps/v1
@@ -352,6 +360,10 @@ rules:
   - ""
   resources:
   - nodes/stats
+  verbs:
+  - get
+- nonResourceURLs:
+  - "/metrics"
   verbs:
   - get
 ---

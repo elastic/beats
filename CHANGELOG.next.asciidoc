@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 - Adds `split_events_by` option to httpjson input. {pull}19246[19246]
 - Adds `date_cursor` option to httpjson input. {pull}19483[19483]
+- Adds Gsuite module with SAML support. {pull}19329[19329]
+- Adds Gsuite User Accounts support. {pull}19329[19329]
 
 *Heartbeat*
 
@@ -138,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
+- Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
 
 *Auditbeat*
 
@@ -145,9 +148,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
-- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
+- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
+- file_integrity: Create fsnotify watcher only when starting file_integrity module {pull}19505[19505]
 
 *Filebeat*
 
@@ -199,6 +203,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
+- Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 
 *Heartbeat*
 
@@ -263,6 +268,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix empty field name errors in the application pool metricset. {pull}19537[19537]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Fix config example in the perfmon configuration files. {pull}19539[19539]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
+- Fix k8s scheduler compatibility issue. {pull}19699[19699]
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 
 *Packetbeat*
 
@@ -316,6 +325,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add data type conversion in `dissect` processor for converting string values to other basic data types. {pull}18683[18683]
+- Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
+- Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
+- Add support to trim captured values in the dissect processor. {pull}19464[19464]
+- Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 
 *Auditbeat*
 
@@ -425,6 +440,29 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed the panw module to pass through (rather than drop) message types other than threat and traffic. {issue}16815[16815] {pull}19375[19375]
 - Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
+- Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
+- Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
+- Add experimental dataset tomcat/log for Apache TomCat logs {pull}19713[19713]
+- Add experimental dataset netscout/sightline for Netscout Arbor Sightline logs {pull}19713[19713]
+- Add experimental dataset barracuda/waf for Barracuda Web Application Firewall logs {pull}19713[19713]
+- Add experimental dataset f5/bigipapm for F5 Big-IP Access Policy Manager logs {pull}19713[19713]
+- Add experimental dataset bluecoat/director for Bluecoat Director logs {pull}19713[19713]
+- Add experimental dataset cisco/nexus for Cisco Nexus logs {pull}19713[19713]
+- Add experimental dataset citrix/virtualapps for Citrix Virtual Apps logs {pull}19713[19713]
+- Add experimental dataset cylance/protect for Cylance Protect logs {pull}19713[19713]
+- Add experimental dataset f5/firepass for F5 FirePass SSL VPN logs {pull}19713[19713]
+- Add experimental dataset fortinet/clientendpoint for Fortinet FortiClient Endpoint Protection logs {pull}19713[19713]
+- Add experimental dataset imperva/securesphere for Imperva Secure Sphere logs {pull}19713[19713]
+- Add experimental dataset infoblox/nios for Infoblox Network Identity Operating System logs {pull}19713[19713]
+- Add experimental dataset juniper/junos for Juniper Junos OS logs {pull}19713[19713]
+- Add experimental dataset kaspersky/av for Kaspersky Anti-Virus logs {pull}19713[19713]
+- Add experimental dataset microsoft/dhcp for Microsoft DHCP Server logs {pull}19713[19713]
+- Add experimental dataset tenable/nessus_security for Tenable Nessus Security Scanner logs {pull}19713[19713]
+- Add experimental dataset rapid7/nexpose for Rapid7 Nexpose logs {pull}19713[19713]
+- Add experimental dataset radware/defensepro for Radware DefensePro logs {pull}19713[19713]
+- Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
+- Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
+- Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 
 *Heartbeat*
 
@@ -518,10 +556,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Accept prefix as metric_types config parameter in googlecloud stackdriver metricset. {pull}19345[19345]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 - Add dashboards for googlecloud load balancing metricset. {pull}18369[18369]
 - Add support for v1 consumer API in Cloud Foundry module, use it by default. {pull}19268[19268]
+- Add support for named ports in autodiscover. {pull}19398[19398]
 - Add param `aws_partition` to support aws-cn, aws-us-gov regions. {issue}18850[18850] {pull}19423[19423]
+- Add support for wildcard `*` in dimension value of AWS CloudWatch metrics config. {issue}18050[18050] {pull}19660[19660]
+- The `elasticsearch/index` metricset now collects metrics for hidden indices as well. {issue}18639[18639] {pull}18703[18703]
+- Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
+- The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
+- Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
 
 *Packetbeat*
 
@@ -542,6 +587,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
 
+*Elastic Log Driver*
+- Add support for `docker logs` command {pull}19531[19531]
+
 ==== Deprecated
 
 *Affecting all Beats*
@@ -555,6 +603,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 - Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
+- Deprecate tags.resource_type_filter config parameter and replace with resource_type. {pull}19688[19688]
 
 *Packetbeat*
 

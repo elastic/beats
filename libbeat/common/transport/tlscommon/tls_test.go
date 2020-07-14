@@ -172,9 +172,13 @@ func TestApplyWithConfig(t *testing.T) {
 func TestServerConfigDefaults(t *testing.T) {
 	t.Run("when CA is not explicitly set", func(t *testing.T) {
 		var c ServerConfig
-		config := common.MustNewConfigFrom([]byte(``))
+		config := common.MustNewConfigFrom(`
+certificate: mycert.pem
+key: mykey.pem
+`)
 		err := config.Unpack(&c)
 		require.NoError(t, err)
+		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
@@ -196,10 +200,13 @@ func TestServerConfigDefaults(t *testing.T) {
 
 		yamlStr := `
     certificate_authorities: [ca_test.pem]
+    certificate: mycert.pem
+    key: mykey.pem
 `
 		var c ServerConfig
 		config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
 		err = config.Unpack(&c)
+		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		require.NoError(t, err)
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
