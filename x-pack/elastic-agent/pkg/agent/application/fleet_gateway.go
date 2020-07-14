@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
@@ -77,7 +76,6 @@ type fleetGateway struct {
 func newFleetGateway(
 	ctx context.Context,
 	log *logger.Logger,
-	rawConfig *config.Config,
 	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
@@ -85,16 +83,11 @@ func newFleetGateway(
 	acker fleetAcker,
 ) (*fleetGateway, error) {
 
-	settings := defaultGatewaySettings
-	if err := rawConfig.Unpack(settings); err != nil {
-		return nil, errors.New(err, "fail to read gateway configuration")
-	}
-
-	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
+	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
 	return newFleetGatewayWithScheduler(
 		ctx,
 		log,
-		settings,
+		defaultGatewaySettings,
 		agentInfo,
 		client,
 		d,

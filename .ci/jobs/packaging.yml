@@ -14,7 +14,7 @@
           discover-pr-forks-trust: 'permission'
           discover-pr-origin: 'merge-current'
           discover-tags: true
-          head-filter-regex: '(master|7\.[x789]|8\.\d+|PR-.*)'
+          head-filter-regex: '(master|7\.[x789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
           disable-pr-notifications: true
           notification-context: 'beats-packaging'
           repo: 'beats'

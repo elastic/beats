@@ -58,7 +58,7 @@ require (
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
 	github.com/elastic/go-concert v0.0.3
 	github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
 	github.com/elastic/go-licenser v0.3.1
@@ -137,7 +137,9 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v2.19.11+incompatible
+	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.2.0 // indirect

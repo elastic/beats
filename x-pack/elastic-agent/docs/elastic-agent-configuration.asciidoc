@@ -56,11 +56,11 @@ A default output configuration is required.
 == {beats} monitoring settings
 
 {agent} monitors {beats} by default. To disable or change monitoring
-settings, set options under `settings.monitoring`:
+settings, set options under `agent.monitoring`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-settings.monitoring:
+agent.monitoring:
   # enabled turns on monitoring of running processes
   enabled: true
   # enables log monitoring
@@ -72,11 +72,11 @@ settings.monitoring:
 -------------------------------------------------------------------------------------
 
 
-To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to
+To disable monitoring, set `agent.monitoring.enabled` to `false`. When set to
 `false`, {beats} monitoring is turned off, and all other options in this section
 are ignored.
 
-To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the
+To enable monitoring, set `agent.monitoring.enabled` to `true`. Also set the
 `logs` and `metrics` settings to control whether logs, metrics, or both are
 collected. If neither setting is specified, monitoring is disabled. Set
 `use_output` to specify the output to which monitoring events are sent.

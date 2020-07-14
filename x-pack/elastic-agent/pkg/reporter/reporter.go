@@ -135,10 +135,17 @@ func generateRecord(agentID string, id string, name string, s state.State) event
 		errors.TypeApplication,
 		errors.M(errors.MetaKeyAppID, id),
 		errors.M(errors.MetaKeyAppName, name))
+	var payload map[string]interface{}
+	if s.Payload != nil {
+		payload = map[string]interface{}{
+			name: s.Payload,
+		}
+	}
 	return event{
 		eventype:  eventType,
 		subType:   subType,
 		timestamp: time.Now(),
 		message:   err.Error(),
+		payload:   payload,
 	}
 }
