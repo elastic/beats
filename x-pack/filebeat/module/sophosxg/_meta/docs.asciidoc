@@ -123,6 +123,9 @@ This is a list of FortiOS fields that are mapped to ECS.
 | ws_protocol                | http.version                   |
 |==============================================================
 
+:has-dashboards!:
+
+:fileset_ex!:
 
 [float]
 [[dynamic-script-compilations]]
