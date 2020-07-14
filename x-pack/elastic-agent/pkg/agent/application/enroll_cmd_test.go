@@ -19,6 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -154,10 +155,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -214,10 +215,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -274,10 +275,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -374,14 +375,14 @@ func bytesToTMPFile(b []byte) (string, error) {
 	return f.Name(), nil
 }
 
-func readConfig(raw []byte) (*FleetAgentConfig, error) {
+func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 	r := bytes.NewReader(raw)
 	config, err := config.NewConfigFrom(r)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg := defaultFleetAgentConfig()
+	cfg := configuration.DefaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}

@@ -12,14 +12,14 @@ import (
 	"testing"
 	"time"
 
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
@@ -31,8 +31,8 @@ import (
 var downloadPath = getAbsPath("tests/downloads")
 var installPath = getAbsPath("tests/scripts")
 
-func getTestOperator(t *testing.T, downloadPath string, installPath string, p *app.Descriptor) (*Operator, *operatorCfg.Config) {
-	operatorConfig := &operatorCfg.Config{
+func getTestOperator(t *testing.T, downloadPath string, installPath string, p *app.Descriptor) *Operator {
+	operatorCfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
 			RetriesCount: 2,
@@ -44,11 +44,6 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 			TargetDirectory: downloadPath,
 			InstallPath:     installPath,
 		},
-	}
-
-	cfg, err := config.NewConfigFrom(operatorConfig)
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	l := getLogger()
@@ -71,7 +66,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,16 +82,13 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	}
 	createFile(t, fullPath)
 
-	return operator, operatorConfig
+	return operator
 }
 
 func getLogger() *logger.Logger {
-	cfg, _ := config.NewConfigFrom(map[string]interface{}{
-		"logging": map[string]interface{}{
-			"level": "error",
-		},
-	})
-	l, _ := logger.NewFromConfig("", cfg)
+	loggerCfg := logger.DefaultLoggingConfig()
+	loggerCfg.Level = logp.ErrorLevel
+	l, _ := logger.NewFromConfig("", loggerCfg)
 	return l
 }
 

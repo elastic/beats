@@ -721,6 +721,19 @@ func Insert(a *AST, node Node, to Selector) error {
 		n, ok := current.Find(part)
 		if !ok {
 			switch t := current.(type) {
+			case *Key:
+				d, ok := t.value.(*Dict)
+				if !ok {
+					return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				}
+
+				newNode := &Key{name: part, value: &Dict{}}
+				d.value = append(d.value, newNode)
+
+				d.sort()
+
+				current = newNode
+				continue
 			case *Dict:
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
@@ -730,7 +743,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				current = newNode
 				continue
 			default:
-				return fmt.Errorf("expecting Dict and received %T", t)
+				return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
 			}
 		}
 
