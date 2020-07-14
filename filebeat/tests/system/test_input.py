@@ -702,8 +702,8 @@ class Test(BaseTest):
 
         # wait until the file is picked up
         self.wait_until(lambda: self.log_contains("Start harvester for new file: " + testfile))
+        self.wait_until(lambda: self.output_has(lines=1))
 
-        time.sleep(2)
         renamedfile = self.working_dir + "/log/renamed.log"
         os.rename(testfile, renamedfile)
 
