@@ -24,9 +24,9 @@ var gsuite = (function () {
             { from: "json.events.name", to: "event.action" },
             { from: "json.id.applicationName", to: "event.provider" },
             { from: "json.id.uniqueQualifier", to: "event.id", type: "string" },
-            { from: "json.actor.email", to: "client.user.email" },
-            { from: "json.actor.profileId", to: "client.user.id", type: "string" },
-            { from: "json.ipAddress", to: "client.ip", type: "ip" },
+            { from: "json.actor.email", to: "source.user.email" },
+            { from: "json.actor.profileId", to: "source.user.id", type: "string" },
+            { from: "json.ipAddress", to: "source.ip", type: "ip" },
             { from: "json.kind", to: "gsuite.kind" },
             { from: "json.id.customerId", to: "organization.id", type: "string" },
             { from: "json.actor.callerType", to: "gsuite.actor.type" },
@@ -40,7 +40,7 @@ var gsuite = (function () {
     });
 
     var completeUserData = function(evt) {
-        var email = evt.Get("client.user.email");
+        var email = evt.Get("source.user.email");
         if (!email) {
             return;
         }
@@ -50,16 +50,16 @@ var gsuite = (function () {
             return;
         }
 
-        evt.Put("client.user.name", data[0]);
-        evt.Put("client.user.domain", data[1]);
+        evt.Put("source.user.name", data[0]);
+        evt.Put("source.user.domain", data[1]);
     };
 
     var copyFields = function(evt) {
-        var ip = evt.Get("client.ip");
+        var ip = evt.Get("source.ip");
         if (ip) {
             evt.Put("related.ip", [ip]);
         }
-        var userName = evt.Get("client.user.name");
+        var userName = evt.Get("source.user.name");
         if (userName) {
             evt.Put("related.user", [userName]);
         }
