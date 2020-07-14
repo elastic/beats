@@ -10,10 +10,23 @@ outputs:
 
 inputs:
   - type: system/metrics
+
+    # The only two requirement are that it has only characters allowed in an Elasticsearch index name
+    # Index names must meet the following criteria:
+    #   Lowercase only
+    #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+    #   Cannot start with -, _, +
+    #   Cannot be . or ..
     dataset.namespace: default
     use_output: default
     streams:
       - metricset: cpu
+        # The only two requirement are that it has only characters allowed in an Elasticsearch index name
+        # Index names must meet the following criteria:
+        #   Lowercase only
+        #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+        #   Cannot start with -, _, +
+        #   Cannot be . or ..
         dataset.name: system.cpu
       - metricset: memory
         dataset.name: system.memory
