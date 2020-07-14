@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package stackdriver
+package metrics
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
-type stackdriverMetricsRequester struct {
+type metricsRequester struct {
 	config config
 
 	client *monitoring.MetricClient
@@ -36,7 +36,7 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *stackdriverMetricsRequester) Metric(ctx context.Context, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
+func (r *metricsRequester) Metric(ctx context.Context, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
@@ -70,7 +70,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, metricType str
 	return
 }
 
-func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, sdc stackDriverConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
@@ -100,7 +100,7 @@ var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
 
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
-func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
+func (r *metricsRequester) getFilterForMetric(m string) (f string) {
 	f = fmt.Sprintf(`metric.type="%s"`, m)
 	if r.config.Zone == "" && r.config.Region == "" {
 		return

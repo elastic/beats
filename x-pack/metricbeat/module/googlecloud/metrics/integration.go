@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package stackdriver
+package metrics
 
 import (
 	"os"
@@ -34,13 +34,14 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 			"region":                region,
 		}
 
-		if metricSetName == "stackdriver" {
-			stackDriverConfig := stackDriverConfig{
-				ServiceName: "compute",
-				Aligner:     "ALIGN_NONE",
-				MetricTypes: []string{"instance/uptime"},
+		if metricSetName == "metrics" {
+			config["metrics"] = []metricsConfig{
+				{
+					ServiceName: "compute",
+					Aligner:     "ALIGN_NONE",
+					MetricTypes: []string{"instance/uptime"},
+				},
 			}
-			config["metrics"] = stackDriverConfig
 		}
 	}
 	return config
