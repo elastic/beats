@@ -15,30 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build windows
+
 package file
 
 import (
-	"os"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type File struct {
-	File     *os.File
-	FileInfo os.FileInfo
-	Path     string
-	State    *State
-}
-
-// IsSameFile checks if the given File path corresponds with the FileInfo given
-// It is used to check if the file has been renamed.
-func IsSameFile(path string, info os.FileInfo) bool {
-	fileInfo, err := os.Stat(path)
-
-	if err != nil {
-		logp.Err("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
-		return false
-	}
-
-	return os.SameFile(fileInfo, info)
+func newINodeMarkerIdentifier(cfg *common.Config) (StateIdentifier, error) {
+	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }
