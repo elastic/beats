@@ -76,6 +76,7 @@ grouped in the following categories:
 * <<exported-fields-s3>>
 * <<exported-fields-santa>>
 * <<exported-fields-sonicwall>>
+* <<exported-fields-sophosxg>>
 * <<exported-fields-squid>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
@@ -120645,6 +120646,1886 @@ type: keyword
 +
 --
 This key captures values or decorators used within a registry entry
+
+type: keyword
+
+--
+
+[[exported-fields-sophosxg]]
+== sophosxg fields
+
+sophosxg Module
+
+
+
+[float]
+=== sophosxg
+
+
+
+
+[float]
+=== firewall
+
+Module for parsing sophosxg syslog.
+
+
+
+*`sophosxg.firewall.device`*::
++
+--
+device
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.date`*::
++
+--
+Date (yyyy-mm-dd) when the event occurred
+
+
+type: date
+
+--
+
+*`sophosxg.firewall.timezone`*::
++
+--
+Time (hh:mm:ss) when the event occurred
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.device_name`*::
++
+--
+Model number of the device
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.device_id`*::
++
+--
+Serial number of the device
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.log_id`*::
++
+--
+Unique 12 characters code (0101011)
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.log_type`*::
++
+--
+Type of event e.g. firewall event
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.log_component`*::
++
+--
+Component responsible for logging e.g. Firewall rule
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.log_subtype`*::
++
+--
+Sub type of event
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.hb_health`*::
++
+--
+Heartbeat status
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.priority`*::
++
+--
+Severity level of traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.status`*::
++
+--
+Ultimate status of traffic – Allowed or Denied
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.duration`*::
++
+--
+Durability of traffic (seconds)
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.fw_rule_id`*::
++
+--
+Firewall Rule ID which is applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.user_name`*::
++
+--
+user_name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.user_group`*::
++
+--
+Group name to which the user belongs
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.iap`*::
++
+--
+Internet Access policy ID applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ips_policy_id`*::
++
+--
+IPS policy ID applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.policy_type`*::
++
+--
+Policy type applied to the traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.appfilter_policy_id`*::
++
+--
+Application Filter policy applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.application_filter_policy`*::
++
+--
+Application Filter policy applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.application`*::
++
+--
+Application name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.application_name`*::
++
+--
+Application name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.application_risk`*::
++
+--
+Risk level assigned to the application
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.application_technology`*::
++
+--
+Technology of the application
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.application_category`*::
++
+--
+Application is resolved by signature or synchronized application
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.appresolvedby`*::
++
+--
+Technology of the application
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.app_is_cloud`*::
++
+--
+Application is Cloud
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.in_interface`*::
++
+--
+Interface for incoming traffic, e.g., Port A
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.out_interface`*::
++
+--
+Interface for outgoing traffic, e.g., Port B
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.src_ip`*::
++
+--
+Original source IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.src_mac`*::
++
+--
+Original source MAC address of traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.src_country_code`*::
++
+--
+Code of the country to which the source IP belongs
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dst_ip`*::
++
+--
+Original destination IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.dst_country_code`*::
++
+--
+Code of the country to which the destination IP belongs
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.protocol`*::
++
+--
+Protocol number of traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.src_port`*::
++
+--
+Original source port of TCP and UDP traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.dst_port`*::
++
+--
+Original destination port of TCP and UDP traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.icmp_type`*::
++
+--
+ICMP type of ICMP traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.icmp_code`*::
++
+--
+ICMP code of ICMP traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.sent_pkts`*::
++
+--
+Total number of packets sent
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.received_pkts`*::
++
+--
+Total number of packets received
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.sent_bytes`*::
++
+--
+Total number of bytes sent
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.recv_bytes`*::
++
+--
+Total number of bytes received
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.trans_src_ ip`*::
++
+--
+Translated source IP address for outgoing traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.trans_src_port`*::
++
+--
+Translated source port for outgoing traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.trans_dst_ip`*::
++
+--
+Translated destination IP address for outgoing traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.trans_dst_port`*::
++
+--
+Translated destination port for outgoing traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.srczonetype`*::
++
+--
+Type of source zone, e.g., LAN
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.srczone`*::
++
+--
+Name of source zone
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dstzonetype`*::
++
+--
+Type of destination zone, e.g., WAN
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dstzone`*::
++
+--
+Name of destination zone
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dir_disp`*::
++
+--
+TPacket direction. Possible values:“org”, “reply”, “”
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.connevent`*::
++
+--
+Event on which this log is generated
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.conn_id`*::
++
+--
+Unique identifier of connection
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.vconn_id`*::
++
+--
+Connection ID of the master connection
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.idp_policy_id`*::
++
+--
+IPS policy ID which is applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.idp_policy_name`*::
++
+--
+IPS policy name i.e. IPS policy name which is applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.signature_id`*::
++
+--
+Signature ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.signature_msg`*::
++
+--
+Signature messsage
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.classification`*::
++
+--
+Signature classification
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.rule_priority`*::
++
+--
+Priority of IPS policy
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.platform`*::
++
+--
+Platform of the traffic.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.category`*::
++
+--
+IPS signature category.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.target`*::
++
+--
+Platform of the traffic.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.eventid`*::
++
+--
+ATP Evenet ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ep_uuid`*::
++
+--
+Endpoint UUID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.threatname`*::
++
+--
+ATP threatname
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.sourceip`*::
++
+--
+Original source IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.destinationip`*::
++
+--
+Original destination IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.login_user`*::
++
+--
+ATP login user
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.eventtype`*::
++
+--
+ATP event type
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.execution_path`*::
++
+--
+ATP execution path
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.av_policy_name`*::
++
+--
+Malware scanning policy name which is applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.from_email_address`*::
++
+--
+Sender email address
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.to_email_address`*::
++
+--
+Receipeint email address
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.subject`*::
++
+--
+Email subject
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.mailsize`*::
++
+--
+mailsize
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.virus`*::
++
+--
+virus name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.FTP_url`*::
++
+--
+FTP URL from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.FTP_direction`*::
++
+--
+Direction of FTP transfer: Upload or Download
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.filesize`*::
++
+--
+Size of the file that contained virus
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.filepath`*::
++
+--
+Path of the file containing virus
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.filename`*::
++
+--
+File name associated with the event
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ftpcommand`*::
++
+--
+FTP command used when virus was found
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.url`*::
++
+--
+URL from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.domainname`*::
++
+--
+Domain from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.quarantine`*::
++
+--
+Path and filename of the file quarantined
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.src_domainname`*::
++
+--
+Sender domain name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dst_domainname`*::
++
+--
+Receiver domain name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.reason`*::
++
+--
+Reason why the record was detected as spam/malicious
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.referer`*::
++
+--
+Referer
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.spamaction`*::
++
+--
+Spam Action
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.mailid`*::
++
+--
+mailid
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.quarantine_reason`*::
++
+--
+Quarantine reason
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.status_code`*::
++
+--
+Status code
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.override_token`*::
++
+--
+Override token
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.con_id`*::
++
+--
+Unique identifier of connection
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.override_authorizer`*::
++
+--
+Override authorizer
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.transactionid`*::
++
+--
+Transaction ID of the AV scan.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.upload_file_type`*::
++
+--
+Upload file type
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.upload_file_name`*::
++
+--
+Upload file name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.httpresponsecode`*::
++
+--
+code of HTTP response
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.user_gp`*::
++
+--
+Group name to which the user belongs.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.category_type`*::
++
+--
+Type of category under which website falls
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.download_file_type`*::
++
+--
+Download file type
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.exceptions`*::
++
+--
+List of the checks excluded by web exceptions.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.contenttype`*::
++
+--
+Type of the content
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.override_name`*::
++
+--
+Override name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.activityname`*::
++
+--
+Web policy activity that matched and caused the policy result.
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.download_file_name`*::
++
+--
+Download file name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.sha1sum`*::
++
+--
+SHA1 checksum of the item being analyzed
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.message_id`*::
++
+--
+Message ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.connid`*::
++
+--
+Connection ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.message`*::
++
+--
+Message
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.email_subject`*::
++
+--
+Email Subject
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.file_path`*::
++
+--
+File path
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dstdomain`*::
++
+--
+Destination Domain
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.file_size`*::
++
+--
+File Size
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.transaction_id`*::
++
+--
+Transaction ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.website`*::
++
+--
+Website
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.file_name`*::
++
+--
+Filename
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.context_prefix`*::
++
+--
+Content Prefix
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.site_category`*::
++
+--
+Site Category
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.context_suffix`*::
++
+--
+Context Suffix
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.dictionary_name`*::
++
+--
+Dictionary Name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.action`*::
++
+--
+Event Action
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.user`*::
++
+--
+User
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.context_match`*::
++
+--
+Context Match 
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.direction`*::
++
+--
+Direction
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.auth_client`*::
++
+--
+Auth Client
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.auth_mechanism`*::
++
+--
+Auth mechanism
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.connectionname`*::
++
+--
+Connectionname
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.remotenetwork`*::
++
+--
+remotenetwork
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.localgateway`*::
++
+--
+Localgateway
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.localnetwork`*::
++
+--
+Localnetwork
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.connectiontype`*::
++
+--
+Connectiontype
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.oldversion`*::
++
+--
+Oldversion
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.newversion`*::
++
+--
+Newversion
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ipaddress`*::
++
+--
+Ipaddress
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.client_physical_address`*::
++
+--
+Client physical address
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.client_host_name`*::
++
+--
+Client host name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.raw_data`*::
++
+--
+Raw data
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.Mode`*::
++
+--
+Mode
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.sessionid`*::
++
+--
+Sessionid
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.starttime`*::
++
+--
+Starttime
+
+
+type: date
+
+--
+
+*`sophosxg.firewall.remote_ip`*::
++
+--
+Remote IP
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.timestamp`*::
++
+--
+timestamp
+
+
+type: date
+
+--
+
+*`sophosxg.firewall.SysLog_SERVER_NAME`*::
++
+--
+SysLog SERVER NAME
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.backup_mode`*::
++
+--
+Backup mode
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.source`*::
++
+--
+Source
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.server`*::
++
+--
+Server
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.host`*::
++
+--
+Host
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.responsetime`*::
++
+--
+Responsetime
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.cookie`*::
++
+--
+cookie
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.querystring`*::
++
+--
+querystring
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.extra`*::
++
+--
+extra
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.PHPSESSID`*::
++
+--
+PHPSESSID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.start_time`*::
++
+--
+Start time
+
+
+type: date
+
+--
+
+*`sophosxg.firewall.eventtime`*::
++
+--
+Event time
+
+
+type: date
+
+--
+
+*`sophosxg.firewall.red_id`*::
++
+--
+RED ID
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.branch_name`*::
++
+--
+Branch Name
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.updatedip`*::
++
+--
+updatedip
+
+
+type: ip
+
+--
+
+*`sophosxg.firewall.idle_cpu`*::
++
+--
+idle ##
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.system_cpu`*::
++
+--
+system
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.user_cpu`*::
++
+--
+system
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.used`*::
++
+--
+used
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.unit`*::
++
+--
+unit
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.total_memory`*::
++
+--
+Total Memory
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.free`*::
++
+--
+free
+
+
+type: integer
+
+--
+
+*`sophosxg.firewall.transmittederrors`*::
++
+--
+transmitted errors
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.receivederrors`*::
++
+--
+received errors
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.receivedkbits`*::
++
+--
+received kbits
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.transmittedkbits`*::
++
+--
+transmitted kbits
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.transmitteddrops`*::
++
+--
+transmitted drops
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.receiveddrops`*::
++
+--
+received drops
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.collisions`*::
++
+--
+collisions
+
+
+type: long
+
+--
+
+*`sophosxg.firewall.interface`*::
++
+--
+interface
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.Configuration`*::
++
+--
+Configuration
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.Reports`*::
++
+--
+Reports
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.Signature`*::
++
+--
+Signature
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.Temp`*::
++
+--
+Temp
+
+
+type: float
+
+--
+
+*`sophosxg.firewall.users`*::
++
+--
+users
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ssid`*::
++
+--
+ssid
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.ap`*::
++
+--
+ap
+
+
+type: keyword
+
+--
+
+*`sophosxg.firewall.clients_conn_ssid`*::
++
+--
+clients connection ssid
+
 
 type: keyword
 
