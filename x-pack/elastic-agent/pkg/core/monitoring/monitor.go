@@ -5,6 +5,7 @@
 package monitoring
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
@@ -28,20 +29,13 @@ type Monitor interface {
 	Close()
 }
 
+// TODO: changeme
 type wrappedConfig struct {
-	DownloadConfig   *artifact.Config                   `yaml:"download" config:"download"`
-	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
+	DownloadConfig   *artifact.Config                   `yaml:"agent.download" config:"agent.download"`
+	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"agent.monitoring" yaml:"agent.monitoring"`
 }
 
 // NewMonitor creates a monitor based on a process configuration.
-func NewMonitor(config *config.Config) (Monitor, error) {
-	cfg := &wrappedConfig{
-		DownloadConfig:   artifact.DefaultConfig(),
-		MonitoringConfig: monitoringConfig.DefaultConfig(),
-	}
-
-	if err := config.Unpack(&cfg); err != nil {
-		return nil, err
-	}
+func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
 	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig), nil
 }
