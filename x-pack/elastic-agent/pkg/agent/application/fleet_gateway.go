@@ -16,6 +16,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
+const maxUnauthCounter int = 6
+
 // Default Configuration for the Fleet Gateway.
 var defaultGatewaySettings = &fleetGatewaySettings{
 	Duration: 1 * time.Second,        // time between successful calls
@@ -59,18 +61,19 @@ type fleetAcker interface {
 // call the API to send the events and will receive actions to be executed locally.
 // The only supported action for now is a "ActionPolicyChange".
 type fleetGateway struct {
-	bgContext  context.Context
-	log        *logger.Logger
-	dispatcher dispatcher
-	client     clienter
-	scheduler  scheduler.Scheduler
-	backoff    backoff.Backoff
-	settings   *fleetGatewaySettings
-	agentInfo  agentInfo
-	reporter   fleetReporter
-	done       chan struct{}
-	wg         sync.WaitGroup
-	acker      fleetAcker
+	bgContext     context.Context
+	log           *logger.Logger
+	dispatcher    dispatcher
+	client        clienter
+	scheduler     scheduler.Scheduler
+	backoff       backoff.Backoff
+	settings      *fleetGatewaySettings
+	agentInfo     agentInfo
+	reporter      fleetReporter
+	done          chan struct{}
+	wg            sync.WaitGroup
+	acker         fleetAcker
+	unauthCounter int
 }
 
 func newFleetGateway(
@@ -203,6 +206,21 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	}
 
 	resp, err := cmd.Execute(ctx, req)
+	if isUnauth(err) {
+		f.unauthCounter++
+
+		if f.shouldUnroll() {
+			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
+			return &fleetapi.CheckinResponse{
+				Actions: []fleetapi.Action{&fleetapi.ActionUnenroll{ActionID: "", ActionType: "UNENROLL", IsDetected: true}},
+				Success: true,
+			}, nil
+		}
+
+		return nil, err
+	}
+
+	f.unauthCounter = 0
 	if err != nil {
 		return nil, err
 	}
@@ -210,6 +228,14 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// ack events so they are dropped from queue
 	ack()
 	return resp, nil
+}
+
+func (f *fleetGateway) shouldUnroll() bool {
+	return f.unauthCounter >= maxUnauthCounter
+}
+
+func isUnauth(err error) bool {
+	return errors.Is(err, fleetapi.ErrInvalidAPIKey)
 }
 
 func (f *fleetGateway) Start() {
