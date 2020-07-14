@@ -70,12 +70,12 @@ device IDs. However, on network shares and cloud providers these
 values might change during the lifetime of the file. If this happens
 {beatname_uc} thinks that file is new and resends the whole content
 of the file. To solve this problem you can configure `file_identity` option. Possible
-values are besides the default `inode_deviceid` are `path` and `inode_marker`.
+values besides the default `inode_deviceid` are `path` and `inode_marker`.
 
 Selecting `path` instructs {beatname_uc} to identify files based on their
 paths. This is a quick way to aviod rereading files if inode and device ids
 might change. However, keep in mind if the files are rotated (renamed), they
-are going to be reread and resent.
+will be reread and resubmitted.
 
 The option `inode_marker` can be used if the inodes stay the same even if
 the device id is changed. You should choose this method if your files are
@@ -85,7 +85,8 @@ readable by {beatname_uc} and set the path in the option `path` of `inode_marker
 The content of this file must be unique to the device. You can put the
 UUID of the device or mountpoint where the input is stored. The following
 example oneliner generates a hidden marker file for the selected mountpoint `/logs`:
-Please note that you should not use this option on Windows.
+Please note that you should not use this option on Windows as file identifiers might be
+more volatile.
 
 ["source","sh",subs="attributes"]
 ----
@@ -114,8 +115,9 @@ a pattern that matches the file you want to harvest and all of its rotated
 files. Also make sure your log rotation strategy prevents lost or duplicate
 messages. For more information, see <<file-log-rotation>>.
 
-Furthermore, do not use `path` method for `file_identity` to avoid duplication
-of the rotated log messages.
+Furthermore, to avoid duplicate of rotated log messages, do not use the
+`path` method for `file_identity`. Or exclude the rotated files with `exclude_files`
+option.
 
 [id="{beatname_lc}-input-{type}-options"]
 ==== Configuration options
