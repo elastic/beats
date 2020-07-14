@@ -23,6 +23,7 @@ It is compatible with a subset of applications under the https://developers.goog
 
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml[SAML Audit Activity Events]
 - https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts[User Accounts Activity Events]
+- https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login[Login Audit Activity Events]
 
 === Configure the module
 
@@ -46,6 +47,10 @@ you can set up your module:
     var.jwt_file: "./credentials_file.json"
     var.delegated_account: "user@example.com"
   user_accounts:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
+  login:
     enabled: true
     var.jwt_file: "./credentials_file.json"
     var.delegated_account: "user@example.com"

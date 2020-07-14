@@ -352,17 +352,6 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
-			name:        "date_cursor must fail in combination with pagination",
-			expectedErr: "invalid configuration: date_cursor cannnot be set in combination with other pagination mechanisms accessing config",
-			input: map[string]interface{}{
-				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo"},
-				"pagination": map[string]interface{}{
-					"header": map[string]interface{}{"field_name": "foo", "regex_pattern": "bar"},
-				},
-				"url": "localhost",
-			},
-		},
-		{
 			name:        "date_cursor.date_format will fail if invalid",
 			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
 			input: map[string]interface{}{

@@ -1,7 +1,7 @@
 {{ if eq .input "httpjson" }}
 type: httpjson
 
-url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/saml
+url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/login
 json_objects_array: items
 split_events_by: events
 
@@ -46,5 +46,5 @@ processors:
       file: ${path.home}/module/gsuite/config/common.js
   - script:
       lang: javascript
-      id: gsuite-saml
-      file: ${path.home}/module/gsuite/saml/config/pipeline.js
+      id: gsuite-login
+      file: ${path.home}/module/gsuite/login/config/pipeline.js
