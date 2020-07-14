@@ -735,7 +735,7 @@ func TestSerialization(t *testing.T) {
     selectors:
     - s1
     - s2
-    into: target
+    path: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {
