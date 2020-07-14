@@ -2,37 +2,32 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability"
+            "id": "elastic-apm"
         },
         "instance": {
-            "id": "2917397443238883901",
-            "name": "gke-observability-8--observability-8--bc1afd95-fv5w"
-        },
-        "machine": {
-            "type": "n1-standard-4"
+            "id": "8867356942891823986",
+            "name": "apm-ui-dev"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "europe-west4-a",
     "event": {
-        "dataset": "googlecloud.stackdriver",
+        "dataset": "googlecloud.metrics",
         "duration": 115000,
         "module": "googlecloud"
     },
     "googlecloud": {
-        "labels": {
-            "user": {
-                "goog-gke-node": ""
-            }
-        },
-        "stackdriver": {
+        "labels": {},
+        "metrics": {
             "instance": {
-                "uptime": 60
+                "uptime": {
+                    "value": 60
+                }
             }
         }
     },
     "metricset": {
-        "name": "stackdriver",
+        "name": "metrics",
         "period": 10000
     },
     "service": {

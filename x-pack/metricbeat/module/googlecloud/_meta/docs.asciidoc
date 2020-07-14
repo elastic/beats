@@ -135,7 +135,7 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `compute`, `loadbalancing`, `pubsub`, `stackdriver` and
+Currently, we have `compute`, `loadbalancing`, `pubsub`, `metrics` and
 `storage` metricset in `googlecloud` module.
 
 [float]
@@ -186,10 +186,11 @@ The `pubsub` metricset comes with a predefined dashboard:
 image::./images/metricbeat-googlecloud-pubsub-overview.png[]
 
 [float]
-=== `stackdriver`
-Stackdriver provides visibility into the performance, uptime, and overall health
-of cloud-powered applications. It collects metrics, events, and metadata from
-different services from Google Cloud.
+=== `metrics`
+`metrics` metricset uses Google Cloud Operations/Stackdriver, which provides
+visibility into the performance, uptime, and overall health of cloud-powered
+applications. It collects metrics, events, and metadata from different services
+from Google Cloud.
 This metricset is to collect https://cloud.google.com/monitoring/api/metrics_gcp[monitoring metrics]
 from Google Cloud using `ListTimeSeries` API.
 

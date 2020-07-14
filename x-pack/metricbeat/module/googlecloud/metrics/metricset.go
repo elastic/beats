@@ -83,14 +83,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	metricsConfigs := struct {
-		StackDriverMetrics []metricsConfig `config:"metrics" validate:"nonzero,required"`
+		Metrics []metricsConfig `config:"metrics" validate:"nonzero,required"`
 	}{}
 
 	if err := base.Module().UnpackConfig(&metricsConfigs); err != nil {
 		return nil, err
 	}
 
-	m.MetricsConfig = metricsConfigs.StackDriverMetrics
+	m.MetricsConfig = metricsConfigs.Metrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
