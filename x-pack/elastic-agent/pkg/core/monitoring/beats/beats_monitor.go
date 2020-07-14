@@ -12,22 +12,13 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 const httpPlusPrefix = "http+"
-
-type wrappedConfig struct {
-	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
-}
-
-func defaultWrappedConfig() *wrappedConfig {
-	return &wrappedConfig{
-		MonitoringConfig: monitoringConfig.DefaultConfig(),
-	}
-}
 
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
@@ -52,15 +43,15 @@ func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig
 
 // Reload reloads state of the monitoring based on config.
 func (b *Monitor) Reload(rawConfig *config.Config) error {
-	cfg := defaultWrappedConfig()
+	cfg := configuration.DefaultConfiguration()
 	if err := rawConfig.Unpack(&cfg); err != nil {
 		return err
 	}
 
-	if cfg == nil || cfg.MonitoringConfig == nil {
+	if cfg == nil || cfg.Settings == nil || cfg.Settings.MonitoringConfig == nil {
 		b.config = monitoringConfig.DefaultConfig()
 	} else {
-		b.config = cfg.MonitoringConfig
+		b.config = cfg.Settings.MonitoringConfig
 	}
 
 	return nil

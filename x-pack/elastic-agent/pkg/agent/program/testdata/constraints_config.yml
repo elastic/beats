@@ -29,12 +29,8 @@ inputs:
       - enabled: true
         metricset: info
 
-settings.monitoring:
+agent.monitoring:
   use_output: monitoring
 
-management:
-  host: "localhost"
-  mode: "local"
-
-config:
+agent:
   reload: 123
