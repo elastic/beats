@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashicorp/go-multierror"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v2"
@@ -77,7 +76,7 @@ func new(name string, cfg *common.Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := configure.Logging("", cfg, newMultiCoreWrapper(internal)); err != nil {
+	if err := configure.LoggingWithOutputs("", cfg, internal); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 
@@ -137,66 +136,5 @@ func makeInternalFileOutput() (zapcore.Core, error) {
 	}
 
 	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
-	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, logp.DebugLevel.ZapLevel())), nil
-}
-
-// newMultiCoreWrapper takes the current zapcore.Core and appends it with the provided others.
-func newMultiCoreWrapper(cores ...zapcore.Core) func(zapcore.Core) zapcore.Core {
-	return func(core zapcore.Core) zapcore.Core {
-		return &multiCore{append(cores, core)}
-	}
-}
-
-// multiCore allows multiple cores to be used for logging.
-type multiCore struct {
-	cores []zapcore.Core
-}
-
-// Enabled returns true if the level is enabled in any one of the cores.
-func (m multiCore) Enabled(level zapcore.Level) bool {
-	for _, core := range m.cores {
-		if core.Enabled(level) {
-			return true
-		}
-	}
-	return false
-}
-
-// With creates a new multiCore with each core set with the given fields.
-func (m multiCore) With(fields []zapcore.Field) zapcore.Core {
-	cores := make([]zapcore.Core, len(m.cores))
-	for i, core := range m.cores {
-		cores[i] = core.With(fields)
-	}
-	return &multiCore{cores}
-}
-
-// Check will place each core that checks for that entry.
-func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	for _, core := range m.cores {
-		checked = core.Check(entry, checked)
-	}
-	return checked
-}
-
-// Write writes the entry to each core.
-func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	var errs error
-	for _, core := range m.cores {
-		if err := core.Write(entry, fields); err != nil {
-			errs = multierror.Append(errs, err)
-		}
-	}
-	return errs
-}
-
-// Sync syncs each core.
-func (m multiCore) Sync() error {
-	var errs error
-	for _, core := range m.cores {
-		if err := core.Sync(); err != nil {
-			errs = multierror.Append(errs, err)
-		}
-	}
-	return errs
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
 }

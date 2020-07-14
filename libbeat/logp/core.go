@@ -27,6 +27,8 @@ import (
 	"sync/atomic"
 	"unsafe"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -61,7 +63,13 @@ type coreLogger struct {
 }
 
 // Configure configures the logp package.
-func Configure(cfg Config, wrapSink ...func(zapcore.Core) zapcore.Core) error {
+func Configure(cfg Config) error {
+	return ConfigureWithOutputs(cfg)
+}
+
+// Configure configures the logp package also sets up the following outputs to also be used
+// by the logger.
+func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 	var (
 		sink         zapcore.Core
 		observedLogs *observer.ObservedLogs
@@ -70,7 +78,7 @@ func Configure(cfg Config, wrapSink ...func(zapcore.Core) zapcore.Core) error {
 
 	// Build a single output (stderr has priority if more than one are enabled).
 	if cfg.toObserver {
-		sink, observedLogs = observer.New(cfg.Level.ZapLevel())
+		sink, observedLogs = observer.New(cfg.Level.zapLevel())
 	} else {
 		sink, err = createLogOutput(cfg)
 	}
@@ -105,9 +113,7 @@ func Configure(cfg Config, wrapSink ...func(zapcore.Core) zapcore.Core) error {
 		sink = selectiveWrapper(sink, selectors)
 	}
 
-	for _, wrapper := range wrapSink {
-		sink = wrapper(sink)
-	}
+	sink = newMultiCore(append(outputs, sink)...)
 	root := zap.New(sink, makeOptions(cfg)...)
 	storeLogger(&coreLogger{
 		selectors:    selectors,
@@ -194,16 +200,16 @@ func makeOptions(cfg Config) []zap.Option {
 
 func makeStderrOutput(cfg Config) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.zapLevel()), nil
 }
 
 func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.zapLevel()), nil
 }
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newSyslog(buildEncoder(cfg), cfg.Level.ZapLevel())
+	core, err := newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +217,7 @@ func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 }
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.ZapLevel())
+	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +243,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		return nil, errors.Wrap(err, "failed to create file rotator")
 	}
 
-	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.zapLevel()), nil
 }
 
 func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
@@ -264,4 +270,63 @@ func storeLogger(l *coreLogger) {
 		old.rootLogger.Sync()
 	}
 	atomic.StorePointer(&_log, unsafe.Pointer(l))
+}
+
+// newMultiCore creates a sink that sends to multiple cores.
+func newMultiCore(cores ...zapcore.Core) zapcore.Core {
+	return &multiCore{cores}
+}
+
+// multiCore allows multiple cores to be used for logging.
+type multiCore struct {
+	cores []zapcore.Core
+}
+
+// Enabled returns true if the level is enabled in any one of the cores.
+func (m multiCore) Enabled(level zapcore.Level) bool {
+	for _, core := range m.cores {
+		if core.Enabled(level) {
+			return true
+		}
+	}
+	return false
+}
+
+// With creates a new multiCore with each core set with the given fields.
+func (m multiCore) With(fields []zapcore.Field) zapcore.Core {
+	cores := make([]zapcore.Core, len(m.cores))
+	for i, core := range m.cores {
+		cores[i] = core.With(fields)
+	}
+	return &multiCore{cores}
+}
+
+// Check will place each core that checks for that entry.
+func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	for _, core := range m.cores {
+		checked = core.Check(entry, checked)
+	}
+	return checked
+}
+
+// Write writes the entry to each core.
+func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	var errs error
+	for _, core := range m.cores {
+		if err := core.Write(entry, fields); err != nil {
+			errs = multierror.Append(errs, err)
+		}
+	}
+	return errs
+}
+
+// Sync syncs each core.
+func (m multiCore) Sync() error {
+	var errs error
+	for _, core := range m.cores {
+		if err := core.Sync(); err != nil {
+			errs = multierror.Append(errs, err)
+		}
+	}
+	return errs
 }

@@ -47,7 +47,7 @@ func init() {
 
 // Logging builds a logp.Config based on the given common.Config and the specified
 // CLI flags.
-func Logging(beatName string, cfg *common.Config, wrapSink ...func(zapcore.Core) zapcore.Core) error {
+func Logging(beatName string, cfg *common.Config) error {
 	config := logp.DefaultConfig(environment)
 	config.Beat = beatName
 	if cfg != nil {
@@ -57,7 +57,22 @@ func Logging(beatName string, cfg *common.Config, wrapSink ...func(zapcore.Core)
 	}
 
 	applyFlags(&config)
-	return logp.Configure(config, wrapSink...)
+	return logp.Configure(config)
+}
+
+// Logging builds a logp.Config based on the given common.Config and the specified
+// CLI flags along with the given outputs.
+func LoggingWithOutputs(beatName string, cfg *common.Config, outputs ...zapcore.Core) error {
+	config := logp.DefaultConfig(environment)
+	config.Beat = beatName
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return err
+		}
+	}
+
+	applyFlags(&config)
+	return logp.ConfigureWithOutputs(config, outputs...)
 }
 
 func applyFlags(cfg *logp.Config) {
