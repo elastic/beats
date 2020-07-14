@@ -84,6 +84,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
+- Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
 
 *Packetbeat*
 

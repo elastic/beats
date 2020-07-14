@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package stackdriver
+package metrics
 
 import (
 	"testing"
@@ -19,79 +19,79 @@ func TestGetFilterForMetric(t *testing.T) {
 	cases := []struct {
 		title          string
 		m              string
-		r              stackdriverMetricsRequester
+		r              metricsRequester
 		expectedFilter string
 	}{
 		{
 			"compute service with zone in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
+			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1-a\")",
 		},
 		{
 			"pubsub service with zone in config",
 			"pubsub.googleapis.com/subscription/ack_message_count",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
+			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with zone in config",
 			"loadbalancing.googleapis.com/https/backend_latencies",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
+			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
 			"compute service with region in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
+			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-east1\")",
 		},
 		{
 			"pubsub service with region in config",
 			"pubsub.googleapis.com/subscription/ack_message_count",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
+			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with region in config",
 			"loadbalancing.googleapis.com/https/backend_latencies",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
+			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
 			"compute service with both region and zone in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{Region: "us-central1", Zone: "us-central1-a"}, logger: logger},
+			metricsRequester{config: config{Region: "us-central1", Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1\")",
 		},
 		{
 			"compute uptime with partial region",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Region: "us-west"}, logger: logger},
+			metricsRequester{config: config{Region: "us-west"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west\")",
 		},
 		{
 			"compute uptime with partial zone",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Zone: "us-west1-"}, logger: logger},
+			metricsRequester{config: config{Zone: "us-west1-"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 		{
 			"compute uptime with wildcard in region",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Region: "us-*"}, logger: logger},
+			metricsRequester{config: config{Region: "us-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-\")",
 		},
 		{
 			"compute uptime with wildcard in zone",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
+			metricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 		{
 			"compute service with no region/zone in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{}, logger: logger},
+			metricsRequester{config: config{}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\"",
 		},
 	}
