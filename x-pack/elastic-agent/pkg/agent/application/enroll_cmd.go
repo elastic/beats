@@ -82,6 +82,11 @@ func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 			CASha256: e.CASha256,
 		}
 	}
+	if e.Insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
+		}
+	}
 
 	return cfg, nil
 }
