@@ -4,8 +4,10 @@
 
 == Microsoft module
 
-This is a module for ingesting data from the different Microsoft Threat 
-Protection service API's.
+This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
+
+- `defender_atp` fileset: Supports Microsoft Defender ATP
+- `dhcp` fileset: Supports Microsoft DHCP logs
 
 include::../include/gs-link.asciidoc[]
 
@@ -101,15 +103,7 @@ This is a list of Defender ATP fields that are mapped to ECS.
 
 experimental[]
 
-This is a module for receiving Microsoft DHCP logs over Syslog or a file.
-
-include::../include/gs-link.asciidoc[]
-
-include::../include/configuring-intro.asciidoc[]
-
 :fileset_ex: dhcp
-
-include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `dhcp` fileset settings
