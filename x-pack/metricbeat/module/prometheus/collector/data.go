@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 
@@ -54,6 +55,7 @@ func (g *typedGenerator) Start() {
 }
 
 func (g *typedGenerator) Stop() {
+	logp.Debug("prometheus.collector.cache", "stopping counterCache")
 	g.counterCache.Stop()
 }
 
@@ -171,7 +173,7 @@ func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, va
 	}
 
 	if g.rateCounters {
-		d["rate"] = g.counterCache.RateUint64(name+labels.String(), value)
+		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
 	}
 
 	return d
@@ -184,7 +186,7 @@ func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, v
 	}
 
 	if g.rateCounters {
-		d["rate"] = g.counterCache.RateFloat64(name+labels.String(), value)
+		d["rate"], _ = g.counterCache.RateFloat64(name+labels.String(), value)
 	}
 
 	return d

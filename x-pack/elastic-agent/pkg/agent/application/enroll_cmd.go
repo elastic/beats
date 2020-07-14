@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"gopkg.in/yaml.v2"
 
@@ -91,7 +92,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewEncryptedDiskStore(fleetAgentConfigPath(), []byte("")),
+		storage.NewDiskStore(info.AgentConfigFile()),
 	)
 
 	return NewEnrollCmdWithStore(
@@ -141,7 +142,7 @@ func (c *EnrollCmd) Execute() error {
 
 	metadata, err := metadata()
 	if err != nil {
-		return errors.New(err, "acquiring hostname")
+		return errors.New(err, "acquiring metadata failed")
 	}
 
 	r := &fleetapi.EnrollRequest{
@@ -161,12 +162,15 @@ func (c *EnrollCmd) Execute() error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, &APIAccess{
-		AccessAPIKey: resp.Item.AccessAPIKey,
-		Kibana:       c.kibanaConfig,
-	})
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	configToStore := map[string]interface{}{
+		"fleet": fleetConfig,
+		"agent": map[string]interface{}{
+			"id": resp.Item.ID,
+		},
+	}
 
-	reader, err := yamlToReader(fleetConfig)
+	reader, err := yamlToReader(configToStore)
 	if err != nil {
 		return err
 	}
@@ -176,6 +180,12 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	if _, err := info.NewAgentInfo(); err != nil {
+		return err
+	}
+
+	// clear action store
+	// fail only if file exists and there was a failure
+	if err := os.Remove(info.AgentActionStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 

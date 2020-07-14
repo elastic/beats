@@ -5,9 +5,12 @@
 package artifact
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 // Config is a configuration used for verifier and downloader
@@ -18,8 +21,8 @@ type Config struct {
 	// Architecture: target architecture [32, 64]
 	Architecture string `json:"-" config:",ignore"`
 
-	// BeatsSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/beats/
-	BeatsSourceURI string `json:"sourceURI" config:"sourceURI"`
+	// SourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/
+	SourceURI string `json:"sourceURI" config:"sourceURI"`
 
 	// TargetDirectory: path to the directory containing downloaded packages
 	TargetDirectory string `json:"targetDirectory" config:"target_directory"`
@@ -40,6 +43,18 @@ type Config struct {
 	// local or network disk.
 	// If not provided FileSystem Downloader will fallback to /beats subfolder of elastic-agent directory.
 	DropPath string `yaml:"dropPath" config:"drop_path"`
+}
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *Config {
+	dataPath := paths.Data()
+	return &Config{
+		SourceURI:       "https://artifacts.elastic.co/downloads/",
+		TargetDirectory: filepath.Join(dataPath, "downloads"),
+		Timeout:         30 * time.Second,
+		PgpFile:         filepath.Join(dataPath, "elastic.pgp"),
+		InstallPath:     filepath.Join(dataPath, "install"),
+	}
 }
 
 // OS return configured operating system or falls back to runtime.GOOS

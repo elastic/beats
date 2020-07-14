@@ -41,7 +41,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	settings := instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithBeatMeta("agent")),
+		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithAgentMeta()),
 		HasDashboards: false,
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)

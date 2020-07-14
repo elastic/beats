@@ -207,11 +207,12 @@ func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, m
 		}
 
 		for _, tag := range outputListTags.TagList {
-			// By default, replace dot "." using under bar "_" for tag keys and values
+			// By default, replace dot "." using underscore "_" for tag keys.
+			// Note: tag values are not dedotted.
 			dbDetails.tags = append(dbDetails.tags,
 				aws.Tag{
 					Key:   common.DeDot(*tag.Key),
-					Value: common.DeDot(*tag.Value),
+					Value: *tag.Value,
 				})
 		}
 		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails

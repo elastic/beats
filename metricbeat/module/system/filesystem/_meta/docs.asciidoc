@@ -48,6 +48,6 @@ metricbeat.modules:
     period: 30s
     metricsets: ["filesystem"]
     processors:
-    - drop_event.when.regexp:
-        system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
+      - drop_event.when.regexp:
+          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
 ----

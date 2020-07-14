@@ -16,18 +16,89 @@ Note: extra GCP charges on Stackdriver Monitoring API requests will be generated
 == Module config and parameters
 This is a list of the possible module parameters you can tune:
 
-* *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
-* *region*: A single string with the region you want to monitor like "us-central1". This will enable monitoring for all zones under this region.
+* *zone*: A single string with the zone you want to monitor like `us-central1-a`.
+Or you can specific a partial zone name like `us-central1-` or `us-central1-*`,
+which will monitor all zones start with `us-central1-`: `us-central1-a`,
+`us-central1-b`, `us-central1-c` and `us-central1-f`.
+Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP zones]
+for zones that are available in GCP.
+
+* *region*: A single string with the region you want to monitor like `us-central1`.
+This will enable monitoring for all zones under this region. Or you can specific
+a partial region name like `us-east` or `us-east*`, which will monitor all regions start with
+`us-east`: `us-east1` and `us-east4`. If both region and zone are configured,
+only region will be used.
+Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP regions]
+for regions that are available in GCP. If both `region` and `zone` are not
+specified, metrics will be collected from all regions/zones.
+
 * *project_id*: A single string with your GCP Project ID
-* *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
-* *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
+
+* *credentials_file_path*: A single string pointing to the JSON file path
+reachable by Metricbeat that you have created using IAM.
+
+* *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels
+and metadata information from metricsets and fetch metrics only. At the moment,
+*labels and metadata extraction is only supported* in `compute` metricset.
+
+* *period*: A single time duration specified for this module collection frequency.
+
+[float]
+== Example configuration
+* `compute` metricset is enabled to collect metrics from `us-central1-a` zone
+in `elastic-observability` project.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+  zone: "us-central1-a"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
+
+* `compute` and `pubsub` metricsets are enabled to collect metrics from all zones
+under `us-central1` region in `elastic-observability` project.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+  region: "us-central1"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
+
+* `compute` metricset is enabled to collect metrics from all regions starts with
+`us-west` in `elastic-observability` project, which includes all zones under
+`us-west1`, `us-west2`, `us-west3` and `us-west4`.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+  region: "us-west"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
 
 [float]
 == Authentication, authorization and permissions.
 Authentication and authorization in Google Cloud Platform can be achieved in many ways. For the current version of the Google Cloud Platform module for Metricbeat, the only supported method is using Service Account JSON files. A typical JSON with a private key looks like this:
 
 [float]
-==== Example Credentials
+=== Example Credentials
 [source,json]
 ----
 {
@@ -62,7 +133,9 @@ Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics
 
 If you also want to *extract service labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
 
-A recommended `period` value between fetches is between 5 and 10 minutes, depending on how granular you want your metrics. GCP restricts information for less than 5 minutes.
+If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
+GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
+In googlecloud module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
 [float]
 === Rough estimation of the number of API Calls
@@ -72,14 +145,14 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `compute`, `loadbalancing`, and `pubsub` metricset in
-`googlecloud` module.
+Currently, we have `compute`, `loadbalancing`, `pubsub`, `stackdriver` and
+`storage` metricset in `googlecloud` module.
 
 [float]
 === `compute`
-Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine]
-Virtual Machines in Google Cloud Platform. The `compute` metricset contains some of the
-metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API].
+This metricset fetches metrics from https://cloud.google.com/compute/[Compute Engine]
+Virtual Machines in Google Cloud Platform. The `compute` metricset contains some
+of the metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[GCP Compute Monitoring API].
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
 This is enough to get most of the info associated with a metric like compute
 labels and metadata and metric specific Labels.
@@ -87,6 +160,62 @@ labels and metadata and metric specific Labels.
 The `compute` metricset comes with a predefined dashboard:
 
 image::./images/metricbeat-googlecloud-compute-overview.png[]
+
+[float]
+=== `loadbalancing`
+This metricset fetches metrics from https://cloud.google.com/load-balancing/[Load Balancing]
+in Google Cloud Platform. The `loadbalancing` metricset contains all metrics
+exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[GCP Load Balancing Monitoring API].
+
+The `loadbalancing` metricset comes with two predefined dashboards:
+
+[float]
+==== HTTPS
+For HTTPS load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-https-overview.png[]
+
+[float]
+==== L3
+For L3 load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-l3-overview.png[]
+
+[float]
+==== TCP/SSL/Proxy
+For TCP/SSL/Proxy load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-tcp-ssl-proxy-overview.png[]
+
+[float]
+=== `pubsub`
+This metricset fetches metrics from https://cloud.google.com/pubsub/[Pub/Sub]
+topics and subscriptions in Google Cloud Platform. The `pubsub` metricset
+contains all GA stage metrics exported from the
+https://cloud.google.com/monitoring/api/metrics_gcp#gcp-pubsub[GCP PubSub Monitoring API].
+
+The `pubsub` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-pubsub-overview.png[]
+
+[float]
+=== `stackdriver`
+Stackdriver provides visibility into the performance, uptime, and overall health
+of cloud-powered applications. It collects metrics, events, and metadata from
+different services from Google Cloud.
+This metricset is to collect https://cloud.google.com/monitoring/api/metrics_gcp[monitoring metrics]
+from Google Cloud using `ListTimeSeries` API.
+
+[float]
+=== `storage`
+This metricset fetches metrics from https://cloud.google.com/storage/[Storage]
+in Google Cloud Platform. The `storage` metricset contains all GA metrics
+exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-storage[GCP Storage Monitoring API].
+
+We recommend users to define `period: 5m` for this metricset because in Google
+Cloud, storage monitoring metrics are written every 5-minute sample period with
+a 10-minute ingest delay.
+
+The `storage` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-storage-overview.png[]
 
 
 [float]
@@ -101,22 +230,45 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+  region: "us-"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+
+- module: googlecloud
+  metricsets:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 1m
 
 - module: googlecloud
   metricsets:
     - storage
-  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 5m
+
+- module: googlecloud
+  metricsets:
+    - stackdriver
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  metrics:
+    - aligner: ALIGN_NONE
+      service: compute
+      metric_types:
+        - "instance/cpu/reserved_cores"
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+        - "instance/uptime"
 ----
 
 [float]
@@ -130,6 +282,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
+* <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
+
 * <<metricbeat-metricset-googlecloud-storage,storage>>
 
 include::googlecloud/compute.asciidoc[]
@@ -137,6 +291,8 @@ include::googlecloud/compute.asciidoc[]
 include::googlecloud/loadbalancing.asciidoc[]
 
 include::googlecloud/pubsub.asciidoc[]
+
+include::googlecloud/stackdriver.asciidoc[]
 
 include::googlecloud/storage.asciidoc[]
 

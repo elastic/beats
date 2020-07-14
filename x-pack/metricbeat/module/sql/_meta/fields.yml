@@ -1,5 +1,5 @@
 - key: sql
-  title: "sql"
+  title: "SQL"
   release: beta
   description: >
     SQL module fetches metrics from a SQL database
@@ -25,3 +25,8 @@
           object_type: keyword
           description: >
             Non-numeric values collected.
+        - name: metrics.boolean.*
+          type: object
+          object_type: keyword
+          description: >
+            Boolean values collected.

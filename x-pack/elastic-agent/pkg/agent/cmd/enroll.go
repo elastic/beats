@@ -14,6 +14,7 @@ import (
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
@@ -46,13 +47,21 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	warn.PrintNotGA(streams.Out)
-
-	config, err := config.LoadYAML(flags.PathConfigFile)
+	pathConfigFile := flags.Config()
+	rawConfig, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", flags.PathConfigFile),
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
 			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, flags.PathConfigFile))
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -67,7 +76,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
-	logger, err := logger.NewFromConfig(config)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
 	}
@@ -95,7 +104,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	c, err := application.NewEnrollCmd(
 		logger,
 		&options,
-		flags.PathConfigFile,
+		pathConfigFile,
 	)
 
 	if err != nil {

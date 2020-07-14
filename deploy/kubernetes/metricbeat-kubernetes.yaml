@@ -79,10 +79,11 @@ data:
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.verification_mode: "none"
-      # If using Red Hat OpenShift remove ssl.verification_mode entry and
-      # uncomment these settings:
+      # If there is a CA bundle that contains the issuer of the certificate used in the Kubelet API,
+      # remove ssl.verification_mode entry and use the CA, for instance:
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    # Currently `proxy` metricset is not supported on Openshift, comment out section
     - module: kubernetes
       metricsets:
         - proxy
@@ -138,6 +139,8 @@ spec:
               fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
         resources:
           limits:
             memory: 200Mi
@@ -174,14 +177,15 @@ spec:
           path: /var/run/docker.sock
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-daemonset-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-daemonset-modules
       - name: data
         hostPath:
+          # When metricbeat runs as non-root user, this directory needs to be writable by group (g+w)
           path: /var/lib/metricbeat-data
           type: DirectoryOrCreate
 ---
@@ -236,6 +240,14 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
+    #- module: kubernetes
+    #  metricsets:
+    #    - apiserver
+    #  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+    #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    #  ssl.certificate_authorities:
+    #    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    #  period: 30s
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
 apiVersion: apps/v1
@@ -300,11 +312,11 @@ spec:
       volumes:
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-deployment-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-deployment-modules
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -333,6 +345,7 @@ rules:
   - namespaces
   - events
   - pods
+  - secrets
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
@@ -348,6 +361,10 @@ rules:
   - ""
   resources:
   - nodes/stats
+  verbs:
+  - get
+- nonResourceURLs:
+  - "/metrics"
   verbs:
   - get
 ---

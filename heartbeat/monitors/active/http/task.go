@@ -20,14 +20,18 @@ package http
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -94,10 +98,8 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
-
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(settings, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
 }
@@ -234,11 +236,16 @@ func execPing(
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req)
-
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
+		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+			}
+		}
+
 		return start, time.Now(), errReason
 	}
 
@@ -247,6 +254,18 @@ func execPing(
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
+	}
+
+	if responseConfig.IncludeHeaders {
+		headerFields := common.MapStr{}
+		for canonicalHeaderKey, vals := range resp.Header {
+			if len(vals) > 1 {
+				headerFields[canonicalHeaderKey] = vals
+			} else {
+				headerFields[canonicalHeaderKey] = vals[0]
+			}
+		}
+		responseFields["headers"] = headerFields
 	}
 
 	httpFields := common.MapStr{"response": responseFields}

@@ -34,9 +34,6 @@ processors:
     field: event.outcome
     value: failure
     if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code > 399"
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - grok:
     field: source.address
     ignore_missing: true
@@ -80,7 +77,7 @@ processors:
 - set:
     field: tls.cipher
     value: '{{apache.access.ssl.cipher}}'
-    if: ctx?.apache?.access?.ssl?.cipher != null
+    ignore_empty_value: true
 
 - script:
     lang: painless

@@ -7,25 +7,10 @@
 <titleabbrev>Configure</titleabbrev>
 ++++
 
-Before modifying configuration settings, make sure you've completed the
-<<heartbeat-configuration,configuration steps>> in the Getting Started.
-This section describes some common use cases for changing configuration options.
-
-To configure Heartbeat, you edit the configuration file. For rpm and deb,
-you’ll find the default configuration file at
-+/etc/heartbeat/heartbeat.yml+. There's also a full example
-configuration file at +/etc/heartbeat/heartbeat.reference.yml+ that shows
-all non-deprecated options. For mac and win, look in the archive that you
-extracted.
-
-The Heartbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
-
-The following topics describe how to configure Heartbeat:
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-heartbeat-options>>
+* <<monitors-scheduler>>
 * <<configuration-general-options>>
 * <<configuration-path>>
 * <<configuring-output>>
@@ -43,6 +28,8 @@ The following topics describe how to configure Heartbeat:
 --
 
 include::./heartbeat-options.asciidoc[]
+
+include::./heartbeat-scheduler.asciidoc[]
 
 include::./heartbeat-general-options.asciidoc[]
 

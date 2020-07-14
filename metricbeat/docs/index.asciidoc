@@ -16,6 +16,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
+:beat_kib_app: {kib} Metrics
 :has_central_config:
 :has_solutions:
 :has_docker_label_ex:
@@ -36,9 +37,7 @@ include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::./gettingstarted.asciidoc[]
-
-include::{libbeat-dir}/repositories.asciidoc[]
+include::./getting-started.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -65,3 +64,5 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+
+include::{libbeat-dir}/shared/redirects.asciidoc[]

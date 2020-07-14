@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -26,48 +26,42 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
-	config, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := InjectAgentConfig(config); err != nil {
+	if err := InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, config)
+	return createApplication(log, pathConfigFile, rawConfig)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
-	config *config.Config,
+	rawConfig *config.Config,
 ) (Application, error) {
 	warn.LogNotGA(log)
-
 	log.Info("Detecting execution mode")
-	c := localDefaultConfig()
-	err := config.Unpack(c)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
-
-	mgmt := defaultManagementConfig()
-	err = c.Management.Unpack(mgmt)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
-
 	ctx := context.Background()
 
-	switch mgmt.Mode {
-	case localMode:
-		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, config)
-	case fleetMode:
-		log.Info("Agent is managed by Fleet")
-		return newManaged(ctx, log, config)
-	default:
-		return nil, ErrInvalidMgmtMode
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
 	}
+
+	if isStandalone(cfg.Fleet) {
+		log.Info("Agent is managed locally")
+		return newLocal(ctx, log, pathConfigFile, rawConfig)
+	}
+
+	log.Info("Agent is managed by Fleet")
+	return newManaged(ctx, log, rawConfig)
+}
+
+// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+	return cfg == nil || !cfg.Enabled
 }

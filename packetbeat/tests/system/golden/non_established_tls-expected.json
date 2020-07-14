@@ -7,13 +7,24 @@
         "destination.domain": "www.elastic.co",
         "destination.ip": "151.101.134.217",
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network_traffic",
+            "network"
+        ],
         "event.dataset": "tls",
         "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "network.community_id": "1:OD+OA3Fyagq6ZdQ3T94i6r2zqWA=",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "172.20.10.2",
+            "151.101.134.217"
+        ],
         "server.domain": "www.elastic.co",
         "server.ip": "151.101.134.217",
         "server.port": 443,

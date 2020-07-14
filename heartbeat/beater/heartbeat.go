@@ -86,7 +86,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.ConfigManager.Enabled() {
+	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 
@@ -126,7 +126,7 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	factory := monitors.NewFactory(bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg, nil)
+		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
 			return errors.Wrap(err, "could not create monitor")
 		}
@@ -156,7 +156,18 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	return autodiscover.NewAutodiscover("heartbeat", b.Publisher, bt.dynamicFactory, autodiscover.QueryConfig(), bt.config.Autodiscover)
+	autodiscover, err := autodiscover.NewAutodiscover(
+		"heartbeat",
+		b.Publisher,
+		bt.dynamicFactory,
+		autodiscover.QueryConfig(),
+		bt.config.Autodiscover,
+		b.Keystore,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return autodiscover, nil
 }
 
 // Stop stops the beat.

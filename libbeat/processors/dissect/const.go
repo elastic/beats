@@ -28,8 +28,8 @@ var (
 	// ` %{key}, %{key/2}`
 	// into:
 	// [["", "key" ], [", ", "key/2"]]
-	delimiterRE = regexp.MustCompile("(?s)(.*?)%\\{([^}]*?)}")
-	suffixRE    = regexp.MustCompile("(.+?)(/(\\d{1,2}))?(->)?$")
+	ordinalIndicator     = "/"
+	fixedLengthIndicator = "#"
 
 	skipFieldPrefix      = "?"
 	appendFieldPrefix    = "+"
@@ -38,6 +38,18 @@ var (
 	indirectAppendPrefix = "&+"
 	greedySuffix         = "->"
 	pointerFieldPrefix   = "*"
+	dataTypeIndicator    = "|"
+	dataTypeSeparator    = "\\|" // Needed for regexp
+
+	numberRE = "\\d{1,2}"
+	alphaRE  = "[[:alpha:]]*"
+
+	delimiterRE = regexp.MustCompile("(?s)(.*?)%\\{([^}]*?)}")
+	suffixRE    = regexp.MustCompile("(.+?)" + // group 1 for key name
+		"(" + ordinalIndicator + "(" + numberRE + ")" + ")?" + // group 2, 3 for ordinal
+		"(" + fixedLengthIndicator + "(" + numberRE + ")" + ")?" + // group 4, 5 for fixed length
+		"(" + greedySuffix + ")?" + // group 6 for greedy
+		"(" + dataTypeSeparator + "(" + alphaRE + ")?" + ")?$") // group 7,8 for data type separator and data type
 
 	defaultJoinString = " "
 
@@ -47,4 +59,6 @@ var (
 	errMixedPrefixIndirectAppend = errors.New("mixed prefix `&+`")
 	errMixedPrefixAppendIndirect = errors.New("mixed prefix `&+`")
 	errEmptyKey                  = errors.New("empty key")
+	errInvalidDatatype           = errors.New("invalid data type")
+	errMissingDatatype           = errors.New("missing data type")
 )

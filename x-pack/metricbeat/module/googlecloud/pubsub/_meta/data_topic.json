@@ -1,32 +1,20 @@
 {
-    "@timestamp": "2020-01-14T11:42:00.000Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "ecs": {
-        "version": "1.4.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
-        "provider": "googlecloud",
         "account": {
-            "id": "elastic-metricbeat"
-        }
-    },
-    "metricset": {
-        "name": "pubsub",
-        "period": 300000
+            "id": "elastic-observability"
+        },
+        "provider": "googlecloud"
     },
     "event": {
-        "duration": 932060852,
         "dataset": "googlecloud.pubsub",
+        "duration": 115000,
         "module": "googlecloud"
     },
     "googlecloud": {
         "labels": {
             "resource": {
-                "subscription_id": "test-subscription"
+                "topic_id": "test-ks"
             }
         },
         "pubsub": {
@@ -35,9 +23,9 @@
                     "bucket_options": {
                         "Options": {
                             "ExponentialBuckets": {
+                                "num_finite_buckets": 16,
                                 "growth_factor": 4,
-                                "scale": 1,
-                                "num_finite_buckets": 16
+                                "scale": 1
                             }
                         }
                     }
@@ -45,17 +33,11 @@
             }
         }
     },
+    "metricset": {
+        "name": "pubsub",
+        "period": 10000
+    },
     "service": {
         "type": "googlecloud"
-    },
-    "host": {
-        "name": "mcastro"
-    },
-    "agent": {
-        "ephemeral_id": "b3b8d9da-0094-4d54-b1dc-4d5e103d38aa",
-        "hostname": "mcastro",
-        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
-        "version": "8.0.0",
-        "type": "metricbeat"
     }
 }

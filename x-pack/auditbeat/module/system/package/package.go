@@ -76,6 +76,21 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingPackage:
+		return "info"
+	case eventActionPackageInstalled:
+		return "installation"
+	case eventActionPackageRemoved:
+		return "deletion"
+	case eventActionPackageUpdated:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -106,7 +121,9 @@ type Package struct {
 	Size        uint64
 	Summary     string
 	URL         string
-	Error       error
+	Type        string
+
+	error error
 }
 
 // Hash creates a hash for Package.
@@ -119,8 +136,12 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() common.MapStr {
+func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
 	mapstr := common.MapStr{
+		"name":    pkg.Name,
+		"version": pkg.Version,
+	}
+	ecsMapstr := common.MapStr{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
@@ -131,29 +152,39 @@ func (pkg Package) toMapStr() common.MapStr {
 
 	if pkg.Arch != "" {
 		mapstr.Put("arch", pkg.Arch)
+		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
 		mapstr.Put("license", pkg.License)
+		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
 		mapstr.Put("installtime", pkg.InstallTime)
+		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
 		mapstr.Put("size", pkg.Size)
+		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
 		mapstr.Put("summary", pkg.Summary)
+		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
 		mapstr.Put("url", pkg.URL)
+		ecsMapstr.Put("reference", pkg.URL)
 	}
 
-	return mapstr
+	if pkg.Type != "" {
+		ecsMapstr.Put("type", pkg.Type)
+	}
+
+	return mapstr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -340,23 +371,27 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 }
 
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"package"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
+			"package": ecsPkgFields,
 			"message": packageMessage(pkg, action),
 		},
-		MetricSetFields: pkg.toMapStr(),
+		MetricSetFields: pkgFields,
 	}
 
 	if ms.HostID() != "" {
 		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
 	}
 
-	if pkg.Error != nil {
-		event.RootFields.Put("error.message", pkg.Error.Error())
+	if pkg.error != nil {
+		event.RootFields.Put("error.message", pkg.error.Error())
 	}
 
 	return event
@@ -538,7 +573,9 @@ func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 		value := strings.TrimSpace(words[1])
 
 		if pkg == nil {
-			pkg = &Package{}
+			pkg = &Package{
+				Type: "dpkg",
+			}
 		}
 
 		switch strings.ToLower(words[0]) {

@@ -12,6 +12,7 @@ filebeat.inputs:
     #uaa_address: ${UAA_ADDRESS}
     #rlp_address: ${RLP_ADDRESS}
     #shard_id: ${SHARD_ID}
+    #version: v1
 
 
 #================================ Outputs =====================================
@@ -51,4 +52,4 @@ output.elasticsearch:
 
 processors:
   - add_cloudfoundry_metadata:
-    <<: *cloudfoundry
+      <<: *cloudfoundry

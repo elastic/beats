@@ -16,6 +16,27 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
+// Default Configuration for the Fleet Gateway.
+var defaultGatewaySettings = &fleetGatewaySettings{
+	Duration: 1 * time.Second,        // time between successful calls
+	Jitter:   500 * time.Millisecond, // used as a jitter for duration
+	Backoff: backoffSettings{ // time after a failed call
+		Init: 5 * time.Second,
+		Max:  60 * time.Second,
+	},
+}
+
+type fleetGatewaySettings struct {
+	Duration time.Duration   `config:"checkin_frequency"`
+	Jitter   time.Duration   `config:"jitter"`
+	Backoff  backoffSettings `config:"backoff"`
+}
+
+type backoffSettings struct {
+	Init time.Duration `config:"init"`
+	Max  time.Duration `config:"max"`
+}
+
 type dispatcher interface {
 	Dispatch(acker fleetAcker, actions ...action) error
 }
@@ -52,32 +73,21 @@ type fleetGateway struct {
 	acker      fleetAcker
 }
 
-type fleetGatewaySettings struct {
-	Duration time.Duration
-	Jitter   time.Duration
-	Backoff  backoffSettings
-}
-
-type backoffSettings struct {
-	Init time.Duration
-	Max  time.Duration
-}
-
 func newFleetGateway(
 	ctx context.Context,
 	log *logger.Logger,
-	settings *fleetGatewaySettings,
 	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
 	r fleetReporter,
 	acker fleetAcker,
 ) (*fleetGateway, error) {
-	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
+
+	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
 	return newFleetGatewayWithScheduler(
 		ctx,
 		log,
-		settings,
+		defaultGatewaySettings,
 		agentInfo,
 		client,
 		d,
@@ -98,6 +108,9 @@ func newFleetGatewayWithScheduler(
 	r fleetReporter,
 	acker fleetAcker,
 ) (*fleetGateway, error) {
+
+	// Backoff implementation doesn't support the using context as the shutdown mechanism.
+	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
 
 	return &fleetGateway{
@@ -144,10 +157,8 @@ func (f *fleetGateway) worker() {
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-		case <-f.done:
-			return
 		case <-f.bgContext.Done():
-			f.Stop()
+			f.stop()
 			return
 		}
 	}
@@ -155,7 +166,7 @@ func (f *fleetGateway) worker() {
 
 func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	f.backoff.Reset()
-	for {
+	for f.bgContext.Err() == nil {
 		// TODO: wrap with timeout context
 		resp, err := f.execute(f.bgContext)
 		if err != nil {
@@ -171,22 +182,24 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 		}
 		return resp, nil
 	}
+
+	return nil, f.bgContext.Err()
 }
 
 func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, error) {
 	// get events
 	ee, ack := f.reporter.Events()
 
-	var metaData map[string]interface{}
-	if m, err := metadata(); err == nil {
-		metaData = m
+	ecsMeta, err := metadata()
+	if err != nil {
+		f.log.Error(errors.New("failed to load metadata", err))
 	}
 
 	// checkin
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
 		Events:   ee,
-		Metadata: metaData,
+		Metadata: ecsMeta,
 	}
 
 	resp, err := cmd.Execute(ctx, req)
@@ -209,7 +222,7 @@ func (f *fleetGateway) Start() {
 	}(&f.wg)
 }
 
-func (f *fleetGateway) Stop() {
+func (f *fleetGateway) stop() {
 	f.log.Info("Fleet gateway is stopping")
 	defer f.scheduler.Stop()
 	close(f.done)

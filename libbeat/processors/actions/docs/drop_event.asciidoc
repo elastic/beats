@@ -12,8 +12,8 @@ are dropped.
 [source,yaml]
 ------
 processors:
- - drop_event:
-     when:
+  - drop_event:
+      when:
         condition
 ------
 

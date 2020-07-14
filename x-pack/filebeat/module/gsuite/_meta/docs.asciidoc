@@ -1,0 +1,94 @@
+[role="xpack"]
+
+:modulename: gsuite
+:has-dashboards: false
+
+== GSuite module
+
+beta[]
+
+This is a module for ingesting data from the different GSuite audit reports API's.
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+It is compatible with a subset of applications under the https://developers.google.com/admin-sdk/reports/v1/get-start/getting-started[Google Reports API v1]. As of today it supports:
+
+- https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml[SAML Audit Activity Events]
+- https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts[User Accounts Activity Events]
+
+=== Configure the module
+
+In order for filebeat to ingest data from the Google Reports API you must set up a `ServiceAccount` that has access to the `Admin SDK API`. Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
+
+This module will make use of the following `oauth2 scope`:
+
+- `https://www.googleapis.com/auth/admin.reports.audit.readonly`
+
+Once you have downloaded your service account credentials as a JSON file,
+you can set up your module:
+
+[float]
+===== Configuration options
+
+[source,yaml]
+----
+- module: gsuite
+  saml:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
+  user_accounts:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
+----
+
+Every fileset has the following configuration options:
+
+*`var.jwt_file`*::
+
+Specifies the path to the JWT credentials file.
+
+*`var.delegated_account`*::
+
+Email of the admin user used to access the API.
+
+*`var.http_client_timeout`*::
+
+Duration of the time limit on HTTP requests made by the module. Defaults to
+`60s`.
+
+*`var.interval`*::
+
+Duration between requests to the API. Defaults to `60s`.
+
+*`var.user_key`*::
+
+Specifies the user key to fetch reports from. Defaults to `all`.
+
+[float]
+==== GSuite Reports ECS fields
+
+This is a list of GSuite Reports fields that are mapped to ECS.
+
+[options="header"]
+|=======================================================================================
+| GSuite Reports             | ECS Fields                                              |
+| items[].id.time            | @timestamp                                              |
+| items[].id.uniqueQualifier | event.id                                                |
+| items[].id.applicationName | event.provider                                          |
+| items[].events[].name      | event.action                                            |
+| items[].customerId         | organization.id                                         |
+| items[].ipAddress          | client.ip, related.ip, client.as.*, client.geo.*        |
+| items[].actor.email        | client.user.email, client.user.name, client.user.domain |
+| items[].actor.profileId    | client.user.id                                          |
+|=======================================================================================
+
+These are the common ones to all filesets.
+
+:has-dashboards!:
+
+:modulename!:

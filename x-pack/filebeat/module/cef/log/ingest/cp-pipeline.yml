@@ -76,7 +76,7 @@ processors:
           - name: deviceExternalId
             to: observer.type
 
-            # Product Family
+            # Product Family (override deviceExternalId if present).
           - name: deviceFacility
             to: observer.type
             convert:
@@ -104,6 +104,10 @@ processors:
             to: checkpoint.termination_reason
 
           # Possibly an IKE cookie
+          - name: requestCookies
+            to: checkpoint.cookie
+
+          # Probably a typo in CP's CEF docs
           - name: checkrequestCookies
             to: checkpoint.cookie
 
@@ -136,7 +140,7 @@ processors:
           - name: deviceCustomNumber1
             labels:
               payload: network.bytes
-              elapsed time in seconds: host.uptime
+              elapsed time in seconds: event.duration
               email recipients number: checkpoint.email_recipients_num
 
           - name: deviceCustomNumber2
@@ -172,9 +176,9 @@ processors:
 
           - name: deviceCustomString6
             labels:
-              application name: process.name
+              application name: network.application
               virus name: checkpoint.virus_name
-              malware name: checkpoint.malware_name
+              malware name: checkpoint.spyware_name
               malware family: checkpoint.malware_family
 
           - name: deviceCustomString3
@@ -208,7 +212,7 @@ processors:
 
           - name: deviceCustomDate2
             labels:
-              subscription expiration: checkpoint.subscription_expiration
+              subscription expiration: checkpoint.subs_exp
 
           - name: deviceFlexNumber1
             labels:
@@ -225,7 +229,7 @@ processors:
 
           - name: flexString2
             labels:
-              malware action: event.action
+              malware action: rule.description
               attack information: event.action
 
           - name: rule_uid
@@ -295,15 +299,19 @@ processors:
             field: event.duration
             ignore_missing: true
 
-  # checkpoint.file_hash can be either MD5 or SHA1.
-  - set:
-      field: file.hash.md5
-      value: '{{checkpoint.file_hash}}'
+  # checkpoint.file_hash can be either MD5, SHA1 or SHA256.
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.md5
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==32'
-  - set:
-      field: file.hash.sha1
-      value: '{{checkpoint.file_hash}}'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha1
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==40'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha256
+      if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==64'
 
   # Event kind is 'event' by default. 'alert' when a risk score and rule info
   # is present.
@@ -324,7 +332,7 @@ processors:
   - set:
       field: event.category
       value: malware
-      if: 'ctx.checkpoint?.protection_id != null || ctx.checkpoint?.malware_name != null || ctx.checkpoint?.malware_family != null || ctx.checkpoint?.spyware_status != null'
+      if: 'ctx.checkpoint?.protection_id != null || ctx.checkpoint?.spyware_name != null || ctx.checkpoint?.malware_family != null || ctx.checkpoint?.spyware_status != null'
   - set:
       field: event.category
       value: intrusion_detection
