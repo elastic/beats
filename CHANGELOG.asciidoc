@@ -3,6 +3,51 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.8.1]]
+=== Beats version 7.8.1
+https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+- Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+
+*Auditbeat*
+
+- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
+
+*Filebeat*
+
+- Fix date and timestamp formats for fortigate module {pull}19316[19316]
+- Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
+- Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
+- Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+
+*Metricbeat*
+
+- Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
+
+==== Added
+
+*Filebeat*
+
+- Add support for timezone offsets and `Z` to decode_cef timestamp parser. {pull}19346[19346]
+
+*Metricbeat*
+
+- Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
+
 [[release-notes-7.8.0]]
 === Beats version 7.8.0
 https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
