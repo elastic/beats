@@ -42,8 +42,8 @@ type Application interface {
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
 	State() state.State
-	SetState(status state.Status, msg string)
-	OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string)
+	SetState(status state.Status, msg string, payload map[string]interface{})
+	OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{})
 }
 
 // Descriptor defines a program which needs to be run.
@@ -68,10 +68,10 @@ type ApplicationStatusHandler struct{}
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application is needed.
-func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	app, ok := s.App().(Application)
 	if !ok {
 		panic(errors.New("only Application can be registered when using the ApplicationStatusHandler", errors.TypeUnexpected))
 	}
-	app.OnStatusChange(s, status, msg)
+	app.OnStatusChange(s, status, msg, payload)
 }

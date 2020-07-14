@@ -62,7 +62,7 @@ func (o *operationVerify) Check(_ context.Context, _ Application) (bool, error) 
 func (o *operationVerify) Run(_ context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 
