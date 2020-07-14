@@ -719,7 +719,7 @@ class Test(BaseTest):
         File is picked up again if the contents of the marker file changes.
         """
 
-        marker_location = self.working_dir + "/marker"
+        marker_location = os.path.join(self.working_dir, "marker")
         with open(marker_location, 'w') as m:
             m.write("very-unique-string")
 
@@ -753,7 +753,7 @@ class Test(BaseTest):
         File reading can be continued after file_identity is changed.
         """
 
-        marker_location = self.working_dir + "/marker"
+        marker_location = os.path.join(self.working_dir, "marker")
         with open(marker_location, 'w') as m:
             m.write("very-unique-string")
 
