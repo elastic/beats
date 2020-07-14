@@ -443,6 +443,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 - Improve ECS categorization field mappings in azure module. {issue}16155[16155] {pull}19376[19376]
 - Add text & flattened versions of fields with unknown subfields in aws cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
+- Added Microsoft Defender ATP Module. {issue}17997[17997] {pull}19197[19197]
 - Add experimental dataset tomcat/log for Apache TomCat logs {pull}19713[19713]
 - Add experimental dataset netscout/sightline for Netscout Arbor Sightline logs {pull}19713[19713]
 - Add experimental dataset barracuda/waf for Barracuda Web Application Firewall logs {pull}19713[19713]
