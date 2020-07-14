@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp/configure"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 const agentName = "elastic-agent"
@@ -28,56 +27,38 @@ type Config = logp.Config
 
 // New returns a configured ECS Logger
 func New(name string) (*Logger, error) {
-	dc, err := defaultConfig()
-	if err != nil {
-		return nil, err
-	}
-	return new(name, dc)
+	defaultCfg := DefaultLoggingConfig()
+	return new(name, defaultCfg)
 }
 
 // NewWithLogpLevel returns a configured logp Logger with specified level.
 func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
-	cfg := struct {
-		Level string `config:"level"`
-	}{Level: level.String()}
+	defaultCfg := DefaultLoggingConfig()
+	defaultCfg.Level = level
 
-	commonCfg, err := common.NewConfigFrom(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(name, commonCfg)
+	return new(name, defaultCfg)
 }
 
 //NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
-func NewFromConfig(name string, cfg *config.Config) (*Logger, error) {
-	defaultCfg, err := defaultConfig()
+func NewFromConfig(name string, cfg *Config) (*Logger, error) {
+	return new(name, cfg)
+}
+
+func new(name string, cfg *Config) (*Logger, error) {
+	commonCfg, err := toCommonConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
-	wrappedConfig := &struct {
-		Logging *common.Config `config:"logging"`
-	}{Logging: defaultCfg}
 
-	if err := cfg.Unpack(&wrappedConfig); err != nil {
-		return nil, err
-	}
-
-	return new(name, wrappedConfig.Logging)
-}
-
-func new(name string, cfg *common.Config) (*Logger, error) {
-	if err := configure.Logging("", cfg); err != nil {
+	if err := configure.Logging("", commonCfg); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 
 	return logp.NewLogger(name), nil
 }
 
-func defaultConfig() (*common.Config, error) {
-	cfg := DefaultLoggingConfig()
-
+func toCommonConfig(cfg *Config) (*common.Config, error) {
 	// work around custom types and common config
 	// when custom type is transformed to common.Config
 	// value is determined based on reflect value which is incorrect
