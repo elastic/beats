@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -20,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 var defaultDelay = 1 * time.Second
@@ -116,6 +118,19 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	err = c.Execute()
+	signal := make(chan struct{})
+
+	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+
+	for err == fleetapi.ErrTooManyRequests {
+		fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
+		backExp.Wait()
+		fmt.Fprintln(streams.Out, "Retrying to enroll...")
+		err = c.Execute()
+	}
+
+	close(signal)
+
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}

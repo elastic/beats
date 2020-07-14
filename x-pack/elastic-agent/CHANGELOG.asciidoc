@@ -86,3 +86,4 @@
 - Configuration cleanup {pull}19848[19848]
 - Agent now sends its own logs to elasticsearch {pull}19811[19811]
 - Add --insecure option to enroll command {pull}19900[19900]
+- Will retry to enroll if the server return a 429. {pull}19918[19811]
