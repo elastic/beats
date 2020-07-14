@@ -82,3 +82,4 @@
 - Refuse invalid stream values in configuration {pull}19587[19587]
 - Agent now load balances across multiple Kibana instances {pull}19628[19628]
 - Configuration cleanup {pull}19848[19848]
+- Agent now sends its own logs to elasticsearch {pull}19811[19811]
