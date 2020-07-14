@@ -129,6 +129,10 @@ file is renamed or moved in such a way that it's no longer matched by the file
 patterns specified for the , the file will not be picked up again.
 {beatname_uc} will not finish reading the file.
 
+Do not use this option when `path` based `file_identity` is configured. It does
+not make sense to enable the option, as Filebeat cannot detect renames using
+path names as unique identifiers.
+
 WINDOWS: If your Windows log rotation system shows errors because it can't
 rotate the files, you should enable this option.
 
@@ -397,3 +401,44 @@ file that hasn't been harvested for a longer period of time.
 This configuration option applies per input. You can use this option to
 indirectly set higher priorities on certain inputs by assigning a higher
 limit of harvesters.
+
+[float]
+===== `file_identity`
+
+Different `file_identity` methods can be configured to suit the
+environment where you are collecting log messages.
+
+
+*`native`*:: The default behaviour of {beatname_uc} is to differentiate
+between files using their inodes and device ids.
+
+[source,yaml]
+----
+file_identity.native: ~
+----
+
+*`path`*:: To identify files based on their paths use this strategy.
+
+WARNING: Only use this strategy if your log files are rotated to a folder
+outside of the scope of your input or not at all. Otherwise you end up
+with duplicated events.
+
+WARNING: This strategy does not support renaming files.
+If an input file is renamed, {beatname_uc} will read it again if the new path
+matches the settings of the input.
+
+[source,yaml]
+----
+file_identity.path: ~
+----
+
+*`inode_marker`*:: If the device id changes from time to time, you must use
+this method to distinguish files. This option is not supported on Windows.
+
+Set the location of the marker file the following way:
+
+[source,yaml]
+----
+file_identity.inode_marker.path: /logs/.filebeat-marker
+----
+

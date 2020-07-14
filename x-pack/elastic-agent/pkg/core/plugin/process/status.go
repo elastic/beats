@@ -18,7 +18,7 @@ import (
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application if needed.
-func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
@@ -28,7 +28,7 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		return
 	}
 
-	a.setStateFromProto(status, msg)
+	a.setStateFromProto(status, msg, payload)
 	if status == proto.StateObserved_FAILED {
 		// ignore when expected state is stopping
 		if s.Expected() == proto.StateExpected_STOPPING {
@@ -52,7 +52,7 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 
 		err := a.start(ctx, tag, cfg)
 		if err != nil {
-			a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err))
+			a.setState(state.Crashed, fmt.Sprintf("failed to restart: %s", err), nil)
 		}
 	}
 }
