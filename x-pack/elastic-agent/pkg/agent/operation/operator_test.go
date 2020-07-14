@@ -12,6 +12,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -137,6 +139,15 @@ func TestConfigurableFailed(t *testing.T) {
 		pid = item.ProcessInfo.PID
 		return nil
 	})
+	items := operator.State()
+	item, ok := items[p.ID()]
+	if !ok {
+		t.Fatalf("no state for process")
+	}
+	assert.Equal(t, map[string]interface{}{
+		"status":  float64(proto.StateObserved_HEALTHY),
+		"message": "Running",
+	}, item.Payload)
 
 	// try to configure (with failed status)
 	cfg := make(map[string]interface{})
