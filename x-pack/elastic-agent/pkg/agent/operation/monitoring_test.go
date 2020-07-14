@@ -152,10 +152,10 @@ func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) State() state.State                { return state.State{} }
-func (*testMonitorableApp) SetState(_ state.Status, _ string) {}
-func (a *testMonitorableApp) Monitor() monitoring.Monitor     { return a.monitor }
-func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string) {
+func (*testMonitorableApp) State() state.State                                          { return state.State{} }
+func (*testMonitorableApp) SetState(_ state.Status, _ string, _ map[string]interface{}) {}
+func (a *testMonitorableApp) Monitor() monitoring.Monitor                               { return a.monitor }
+func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string, _ map[string]interface{}) {
 }
 
 type testMonitor struct {

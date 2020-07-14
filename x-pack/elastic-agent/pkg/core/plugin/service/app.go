@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"reflect"
 	"sync"
 	"time"
 
@@ -125,10 +126,10 @@ func (a *Application) Started() bool {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string) {
+func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg)
+	a.setState(status, msg, payload)
 }
 
 // Start starts the application with a specified config.
@@ -150,11 +151,11 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 
 	// already started
 	if a.srvState != nil {
-		a.setState(state.Starting, "Starting")
-		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
+		a.setState(state.Starting, "Starting", nil)
+		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
 		a.srvState.UpdateConfig(string(cfgStr))
 	} else {
-		a.setState(state.Starting, "Starting")
+		a.setState(state.Starting, "Starting", nil)
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
@@ -226,9 +227,9 @@ func (a *Application) Stop() {
 	}
 
 	if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
-		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error())
+		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error(), nil)
 	} else {
-		a.setState(state.Stopped, "Stopped")
+		a.setState(state.Stopped, "Stopped", nil)
 	}
 	a.srvState = nil
 
@@ -247,7 +248,7 @@ func (a *Application) Shutdown() {
 
 	// destroy the application in the server, this skips sending
 	// the expected stopping state to the service
-	a.setState(state.Stopped, "Stopped")
+	a.setState(state.Stopped, "Stopped", nil)
 	a.srvState.Destroy()
 	a.srvState = nil
 
@@ -258,7 +259,7 @@ func (a *Application) Shutdown() {
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application is needed.
-func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
@@ -268,10 +269,10 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		return
 	}
 
-	a.setStateFromProto(status, msg)
+	a.setStateFromProto(status, msg, payload)
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
+func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	var status state.Status
 	switch pstatus {
 	case proto.StateObserved_STARTING:
@@ -287,13 +288,14 @@ func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg 
 	case proto.StateObserved_STOPPING:
 		status = state.Stopping
 	}
-	a.setState(status, msg)
+	a.setState(status, msg, payload)
 }
 
-func (a *Application) setState(status state.Status, msg string) {
-	if a.state.Status != status || a.state.Message != msg {
+func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
 		a.state.Status = status
 		a.state.Message = msg
+		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
