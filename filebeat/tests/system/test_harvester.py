@@ -79,7 +79,7 @@ class Test(BaseTest):
 
     def test_close_removed(self):
         """
-        Checks that a file is closed if removed with inode_deviceid file identifier
+        Checks that a file is closed if removed with native file identifier
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",

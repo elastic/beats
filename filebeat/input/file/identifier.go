@@ -19,33 +19,28 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
-	inodeDeviceIDName = "inode_deviceid"
-	pathName          = "path"
-	inodeMarkerName   = "inode_marker"
+	nativeName      = "native"
+	pathName        = "path"
+	inodeMarkerName = "inode_marker"
 
-	DefaultIdentifierName = inodeDeviceIDName
+	DefaultIdentifierName = nativeName
 	identitySep           = "::"
 )
 
 var (
 	identifierFactories = map[string]IdentifierFactory{
-		inodeDeviceIDName: newINodeDeviceIdentifier,
-		pathName:          newPathIdentifier,
-		inodeMarkerName:   newINodeMarkerIdentifier,
+		nativeName:      newINodeDeviceIdentifier,
+		pathName:        newPathIdentifier,
+		inodeMarkerName: newINodeMarkerIdentifier,
 	}
 )
 
@@ -78,7 +73,7 @@ type inodeDeviceIdentifier struct {
 
 func newINodeDeviceIdentifier(_ *common.Config) (StateIdentifier, error) {
 	return &inodeDeviceIdentifier{
-		name: inodeDeviceIDName,
+		name: nativeName,
 	}, nil
 }
 
@@ -100,73 +95,6 @@ func newPathIdentifier(_ *common.Config) (StateIdentifier, error) {
 func (p *pathIdentifier) GenerateID(s State) (id, identifierType string) {
 	stateID := p.name + identitySep + s.Source
 	return genIDWithHash(s.Meta, stateID), p.name
-}
-
-type inodeMarkerIdentifier struct {
-	log        *logp.Logger
-	name       string
-	markerPath string
-
-	markerFileLastModifitaion time.Time
-	markerTxt                 string
-}
-
-func newINodeMarkerIdentifier(cfg *common.Config) (StateIdentifier, error) {
-	var config struct {
-		MarkerPath string `config:"path" validate:"required"`
-	}
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %v", err)
-	}
-
-	fi, err := os.Stat(config.MarkerPath)
-	if err != nil {
-		return nil, fmt.Errorf("error while opening marker file at %s: %v", config.MarkerPath, err)
-	}
-	markerContent, err := ioutil.ReadFile(config.MarkerPath)
-	if err != nil {
-		return nil, fmt.Errorf("error while reading marker file at %s: %v", config.MarkerPath, err)
-	}
-	return &inodeMarkerIdentifier{
-		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
-		name:                      inodeMarkerName,
-		markerPath:                config.MarkerPath,
-		markerFileLastModifitaion: fi.ModTime(),
-		markerTxt:                 string(markerContent),
-	}, nil
-}
-
-func (i *inodeMarkerIdentifier) markerContents() string {
-	f, err := os.Open(i.markerPath)
-	if err != nil {
-		i.log.Errorf("Failed to open marker file %s: %v", i.markerPath, err)
-		return ""
-	}
-	defer f.Close()
-
-	fi, err := f.Stat()
-	if err != nil {
-		i.log.Errorf("Failed to fetch file information for %s: %v", i.markerPath, err)
-		return ""
-	}
-	if i.markerFileLastModifitaion.Before(fi.ModTime()) {
-		contents, err := ioutil.ReadFile(i.markerPath)
-		if err != nil {
-			i.log.Errorf("Error while reading contents of marker file: %v", err)
-			return ""
-		}
-		i.markerTxt = string(contents)
-	}
-
-	return i.markerTxt
-}
-
-func (i *inodeMarkerIdentifier) GenerateID(s State) (id, identifierType string) {
-	m := i.markerContents()
-
-	stateID := fmt.Sprintf("%s%s%s-%s", i.name, identitySep, s.FileStateOS.InodeString(), m)
-	return genIDWithHash(s.Meta, stateID), i.name
 }
 
 func genIDWithHash(meta map[string]string, fileID string) string {

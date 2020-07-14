@@ -409,12 +409,12 @@ Different `file_identity` methods can be configured to suit the
 environment where you are collecting log messages.
 
 
-*`inode_deviceid`*:: The default behaviour of {beatname_uc} is to differentiate
+*`native`*:: The default behaviour of {beatname_uc} is to differentiate
 between files using their inodes and device ids.
 
 [source,yaml]
 ----
-file_identity.inode_deviceid: ~
+file_identity.native: ~
 ----
 
 *`path`*:: To identify files based on their paths use this strategy.
@@ -433,7 +433,9 @@ file_identity.path: ~
 ----
 
 *`inode_marker`*:: If the device id changes from time to time, you must use
-this method to distinguish files. Set the location of the marker file the following way:
+this method to distinguish files. This option is not supported on Windows.
+
+Set the location of the marker file the following way:
 
 [source,yaml]
 ----

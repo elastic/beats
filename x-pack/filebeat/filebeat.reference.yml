@@ -1547,7 +1547,7 @@ filebeat.inputs:
 
   # Method to determine if two files are the same or not. By default
   # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.inode_deviceid: ~
+  #file_identity.native: ~
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
