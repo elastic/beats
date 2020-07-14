@@ -87,10 +87,10 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	url := args[0]
 	enrollmentToken := args[1]
 
-	caStr, _ := cmd.Flags().GetString("certificate_authorities")
+	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
 
-	caSHA256str, _ := cmd.Flags().GetString("ca_sha256")
+	caSHA256str, _ := cmd.Flags().GetString("ca-sha256")
 	caSHA256 := cli.StringToSlice(caSHA256str)
 
 	delay(defaultDelay)
