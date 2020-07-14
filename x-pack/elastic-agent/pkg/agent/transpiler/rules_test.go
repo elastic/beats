@@ -262,6 +262,34 @@ output:
 				},
 			},
 		},
+		"select into": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					SelectInto("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
 		"copy top level slice": {
 			givenYAML: `
 inputs:
@@ -642,6 +670,7 @@ func TestSerialization(t *testing.T) {
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
+		SelectInto("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -702,6 +731,11 @@ func TestSerialization(t *testing.T) {
     - b
     on_conflict: insert_before
 - fix_stream: {}
+- select_into:
+    selectors:
+    - s1
+    - s2
+    into: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {
