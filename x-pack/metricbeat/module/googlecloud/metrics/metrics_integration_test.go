@@ -5,7 +5,7 @@
 // +build integration
 // +build googlecloud
 
-package stackdriver
+package metrics
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	config := GetConfigForTest(t, "stackdriver")
+	config := GetConfigForTest(t, "metrics")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

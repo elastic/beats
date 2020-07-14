@@ -1,11 +1,11 @@
-Stackdriver provides visibility into the performance, uptime, and overall health
+Operations monitoring provides visibility into the performance, uptime, and overall health
 of cloud-powered applications. It collects metrics, events, and metadata from
 different services from Google Cloud. This metricset is to collect monitoring
 metrics from Google Cloud using `ListTimeSeries` API. The full list of metric
 types that Google Cloud monitoring supports can be found in
 https://cloud.google.com/monitoring/api/metrics_gcp#gcp[Google Cloud Metrics].
 
-Each monitoring metric from stackdriver has a sample period and/or ingest delay.
+Each monitoring metric from Google Cloud has a sample period and/or ingest delay.
 Sample period is the time interval between consecutive data points for metrics
 that are written periodically. Ingest delay represents the time for data points
 older than this value are guaranteed to be available to read. Sample period and
@@ -32,7 +32,7 @@ for the full list of aligners.
 
 [float]
 === Example Configuration
-* `stackdriver` metricset is enabled to collect metrics from all zones under
+* `metrics` metricset is enabled to collect metrics from all zones under
 `europe-west1-c` region in `elastic-observability` project. Two sets of metrics
 are specified: first one is to collect CPU usage time and utilization with
 aggregation aligner ALIGN_MEAN; second one is to collect uptime with aggregation
@@ -45,7 +45,7 @@ given aggregation aligner applied for each metric type.
 ----
 - module: googlecloud
   metricsets:
-    - stackdriver
+    - metrics
   zone: "europe-west1-c"
   project_id: elastic-observability
   credentials_file_path: "your JSON credentials file path"
@@ -64,7 +64,7 @@ given aggregation aligner applied for each metric type.
 
 ----
 
-* `stackdriver` metricset is enabled to collect metrics from all zones under
+* `metrics` metricset is enabled to collect metrics from all zones under
 `europe-west1-c` region in `elastic-observability` project. Two sets of metrics
 are specified: first one is to collect CPU usage time and utilization with
 aggregation aligner ALIGN_MEAN; second one is to collect uptime with aggregation
@@ -78,7 +78,7 @@ ignored.
 ----
 - module: googlecloud
   metricsets:
-    - stackdriver
+    - metrics
   zone: "europe-west1-c"
   project_id: elastic-observability
   credentials_file_path: "your JSON credentials file path"
@@ -96,7 +96,7 @@ ignored.
         - "instance/uptime"
 ----
 
-* `stackdriver` metricset is enabled to collect metrics from all zones under
+* `metrics` metricset is enabled to collect metrics from all zones under
 `europe-west1-c` region in `elastic-observability` project. One set of metrics
 will be collected: metric types that starts with `instance/cpu` under `compute`
 service with aligner ALIGN_NONE. These metric types all have 240 seconds ingest
@@ -112,7 +112,7 @@ every minute with no aggregation. The metric types in `compute` service with
 ----
 - module: googlecloud
   metricsets:
-    - stackdriver
+    - metrics
   zone: "europe-west1-c"
   project_id: elastic-observability
   credentials_file_path: "your JSON credentials file path"

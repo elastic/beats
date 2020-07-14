@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package stackdriver
+package metrics
 
 import (
 	"context"
@@ -25,7 +25,7 @@ import (
 
 const (
 	// MetricsetName is the name of this Metricset
-	MetricsetName = "stackdriver"
+	MetricsetName = "metrics"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -42,14 +42,14 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config            config
-	metricsMeta       map[string]metricMeta
-	requester         *stackdriverMetricsRequester
-	stackDriverConfig []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
+	config        config
+	metricsMeta   map[string]metricMeta
+	requester     *metricsRequester
+	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//stackDriverConfig holds a configuration specific for stackdriver metricset.
-type stackDriverConfig struct {
+//metricsConfig holds a configuration specific for metrics metricset.
+type metricsConfig struct {
 	ServiceName string   `config:"service"  validate:"required"`
 	MetricTypes []string `config:"metric_types" validate:"required"`
 	Aligner     string   `config:"aligner"`
@@ -82,15 +82,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	stackDriverConfigs := struct {
-		StackDriverMetrics []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
+	metricsConfigs := struct {
+		Metrics []metricsConfig `config:"metrics" validate:"nonzero,required"`
 	}{}
 
-	if err := base.Module().UnpackConfig(&stackDriverConfigs); err != nil {
+	if err := base.Module().UnpackConfig(&metricsConfigs); err != nil {
 		return nil, err
 	}
 
-	m.stackDriverConfig = stackDriverConfigs.StackDriverMetrics
+	m.MetricsConfig = metricsConfigs.Metrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
@@ -112,7 +112,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error calling metricDescriptor function")
 	}
 
-	m.requester = &stackdriverMetricsRequester{
+	m.requester = &metricsRequester{
 		config: m.config,
 		client: client,
 		logger: m.Logger(),
@@ -124,8 +124,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	for _, sdc := range m.stackDriverConfig {
-		m.Logger().Debugf("stackdriver config: %v", sdc)
+	for _, sdc := range m.MetricsConfig {
+		m.Logger().Debugf("metrics config: %v", sdc)
 		responses, err := m.requester.Metrics(ctx, sdc, m.metricsMeta)
 		if err != nil {
 			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
@@ -196,8 +196,8 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 	return nil
 }
 
-// Validate stackdriver related config
-func (mc *stackDriverConfig) Validate() error {
+// Validate metrics related config
+func (mc *metricsConfig) Validate() error {
 	gcpAlignerNames := make([]string, 0)
 	for k := range googlecloud.AlignersMapToGCP {
 		gcpAlignerNames = append(gcpAlignerNames, k)
@@ -219,7 +219,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 		Name: "projects/" + m.config.ProjectID,
 	}
 
-	for _, sdc := range m.stackDriverConfig {
+	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
 			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
 			it := client.ListMetricDescriptors(ctx, req)

@@ -27,7 +27,7 @@ func NewMetadataService(projectID, zone string, region string, opt ...option.Cli
 		region:        region,
 		opt:           opt,
 		instanceCache: common.NewCache(30*time.Second, 13),
-		logger:        logp.NewLogger("stackdriver-compute"),
+		logger:        logp.NewLogger("metrics-compute"),
 	}, nil
 }
 
