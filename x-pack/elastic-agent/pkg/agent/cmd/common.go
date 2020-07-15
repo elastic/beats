@@ -6,11 +6,12 @@ package cmd
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
+	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
@@ -21,7 +22,6 @@ const defaultConfig = "elastic-agent.yml"
 
 type globalFlags struct {
 	PathConfigFile  string
-	FlagStrictPerms bool
 }
 
 // Config returns path which identifies configuration file.
@@ -30,10 +30,6 @@ func (f *globalFlags) Config() string {
 		return filepath.Join(paths.Config(), defaultConfig)
 	}
 	return f.PathConfigFile
-}
-
-func (f *globalFlags) StrictPermission() bool {
-	return f.FlagStrictPerms
 }
 
 // NewCommand returns the default command for the agent.
@@ -49,19 +45,26 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 
 	flags := &globalFlags{}
 
+	// path flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
+	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "c", "c", defaultConfig, `Configuration file, relative to path.config`)
 
-	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "", "c", defaultConfig, fmt.Sprintf(`Configuration file, relative to path.config (default "%s")`, defaultConfig))
-	cmd.PersistentFlags().BoolVarP(&flags.FlagStrictPerms, "strict.perms", "", true, "Strict permission checking on config files")
+	// logging flags
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("e"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 
-	// Add version.
+	// subcommands
+	run := newRunCommandWithArgs(flags, args, streams)
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
-	cmd.AddCommand(newRunCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(run)
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newIntrospectCommandWithArgs(flags, args, streams))
+	cmd.Run = run.Run
 
 	return cmd
 }
