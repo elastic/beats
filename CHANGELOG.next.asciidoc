@@ -70,6 +70,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds `date_cursor` option to httpjson input. {pull}19483[19483]
 - Adds Gsuite module with SAML support. {pull}19329[19329]
 - Adds Gsuite User Accounts support. {pull}19329[19329]
+- Adds Gsuite Login audit support. {pull}19702[19702]
 
 *Heartbeat*
 
