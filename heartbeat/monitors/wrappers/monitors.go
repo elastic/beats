@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"sync"
 	"time"
 
@@ -37,26 +38,26 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, id string, name string, typ string, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdFields stdfields.StdMonitorFields, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(id, name, typ, len(js) > 1, sched, timeout)
+			return addMonitorMeta(stdFields, len(js) > 1, sched, timeout)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
+func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
 			cont, e := job(event)
-			thisID := id
+			thisID := stdFields.ID
 
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -65,7 +66,7 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *sch
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", id, urlHash)
+				thisID = fmt.Sprintf("%s-%x", stdFields.ID, urlHash)
 			}
 
 			eventext.MergeEventFields(
@@ -73,8 +74,8 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *sch
 				common.MapStr{
 					"monitor": common.MapStr{
 						"id":       thisID,
-						"name":     name,
-						"type":     typ,
+						"name":     stdFields.Name,
+						"type":     stdFields.Type,
 						"timespan": timespan(started, sched, timeout),
 					},
 				},

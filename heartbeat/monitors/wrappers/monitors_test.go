@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"net/url"
 	"reflect"
 	"testing"
@@ -39,24 +40,21 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-type fields struct {
-	id   string
-	name string
-	typ  string
-}
 
 type testDef struct {
-	name     string
-	fields   fields
-	jobs     []jobs.Job
-	want     []validator.Validator
-	metaWant []validator.Validator
+	name      string
+	stdFields stdfields.StdMonitorFields
+	jobs      []jobs.Job
+	want      []validator.Validator
+	metaWant  []validator.Validator
 }
+
+var testMonFields = stdfields.StdMonitorFields{ID: "myid", Name: "myname", Type: "mytype"}
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
 		schedule, _ := schedule.Parse("@every 1s")
-		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ, schedule, time.Duration(0))
+		wrapped := WrapCommon(tt.jobs, tt.stdFields, schedule, time.Duration(0))
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
@@ -77,10 +75,9 @@ func testCommonWrap(t *testing.T, tt testDef) {
 }
 
 func TestSimpleJob(t *testing.T) {
-	fields := fields{"myid", "myname", "mytyp"}
 	testCommonWrap(t, testDef{
 		"simple",
-		fields,
+		testMonFields,
 		[]jobs.Job{makeURLJob(t, "tcp://foo.com:80")},
 		[]validator.Validator{
 			lookslike.Compose(
@@ -88,9 +85,9 @@ func TestSimpleJob(t *testing.T) {
 				lookslike.MustCompile(map[string]interface{}{
 					"monitor": map[string]interface{}{
 						"duration.us": isdef.IsDuration,
-						"id":          fields.id,
-						"name":        fields.name,
-						"type":        fields.typ,
+						"id":          testMonFields.ID,
+						"name":        testMonFields.Name,
+						"type":        testMonFields.Type,
 						"status":      "up",
 						"check_group": isdef.IsString,
 					},
@@ -103,8 +100,6 @@ func TestSimpleJob(t *testing.T) {
 }
 
 func TestErrorJob(t *testing.T) {
-	fields := fields{"myid", "myname", "mytyp"}
-
 	errorJob := func(event *beat.Event) ([]jobs.Job, error) {
 		return nil, fmt.Errorf("myerror")
 	}
@@ -114,9 +109,9 @@ func TestErrorJob(t *testing.T) {
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
 				"duration.us": isdef.IsDuration,
-				"id":          fields.id,
-				"name":        fields.name,
-				"type":        fields.typ,
+				"id":          testMonFields.ID,
+				"name":        testMonFields.Name,
+				"type":        testMonFields.Type,
 				"status":      "down",
 				"check_group": isdef.IsString,
 			},
@@ -125,7 +120,7 @@ func TestErrorJob(t *testing.T) {
 
 	testCommonWrap(t, testDef{
 		"job error",
-		fields,
+		testMonFields,
 		[]jobs.Job{errorJob},
 		[]validator.Validator{
 			lookslike.Compose(
@@ -138,8 +133,6 @@ func TestErrorJob(t *testing.T) {
 }
 
 func TestMultiJobNoConts(t *testing.T) {
-	fields := fields{"myid", "myname", "mytyp"}
-
 	uniqScope := isdef.ScopedIsUnique()
 
 	validatorMaker := func(u string) validator.Validator {
@@ -149,8 +142,8 @@ func TestMultiJobNoConts(t *testing.T) {
 				"monitor": map[string]interface{}{
 					"duration.us": isdef.IsDuration,
 					"id":          uniqScope.IsUniqueTo("id"),
-					"name":        fields.name,
-					"type":        fields.typ,
+					"name":        testMonFields.Name,
+					"type":        testMonFields.Type,
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
@@ -162,7 +155,7 @@ func TestMultiJobNoConts(t *testing.T) {
 
 	testCommonWrap(t, testDef{
 		"multi-job",
-		fields,
+		testMonFields,
 		[]jobs.Job{makeURLJob(t, "http://foo.com"), makeURLJob(t, "http://bar.com")},
 		[]validator.Validator{validatorMaker("http://foo.com"), validatorMaker("http://bar.com")},
 		nil,
@@ -170,8 +163,6 @@ func TestMultiJobNoConts(t *testing.T) {
 }
 
 func TestMultiJobConts(t *testing.T) {
-	fields := fields{"myid", "myname", "mytyp"}
-
 	uniqScope := isdef.ScopedIsUnique()
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
@@ -198,8 +189,8 @@ func TestMultiJobConts(t *testing.T) {
 				"monitor": map[string]interface{}{
 					"duration.us": isdef.IsDuration,
 					"id":          uniqScope.IsUniqueTo(u),
-					"name":        fields.name,
-					"type":        fields.typ,
+					"name":        testMonFields.Name,
+					"type":        testMonFields.Type,
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
@@ -210,7 +201,7 @@ func TestMultiJobConts(t *testing.T) {
 
 	testCommonWrap(t, testDef{
 		"multi-job-continuations",
-		fields,
+		testMonFields,
 		[]jobs.Job{makeContJob(t, "http://foo.com"), makeContJob(t, "http://bar.com")},
 		[]validator.Validator{
 			contJobValidator("http://foo.com", "1st"),
@@ -229,8 +220,6 @@ func TestMultiJobConts(t *testing.T) {
 }
 
 func TestMultiJobContsCancelledEvents(t *testing.T) {
-	fields := fields{"myid", "myname", "mytyp"}
-
 	uniqScope := isdef.ScopedIsUnique()
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
@@ -258,8 +247,8 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 				"monitor": map[string]interface{}{
 					"duration.us": isdef.IsDuration,
 					"id":          uniqScope.IsUniqueTo(u),
-					"name":        fields.name,
-					"type":        fields.typ,
+					"name":        testMonFields.Name,
+					"type":        testMonFields.Type,
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
@@ -271,7 +260,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 	metaCancelledValidator := lookslike.MustCompile(map[string]interface{}{eventext.EventCancelledMetaKey: true})
 	testCommonWrap(t, testDef{
 		"multi-job-continuations",
-		fields,
+		testMonFields,
 		[]jobs.Job{makeContJob(t, "http://foo.com"), makeContJob(t, "http://bar.com")},
 		[]validator.Validator{
 			lookslike.Compose(

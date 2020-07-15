@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -43,7 +44,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test",Type: "tcp"}, sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

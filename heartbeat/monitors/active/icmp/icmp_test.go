@@ -18,6 +18,7 @@
 package icmp
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"net"
 	"net/url"
 	"testing"
@@ -69,7 +70,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Equal(t, 1, endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(j, "test", "", "icmp", sched, time.Duration(0))
+	wrapped := wrappers.WrapCommon(j,stdfields.StdMonitorFields{ID: "test", Type: "icmp"}, sched, time.Duration(0))
 	wrapped[0](e)
 	return tl, e
 }
