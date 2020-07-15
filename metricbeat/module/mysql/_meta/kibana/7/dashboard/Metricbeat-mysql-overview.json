@@ -27,14 +27,14 @@
             "gridData": {
               "h": 15,
               "i": "14",
-              "w": 24,
-              "x": 24,
+              "w": 16,
+              "x": 15,
               "y": 38
             },
             "panelIndex": "14",
             "panelRefName": "panel_0",
             "title": "Open Tables, Files, Streams",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -50,7 +50,7 @@
             "panelIndex": "050b110b-0b4d-404a-86c0-fa97f7eed2a0",
             "panelRefName": "panel_1",
             "title": "Rate of Questions",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -66,7 +66,7 @@
             "panelIndex": "988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
             "panelRefName": "panel_2",
             "title": "Rate of SELECT statements",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -82,7 +82,7 @@
             "panelIndex": "a1f8fa38-a62f-4e05-adde-e995dae9ad83",
             "panelRefName": "panel_3",
             "title": "Rate of INSERT, UPDATE, DELETE",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -98,7 +98,7 @@
             "panelIndex": "d126fb61-605f-43af-b5d5-3fa3c128f726",
             "panelRefName": "panel_4",
             "title": "Connected Threads",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -114,7 +114,7 @@
             "panelIndex": "59586d96-3abd-48a3-a258-cfd620826ec2",
             "panelRefName": "panel_5",
             "title": "Connections",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -130,7 +130,7 @@
             "panelIndex": "dd0cf202-fe22-4daf-8f25-09c64d412bf3",
             "panelRefName": "panel_6",
             "title": "Aborted Connections Rate",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -146,7 +146,7 @@
             "panelIndex": "ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
             "panelRefName": "panel_7",
             "title": "Thread Activity",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -162,7 +162,7 @@
             "panelIndex": "24fc2926-610d-4910-8f3e-eb63ca69788c",
             "panelRefName": "panel_8",
             "title": "Buffer Pool Pages",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -178,7 +178,7 @@
             "panelIndex": "33c10c95-be67-492e-afb5-863f375cffc2",
             "panelRefName": "panel_9",
             "title": "Buffer Pool Utilization",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -194,7 +194,7 @@
             "panelIndex": "d35d7c5e-8832-40e2-8c77-953ad320c853",
             "panelRefName": "panel_10",
             "title": "Buffer Pool Efficiency",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -203,46 +203,14 @@
             "gridData": {
               "h": 15,
               "i": "3cd58868-0d03-4715-9ecc-9fba3cde47c1",
-              "w": 24,
+              "w": 15,
               "x": 0,
               "y": 38
             },
             "panelIndex": "3cd58868-0d03-4715-9ecc-9fba3cde47c1",
             "panelRefName": "panel_11",
             "title": "Network Traffic",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {
-              "title": "InnoDB Row Operations"
-            },
-            "gridData": {
-              "h": 15,
-              "i": "7c21c964-df1f-46b1-a1f4-356c037b8486",
-              "w": 24,
-              "x": 0,
-              "y": 53
-            },
-            "panelIndex": "7c21c964-df1f-46b1-a1f4-356c037b8486",
-            "panelRefName": "panel_12",
-            "title": "InnoDB Row Operations",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {
-              "title": "SSL Cache"
-            },
-            "gridData": {
-              "h": 15,
-              "i": "751a97b7-cb5c-42f5-b6ae-d4f00a48a8a7",
-              "w": 15,
-              "x": 0,
-              "y": 68
-            },
-            "panelIndex": "751a97b7-cb5c-42f5-b6ae-d4f00a48a8a7",
-            "panelRefName": "panel_13",
-            "title": "SSL Cache",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
@@ -250,31 +218,63 @@
             },
             "gridData": {
               "h": 15,
-              "i": "9e731830-a7ff-4433-8005-a33387251620",
+              "i": "277c8209-3c5f-41f5-95f4-de0782917fba",
               "w": 17,
-              "x": 15,
-              "y": 68
+              "x": 31,
+              "y": 38
             },
-            "panelIndex": "9e731830-a7ff-4433-8005-a33387251620",
-            "panelRefName": "panel_14",
+            "panelIndex": "277c8209-3c5f-41f5-95f4-de0782917fba",
+            "panelRefName": "panel_12",
             "title": "Open Tables Cache",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
           },
           {
             "embeddableConfig": {
               "title": "Connection Errors"
             },
             "gridData": {
-              "h": 15,
-              "i": "d72cd0ce-18a1-471b-beb8-31742cf835c2",
-              "w": 24,
-              "x": 24,
+              "h": 13,
+              "i": "9487b742-3e7f-4d57-af32-014ad360235c",
+              "w": 13,
+              "x": 0,
               "y": 53
             },
-            "panelIndex": "d72cd0ce-18a1-471b-beb8-31742cf835c2",
-            "panelRefName": "panel_15",
+            "panelIndex": "9487b742-3e7f-4d57-af32-014ad360235c",
+            "panelRefName": "panel_13",
             "title": "Connection Errors",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.8.1"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Commands Operations"
+            },
+            "gridData": {
+              "h": 13,
+              "i": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+              "w": 20,
+              "x": 13,
+              "y": 53
+            },
+            "panelIndex": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
+            "panelRefName": "panel_14",
+            "title": "Commands Operations",
+            "version": "7.8.1"
+          },
+          {
+            "embeddableConfig": {
+              "title": "SSL Cache"
+            },
+            "gridData": {
+              "h": 13,
+              "i": "cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+              "w": 15,
+              "x": 33,
+              "y": 53
+            },
+            "panelIndex": "cd4deb30-c0dd-4f23-8868-ecffd73b2406",
+            "panelRefName": "panel_15",
+            "title": "SSL Cache",
+            "version": "7.8.1"
           }
         ],
         "timeRestore": false,
@@ -347,29 +347,29 @@
           "type": "visualization"
         },
         {
-          "id": "dab6e7d0-c5f9-11ea-bff4-fd75cf2c84b2",
+          "id": "cd72e030-c6a6-11ea-a106-5be590f42b74",
           "name": "panel_12",
           "type": "visualization"
         },
         {
-          "id": "dd2c3820-c5fa-11ea-bff4-fd75cf2c84b2",
+          "id": "0774bbb0-c69c-11ea-a106-5be590f42b74",
           "name": "panel_13",
           "type": "visualization"
         },
         {
-          "id": "75083730-c5fa-11ea-bff4-fd75cf2c84b2",
+          "id": "3e5c4490-c6a1-11ea-a106-5be590f42b74",
           "name": "panel_14",
           "type": "visualization"
         },
         {
-          "id": "c2759390-c5fb-11ea-bff4-fd75cf2c84b2",
+          "id": "8b276c80-c6ad-11ea-a106-5be590f42b74",
           "name": "panel_15",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-07-14T18:00:04.248Z",
-      "version": "WzYyNyw3XQ=="
+      "updated_at": "2020-07-15T15:17:01.974Z",
+      "version": "WzM4MywxXQ=="
     },
     {
       "attributes": {
@@ -418,6 +418,7 @@
                 ],
                 "point_size": "0",
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -440,6 +441,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -462,6 +464,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -478,12 +481,12 @@
       },
       "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyMywyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIwNywxXQ=="
     },
     {
       "attributes": {
@@ -549,6 +552,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -565,12 +569,12 @@
       },
       "id": "4fa69a10-630b-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyNCwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIwOCwxXQ=="
     },
     {
       "attributes": {
@@ -636,6 +640,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -652,12 +657,12 @@
       },
       "id": "7ea77d30-630a-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyNSwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIwOSwxXQ=="
     },
     {
       "attributes": {
@@ -723,6 +728,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -757,6 +763,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -791,6 +798,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -807,12 +815,12 @@
       },
       "id": "779ee920-6309-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyNiwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxMCwxXQ=="
     },
     {
       "attributes": {
@@ -874,6 +882,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -890,12 +899,12 @@
       },
       "id": "fc6b5a40-630d-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyNywyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxMSwxXQ=="
     },
     {
       "attributes": {
@@ -956,6 +965,7 @@
                 ],
                 "point_size": "0",
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -978,6 +988,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1000,6 +1011,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1016,12 +1028,12 @@
       },
       "id": "493e8460-630d-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyOCwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxMiwxXQ=="
     },
     {
       "attributes": {
@@ -1087,6 +1099,7 @@
                 ],
                 "point_size": 1,
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1119,6 +1132,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1135,12 +1149,12 @@
       },
       "id": "bf60bc10-639b-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIyOSwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxMywxXQ=="
     },
     {
       "attributes": {
@@ -1189,6 +1203,7 @@
                 ],
                 "point_size": "0",
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none"
               },
@@ -1233,6 +1248,7 @@
                 ],
                 "point_size": "0",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1249,12 +1265,12 @@
       },
       "id": "822df290-630f-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIzMCwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxNCwxXQ=="
     },
     {
       "attributes": {
@@ -1308,6 +1324,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1330,6 +1347,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1352,6 +1370,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1368,12 +1387,12 @@
       },
       "id": "98c7bca0-63a2-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIzMSwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxNSwxXQ=="
     },
     {
       "attributes": {
@@ -1467,6 +1486,7 @@
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1483,12 +1503,12 @@
       },
       "id": "96d46630-63a4-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIzMiwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxNiwxXQ=="
     },
     {
       "attributes": {
@@ -1583,6 +1603,7 @@
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1599,12 +1620,12 @@
       },
       "id": "a1e00160-63a4-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIzNCwyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxOCwxXQ=="
     },
     {
       "attributes": {
@@ -1677,6 +1698,7 @@
                 ],
                 "point_size": "0",
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1711,6 +1733,7 @@
                 ],
                 "point_size": "0",
                 "seperate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -1727,12 +1750,12 @@
       },
       "id": "c8661020-6310-11ea-a83e-25b8612d00cc",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-02T09:58:18.971Z",
-      "version": "WzIzMywyXQ=="
+      "updated_at": "2020-07-15T12:11:22.038Z",
+      "version": "WzIxNywxXQ=="
     },
     {
       "attributes": {
@@ -1746,7 +1769,7 @@
             }
           }
         },
-        "title": "InnoDB Row Operations [Metricbeat MySQL] ECS",
+        "title": "Open Tables Cache [MySQL Metricbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1758,297 +1781,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "#68BC00",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Read",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.innodb.rows.reads",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "811afea0-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(252,220,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "89cddcc0-c5f9-11ea-874a-69e6dd63ed89",
-                "label": "Inserted",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.innodb.rows.inserted",
-                    "id": "89cddcc1-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "max"
-                  },
-                  {
-                    "field": "89cddcc1-c5f9-11ea-874a-69e6dd63ed89",
-                    "id": "93a564c0-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(211,49,21,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "9e6d4030-c5f9-11ea-874a-69e6dd63ed89",
-                "label": "Deleted",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.innodb.rows.deleted",
-                    "id": "9e6d4031-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "max"
-                  },
-                  {
-                    "field": "9e6d4031-c5f9-11ea-874a-69e6dd63ed89",
-                    "id": "ace79c50-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(254,146,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "b42084a0-c5f9-11ea-874a-69e6dd63ed89",
-                "label": "Updates",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.innodb.rows.updated",
-                    "id": "b420abb0-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "max"
-                  },
-                  {
-                    "field": "b420abb0-c5f9-11ea-874a-69e6dd63ed89",
-                    "id": "bf243090-c5f9-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "InnoDB Row Operations [Metricbeat MySQL] ECS",
-          "type": "metrics"
-        }
-      },
-      "id": "dab6e7d0-c5f9-11ea-bff4-fd75cf2c84b2",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-07-14T17:46:08.201Z",
-      "version": "WzU3NSw3XQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "SSL Cache [Metricbeat MySQL] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "#68BC00",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Hits",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.cache.ssl.hits",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "229509b0-c5fa-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(252,220,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "34b51540-c5fa-11ea-874a-69e6dd63ed89",
-                "label": "Misses",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.cache.ssl.misses",
-                    "id": "34b53c50-c5fa-11ea-874a-69e6dd63ed89",
-                    "type": "max"
-                  },
-                  {
-                    "field": "34b53c50-c5fa-11ea-874a-69e6dd63ed89",
-                    "id": "40e11490-c5fa-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(196,81,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "4a936150-c5fa-11ea-874a-69e6dd63ed89",
-                "label": "Size",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.cache.ssl.size",
-                    "id": "4a936151-c5fa-11ea-874a-69e6dd63ed89",
-                    "type": "max"
-                  },
-                  {
-                    "field": "4a936151-c5fa-11ea-874a-69e6dd63ed89",
-                    "id": "58b25700-c5fa-11ea-874a-69e6dd63ed89",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "SSL Cache [Metricbeat MySQL] ECS",
-          "type": "metrics"
-        }
-      },
-      "id": "dd2c3820-c5fa-11ea-bff4-fd75cf2c84b2",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-07-14T17:53:47.114Z",
-      "version": "WzYwMCw3XQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Open Tables Cache [Metricbeat MySQL] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "isModelInvalid": false,
             "series": [
@@ -2069,13 +1802,14 @@
                   },
                   {
                     "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "229509b0-c5fa-11ea-874a-69e6dd63ed89",
+                    "id": "534a23e0-c6a6-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "kibana",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -2086,18 +1820,18 @@
                 "color": "rgba(252,220,0,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "34b51540-c5fa-11ea-874a-69e6dd63ed89",
+                "id": "60ab20c0-c6a6-11ea-880f-352bebf10188",
                 "label": "Misses",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "mysql.status.cache.table.open_cache.misses",
-                    "id": "34b53c50-c5fa-11ea-874a-69e6dd63ed89",
+                    "id": "60ab47d0-c6a6-11ea-880f-352bebf10188",
                     "type": "max"
                   },
                   {
-                    "field": "34b53c50-c5fa-11ea-874a-69e6dd63ed89",
-                    "id": "40e11490-c5fa-11ea-874a-69e6dd63ed89",
+                    "field": "60ab47d0-c6a6-11ea-880f-352bebf10188",
+                    "id": "6a1519e0-c6a6-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -2111,21 +1845,21 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "rgba(251,158,0,1)",
+                "color": "rgba(254,146,0,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "4a936150-c5fa-11ea-874a-69e6dd63ed89",
+                "id": "69113e70-c6a6-11ea-880f-352bebf10188",
                 "label": "Overflows",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "mysql.status.cache.table.open_cache.overflows",
-                    "id": "4a936151-c5fa-11ea-874a-69e6dd63ed89",
+                    "id": "69113e71-c6a6-11ea-880f-352bebf10188",
                     "type": "max"
                   },
                   {
-                    "field": "4a936151-c5fa-11ea-874a-69e6dd63ed89",
-                    "id": "58b25700-c5fa-11ea-874a-69e6dd63ed89",
+                    "field": "69113e71-c6a6-11ea-880f-352bebf10188",
+                    "id": "75a108a0-c6a6-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -2142,18 +1876,18 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Open Tables Cache [Metricbeat MySQL] ECS",
+          "title": "Open Tables Cache [MySQL Metricbeat] ECS",
           "type": "metrics"
         }
       },
-      "id": "75083730-c5fa-11ea-bff4-fd75cf2c84b2",
+      "id": "cd72e030-c6a6-11ea-a106-5be590f42b74",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-14T17:50:08.419Z",
-      "version": "WzU5MSw3XQ=="
+      "updated_at": "2020-07-15T15:12:29.413Z",
+      "version": "WzM3NSwxXQ=="
     },
     {
       "attributes": {
@@ -2167,7 +1901,7 @@
             }
           }
         },
-        "title": "Connection Errors [Metricbeat MySQL] ECS",
+        "title": "Connection Errors [MySQL Metricbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2179,7 +1913,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "isModelInvalid": false,
             "series": [
@@ -2196,17 +1930,26 @@
                   {
                     "field": "mysql.status.connection.errors.max",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "percentiles": [
+                      {
+                        "id": "968f0500-c69a-11ea-880f-352bebf10188",
+                        "mode": "line",
+                        "shade": 0.2,
+                        "value": 50
+                      }
+                    ],
                     "type": "max"
                   },
                   {
                     "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "4556a1b0-c5fb-11ea-9f6d-8703f30f5e72",
+                    "id": "a088e210-c69a-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "kibana",
                 "split_mode": "everything",
                 "stacked": "none",
                 "type": "timeseries"
@@ -2217,74 +1960,18 @@
                 "color": "rgba(252,220,0,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "4be51930-c5fb-11ea-9f6d-8703f30f5e72",
-                "label": "Peer Address",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.connection.errors.peer_address",
-                    "id": "4be51931-c5fb-11ea-9f6d-8703f30f5e72",
-                    "type": "max"
-                  },
-                  {
-                    "field": "4be51931-c5fb-11ea-9f6d-8703f30f5e72",
-                    "id": "5bab5640-c5fb-11ea-9f6d-8703f30f5e72",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(226,115,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "6169faa0-c5fb-11ea-9f6d-8703f30f5e72",
-                "label": "Internal",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "mysql.status.connection.errors.internal",
-                    "id": "6169faa1-c5fb-11ea-9f6d-8703f30f5e72",
-                    "type": "max"
-                  },
-                  {
-                    "field": "6169faa1-c5fb-11ea-9f6d-8703f30f5e72",
-                    "id": "6d35d890-c5fb-11ea-9f6d-8703f30f5e72",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none",
-                "type": "timeseries"
-              },
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(176,188,0,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "730b8760-c5fb-11ea-9f6d-8703f30f5e72",
+                "id": "a61998a0-c69a-11ea-880f-352bebf10188",
                 "label": "Accept",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "mysql.status.connection.errors.accept",
-                    "id": "730bae70-c5fb-11ea-9f6d-8703f30f5e72",
+                    "id": "a61998a1-c69a-11ea-880f-352bebf10188",
                     "type": "max"
                   },
                   {
-                    "field": "730bae70-c5fb-11ea-9f6d-8703f30f5e72",
-                    "id": "7df3e320-c5fb-11ea-9f6d-8703f30f5e72",
+                    "field": "a61998a1-c69a-11ea-880f-352bebf10188",
+                    "id": "a8f8c3c0-c69a-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -2298,21 +1985,49 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "rgba(0,156,224,1)",
+                "color": "rgba(252,196,0,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "88c3add0-c5fb-11ea-9f6d-8703f30f5e72",
+                "id": "b6a26260-c69a-11ea-880f-352bebf10188",
+                "label": "Internal",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.connection.errors.internal",
+                    "id": "b6a26261-c69a-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "b6a26261-c69a-11ea-880f-352bebf10188",
+                    "id": "c09d02c0-c69a-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,204,202,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "c713d390-c69a-11ea-880f-352bebf10188",
                 "label": "Select",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "mysql.status.connection.errors.select",
-                    "id": "88c3add1-c5fb-11ea-9f6d-8703f30f5e72",
+                    "id": "c713d391-c69a-11ea-880f-352bebf10188",
                     "type": "max"
                   },
                   {
-                    "field": "88c3add1-c5fb-11ea-9f6d-8703f30f5e72",
-                    "id": "96895ff0-c5fb-11ea-9f6d-8703f30f5e72",
+                    "field": "c713d391-c69a-11ea-880f-352bebf10188",
+                    "id": "4ace8360-c69b-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -2326,21 +2041,21 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "#68BC00",
+                "color": "rgba(253,161,255,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "ae36edc0-c5fb-11ea-9f6d-8703f30f5e72",
-                "label": "TCP Wrap",
+                "id": "50c798b0-c69b-11ea-880f-352bebf10188",
+                "label": "Peer Address",
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "mysql.status.connection.errors.tcpwrap",
-                    "id": "ae36edc1-c5fb-11ea-9f6d-8703f30f5e72",
+                    "field": "mysql.status.connection.errors.peer_address",
+                    "id": "50c798b1-c69b-11ea-880f-352bebf10188",
                     "type": "max"
                   },
                   {
-                    "field": "ae36edc1-c5fb-11ea-9f6d-8703f30f5e72",
-                    "id": "b2282520-c5fb-11ea-9f6d-8703f30f5e72",
+                    "field": "50c798b1-c69b-11ea-880f-352bebf10188",
+                    "id": "78d49650-c69b-11ea-880f-352bebf10188",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -2357,19 +2072,311 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Connection Errors [Metricbeat MySQL] ECS",
+          "title": "Connection Errors [MySQL Metricbeat] ECS",
           "type": "metrics"
         }
       },
-      "id": "c2759390-c5fb-11ea-bff4-fd75cf2c84b2",
+      "id": "0774bbb0-c69c-11ea-a106-5be590f42b74",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.8.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-07-14T17:59:27.817Z",
-      "version": "WzYyMyw3XQ=="
+      "updated_at": "2020-07-15T13:06:43.051Z",
+      "version": "WzM0OCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Commands Operations [MySQL Metricbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Select",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.command.select",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "e76f75d0-c6a0-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "kibana",
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(219,223,0,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "ed3a0110-c6a0-11ea-880f-352bebf10188",
+                "label": "Update",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.command.update",
+                    "id": "ed3a0111-c6a0-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "ed3a0111-c6a0-11ea-880f-352bebf10188",
+                    "id": "f961e1b0-c6a0-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(244,78,59,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "00b3f750-c6a1-11ea-880f-352bebf10188",
+                "label": "Delete",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.command.delete",
+                    "id": "00b3f751-c6a1-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "00b3f751-c6a1-11ea-880f-352bebf10188",
+                    "id": "09f46f70-c6a1-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,220,0,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "0f38dac0-c6a1-11ea-880f-352bebf10188",
+                "label": "Insert",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.command.insert",
+                    "id": "0f38dac1-c6a1-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "0f38dac1-c6a1-11ea-880f-352bebf10188",
+                    "id": "1d1cc340-c6a1-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Commands Operations [MySQL Metricbeat] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "3e5c4490-c6a1-11ea-a106-5be590f42b74",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-07-15T13:44:02.649Z",
+      "version": "WzM1NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SSL Cache [MySQL Metricbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Hits",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.cache.ssl.hits",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "1a353d40-c6ad-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "kibana",
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(253,161,255,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "2dd02900-c6ad-11ea-880f-352bebf10188",
+                "label": "Misses",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.cache.ssl.misses",
+                    "id": "2dd02901-c6ad-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "2dd02901-c6ad-11ea-880f-352bebf10188",
+                    "id": "327cc120-c6ad-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,204,202,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "3f459cb0-c6ad-11ea-880f-352bebf10188",
+                "label": "Size",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mysql.status.cache.ssl.size",
+                    "id": "3f459cb1-c6ad-11ea-880f-352bebf10188",
+                    "type": "max"
+                  },
+                  {
+                    "field": "3f459cb1-c6ad-11ea-880f-352bebf10188",
+                    "id": "426ccd50-c6ad-11ea-880f-352bebf10188",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SSL Cache [MySQL Metricbeat] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "8b276c80-c6ad-11ea-a106-5be590f42b74",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-07-15T15:12:05.448Z",
+      "version": "WzM3NCwxXQ=="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.8.1"
 }
