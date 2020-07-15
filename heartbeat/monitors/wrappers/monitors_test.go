@@ -104,6 +104,36 @@ func TestSimpleJob(t *testing.T) {
 	})
 }
 
+func TestJobWithServiceName(t *testing.T) {
+	fields := testMonFields
+	fields.ServiceName = "testServiceName"
+	testCommonWrap(t, testDef{
+		"simple",
+		fields,
+		[]jobs.Job{makeURLJob(t, "tcp://foo.com:80")},
+		[]validator.Validator{
+			lookslike.Compose(
+				urlValidator(t, "tcp://foo.com:80"),
+				lookslike.MustCompile(map[string]interface{}{
+					"monitor": map[string]interface{}{
+						"duration.us": isdef.IsDuration,
+						"id":          testMonFields.ID,
+						"name":        testMonFields.Name,
+						"type":        testMonFields.Type,
+						"status":      "up",
+						"check_group": isdef.IsString,
+					},
+					"service": map[string]interface{}{
+						"name": fields.ServiceName,
+					},
+				}),
+				hbtestllext.MonitorTimespanValidator,
+				summaryValidator(1, 0),
+			)},
+		nil,
+	})
+}
+
 func TestErrorJob(t *testing.T) {
 	errorJob := func(event *beat.Event) ([]jobs.Job, error) {
 		return nil, fmt.Errorf("myerror")

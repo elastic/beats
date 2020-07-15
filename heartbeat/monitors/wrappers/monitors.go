@@ -38,26 +38,26 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(stdFields, len(js) > 1)
+			return addMonitorMeta(stdMonFields, len(js) > 1)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
+func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
 			cont, e := job(event)
-			thisID := stdFields.ID
+			thisID := stdMonFields.ID
 
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -66,20 +66,25 @@ func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool) jobs.Job
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", stdFields.ID, urlHash)
+				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
 			}
 
-			eventext.MergeEventFields(
-				event,
-				common.MapStr{
-					"monitor": common.MapStr{
-						"id":       thisID,
-						"name":     stdFields.Name,
-						"type":     stdFields.Type,
-						"timespan": timespan(started, stdFields.Schedule, stdFields.Timeout),
-					},
+			fieldsToMerge := common.MapStr{
+				"monitor": common.MapStr{
+					"id":       thisID,
+					"name":     stdMonFields.Name,
+					"type":     stdMonFields.Type,
+					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
 				},
-			)
+			}
+
+			if stdMonFields.ServiceName != "" {
+				fieldsToMerge["service"] = common.MapStr{
+					"name": stdMonFields.ServiceName,
+				}
+			}
+
+			eventext.MergeEventFields(event, fieldsToMerge)
 
 			return cont, e
 		}
