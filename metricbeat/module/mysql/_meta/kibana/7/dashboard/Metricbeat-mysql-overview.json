@@ -1769,7 +1769,7 @@
             }
           }
         },
-        "title": "Open Tables Cache [MySQL Metricbeat] ECS",
+        "title": "Open Tables Cache [Metricbeat MySQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1876,7 +1876,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Open Tables Cache [MySQL Metricbeat] ECS",
+          "title": "Open Tables Cache [Metricbeat MySQL] ECS",
           "type": "metrics"
         }
       },
@@ -1901,7 +1901,7 @@
             }
           }
         },
-        "title": "Connection Errors [MySQL Metricbeat] ECS",
+        "title": "Connection Errors [Metricbeat MySQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2072,7 +2072,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Connection Errors [MySQL Metricbeat] ECS",
+          "title": "Connection Errors [Metricbeat MySQL] ECS",
           "type": "metrics"
         }
       },
@@ -2097,7 +2097,7 @@
             }
           }
         },
-        "title": "Commands Operations [MySQL Metricbeat] ECS",
+        "title": "Commands Operations [Metricbeat MySQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2232,7 +2232,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Commands Operations [MySQL Metricbeat] ECS",
+          "title": "Commands Operations [Metricbeat MySQL] ECS",
           "type": "metrics"
         }
       },
@@ -2257,7 +2257,7 @@
             }
           }
         },
-        "title": "SSL Cache [MySQL Metricbeat] ECS",
+        "title": "SSL Cache [Metricbeat MySQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2364,7 +2364,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SSL Cache [MySQL Metricbeat] ECS",
+          "title": "SSL Cache [Metricbeat MySQL] ECS",
           "type": "metrics"
         }
       },
