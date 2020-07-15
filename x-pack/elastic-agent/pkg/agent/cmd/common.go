@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
