@@ -1,6 +1,6 @@
 {
   "upstream": "elastic/beats",
-  "branches": [{ "name": "7.8"}, { "name": "7.7"}, { "name": "7.x"}],
+  "branches": [{ "name": "7.9"}, { "name": "7.8"}, { "name": "7.7"}, { "name": "7.x"}],
   "labels": ["backport"],
   "autoAssign": true,
   "prTitle": "Cherry-pick to {targetBranch}: {commitMessages}"
