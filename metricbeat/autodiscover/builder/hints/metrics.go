@@ -219,9 +219,16 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int, noPort boo
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
-	// Only pick hosts that have ${data.port} or the port on current event. This will make
-	// sure that incorrect meta mapping doesn't happen
+	// Only pick hosts that:
+	// 1. have noPort (pod level event) and data.ports.<port_name> defined
+	// 2. have ${data.port} or the port on current event.
+	// This will make sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
+		if strings.Contains(h, "data.ports.") && noPort {
+			result = append(result, fmt.Sprintf("'%v'", h))
+			// move on to the next host
+			continue
+		}
 		if strings.Contains(h, "data.port") && port != 0 && !noPort || m.checkHostPort(h, port) ||
 			// Use the event that has no port config if there is a ${data.host}:9090 like input
 			(noPort && strings.Contains(h, "data.host")) {

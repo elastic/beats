@@ -37,6 +37,7 @@ type State struct {
 	ProcessInfo *process.Info
 	Status      Status
 	Message     string
+	Payload     map[string]interface{}
 }
 
 // Reporter is interface that is called when a state is changed.

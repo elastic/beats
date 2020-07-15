@@ -24,9 +24,9 @@
             - name: system.*
               type: object
               object_type: keyword
-        - name: "stackdriver.*.*.*.*"
+        - name: "metrics.*.*.*.*"
           type: object
           object_type: double
           object_type_mapping_type: "*"
           description: >
-            Metrics that returned from StackDriver API query.
+            Metrics that returned from Google Cloud API query.

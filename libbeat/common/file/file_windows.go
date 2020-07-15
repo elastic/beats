@@ -29,9 +29,9 @@ import (
 )
 
 type StateOS struct {
-	IdxHi uint64 `json:"idxhi,"`
-	IdxLo uint64 `json:"idxlo,"`
-	Vol   uint64 `json:"vol,"`
+	IdxHi uint64 `json:"idxhi," struct:"idxhi"`
+	IdxLo uint64 `json:"idxlo," struct:"idxlo"`
+	Vol   uint64 `json:"vol," struct:"vol"`
 }
 
 var (
@@ -145,4 +145,13 @@ func IsRemoved(f *os.File) bool {
 		return true // assume file is removed if syscall errors
 	}
 	return info.DeletePending
+}
+
+// InodeString returns idxhi and idxlo as a string.
+func (fs *StateOS) InodeString() string {
+	var buf [61]byte
+	current := strconv.AppendUint(buf[:0], fs.IdxHi, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.IdxLo, 10)
+	return string(current)
 }

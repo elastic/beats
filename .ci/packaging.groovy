@@ -37,8 +37,18 @@ pipeline {
       agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
-        expression {
-          return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
+        anyOf {
+          triggeredBy cause: "IssueCommentCause"
+          expression {
+            def ret = isUserTrigger() || isUpstreamTrigger()
+            if(!ret){
+              currentBuild.result = 'NOT_BUILT'
+              currentBuild.description = "The build has been skipped"
+              currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+              echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+            }
+            return ret
+          }
         }
       }
       stages {
@@ -105,6 +115,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                    deleteDir()
                     release()
                     pushCIDockerImages()
                   }
@@ -128,6 +139,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+                    deleteDir()
                     withMacOSEnv(){
                       release()
                     }
@@ -224,7 +236,6 @@ def withBeatsEnv(Closure body) {
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
-      deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}"){
         body()

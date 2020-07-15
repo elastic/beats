@@ -50,9 +50,10 @@ type OAuth2 struct {
 	TokenURL       string              `config:"token_url"`
 
 	// google specific
-	GoogleCredentialsFile string `config:"google.credentials_file"`
-	GoogleCredentialsJSON []byte `config:"google.credentials_json"`
-	GoogleJWTFile         string `config:"google.jwt_file"`
+	GoogleCredentialsFile  string `config:"google.credentials_file"`
+	GoogleCredentialsJSON  []byte `config:"google.credentials_json"`
+	GoogleJWTFile          string `config:"google.jwt_file"`
+	GoogleDelegatedAccount string `config:"google.delegated_account"`
 
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
@@ -79,6 +80,15 @@ func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client,
 		}
 		return creds.Client(ctx), nil
 	case OAuth2ProviderGoogle:
+		if o.GoogleJWTFile != "" {
+			cfg, err := google.JWTConfigFromJSON(o.GoogleCredentialsJSON, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading jwt credentials: %w", err)
+			}
+			cfg.Subject = o.GoogleDelegatedAccount
+			return cfg.Client(ctx), nil
+		}
+
 		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
@@ -149,6 +159,9 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 	// credentials_json
 	if len(o.GoogleCredentialsJSON) > 0 {
+		if o.GoogleDelegatedAccount != "" {
+			return errors.New("invalid configuration: google.delegated_account can only be provided with a jwt_file")
+		}
 		if !json.Valid(o.GoogleCredentialsJSON) {
 			return errors.New("invalid configuration: google.credentials_json must be valid JSON")
 		}
@@ -157,6 +170,9 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 	// credentials_file
 	if o.GoogleCredentialsFile != "" {
+		if o.GoogleDelegatedAccount != "" {
+			return errors.New("invalid configuration: google.delegated_account can only be provided with a jwt_file")
+		}
 		return o.populateCredentialsJSONFromFile(o.GoogleCredentialsFile)
 	}
 
