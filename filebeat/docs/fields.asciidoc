@@ -62433,6 +62433,116 @@ type: keyword
 --
 
 
+*`gsuite.groups.acl_permission`*::
++
+--
+Group permission setting updated. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.email`*::
++
+--
+Group email.
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.member.email`*::
++
+--
+Member email.
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.member.role`*::
++
+--
+Member role. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.setting`*::
++
+--
+Group setting updated. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.new_value`*::
++
+--
+New value(s) of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.old_value`*::
++
+--
+Old value(s) of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+type: keyword
+
+--
+
+*`gsuite.groups.value`*::
++
+--
+Value of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.message.id`*::
++
+--
+SMTP message Id of an email message. Present for moderation events.
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.message.moderation_action`*::
++
+--
+Message moderation action. Possible values are `approved` and `rejected`.
+
+
+type: keyword
+
+--
+
+*`gsuite.groups.status`*::
++
+--
+A status describing the output of an operation. Possible values are `failed` and `succeeded`.
+
+
+type: keyword
+
+--
+
+
 *`gsuite.login.affected_email_address`*::
 +
 --

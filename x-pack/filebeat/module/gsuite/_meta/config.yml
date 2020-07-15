@@ -39,3 +39,11 @@
     # var.http_client_timeout: 60s
     # var.user_key: all
     # var.interval: 5s
+  groups:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
