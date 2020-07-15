@@ -33,7 +33,7 @@ type actionDispatcher struct {
 func newActionDispatcher(ctx context.Context, log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New()
+		log, err = logger.New("action_dispatcher")
 		if err != nil {
 			return nil, err
 		}
@@ -85,6 +85,10 @@ func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 	)
 
 	for _, action := range actions {
+		if err := ad.ctx.Err(); err != nil {
+			return err
+		}
+
 		if err := ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err

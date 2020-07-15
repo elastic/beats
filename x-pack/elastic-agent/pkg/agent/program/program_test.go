@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
@@ -40,25 +41,19 @@ func TestGroupBy(t *testing.T) {
 				},
 			},
 
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":       "log",
+					"use_output": "special",
+					"streams":    map[string]interface{}{"paths": "/var/log/hello.log"},
+				},
+				{
+					"type":       "system/metrics",
 					"use_output": "special",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
-					"use_output": "special",
-				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/infosec.log"},
 					"use_output": "infosec1",
 				},
 			},
@@ -79,18 +74,14 @@ func TestGroupBy(t *testing.T) {
 					"password": "mypassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/hello.log"},
 					"use_output": "special",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+				{
+					"type":       "system/metrics",
 					"use_output": "special",
 				},
 			},
@@ -104,12 +95,10 @@ func TestGroupBy(t *testing.T) {
 					"password": "anotherpassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/infosec.log"},
 					"use_output": "infosec1",
 				},
 			},
@@ -147,25 +136,19 @@ func TestGroupBy(t *testing.T) {
 				},
 			},
 
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/hello.log"},
 					"use_output": "special",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+				{
+					"type":       "system/metrics",
 					"use_output": "special",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/infosec.log"},
 					"use_output": "donotexist",
 				},
 			},
@@ -194,23 +177,18 @@ func TestGroupBy(t *testing.T) {
 					"password": "anotherpassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+
+				{
+					"type": "system/metrics",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
 				},
 			},
 		}
@@ -230,23 +208,19 @@ func TestGroupBy(t *testing.T) {
 					"password": "mypassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+
+				{
+					"type": "system/metrics",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
 				},
 			},
 		})
@@ -276,23 +250,19 @@ func TestGroupBy(t *testing.T) {
 					"password": "anotherpassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+
+				{
+					"type": "system/metrics",
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/infosec.log"},
 					"use_output": "infosec1",
 				},
 			},
@@ -313,17 +283,14 @@ func TestGroupBy(t *testing.T) {
 					"password": "mypassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":    "log",
+					"streams": map[string]interface{}{"paths": "/var/log/hello.log"},
 				},
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type": "system/metrics",
-					},
+
+				{
+					"type": "system/metrics",
 				},
 			},
 		})
@@ -336,12 +303,10 @@ func TestGroupBy(t *testing.T) {
 					"password": "anotherpassword",
 				},
 			},
-			"datasources": []map[string]interface{}{
-				map[string]interface{}{
-					"inputs": map[string]interface{}{
-						"type":    "log",
-						"streams": map[string]interface{}{"paths": "/var/log/infosec.log"},
-					},
+			"inputs": []map[string]interface{}{
+				{
+					"type":       "log",
+					"streams":    map[string]interface{}{"paths": "/var/log/infosec.log"},
 					"use_output": "infosec1",
 				},
 			},
@@ -420,8 +385,8 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat"},
-			expected: 2,
+			programs: []string{"filebeat", "metricbeat", "endpoint"},
+			expected: 3,
 		},
 		"constraints_config": {
 			programs: []string{"filebeat"},
@@ -453,9 +418,19 @@ func TestConfiguration(t *testing.T) {
 		"enabled_output_false": {
 			expected: 0,
 		},
+		"endpoint_basic": {
+			programs: []string{"endpoint"},
+			expected: 1,
+		},
+		"endpoint_no_fleet": {
+			expected: 0,
+		},
+		"endpoint_unknown_output": {
+			expected: 0,
+		},
 	}
 
-	l, _ := logger.New()
+	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -486,13 +461,13 @@ func TestConfiguration(t *testing.T) {
 			for _, program := range defPrograms {
 				programConfig, err := ioutil.ReadFile(filepath.Join(
 					"testdata",
-					name+"-"+strings.ToLower(program.Spec.Name)+".yml",
+					name+"-"+strings.ToLower(program.Spec.Cmd)+".yml",
 				))
 
 				require.NoError(t, err)
 				var m map[string]interface{}
 				err = yamltest.FromYAML(programConfig, &m)
-				require.NoError(t, err)
+				require.NoError(t, errors.Wrap(err, program.Cmd()))
 
 				compareMap := &transpiler.MapVisitor{}
 				program.Config.Accept(compareMap)

@@ -1,0 +1,181 @@
+description: Pipeline for parsing fortinet firewall logs
+processors:
+- grok:
+    field: message
+    patterns:
+    - '%{SYSLOG5424PRI}%{GREEDYDATA:syslog5424_sd}$'
+- kv:
+    field: syslog5424_sd
+    field_split: " (?=[a-z\\_\\-]+=)"
+    value_split: "="
+    prefix: "fortinet.firewall."
+    ignore_missing: true
+    ignore_failure: false
+    trim_value: "\""
+- set:
+    field: observer.vendor
+    value: Fortinet
+- set:
+    field: observer.product
+    value: Fortigate
+- set:
+    field: observer.type
+    value: firewall
+- set:
+    field: event.module
+    value: fortinet
+- set:
+    field: event.dataset
+    value: fortinet.firewall
+- set:
+    field: event.timezone
+    value: "{{fortinet.firewall.tz}}"
+    ignore_empty_value: true
+- set:
+    field: _temp.time
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}} {{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null"
+- set:
+    field: _temp.time
+    value: "{{fortinet.firewall.date}} {{fortinet.firewall.time}}"
+    if: "ctx.fortinet?.firewall?.tz == null"
+- date:
+    field: _temp.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null"
+- date:
+    field: _temp.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+    if: "ctx.fortinet?.firewall?.tz == null"
+- gsub:
+    field: fortinet.firewall.eventtime
+    pattern: "\\d{6}$"
+    replacement: ""
+    if: "(ctx.fortinet?.firewall?.eventtime).length() > 18"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX_MS
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX_MS
+    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+- rename:
+    field: fortinet.firewall.devname
+    target_field: observer.name
+    ignore_missing: true
+- script:
+    lang: painless
+    source: "ctx.event.duration = Long.parseLong(ctx.fortinet.firewall.duration) * 1000000000"
+    if: "ctx.fortinet?.firewall?.duration != null"
+- rename:
+    field: fortinet.firewall.devid
+    target_field: observer.serial_number
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.dstintf
+    target_field: observer.egress.interface.name
+    ignore_missing: true
+    if: "ctx.observer?.egress?.interface?.name == null"
+- rename:
+    field: fortinet.firewall.srcintf
+    target_field: observer.ingress.interface.name
+    ignore_missing: true
+    if: "ctx.observer?.ingress?.interface?.name == null"
+- rename:
+    field: fortinet.firewall.dst_int
+    target_field: observer.egress.interface.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.src_int
+    target_field: observer.ingress.interface.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.level
+    target_field: log.level
+    ignore_missing: true
+- remove:
+    field: fortinet.firewall.assignip
+    if: "ctx.fortinet?.firewall?.assignip == 'N/A'"
+- remove:
+    field: fortinet.firewall.dstip
+    if: "ctx.fortinet?.firewall?.dstip == 'N/A'"
+- remove:
+    field: fortinet.firewall.srcip
+    if: "ctx.fortinet?.firewall?.srcip == 'N/A'"
+- remove:
+    field: fortinet.firewall.remip
+    if: "ctx.fortinet?.firewall?.remip == 'N/A'"
+- remove:
+    field: fortinet.firewall.locip
+    if: "ctx.fortinet?.firewall?.locip == 'N/A'"
+- remove:
+    field: fortinet.firewall.group
+    if: "ctx.fortinet?.firewall?.group == 'N/A'"
+- remove:
+    field: fortinet.firewall.user
+    if: "ctx.fortinet?.firewall?.user == 'N/A'"
+- remove:
+    field: fortinet.firewall.tranip
+    if: "ctx.fortinet?.firewall?.tranip == 'N/A'"
+- remove:
+    field: fortinet.firewall.transip
+    if: "ctx.fortinet?.firewall?.transip == 'N/A'"
+- remove:
+    field: fortinet.firewall.tunnelip
+    if: "ctx.fortinet?.firewall?.tunnelip == 'N/A'"
+- remove:
+    field:
+    - _temp
+    - message
+    - syslog5424_sd
+    - syslog5424_pri
+    - fortinet.firewall.tz
+    - fortinet.firewall.date
+    - fortinet.firewall.eventtime
+    - fortinet.firewall.time
+    - fortinet.firewall.duration
+    - host
+    ignore_missing: true
+- pipeline:
+    name: '{< IngestPipeline "event" >}'
+    if: "ctx.fortinet?.firewall?.type == 'event'"
+- pipeline:
+    name: '{< IngestPipeline "traffic" >}'
+    if: "ctx.fortinet?.firewall?.type == 'traffic'"
+- pipeline:
+    name: '{< IngestPipeline "utm" >}'
+    if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

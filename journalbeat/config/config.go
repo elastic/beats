@@ -21,13 +21,8 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 )
-
-// SeekMode is specifies how a journal is read
-type SeekMode uint8
 
 // Config stores the configuration of Journalbeat
 type Config struct {
@@ -35,42 +30,9 @@ type Config struct {
 	RegistryFile string           `config:"registry_file"`
 }
 
-const (
-	// SeekInvalid is an invalid value for seek
-	SeekInvalid SeekMode = iota
-	// SeekHead option seeks to the head of a journal
-	SeekHead
-	// SeekTail option seeks to the tail of a journal
-	SeekTail
-	// SeekCursor option seeks to the position specified in the cursor
-	SeekCursor
-
-	seekHeadStr   = "head"
-	seekTailStr   = "tail"
-	seekCursorStr = "cursor"
-)
-
 var (
 	// DefaultConfig are the defaults of a Journalbeat instance
 	DefaultConfig = Config{
 		RegistryFile: "registry",
 	}
-
-	seekModes = map[string]SeekMode{
-		seekHeadStr:   SeekHead,
-		seekTailStr:   SeekTail,
-		seekCursorStr: SeekCursor,
-	}
 )
-
-// Unpack validates and unpack "seek" config option
-func (m *SeekMode) Unpack(value string) error {
-	mode, ok := seekModes[value]
-	if !ok {
-		return fmt.Errorf("invalid seek mode '%s'", value)
-	}
-
-	*m = mode
-
-	return nil
-}

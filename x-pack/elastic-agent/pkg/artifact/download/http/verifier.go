@@ -5,14 +5,18 @@
 package http
 
 import (
+	"bufio"
 	"bytes"
+	"crypto/sha512"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"golang.org/x/crypto/openpgp"
 
@@ -44,16 +48,89 @@ func NewVerifier(config *artifact.Config) (*Verifier, error) {
 		client: client,
 	}
 
-	if err := v.loadPGP(config.PgpFile); err != nil {
-		return nil, errors.New(err, "loading PGP")
-	}
-
 	return v, nil
 }
 
 // Verify checks downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
 func (v *Verifier) Verify(programName, version string) (bool, error) {
+	// TODO: think about verifying asc for prepacked beats
+
+	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
+	if err != nil {
+		return false, errors.New(err, "retrieving package name")
+	}
+
+	fullPath, err := artifact.GetArtifactPath(programName, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
+	if err != nil {
+		return false, errors.New(err, "retrieving package path")
+	}
+
+	isMatch, err := v.verifyHash(filename, fullPath)
+	if !isMatch || err != nil {
+		// remove bits so they can be redownloaded
+		os.Remove(fullPath)
+		os.Remove(fullPath + ".sha512")
+	}
+
+	return isMatch, err
+}
+
+func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
+	hashFilePath := fullPath + ".sha512"
+	hashFileHandler, err := os.Open(hashFilePath)
+	if err != nil {
+		return false, err
+	}
+	defer hashFileHandler.Close()
+
+	// get hash
+	// content of a file is in following format
+	// hash  filename
+	var expectedHash string
+	scanner := bufio.NewScanner(hashFileHandler)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !strings.HasSuffix(line, filename) {
+			continue
+		}
+
+		expectedHash = strings.TrimSpace(strings.TrimSuffix(line, filename))
+	}
+
+	if expectedHash == "" {
+		return false, fmt.Errorf("hash for '%s' not found", filename)
+	}
+
+	// compute file hash
+	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
+	if err != nil {
+		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
+	}
+	defer fileReader.Close()
+
+	// compute file hash
+	hash := sha512.New()
+	if _, err := io.Copy(hash, fileReader); err != nil {
+		return false, err
+	}
+	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
+
+	return expectedHash == computedHash, nil
+}
+
+func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
+	var err error
+	var pgpBytesLoader sync.Once
+
+	pgpBytesLoader.Do(func() {
+		err = v.loadPGP(v.config.PgpFile)
+	})
+
+	if err != nil {
+		return false, errors.New(err, "loading PGP")
+	}
+
 	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
@@ -92,10 +169,11 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 	}
 
 	return true, nil
+
 }
 
 func (v *Verifier) composeURI(programName, filename string) (string, error) {
-	upstream := v.config.BeatsSourceURI
+	upstream := v.config.SourceURI
 	if !strings.HasPrefix(upstream, "http") && !strings.HasPrefix(upstream, "file") && !strings.HasPrefix(upstream, "/") {
 		// always default to https
 		upstream = fmt.Sprintf("https://%s", upstream)
@@ -107,7 +185,7 @@ func (v *Verifier) composeURI(programName, filename string) (string, error) {
 		return "", errors.New(err, "invalid upstream URI", errors.TypeNetwork, errors.M(errors.MetaKeyURI, upstream))
 	}
 
-	uri.Path = path.Join(uri.Path, programName, filename+ascSuffix)
+	uri.Path = path.Join(uri.Path, "beats", programName, filename+ascSuffix)
 	return uri.String(), nil
 }
 

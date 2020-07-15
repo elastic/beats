@@ -175,7 +175,7 @@ func (s *diskSpool) Close() error {
 
 // BufferConfig returns the queue initial buffer settings.
 func (s *diskSpool) BufferConfig() queue.BufferConfig {
-	return queue.BufferConfig{Events: -1}
+	return queue.BufferConfig{MaxEvents: -1}
 }
 
 // Producer creates a new queue producer for publishing events.

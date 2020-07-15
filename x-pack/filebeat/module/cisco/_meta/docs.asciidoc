@@ -11,6 +11,7 @@ filesets for receiving logs over syslog or read from a file:
 - `asa` fileset: supports Cisco ASA firewall logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
+- `nexus` fileset: supports Cisco Nexus switch logs.
 
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
@@ -96,6 +97,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 *`var.syslog_port`*::
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-asa, forwarded]`.
 
 :has-dashboards!:
 
@@ -239,6 +246,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9003.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ftd, forwarded]`.
+
 :has-dashboards!:
 
 :fileset_ex!:
@@ -270,7 +283,58 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9002.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ios, forwarded]`.
+
 include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `nexus` fileset settings
+
+experimental[]
+
+NOTE: This was converted from RSA NetWitness log parser XML "cisconxos" device revision 134.
+
+*`var.input`*::
+
+The input from which messages are read. One of `file`, `tcp` or `udp`.
+
+*`var.syslog_host`*::
+
+The address to listen to UDP or TCP based syslog traffic.
+Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to `9506`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+*`var.tz_offset`*::
+
+By default, datetimes in the logs will be interpreted as relative to
+the timezone configured in the host where {beatname_uc} is running. If ingesting
+logs from a host on a different timezone, use this field to set the timezone
+offset so that datetimes are correctly parsed. Valid values are in the form
+±HH:mm, for example, `-07:00` for `UTC-7`.
+
+*`var.rsa_fields`*::
+
+Flag to control the addition of non-ECS fields to the event. Defaults to true,
+which causes both ECS and custom fields under `rsa` to be are added.
+
+*`var.keep_raw_fields`*::
+
+Flag to control the addition of the raw parser fields to the event. This fields
+will be found under `rsa.raw`. The default is false.
 
 :has-dashboards!:
 
@@ -280,16 +344,16 @@ include::../include/timezone-support.asciidoc[]
 [[dynamic-script-compilations]]
 === Dynamic Script Compilations
 
-The `asa` and `ftd` filesets are based on Elasticsearch ingest pipelines and 
-make extensive use of script processors and painless conditions. This can cause 
+The `asa` and `ftd` filesets are based on Elasticsearch ingest pipelines and
+make extensive use of script processors and painless conditions. This can cause
 the pipelines to fail loading the first time the module is used, due to exceeding
-the maximum script compilation limits. It is recommended to tune the following 
+the maximum script compilation limits. It is recommended to tune the following
 parameters on your Elasticsearch cluster:
 
 - {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
   Increase to at least `100/5m`.
 
-- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
+- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache.max_size]:
   Increase to at least `200` if using both filesets or other script-heavy modules.
 
 [float]

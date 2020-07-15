@@ -22,6 +22,7 @@ package memcache
 import (
 	"encoding/json"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -388,12 +389,18 @@ func (t *transaction) Event(event *beat.Event) error {
 	mc := common.MapStr{}
 	event.Fields["memcache"] = mc
 
+	msg := t.request
+	if msg == nil {
+		msg = t.response
+	}
+
 	if t.request != nil {
 		_, err := t.request.SubEvent("request", mc)
 		if err != nil {
 			logp.Warn("error filling transaction request: %v", err)
 			return err
 		}
+		event.Fields["event.action"] = "memcache." + strings.ToLower(t.request.command.typ.String())
 	}
 	if t.response != nil {
 		_, err := t.response.SubEvent("response", mc)
@@ -401,12 +408,12 @@ func (t *transaction) Event(event *beat.Event) error {
 			logp.Warn("error filling transaction response: %v", err)
 			return err
 		}
+		normalized := normalizeEventOutcome(memcacheStatusCode(t.response.status).String())
+		if normalized != "" {
+			event.Fields["event.outcome"] = normalized
+		}
 	}
 
-	msg := t.request
-	if msg == nil {
-		msg = t.response
-	}
 	if msg == nil {
 		mc["protocol_type"] = "unknown"
 	} else {
@@ -418,6 +425,19 @@ func (t *transaction) Event(event *beat.Event) error {
 	}
 
 	return nil
+}
+
+func normalizeEventOutcome(outcome string) string {
+	switch outcome {
+	case "Fail":
+		return "failure"
+	case "UNKNOWN":
+		return "unknown"
+	case "Success":
+		return "success"
+	default:
+		return ""
+	}
 }
 
 func computeTransactionStatus(requ, resp *message) string {

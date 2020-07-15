@@ -7,6 +7,27 @@ filebeat:
     index: logs-generic-default
     vars:
       var: value
+    processors:
+      - add_fields:
+          target: "dataset"
+          fields:
+            type: logs
+            name: generic
+            namespace: default
+  - type: log
+    paths:
+      - /var/log/hello3.log
+      - /var/log/hello4.log
+    index: testtype-generic-default
+    vars:
+      var: value
+    processors:
+      - add_fields:
+          target: "dataset"
+          fields:
+            type: testtype
+            name: generic
+            namespace: default
 output:
   elasticsearch:
     hosts:

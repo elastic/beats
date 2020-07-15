@@ -1,0 +1,91 @@
+description: Pipeline for normalizing envoy access logs
+processors:
+- script:
+    lang: painless
+    source: >-
+      if (ctx.message.charAt(0) == (char)("[")) {
+        ctx.temp_message = "ACCESS " + ctx.message;
+      } else if (ctx.message.substring(0, 7) == "ACCESS ") {
+        ctx.temp_message = ctx.message;
+      } else {
+        throw new Exception("Not a valid envoyproxy access log");
+      }
+- dissect:
+    field: temp_message
+    pattern: '%{envoyproxy.log_type} [%{timestamp}] "%{method} %{path} %{proto}" %{response_code}
+      %{envoyproxy.response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time}
+      "%{source.address}" "%{user_agent.original}" "%{envoyproxy.request_id}" "%{envoyproxy.authority}"
+      "%{dest}"'
+    on_failure:
+    - script:
+        lang: painless
+        source: 'ctx.remove(''temp_message''); throw new Exception("Dissect error:
+          Not a valid envoyproxy access log");'
+- script:
+    lang: painless
+    source: >-
+      if (ctx.dest == "-") {
+        ctx.remove('dest');
+      } else {
+        ctx['destination'] = new HashMap();
+        def p = ctx.dest.indexOf (':');
+        def l = ctx.dest.length();
+        ctx.destination.address = ctx.dest.substring(0, p);
+        ctx.destination.port = ctx.dest.substring(p+1, l);
+      }
+      ctx.remove('dest');
+    if: ctx.dest != null
+- convert:
+    field: destination.port
+    type: integer
+    if: ctx.destination?.port != null
+- convert:
+    field: duration
+    type: double
+    if: ctx.duration != null
+- script:
+    lang: painless
+    source: ctx.event.duration = Math.round(ctx.duration * params.scale)
+    params:
+      scale: 1000000
+    if: ctx.duration != null
+- remove:
+    field:
+    - json
+    - duration
+    - time
+    - temp_message
+    ignore_missing: true
+- pipeline:
+    if: ctx.proto.charAt(0) != (char)("-")
+    name: '{< IngestPipeline "pipeline-http" >}'
+- pipeline:
+    if: ctx.proto.charAt(0) == (char)("-")
+    name: '{< IngestPipeline "pipeline-tcp" >}'
+- remove:
+    field:
+    - proto
+    - upstream_service_time
+    ignore_failure: true
+- remove:
+    field: source.address
+    if: ctx.source.address == '-'
+- remove:
+    field: envoyproxy.response_flags
+    if: ctx.envoyproxy.response_flags == '-'
+- split:
+    field: envoyproxy.response_flags
+    separator: ','
+    if: ctx.envoyproxy.response_flags != null
+- set:
+    field: destination.ip
+    value: '{{destination.address}}'
+    ignore_empty_value: true
+- set:
+    field: source.ip
+    value: '{{source.address}}'
+    ignore_empty_value: true
+on_failure:
+- set:
+    field: error.message
+    value: 'pipeline-plaintext: {{ _ingest.on_failure_message }}'

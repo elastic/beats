@@ -363,7 +363,7 @@
             "gauge_style": "circle",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -383,9 +383,9 @@
                 "metrics": [
                   {
                     "denominator": "60",
-                    "field": "googlecloud.compute.instance.uptime",
+                    "field": "googlecloud.compute.instance.uptime.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "numerator": "googlecloud.compute.instance.uptime",
+                    "numerator": "googlecloud.compute.instance.uptime.value",
                     "type": "avg",
                     "values": [
                       "60"
@@ -451,7 +451,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -466,7 +466,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.cpu.utilization",
+                    "field": "googlecloud.compute.instance.cpu.utilization.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -518,7 +518,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -533,7 +533,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.disk.read_ops_count",
+                    "field": "googlecloud.compute.instance.disk.read_ops_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -584,7 +584,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -599,7 +599,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.disk.write_ops_count",
+                    "field": "googlecloud.compute.instance.disk.write_ops_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -650,7 +650,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -665,7 +665,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.network.sent_bytes_count",
+                    "field": "googlecloud.compute.instance.network.sent_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -716,7 +716,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -731,7 +731,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.network.received_bytes_count",
+                    "field": "googlecloud.compute.instance.network.received_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -800,7 +800,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -815,7 +815,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.firewall.dropped_bytes_count",
+                    "field": "googlecloud.compute.firewall.dropped_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -885,7 +885,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -900,7 +900,7 @@
                 "line_width": "3",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.firewall.dropped_packets_count",
+                    "field": "googlecloud.compute.firewall.dropped_packets_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }

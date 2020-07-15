@@ -60,11 +60,10 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
-	UseVendor    = true
 
 	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
-	CrossBuildMountModcache = false
+	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
@@ -109,10 +108,6 @@ func init() {
 	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
-	}
-	UseVendor, err = strconv.ParseBool(EnvOr("USE_VENDOR", "true"))
-	if err != nil {
-		panic(errors.Wrap(err, "failed to parse USE_VENDOR env value"))
 	}
 
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
@@ -286,7 +281,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-	return listModuleDir(elasticBeatsModulePath)
+	return gotool.ListModuleCacheDir(elasticBeatsModulePath)
 }
 
 var (

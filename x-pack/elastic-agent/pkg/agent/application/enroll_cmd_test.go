@@ -11,17 +11,18 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"os"
-	"runtime"
 	"strconv"
 	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 )
 
 type mockStore struct {
@@ -43,11 +44,7 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Disabled under windows: https://github.com/elastic/beats/issues/16860")
-	}
-
-	log, _ := logger.New()
+	log, _ := logger.New("tst")
 
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
@@ -158,10 +155,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -218,10 +215,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -278,10 +275,10 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
@@ -326,15 +323,9 @@ func withServer(
 	test func(t *testing.T, host string),
 ) func(t *testing.T) {
 	return func(t *testing.T) {
-		listener, err := net.Listen("tcp", ":0")
-		require.NoError(t, err)
-		defer listener.Close()
-
-		port := listener.Addr().(*net.TCPAddr).Port
-
-		go http.Serve(listener, m(t))
-
-		test(t, "localhost:"+strconv.Itoa(port))
+		s := httptest.NewServer(m(t))
+		defer s.Close()
+		test(t, s.Listener.Addr().String())
 	}
 }
 
@@ -343,7 +334,6 @@ func withTLSServer(
 	test func(t *testing.T, caBytes []byte, host string),
 ) func(t *testing.T) {
 	return func(t *testing.T) {
-
 		ca, err := authority.NewCA()
 		require.NoError(t, err)
 		pair, err := ca.GeneratePair()
@@ -352,7 +342,7 @@ func withTLSServer(
 		serverCert, err := tls.X509KeyPair(pair.Crt, pair.Key)
 		require.NoError(t, err)
 
-		listener, err := net.Listen("tcp", ":0")
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
 		require.NoError(t, err)
 		defer listener.Close()
 
@@ -385,16 +375,16 @@ func bytesToTMPFile(b []byte) (string, error) {
 	return f.Name(), nil
 }
 
-func readConfig(raw []byte) (*FleetAgentConfig, error) {
+func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 	r := bytes.NewReader(raw)
 	config, err := config.NewConfigFrom(r)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg := defaultFleetAgentConfig()
+	cfg := configuration.DefaultConfiguration()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}
-	return cfg, nil
+	return cfg.Fleet, nil
 }

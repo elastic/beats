@@ -55,7 +55,7 @@ func (s *States) UpdateWithTs(newState State, ts time.Time) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.ID()
+	id := newState.Id
 	index := s.findPrevious(id)
 	newState.Timestamp = ts
 
@@ -74,11 +74,18 @@ func (s *States) UpdateWithTs(newState State, ts time.Time) {
 func (s *States) FindPrevious(newState State) State {
 	s.RLock()
 	defer s.RUnlock()
-	i := s.findPrevious(newState.ID())
+	i := s.findPrevious(newState.Id)
 	if i < 0 {
 		return State{}
 	}
 	return s.states[i]
+}
+
+func (s *States) IsNew(state State) bool {
+	s.RLock()
+	defer s.RUnlock()
+	i := s.findPrevious(state.Id)
+	return i < 0
 }
 
 // findPrevious returns the previous state for the file.
@@ -94,6 +101,12 @@ func (s *States) findPrevious(id string) int {
 // The number of states that were cleaned up and number of states that can be
 // cleaned up in the future is returned.
 func (s *States) Cleanup() (int, int) {
+	return s.CleanupWith(nil)
+}
+
+// CleanupWith cleans up the state array. It calls `fn` with the state ID, for
+// each entry to be removed.
+func (s *States) CleanupWith(fn func(string)) (int, int) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -114,13 +127,16 @@ func (s *States) Cleanup() (int, int) {
 				continue
 			}
 
-			delete(s.idx, state.ID())
+			delete(s.idx, state.Id)
+			if fn != nil {
+				fn(state.Id)
+			}
 			logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 
 			L--
 			if L != i {
 				s.states[i] = s.states[L]
-				s.idx[s.states[i].ID()] = i
+				s.idx[s.states[i].Id] = i
 			}
 		} else {
 			i++
@@ -162,7 +178,7 @@ func (s *States) SetStates(states []State) {
 	// create new index
 	s.idx = map[string]int{}
 	for i := range states {
-		s.idx[states[i].ID()] = i
+		s.idx[states[i].Id] = i
 	}
 }
 

@@ -143,6 +143,9 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "DlpAgent"
     },
     {
@@ -289,6 +292,9 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "DlpAgent"
     },
     {
@@ -436,6 +442,9 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "DlpAgent"
     },
     {
@@ -583,6 +592,9 @@
         ],
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "DlpAgent"
     },
     {
@@ -680,6 +692,9 @@
         "rule.name": "Low volume of content detected test",
         "service.type": "o365",
         "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "DlpAgent"
     },
     {
@@ -701,6 +716,7 @@
         "file.owner": "alice@testsiem2.onmicrosoft.com",
         "fileset.name": "audit",
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "host.name": "testsiem2.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 10504,
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
@@ -772,6 +788,9 @@
         "rule.id": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
         "rule.name": "Low volume of content detected test",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",

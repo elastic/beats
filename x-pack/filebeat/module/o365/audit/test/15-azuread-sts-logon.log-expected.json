@@ -18,6 +18,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 0,
         "network.type": "ipv4",
@@ -81,6 +82,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -111,6 +115,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 1450,
         "network.type": "ipv4",
@@ -174,6 +179,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -204,6 +212,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 2901,
         "network.type": "ipv4",
@@ -267,6 +276,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -297,6 +309,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 4293,
         "network.type": "ipv4",
@@ -360,6 +373,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -390,6 +406,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 5744,
         "network.type": "ipv4",
@@ -453,6 +470,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -483,6 +503,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 7137,
         "network.type": "ipv4",
@@ -546,6 +567,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -576,6 +600,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 8587,
         "network.type": "ipv4",
@@ -639,6 +664,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -669,6 +697,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 10037,
         "network.type": "ipv4",
@@ -732,6 +761,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -762,6 +794,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 11429,
         "network.type": "ipv4",
@@ -825,6 +858,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -855,6 +891,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 12822,
         "network.type": "ipv4",
@@ -918,6 +955,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -948,6 +988,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 14214,
         "network.type": "ipv4",
@@ -1011,6 +1052,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1041,6 +1085,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 15664,
         "network.type": "ipv4",
@@ -1104,6 +1149,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1134,6 +1182,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 17114,
         "network.type": "ipv4",
@@ -1197,6 +1246,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1227,6 +1279,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 18564,
         "network.type": "ipv4",
@@ -1290,6 +1343,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1320,6 +1376,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 20013,
         "network.type": "ipv4",
@@ -1380,6 +1437,9 @@
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1410,6 +1470,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 21463,
         "network.type": "ipv4",
@@ -1473,6 +1534,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1503,6 +1567,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 22913,
         "network.type": "ipv4",
@@ -1566,6 +1631,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1596,6 +1664,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 24306,
         "network.type": "ipv4",
@@ -1656,6 +1725,9 @@
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1686,6 +1758,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 25755,
         "network.type": "ipv4",
@@ -1749,6 +1822,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1779,6 +1855,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 27205,
         "network.type": "ipv4",
@@ -1842,6 +1919,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1872,6 +1952,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 28655,
         "network.type": "ipv4",
@@ -1935,6 +2016,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -1965,6 +2049,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 30048,
         "network.type": "ipv4",
@@ -2028,6 +2113,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2058,6 +2146,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 31498,
         "network.type": "ipv4",
@@ -2121,6 +2210,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2151,6 +2243,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 32948,
         "network.type": "ipv4",
@@ -2214,6 +2307,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2244,6 +2340,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 34398,
         "network.type": "ipv4",
@@ -2307,6 +2404,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2337,6 +2437,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 35847,
         "network.type": "ipv4",
@@ -2400,6 +2501,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2430,6 +2534,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 37297,
         "network.type": "ipv4",
@@ -2493,6 +2598,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2523,6 +2631,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 38748,
         "network.type": "ipv4",
@@ -2586,6 +2695,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2616,6 +2728,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 40199,
         "network.type": "ipv4",
@@ -2679,6 +2792,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2709,6 +2825,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 41650,
         "network.type": "ipv4",
@@ -2771,6 +2888,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2801,6 +2921,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 43031,
         "network.type": "ipv4",
@@ -2865,6 +2986,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -2948,6 +3072,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -2976,6 +3103,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 45648,
         "network.type": "ipv4",
@@ -3039,6 +3167,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3122,6 +3253,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -3150,6 +3284,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 48207,
         "network.type": "ipv4",
@@ -3214,6 +3349,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3297,6 +3435,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -3325,6 +3466,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 50824,
         "network.type": "ipv4",
@@ -3389,6 +3531,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3419,6 +3564,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 52332,
         "network.type": "ipv4",
@@ -3482,6 +3628,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3512,6 +3661,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 53782,
         "network.type": "ipv4",
@@ -3575,6 +3725,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3658,6 +3811,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -3686,6 +3842,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 56341,
         "network.type": "ipv4",
@@ -3750,6 +3907,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3780,6 +3940,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 57849,
         "network.type": "ipv4",
@@ -3840,6 +4001,9 @@
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3870,6 +4034,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 59299,
         "network.type": "ipv4",
@@ -3933,6 +4098,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -3963,6 +4131,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 60750,
         "network.type": "ipv4",
@@ -4026,6 +4195,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4109,6 +4281,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -4137,6 +4312,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 63308,
         "network.type": "ipv4",
@@ -4200,6 +4376,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4230,6 +4409,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 64758,
         "network.type": "ipv4",
@@ -4293,6 +4473,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4323,6 +4506,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 66208,
         "network.type": "ipv4",
@@ -4386,6 +4570,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4416,6 +4603,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 67601,
         "network.type": "ipv4",
@@ -4479,6 +4667,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4509,6 +4700,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 69051,
         "network.type": "ipv4",
@@ -4572,6 +4764,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4602,6 +4797,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 70444,
         "network.type": "ipv4",
@@ -4665,6 +4861,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4695,6 +4894,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 71895,
         "network.type": "ipv4",
@@ -4758,6 +4958,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4788,6 +4991,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 73345,
         "network.type": "ipv4",
@@ -4851,6 +5055,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4881,6 +5088,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 74795,
         "network.type": "ipv4",
@@ -4944,6 +5152,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -4974,6 +5185,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 76246,
         "network.type": "ipv4",
@@ -5037,6 +5249,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5067,6 +5282,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 77696,
         "network.type": "ipv4",
@@ -5130,6 +5346,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5160,6 +5379,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 79146,
         "network.type": "ipv4",
@@ -5223,6 +5443,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5253,6 +5476,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 80596,
         "network.type": "ipv4",
@@ -5316,6 +5540,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5346,6 +5573,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 82047,
         "network.type": "ipv4",
@@ -5406,6 +5634,9 @@
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5436,6 +5667,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 83439,
         "network.type": "ipv4",
@@ -5499,6 +5731,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5529,6 +5764,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 84890,
         "network.type": "ipv4",
@@ -5592,6 +5828,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5622,6 +5861,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 86340,
         "network.type": "ipv4",
@@ -5685,6 +5925,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5715,6 +5958,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 87732,
         "network.type": "ipv4",
@@ -5778,6 +6022,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5808,6 +6055,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 89182,
         "network.type": "ipv4",
@@ -5871,6 +6119,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5901,6 +6152,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 90575,
         "network.type": "ipv4",
@@ -5964,6 +6216,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -5994,6 +6249,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 91967,
         "network.type": "ipv4",
@@ -6057,6 +6313,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -6087,6 +6346,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 93417,
         "network.type": "ipv4",
@@ -6150,6 +6410,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -6180,6 +6443,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 94867,
         "network.type": "ipv4",
@@ -6243,6 +6507,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
@@ -6273,6 +6540,7 @@
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 96317,
         "network.type": "ipv4",
@@ -6336,6 +6604,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",

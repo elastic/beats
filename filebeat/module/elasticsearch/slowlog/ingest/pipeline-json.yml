@@ -12,12 +12,42 @@ processors:
       != 'index_search_slowlog'
 - remove:
     field: elasticsearch.slowlog.type
+- dot_expander:
+    field: service.name
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.service.name
+    target_field: service.name
+    ignore_missing: true
 - rename:
     field: elasticsearch.slowlog.level
     target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.level
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.log.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.logger
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.log.logger
+    target_field: log.logger
+    ignore_missing: true
+- dot_expander:
+    field: process.thread.name
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.process.thread.name
+    target_field: process.thread.name
+    ignore_missing: true
 - rename:
     field: elasticsearch.slowlog.component
     target_field: elasticsearch.component
+    ignore_missing: true
 - dot_expander:
     field: cluster.name
     path: elasticsearch.slowlog
@@ -68,8 +98,16 @@ processors:
     - \[%{INDEXNAME:elasticsearch.index.name}\]\[%{NUMBER:elasticsearch.shard.id}\]
 - remove:
     field: elasticsearch.slowlog.message
-- date:
+- rename:
+    field: elasticsearch.slowlog.@timestamp
+    target_field: '@timestamp'
+    ignore_missing: true
+- rename:
     field: elasticsearch.slowlog.timestamp
+    target_field: '@timestamp'
+    ignore_missing: true
+- date:
+    field: '@timestamp'
     target_field: '@timestamp'
     formats:
     - ISO8601

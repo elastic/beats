@@ -7,9 +7,11 @@ package application
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"gopkg.in/yaml.v2"
 
@@ -59,6 +61,7 @@ type EnrollCmdOption struct {
 	URL                  string
 	CAs                  []string
 	CASha256             []string
+	Insecure             bool
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 }
@@ -68,12 +71,20 @@ func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	if cfg.Protocol == kibana.ProtocolHTTP && !e.Insecure {
+		return nil, fmt.Errorf("connection to Kibana is insecure, strongly recommended to use a secure connection (override with --insecure)")
+	}
 
 	// Add any SSL options from the CLI.
 	if len(e.CAs) > 0 || len(e.CASha256) > 0 {
 		cfg.TLS = &tlscommon.Config{
 			CAs:      e.CAs,
 			CASha256: e.CASha256,
+		}
+	}
+	if e.Insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
 		}
 	}
 
@@ -91,7 +102,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewEncryptedDiskStore(fleetAgentConfigPath(), []byte("")),
+		storage.NewDiskStore(info.AgentConfigFile()),
 	)
 
 	return NewEnrollCmdWithStore(
@@ -112,16 +123,16 @@ func NewEnrollCmdWithStore(
 
 	cfg, err := options.kibanaConfig()
 	if err != nil {
-		return nil, errors.New(err,
-			"invalid Kibana configuration",
+		return nil, errors.New(
+			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, options.URL))
 	}
 
 	client, err := fleetapi.NewWithConfig(log, cfg)
 	if err != nil {
-		return nil, errors.New(err,
-			"fail to create the API client",
+		return nil, errors.New(
+			err, "Error",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, options.URL))
 	}
@@ -141,7 +152,7 @@ func (c *EnrollCmd) Execute() error {
 
 	metadata, err := metadata()
 	if err != nil {
-		return errors.New(err, "acquiring hostname")
+		return errors.New(err, "acquiring metadata failed")
 	}
 
 	r := &fleetapi.EnrollRequest{
@@ -161,12 +172,15 @@ func (c *EnrollCmd) Execute() error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, &APIAccess{
-		AccessAPIKey: resp.Item.AccessAPIKey,
-		Kibana:       c.kibanaConfig,
-	})
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	configToStore := map[string]interface{}{
+		"fleet": fleetConfig,
+		"agent": map[string]interface{}{
+			"id": resp.Item.ID,
+		},
+	}
 
-	reader, err := yamlToReader(fleetConfig)
+	reader, err := yamlToReader(configToStore)
 	if err != nil {
 		return err
 	}
@@ -176,6 +190,12 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	if _, err := info.NewAgentInfo(); err != nil {
+		return err
+	}
+
+	// clear action store
+	// fail only if file exists and there was a failure
+	if err := os.Remove(info.AgentActionStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 

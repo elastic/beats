@@ -14,12 +14,14 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 - Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
 - Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
 - Fix license detection, when a beats successfully connect to Elasticsearch the detected license will be show in the log at info level. {pull}15834[15834]
+- Fix the `parameters` option configured in the Elasticsearch output so the values are added to the query string on bulk request. {issues}18325[18325]
 
 *Filebeat*
 
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378] {pull}14754[14754]
 - Fix azure filesets test files. {issue}14185[14185] {pull}14235[14235]
 - Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
+- Remove references to non-existent Zeek `signatures` fileset. {pull}18878[18878]
 
 *Metricbeat*
 
@@ -30,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 - Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 - Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
+- Add domain state to kvm module {pull}17673[17673]
 
 [[release-notes-7.5.0]]
 === Beats version 7.5.0
@@ -153,6 +156,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
 - Add support for gzipped files in S3 input {pull}13980[13980]
 - Add Filebeat Azure Dashboards {pull}14127[14127]
+- Add support for thread ID in Filebeat Kafka module. {pull}19463[19463]
 
 
 *Heartbeat*

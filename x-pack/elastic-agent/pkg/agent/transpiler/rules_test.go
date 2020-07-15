@@ -22,64 +22,141 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
-		"inject index": {
+		"fix streams": {
 			givenYAML: `
-datasources:
+inputs:
   - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
   - name: Specified dataset
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+  - name: All specified with empty strings
+    type: file
+    dataset.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: ""
 `,
 			expectedYAML: `
-datasources:
+inputs:
   - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
-          index: mytype-generic-default
+    type: file
+    dataset.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: generic
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          index: mytype-generic-nsns
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: generic
   - name: Specified dataset
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
-          index: mytype-dsds-default
+    type: file
+    dataset.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
-          index: mytype-dsds-nsns
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+  - name: All specified with empty strings
+    type: file
+    dataset.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: generic
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					FixStream(),
+				},
+			},
+		},
+
+		"inject index": {
+			givenYAML: `
+inputs:
+  - name: All default
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+  - name: Specified namespace
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+
+  - name: Specified dataset
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+  - name: All specified
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+  - name: All specified with empty strings
+    type: file
+    dataset.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: ""
+`,
+			expectedYAML: `
+inputs:
+  - name: All default
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        index: mytype-generic-default
+  - name: Specified namespace
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        index: mytype-generic-nsns
+
+  - name: Specified dataset
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+        index: mytype-dsds-default
+  - name: All specified
+    type: file
+    dataset.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: dsds
+        index: mytype-dsds-nsns
+  - name: All specified with empty strings
+    type: file
+    dataset.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        dataset.name: ""
+        index: mytype-generic-default
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -182,6 +259,34 @@ output:
 			rule: &RuleList{
 				Rules: []Rule{
 					Rename("donoexist", "what"),
+				},
+			},
+		},
+		"select into": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					SelectInto("level_one.level_two", "level_one.key1", "level_one.key2"),
 				},
 			},
 		},
@@ -481,7 +586,7 @@ inputs:
 `,
 			rule: &RuleList{
 				Rules: []Rule{
-					CopyToList("namespace", "inputs", false),
+					CopyToList("namespace", "inputs", "insert_after"),
 				},
 			},
 		},
@@ -524,8 +629,8 @@ logs:
 				require.NoError(t, err)
 			}
 
-			if !assert.True(t, cmp.Equal(v.Content, m)) {
-				diff := cmp.Diff(v.Content, m)
+			if !assert.True(t, cmp.Equal(m, v.Content)) {
+				diff := cmp.Diff(m, v.Content)
 				if diff != "" {
 					t.Errorf("mismatch (-want +got):\n%s", diff)
 				}
@@ -561,8 +666,11 @@ func TestSerialization(t *testing.T) {
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
 		InjectIndex("index-type"),
-		CopyToList("t1", "t2", false),
-		CopyAllToList("t2", false, "a", "b"),
+		InjectStreamProcessor("insert_after", "index-type"),
+		CopyToList("t1", "t2", "insert_after"),
+		CopyAllToList("t2", "insert_before", "a", "b"),
+		FixStream(),
+		SelectInto("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -609,16 +717,25 @@ func TestSerialization(t *testing.T) {
     to: target
 - inject_index:
     type: index-type
+- inject_stream_processor:
+    type: index-type
+    on_conflict: insert_after
 - copy_to_list:
     item: t1
     to: t2
-    overwrite: false
+    on_conflict: insert_after
 - copy_all_to_list:
     to: t2
     except:
     - a
     - b
-    overwrite: false
+    on_conflict: insert_before
+- fix_stream: {}
+- select_into:
+    selectors:
+    - s1
+    - s2
+    path: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

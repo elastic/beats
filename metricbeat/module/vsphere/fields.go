@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetVsphere returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/vsphere.
+// This is the base64 encoded gzipped contents of module/vsphere.
 func AssetVsphere() string {
 	return "eJzMls1u2zoQhfd+ikH28QNocTe5SLtxWyBNtwYjjSzWooYgRwnUpy9ISoZ+6CapqLZcGLBInfNJ1JzhLZyxy+DZ6goN7gBYco0Z3Dw/+Cs3O4ACbW6kZklNBv/tAAD6WVBUtLW7zWCNwmIGJ7EDKCXWhc380ltohMKxhRvcabfYUKv7KxGXqdBYrBAsLNNFLi55VbafiohMn2MYc4wxivudTAwkZ+xeyBSzuV/wuPH/wLTUHQxL6/TTWd7LGm1nGRUshAfPXGiRS+72TCzq/VPHaKMENTWn99l/dYrgFYFK4AqjG+NGSUYJzmBpv+AsDWJSzHuDmJyytVgkpXy0WGxDqXNOyajR5NjwWyn75ZfZRSBUZHlNFszu/9sx8JEsX0+AXLdhU1T1I+Wm3H15BNnAYaY6tg31n843VP8bjH1Bp/P15fyKrUJFZqsiPXhxZx+Tfr06e7it8jgR3jYxvBauQX4hcz66f3Gw3yraT0EWprKX84803IpaibySzapzy1Wl96eWi729nD/n2uCaCU7M3M9GWTk0k1mWb5XR38I2wCHsw/W4poTf2Nz0s0YjWDYneAhHuH+taYxD9NSi5c2ilEr44AxWh5Zn9R/rhqihUJKkf/rXOukByd6rbwbpYcctYT1r3lomdQyhGSWkp++4OAyHi8cVlX3njSFi/Efb1s8AAAD//5A1D00="
 }

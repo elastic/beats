@@ -2,7 +2,12 @@
   type: group
   description: >
     Fields for Azure audit logs.
+  default_field: false
   fields:
+    - name: category
+      type: keyword
+      description: >
+        The category of the operation.  Currently, Audit is the only supported value.
     - name: operation_name
       type: keyword
       description: >

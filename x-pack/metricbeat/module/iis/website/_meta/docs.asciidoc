@@ -7,6 +7,9 @@ The metrics contain the IIS Performance counter values like:
     Web Service: Current Connections (through experience with their apps app, users can identify what is a normal value for this) and others.
 
 
+[float]
+==== Dashboard
 
+image::./images/metricbeat-iis-website-overview.png[]
 
 

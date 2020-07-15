@@ -14,10 +14,11 @@ import (
 
 	"github.com/magefile/mage/mg"
 
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
@@ -26,9 +27,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
-
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
 )
 
 func init() {
@@ -153,11 +151,6 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // BuildPkgForFunctions creates a folder named pkg and adds functions to it.
 // This makes testing the manager more comfortable.
 func BuildPkgForFunctions() error {
@@ -166,11 +159,9 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
-		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
-		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
-		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
-		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
+		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{

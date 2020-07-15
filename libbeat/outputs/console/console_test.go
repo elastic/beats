@@ -21,6 +21,7 @@ package console
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"testing"
@@ -130,7 +131,7 @@ func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
 		c, _ := newConsole("test", outputs.NewNilObserver(), codec)
 		for _, b := range batches {
-			c.Publish(b)
+			c.Publish(context.Background(), b)
 		}
 	})
 }

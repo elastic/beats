@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetPrometheus returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/prometheus.
+// This is the base64 encoded gzipped contents of module/prometheus.
 func AssetPrometheus() string {
 	return "eJzMkkGO2zAMRfc+xYe7G2TmAF70BAXaosuiCBT7O1ZHllSSniC3LxzHGU0yQJF2Uy75RfLxi4945rFBljTSBk5aAeYtsEH95ZKsK6CjtuKz+RQbfKwA4Js5U2grLrNDL2mEw2sVGLucfLSnCtAhiW3bFHu/b9C7oKwAYaBTNti7+Q3NfNxrg++1aqg3qAezXP+ogN4zdNqc5j4iupFX1HPYMc+9JE35nCnL5viAz9JR4BV+zEnMRcNA4QbB7RgUBx8CRmftgN6L2gY2EEI1OCG6NO0CL/1WlKX46eEirDBp95OtFeklsV3UZx4PSbpCfsfmNQpnR5r49jz1BmZR76e52u2Nuh1dzj7uz0/rh/ovoW9of02U4//G+uLCdPr1Kdh627P89VPB//Z639nqZqfyNP8Ac2qwfiVLHy5jdzRX5K9vfUURjsm4PYg3/gvR0genPivYqzNn45TyQrmD9ncAAAD//1baTA8="
 }

@@ -207,11 +207,13 @@ func (lib *librpm) close() error {
 func openLibrpm() (*librpm, error) {
 	var librpmNames = []string{
 		"librpm.so",   // with rpm-devel installed
-		"librpm.so.8", // Fedora 29
+		"librpm.so.9", // Fedora 31/32
+		"librpm.so.8", // Fedora 29/30
 		"librpm.so.3", // CentOS 7
 		"librpm.so.1", // CentOS 6
 
 		// Following for completeness, but not explicitly tested
+		"librpm.so.10",
 		"librpm.so.7",
 		"librpm.so.6",
 		"librpm.so.5",
@@ -357,7 +359,9 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	}
 	defer C.my_headerFree(openedLibrpm.headerFree, header)
 
-	pkg := Package{}
+	pkg := Package{
+		Type: "rpm",
+	}
 
 	name := C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_NAME)
 	if name != nil {
@@ -370,7 +374,7 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	if version != nil {
 		pkg.Version = C.GoString(version)
 	} else {
-		pkg.Error = errors.New("Failed to get package version")
+		pkg.error = errors.New("failed to get package version")
 	}
 
 	pkg.Release = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_RELEASE))

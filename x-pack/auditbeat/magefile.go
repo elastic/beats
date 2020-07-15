@@ -29,16 +29,11 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(fieldsYML)
 
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 	devtools.BeatLicense = "Elastic License"
 	devtools.Platforms = devtools.Platforms.Filter("!linux/ppc64 !linux/mips64")
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.

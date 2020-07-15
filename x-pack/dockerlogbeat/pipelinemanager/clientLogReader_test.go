@@ -5,18 +5,40 @@
 package pipelinemanager
 
 import (
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/daemon/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/docker/docker/daemon/logger/jsonfilelog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
+
+func TestConfigHosts(t *testing.T) {
+	testHostEmpty := map[string]string{
+		"api_key": "keykey",
+	}
+	_, err := NewCfgFromRaw(testHostEmpty)
+	assert.Error(t, err)
+
+	testMultiHost := map[string]string{
+		"hosts": "endpoint1,endpoint2",
+	}
+	goodOut := []string{"endpoint1", "endpoint2"}
+	cfg, err := NewCfgFromRaw(testMultiHost)
+	assert.NoError(t, err)
+	assert.Equal(t, goodOut, cfg.Endpoint)
+
+}
 
 func TestNewClient(t *testing.T) {
 	logString := "This is a log line"
@@ -68,7 +90,17 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInputFromLine(t, logString))
 	require.NoError(t, err)
 
-	client, err := newClientFromPipeline(mockConnector, reader, "aaa", cfgObject)
+	info := logger.Info{
+		ContainerID: "b87d3b0379f816a5f2f7070f28cc05e2f564a3fb549a67c64ec30fc5b04142ed",
+		LogPath:     filepath.Join("/tmp/dockerbeattest/", string(time.Now().Unix())),
+	}
+
+	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
+	assert.NoError(t, err)
+	localLog, err := jsonfilelog.New(info)
+	assert.NoError(t, err)
+
+	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject, localLog)
 	require.NoError(t, err)
 
 	return client

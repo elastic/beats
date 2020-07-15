@@ -37,7 +37,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- Activemq Module -------------------------------
+#------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   # Audit logs
   audit:
@@ -127,6 +127,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   cloudwatch:
     enabled: false
 
@@ -157,6 +160,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   ec2:
     enabled: false
@@ -189,6 +195,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   elb:
     enabled: false
 
@@ -219,6 +228,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   s3access:
     enabled: false
@@ -251,6 +263,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   vpcflow:
     enabled: false
 
@@ -282,21 +297,24 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
   activitylogs:
     enabled: true
     var:
-      # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
       eventhub: "insights-operational-logs"
-      # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      # consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
       consumer_group: "$Default"
       # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
       connection_string: ""
-      # the name of the storage account the state/offsets will be stored and updated.
+      # the name of the storage account the state/offsets will be stored and updated
       storage_account: ""
-      #The storage account key, this key will be used to authorize access to data in your storage account.
+      # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
 
   auditlogs:
@@ -316,6 +334,48 @@ filebeat.modules:
  #     storage_account: ""
  #     storage_account_key: ""
 
+#------------------ Barracuda Web Application Firewall Module ------------------
+- module: barracuda
+  waf:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9503
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#-------------------------- Blue Coat Director Module --------------------------
+- module: bluecoat
+  director:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9505
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
   log:
@@ -323,6 +383,21 @@ filebeat.modules:
     var:
       syslog_host: localhost
       syslog_port: 9003
+
+#------------------------------ Checkpoint Module ------------------------------
+- module: checkpoint
+  firewall:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -379,6 +454,46 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  nexus:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9506
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#---------------------------- Citrix XenApp Module ----------------------------
+- module: citrix
+  virtualapps:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9507
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
@@ -398,6 +513,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#---------------------------- CylanceProtect Module ----------------------------
+- module: cylance
+  protect:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9508
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
@@ -442,6 +578,80 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#--------------------- Big-IP Access Policy Manager Module ---------------------
+- module: f5
+  bigipapm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9504
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  firepass:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9509
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#------------------------------- Fortinet Module -------------------------------
+- module: fortinet
+  firewall:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9004
+
+  clientendpoint:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9510
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #----------------------------- Google Cloud Module -----------------------------
 - module: googlecloud
@@ -499,7 +709,58 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
-#------------------------------- Haproxy Module -------------------------------
+#-------------------------------- Gsuite Module --------------------------------
+- module: gsuite
+  saml:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  user_accounts:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  login:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  admin:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  drive:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  groups:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+
+#------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
   log:
@@ -586,6 +847,48 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#------------------------- Imperva SecureSphere Module -------------------------
+- module: imperva
+  securesphere:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9511
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#---------------------------- Infoblox NIOS Module ----------------------------
+- module: infoblox
+  nios:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9512
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Iptables Module -------------------------------
 - module: iptables
   log:
@@ -597,6 +900,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#---------------------------- Juniper JUNOS Module ----------------------------
+- module: juniper
+  junos:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9513
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
@@ -611,6 +935,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------- Kaspersky Anti-Virus Module -------------------------
+- module: kaspersky
+  av:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9514
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
@@ -639,6 +984,41 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------------ Microsoft Module ------------------------------
+- module: microsoft
+  # ATP configuration
+  defender_atp:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+   
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  dhcp:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9515
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #--------------------------------- MISP Module ---------------------------------
 - module: misp
@@ -709,7 +1089,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Nats Module ---------------------------------
+#--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
   log:
@@ -726,6 +1106,27 @@ filebeat.modules:
     var:
       netflow_host: localhost
       netflow_port: 2055
+
+#-------------------------- Arbor Peakflow SP Module --------------------------
+- module: netscout
+  sightline:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9502
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
@@ -804,7 +1205,7 @@ filebeat.modules:
     #   authentication_endpoint: "https://login.microsoftonline.us/"
     #   resource: "https://manage.office365.us"
     #
-    #   max_retention: 7d
+    #   max_retention: 168h
     #   max_requests_per_minute: 2000
     #   poll_interval: 3m
 
@@ -812,17 +1213,10 @@ filebeat.modules:
 - module: okta
   system:
     enabled: true
-    # API key to access Okta
-    #var.api_key
-
-    # URL of the Okta REST API
-    #var.url
-
-    # Disable SSL verification 
-    #var.ssl: |-
-    #  {
-    #    "verification_mode": "none"
-    #  }
+    # You must configure the URL with your Okta domain and provide an
+    # API token to access the logs API.
+    #var.url: https://yourOktaDomain/api/v1/logs
+    #var.api_key: 'yourApiTokenHere'
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -874,6 +1268,48 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
 
+#-------------------------- Radware DefensePro Module --------------------------
+- module: radware
+  defensepro:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9518
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#---------------------------- Rapid7 NeXpose Module ----------------------------
+- module: rapid7
+  nexpose:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9517
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
   # Main logs
@@ -902,6 +1338,72 @@ filebeat.modules:
     # Filebeat will choose the the default path.
     #var.paths:
 
+#----------------------------- Sonicwall-FW Module -----------------------------
+- module: sonicwall
+  firewall:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9519
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#------------------------------- Sophosxg Module -------------------------------
+- module: sophosxg
+  firewall:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9005
+
+    # firewall default hostanme 
+    #var.default_host_name: firewall.localgroup.local
+    
+    # known firewalls
+    #var.known_devices:
+    #   "device1_serialnumber": "a.host.local"
+    #   "device2_serialnumber": "b.host.local"
+
+
+#-------------------------------- Squid Module --------------------------------
+- module: squid
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9520
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Suricata Module -------------------------------
 - module: suricata
   # All logs
@@ -911,6 +1413,48 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------- Tenable Network Security Nessus Module -------------------
+- module: tenable
+  nessus_security:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9516
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#---------------------------- Apache Tomcat Module ----------------------------
+- module: tomcat
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9501
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik
@@ -972,8 +1516,6 @@ filebeat.modules:
     enabled: true
   rfb:
     enabled: true
-  signatures:
-    enabled: true
   sip:
     enabled: true
   smb_cmd:
@@ -1008,6 +1550,28 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#----------------------------- Zscaler NSS Module -----------------------------
+- module: zscaler
+  zia:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9521
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 
 
 #=========================== Filebeat inputs =============================
@@ -1062,6 +1626,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
@@ -1076,6 +1644,11 @@ filebeat.inputs:
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
+
+  # By default, all events contain `host.name`. This option can be set to true
+  # to disable the addition of this field to all events. The default value is
+  # false.
+  #publisher_pipeline.disable_host: false
 
   # Ignore files which were modified more then the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
@@ -1150,6 +1723,15 @@ filebeat.inputs:
   # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
   # Default is 5s.
   #multiline.timeout: 5s
+
+  # To aggregate constant number of lines into a single event use the count mode of multiline.
+  #multiline.type: count
+
+  # The number of lines to aggregate into a single event.
+  #multiline.count_lines: 3
+
+  # Do not add new line character when concatenating lines.
+  #multiline.skip_newline: false
 
   # Setting tail_files to true means filebeat starts reading new files at the end
   # instead of the beginning. If this is used in combination with log rotation
@@ -1386,6 +1968,7 @@ filebeat.inputs:
   # Configure stream to filter to a specific stream: stdout, stderr or all (default)
   #stream: all
 
+
 #------------------------------ NetFlow input --------------------------------
 # Experimental: Config options for the Netflow/IPFIX collector over UDP input
 #- type: netflow
@@ -1461,7 +2044,8 @@ filebeat.inputs:
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
   #visibility_timeout: 300
-#========================== Filebeat autodiscover ==============================
+
+# =========================== Filebeat autodiscover ============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
 # or inputs as they happen.
@@ -1478,7 +2062,7 @@ filebeat.inputs:
 #              paths:
 #                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
-#========================= Filebeat global options ============================
+# ========================== Filebeat global options ===========================
 
 # Registry data path. If a relative path is used, it is considered relative to the
 # data path.
@@ -1525,7 +2109,8 @@ filebeat.inputs:
     #reload.enabled: true
     #reload.period: 10s
 
-#================================ General ======================================
+
+# ================================== General ===================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
@@ -1633,7 +2218,7 @@ filebeat.inputs:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-#================================ Processors ===================================
+# ================================= Processors =================================
 
 # Processors are used to reduce the number of fields in the exported event or to
 # enhance the event with external metadata. This section defines a list of
@@ -1650,153 +2235,153 @@ filebeat.inputs:
 # values:
 #
 #processors:
-#- include_fields:
-#    fields: ["cpu"]
-#- drop_fields:
-#    fields: ["cpu.user", "cpu.system"]
+#  - include_fields:
+#      fields: ["cpu"]
+#  - drop_fields:
+#      fields: ["cpu.user", "cpu.system"]
 #
 # The following example drops the events that have the HTTP response code 200:
 #
 #processors:
-#- drop_event:
-#    when:
-#       equals:
-#           http.code: 200
+#  - drop_event:
+#      when:
+#        equals:
+#          http.code: 200
 #
 # The following example renames the field a to b:
 #
 #processors:
-#- rename:
-#    fields:
-#       - from: "a"
-#         to: "b"
+#  - rename:
+#      fields:
+#        - from: "a"
+#          to: "b"
 #
 # The following example tokenizes the string into fields:
 #
 #processors:
-#- dissect:
-#    tokenizer: "%{key1} - %{key2}"
-#    field: "message"
-#    target_prefix: "dissect"
+#  - dissect:
+#      tokenizer: "%{key1} - %{key2}"
+#      field: "message"
+#      target_prefix: "dissect"
 #
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
 #
 #processors:
-#- add_cloud_metadata: ~
+#  - add_cloud_metadata: ~
 #
 # The following example enriches each event with the machine's local time zone
 # offset from UTC.
 #
 #processors:
-#- add_locale:
-#    format: offset
+#  - add_locale:
+#      format: offset
 #
 # The following example enriches each event with docker metadata, it matches
 # given fields to an existing container id and adds info from that container:
 #
 #processors:
-#- add_docker_metadata:
-#    host: "unix:///var/run/docker.sock"
-#    match_fields: ["system.process.cgroup.id"]
-#    match_pids: ["process.pid", "process.ppid"]
-#    match_source: true
-#    match_source_index: 4
-#    match_short_id: false
-#    cleanup_timeout: 60
-#    labels.dedot: false
-#    # To connect to Docker over TLS you must specify a client and CA certificate.
-#    #ssl:
-#    #  certificate_authority: "/etc/pki/root/ca.pem"
-#    #  certificate:           "/etc/pki/client/cert.pem"
-#    #  key:                   "/etc/pki/client/cert.key"
+#  - add_docker_metadata:
+#      host: "unix:///var/run/docker.sock"
+#      match_fields: ["system.process.cgroup.id"]
+#      match_pids: ["process.pid", "process.ppid"]
+#      match_source: true
+#      match_source_index: 4
+#      match_short_id: false
+#      cleanup_timeout: 60
+#      labels.dedot: false
+#      # To connect to Docker over TLS you must specify a client and CA certificate.
+#      #ssl:
+#      #  certificate_authority: "/etc/pki/root/ca.pem"
+#      #  certificate:           "/etc/pki/client/cert.pem"
+#      #  key:                   "/etc/pki/client/cert.key"
 #
 # The following example enriches each event with docker metadata, it matches
 # container id from log path available in `source` field (by default it expects
 # it to be /var/lib/docker/containers/*/*.log).
 #
 #processors:
-#- add_docker_metadata: ~
+#  - add_docker_metadata: ~
 #
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata: ~
+#  - add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
 #
 #processors:
-#- add_process_metadata:
-#    match_pids: ["system.process.ppid"]
-#    target: system.process.parent
+#  - add_process_metadata:
+#      match_pids: ["system.process.ppid"]
+#      target: system.process.parent
 #
 # The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
-#- decode_json_fields:
-#    fields: ["field1", "field2", ...]
-#    process_array: false
-#    max_depth: 1
-#    target: ""
-#    overwrite_keys: false
+#  - decode_json_fields:
+#      fields: ["field1", "field2", ...]
+#      process_array: false
+#      max_depth: 1
+#      target: ""
+#      overwrite_keys: false
 #
 #processors:
-#- decompress_gzip_field:
-#    from: "field1"
-#    to: "field2"
-#    ignore_missing: false
-#    fail_on_error: true
+#  - decompress_gzip_field:
+#      from: "field1"
+#      to: "field2"
+#      ignore_missing: false
+#      fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #
 #processors:
-#- copy_fields:
-#    fields:
+#  - copy_fields:
+#      fields:
 #        - from: message
 #          to: message_copied
-#    fail_on_error: true
-#    ignore_missing: false
+#      fail_on_error: true
+#      ignore_missing: false
 #
 # The following example truncates the value of message to 1024 bytes
 #
 #processors:
-#- truncate_fields:
-#    fields:
-#      - message
-#    max_bytes: 1024
-#    fail_on_error: false
-#    ignore_missing: true
+#  - truncate_fields:
+#      fields:
+#        - message
+#      max_bytes: 1024
+#      fail_on_error: false
+#      ignore_missing: true
 #
 # The following example preserves the raw message under event.original
 #
 #processors:
-#- copy_fields:
-#    fields:
+#  - copy_fields:
+#      fields:
 #        - from: message
 #          to: event.original
-#    fail_on_error: false
-#    ignore_missing: true
-#- truncate_fields:
-#    fields:
-#      - event.original
-#    max_bytes: 1024
-#    fail_on_error: false
-#    ignore_missing: true
+#      fail_on_error: false
+#      ignore_missing: true
+#  - truncate_fields:
+#      fields:
+#        - event.original
+#      max_bytes: 1024
+#      fail_on_error: false
+#      ignore_missing: true
 #
 # The following example URL-decodes the value of field1 to field2
 #
 #processors:
-#- urldecode:
-#    fields:
-#      - from: "field1"
-#        to: "field2"
-#    ignore_missing: false
-#    fail_on_error: true
+#  - urldecode:
+#      fields:
+#        - from: "field1"
+#          to: "field2"
+#      ignore_missing: false
+#      fail_on_error: true
 
-#============================= Elastic Cloud ==================================
+# =============================== Elastic Cloud ================================
 
 # These settings simplify using Filebeat with the Elastic Cloud (https://cloud.elastic.co/).
 
@@ -1809,11 +2394,11 @@ filebeat.inputs:
 # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
 #cloud.auth:
 
-#================================ Outputs ======================================
+# ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
 
-#-------------------------- Elasticsearch output -------------------------------
+# ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -1933,7 +2518,28 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-#----------------------------- Logstash output ---------------------------------
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
+# ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -2047,7 +2653,7 @@ output.elasticsearch:
   # timing out. The default is 30s.
   #timeout: 30s
 
-#------------------------------- Kafka output ----------------------------------
+# -------------------------------- Kafka Output --------------------------------
 #output.kafka:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -2118,6 +2724,17 @@ output.elasticsearch:
   # all events are published.  Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
   #max_retries: 3
+
+  # The number of seconds to wait before trying to republish to Kafka
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to republish. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful publish, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to republish to
+  # Kafka after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
@@ -2201,17 +2818,21 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/path/config
+  #kerberos.config_path: /etc/krb5.conf
 
-  # The service principal name.
-  #kerberos.service_name: HTTP/my-service@realm
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
 
   # Name of the Kerberos user.
   #kerberos.username: elastic
@@ -2222,7 +2843,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
-#------------------------------- Redis output ----------------------------------
+# -------------------------------- Redis Output --------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -2340,7 +2961,7 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
-#------------------------------- File output -----------------------------------
+# -------------------------------- File Output ---------------------------------
 #output.file:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -2374,7 +2995,7 @@ output.elasticsearch:
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
 
-#----------------------------- Console output ---------------------------------
+# ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
   #enabled: true
@@ -2387,7 +3008,7 @@ output.elasticsearch:
     # Configure escaping HTML symbols in strings.
     #escape_html: false
 
-#================================= Paths ======================================
+# =================================== Paths ====================================
 
 # The home path for the Filebeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
@@ -2413,11 +3034,13 @@ output.elasticsearch:
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
 
-#================================ Keystore ==========================================
+# ================================== Keystore ==================================
+
 # Location of the Keystore containing the keys and their sensitive values.
 #keystore.path: "${path.config}/beats.keystore"
 
-#============================== Dashboards =====================================
+# ================================= Dashboards =================================
+
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards are disabled by default and can be enabled either by setting the
 # options here, or by using the `-setup` CLI flag or the `setup` command.
@@ -2461,8 +3084,7 @@ output.elasticsearch:
 # Maximum number of retries before exiting with an error, 0 for unlimited retrying.
 #setup.dashboards.retry.maximum: 0
 
-
-#============================== Template =====================================
+# ================================== Template ==================================
 
 # A template is used to set the mapping in Elasticsearch
 # By default template loading is enabled and the template is loaded.
@@ -2516,7 +3138,7 @@ setup.template.settings:
   #_source:
     #enabled: false
 
-#============================== Setup ILM =====================================
+# ====================== Index Lifecycle Management (ILM) ======================
 
 # Configure index lifecycle management (ILM). These settings create a write
 # alias and add additional settings to the index template. When ILM is enabled,
@@ -2530,13 +3152,13 @@ setup.template.settings:
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
 # name is 'filebeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: "filebeat"
+#setup.ilm.rollover_alias: 'filebeat'
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# 'filebeat'.
+# 'beatname'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
@@ -2551,7 +3173,7 @@ setup.template.settings:
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
 
-#============================== Kibana =====================================
+# =================================== Kibana ===================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
 # This requires a Kibana endpoint configuration.
@@ -2606,9 +3228,8 @@ setup.kibana:
   # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
+# ================================== Logging ===================================
 
-
-#================================ Logging ======================================
 # There are four options for the log output: file, stderr, syslog, eventlog
 # The file output is the default.
 
@@ -2675,8 +3296,12 @@ logging.files:
 # Set to true to log messages in JSON format.
 #logging.json: false
 
+# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
+# information. Recommended to use in combination with `logging.json=true`
+# Defaults to false.
+#logging.ecs: false
 
-#============================== X-Pack Monitoring ===============================
+# ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
@@ -2786,6 +3411,27 @@ logging.files:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
   #metrics.period: 10s
   #state.period: 1m
 
@@ -2797,7 +3443,8 @@ logging.files:
 # and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
 #monitoring.cloud.auth:
 
-#================================ HTTP Endpoint ======================================
+# =============================== HTTP Endpoint ================================
+
 # Each beat can expose internal metrics through a HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
 # Stats can be access through http://localhost:5066/stats . For pretty JSON output
@@ -2821,12 +3468,48 @@ logging.files:
 # `http.user`.
 #http.named_pipe.security_descriptor:
 
-#============================= Process Security ================================
+# ============================== Process Security ==============================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
 
-#================================= Migration ==================================
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the filebeat.
+#instrumentation:
+    # Set to true to enable instrumentation of filebeat.
+    #enabled: false
+
+    # Environment in which filebeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
+
+# ================================= Migration ==================================
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
+

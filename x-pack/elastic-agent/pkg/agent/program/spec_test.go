@@ -21,10 +21,10 @@ import (
 
 func TestSerialization(t *testing.T) {
 	spec := Spec{
-		Name:         "hello",
-		Cmd:          "hellocmd",
-		Configurable: "file",
-		Args:         []string{"-c", "first"},
+		Name:     "hello",
+		Cmd:      "hellocmd",
+		Args:     []string{"-c", "first"},
+		Artifact: "nested/hellocmd",
 		Rules: transpiler.NewRuleList(
 			transpiler.Copy("inputs", "filebeat"),
 			transpiler.Filter("filebeat", "output", "keystore"),
@@ -44,18 +44,24 @@ func TestSerialization(t *testing.T) {
 				"log",
 			),
 		),
+		CheckInstallSteps: transpiler.NewStepList(
+			transpiler.ExecFile(25, "app", "verify", "--installed"),
+		),
 		PostInstallSteps: transpiler.NewStepList(
 			transpiler.DeleteFile("d-1", true),
 			transpiler.MoveFile("m-1", "m-2", false),
+		),
+		PreUninstallSteps: transpiler.NewStepList(
+			transpiler.ExecFile(30, "app", "uninstall", "--force"),
 		),
 		When: "1 == 1",
 	}
 	yml := `name: hello
 cmd: hellocmd
-configurable: file
 args:
 - -c
 - first
+artifact: nested/hellocmd
 rules:
 - copy:
     from: inputs
@@ -89,6 +95,13 @@ rules:
     key: type
     values:
     - log
+check_install:
+- exec_file:
+    path: app
+    args:
+    - verify
+    - --installed
+    timeout: 25
 post_install:
 - delete_file:
     path: d-1
@@ -97,6 +110,13 @@ post_install:
     path: m-1
     target: m-2
     fail_on_missing: false
+pre_uninstall:
+- exec_file:
+    path: app
+    args:
+    - uninstall
+    - --force
+    timeout: 30
 when: 1 == 1
 `
 	t.Run("serialization", func(t *testing.T) {

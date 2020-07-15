@@ -10,21 +10,14 @@ import (
 
 // XPackConfigFileParams returns the configuration of sample and reference configuration data.
 func XPackConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/beat.yml"),
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/beat.reference.yml"),
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		ExtraVars: map[string]interface{}{
-			"ExcludeConsole":             true,
-			"ExcludeFileOutput":          true,
-			"ExcludeKafka":               true,
-			"ExcludeRedis":               true,
-			"UseDockerMetadataProcessor": false,
-		},
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	p.ExtraVars = map[string]interface{}{
+		"ExcludeConsole":             false,
+		"ExcludeFileOutput":          true,
+		"ExcludeKafka":               true,
+		"ExcludeRedis":               true,
+		"UseDockerMetadataProcessor": false,
 	}
+	return p
 }

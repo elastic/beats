@@ -1,0 +1,85 @@
+[[elastic-agent-installation]]
+[role="xpack"]
+= Install {agent}
+
+experimental[]
+
+Download and install the Agent on each system you want to monitor.
+
+//TODO: Replace with tabbed panel when the code is stable. 
+
+// tag::install-elastic-agent[]
+
+To download and install {elastic-agent}, use the commands that work with your
+system:
+
+*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {agent} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+----
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-darwin-x86_64.tar.gz
+tar xzvf elastic-agent-{version}-darwin-x86_64.tar.gz
+----
+
+endif::[]
+
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {agent} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+----
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-linux-x86_64.tar.gz
+tar xzvf elastic-agent-{version}-linux-x86_64.tar.gz
+----
+
+endif::[]
+
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {agent} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the {agent} Windows zip file from the
+https://www.elastic.co/downloads/beats/elastic-agent[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `elastic-agent-<version>-windows` directory to `Elastic-Agent`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. From the PowerShell prompt, run the following commands to install Filebeat as a
+Windows service:
++
+[source,shell]
+----
+PS > cd 'C:\Program Files\Elastic-Agent'
+PS C:\Program Files\Elastic-Agent> .\install-service-elastic-agent.ps1
+----
+
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
+
+endif::[]
+
+// end::install-elastic-agent[]
+

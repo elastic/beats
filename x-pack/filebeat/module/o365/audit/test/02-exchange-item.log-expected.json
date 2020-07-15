@@ -15,6 +15,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 0,
         "network.type": "ipv6",
@@ -55,6 +56,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -74,6 +78,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 1526,
         "network.type": "ipv6",
@@ -114,6 +119,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -133,6 +141,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 3083,
         "network.type": "ipv6",
@@ -173,6 +182,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -192,6 +204,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 4634,
         "network.type": "ipv6",
@@ -232,6 +245,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -251,6 +267,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 5847,
         "network.type": "ipv6",
@@ -291,6 +308,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -310,6 +330,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 7111,
         "network.type": "ipv6",
@@ -350,6 +371,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -369,6 +393,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 8324,
         "network.type": "ipv6",
@@ -409,6 +434,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -428,6 +456,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 9590,
         "network.type": "ipv6",
@@ -468,6 +497,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -487,6 +519,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 10832,
         "network.type": "ipv6",
@@ -527,6 +560,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     }
