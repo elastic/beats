@@ -23,6 +23,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<configuration-logging>>
 * <<http-endpoint>>
 * <<regexp-support>>
+* <<configuration-instrumentation>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -58,5 +59,7 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 include::{libbeat-dir}/http-endpoint.asciidoc[]
 
 include::{libbeat-dir}/regexp.asciidoc[]
+
+include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]
