@@ -22,6 +22,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
 * <<http-endpoint>>
+* <<configuration-instrumentation>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -47,5 +48,7 @@ include::{libbeat-dir}/queueconfig.asciidoc[]
 include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]
