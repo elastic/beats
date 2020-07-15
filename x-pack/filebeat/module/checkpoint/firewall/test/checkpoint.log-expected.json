@@ -5656,5 +5656,76 @@
             "checkpoint-firewall",
             "forwarded"
         ]
-    }
+    },
+    {
+        "checkpoint" : {
+          "logid" : "0",
+          "parent_rule" : "0",
+          "rule_action" : "Accept",
+          "match_id" : "1"
+        },
+        "server" : {
+          "port" : 514,
+          "ip" : "192.168.1.153"
+        },
+        "destination" : {
+          "port" : 514,
+          "ip" : "192.168.1.153"
+        },
+        "rule" : {
+          "uuid" : "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2"
+        },
+        "source" : {
+          "port" : 43103,
+          "ip" : "192.168.1.100"
+        },
+        "network" : {
+          "name" : "Network",
+          "application" : "syslog",
+          "iana_number" : "17",
+          "direction" : "outbound"
+        },
+        "observer" : {
+          "name" : "192.168.1.100",
+          "ingress" : {
+            "zone" : "Local"
+          },
+          "product" : "VPN-1 & FireWall-1",
+          "type" : "firewall",
+          "vendor" : "Checkpoint",
+          "egress" : {
+            "interface" : {
+              "name" : "eth0"
+            },
+            "zone" : "External"
+          }
+        },
+        "@timestamp" : "2020-07-13T13:29:14.000Z",
+        "related" : {
+          "ip" : [
+            "192.168.1.100",
+            "192.168.1.153"
+          ]
+        },
+        "client" : {
+          "port" : 43103,
+          "ip" : "192.168.1.100"
+        },
+        "event" : {
+          "sequence" : 1,
+          "created" : "2020-07-14T15:57:46.675Z",
+          "kind" : "event",
+          "module" : "checkpoint",
+          "action" : "Accept",
+          "id" : "{0x5e819dc3,0x0,0x353707c7,0xee78a1dc}",
+          "category" : [
+            "network"
+          ],
+          "type" : [
+            "allowed",
+            "connection"
+          ],
+          "outcome" : "success"
+        }
+      }
 ]
