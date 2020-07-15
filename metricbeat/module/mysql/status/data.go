@@ -125,6 +125,36 @@ var (
 				},
 				"write_requests": c.Int("Innodb_buffer_pool_write_requests"),
 			},
+			"rows": s.Object{
+				"reads":    c.Int("Innodb_rows_read"),
+				"updated":  c.Int("Innodb_rows_updated"),
+				"deleted":  c.Int("Innodb_rows_deleted"),
+				"inserted": c.Int("Innodb_rows_inserted"),
+			},
+		},
+		"cache": s.Object{
+			"table": s.Object{
+				"open_cache": s.Object{
+					"hits":      c.Int("Table_open_cache_hits"),
+					"misses":    c.Int("Table_open_cache_misses"),
+					"overflows": c.Int("Table_open_cache_overflows"),
+				},
+			},
+			"ssl": s.Object{
+				"hits":   c.Int("Ssl_session_cache_hits"),
+				"misses": c.Int("Ssl_session_cache_misses"),
+				"size":   c.Int("Ssl_session_cache_size"),
+			},
+		},
+		"connection": s.Object{
+			"errors": s.Object{
+				"accept":       c.Int("Connection_errors_accept"),
+				"internal":     c.Int("Connection_errors_internal"),
+				"max":          c.Int("Connection_errors_max_connections"),
+				"peer_address": c.Int("Connection_errors_peer_address"),
+				"select":       c.Int("Connection_errors_select"),
+				"tcpwrap":      c.Int("Connection_errors_tcpwrap"),
+			},
 		},
 	}
 )

@@ -15,10 +15,10 @@ import (
 
 // Config options
 type Config struct {
-	ClientId            string           `config:"client_id"    validate:"required"`
-	ClientSecret        string           `config:"client_secret" validate:"required"`
-	TenantId            string           `config:"tenant_id" validate:"required"`
-	SubscriptionId      string           `config:"subscription_id" validate:"required"`
+	ClientId            string           `config:"client_id"`
+	ClientSecret        string           `config:"client_secret"`
+	TenantId            string           `config:"tenant_id"`
+	SubscriptionId      string           `config:"subscription_id"`
 	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
@@ -60,10 +60,6 @@ func init() {
 // newModule adds validation that hosts is non-empty, a requirement to use the
 // azure module.
 func newModule(base mb.BaseModule) (mb.Module, error) {
-	var config Config
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
-	}
 	return &base, nil
 }
 
@@ -163,4 +159,20 @@ func hasConfigOptions(config []string) bool {
 		}
 	}
 	return true
+}
+
+func (conf *Config) Validate() error {
+	if conf.SubscriptionId == "" {
+		return errors.New("no subscription ID has been configured")
+	}
+	if conf.ClientSecret == "" {
+		return errors.New("no client secret has been configured")
+	}
+	if conf.ClientId == "" {
+		return errors.New("no client ID has been configured")
+	}
+	if conf.TenantId == "" {
+		return errors.New("no tenant ID has been configured")
+	}
+	return nil
 }

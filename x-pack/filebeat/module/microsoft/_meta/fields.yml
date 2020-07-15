@@ -1,0 +1,10 @@
+- key: microsoft
+  title: Microsoft
+  description: >
+    Microsoft Module
+  fields:
+    - name: microsoft
+      type: group
+      description: >
+        Fields from Microsoft ATP
+      fields:

@@ -54,8 +54,8 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 
 	// Failed applications can be started again.
 	if srvState != nil {
-		a.setState(state.Starting, "Starting")
-		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
+		a.setState(state.Starting, "Starting", nil)
+		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
 		srvState.UpdateConfig(string(cfgStr))
 	} else {
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
@@ -66,9 +66,9 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 
 	if a.state.Status != state.Stopped {
 		// restarting as it was previously in a different state
-		a.setState(state.Restarting, "Restarting")
+		a.setState(state.Restarting, "Restarting", nil)
 	} else {
-		a.setState(state.Starting, "Starting")
+		a.setState(state.Starting, "Starting", nil)
 	}
 
 	defer func() {

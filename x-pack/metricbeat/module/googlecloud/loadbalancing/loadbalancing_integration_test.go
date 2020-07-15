@@ -13,7 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
 )
 
 func TestData(t *testing.T) {
@@ -34,7 +34,7 @@ func TestData(t *testing.T) {
 		{"googlecloud.loadbalancing.tcp_ssl_proxy", "./_meta/data_tcp_ssl_proxy.json"},
 	}
 
-	config := stackdriver.GetConfigForTest(t, "loadbalancing")
+	config := metrics.GetConfigForTest(t, "loadbalancing")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

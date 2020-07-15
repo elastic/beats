@@ -47,7 +47,7 @@ func (o *operationUninstall) Check(_ context.Context, _ Application) (bool, erro
 func (o *operationUninstall) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 

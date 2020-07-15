@@ -1,0 +1,50 @@
+- name: billing
+  type: group
+  release: beta
+  description: >
+    billing and usage details
+  fields:
+    - name: currency
+      type: keyword
+      description: >
+        The currency
+    - name: pretax_cost
+      type: float
+      description: >
+        Cost
+    - name: department_name
+      type: keyword
+      description: >
+        The department name
+    - name: product
+      type: keyword
+      description: >
+        The product type
+    - name: usage_start
+      type: date
+      description: >
+        The usage start date
+    - name: usage_end
+      type: date
+      description: >
+        The usage end date
+    - name: billing_period_id
+      type: keyword
+      description: >
+        The billing period id
+    - name: account_name
+      type: keyword
+      description: >
+        The billing account name
+    - name: actual_cost
+      type: float
+      description: >
+        The actual cost
+    - name: forecast_cost
+      type: float
+      description: >
+        The forecast cost
+    - name: usage_date
+      type: date
+      description: >
+        The usage date
