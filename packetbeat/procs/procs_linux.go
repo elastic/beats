@@ -68,8 +68,10 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
 		return nil, err
 	}
+
 	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true)
-	if err != nil {
+	// Ignore the error when /proc/net/tcp6 doesn't exists (ipv6 disabled).
+	if err != nil && !os.IsNotExist(err) {
 		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
 		return nil, err
 	}
