@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	homePath string
+	homePath   string
 	configPath string
-	dataPath string
-	logsPath string
+	dataPath   string
+	logsPath   string
 )
 
 func init() {

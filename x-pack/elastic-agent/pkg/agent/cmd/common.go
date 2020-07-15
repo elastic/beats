@@ -21,7 +21,7 @@ import (
 const defaultConfig = "elastic-agent.yml"
 
 type globalFlags struct {
-	PathConfigFile  string
+	PathConfigFile string
 }
 
 // Config returns path which identifies configuration file.
