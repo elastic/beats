@@ -73,6 +73,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Login audit support. {pull}19702[19702]
 - Adds Gsuite Admin support. {pull}19769[19769]
 - Adds Gsuite Drive support. {pull}19704[19704]
+- Adds Gsuite Groups support. {pull}19725[19725]
 
 *Heartbeat*
 
