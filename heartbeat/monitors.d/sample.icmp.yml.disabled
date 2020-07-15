@@ -10,6 +10,9 @@
   # Human readable display name for this service in Uptime UI and elsewhere
   name: My ICMP Monitor
 
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service_name: my-apm-service-name
+
   # Enable/Disable monitor
   #enabled: true
 

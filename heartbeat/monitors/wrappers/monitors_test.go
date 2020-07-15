@@ -19,11 +19,12 @@ package wrappers
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"net/url"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,7 +41,6 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-
 type testDef struct {
 	name      string
 	stdFields stdfields.StdMonitorFields
@@ -50,11 +50,11 @@ type testDef struct {
 }
 
 var testMonFields = stdfields.StdMonitorFields{
-	ID: "myid",
-	Name: "myname",
-	Type: "mytype",
+	ID:       "myid",
+	Name:     "myname",
+	Type:     "mytype",
 	Schedule: schedule.MustParse("@every 1s"),
-	Timeout: 1,
+	Timeout:  1,
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {

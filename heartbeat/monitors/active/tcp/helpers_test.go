@@ -18,12 +18,14 @@
 package tcp
 
 import (
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/pkg/errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/stretchr/testify/require"
 
@@ -42,7 +44,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test",Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

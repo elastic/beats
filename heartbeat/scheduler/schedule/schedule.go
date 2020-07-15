@@ -62,7 +62,7 @@ func Parse(in string) (*Schedule, error) {
 	return &Schedule{s}, nil
 }
 
-func MustParse(in string) (*Schedule) {
+func MustParse(in string) *Schedule {
 	sched, err := Parse(in)
 	if err != nil {
 		panic(fmt.Sprintf("could not parse schedule parsed with MustParse: %s", err))

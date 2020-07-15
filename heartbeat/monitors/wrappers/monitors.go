@@ -19,9 +19,10 @@ package wrappers
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 

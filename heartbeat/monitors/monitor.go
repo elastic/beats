@@ -21,8 +21,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"sync"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"

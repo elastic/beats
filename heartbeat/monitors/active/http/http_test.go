@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -32,6 +31,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/stretchr/testify/require"
 
@@ -319,7 +320,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs,stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
