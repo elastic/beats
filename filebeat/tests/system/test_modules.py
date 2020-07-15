@@ -279,6 +279,9 @@ def clean_keys(obj):
         delete_key(obj, "event.ingested")
         delete_key(obj, "@timestamp")
 
+    if obj["event.module"] == "gsuite":
+        delete_key(obj, "event.ingested")
+
 
 def delete_key(obj, key):
     if key in obj:
