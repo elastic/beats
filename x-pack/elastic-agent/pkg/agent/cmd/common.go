@@ -20,7 +20,6 @@ import (
 const defaultConfig = "elastic-agent.yml"
 
 type globalFlags struct {
-	PathConfig      string
 	PathConfigFile  string
 	FlagStrictPerms bool
 }
@@ -28,7 +27,7 @@ type globalFlags struct {
 // Config returns path which identifies configuration file.
 func (f *globalFlags) Config() string {
 	if len(f.PathConfigFile) == 0 || f.PathConfigFile == defaultConfig {
-		return filepath.Join(paths.Home(), defaultConfig)
+		return filepath.Join(paths.Config(), defaultConfig)
 	}
 	return f.PathConfigFile
 }
@@ -51,11 +50,11 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	flags := &globalFlags{}
 
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 
 	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "", "c", defaultConfig, fmt.Sprintf(`Configuration file, relative to path.config (default "%s")`, defaultConfig))
-	cmd.PersistentFlags().StringVarP(&flags.PathConfig, "path.config", "", "${path.home}", "Configuration path")
 	cmd.PersistentFlags().BoolVarP(&flags.FlagStrictPerms, "strict.perms", "", true, "Strict permission checking on config files")
 
 	// Add version.
