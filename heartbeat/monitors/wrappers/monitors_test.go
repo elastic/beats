@@ -49,12 +49,17 @@ type testDef struct {
 	metaWant  []validator.Validator
 }
 
-var testMonFields = stdfields.StdMonitorFields{ID: "myid", Name: "myname", Type: "mytype"}
+var testMonFields = stdfields.StdMonitorFields{
+	ID: "myid",
+	Name: "myname",
+	Type: "mytype",
+	Schedule: schedule.MustParse("@every 1s"),
+	Timeout: 1,
+}
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		schedule, _ := schedule.Parse("@every 1s")
-		wrapped := WrapCommon(tt.jobs, tt.stdFields, schedule, time.Duration(0))
+		wrapped := WrapCommon(tt.jobs, tt.stdFields)
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)

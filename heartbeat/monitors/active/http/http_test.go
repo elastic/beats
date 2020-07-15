@@ -79,8 +79,8 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http"}, sched, time.Duration(0))[0]
+	sched := schedule.MustParse("@every 1s")
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -319,7 +319,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs,stdfields.StdMonitorFields{ID: "test", Type: "http"}, sched, time.Duration(0))[0]
+	job := wrappers.WrapCommon(jobs,stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -515,7 +515,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http"}, sched, time.Duration(0))[0]
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	// Run this test multiple times since in the past we had an issue where the redirects
 	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
@@ -562,7 +562,7 @@ func TestNoHeaders(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http"}, sched, time.Duration(0))[0]
+	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

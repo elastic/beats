@@ -156,7 +156,7 @@ func newMonitorUnsafe(
 	}
 
 	rawJobs, endpoints, err := monitorPlugin.create(config)
-	wrappedJobs := wrappers.WrapCommon(rawJobs, m.stdFields, stdFields.Schedule, stdFields.Timeout)
+	wrappedJobs := wrappers.WrapCommon(rawJobs, m.stdFields)
 	m.endpoints = endpoints
 
 	if err != nil {

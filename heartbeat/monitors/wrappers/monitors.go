@@ -38,21 +38,21 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdFields stdfields.StdMonitorFields, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(stdFields, len(js) > 1, sched, timeout)
+			return addMonitorMeta(stdFields, len(js) > 1)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
+func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
@@ -76,7 +76,7 @@ func addMonitorMeta(stdFields stdfields.StdMonitorFields, isMulti bool, sched *s
 						"id":       thisID,
 						"name":     stdFields.Name,
 						"type":     stdFields.Type,
-						"timespan": timespan(started, sched, timeout),
+						"timespan": timespan(started, stdFields.Schedule, stdFields.Timeout),
 					},
 				},
 			)
