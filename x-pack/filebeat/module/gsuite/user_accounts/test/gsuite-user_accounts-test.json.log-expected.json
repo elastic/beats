@@ -1,0 +1,386 @@
+[
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "2sv_disable",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"2sv_change\",\"name\":\"2sv_disable\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "2sv_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 0,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "2sv_enroll",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"2sv_change\",\"name\":\"2sv_enroll\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "2sv_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 316,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "password_edit",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"password_change\",\"name\":\"password_edit\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "password_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 631,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "recovery_email_edit",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"recovery_info_change\",\"name\":\"recovery_email_edit\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "recovery_info_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 954,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "recovery_phone_edit",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"recovery_info_change\",\"name\":\"recovery_phone_edit\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "recovery_info_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 1288,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "recovery_secret_qa_edit",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"recovery_info_change\",\"name\":\"recovery_secret_qa_edit\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "recovery_info_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 1622,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "titanium_enroll",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"titanium_change\",\"name\":\"titanium_enroll\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "titanium_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 1960,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "client.as.number": 7922,
+        "client.as.organization.name": "Comcast Cable Communications, LLC",
+        "client.geo.city_name": "State College",
+        "client.geo.continent_name": "North America",
+        "client.geo.country_iso_code": "US",
+        "client.geo.location.lat": 40.7957,
+        "client.geo.location.lon": -77.8618,
+        "client.geo.region_iso_code": "US-PA",
+        "client.geo.region_name": "Pennsylvania",
+        "client.ip": "98.235.162.24",
+        "client.user.domain": "bar.com",
+        "client.user.email": "foo@bar.com",
+        "client.user.id": "1",
+        "client.user.name": "foo",
+        "event.action": "titanium_unenroll",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "gsuite.user_accounts",
+        "event.id": "1",
+        "event.module": "gsuite",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"user_accounts\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"titanium_change\",\"name\":\"titanium_unenroll\"}}",
+        "event.provider": "user_accounts",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "user_accounts",
+        "gsuite.actor.type": "USER",
+        "gsuite.event.type": "titanium_change",
+        "gsuite.kind": "admin#reports#activity",
+        "gsuite.organization.domain": "elastic.com",
+        "input.type": "log",
+        "log.offset": 2285,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "gsuite",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]
