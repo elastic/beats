@@ -33,9 +33,9 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )

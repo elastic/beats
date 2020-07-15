@@ -126,7 +126,7 @@ class BaseTest(TestCase):
                     types=None,
                     required_fields=None):
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding='utf_8') as f:
             for line in f:
                 document = self.flatten_object(json.loads(line), self.dict_fields)
                 if not types or document["type"] in types:

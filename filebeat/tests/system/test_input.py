@@ -713,6 +713,7 @@ class Test(BaseTest):
         # assert that renaming of the file went undetected
         assert not self.log_contains("File rename was detected:" + testfile + " -> " + renamedfile)
 
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/20010")
     @unittest.skipIf(sys.platform.startswith("win"), "inode_marker is not supported on windows")
     def test_inode_marker_based_identity_tracking(self):
         """
