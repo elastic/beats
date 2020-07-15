@@ -46,6 +46,7 @@ type Pagination struct {
 	Header           *Header       `config:"header"`
 	IDField          string        `config:"id_field"`
 	RequestField     string        `config:"req_field"`
+	URLField         string        `config:"url_field"`
 	URL              string        `config:"url"`
 }
 
@@ -69,7 +70,7 @@ type RateLimit struct {
 
 type DateCursor struct {
 	Enabled         *bool         `config:"enabled"`
-	Field           string        `config:"field" validate:"required"`
+	Field           string        `config:"field"`
 	URLField        string        `config:"url_field" validate:"required"`
 	ValueTemplate   *Template     `config:"value_template"`
 	DateFormat      string        `config:"date_format"`
@@ -131,9 +132,6 @@ func (c *config) Validate() error {
 		}
 	}
 	if c.Pagination != nil {
-		if c.DateCursor.IsEnabled() {
-			return errors.Errorf("invalid configuration: date_cursor cannnot be set in combination with other pagination mechanisms")
-		}
 		if c.Pagination.Header != nil {
 			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" || len(c.Pagination.ExtraBodyContent) > 0 {
 				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")

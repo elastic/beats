@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -319,19 +320,33 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 }
 
 // createRequestInfoFromBody creates a new RequestInfo for a new HTTP request in pagination based on HTTP response body
-func createRequestInfoFromBody(m common.MapStr, idField string, requestField string, extraBodyContent common.MapStr, url string, ri *RequestInfo) (*RequestInfo, error) {
-	v, err := m.GetValue(idField)
-	if err != nil {
-		if err == common.ErrKeyNotFound {
-			return nil, nil
-		} else {
-			return nil, errors.Wrapf(err, "failed to retrieve id_field for pagination")
-		}
+func createRequestInfoFromBody(config *Pagination, response, last common.MapStr, ri *RequestInfo) (*RequestInfo, error) {
+	// we try to get it from last element, if not found, from the original response
+	v, err := last.GetValue(config.IDField)
+	if err == common.ErrKeyNotFound {
+		v, err = response.GetValue(config.IDField)
 	}
-	if requestField != "" {
-		ri.ContentMap.Put(requestField, v)
-		if url != "" {
-			ri.URL = url
+
+	if err == common.ErrKeyNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to retrieve id_field for pagination")
+	}
+
+	if config.RequestField != "" {
+		ri.ContentMap.Put(config.RequestField, v)
+		if config.URL != "" {
+			ri.URL = config.URL
+		}
+	} else if config.URLField != "" {
+		url, err := url.Parse(ri.URL)
+		if err == nil {
+			q := url.Query()
+			q.Set(config.URLField, fmt.Sprint(v))
+			url.RawQuery = q.Encode()
+			ri.URL = url.String()
 		}
 	} else {
 		switch vt := v.(type) {
@@ -341,8 +356,8 @@ func createRequestInfoFromBody(m common.MapStr, idField string, requestField str
 			return nil, errors.New("pagination ID is not of string type")
 		}
 	}
-	if len(extraBodyContent) > 0 {
-		ri.ContentMap.Update(extraBodyContent)
+	if len(config.ExtraBodyContent) > 0 {
+		ri.ContentMap.Update(common.MapStr(config.ExtraBodyContent))
 	}
 	return ri, nil
 }
@@ -350,6 +365,12 @@ func createRequestInfoFromBody(m common.MapStr, idField string, requestField str
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
 func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *RequestInfo) error {
 	ri.URL = in.getURL()
+
+	var (
+		m, v         interface{}
+		response, mm map[string]interface{}
+	)
+
 	for {
 		req, err := in.createHTTPRequest(ctx, ri)
 		if err != nil {
@@ -375,8 +396,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			}
 			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
-		var m, v interface{}
-		var mm map[string]interface{}
+
 		err = json.Unmarshal(responseData, &m)
 		if err != nil {
 			in.log.Debug("failed to unmarshal http.response.body", string(responseData))
@@ -390,6 +410,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				return err
 			}
 		case map[string]interface{}:
+			response = obj
 			if in.config.JSONObjects == "" {
 				mm, err = in.processEventArray([]interface{}{obj})
 				if err != nil {
@@ -399,7 +420,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
 					if err == common.ErrKeyNotFound {
-						return nil
+						break
 					}
 					return err
 				}
@@ -417,6 +438,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			in.log.Debug("http.response.body is not a valid JSON object", string(responseData))
 			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
 		}
+
 		if mm != nil && in.config.Pagination.IsEnabled() {
 			if in.config.Pagination.Header != nil {
 				// Pagination control using HTTP Header
@@ -426,7 +448,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				}
 				if ri.URL == url || url == "" {
 					in.log.Info("Pagination finished.")
-					return nil
+					break
 				}
 				ri.URL = url
 				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
@@ -436,12 +458,12 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			} else {
 				// Pagination control using HTTP Body fields
-				ri, err = createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
+				ri, err = createRequestInfoFromBody(in.config.Pagination, common.MapStr(response), common.MapStr(mm), ri)
 				if err != nil {
 					return err
 				}
 				if ri == nil {
-					return nil
+					break
 				}
 				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
 					return err
@@ -450,11 +472,14 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			}
 		}
-		if mm != nil && in.config.DateCursor.IsEnabled() {
-			in.advanceCursor(common.MapStr(mm))
-		}
-		return nil
+		break
 	}
+
+	if mm != nil && in.config.DateCursor.IsEnabled() {
+		in.advanceCursor(common.MapStr(mm))
+	}
+
+	return nil
 }
 
 func (in *HttpjsonInput) getURL() string {
@@ -496,6 +521,11 @@ func (in *HttpjsonInput) getURL() string {
 }
 
 func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
+	if in.config.DateCursor.Field == "" {
+		in.nextCursorValue = time.Now().UTC().Format(in.config.DateCursor.GetDateFormat())
+		return
+	}
+
 	v, err := m.GetValue(in.config.DateCursor.Field)
 	if err != nil {
 		in.log.Warnf("date_cursor field: %q", err)
@@ -505,6 +535,7 @@ func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
 	case string:
 		_, err := time.Parse(in.config.DateCursor.GetDateFormat(), t)
 		if err != nil {
+			in.log.Warn("date_cursor field does not have the expected layout")
 			return
 		}
 		in.nextCursorValue = t
