@@ -113,7 +113,4 @@ logs:FilterLogEvents
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
-[id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
-
 :type!:
