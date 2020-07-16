@@ -49,6 +49,7 @@
 - Properly stops subprocess on shutdown {pull}19567[19567]
 - Forward revision number of the configuration to the endpoint. {pull}19759[19759]
 - Remove support for logs type and use logfile {pull}19761[19761]
+- Avoid comparing uncomparable types on enroll {issue}19976[19976]
 
 ==== New features
 
