@@ -22,6 +22,8 @@ include::install-elastic-agent.asciidoc[leveloffset=+1]
 
 include::run-elastic-agent.asciidoc[leveloffset=+1]
 
+include::stop-elastic-agent.asciidoc[leveloffset=+1]
+
 include::elastic-agent-command-line.asciidoc[leveloffset=+1]
 
 include::elastic-agent-configuration.asciidoc[leveloffset=+1]
