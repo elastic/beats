@@ -179,6 +179,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
+- auditd: Fix spelling of anomaly in `event.category`.
+- auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
+- auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
 
 *Filebeat*
 
@@ -421,6 +424,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
+- Add enrichment of auditd seccomp events with name of the architecture, syscall, and signal. {issue}14055[14055] {pull}19300[19300]
 
 *Filebeat*
 
