@@ -35,8 +35,8 @@ func (r ptrRecord) IsExpired(now time.Time) bool {
 
 type ptrCache struct {
 	sync.RWMutex
-	data    map[string]ptrRecord
-	maxSize int
+	data          map[string]ptrRecord
+	maxSize       int
 	minSuccessTTL time.Duration
 }
 
@@ -50,7 +50,7 @@ func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
 
 	c.data[key] = ptrRecord{
 		host:    ptr.Host,
-		expires: now.Add(maxDuration(time.Duration(ptr.TTL), c.minSuccessTTL) * time.Second),
+		expires: now.Add(maxDuration(time.Duration(ptr.TTL)*time.Second, c.minSuccessTTL)),
 	}
 }
 
@@ -157,8 +157,8 @@ func NewPTRLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver PTRR
 
 	c := &PTRLookupCache{
 		success: &ptrCache{
-			data:    make(map[string]ptrRecord, conf.SuccessCache.InitialCapacity),
-			maxSize: conf.SuccessCache.MaxCapacity,
+			data:          make(map[string]ptrRecord, conf.SuccessCache.InitialCapacity),
+			maxSize:       conf.SuccessCache.MaxCapacity,
 			minSuccessTTL: conf.SuccessCache.MinTTL,
 		},
 		failure: &failureCache{
