@@ -15772,83 +15772,6 @@ Elasticsearch module
 
 
 
-[float]
-=== elasticsearch
-
-
-
-
-*`elasticsearch.cluster.name`*::
-+
---
-Elasticsearch cluster name.
-
-
-type: keyword
-
---
-
-*`elasticsearch.cluster.id`*::
-+
---
-Elasticsearch cluster id.
-
-
-type: keyword
-
---
-
-*`elasticsearch.cluster.state.id`*::
-+
---
-Elasticsearch state id.
-
-
-type: keyword
-
---
-
-
-*`elasticsearch.node.id`*::
-+
---
-Node ID
-
-
-type: keyword
-
---
-
-*`elasticsearch.node.name`*::
-+
---
-Node name.
-
-
-type: keyword
-
---
-
-*`elasticsearch.node.master`*::
-+
---
-Is the node the master node?
-
-
-type: boolean
-
---
-
-*`elasticsearch.node.mlockall`*::
-+
---
-Is mlockall enabled on the node?
-
-
-type: boolean
-
---
-
 *`cluster_uuid`*::
 +
 --
@@ -16727,6 +16650,83 @@ alias to: elasticsearch.node.stats.thread_pool.write.threads.count
 --
 
 [float]
+=== elasticsearch
+
+
+
+
+*`elasticsearch.cluster.name`*::
++
+--
+Elasticsearch cluster name.
+
+
+type: keyword
+
+--
+
+*`elasticsearch.cluster.id`*::
++
+--
+Elasticsearch cluster id.
+
+
+type: keyword
+
+--
+
+*`elasticsearch.cluster.state.id`*::
++
+--
+Elasticsearch state id.
+
+
+type: keyword
+
+--
+
+
+*`elasticsearch.node.id`*::
++
+--
+Node ID
+
+
+type: keyword
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+Node name.
+
+
+type: keyword
+
+--
+
+*`elasticsearch.node.master`*::
++
+--
+Is the node the master node?
+
+
+type: boolean
+
+--
+
+*`elasticsearch.node.mlockall`*::
++
+--
+Is mlockall enabled on the node?
+
+
+type: boolean
+
+--
+
+[float]
 === ccr
 
 Cross-cluster replication stats
@@ -16734,7 +16734,7 @@ Cross-cluster replication stats
 
 
 
-*`node_stats.ccr.leader.index`*::
+*`elasticsearch.ccr.leader.index`*::
 +
 --
 Name of leader index
@@ -16744,7 +16744,7 @@ type: keyword
 
 --
 
-*`node_stats.ccr.leader.max_seq_no`*::
+*`elasticsearch.ccr.leader.max_seq_no`*::
 +
 --
 Maximum sequence number of operation on the leader shard
@@ -16755,7 +16755,7 @@ type: long
 --
 
 
-*`node_stats.ccr.follower.index`*::
+*`elasticsearch.ccr.follower.index`*::
 +
 --
 Name of follower index
@@ -16765,7 +16765,7 @@ type: keyword
 
 --
 
-*`node_stats.ccr.follower.shard.number`*::
+*`elasticsearch.ccr.follower.shard.number`*::
 +
 --
 Number of the shard within the index
@@ -16775,7 +16775,7 @@ type: long
 
 --
 
-*`node_stats.ccr.follower.operations_written`*::
+*`elasticsearch.ccr.follower.operations_written`*::
 +
 --
 Number of operations indexed (replicated) into the follower shard from the leader shard
@@ -16785,7 +16785,7 @@ type: long
 
 --
 
-*`node_stats.ccr.follower.time_since_last_read.ms`*::
+*`elasticsearch.ccr.follower.time_since_last_read.ms`*::
 +
 --
 Time, in ms, since the follower last fetched from the leader
@@ -16795,7 +16795,7 @@ type: long
 
 --
 
-*`node_stats.ccr.follower.global_checkpoint`*::
+*`elasticsearch.ccr.follower.global_checkpoint`*::
 +
 --
 Global checkpoint value on follower shard
@@ -16812,7 +16812,7 @@ Cluster stats
 
 
 
-*`node_stats.cluster.stats.status`*::
+*`elasticsearch.cluster.stats.status`*::
 +
 --
 Cluster status (green, yellow, red).
@@ -16829,7 +16829,7 @@ Nodes statistics.
 
 
 
-*`node_stats.cluster.stats.nodes.count`*::
+*`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
 Total number of nodes in cluster.
@@ -16839,7 +16839,7 @@ type: long
 
 --
 
-*`node_stats.cluster.stats.nodes.master`*::
+*`elasticsearch.cluster.stats.nodes.master`*::
 +
 --
 Number of master-eligible nodes in cluster.
@@ -16849,7 +16849,7 @@ type: long
 
 --
 
-*`node_stats.cluster.stats.nodes.data`*::
+*`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
 Number of data nodes in cluster.
@@ -16866,7 +16866,7 @@ Indices statistics.
 
 
 
-*`node_stats.cluster.stats.indices.count`*::
+*`elasticsearch.cluster.stats.indices.count`*::
 +
 --
 Total number of indices in cluster.
@@ -16883,7 +16883,7 @@ Shard statistics.
 
 
 
-*`node_stats.cluster.stats.indices.shards.count`*::
+*`elasticsearch.cluster.stats.indices.shards.count`*::
 +
 --
 Total number of shards in cluster.
@@ -16893,7 +16893,7 @@ type: long
 
 --
 
-*`node_stats.cluster.stats.indices.shards.primaries`*::
+*`elasticsearch.cluster.stats.indices.shards.primaries`*::
 +
 --
 Total number of primary shards in cluster.
@@ -16903,7 +16903,7 @@ type: long
 
 --
 
-*`node_stats.cluster.stats.indices.fielddata.memory.bytes`*::
+*`elasticsearch.cluster.stats.indices.fielddata.memory.bytes`*::
 +
 --
 Memory used for fielddata.
@@ -16920,7 +16920,7 @@ Enrich stats
 
 
 
-*`node_stats.enrich.queue.size`*::
+*`elasticsearch.enrich.queue.size`*::
 +
 --
 Number of search requests in the queue.
@@ -16931,7 +16931,7 @@ type: long
 --
 
 
-*`node_stats.enrich.remote_requests.current`*::
+*`elasticsearch.enrich.remote_requests.current`*::
 +
 --
 Current number of outstanding remote requests.
@@ -16941,7 +16941,7 @@ type: long
 
 --
 
-*`node_stats.enrich.remote_requests.total`*::
+*`elasticsearch.enrich.remote_requests.total`*::
 +
 --
 Number of outstanding remote requests executed since node startup.
@@ -16951,7 +16951,7 @@ type: long
 
 --
 
-*`node_stats.enrich.executed_searches.total`*::
+*`elasticsearch.enrich.executed_searches.total`*::
 +
 --
 Number of search requests that enrich processors have executed since node startup.
@@ -16968,7 +16968,7 @@ index
 
 
 
-*`node_stats.index.name`*::
+*`elasticsearch.index.name`*::
 +
 --
 Index name.
@@ -16979,7 +16979,7 @@ type: keyword
 --
 
 
-*`node_stats.index.total.docs.count`*::
+*`elasticsearch.index.total.docs.count`*::
 +
 --
 Total number of documents in the index.
@@ -16989,7 +16989,7 @@ type: long
 
 --
 
-*`node_stats.index.total.docs.deleted`*::
+*`elasticsearch.index.total.docs.deleted`*::
 +
 --
 Total number of deleted documents in the index.
@@ -16999,7 +16999,7 @@ type: long
 
 --
 
-*`node_stats.index.total.store.size.bytes`*::
+*`elasticsearch.index.total.store.size.bytes`*::
 +
 --
 Total size of the index in bytes.
@@ -17011,7 +17011,7 @@ format: bytes
 
 --
 
-*`node_stats.index.total.segments.count`*::
+*`elasticsearch.index.total.segments.count`*::
 +
 --
 Total number of index segments.
@@ -17021,7 +17021,7 @@ type: long
 
 --
 
-*`node_stats.index.total.segments.memory.bytes`*::
+*`elasticsearch.index.total.segments.memory.bytes`*::
 +
 --
 Total number of memory used by the segments in bytes.
@@ -17040,7 +17040,7 @@ index
 
 
 
-*`node_stats.index.recovery.id`*::
+*`elasticsearch.index.recovery.id`*::
 +
 --
 Shard recovery id.
@@ -17050,7 +17050,7 @@ type: long
 
 --
 
-*`node_stats.index.recovery.type`*::
+*`elasticsearch.index.recovery.type`*::
 +
 --
 Shard recovery type.
@@ -17060,7 +17060,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.primary`*::
+*`elasticsearch.index.recovery.primary`*::
 +
 --
 True if primary shard.
@@ -17070,7 +17070,7 @@ type: boolean
 
 --
 
-*`node_stats.index.recovery.stage`*::
+*`elasticsearch.index.recovery.stage`*::
 +
 --
 Recovery stage.
@@ -17080,7 +17080,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.target.id`*::
+*`elasticsearch.index.recovery.target.id`*::
 +
 --
 Target node id.
@@ -17090,7 +17090,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.target.host`*::
+*`elasticsearch.index.recovery.target.host`*::
 +
 --
 Target node host address (could be IP address or hostname).
@@ -17100,7 +17100,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.target.name`*::
+*`elasticsearch.index.recovery.target.name`*::
 +
 --
 Target node name.
@@ -17110,7 +17110,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.source.id`*::
+*`elasticsearch.index.recovery.source.id`*::
 +
 --
 Source node id.
@@ -17120,7 +17120,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.source.host`*::
+*`elasticsearch.index.recovery.source.host`*::
 +
 --
 Source node host address (could be IP address or hostname).
@@ -17130,7 +17130,7 @@ type: keyword
 
 --
 
-*`node_stats.index.recovery.source.name`*::
+*`elasticsearch.index.recovery.source.name`*::
 +
 --
 Source node name.
@@ -17148,7 +17148,7 @@ index
 
 
 
-*`node_stats.index.summary.primaries.docs.count`*::
+*`elasticsearch.index.summary.primaries.docs.count`*::
 +
 --
 Total number of documents in the index.
@@ -17158,7 +17158,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.primaries.docs.deleted`*::
+*`elasticsearch.index.summary.primaries.docs.deleted`*::
 +
 --
 Total number of deleted documents in the index.
@@ -17168,7 +17168,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.primaries.store.size.bytes`*::
+*`elasticsearch.index.summary.primaries.store.size.bytes`*::
 +
 --
 Total size of the index in bytes.
@@ -17180,7 +17180,7 @@ format: bytes
 
 --
 
-*`node_stats.index.summary.primaries.segments.count`*::
+*`elasticsearch.index.summary.primaries.segments.count`*::
 +
 --
 Total number of index segments.
@@ -17190,7 +17190,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.primaries.segments.memory.bytes`*::
+*`elasticsearch.index.summary.primaries.segments.memory.bytes`*::
 +
 --
 Total number of memory used by the segments in bytes.
@@ -17203,7 +17203,7 @@ format: bytes
 --
 
 
-*`node_stats.index.summary.total.docs.count`*::
+*`elasticsearch.index.summary.total.docs.count`*::
 +
 --
 Total number of documents in the index.
@@ -17213,7 +17213,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.total.docs.deleted`*::
+*`elasticsearch.index.summary.total.docs.deleted`*::
 +
 --
 Total number of deleted documents in the index.
@@ -17223,7 +17223,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.total.store.size.bytes`*::
+*`elasticsearch.index.summary.total.store.size.bytes`*::
 +
 --
 Total size of the index in bytes.
@@ -17235,7 +17235,7 @@ format: bytes
 
 --
 
-*`node_stats.index.summary.total.segments.count`*::
+*`elasticsearch.index.summary.total.segments.count`*::
 +
 --
 Total number of index segments.
@@ -17245,7 +17245,7 @@ type: long
 
 --
 
-*`node_stats.index.summary.total.segments.memory.bytes`*::
+*`elasticsearch.index.summary.total.segments.memory.bytes`*::
 +
 --
 Total number of memory used by the segments in bytes.
@@ -17264,7 +17264,7 @@ ml
 
 
 
-*`node_stats.ml.job.id`*::
+*`elasticsearch.ml.job.id`*::
 +
 --
 Unique ml job id.
@@ -17274,7 +17274,7 @@ type: keyword
 
 --
 
-*`node_stats.ml.job.state`*::
+*`elasticsearch.ml.job.state`*::
 +
 --
 Job state.
@@ -17284,7 +17284,7 @@ type: keyword
 
 --
 
-*`node_stats.ml.job.data_counts.processed_record_count`*::
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
 +
 --
 Processed data events.
@@ -17294,7 +17294,7 @@ type: long
 
 --
 
-*`node_stats.ml.job.data_counts.invalid_date_count`*::
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
 +
 --
 The number of records with either a missing date field or a date that could not be parsed.
@@ -17311,7 +17311,7 @@ node
 
 
 
-*`node_stats.node.version`*::
+*`elasticsearch.node.version`*::
 +
 --
 Node version.
@@ -17328,7 +17328,7 @@ JVM Info.
 
 
 
-*`node_stats.node.jvm.version`*::
+*`elasticsearch.node.jvm.version`*::
 +
 --
 JVM version.
@@ -17338,7 +17338,7 @@ type: keyword
 
 --
 
-*`node_stats.node.jvm.memory.heap.init.bytes`*::
+*`elasticsearch.node.jvm.memory.heap.init.bytes`*::
 +
 --
 Heap init used by the JVM in bytes.
@@ -17350,7 +17350,7 @@ format: bytes
 
 --
 
-*`node_stats.node.jvm.memory.heap.max.bytes`*::
+*`elasticsearch.node.jvm.memory.heap.max.bytes`*::
 +
 --
 Heap max used by the JVM in bytes.
@@ -17362,7 +17362,7 @@ format: bytes
 
 --
 
-*`node_stats.node.jvm.memory.nonheap.init.bytes`*::
+*`elasticsearch.node.jvm.memory.nonheap.init.bytes`*::
 +
 --
 Non-Heap init used by the JVM in bytes.
@@ -17374,7 +17374,7 @@ format: bytes
 
 --
 
-*`node_stats.node.jvm.memory.nonheap.max.bytes`*::
+*`elasticsearch.node.jvm.memory.nonheap.max.bytes`*::
 +
 --
 Non-Heap max used by the JVM in bytes.
@@ -17386,7 +17386,7 @@ format: bytes
 
 --
 
-*`node_stats.node.process.mlockall`*::
+*`elasticsearch.node.process.mlockall`*::
 +
 --
 If process locked in memory.
@@ -17410,7 +17410,7 @@ Node indices stats
 
 
 
-*`node_stats.node.stats.indices.docs.count`*::
+*`elasticsearch.node.stats.indices.docs.count`*::
 +
 --
 Total number of existing documents.
@@ -17420,7 +17420,7 @@ type: long
 
 --
 
-*`node_stats.node.stats.indices.docs.deleted`*::
+*`elasticsearch.node.stats.indices.docs.deleted`*::
 +
 --
 Total number of deleted documents.
@@ -17430,7 +17430,7 @@ type: long
 
 --
 
-*`node_stats.node.stats.indices.segments.count`*::
+*`elasticsearch.node.stats.indices.segments.count`*::
 +
 --
 Total number of segments.
@@ -17440,7 +17440,7 @@ type: long
 
 --
 
-*`node_stats.node.stats.indices.segments.memory.bytes`*::
+*`elasticsearch.node.stats.indices.segments.memory.bytes`*::
 +
 --
 Total size of segments in bytes.
@@ -17452,7 +17452,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.indices.store.size.bytes`*::
+*`elasticsearch.node.stats.indices.store.size.bytes`*::
 +
 --
 Total size of the store in bytes.
@@ -17463,7 +17463,7 @@ type: long
 --
 
 
-*`node_stats.node.stats.indices.bulk.avg_size.bytes`*::
+*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
 +
 --
 type: long
@@ -17472,45 +17472,21 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.indices.bulk.avg_time.ms`*::
+*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.indices.bulk.operations.total.count`*::
+*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.indices.bulk.total_size.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.bulk.total_time.ms`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.indices.fielddata.evictions.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.fielddata.memory.bytes`*::
+*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
 +
 --
 type: long
@@ -17519,22 +17495,7 @@ format: bytes
 
 --
 
-
-*`node_stats.node.stats.indices.indexing.index_time.ms`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.indexing.index_total.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.indexing.throttle_time.ms`*::
+*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
 +
 --
 type: long
@@ -17542,156 +17503,14 @@ type: long
 --
 
 
-*`node_stats.node.stats.indices.query_cache.evictions.count`*::
+*`elasticsearch.node.stats.indices.fielddata.evictions.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.indices.query_cache.hits.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.query_cache.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.query_cache.misses.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.indices.request_cache.evictions.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.request_cache.hits.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.request_cache.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.request_cache.misses.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.indices.search.query_time.ms`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.indices.search.query_total.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.indices.segments.doc_values.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.fixed_bit_set.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.index_writer.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.norms.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.points.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.stored_fields.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.term_vectors.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.terms.memory.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`node_stats.node.stats.indices.segments.version_map.memory.bytes`*::
+*`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
 +
 --
 type: long
@@ -17701,7 +17520,178 @@ format: bytes
 --
 
 
-*`node_stats.node.stats.jvm.mem.heap.max.bytes`*::
+*`elasticsearch.node.stats.indices.indexing.index_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.indexing.index_total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.indexing.throttle_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.query_cache.evictions.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.query_cache.hits.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.query_cache.misses.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.request_cache.evictions.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.request_cache.hits.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.request_cache.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.request_cache.misses.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.search.query_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.segments.doc_values.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.fixed_bit_set.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.index_writer.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.norms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.points.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.stored_fields.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.term_vectors.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.terms.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indices.segments.version_map.memory.bytes`*::
 +
 --
 type: long
@@ -17711,7 +17701,7 @@ format: bytes
 --
 
 
-*`node_stats.node.stats.jvm.mem.heap.used.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.heap.max.bytes`*::
 +
 --
 type: long
@@ -17720,7 +17710,17 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.heap.used.pct`*::
+
+*`elasticsearch.node.stats.jvm.mem.heap.used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.jvm.mem.heap.used.pct`*::
 +
 --
 type: long
@@ -17743,7 +17743,7 @@ Old memory pool stats.
 
 
 
-*`node_stats.node.stats.jvm.mem.pools.old.max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`*::
 +
 --
 Max bytes.
@@ -17754,7 +17754,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.old.peak.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.old.peak.bytes`*::
 +
 --
 Peak bytes.
@@ -17765,7 +17765,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.old.peak_max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.old.peak_max.bytes`*::
 +
 --
 Peak max bytes.
@@ -17776,7 +17776,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.old.used.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.old.used.bytes`*::
 +
 --
 Used bytes.
@@ -17794,7 +17794,7 @@ Young memory pool stats.
 
 
 
-*`node_stats.node.stats.jvm.mem.pools.young.max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`*::
 +
 --
 Max bytes.
@@ -17805,7 +17805,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.young.peak.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.young.peak.bytes`*::
 +
 --
 Peak bytes.
@@ -17816,7 +17816,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.young.peak_max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.young.peak_max.bytes`*::
 +
 --
 Peak max bytes.
@@ -17827,7 +17827,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.young.used.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.young.used.bytes`*::
 +
 --
 Used bytes.
@@ -17845,7 +17845,7 @@ Survivor memory pool stats.
 
 
 
-*`node_stats.node.stats.jvm.mem.pools.survivor.max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`*::
 +
 --
 Max bytes.
@@ -17856,7 +17856,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.survivor.peak.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.survivor.peak.bytes`*::
 +
 --
 Peak bytes.
@@ -17867,7 +17867,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.survivor.peak_max.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.survivor.peak_max.bytes`*::
 +
 --
 Peak max bytes.
@@ -17878,7 +17878,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.jvm.mem.pools.survivor.used.bytes`*::
+*`elasticsearch.node.stats.jvm.mem.pools.survivor.used.bytes`*::
 +
 --
 Used bytes.
@@ -17903,7 +17903,7 @@ Old collection gc.
 
 
 
-*`node_stats.node.stats.jvm.gc.collectors.old.collection.count`*::
+*`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`*::
 +
 --
 
@@ -17912,7 +17912,7 @@ type: long
 
 --
 
-*`node_stats.node.stats.jvm.gc.collectors.old.collection.ms`*::
+*`elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms`*::
 +
 --
 
@@ -17928,7 +17928,7 @@ Young collection gc.
 
 
 
-*`node_stats.node.stats.jvm.gc.collectors.young.collection.count`*::
+*`elasticsearch.node.stats.jvm.gc.collectors.young.collection.count`*::
 +
 --
 
@@ -17937,7 +17937,7 @@ type: long
 
 --
 
-*`node_stats.node.stats.jvm.gc.collectors.young.collection.ms`*::
+*`elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms`*::
 +
 --
 
@@ -17954,7 +17954,7 @@ File system summary
 
 
 
-*`node_stats.node.stats.fs.summary.total.bytes`*::
+*`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
 
@@ -17965,7 +17965,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.fs.summary.free.bytes`*::
+*`elasticsearch.node.stats.fs.summary.free.bytes`*::
 +
 --
 
@@ -17976,7 +17976,7 @@ format: bytes
 
 --
 
-*`node_stats.node.stats.fs.summary.available.bytes`*::
+*`elasticsearch.node.stats.fs.summary.available.bytes`*::
 +
 --
 
@@ -17989,7 +17989,7 @@ format: bytes
 
 
 
-*`node_stats.node.stats.fs.io_stats.total.operations.count`*::
+*`elasticsearch.node.stats.fs.io_stats.total.operations.count`*::
 +
 --
 type: long
@@ -17997,29 +17997,14 @@ type: long
 --
 
 
-*`node_stats.node.stats.fs.io_stats.total.read.kb`*::
+*`elasticsearch.node.stats.fs.io_stats.total.read.kb`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.fs.io_stats.total.read.operations.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.fs.io_stats.total.write.kb`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.fs.io_stats.total.write.operations.count`*::
+*`elasticsearch.node.stats.fs.io_stats.total.read.operations.count`*::
 +
 --
 type: long
@@ -18027,21 +18012,14 @@ type: long
 --
 
 
-*`node_stats.node.stats.os.cpu.load_avg.1m`*::
+*`elasticsearch.node.stats.fs.io_stats.total.write.kb`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.os.cpu.load_avg.5m`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.os.cpu.load_avg.15m`*::
+*`elasticsearch.node.stats.fs.io_stats.total.write.operations.count`*::
 +
 --
 type: long
@@ -18049,38 +18027,21 @@ type: long
 --
 
 
-
-*`node_stats.node.stats.os.cpu.cgroup.cpuacct.control_group`*::
+*`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.os.cpu.cgroup.cpuacct.usage.ns`*::
+*`elasticsearch.node.stats.os.cpu.load_avg.5m`*::
 +
 --
 type: long
 
 --
 
-
-*`node_stats.node.stats.os.cpu.cgroup.cpu.control_group`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.os.cpu.cgroup.cpu.cfs.period.us`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.os.cpu.cgroup.cpu.cfs.quota.us`*::
+*`elasticsearch.node.stats.os.cpu.load_avg.15m`*::
 +
 --
 type: long
@@ -18088,21 +18049,15 @@ type: long
 --
 
 
-*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.elapsed_periods.count`*::
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpuacct.control_group`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.times_throttled.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.os.cpu.cgroup.cpu.stat.time_throttled.ns`*::
+*`elasticsearch.node.stats.os.cpu.cgroup.cpuacct.usage.ns`*::
 +
 --
 type: long
@@ -18110,23 +18065,59 @@ type: long
 --
 
 
-*`node_stats.node.stats.os.cpu.cgroup.memory.control_group`*::
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.control_group`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.os.cpu.cgroup.memory.limit.bytes`*::
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.cfs.period.us`*::
 +
 --
 type: long
 
-format: bytes
+--
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.cfs.quota.us`*::
++
+--
+type: long
 
 --
 
-*`node_stats.node.stats.os.cpu.cgroup.memory.usage.bytes`*::
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.elapsed_periods.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.times_throttled.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.time_throttled.ns`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.os.cpu.cgroup.memory.control_group`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cpu.cgroup.memory.limit.bytes`*::
 +
 --
 type: long
@@ -18135,8 +18126,17 @@ format: bytes
 
 --
 
+*`elasticsearch.node.stats.os.cpu.cgroup.memory.usage.bytes`*::
++
+--
+type: long
 
-*`node_stats.node.stats.process.cpu.pct`*::
+format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.process.cpu.pct`*::
 +
 --
 type: long
@@ -18146,37 +18146,14 @@ format: percent
 --
 
 
-*`node_stats.node.stats.process.file_descriptors.max.count`*::
+*`elasticsearch.node.stats.process.file_descriptors.max.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.process.file_descriptors.open.count`*::
-+
---
-type: long
-
---
-
-
-
-*`node_stats.node.stats.thread_pool.bulk.queue.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.bulk.rejected.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.bulk.threads.count`*::
+*`elasticsearch.node.stats.process.file_descriptors.open.count`*::
 +
 --
 type: long
@@ -18184,43 +18161,22 @@ type: long
 --
 
 
-*`node_stats.node.stats.thread_pool.generic.queue.count`*::
+
+*`elasticsearch.node.stats.thread_pool.bulk.queue.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.generic.rejected.count`*::
+*`elasticsearch.node.stats.thread_pool.bulk.rejected.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.generic.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.thread_pool.get.queue.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.get.rejected.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.get.threads.count`*::
+*`elasticsearch.node.stats.thread_pool.bulk.threads.count`*::
 +
 --
 type: long
@@ -18228,43 +18184,21 @@ type: long
 --
 
 
-*`node_stats.node.stats.thread_pool.index.queue.count`*::
+*`elasticsearch.node.stats.thread_pool.generic.queue.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.index.rejected.count`*::
+*`elasticsearch.node.stats.thread_pool.generic.rejected.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.index.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.thread_pool.management.queue.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.management.rejected.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.management.threads.count`*::
+*`elasticsearch.node.stats.thread_pool.generic.threads.count`*::
 +
 --
 type: long
@@ -18272,43 +18206,21 @@ type: long
 --
 
 
-*`node_stats.node.stats.thread_pool.search.queue.count`*::
+*`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.search.rejected.count`*::
+*`elasticsearch.node.stats.thread_pool.get.rejected.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.search.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`node_stats.node.stats.thread_pool.watcher.queue.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.watcher.rejected.count`*::
-+
---
-type: long
-
---
-
-*`node_stats.node.stats.thread_pool.watcher.threads.count`*::
+*`elasticsearch.node.stats.thread_pool.get.threads.count`*::
 +
 --
 type: long
@@ -18316,21 +18228,109 @@ type: long
 --
 
 
-*`node_stats.node.stats.thread_pool.write.queue.count`*::
+*`elasticsearch.node.stats.thread_pool.index.queue.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.write.rejected.count`*::
+*`elasticsearch.node.stats.thread_pool.index.rejected.count`*::
 +
 --
 type: long
 
 --
 
-*`node_stats.node.stats.thread_pool.write.threads.count`*::
+*`elasticsearch.node.stats.thread_pool.index.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.management.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.management.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.management.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.search.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.watcher.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.watcher.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.watcher.threads.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.write.rejected.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.write.threads.count`*::
 +
 --
 type: long
@@ -18344,7 +18344,7 @@ type: long
 
 
 
-*`node_stats.cluster.pending_task.insert_order`*::
+*`elasticsearch.cluster.pending_task.insert_order`*::
 +
 --
 Insert order
@@ -18354,7 +18354,7 @@ type: long
 
 --
 
-*`node_stats.cluster.pending_task.priority`*::
+*`elasticsearch.cluster.pending_task.priority`*::
 +
 --
 Priority
@@ -18364,7 +18364,7 @@ type: long
 
 --
 
-*`node_stats.cluster.pending_task.source`*::
+*`elasticsearch.cluster.pending_task.source`*::
 +
 --
 Source. For example: put-mapping
@@ -18374,7 +18374,7 @@ type: keyword
 
 --
 
-*`node_stats.cluster.pending_task.time_in_queue.ms`*::
+*`elasticsearch.cluster.pending_task.time_in_queue.ms`*::
 +
 --
 Time in queue
@@ -18391,7 +18391,7 @@ shard fields
 
 
 
-*`node_stats.shard.primary`*::
+*`elasticsearch.shard.primary`*::
 +
 --
 True if this is the primary shard.
@@ -18401,7 +18401,7 @@ type: boolean
 
 --
 
-*`node_stats.shard.number`*::
+*`elasticsearch.shard.number`*::
 +
 --
 The number of this shard.
@@ -18411,7 +18411,7 @@ type: long
 
 --
 
-*`node_stats.shard.state`*::
+*`elasticsearch.shard.state`*::
 +
 --
 The state of this shard.
@@ -18421,7 +18421,7 @@ type: keyword
 
 --
 
-*`node_stats.shard.relocating_node.name`*::
+*`elasticsearch.shard.relocating_node.name`*::
 +
 --
 The node the shard was relocated from.

@@ -6,42 +6,6 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
-    - name: elasticsearch
-      type: group
-      description: >
-      fields:
-        - name: cluster.name
-          type: keyword
-          description: >
-            Elasticsearch cluster name.
-        - name: cluster.id
-          type: keyword
-          description: >
-            Elasticsearch cluster id.
-        - name: cluster.state.id
-          type: keyword
-          description: >
-            Elasticsearch state id.
-        - name: node
-          type: group
-          fields:
-            - name: id
-              type: keyword
-              description: >
-                Node ID
-            - name: name
-              type: keyword
-              description: >
-                Node name.
-            - name: master
-              type: boolean
-              description: >
-                Is the node the master node?
-            - name: mlockall
-              type: boolean
-              description: >
-                Is mlockall enabled on the node?
-    # Field aliases for migration from legacy structure
     - name: cluster_uuid
       type: alias
       path: elasticsearch.cluster.id
@@ -147,7 +111,6 @@
                 - name: miss_count
                   path: elasticsearch.node.stats.indices.query_cache.misses.count
                   type: alias
-
             - name: request_cache
               type: group
               fields:
@@ -442,3 +405,38 @@
                 - name: threads
                   path: elasticsearch.node.stats.thread_pool.write.threads.count
                   type: alias
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:
+        - name: cluster.name
+          type: keyword
+          description: >
+            Elasticsearch cluster name.
+        - name: cluster.id
+          type: keyword
+          description: >
+            Elasticsearch cluster id.
+        - name: cluster.state.id
+          type: keyword
+          description: >
+            Elasticsearch state id.
+        - name: node
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                Node ID
+            - name: name
+              type: keyword
+              description: >
+                Node name.
+            - name: master
+              type: boolean
+              description: >
+                Is the node the master node?
+            - name: mlockall
+              type: boolean
+              description: >
+                Is mlockall enabled on the node?
