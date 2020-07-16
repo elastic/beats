@@ -15,7 +15,7 @@ To alter this behavior, configure the output and other configuration settings:
 * <<elastic-agent-monitoring-configuration>>
 * <<elastic-agent-datasource-configuration>>
 
-[float]
+[discrete]
 [[elastic-agent-output-configuration]]
 == Output settings
 
@@ -51,7 +51,7 @@ username and password pair, and the second one contains an API key.
 A default output configuration is required.
 ==============
 
-[float]
+[discrete]
 [[elastic-agent-monitoring-configuration]]
 == {beats} monitoring settings
 
@@ -81,6 +81,7 @@ To enable monitoring, set `agent.monitoring.enabled` to `true`. Also set the
 collected. If neither setting is specified, monitoring is disabled. Set
 `use_output` to specify the output to which monitoring events are sent.
 
+[discrete]
 [[elastic-agent-datasource-configuration]]
 == Datasource settings
 
