@@ -288,15 +288,18 @@
                       type: long
                     - name: operations.count
                       type: long
-    - name: os.cpu
+    - name: os
       type: group
       fields:
-        - name: load_avg.1m
-          type: long
-        - name: load_avg.5m
-          type: long
-        - name: load_avg.15m
-          type: long
+        - name: cpu
+          type: group
+          fields:
+            - name: load_avg.1m
+              type: long
+            - name: load_avg.5m
+              type: long
+            - name: load_avg.15m
+              type: long
         - name: cgroup
           type: group
           fields:
@@ -304,14 +307,14 @@
               type: group
               fields:
                 - name: control_group
-                  type: long
+                  type: keyword
                 - name: usage.ns
                   type: long
             - name: cpu
               type: group
               fields:
                 - name: control_group
-                  type: long
+                  type: keyword
                 - name: cfs
                   type: group
                   fields:
@@ -332,7 +335,7 @@
               type: group
               fields:
                 - name: control_group
-                  type: long
+                  type: keyword
                 - name: limit.bytes
                   type: long
                   format: bytes

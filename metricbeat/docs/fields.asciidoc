@@ -18027,6 +18027,7 @@ type: long
 --
 
 
+
 *`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
 +
 --
@@ -18050,22 +18051,14 @@ type: long
 
 
 
-*`elasticsearch.node.stats.os.cpu.cgroup.cpuacct.control_group`*::
+*`elasticsearch.node.stats.os.cgroup.cpuacct.control_group`*::
 +
 --
-type: long
+type: keyword
 
 --
 
-*`elasticsearch.node.stats.os.cpu.cgroup.cpuacct.usage.ns`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.control_group`*::
+*`elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns`*::
 +
 --
 type: long
@@ -18073,36 +18066,22 @@ type: long
 --
 
 
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.cfs.period.us`*::
+*`elasticsearch.node.stats.os.cgroup.cpu.control_group`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.cpu.cfs.period.us`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.cfs.quota.us`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.elapsed_periods.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.times_throttled.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.os.cpu.cgroup.cpu.stat.time_throttled.ns`*::
+*`elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us`*::
 +
 --
 type: long
@@ -18110,14 +18089,36 @@ type: long
 --
 
 
-*`elasticsearch.node.stats.os.cpu.cgroup.memory.control_group`*::
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.node.stats.os.cpu.cgroup.memory.limit.bytes`*::
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.os.cgroup.memory.control_group`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
 +
 --
 type: long
@@ -18126,7 +18127,7 @@ format: bytes
 
 --
 
-*`elasticsearch.node.stats.os.cpu.cgroup.memory.usage.bytes`*::
+*`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
 +
 --
 type: long
