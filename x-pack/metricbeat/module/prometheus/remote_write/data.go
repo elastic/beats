@@ -79,7 +79,7 @@ func (g *RemoteWriteTypedGenerator) Start() {
 }
 
 func (g *RemoteWriteTypedGenerator) Stop() {
-	logp.Debug("prometheus.collector.cache", "stopping CounterCache")
+	logp.Debug("prometheus.remote_write.cache", "stopping CounterCache")
 	g.CounterCache.Stop()
 }
 

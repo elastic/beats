@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-
 // DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
 func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error) {
 	return &remoteWriteEventGenerator{}, nil

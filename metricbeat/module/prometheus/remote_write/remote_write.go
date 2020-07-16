@@ -56,9 +56,9 @@ type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet) (RemoteWriteEve
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	server serverhelper.Server
-	events chan mb.Event
-	promEventsGen  RemoteWriteEventsGenerator
+	server          serverhelper.Server
+	events          chan mb.Event
+	promEventsGen   RemoteWriteEventsGenerator
 	eventGenStarted bool
 }
 
@@ -110,7 +110,6 @@ func MetricSetBuilder(namespace string, genFactory RemoteWriteEventsGeneratorFac
 	}
 }
 
-
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()
@@ -126,7 +125,20 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 }
 
+// Close stops the metricset
+func (m *MetricSet) Close() error {
+	if m.eventGenStarted {
+		m.promEventsGen.Stop()
+	}
+	return nil
+}
+
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
+	if !m.eventGenStarted {
+		m.promEventsGen.Start()
+		m.eventGenStarted = true
+	}
+
 	compressed, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		m.Logger().Errorf("Read error %v", err)

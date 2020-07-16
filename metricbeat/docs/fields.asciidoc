@@ -35084,7 +35084,12 @@ type: object
 *`prometheus.*.histogram`*::
 +
 --
-Prometheus histogram metric - release: ga
+Prometheus histogram metric - release: ga - name: remote_write
+  type: group
+  description: >
+    remote write metrics from Prometheus server
+  release: beta
+  fields:
 
 
 type: object
