@@ -64,7 +64,7 @@ type nameserverStats struct {
 
 // NewMiekgResolver returns a new MiekgResolver. It returns an error if no
 // nameserver are given and none can be read from /etc/resolv.conf.
-func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, Transport string, servers ...string) (*MiekgResolver, error) {
+func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*MiekgResolver, error) {
 	// Use /etc/resolv.conf if no nameservers are given. (Won't work for Windows).
 	if len(servers) == 0 {
 		config, err := dns.ClientConfigFromFile(etcResolvConf)
@@ -77,8 +77,8 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, Transport
 	// Add port if one was not specified.
 	for i, s := range servers {
 		if _, _, err := net.SplitHostPort(s); err != nil {
-			withPort := ""
-			switch Transport {
+			var withPort string
+			switch transport {
 			case "tls":
 				withPort = s + ":853"
 			default:
@@ -97,18 +97,17 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, Transport
 		timeout = defaultConfig.Timeout
 	}
 
-	clientTransferTyp := "udp"
-
-	switch Transport {
+	var clientTransferType string
+	switch transport {
 	case "tls":
-		clientTransferTyp = "tcp-tls"
+		clientTransferType = "tcp-tls"
 	default:
-		clientTransferTyp = "udp"
+		clientTransferType = "udp"
 	}
 
 	return &MiekgResolver{
 		client: &dns.Client{
-			Net:     clientTransferTyp,
+			Net:     clientTransferType,
 			Timeout: timeout,
 		},
 		servers:  servers,
