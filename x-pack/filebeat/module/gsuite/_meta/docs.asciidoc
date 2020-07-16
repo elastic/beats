@@ -25,9 +25,12 @@ It is compatible with a subset of applications under the https://developers.goog
 
 === Configure the module
 
-In order for filebeat to ingest data from the Google Reports API you must set up a `ServiceAccount` that has access to the `Admin SDK API`. Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
+In order for filebeat to ingest data from the Google Reports API you must https://support.google.com/gsuitemigrate/answer/9222993?hl=en[set up a ServiceAccount] that https://support.google.com/gsuitemigrate/answer/9222865?hl=en[has access to the Admin SDK API].
 
-This module will make use of the following `oauth2 scope`:
+
+Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
+
+This module will make use of the following *oauth2 scope*:
 
 - `https://www.googleapis.com/auth/admin.reports.audit.readonly`
 
@@ -52,6 +55,18 @@ you can set up your module:
     enabled: true
     var.jwt_file: "./credentials_file.json"
     var.delegated_account: "user@example.com"
+  admin:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
+  drive:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
+  groups:
+    enabled: true
+    var.jwt_file: "./credentials_file.json"
+    var.delegated_account: "user@example.com"
 ----
 
 Every fileset has the following configuration options:
@@ -71,11 +86,18 @@ Duration of the time limit on HTTP requests made by the module. Defaults to
 
 *`var.interval`*::
 
-Duration between requests to the API. Defaults to `60s`.
+Duration between requests to the API. Defaults to `2h`.
+
+NOTE: GSuite defaults to a 2 hour polling interval because Google reports can go from
+some minutes up to 3 days of delay. For more details on this, you can read more https://support.google.com/a/answer/7061566[here].
 
 *`var.user_key`*::
 
 Specifies the user key to fetch reports from. Defaults to `all`.
+
+*`var.initial_interval`*::
+
+It will poll events up to this time period when the module starts. This is to prevent polling too many or repeated events on module restarts. Defaults to `24h`.
 
 [float]
 ==== GSuite Reports ECS fields
@@ -83,22 +105,19 @@ Specifies the user key to fetch reports from. Defaults to `all`.
 This is a list of GSuite Reports fields that are mapped to ECS.
 
 [options="header"]
-|=======================================================================================
-| GSuite Reports             | ECS Fields                                              |
-| items[].id.time            | @timestamp                                              |
-| items[].id.uniqueQualifier | event.id                                                |
-| items[].id.applicationName | event.provider                                          |
-| items[].events[].name      | event.action                                            |
-| items[].customerId         | organization.id                                         |
-| items[].ipAddress          | source.ip, related.ip, source.as.*, source.geo.*        |
-| items[].actor.email        | source.user.email, source.user.name, source.user.domain |
-| items[].actor.profileId    | source.user.id                                          |
-|=======================================================================================
+|===============================================================================================
+| GSuite Reports               | ECS Fields                                                    |
+| `items[].id.time`            | `@timestamp`                                                  |
+| `items[].id.uniqueQualifier` | `event.id`                                                    |
+| `items[].id.applicationName` | `event.provider`                                              |
+| `items[].events[].name`      | `event.action`                                                |
+| `items[].customerId`         | `organization.id`                                             |
+| `items[].ipAddress`          | `source.ip`, related.ip`, `source.as.*`, `source.geo.*`       |
+| `items[].actor.email`        | `source.user.email`, `source.user.name`, `source.user.domain` |
+| `items[].actor.profileId`    | `source.user.id`                                              |
+|===============================================================================================
 
 These are the common ones to all filesets.
-
-Note: GSuite defaults to a 2 hours polling interval because Google admin lag times can go from
-some minutes up to 3 days. For more details on this, please read more https://support.google.com/a/answer/7061566[here].
 
 :has-dashboards!:
 
