@@ -373,3 +373,32 @@ May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED
 		})
 	}
 }
+
+func TestTrimLogDelimiter(t *testing.T) {
+	cases := []struct {
+		title       string
+		logOriginal string
+		expectedLog string
+	}{
+		{"string with delimiter",
+			`test
+`,
+			"test",
+		},
+		{"string without delimiter",
+			"test",
+			"test",
+		},
+		{"string just with delimiter",
+			`
+`,
+			"",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			log := trimLogDelimiter(c.logOriginal)
+			assert.Equal(t, c.expectedLog, log)
+		})
+	}
+}
