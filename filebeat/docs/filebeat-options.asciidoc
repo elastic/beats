@@ -121,3 +121,5 @@ include::inputs/input-tcp.asciidoc[]
 include::inputs/input-udp.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-awscloudwatch.asciidoc[]
