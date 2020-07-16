@@ -477,8 +477,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	// handle s3 objects that are not json content-type
 	offset := 0
 	for {
-		logOriginal, err := reader.ReadString('\n')
-		log := trimLogDelimiter(logOriginal)
+		log, err := readStringAndTrimDelimiter(reader)
+		if err != nil {
+			err = errors.Wrap(err, "readStringAndTrimDelimiter failed")
+			p.logger.Error(err)
+			return err
+		}
+
 		if log == "" {
 			break
 		}
@@ -613,6 +618,14 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 
 func trimLogDelimiter(log string) string {
 	return strings.TrimSuffix(log, "\n")
+}
+
+func readStringAndTrimDelimiter(reader *bufio.Reader) (string, error) {
+	logOriginal, err := reader.ReadString('\n')
+	if err != nil {
+		return logOriginal, err
+	}
+	return trimLogDelimiter(logOriginal), nil
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
