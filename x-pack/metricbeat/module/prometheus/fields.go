@@ -19,5 +19,5 @@ func init() {
 // AssetPrometheus returns asset data.
 // This is the base64 encoded gzipped contents of module/prometheus.
 func AssetPrometheus() string {
-	return "eJzEkktqAzEMhvdzih8vQ5MDeNEzFLosJSi24rjxC0tTmtuXZIYw9EGzKMQ7+/+QPgmvceSTRes1sx54lPVHI3ccAI2a2MI8XSPoqbFHZu3RiRkAz+J6bBprsXgcAOBZSQXiOp3Zfa8ZhEUNLr7VWHQzAJ0Tk7BFoAEQVo0liMWLEUnmAeag2szrAOwjJy/20mGNQpmXzpvV5p3SyJcYF02Luntjp/PTdNlOia/jLvH3ZJuptVjCjJmVmZkfxjyfxVSBxsDzZn6XdHUsyv1+mrPAn6Kd9I7LPHf3N7seomgNnfKNwl/5/3G+Vl36Ts7LX/4ZAAD//xMCFRw="
+	return "eJzEkstqMzEMhfd+ioOX4U8ewIv/GQpdlhKUGcVx4xuWXJq3L8kMYXqjWRSinX0O0qeD1jjyyaG2klgP3GX9Vmk4GkCDRnawD1cJeqo8IrG2MIg1wMgytFA1lOzw3wDAo5IKZGh09u5bSSAsenAeawlZNwZoHJmEHTwZQFg1ZC8OT1Yk2n+wB9Vqnw2wDxxHcZcJa2RKvGTerDavFDtfZFwwHcruhQedv6bHdlLG0neRvyrbRLWG7GebXdnZ882a51ps5al7npP5GXIoPSu3+2HOAL+CNtI7hnmePt7MegiixTdKNwJ/9v8N87Xrkndi/njlUzXW3jJyiOY9AAD//85gGik="
 }
