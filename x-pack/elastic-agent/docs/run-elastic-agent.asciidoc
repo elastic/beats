@@ -7,7 +7,7 @@ experimental[]
 {agent} runs in two modes: standalone or fleet. The two modes differ in how you
 configure and manage the Agent.
 
-[float]
+[discrete]
 [[fleet-mode]]
 == Run in {fleet} mode
 
@@ -40,7 +40,7 @@ To start {agent}, run:
 ./elastic-agent run
 ----
 
-[float]
+[discrete]
 [[standalone-mode]]
 == Run in standalone mode (default)
 

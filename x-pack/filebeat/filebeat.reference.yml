@@ -711,11 +711,54 @@ filebeat.modules:
 
 #-------------------------------- Gsuite Module --------------------------------
 - module: gsuite
-  # All logs
   saml:
     enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
   user_accounts:
     enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  login:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  admin:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  drive:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
+  groups:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 5s
 
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
@@ -942,8 +985,22 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#---------------------------- Microsoft DHCP Module ----------------------------
+#------------------------------ Microsoft Module ------------------------------
 - module: microsoft
+  # ATP configuration
+  defender_atp:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+   
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
   dhcp:
     enabled: true
 
@@ -1301,6 +1358,30 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+#------------------------------- Sophosxg Module -------------------------------
+- module: sophosxg
+  firewall:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9005
+
+    # firewall default hostanme 
+    #var.default_host_name: firewall.localgroup.local
+    
+    # known firewalls
+    #var.known_devices:
+    #   "device1_serialnumber": "a.host.local"
+    #   "device2_serialnumber": "b.host.local"
+
 
 #-------------------------------- Squid Module --------------------------------
 - module: squid

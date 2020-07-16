@@ -95,7 +95,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "1970-01-19T10:29:21.368Z",
+        "event.start": "2020-06-24T01:16:08.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -313,7 +313,7 @@
         "event.kind": "event",
         "event.module": "fortinet",
         "event.outcome": "success",
-        "event.start": "1970-01-19T06:09:48.391-04:00",
+        "event.start": "2020-06-10T07:26:31.000-04:00",
         "event.timezone": "-0400",
         "event.type": [
             "allowed"

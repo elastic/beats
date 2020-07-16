@@ -181,10 +181,11 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
-			log:        log,
-			emitter:    emit,
-			dispatcher: router,
-			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
+			log:         log,
+			emitter:     emit,
+			dispatcher:  router,
+			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
+			actionStore: actionStore,
 		},
 	)
 

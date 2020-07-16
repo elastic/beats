@@ -75,14 +75,6 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
-        body = {
-            "transient": {
-                "script.max_compilations_rate": "2000/1m"
-            }
-        }
-
-        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
-
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -281,6 +273,14 @@ def clean_keys(obj):
     if obj["event.dataset"] == "aws.vpcflow":
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
+
+    # Remove event.ingested from testing, as it will never be the same.
+    if obj["event.dataset"] == "microsoft.defender_atp":
+        delete_key(obj, "event.ingested")
+        delete_key(obj, "@timestamp")
+
+    if obj["event.module"] == "gsuite":
+        delete_key(obj, "event.ingested")
 
 
 def delete_key(obj, key):

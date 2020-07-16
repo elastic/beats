@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -20,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 var defaultDelay = 1 * time.Second
@@ -38,9 +40,10 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		},
 	}
 
-	cmd.Flags().StringP("certificate_authorities", "a", "", "Comma separated list of root certificate for server verifications")
-	cmd.Flags().StringP("ca_sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
+	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
+	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
+	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
 
 	return cmd
 }
@@ -76,6 +79,8 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
+	insecure, _ := cmd.Flags().GetBool("insecure")
+
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
@@ -84,10 +89,10 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	url := args[0]
 	enrollmentToken := args[1]
 
-	caStr, _ := cmd.Flags().GetString("certificate_authorities")
+	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
 
-	caSHA256str, _ := cmd.Flags().GetString("ca_sha256")
+	caSHA256str, _ := cmd.Flags().GetString("ca-sha256")
 	caSHA256 := cli.StringToSlice(caSHA256str)
 
 	delay(defaultDelay)
@@ -98,6 +103,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		URL:                  url,
 		CAs:                  CAs,
 		CASha256:             caSHA256,
+		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 	}
 
@@ -112,6 +118,19 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	err = c.Execute()
+	signal := make(chan struct{})
+
+	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+
+	for errors.Is(err, fleetapi.ErrTooManyRequests) {
+		fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
+		backExp.Wait()
+		fmt.Fprintln(streams.Out, "Retrying to enroll...")
+		err = c.Execute()
+	}
+
+	close(signal)
+
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}

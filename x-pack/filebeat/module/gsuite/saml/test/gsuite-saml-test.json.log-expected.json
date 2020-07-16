@@ -1,20 +1,6 @@
 [
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
-        "client.as.number": 7922,
-        "client.as.organization.name": "Comcast Cable Communications, LLC",
-        "client.geo.city_name": "State College",
-        "client.geo.continent_name": "North America",
-        "client.geo.country_iso_code": "US",
-        "client.geo.location.lat": 40.7957,
-        "client.geo.location.lon": -77.8618,
-        "client.geo.region_iso_code": "US-PA",
-        "client.geo.region_name": "Pennsylvania",
-        "client.ip": "98.235.162.24",
-        "client.user.domain": "bar.com",
-        "client.user.email": "foo@bar.com",
-        "client.user.id": "1",
-        "client.user.name": "foo",
         "event.action": "login_failure",
         "event.category": [
             "authentication"
@@ -49,26 +35,26 @@
             "foo"
         ],
         "service.type": "gsuite",
+        "source.as.number": 7922,
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
+        "source.geo.city_name": "State College",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 40.7957,
+        "source.geo.location.lon": -77.8618,
+        "source.geo.region_iso_code": "US-PA",
+        "source.geo.region_name": "Pennsylvania",
+        "source.ip": "98.235.162.24",
+        "source.user.domain": "bar.com",
+        "source.user.email": "foo@bar.com",
+        "source.user.id": "1",
+        "source.user.name": "foo",
         "tags": [
             "forwarded"
         ]
     },
     {
         "@timestamp": "2020-10-02T15:00:01.000Z",
-        "client.as.number": 7922,
-        "client.as.organization.name": "Comcast Cable Communications, LLC",
-        "client.geo.city_name": "State College",
-        "client.geo.continent_name": "North America",
-        "client.geo.country_iso_code": "US",
-        "client.geo.location.lat": 40.7957,
-        "client.geo.location.lon": -77.8618,
-        "client.geo.region_iso_code": "US-PA",
-        "client.geo.region_name": "Pennsylvania",
-        "client.ip": "98.235.162.24",
-        "client.user.domain": "bar.com",
-        "client.user.email": "foo@bar.com",
-        "client.user.id": "1",
-        "client.user.name": "foo",
         "event.action": "login_success",
         "event.category": [
             "authentication"
@@ -101,6 +87,20 @@
             "foo"
         ],
         "service.type": "gsuite",
+        "source.as.number": 7922,
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
+        "source.geo.city_name": "State College",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 40.7957,
+        "source.geo.location.lon": -77.8618,
+        "source.geo.region_iso_code": "US-PA",
+        "source.geo.region_name": "Pennsylvania",
+        "source.ip": "98.235.162.24",
+        "source.user.domain": "bar.com",
+        "source.user.email": "foo@bar.com",
+        "source.user.id": "1",
+        "source.user.name": "foo",
         "tags": [
             "forwarded"
         ]

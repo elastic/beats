@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strings"
 
+	"go.uber.org/zap/zapcore"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -40,7 +42,7 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "Log at INFO level")
 	flag.BoolVar(&toStderr, "e", false, "Log to stderr and disable syslog/file output")
 	common.StringArrVarFlag(nil, &debugSelectors, "d", "Enable certain debug selectors")
-	flag.Var((*environmentVar)(&environment), "environment", "set environment the Beat is run in")
+	flag.Var((*environmentVar)(&environment), "environment", "set environment being ran in")
 }
 
 // Logging builds a logp.Config based on the given common.Config and the specified
@@ -56,6 +58,21 @@ func Logging(beatName string, cfg *common.Config) error {
 
 	applyFlags(&config)
 	return logp.Configure(config)
+}
+
+// Logging builds a logp.Config based on the given common.Config and the specified
+// CLI flags along with the given outputs.
+func LoggingWithOutputs(beatName string, cfg *common.Config, outputs ...zapcore.Core) error {
+	config := logp.DefaultConfig(environment)
+	config.Beat = beatName
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return err
+		}
+	}
+
+	applyFlags(&config)
+	return logp.ConfigureWithOutputs(config, outputs...)
 }
 
 func applyFlags(cfg *logp.Config) {
