@@ -34,7 +34,7 @@
             "panelIndex": "14",
             "panelRefName": "panel_0",
             "title": "Open Tables, Files, Streams",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -50,7 +50,7 @@
             "panelIndex": "050b110b-0b4d-404a-86c0-fa97f7eed2a0",
             "panelRefName": "panel_1",
             "title": "Rate of Questions",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -66,7 +66,7 @@
             "panelIndex": "988a61d7-ac3e-481e-a6ae-aa75aaa32a3a",
             "panelRefName": "panel_2",
             "title": "Rate of SELECT statements",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -82,7 +82,7 @@
             "panelIndex": "a1f8fa38-a62f-4e05-adde-e995dae9ad83",
             "panelRefName": "panel_3",
             "title": "Rate of INSERT, UPDATE, DELETE",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -98,7 +98,7 @@
             "panelIndex": "d126fb61-605f-43af-b5d5-3fa3c128f726",
             "panelRefName": "panel_4",
             "title": "Connected Threads",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -114,7 +114,7 @@
             "panelIndex": "59586d96-3abd-48a3-a258-cfd620826ec2",
             "panelRefName": "panel_5",
             "title": "Connections",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -130,7 +130,7 @@
             "panelIndex": "dd0cf202-fe22-4daf-8f25-09c64d412bf3",
             "panelRefName": "panel_6",
             "title": "Aborted Connections Rate",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -146,7 +146,7 @@
             "panelIndex": "ead16a55-a2d3-49ae-a09b-a0b03560e9a0",
             "panelRefName": "panel_7",
             "title": "Thread Activity",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -162,7 +162,7 @@
             "panelIndex": "24fc2926-610d-4910-8f3e-eb63ca69788c",
             "panelRefName": "panel_8",
             "title": "Buffer Pool Pages",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -178,7 +178,7 @@
             "panelIndex": "33c10c95-be67-492e-afb5-863f375cffc2",
             "panelRefName": "panel_9",
             "title": "Buffer Pool Utilization",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -194,7 +194,7 @@
             "panelIndex": "d35d7c5e-8832-40e2-8c77-953ad320c853",
             "panelRefName": "panel_10",
             "title": "Buffer Pool Efficiency",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -210,7 +210,7 @@
             "panelIndex": "3cd58868-0d03-4715-9ecc-9fba3cde47c1",
             "panelRefName": "panel_11",
             "title": "Network Traffic",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -226,7 +226,7 @@
             "panelIndex": "277c8209-3c5f-41f5-95f4-de0782917fba",
             "panelRefName": "panel_12",
             "title": "Open Tables Cache",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -242,7 +242,7 @@
             "panelIndex": "9487b742-3e7f-4d57-af32-014ad360235c",
             "panelRefName": "panel_13",
             "title": "Connection Errors",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -258,7 +258,7 @@
             "panelIndex": "00cd9f15-01bd-43f3-a8c5-43d6ff17dad3",
             "panelRefName": "panel_14",
             "title": "Commands Operations",
-            "version": "7.8.1"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -274,7 +274,7 @@
             "panelIndex": "cd4deb30-c0dd-4f23-8868-ecffd73b2406",
             "panelRefName": "panel_15",
             "title": "SSL Cache",
-            "version": "7.8.1"
+            "version": "7.8.0"
           }
         ],
         "timeRestore": false,
@@ -2378,5 +2378,5 @@
       "version": "WzM3NCwxXQ=="
     }
   ],
-  "version": "7.8.1"
+  "version": "7.8.0"
 }
