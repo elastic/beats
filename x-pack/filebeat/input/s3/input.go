@@ -108,7 +108,7 @@ func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3
 	defer log.Infof("S3 input for '%v' is started.", inp.config.QueueURL)
 
 	return &s3Collector{
-		cancelation:       ctxtool.FromCanceller(ctx.Cancelation),
+		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
 		config:            &inp.config,
 		publisher:         client,

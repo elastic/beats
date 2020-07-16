@@ -33,14 +33,14 @@ import (
 )
 
 type s3Collector struct {
-	cancelation context.Context
-	logger      *logp.Logger
+	cancellation context.Context
+	logger       *logp.Logger
 
 	config            *config
 	visibilityTimeout int64
 
-	sqs       *sqs.Client
-	s3        *s3.Client
+	sqs       sqsiface.ClientAPI
+	s3        s3iface.ClientAPI
 	publisher beat.Client
 }
 
@@ -94,7 +94,7 @@ var (
 )
 
 func (c *s3Collector) run() {
-	for c.cancelation.Err() == nil {
+	for c.cancellation.Err() == nil {
 		// receive messages from sqs
 		output, err := c.receiveMessage(c.sqs, c.visibilityTimeout)
 		if err != nil {
@@ -155,7 +155,7 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 	defer wg.Done()
 	for {
 		select {
-		case <-c.cancelation.Done():
+		case <-c.cancellation.Done():
 			return
 		case err := <-errC:
 			if err != nil {
@@ -202,7 +202,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 		})
 
 	// The Context will interrupt the request if the timeout expires.
-	sendCtx, cancelFn := context.WithTimeout(c.cancelation, c.config.APITimeout)
+	sendCtx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
 	return req.Send(sendCtx)
@@ -216,7 +216,7 @@ func (c *s3Collector) changeVisibilityTimeout(queueURL string, visibilityTimeout
 	})
 
 	// The Context will interrupt the request if the timeout expires.
-	sendCtx, cancelFn := context.WithTimeout(c.cancelation, c.config.APITimeout)
+	sendCtx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(sendCtx)
@@ -293,7 +293,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(c.cancelation, c.config.APITimeout)
+	ctx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
 	resp, err := req.Send(ctx)
@@ -463,7 +463,7 @@ func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int, obj
 
 func (c *s3Collector) forwardEvent(event beat.Event) error {
 	c.publisher.Publish(event)
-	return c.cancelation.Err()
+	return c.cancellation.Err()
 }
 
 func (c *s3Collector) deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS sqsiface.ClientAPI) error {
@@ -475,7 +475,7 @@ func (c *s3Collector) deleteMessage(queueURL string, messagesReceiptHandle strin
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
 
 	// The Context will interrupt the request if the timeout expires.
-	ctx, cancelFn := context.WithTimeout(c.cancelation, c.config.APITimeout)
+	ctx, cancelFn := context.WithTimeout(c.cancellation, c.config.APITimeout)
 	defer cancelFn()
 
 	_, err := req.Send(ctx)
