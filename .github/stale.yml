@@ -46,12 +46,36 @@ limitPerRun: 30
 # only: issues
 
 # Optionally, specify configuration settings that are specific to just 'issues' or 'pulls':
-# pulls:
-#   daysUntilStale: 30
-#   markComment: >
-#     This pull request has been automatically marked as stale because it has not had
-#     recent activity. It will be closed if no further activity occurs. Thank you
-#     for your contributions.
+pulls:
+  daysUntilStale: 30
+  daysUntilClose: 30
+  markComment: >
+    Hi!
+
+    We just realized that we haven't looked into this PR in a while. We're
+    sorry!
+
+
+    We're labeling this issue as `Stale` to make it hit our filters and 
+    make sure we get back to it in as soon as possible. In the meantime, it'd
+    be extremely helpful if you could take a look at it as well and confirm its
+    relevance. A simple comment with a nice emoji will be enough `:+1`.
+
+    Thank you for your contribution!
+ 
+  closeComment: >
+    Hi!
+
+    This PR has been stale for a while and we're going to close it as part of
+    our cleanup procedure.
+
+    We appreciate your contribution and would like to apologize if we have not
+    been able to review it, due to the current heavy load of the team.
+
+    Feel free to re-open this PR if you think it should stay open and is worth rebasing.
+
+    Thank you for your contribution!
+
 
 # issues:
 #   exemptLabels:
