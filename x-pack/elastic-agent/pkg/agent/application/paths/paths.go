@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	homePath string
-	dataPath string
-	logsPath string
+	homePath   string
+	configPath string
+	dataPath   string
+	logsPath   string
 )
 
 func init() {
@@ -21,6 +22,7 @@ func init() {
 
 	fs := flag.CommandLine
 	fs.StringVar(&homePath, "path.home", exePath, "Agent root path")
+	fs.StringVar(&configPath, "path.config", exePath, "Config path is the directory Agent looks for its config file")
 	fs.StringVar(&dataPath, "path.data", filepath.Join(exePath, "data"), "Data path contains Agent managed binaries")
 	fs.StringVar(&logsPath, "path.logs", exePath, "Logs path contains Agent log output")
 }
@@ -29,6 +31,11 @@ func init() {
 // Executable is not supported on nacl.
 func Home() string {
 	return homePath
+}
+
+// Config returns a directory where configuration file lives
+func Config() string {
+	return configPath
 }
 
 // Data returns the data directory for Agent
