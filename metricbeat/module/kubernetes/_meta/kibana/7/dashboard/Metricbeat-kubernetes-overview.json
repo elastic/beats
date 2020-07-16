@@ -126,6 +126,28 @@
                                         "field": "kubernetes.container.cpu.usage.nanocores",
                                         "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
                                         "type": "sum"
+                                    },
+                                    {
+                                        "id": "8b346300-bf95-11ea-a07c-851701f0d645",
+                                        "type": "avg",
+                                        "field": "metricset.period"
+                                    },
+                                    {
+                                        "id": "25ae6580-bf95-11ea-a07c-851701f0d645",
+                                        "type": "calculation",
+                                        "variables": [
+                                            {
+                                                "id": "39e40aa0-bf95-11ea-a07c-851701f0d645",
+                                                "name": "sum_nanocores",
+                                                "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28"
+                                            },
+                                            {
+                                                "id": "85213600-bf95-11ea-a07c-851701f0d645",
+                                                "name": "avg_period",
+                                                "field": "8b346300-bf95-11ea-a07c-851701f0d645"
+                                            }
+                                        ],
+                                        "script": "params.sum_nanocores / (params._interval / params.avg_period)"
                                     }
                                 ],
                                 "override_index_pattern": 0,

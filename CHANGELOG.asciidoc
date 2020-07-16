@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 - Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
 - Add domain state to kvm module {pull}17673[17673]
+- Fix Kubernetes Overview Dashboard to correctly display non 10s intervals for node usage {pull}19675[19675]
 
 [[release-notes-7.5.0]]
 === Beats version 7.5.0
