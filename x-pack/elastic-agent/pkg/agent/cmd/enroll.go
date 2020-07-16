@@ -122,7 +122,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
-	for err == fleetapi.ErrTooManyRequests {
+	for errors.Is(err, fleetapi.ErrTooManyRequests) {
 		fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
 		backExp.Wait()
 		fmt.Fprintln(streams.Out, "Retrying to enroll...")
