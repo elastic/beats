@@ -35,6 +35,8 @@ import (
 // Every data frame read from the queue is assigned a unique sequential
 // integer, which is used to keep track of which frames have been
 // acknowledged.
+// This id is not stable between restarts; the value 0 is always assigned
+// to the oldest remaining frame on startup.
 type frameID uint64
 
 // segmentPos is a byte index into the segment's data region.
@@ -138,9 +140,10 @@ func queueSegmentsForPath(
 	return segments, nil
 }
 
-// A nil data frame with no error means this reader has no more frames.
-// If nextDataFrame returns an error, it should be logged and the
-// corresponding segment should be dropped.
+// nextDataFrame returns the bytes of the next data frame, or an error if the
+// frame couldn't be read. If an error is returned, the caller should log it
+// and drop the containing segment. A nil return value with no error means
+// there are no frames to read.
 func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 	if reader.curPosition >= reader.endPosition {
 		return nil, nil

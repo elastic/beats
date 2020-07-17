@@ -98,7 +98,7 @@ type diskQueue struct {
 	stateFile *stateFile
 
 	// Metadata related to the segment files.
-	segments diskQueueSegments
+	segments *diskQueueSegments
 
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
@@ -178,21 +178,27 @@ type diskQueueSegments struct {
 	// The segment that is currently being written.
 	writing *queueSegment
 
-	writer *segmentWriter
-	reader *segmentReader
+	//writer *segmentWriter
+	//reader *segmentReader
 
 	// A list of the segments that have been completely written but have
-	// not yet been processed by the reader loop, sorted by increasing
+	// not yet been completely processed by the reader loop, sorted by increasing
 	// segment ID. Segments are always read in order. When a segment has
 	// been read completely, it is removed from the front of this list and
-	// appended to completedSegments.
+	// appended to waiting.
 	reading []*queueSegment
 
 	// A list of the segments that have been read but have not yet been
 	// completely acknowledged, sorted by increasing segment ID. When the
 	// first entry of this list is completely acknowledged, it is removed
-	// from this list and the underlying file is deleted.
-	completed []*queueSegment
+	// from this list and added to finished.
+	waiting []*queueSegment
+
+	// A list of the segments that have been completely processed and are
+	// ready to be deleted. The writer loop always tries to delete segments
+	// in this list before writing new data. When a segment is successfully
+	// deleted, it is removed from this list.
+	finished []*queueSegment
 
 	// The next sequential unused segment ID. This is what will be assigned
 	// to the next queueSegment we create.

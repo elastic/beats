@@ -78,18 +78,6 @@ func (dq *diskQueue) readerLoop() {
 	}
 }
 
-func (dq *diskQueue) writerLoop() {
-	for {
-		var frameBytes []byte
-		select {
-		case frameBytes = <-dq.inChan:
-
-		case <-dq.done:
-			break
-		}
-	}
-}
-
 func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 	var err error
 	dq.segments.Lock()
