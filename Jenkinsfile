@@ -140,7 +140,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Filebeat oss Linux", target: "-C filebeat testsuite", withModule: true)
+            makeTarget(context: "Filebeat oss Linux", directory: 'filebeat', target: 'testsuite', withModule: true)
           }
         }
         stage('Filebeat x-pack'){
@@ -230,7 +230,7 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
-                makeTarget(context: "Heartbeat oss Linux", target: "-C heartbeat testsuite")
+                makeTarget(context: "Heartbeat oss Linux", directory: 'heartbeat', target: "testsuite")
               }
             }
             stage('Heartbeat Mac OS X'){
@@ -276,7 +276,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Auditbeat oss Linux", target: "-C auditbeat testsuite", withModule: true)
+            makeTarget(context: "Auditbeat oss Linux", directory: 'auditbeat', target: "testsuite", withModule: true)
           }
         }
         stage('Auditbeat crosscompile'){
@@ -289,7 +289,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Auditbeat oss crosscompile", target: "-C auditbeat crosscompile")
+            makeTarget(context: "Auditbeat oss crosscompile", directory: 'auditbeat', target: "crosscompile")
           }
         }
         stage('Auditbeat oss Mac OS X'){
@@ -374,12 +374,12 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
-                makeTarget(context: "Libbeat oss Linux", target: "-C libbeat testsuite")
+                makeTarget(context: "Libbeat oss Linux", directory: 'libbeat', target: "testsuite")
               }
             }
             stage('Libbeat crosscompile'){
               steps {
-                makeTarget(context: "Libbeat oss crosscompile", target: "-C libbeat crosscompile")
+                makeTarget(context: "Libbeat oss crosscompile", directory: 'libbeat', target: "crosscompile")
               }
             }
             stage('Libbeat stress-tests'){
@@ -399,7 +399,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Libbeat x-pack Linux", target: "-C x-pack/libbeat testsuite")
+            makeTarget(context: "Libbeat x-pack Linux", directory: 'x-pack/libbeat', target: "testsuite")
           }
         }
         stage('Metricbeat OSS Unit tests'){
@@ -486,7 +486,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Metricbeat OSS crosscompile", target: "-C metricbeat crosscompile")
+            makeTarget(context: "Metricbeat OSS crosscompile", directory: 'metricbeat', target: "crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -558,7 +558,7 @@ pipeline {
           stages {
             stage('Packetbeat oss'){
               steps {
-                makeTarget(context: "Packetbeat oss Linux", target: "-C packetbeat testsuite")
+                makeTarget(context: "Packetbeat oss Linux", directory: 'packetbeat', target: "testsuite")
               }
             }
           }
@@ -592,7 +592,7 @@ pipeline {
           stages {
             stage('Winlogbeat oss'){
               steps {
-                makeTarget(context: "Winlogbeat oss crosscompile", target: "-C winlogbeat crosscompile")
+                makeTarget(context: "Winlogbeat oss crosscompile", directory: 'winlogbeat', target: "crosscompile")
               }
             }
             stage('Winlogbeat Windows'){
@@ -637,7 +637,7 @@ pipeline {
               steps {
                 mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
                 withEnv(["GO_VERSION=1.13.1"]){
-                  makeTarget(context: "Functionbeat x-pack Linux", target: "-C x-pack/functionbeat test-gcp-functions")
+                  makeTarget(context: "Functionbeat x-pack Linux", directory: 'x-pack/functionbeat', target: "test-gcp-functions")
                 }
               }
             }
@@ -686,7 +686,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                makeTarget(context: "Journalbeat Linux", target: "-C journalbeat testsuite")
+                makeTarget(context: "Journalbeat Linux", directory: 'journalbeat', target: "testsuite")
               }
             }
           }
@@ -703,14 +703,14 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
-                makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
+                makeTarget(context: "Generators Metricbeat Linux", directory: 'generator/_templates/metricbeat', target: "test")
+                makeTarget(context: "Generators Metricbeat Linux", directory: 'generator/_templates/metricbeat', target: "test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
-                makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
+                makeTarget(context: "Generators Beat Linux", directory: 'generator/_templates/beat', target: "test")
+                makeTarget(context: "Generators Beat Linux", directory: 'generator/_templates/beat', target: "test-package")
               }
             }
             stage('Generators Metricbeat Mac OS X'){
@@ -723,7 +723,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
+                makeTarget(context: "Generators Metricbeat Mac OS X", directory: 'generator/_templates/metricbeat', target: "test")
               }
               post {
                 always {
@@ -741,7 +741,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
+                makeTarget(context: "Generators Beat Mac OS X", directory: 'generator/_templates/beat', target: "test")
               }
               post {
                 always {
@@ -794,15 +794,17 @@ def fixPermissions(location) {
 def makeTarget(Map args = [:]) {
   def context = args.context
   def target = args.target
+  def directory = args.get('directory', '')
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
+  def directoryFlag = directory.trim() ? "-C ${directory}" : ''
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(target)) {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
       }
-      sh(label: "Make ${target}", script: "make ${target}")
+      sh(label: "Make ${target}", script: "make ${directoryFlag} ${target}")
       whenTrue(clean) {
         fixPermissions("${HOME}")
       }
@@ -816,7 +818,7 @@ def mageTarget(Map args = [:]) {
   def target = args.target
   def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(directory)) {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -836,7 +838,7 @@ def mageTargetWin(Map args = [:]) {
   def target = args.target
   def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin(withModule: withModule, modulePattern: getModulePattern(directory)) {
+    withBeatsEnvWin(withModule: withModule, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -858,9 +860,10 @@ def getModulePattern(String toCompare) {
 def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
+  def directory = args.get('directory', '')
   def modulePattern
   if (withModule) {
-    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnv: modulePattern parameter is required.')
+    modulePattern = getModulePattern(directory)
   }
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
@@ -869,7 +872,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
 
   // NOTE: This is required to run after the unstash
-  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern, directory) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -911,9 +914,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
 
 def withBeatsEnvWin(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
+  def directory = args.get('directory', '')
   def modulePattern
   if (withModule) {
-    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnvWin: modulePattern parameter is required.')
+    modulePattern = getModulePattern(directory)
   }
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
@@ -923,7 +927,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
 
   // NOTE: This is required to run after the unstash
-  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern, directory) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -1289,10 +1293,14 @@ def loadConfigEnvVars(){
   For such, it's required to look for changes under the module folder and exclude anything else
   such as ascidoc and png files.
 */
-def getCommonModuleInTheChangeSet(String pattern) {
+def getCommonModuleInTheChangeSet(String pattern, String directory) {
   def module = ''
+  // Transform folder structure in regex format since path separator is required to be escaped
+  def transformedDirectory = directory.replaceAll('/', '\\/')
+  def directoryExclussion = "((?!^${transformedDirectory}\\/).)*\$"
+  def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
   dir("${env.BASE_DIR}") {
-    module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+    module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
   }
   return module
 }
