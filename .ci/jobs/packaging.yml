@@ -14,12 +14,12 @@
           discover-pr-forks-trust: 'permission'
           discover-pr-origin: 'merge-current'
           discover-tags: true
-          head-filter-regex: '(master|7\.[x789]|8\.\d+|PR-.*)'
+          head-filter-regex: '(master|7\.[x789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
           disable-pr-notifications: true
           notification-context: 'beats-packaging'
           repo: 'beats'
           repo-owner: 'elastic'
-          credentials-id: 2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken
+          credentials-id: github-app-beats-ci
           ssh-checkout:
             credentials: f6c7695a-671e-4f4f-a331-acdce44ff9ba
           build-strategies:

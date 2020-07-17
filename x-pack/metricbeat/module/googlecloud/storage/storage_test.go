@@ -11,7 +11,7 @@ import (
 
 	// Register input module and metricset
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
 )
 
 func init() {

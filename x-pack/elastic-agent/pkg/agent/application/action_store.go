@@ -142,6 +142,7 @@ var _ actionConfigChangeSerializer = actionConfigChangeSerializer(fleetapi.Actio
 type actionUnenrollSerializer struct {
 	ActionID   string `yaml:"action_id"`
 	ActionType string `yaml:"action_type"`
+	IsDetected bool   `yaml:"is_detected"`
 }
 
 // Add a guards between the serializer structs and the original struct.

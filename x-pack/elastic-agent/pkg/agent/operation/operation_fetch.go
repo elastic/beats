@@ -8,7 +8,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -20,14 +20,14 @@ import (
 type operationFetch struct {
 	logger         *logger.Logger
 	program        Descriptor
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	downloader     download.Downloader
 }
 
 func newOperationFetch(
 	logger *logger.Logger,
 	program Descriptor,
-	operatorConfig *config.Config,
+	operatorConfig *configuration.SettingsConfig,
 	downloader download.Downloader) *operationFetch {
 
 	return &operationFetch{
@@ -66,7 +66,7 @@ func (o *operationFetch) Check(_ context.Context, _ Application) (bool, error) {
 func (o *operationFetch) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 

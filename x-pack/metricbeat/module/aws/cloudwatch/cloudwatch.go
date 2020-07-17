@@ -68,7 +68,8 @@ type Config struct {
 	Namespace          string      `config:"namespace" validate:"nonzero,required"`
 	MetricName         []string    `config:"name"`
 	Dimensions         []Dimension `config:"dimensions"`
-	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
+	ResourceTypeFilter string      `config:"tags.resource_type_filter"` // Deprecated.
+	ResourceType       string      `config:"resource_type"`
 	Statistic          []string    `config:"statistic"`
 	Tags               []aws.Tag   `config:"tags"` // Deprecated.
 }
@@ -77,6 +78,10 @@ type Config struct {
 func (c Config) Validate() error {
 	if c.Tags != nil {
 		cfgwarn.Deprecate("8.0.0", "tags is deprecated. Use tags_filter instead")
+	}
+
+	if c.ResourceTypeFilter != "" {
+		cfgwarn.Deprecate("8.0.0", "tags.resource_type_filter is deprecated. Use resource_type instead")
 	}
 	return nil
 }
@@ -350,11 +355,11 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 				metricsWithStatsTotal = append(metricsWithStatsTotal, metricsWithStats)
 			}
 
-			if config.ResourceTypeFilter != "" {
-				if _, ok := resourceTypesWithTags[config.ResourceTypeFilter]; ok {
-					resourceTypesWithTags[config.ResourceTypeFilter] = tagsFilter
+			if config.ResourceType != "" {
+				if _, ok := resourceTypesWithTags[config.ResourceType]; ok {
+					resourceTypesWithTags[config.ResourceType] = tagsFilter
 				} else {
-					resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], tagsFilter...)
+					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], tagsFilter...)
 				}
 			}
 			continue
@@ -364,7 +369,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			names:              config.MetricName,
 			tags:               tagsFilter,
 			statistics:         config.Statistic,
-			resourceTypeFilter: config.ResourceTypeFilter,
+			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
 		}
 
@@ -494,7 +499,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(metricDataResults)
 
-	// Create events when there is no tags_filter or tags.resource_type_filter specified.
+	// Create events when there is no tags_filter or resource_type specified.
 	if len(resourceTypeTagFilters) == 0 {
 		if !timestamp.IsZero() {
 			for _, output := range metricDataResults {
