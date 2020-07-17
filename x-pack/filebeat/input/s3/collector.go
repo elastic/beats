@@ -360,16 +360,6 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 	offset := 0
 	for {
 		log, err := readStringAndTrimDelimiter(reader)
-		if err != nil {
-			err = errors.Wrap(err, "readStringAndTrimDelimiter failed")
-			c.logger.Error(err)
-			return err
-		}
-
-		if log == "" {
-			break
-		}
-
 		if err == io.EOF {
 			// create event for last line
 			offset += len([]byte(log))
@@ -385,6 +375,10 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			err = errors.Wrap(err, "ReadString failed")
 			c.logger.Error(err)
 			return err
+		}
+
+		if log == "" {
+			break
 		}
 
 		// create event per log line
