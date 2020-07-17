@@ -22,10 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -33,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"

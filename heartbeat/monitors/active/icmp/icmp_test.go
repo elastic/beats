@@ -23,13 +23,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
