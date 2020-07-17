@@ -30,5 +30,3 @@ class Test(BaseTest):
         assert "response" in o["http"]
 
         assert not "error" in o
-
-
