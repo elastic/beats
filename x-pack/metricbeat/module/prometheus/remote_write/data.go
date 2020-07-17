@@ -100,6 +100,11 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 				// Add labels
 				if len(labels) > 0 {
+					if promType == "histogram" {
+						labelsClone := labels.Clone()
+						labelsClone.Delete("le")
+						labels = labelsClone.Clone()
+					}
 					eventList[labelsHash].ModuleFields["labels"] = labels
 				}
 			}
@@ -112,26 +117,10 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 					name: g.rateCounterFloat64(name, labels, val),
 				}
 			case "counter_int":
-				//events = append(events, collector.PromEvent{
-				//	Data: common.MapStr{
-				//		name: g.rateCounterUint64(name, labels, uint64(val)),
-				//	},
-				//	Labels: labels,
-				//	Timestamp: metric.Timestamp.Time(),
-				//})
 				data = common.MapStr{
 					name: g.rateCounterUint64(name, labels, uint64(val)),
 				}
 			case "other":
-				//events = append(events, collector.PromEvent{
-				//	Data: common.MapStr{
-				//		name: common.MapStr{
-				//			"value": val,
-				//		},
-				//	},
-				//	Labels: labels,
-				//	Timestamp: metric.Timestamp.Time(),
-				//})
 				data = common.MapStr{
 					name: common.MapStr{
 						"value": val,
@@ -161,7 +150,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				}
 				hist.buckets = append(hist.buckets, b)
 				hist.timestamp = metric.Timestamp.Time()
-				hist.labels = labels
+				hist.labels = labelsClone
 				hist.metricName = name
 				continue
 			}
@@ -191,7 +180,6 @@ func (g *RemoteWriteTypedGenerator) rateCounterFloat64(name string, labels commo
 	d := common.MapStr{
 		"counter": value,
 	}
-
 	if g.RateCounters {
 		d["rate"], _ = g.CounterCache.RateFloat64(name+labels.String(), value)
 	}
@@ -222,16 +210,6 @@ func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 			Bucket: histogram.buckets,
 		}
 
-		//events = append(events, collector.PromEvent{
-		//	Data: common.MapStr{
-		//		name: common.MapStr{
-		//			"histogram": xcollector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
-		//		},
-		//	},
-		//	Labels:    histogram.labels,
-		//	Timestamp: histogram.timestamp,
-		//})
-
 		data := common.MapStr{
 			name: common.MapStr{
 				"histogram": xcollector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
@@ -248,7 +226,7 @@ func findType(metricName string, labels common.MapStr) string {
 	}
 	if strings.Contains(metricName, "_total") || strings.Contains(metricName, "_sum") {
 		return "counter_float"
-	} else if strings.Contains(metricName, "_sum") {
+	} else if strings.Contains(metricName, "_count") {
 		return "counter_int"
 	} else if strings.Contains(metricName, "_bucket") && leLabel {
 		return "histogram"
