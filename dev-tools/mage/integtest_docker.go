@@ -22,6 +22,7 @@ import (
 	"go/build"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -162,6 +163,13 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 	// Fix file permissions after test is done writing files as root.
 	if runtime.GOOS != "windows" {
+		repo, err := GetProjectRepoInfo()
+		if err != nil {
+			return err
+		}
+
+		// Handle virtualenv and the current project dir.
+		defer DockerChown(path.Join(repo.RootDir, "build"))
 		defer DockerChown(".")
 	}
 	return test()
