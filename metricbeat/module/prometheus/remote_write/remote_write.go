@@ -18,7 +18,6 @@
 package remote_write
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -135,7 +134,6 @@ func (m *MetricSet) Close() error {
 }
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
-	fmt.Println("handleFunc 1")
 	if !m.eventGenStarted {
 		m.promEventsGen.Start()
 		m.eventGenStarted = true
