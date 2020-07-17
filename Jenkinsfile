@@ -395,6 +395,11 @@ pipeline {
                 makeTarget(context: "Libbeat oss crosscompile", target: "-C libbeat crosscompile")
               }
             }
+            stage('Libbeat stress-tests'){
+              steps {
+                makeTarget(context: "Libbeat stress-tests", target: "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
+              }
+            }
           }
         }
         stage('Libbeat x-pack'){
