@@ -13,6 +13,8 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -64,6 +66,7 @@ type EnrollCmdOption struct {
 	Insecure             bool
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
+	Staging              string
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -173,11 +176,19 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	agentConfig := map[string]interface{}{
+		"id": resp.Item.ID,
+	}
+	if c.options.Staging != "" {
+		staging := fmt.Sprintf("https://staging.elastic.co/%s-%s/downloads/", release.Version(), c.options.Staging[:8])
+		agentConfig["download"] = map[string]interface{}{
+			"sourceURI": staging,
+		}
+	}
+
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
-		"agent": map[string]interface{}{
-			"id": resp.Item.ID,
-		},
+		"agent": agentConfig,
 	}
 
 	reader, err := yamlToReader(configToStore)
