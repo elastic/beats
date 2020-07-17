@@ -8,7 +8,7 @@
 === awscloudwatch input
 
 ++++
-<titleabbrev>awscloudwatch</titleabbrev>
+<titleabbrev>AWS CloudWatch</titleabbrev>
 ++++
 
 beta[]
