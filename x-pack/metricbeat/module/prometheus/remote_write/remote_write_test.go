@@ -467,7 +467,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 
 }
 
-// TestGenerateEventsQuantilesDifferentLabels tests multiple gauges with different labels
+// TestGenerateEventsQuantilesDifferentLabels tests summaries with different labels
 func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
@@ -658,4 +658,407 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	e = events[labels3.String()]
 	assert.EqualValues(t, e.ModuleFields, expected3)
 
+}
+
+
+// TestGenerateEventsHistogramsDifferentLabels tests histograms with different labels
+func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
+
+	counters := xcollector.NewCounterCache(1 * time.Second)
+
+	g := RemoteWriteTypedGenerator{
+		CounterCache: counters,
+		RateCounters: true,
+	}
+	g.CounterCache.Start()
+	labels := common.MapStr{
+		"runtime": model.LabelValue("linux"),
+	}
+	labels2 := common.MapStr{
+		"runtime": model.LabelValue("darwin"),
+	}
+
+	// first fetch
+	metrics := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(42),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(43),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(44),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_sum",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(45),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_count",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(46),
+			Timestamp: model.Time(424242),
+		},
+		// second histogram same label
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(52),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(53),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(54),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_sum",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(55),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_count",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(56),
+			Timestamp: model.Time(424242),
+		},
+		// third histogram different label
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(62),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(63),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(64),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_sum",
+				"runtime": "darwin",
+			},
+			Value: model.SampleValue(65),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_count",
+				"runtime": "darwin",
+			},
+			Value: model.SampleValue(66),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events := g.GenerateEvents(metrics)
+
+
+	expected := common.MapStr{
+		"http_request_duration_seconds": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
+			},
+		},
+		"http_request_duration_seconds_sum": common.MapStr{
+			"counter": float64(45),
+			"rate": float64(0),
+		},
+		"http_request_duration_seconds_count": common.MapStr{
+			"counter": uint64(46),
+			"rate": uint64(0),
+		},
+		"http_request_bytes": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
+			},
+		},
+		"http_request_bytes_sum": common.MapStr{
+			"counter": float64(55),
+			"rate": float64(0),
+		},
+		"http_request_bytes_count": common.MapStr{
+			"counter": uint64(56),
+			"rate": uint64(0),
+		},
+		"labels": labels,
+	}
+	expected2 := common.MapStr{
+		"http_request_bytes": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
+			},
+		},
+		"http_request_bytes_sum": common.MapStr{
+			"counter": float64(65),
+			"rate": float64(0),
+		},
+		"http_request_bytes_count": common.MapStr{
+			"counter": uint64(66),
+			"rate": uint64(0),
+		},
+		"labels": labels2,
+	}
+
+	assert.Equal(t, 2, len(events))
+	e := events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+	e = events[labels2.String()]
+	assert.EqualValues(t, e.ModuleFields, expected2)
+
+	// repeat in order to test the rate
+	metrics = model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(142),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(143),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_bucket",
+				"runtime": "linux",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(144),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_sum",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(145),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_duration_seconds_count",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(146),
+			Timestamp: model.Time(424242),
+		},
+		// second histogram same label
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(252),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(253),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "linux",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(254),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_sum",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(255),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_count",
+				"runtime": "linux",
+			},
+			Value: model.SampleValue(256),
+			Timestamp: model.Time(424242),
+		},
+		// third histogram different label
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "0.25",
+			},
+			Value: model.SampleValue(362),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "0.50",
+			},
+			Value: model.SampleValue(363),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_bucket",
+				"runtime": "darwin",
+				"le": "+Inf",
+			},
+			Value: model.SampleValue(364),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_sum",
+				"runtime": "darwin",
+			},
+			Value: model.SampleValue(365),
+			Timestamp: model.Time(424242),
+		},
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__": "http_request_bytes_count",
+				"runtime": "darwin",
+			},
+			Value: model.SampleValue(366),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events = g.GenerateEvents(metrics)
+
+
+	expected = common.MapStr{
+		"http_request_duration_seconds": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(100), uint64(100), uint64(100)},
+			},
+		},
+		"http_request_duration_seconds_sum": common.MapStr{
+			"counter": float64(145),
+			"rate": float64(100),
+		},
+		"http_request_duration_seconds_count": common.MapStr{
+			"counter": uint64(146),
+			"rate": uint64(100),
+		},
+		"http_request_bytes": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(200), uint64(200), uint64(200)},
+			},
+		},
+		"http_request_bytes_sum": common.MapStr{
+			"counter": float64(255),
+			"rate": float64(200),
+		},
+		"http_request_bytes_count": common.MapStr{
+			"counter": uint64(256),
+			"rate": uint64(200),
+		},
+		"labels": labels,
+	}
+	expected2 = common.MapStr{
+		"http_request_bytes": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(0.125),float64(0.375), float64(0.75)},
+				"counts": []uint64{uint64(300), uint64(300), uint64(300)},
+			},
+		},
+		"http_request_bytes_sum": common.MapStr{
+			"counter": float64(365),
+			"rate": float64(300),
+		},
+		"http_request_bytes_count": common.MapStr{
+			"counter": uint64(366),
+			"rate": uint64(300),
+		},
+		"labels": labels2,
+	}
+
+	assert.Equal(t, 2, len(events))
+	e = events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+	e = events[labels2.String()]
+	assert.EqualValues(t, e.ModuleFields, expected2)
 }

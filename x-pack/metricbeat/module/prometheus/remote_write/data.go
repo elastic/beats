@@ -72,7 +72,7 @@ func (g *RemoteWriteTypedGenerator) Stop() {
 
 func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	var data common.MapStr
-	var histograms map[string]histogram
+	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
@@ -93,6 +93,11 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
 			// join metrics with same labels in a single event
 			labelsHash := labels.String()
+			labelsClone := labels.Clone()
+			labelsClone.Delete("le")
+			if promType == "histogram" {
+				labelsHash = labelsClone.String()
+			}
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = mb.Event{
 					ModuleFields: common.MapStr{},
@@ -101,11 +106,10 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				// Add labels
 				if len(labels) > 0 {
 					if promType == "histogram" {
-						labelsClone := labels.Clone()
-						labelsClone.Delete("le")
-						labels = labelsClone.Clone()
+						eventList[labelsHash].ModuleFields["labels"] = labelsClone
+					} else {
+						eventList[labelsHash].ModuleFields["labels"] = labels
 					}
-					eventList[labelsHash].ModuleFields["labels"] = labels
 				}
 			}
 
@@ -127,9 +131,6 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 					},
 				}
 			case "histogram":
-				labelsClone := labels.Clone()
-				labelsClone.Delete("le")
-
 				histKey := name + labelsClone.String()
 
 				le, _ := labels.GetValue("le")
@@ -152,6 +153,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				hist.timestamp = metric.Timestamp.Time()
 				hist.labels = labelsClone
 				hist.metricName = name
+				histograms[histKey] = hist
 				continue
 			}
 			e.ModuleFields.Update(data)
@@ -188,13 +190,11 @@ func (g *RemoteWriteTypedGenerator) rateCounterFloat64(name string, labels commo
 }
 
 func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
-	for name, histogram := range histograms {
+	for _, histogram := range histograms {
 		labelsHash := histogram.labels.String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				ModuleFields: common.MapStr{
-					"metrics": common.MapStr{},
-				},
+				ModuleFields: common.MapStr{},
 			}
 
 			// Add labels
@@ -209,13 +209,13 @@ func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 		hist := dto.Histogram{
 			Bucket: histogram.buckets,
 		}
-
+		name := strings.TrimSuffix(histogram.metricName, "_bucket")
 		data := common.MapStr{
 			name: common.MapStr{
 				"histogram": xcollector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
 			},
 		}
-		e.ModuleFields["metrics"].(common.MapStr).Update(data)
+		e.ModuleFields.Update(data)
 	}
 }
 
