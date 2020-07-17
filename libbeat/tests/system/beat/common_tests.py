@@ -24,10 +24,10 @@ class TestExportsMixin:
         assert exit_code == 0
         output = self.get_log()
         trailer = "\nPASS\n"
-        if not output.endswith(trailer):
-            raise Exception("didn't return expected trailer:{} got:{}".format(trailer.__repr__(),
-                                                                              output[-100:].__repr__()))
-        return output[:-len(trailer)]
+        pos = output.rfind(trailer)
+        if pos == -1:
+            raise Exception("didn't return expected trailer:{} got:{}".format(trailer.__repr__(),                                                   output[-100:].__repr__()))
+        return output[:pos]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_ilm_policy(self):
