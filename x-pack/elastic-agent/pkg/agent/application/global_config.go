@@ -26,8 +26,10 @@ func InjectAgentConfig(c *config.Config) error {
 func agentGlobalConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"path": map[string]interface{}{
-			"data": paths.Data(),
-			"home": paths.Home(),
+			"data":   paths.Data(),
+			"config": paths.Config(),
+			"home":   paths.Home(),
+			"logs":   paths.Logs(),
 		},
 	}
 }
