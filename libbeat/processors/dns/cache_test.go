@@ -101,17 +101,28 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 
-	// Cache returned TTL=0 with MinTTL.
+	minTTL := defaultConfig.CacheConfig.SuccessCache.MinTTL
+	// Initial success returned TTL=0 with MinTTL.
 	ptr, err = c.LookupPTR(gatewayIP + "2")
 	if assert.NoError(t, err) {
 		assert.EqualValues(t, gatewayName, ptr.Host)
-		assert.EqualValues(t, 0, ptr.TTL)
+
+		assert.EqualValues(t, minTTL/time.Second, ptr.TTL)
 		assert.EqualValues(t, 3, c.stats.Hit.Get())
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
 
-		minTTL := defaultConfig.CacheConfig.SuccessCache.MinTTL
 		expectedExpire := time.Now().Add(minTTL).Unix()
 		gotExpire := c.success.data[gatewayIP+"2"].expires.Unix()
 		assert.InDelta(t, expectedExpire, gotExpire, 1)
+	}
+
+	// Cached success from a previous TTL=0 response.
+	ptr, err = c.LookupPTR(gatewayIP + "2")
+	if assert.NoError(t, err) {
+		assert.EqualValues(t, gatewayName, ptr.Host)
+		// TTL counts down while in cache.
+		assert.InDelta(t, minTTL/time.Second, ptr.TTL, 1)
+		assert.EqualValues(t, 4, c.stats.Hit.Get())
+		assert.EqualValues(t, 4, c.stats.Miss.Get())
 	}
 }
