@@ -725,22 +725,26 @@ function AuditProcessor(tenant_names, debug) {
         'Yammer': yammerSchema(debug).Run,
     }));
 
-    builder.Add("extractClientIPv4Port", new processor.Dissect({
-        tokenizer: '%{ip}:%{port}',
+    builder.Add("extractClientIPPortBrackets", new processor.Dissect({
+        tokenizer: '[%{_ip}]:%{port}',
         field: 'client.address',
         target_prefix: 'client',
         'when.and': [
-            {'contains.client.address': '.'},
-            {'contains.client.address': ':'},
+            {'not.has_fields': ['client._ip', 'client.port']},
+            {'contains.client.address': ']:'},
         ],
     }));
-    builder.Add("extractClientIPv6Port", new processor.Dissect({
-        tokenizer: '[%{ip}]:%{port}',
+    builder.Add("extractClientIPv4Port", new processor.Dissect({
+        tokenizer: '%{_ip}:%{port}',
         field: 'client.address',
         target_prefix: 'client',
         'when.and': [
-            {'contains.client.address': '['},
+            {'not.has_fields': ['client._ip', 'client.port']},
+            {'contains.client.address': '.'},
             {'contains.client.address': ':'},
+            // Best effort to avoid parsing IPv6-mapped IPv4 as ip:port.
+            // Won't succeed if IPv6 address is not shortened.
+            {'not.contains.client.address': '::'},
         ],
     }));
 
@@ -749,11 +753,14 @@ function AuditProcessor(tenant_names, debug) {
         fields: [
             {from: "client.address", to: "client.ip", type: "ip"},
             {from: "server.address", to: "server.ip", type: "ip"},
+            {from: "client._ip",     to: "client.ip", type: "ip"},
         ],
         ignore_missing: true,
         fail_on_error: false
     }));
-
+    builder.Add("removeTempIP", function (evt) {
+        evt.Delete("client._ip");
+    });
     builder.Add("setSrcDstFields", new processor.Convert({
         fields: [
             {from: "client.ip", to: "source.ip"},

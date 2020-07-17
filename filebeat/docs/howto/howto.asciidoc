@@ -5,27 +5,39 @@
 --
 Learn how to perform common {beatname_uc} configuration tasks.
 
-* <<configuration-filebeat-options>>
+* <<override-{beatname_lc}-config-settings>
+* <<{beatname_lc}-template>>
+* <<change-index-name>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
 * <<{beatname_lc}-geoip>>
 * <<{beatname_lc}-deduplication>>
-* <<using-environ-vars>>
 * <<configuring-ingest-node>>
+* <<using-environ-vars>>
 * <<yaml-tips>>
 
 
 --
 
-include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
+include::override-config-settings.asciidoc[]
+
+include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
+
+include::{libbeat-dir}/howto/change-index-name.asciidoc[]
+
+include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
+
+include::load-ingest-pipelines.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
+
 :standalone:
 include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
-
-include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
 :standalone:
 include::{libbeat-dir}/yaml.asciidoc[]

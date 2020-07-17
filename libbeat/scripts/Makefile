@@ -25,8 +25,7 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
-INSTALL_FLAG?=-mod=vendor
-INSTALL_CMD?=install ${INSTALL_FLAG}
+INSTALL_CMD?=get
 export INSTALL_FLAG
 export INSTALL_CMD
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
@@ -146,7 +145,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL)
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
 ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
-	go install -mod=vendor github.com/mitchellh/gox
+	go ${INSTALL_CMD} github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 endif
@@ -175,7 +174,7 @@ fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on th
 
 .PHONY: lint
 lint:
-	@go install -mod=vendor $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	@go {INSTALL_CMD} $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 .PHONY: clean
@@ -204,7 +203,8 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	GOFLAGS="${INSTALL_FLAG}" \
+		$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
@@ -214,7 +214,8 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	GOFLAGS="${INSTALL_FLAG}" \
+		$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
@@ -228,7 +229,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
-	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  -e BEATS_INSIDE_INTEGRATION_TEST_ENV=${BEATS_INSIDE_INTEGRATION_TEST_ENV} \
 	  -e GOFLAGS=${INSTALL_FLAG} \
 	  beat make integration-tests
 
@@ -359,7 +360,7 @@ update: python-env fields collect config ## @build Update expects the most recen
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	go run ${INSTALL_FLAG} ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
@@ -491,7 +492,3 @@ ifdef NO_COLLECT
 .PHONY: collect
 collect:
 endif
-
-.PHONY: vendor
-vendor:
-	@mage vendor

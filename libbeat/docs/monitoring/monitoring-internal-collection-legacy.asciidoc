@@ -11,9 +11,9 @@
 
 [role="xpack"]
 [[monitoring-internal-collection-legacy]]
-== Use legacy internal collection to send monitoring data
+== Use legacy collection to send monitoring data
 ++++
-<titleabbrev>Use legacy internal collection (deprecated)</titleabbrev>
+<titleabbrev>Use legacy collection (deprecated)</titleabbrev>
 ++++
 
 deprecated[7.2.0]
@@ -23,10 +23,10 @@ that sent monitoring data to the production cluster, which would either index
 the data locally, or forward the data to a dedicated monitoring cluster via HTTP
 exporters.
 
-Starting in {beatname_uc} version 7.2, the legacy settings for internal
-collection are deprecated and will be removed in version 8.0.0. Instead of
-sending monitoring data to your production cluster, it's recommended that you
-use the configuration described under
+Starting in {beatname_uc} version 7.2, legacy collection settings are deprecated
+and will be removed in version 8.0.0. Instead of sending monitoring data to your
+production cluster, it's recommended that you use the configuration described
+under
 <<monitoring-internal-collection,internal collection>> to route
 monitoring data directly to your monitoring cluster.
 

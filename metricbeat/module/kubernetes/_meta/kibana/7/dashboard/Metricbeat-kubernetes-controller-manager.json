@@ -329,7 +329,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "30s",
             "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_controllermanager_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
@@ -475,7 +475,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -585,7 +585,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -658,7 +658,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -728,7 +728,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -816,7 +816,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -893,7 +893,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -972,7 +972,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {

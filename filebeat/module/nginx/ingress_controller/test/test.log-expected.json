@@ -13,7 +13,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "post",
+        "http.request.method": "POST",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -32,8 +32,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -54,7 +58,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -73,8 +77,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -95,7 +103,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "delete",
+        "http.request.method": "DELETE",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -114,8 +122,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -136,7 +148,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "patch",
+        "http.request.method": "PATCH",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -155,8 +167,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -177,7 +193,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "patchp",
+        "http.request.method": "PATCHp",
         "http.response.body.bytes": 163,
         "http.response.status_code": 400,
         "http.version": "1.1",
@@ -191,8 +207,12 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42"
     },
     {
@@ -223,8 +243,12 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42"
     },
     {
@@ -241,7 +265,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -260,8 +284,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
@@ -282,7 +310,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -301,8 +329,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -326,7 +358,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -346,8 +378,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -371,7 +407,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -390,8 +426,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -415,7 +455,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -435,8 +475,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -460,7 +504,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -479,8 +523,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -504,7 +552,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -524,8 +572,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -549,7 +601,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -568,8 +620,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -593,7 +649,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -612,8 +668,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -637,7 +697,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -657,8 +717,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -682,7 +746,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -701,8 +765,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -726,7 +794,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -746,8 +814,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -771,7 +843,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -790,8 +862,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42?address=delhi+technological+university",
         "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
@@ -812,7 +888,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -831,8 +907,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -856,7 +936,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -875,8 +955,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -900,7 +984,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -919,8 +1003,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2/some",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",

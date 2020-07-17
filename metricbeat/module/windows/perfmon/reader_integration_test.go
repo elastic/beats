@@ -77,7 +77,7 @@ func TestReadSuccessfully(t *testing.T) {
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
 	assert.Nil(t, err)
-	assert.NotNil(t, events)
+	assert.Nil(t, events)
 	assert.Zero(t, len(events))
 	events, err = reader.Read()
 	assert.Nil(t, err)

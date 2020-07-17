@@ -51,4 +51,4 @@ output.elasticsearch:
 
 processors:
   - add_cloudfoundry_metadata:
-    <<: *cloudfoundry
+      <<: *cloudfoundry

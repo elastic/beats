@@ -1,5 +1,0 @@
----
-comments:
-  - label: needs_team
-    comment: |
-      This issue doesn't have a `Team:<team>` label.

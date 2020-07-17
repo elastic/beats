@@ -18,6 +18,7 @@
         "file.name": "Screenshot 2020-01-27 at 11.30.48.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 0,
         "network.type": "ipv4",
@@ -59,6 +60,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -90,6 +94,7 @@
         "file.name": "Screenshot 2020-01-27 at 11.30.48.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 1130,
         "network.type": "ipv4",
@@ -131,6 +136,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -162,6 +170,7 @@
         "file.name": "All.aspx",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 2260,
         "network.type": "ipv4",
@@ -203,6 +212,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -234,6 +246,7 @@
         "file.name": "All.aspx",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 3346,
         "network.type": "ipv4",
@@ -275,6 +288,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -306,6 +322,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 4432,
         "network.type": "ipv4",
@@ -348,6 +365,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -379,6 +399,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 5540,
         "network.type": "ipv4",
@@ -420,6 +441,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -451,6 +475,7 @@
         "file.name": "Screenshot 2020-01-27 at 11.30.48.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 6625,
         "network.type": "ipv4",
@@ -492,6 +517,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -523,6 +551,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 7755,
         "network.type": "ipv4",
@@ -565,6 +594,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -596,6 +628,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 8863,
         "network.type": "ipv4",
@@ -637,6 +670,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -668,6 +704,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 9948,
         "network.type": "ipv4",
@@ -709,6 +746,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -740,6 +780,7 @@
         "file.name": "Screenshot.png",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 11033,
         "network.type": "ipv4",
@@ -781,6 +822,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",

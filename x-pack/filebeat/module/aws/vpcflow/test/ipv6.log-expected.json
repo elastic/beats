@@ -38,6 +38,9 @@
         "source.bytes": 8855,
         "source.ip": "2001:db8:1234:a100:8d6e:3477:df66:f105",
         "source.packets": 54,
-        "source.port": 34892
+        "source.port": 34892,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

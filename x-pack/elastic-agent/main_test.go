@@ -8,17 +8,21 @@ import (
 	"flag"
 	"testing"
 
-	// Just using this a place holder.
-	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	"github.com/spf13/cobra"
 )
 
 var systemTest *bool
 
 func init() {
 	testing.Init()
+
+	cmd := &cobra.Command{
+		Use: "elastic-agent [subcommand]",
+	}
+
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
 
 // Test started when the test binary is started. Only calls main.

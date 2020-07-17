@@ -84,14 +84,15 @@ processors:
       value: aws
 
   - set:
-      if: "ctx?.aws?.vpcflow?.account_id != null"
       field: cloud.account.id
       value: "{{aws.vpcflow.account_id}}"
+      ignore_empty_value: true
 
   - set:
-      if: "ctx?.aws?.vpcflow?.instance_id != null && ctx.aws.vpcflow.instance_id != '-'"
+      if: "ctx.aws.vpcflow.instance_id != '-'"
       field: cloud.instance.id
       value: "{{aws.vpcflow.instance_id}}"
+      ignore_empty_value: true
 
   - set:
       field: event.kind

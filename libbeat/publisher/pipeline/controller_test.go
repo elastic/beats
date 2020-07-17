@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -43,7 +44,7 @@ func TestOutputReload(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			goroutines := resources.NewGoroutinesChecker()
 			defer goroutines.Check(t)

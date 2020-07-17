@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-istio-pilot]]
-=== istio pilot metricset
+=== Istio pilot metricset
 
 beta[]
 

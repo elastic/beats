@@ -40,17 +40,14 @@ processors:
         ctx.event.outcome = 'failure';
       }
 
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - set:
     field: host.id
     value: "{{elasticsearch.node.id}}"
-    if: "ctx?.elasticsearch?.node?.id != null"
+    ignore_empty_value: true
 - set:
     field: host.name
     value: "{{elasticsearch.node.name}}"
-    if: "ctx?.elasticsearch?.node?.name != null"
+    ignore_empty_value: true
 - append:
     field: related.user
     value: "{{user.name}}"

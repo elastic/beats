@@ -10,10 +10,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -21,9 +24,11 @@ import (
 
 type emitterFunc func(*config.Config) error
 
-// ConfigHandler is capable of handling config and perform actions at it.
+// ConfigHandler is capable of handling config, perform actions at it, shutdown any long running process.
 type ConfigHandler interface {
 	HandleConfig(configrequest.Request) error
+	Close() error
+	Shutdown()
 }
 
 type discoverFunc func() ([]string, error)
@@ -37,8 +42,10 @@ type Local struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
+	router      *router
 	source      source
 	agentInfo   *info.AgentInfo
+	srv         *server.Server
 }
 
 type source interface {
@@ -53,9 +60,13 @@ func newLocal(
 	pathConfigFile string,
 	rawConfig *config.Config,
 ) (*Local, error) {
-	var err error
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	if log == nil {
-		log, err = logger.New()
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -65,12 +76,7 @@ func newLocal(
 		return nil, err
 	}
 
-	c := localConfigDefault()
-	if err := rawConfig.Unpack(c); err != nil {
-		return nil, errors.New(err, "initialize local mode")
-	}
-
-	logR := logreporter.NewReporter(log, c.Management.Reporting)
+	logR := logreporter.NewReporter(log)
 
 	localApplication := &Local{
 		log:       log,
@@ -78,29 +84,42 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
+	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
+	if err != nil {
+		return nil, errors.New(err, "initialize GRPC listener")
+	}
 
 	reporter := reporting.NewReporter(localApplication.bgContext, log, localApplication.agentInfo, logR)
 
-	monitor, err := monitoring.NewMonitor(rawConfig)
+	monitor, err := monitoring.NewMonitor(cfg.Settings)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, rawConfig, nil, reporter, monitor))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, cfg.Settings, localApplication.srv, reporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
+	localApplication.router = router
 
-	discover := discoverer(pathConfigFile, c.Management.Path)
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
+	discover := discoverer(pathConfigFile, cfg.Settings.Path)
+	emit := emitter(
+		log,
+		router,
+		&configModifiers{
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+		},
+		monitor,
+	)
 
 	var cfgSource source
-	if !c.Management.Reload.Enabled {
+	if !cfg.Settings.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
 		cfgSource = newOnce(log, discover, emit)
 	} else {
-		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Management.Reload.Period)
-		cfgSource = newPeriodic(log, c.Management.Reload.Period, discover, emit)
+		log.Debugf("Reloading of configuration is on, frequency is set to %s", cfg.Settings.Reload.Period)
+		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, emit)
 	}
 
 	localApplication.source = cfgSource
@@ -113,6 +132,9 @@ func (l *Local) Start() error {
 	l.log.Info("Agent is starting")
 	defer l.log.Info("Agent is stopped")
 
+	if err := l.srv.Start(); err != nil {
+		return err
+	}
 	if err := l.source.Start(); err != nil {
 		return err
 	}
@@ -122,8 +144,11 @@ func (l *Local) Start() error {
 
 // Stop stops a local agent.
 func (l *Local) Stop() error {
+	err := l.source.Stop()
 	l.cancelCtxFn()
-	return l.source.Stop()
+	l.router.Shutdown()
+	l.srv.Stop()
+	return err
 }
 
 // AgentInfo retrieves agent information.

@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-22T11:34:33.783048Z",
     "event": {
       "action": "added-group-account",
+      "category": "iam",
       "code": 4754,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "group"
+      ]
     },
     "group": {
       "domain": "WLBEAT",

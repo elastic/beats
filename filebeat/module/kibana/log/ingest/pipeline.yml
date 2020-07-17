@@ -70,7 +70,7 @@ processors:
 - set:
     field: source.ip
     value: '{{source.address}}'
-    if: ctx.source?.address != null
+    ignore_empty_value: true
 - rename:
     field: kibana.log.meta.req.url
     target_field: url.original

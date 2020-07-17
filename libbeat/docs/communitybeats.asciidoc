@@ -23,6 +23,7 @@ endif::[]
 NOTE: Elastic provides no warranty or support for community-sourced Beats.
 
 [horizontal]
+https://github.com/visasimbu/IIBBeat[IIBBeat]:: Periodically executes shell commands or batch commands to collect IBM Integration node, Integration server, app status, bar file deployment time and bar file location to Logstash or Elasticsearch.
 https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.

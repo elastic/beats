@@ -117,7 +117,8 @@ func TestParseDHCPRequest(t *testing.T) {
 				"port": 67,
 			},
 			"event": common.MapStr{
-				"category": "network_traffic",
+				"category": []string{"network_traffic", "network"},
+				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
@@ -128,6 +129,9 @@ func TestParseDHCPRequest(t *testing.T) {
 				"protocol":     "dhcpv4",
 				"bytes":        272,
 				"community_id": "1:t9O1j0qj71O4wJM7gnaHtgmfev8=",
+			},
+			"related": common.MapStr{
+				"ip": []string{"0.0.0.0", "255.255.255.255"},
 			},
 			"dhcpv4": common.MapStr{
 				"client_mac":     "00:0b:82:01:fc:42",
@@ -197,7 +201,8 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes": 300,
 			},
 			"event": common.MapStr{
-				"category": "network_traffic",
+				"category": []string{"network_traffic", "network"},
+				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
@@ -209,7 +214,9 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes":        300,
 				"community_id": "1:VbRSZnvQqvLiQRhYHLrdVI17sLQ=",
 			},
-
+			"related": common.MapStr{
+				"ip": []string{"192.168.0.1", "192.168.0.10"},
+			},
 			"dhcpv4": common.MapStr{
 				"assigned_ip":    "192.168.0.10",
 				"client_mac":     "00:0b:82:01:fc:42",

@@ -75,6 +75,8 @@ processors:
  - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
  - convert: { type: long, ignore_missing: true, field: source.nat.port }
  - convert: { type: long, ignore_missing: true, field: destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: client.nat.port }
+ - convert: { type: long, ignore_missing: true, field: server.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
@@ -195,8 +197,6 @@ processors:
        - intrusion_detection
        - network
      if: 'ctx?._temp_?.message_type == "THREAT"'
- - drop:
-     if: 'ctx?.event?.category == null'
  - append:
      field: event.type
      value: allowed
@@ -442,7 +442,7 @@ processors:
  - set:
      field: rule.name
      value: "{{panw.panos.ruleset}}"
-     if: "ctx?.panw?.panos?.ruleset != null"
+     ignore_empty_value: true
 
  - append:
      field: related.user
@@ -474,6 +474,22 @@ processors:
      field:
        - _temp_
      ignore_missing: true
+
+# Remove NAT fields when translation was not done.
+ - remove:
+     field:
+       - source.nat.ip
+       - source.nat.port
+       - client.nat.ip
+       - client.nat.port
+     if: 'ctx?.source?.nat?.ip == "0.0.0.0" && ctx?.source?.nat?.port == 0'
+ - remove:
+     field:
+       - destination.nat.ip
+       - destination.nat.port
+       - server.nat.ip
+       - server.nat.port
+     if: 'ctx?.destination?.nat?.ip == "0.0.0.0" && ctx?.destination?.nat?.port == 0'
 
 on_failure:
   - set:

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -28,6 +29,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -62,6 +65,9 @@ var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
 var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+
+// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
+var BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -106,6 +112,14 @@ type License struct {
 type licenseWrapper struct {
 	License License `json:"license"`
 }
+
+var BulkStatsDict = c.Dict("bulk", s.Schema{
+	"total_operations":     c.Int("total_operations"),
+	"total_time_in_millis": c.Int("total_time_in_millis"),
+	"total_size_in_bytes":  c.Int("total_size_in_bytes"),
+	"avg_time_in_millis":   c.Int("avg_time_in_millis"),
+	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
+}, c.DictOptional)
 
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
@@ -248,18 +262,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	}
 
 	// License not found in cache, fetch it from Elasticsearch
-	info, err := GetInfo(http, resetURI)
-	if err != nil {
-		return nil, err
-	}
-	var licensePath string
-	if info.Version.Number.Major < 7 {
-		licensePath = "_xpack/license"
-	} else {
-		licensePath = "_license"
-	}
-
-	content, err := fetchPath(http, resetURI, licensePath, "")
+	content, err := fetchPath(http, resetURI, "_license", "")
 	if err != nil {
 		return nil, err
 	}
@@ -355,6 +358,61 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	var xpack XPack
 	err = json.Unmarshal(content, &xpack)
 	return xpack, err
+}
+
+type boolStr bool
+
+func (b *boolStr) UnmarshalJSON(raw []byte) error {
+	var bs string
+	err := json.Unmarshal(raw, &bs)
+	if err != nil {
+		return err
+	}
+
+	bv, err := strconv.ParseBool(bs)
+	if err != nil {
+		return err
+	}
+
+	*b = boolStr(bv)
+	return nil
+}
+
+type IndexSettings struct {
+	Hidden bool
+}
+
+// GetIndicesSettings returns a map of index names to their settings.
+// Note that as of now it is optimized to fetch only the "hidden" index setting to keep the memory
+// footprint of this function call as low as possible.
+func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSettings, error) {
+	content, err := fetchPath(http, resetURI, "*/_settings", "filter_path=*.settings.index.hidden&expand_wildcards=all")
+
+	if err != nil {
+		return nil, errors.Wrap(err, "could not fetch indices settings")
+	}
+
+	var resp map[string]struct {
+		Settings struct {
+			Index struct {
+				Hidden boolStr `json:"hidden"`
+			} `json:"index"`
+		} `json:"settings"`
+	}
+
+	err = json.Unmarshal(content, &resp)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse indices settings response")
+	}
+
+	ret := make(map[string]IndexSettings, len(resp))
+	for index, settings := range resp {
+		ret[index] = IndexSettings{
+			Hidden: bool(settings.Settings.Index.Hidden),
+		}
+	}
+
+	return ret, nil
 }
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled

@@ -20,6 +20,7 @@
 package logstash
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -93,7 +94,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	host := getElasticsearchHost()
 	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
-	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "")
+	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "", outil.SelectorLowerCase)
 	indexSel := outil.MakeSelector(indexFmtExpr)
 	index, _ = indexSel.Select(&beat.Event{
 		Timestamp: ts,
@@ -301,7 +302,7 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 			},
 		},
 	)
-	ls.Publish(batch)
+	ls.Publish(context.Background(), batch)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -546,7 +547,7 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	t.Publish(outest.NewBatch(event))
+	t.Publish(context.Background(), outest.NewBatch(event))
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
@@ -560,7 +561,7 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 		wg.Done()
 	}
 
-	t.Publish(batch)
+	t.Publish(context.Background(), batch)
 	wg.Wait()
 	return ok
 }

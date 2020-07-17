@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-22T11:32:35.1274042Z",
     "event": {
       "action": "deleted-group-account",
+      "category": "iam",
       "code": 4734,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "deletion",
+        "group"
+      ]
     },
     "group": {
       "domain": "WLBEAT",

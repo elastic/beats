@@ -19,7 +19,7 @@
         ],
         "fileset.name": "access",
         "http.request.body.bytes": 456,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 123,
         "http.response.status_code": 200,
         "http.version": "1.1",

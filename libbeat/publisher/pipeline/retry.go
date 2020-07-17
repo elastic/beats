@@ -19,8 +19,6 @@ package pipeline
 
 import (
 	"sync"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // retryer is responsible for accepting and managing failed send attempts. It
@@ -31,7 +29,7 @@ import (
 // will the consumer be paused, until some batches have been processed by some
 // outputs.
 type retryer struct {
-	logger   *logp.Logger
+	logger   logger
 	observer outputObserver
 
 	done chan struct{}
@@ -77,7 +75,7 @@ const (
 )
 
 func newRetryer(
-	log *logp.Logger,
+	log logger,
 	observer outputObserver,
 	out workQueue,
 	c interruptor,

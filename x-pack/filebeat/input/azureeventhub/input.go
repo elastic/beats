@@ -85,11 +85,7 @@ func NewInput(
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -203,14 +199,32 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
-	if err != nil {
-		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-	}
+	var mapObject map[string][]interface{}
 	var messages []string
-	if len(obj[expandEventListFromField]) > 0 {
-		for _, ms := range obj[expandEventListFromField] {
+	// check if the message is a "records" object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		if len(mapObject[expandEventListFromField]) > 0 {
+			for _, ms := range mapObject[expandEventListFromField] {
+				js, err := json.Marshal(ms)
+				if err == nil {
+					messages = append(messages, string(js))
+				} else {
+					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				}
+			}
+		}
+	} else {
+		a.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
+		// in some cases the message is an array
+		var arrayObject []interface{}
+		err = json.Unmarshal(bMessage, &arrayObject)
+		if err != nil {
+			// return entire message
+			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			return []string{string(bMessage)}
+		}
+		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))

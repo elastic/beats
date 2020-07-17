@@ -60,3 +60,18 @@
             - name: sent_packets_count.value
               type: long
               description: Count of packets sent over the network
+        - name: memory.balloon
+          type: group
+          fields:
+            - name: ram_size.value
+              type: long
+              description: The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+            - name: ram_used.value
+              type: long
+              description: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+            - name: swap_in_bytes_count.value
+              type: long
+              description: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+            - name: swap_out_bytes_count.value
+              type: long
+              description: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.

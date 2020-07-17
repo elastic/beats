@@ -37,10 +37,10 @@ The following configuration drops all the DEBUG messages.
 [source,yaml]
 -----------------------------------------------------
 processors:
- - drop_event:
-     when:
+  - drop_event:
+      when:
         regexp:
-           message: "^DBG:"
+          message: "^DBG:"
 -----------------------------------------------------
 
 To drop all the log messages coming from a certain log file:
@@ -48,10 +48,10 @@ To drop all the log messages coming from a certain log file:
 [source,yaml]
 ----------------
 processors:
- - drop_event:
-     when:
+  - drop_event:
+      when:
         contains:
-           source: "test"
+          source: "test"
 ----------------
 
 [float]

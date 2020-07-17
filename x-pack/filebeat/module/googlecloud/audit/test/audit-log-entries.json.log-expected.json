@@ -31,6 +31,9 @@
         "service.name": "cloudbilling.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "xxx@xxx.xxx"
     },
     {
@@ -72,6 +75,9 @@
         "service.name": "compute.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -112,6 +118,12 @@
             "global"
         ],
         "googlecloud.audit.resource_name": "projects/elastic-beats/global/instances",
+        "googlecloud.audit.response.details.group": "batch",
+        "googlecloud.audit.response.details.kind": "jobs",
+        "googlecloud.audit.response.details.name": "gsuite-exporter-1589294700",
+        "googlecloud.audit.response.details.uid": "2beff34a-945f-11ea-bacf-42010a80007f",
+        "googlecloud.audit.response.proto_name": "core.k8s.io/v1.Status",
+        "googlecloud.audit.response.status": "Success",
         "googlecloud.audit.service_name": "compute.googleapis.com",
         "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
         "input.type": "log",
@@ -120,6 +132,9 @@
         "service.name": "compute.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -165,10 +180,13 @@
         "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
         "input.type": "log",
         "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
-        "log.offset": 3541,
+        "log.offset": 3776,
         "service.name": "compute.googleapis.com",
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",

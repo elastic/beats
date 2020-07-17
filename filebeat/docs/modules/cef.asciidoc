@@ -40,6 +40,12 @@ The UDP port to listen for syslog traffic. Defaults to `9003`
 
 NOTE: Ports below 1024 require Filebeat to run as root.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cef, forwarded]`.
+
 [float]
 ==== Forcepoint NGFW Security Management Center
 

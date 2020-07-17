@@ -23,14 +23,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
 )
 
@@ -53,7 +53,8 @@ func TestDockerStart(t *testing.T) {
 
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
-	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config))
+	k, _ := keystore.NewFileKeystore("test")
+	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config), k)
 	if err != nil {
 		t.Fatal(err)
 	}

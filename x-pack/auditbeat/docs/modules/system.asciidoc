@@ -38,6 +38,26 @@ The frequency of these polls is controlled by the `period` configuration
 parameter.
 
 [float]
+==== Entity IDs
+
+This module populates `entity_id` fields to uniquely identify entities (users,
+packages, processes...) within a host. This requires {beatname_uc}
+to obtain a unique identifier for the host:
+
+- Windows: Uses the `HKLM\Software\Microsoft\Cryptography\MachineGuid` registry
+key.
+- macOS: Uses the value returned by `gethostuuid(2)` system call.
+- Linux: Uses the content of one of the following files, created by either
+`systemd` or `dbus`:
+ * /etc/machine-id
+ * /var/lib/dbus/machine-id
+ * /var/db/dbus/machine-id
+
+NOTE: Under CentOS 6.x, it's possible that none of the files above exist.
+In that case, running `dbus-uuidgen --ensure` (provided by the `dbus` package)
+will generate one for you.
+
+[float]
 ==== Example dashboard
 
 The module comes with a sample dashboard:

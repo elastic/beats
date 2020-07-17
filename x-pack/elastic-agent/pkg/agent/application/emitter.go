@@ -26,7 +26,11 @@ type configModifiers struct {
 	Decorators []decoratorFunc
 }
 
-func emitter(log *logger.Logger, router *router, modifiers *configModifiers, reloadables ...reloadable) emitterFunc {
+type programsDispatcher interface {
+	Dispatch(id string, grpProg map[routingKey][]program.Program) error
+}
+
+func emitter(log *logger.Logger, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) emitterFunc {
 	return func(c *config.Config) error {
 		if err := InjectAgentConfig(c); err != nil {
 			return err

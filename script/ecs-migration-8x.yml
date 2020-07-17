@@ -1,0 +1,17 @@
+# The ECS migration file contains the information about all the Beats fields
+# which were changed between 7.x and 8.0.
+#
+# This file will be used to generate breaking change documentation and migrate
+# Kibana dashboards. See script/renamed_fields.py and script/kibana-migration.py.
+#
+# The format of the file is as following:
+#
+# - from: <original-name-in-7x> # Field name in 7.x.
+#   to: <new-name-in-8x>        # Field name in 8.0.
+#   alias: <true|false>         # True if a migration alias exists in fields.yml.
+#   beat: <beatname>            # Omit for libbeat fields.
+
+## Libbeat
+- from: agent.hostname
+  to: agent.name
+  alias: true

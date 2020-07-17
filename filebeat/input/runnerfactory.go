@@ -46,10 +46,9 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 func (r *RunnerFactory) Create(
 	pipeline beat.PipelineConnector,
 	c *common.Config,
-	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
-	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
+	p, err := New(c, connector, r.beatDone, r.registrar.GetStates())
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err
@@ -59,6 +58,6 @@ func (r *RunnerFactory) Create(
 }
 
 func (r *RunnerFactory) CheckConfig(cfg *common.Config) error {
-	_, err := r.Create(pipeline.NewNilPipeline(), cfg, nil)
+	_, err := r.Create(pipeline.NewNilPipeline(), cfg)
 	return err
 }

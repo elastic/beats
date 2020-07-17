@@ -12,7 +12,7 @@
 
 [role="xpack"]
 [[configuration-monitor-legacy]]
-=== Settings for legacy internal collection
+=== Settings for legacy collection
 
 deprecated::[7.2.0,These settings are deprecated and will be removed in version 8.0.0. Instead of sending monitoring data to your production cluster it's recommended that you use the configuration described under <<monitoring-internal-collection>> to route monitoring data directly to your monitoring cluster.]
 

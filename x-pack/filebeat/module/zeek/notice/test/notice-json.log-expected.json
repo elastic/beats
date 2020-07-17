@@ -1,11 +1,24 @@
 [
     {
         "@timestamp": "2011-11-04T19:44:35.879Z",
+        "event.category": [
+            "intrusion_detection"
+        ],
         "event.dataset": "zeek.notice",
+        "event.kind": "alert",
         "event.module": "zeek",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 0,
+        "related.ip": [
+            "172.16.238.1"
+        ],
+        "rule.description": "172.16.238.1 appears to be guessing SSH passwords (seen in 30 connections).",
+        "rule.name": "SSH::Password_Guessing",
         "service.type": "zeek",
         "source.address": "172.16.238.1",
         "source.ip": "172.16.238.1",
@@ -32,11 +45,25 @@
         "destination.geo.region_iso_code": "DE-HE",
         "destination.geo.region_name": "Hesse",
         "destination.ip": "207.154.238.205",
+        "event.category": [
+            "intrusion_detection"
+        ],
         "event.dataset": "zeek.notice",
+        "event.kind": "alert",
         "event.module": "zeek",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 357,
+        "related.ip": [
+            "8.42.77.171",
+            "207.154.238.205"
+        ],
+        "rule.description": "8.42.77.171 scanned at least 15 unique ports of host 207.154.238.205 in 0m0s",
+        "rule.name": "Scan::Port_Scan",
         "service.type": "zeek",
         "source.address": "8.42.77.171",
         "source.as.number": 393552,

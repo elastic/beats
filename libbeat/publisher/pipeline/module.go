@@ -21,6 +21,8 @@ import (
 	"flag"
 	"fmt"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -43,6 +45,7 @@ type Monitors struct {
 	Metrics   *monitoring.Registry
 	Telemetry *monitoring.Registry
 	Logger    *logp.Logger
+	Tracer    *apm.Tracer
 }
 
 // OutputFactory is used by the publisher pipeline to create an output instance.

@@ -255,9 +255,6 @@ func (b GolangCrossBuilder) Build() error {
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
-	if UseVendor {
-		args = append(args, "--env", "GOFLAGS=-mod=vendor")
-	}
 	if CrossBuildMountModcache {
 		// Mount $GOPATH/pkg/mod into the container, read-only.
 		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
@@ -266,6 +263,7 @@ func (b GolangCrossBuilder) Build() error {
 
 	args = append(args,
 		"--rm",
+		"--env", "GOFLAGS=-mod=readonly",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
@@ -297,7 +295,9 @@ func DockerChown(path string) {
 func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
 	numFixed := 0
-	defer log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+	defer func() {
+		log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
 		if err != nil {

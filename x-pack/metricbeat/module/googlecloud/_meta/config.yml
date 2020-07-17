@@ -1,11 +1,11 @@
 - module: googlecloud
   metricsets:
     - compute
-  region: "us-central1"
+  region: "us-"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 1m
 
 - module: googlecloud
   metricsets:
@@ -15,13 +15,28 @@
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 60s
+  period: 1m
 
 - module: googlecloud
   metricsets:
     - storage
-  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 5m
+
+- module: googlecloud
+  metricsets:
+    - metrics
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  metrics:
+    - aligner: ALIGN_NONE
+      service: compute
+      metric_types:
+        - "instance/cpu/reserved_cores"
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+        - "instance/uptime"

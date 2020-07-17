@@ -89,7 +89,7 @@ func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
 		Timestamp: time.Now().Format(fleetTimeFormat),
 		ActionID:  action.ID(),
 		AgentID:   agentID,
-		Message:   fmt.Sprintf("Action '%s' ot type '%s' acknowledged.", action.ID(), action.Type()),
+		Message:   fmt.Sprintf("Action '%s' of type '%s' acknowledged.", action.ID(), action.Type()),
 	}
 }
 

@@ -49,5 +49,5 @@ func Fields() error {
 
 // Config generates example and reference configuration for libbeat.
 func Config() error {
-	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
+	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.DefaultConfigFileParams(), ".")
 }

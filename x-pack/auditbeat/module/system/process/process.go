@@ -66,6 +66,21 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingProcess:
+		return "info"
+	case eventActionProcessStarted:
+		return "start"
+	case eventActionProcessStopped:
+		return "end"
+	case eventActionProcessError:
+		return "info"
+	default:
+		return "info"
+	}
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -319,8 +334,10 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"process"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"process": process.toMapStr(),
 			"message": processMessage(process, action),

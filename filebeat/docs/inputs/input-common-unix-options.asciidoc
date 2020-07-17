@@ -17,6 +17,22 @@ The maximum size of the message received over the socket. The default is `20MiB`
 The path to the Unix socket that will receive event streams.
 
 [float]
+[id="{beatname_lc}-input-{type}-unix-group"]
+==== `group`
+
+The group ownership of the Unix socket that will be created by Filebeat.
+The default is the primary group name for the user Filebeat is running as.
+This option is ignored on Windows.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-mode"]
+==== `mode`
+
+The file mode of the Unix socket that will be created by Filebeat. This is
+expected to be a file mode as an octal string. The default value is the system
+default (generally `0755`).
+
+[float]
 [id="{beatname_lc}-input-{type}-unix-line-delimiter"]
 ==== `line_delimiter`
 

@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
@@ -20,8 +21,8 @@ const checkingPath = "/api/ingest_manager/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
-	Events   []SerializableEvent    `json:"events"`
-	Metadata map[string]interface{} `json:"local_metadata,omitempty"`
+	Events   []SerializableEvent `json:"events"`
+	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }
 
 // SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
@@ -111,7 +112,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
-	fmt.Println(string(rs))
+
 	if err := checkinResponse.Validate(); err != nil {
 		return nil, err
 	}

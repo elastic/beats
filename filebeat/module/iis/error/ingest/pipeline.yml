@@ -71,9 +71,6 @@ processors:
     field: event.type
     value: connection
     if: "ctx?.source?.ip != null && ctx?.destination?.ip != null"
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - append:
     field: related.ip
     value: "{{source.ip}}"

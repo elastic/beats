@@ -51,7 +51,8 @@
         "source.port": 33876,
         "source.service.name": "httpd",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ],
         "url.original": "https://www.example.com/cart"
     },
@@ -119,7 +120,8 @@
         "source.port": 33876,
         "source.user.name": "bob",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -148,7 +150,8 @@
         "service.type": "cef",
         "source.user.group.name": "user",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -182,7 +185,8 @@
         "service.type": "cef",
         "source.ip": "192.168.3.4",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     }
 ]

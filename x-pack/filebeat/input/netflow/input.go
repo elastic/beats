@@ -92,11 +92,7 @@ func NewInput(
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

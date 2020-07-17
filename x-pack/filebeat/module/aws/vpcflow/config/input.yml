@@ -49,6 +49,8 @@ paths:
 exclude_files: [".gz$"]
 
 {{ end }}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - drop_event:
@@ -167,3 +169,8 @@ processors:
       - add_fields:
           target: network
           fields: {transport: udp}
+
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

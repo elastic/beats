@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-activemq]]
 [role="xpack"]
-== activemq module
+== ActiveMQ module
 
 This module periodically fetches JMX metrics from Apache ActiveMQ.
 
@@ -20,7 +20,7 @@ The ActiveMQ module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX m
 [float]
 === Example configuration
 
-The activemq module supports the standard configuration options that are described
+The ActiveMQ module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

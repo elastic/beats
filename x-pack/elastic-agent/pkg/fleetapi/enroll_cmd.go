@@ -14,11 +14,15 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
 // EnrollType is the type of enrollment to do with the elastic-agent.
 type EnrollType string
+
+// ErrTooManyRequests is received when the remote server is overloaded.
+var ErrTooManyRequests = errors.New("too many requests received (429)")
 
 const (
 	// PermanentEnroll is default enrollment type, by default an Agent is permanently enroll to Agent.
@@ -84,7 +88,7 @@ type EnrollRequest struct {
 
 // Metadata is a all the metadata send or received from the elastic-agent.
 type Metadata struct {
-	Local        map[string]interface{} `json:"local"`
+	Local        *info.ECSMeta          `json:"local"`
 	UserProvided map[string]interface{} `json:"user_provided"`
 }
 
@@ -188,6 +192,10 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return nil, ErrTooManyRequests
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, extract(resp.Body)

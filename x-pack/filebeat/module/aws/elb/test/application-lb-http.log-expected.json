@@ -22,7 +22,7 @@
         "event.start": "2019-10-11T15:01:06.657000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 0,
         "http.response.status_code": 460,
@@ -41,6 +41,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56398",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da09932-2c342a443bfb96249aa50ed7",
         "user_agent.original": "curl/7.58.0"
     },
@@ -67,7 +70,7 @@
         "event.start": "2019-10-11T15:01:40.491000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -86,6 +89,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56488",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da09954-2c342a443bfb96249aa50ed7",
         "user_agent.original": "curl/7.58.0"
     },
@@ -112,7 +118,7 @@
         "event.start": "2019-10-11T15:01:12.914000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -131,6 +137,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56416",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da09938-d9c72660e247c36070017828",
         "user_agent.original": "curl/7.58.0"
     },
@@ -157,7 +166,7 @@
         "event.start": "2019-10-11T15:01:25.189000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -176,6 +185,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56448",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da09945-0eaa8050df7d96f84806ded0",
         "user_agent.original": "curl/7.58.0"
     },
@@ -202,7 +214,7 @@
         "event.start": "2019-10-11T15:02:18.836000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -221,6 +233,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56602",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da0997a-5add00b04bc8ae20ae96d9f0",
         "user_agent.original": "curl/7.58.0"
     },
@@ -247,7 +262,7 @@
         "event.start": "2019-10-11T15:02:31.202000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -266,6 +281,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "56638",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da09987-cc391940b332434860dfa848",
         "user_agent.original": "curl/7.58.0"
     },
@@ -292,7 +310,7 @@
         "event.start": "2019-10-11T15:03:39.331000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
@@ -311,6 +329,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "37632",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da099cb-3d3b17eb2b75373f4c0c36c5",
         "user_agent.original": "curl/7.58.0"
     },
@@ -341,7 +362,7 @@
         "event.start": "2019-10-11T15:55:09.307000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
@@ -360,6 +381,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "37838",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da0a5dd-4d9a423a0e9a782fe2f390af",
         "user_agent.original": "curl/7.58.0"
     },
@@ -390,7 +414,7 @@
         "event.start": "2019-10-11T15:55:11.352000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
@@ -409,6 +433,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "37850",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da0a5df-7d64cabe9955b4df9acc800a",
         "user_agent.original": "curl/7.58.0"
     },
@@ -439,7 +466,7 @@
         "event.start": "2019-10-11T15:55:11.987000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
@@ -458,6 +485,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "37856",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-5da0a5df-7c958e828ff43b63d0e0fac4",
         "user_agent.original": "curl/7.58.0"
     }

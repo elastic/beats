@@ -27,8 +27,8 @@ ifndef::serverless[]
 {metricbeat} collects monitoring data from your {beatname_uc} instance
 and sends it directly to your monitoring cluster.
 endif::[]
-* <<monitoring-internal-collection-legacy,Legacy internal collection (deprecated)>> - 
-Legacy internal collectors send monitoring data to your production cluster.
+* <<monitoring-internal-collection-legacy,Legacy collection (deprecated)>> - 
+Legacy collectors send monitoring data to your production cluster.
 
 
 //Commenting out this link temporarily until the general monitoring docs can be

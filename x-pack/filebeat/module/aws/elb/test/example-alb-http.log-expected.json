@@ -26,7 +26,7 @@
         "event.start": "2018-07-02T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 200,
@@ -36,6 +36,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
         "user_agent.original": "curl/7.46.0"
     },
@@ -71,7 +74,7 @@
         "event.start": "2018-07-02T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "https://www.example.com:443/",
         "http.response.body.bytes": 57,
         "http.response.status_code": 200,
@@ -81,6 +84,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -117,7 +123,7 @@
         "event.start": "2018-07-02T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 5,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "https://10.0.2.105:773/",
         "http.response.body.bytes": 257,
         "http.response.status_code": 200,
@@ -127,6 +133,9 @@
         "service.type": "aws",
         "source.ip": "10.0.1.252",
         "source.port": "48160",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -160,7 +169,7 @@
         "event.start": "2018-07-02T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://10.0.0.30:80/",
         "http.response.body.bytes": 587,
         "http.response.status_code": 101,
@@ -170,6 +179,9 @@
         "service.type": "aws",
         "source.ip": "10.0.0.140",
         "source.port": "40914",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "-"
     },
@@ -194,7 +206,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 218,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "https://10.0.0.30:443/",
         "http.response.body.bytes": 786,
         "http.response.status_code": 101,
@@ -204,6 +216,9 @@
         "service.type": "aws",
         "source.ip": "10.0.0.140",
         "source.port": "44244",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -234,7 +249,7 @@
         "event.start": "2018-11-30T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 200,
@@ -244,6 +259,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
@@ -272,7 +290,7 @@
         "event.start": "2018-11-30T22:22:48.364000Z",
         "fileset.name": "elb",
         "http.request.body.bytes": 34,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://www.example.com:80/",
         "http.response.body.bytes": 366,
         "http.response.status_code": 502,
@@ -282,6 +300,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
@@ -311,6 +332,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "-",
         "user_agent.original": "-"
     },
@@ -339,6 +363,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "-",
         "user_agent.original": "-"
     }

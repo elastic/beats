@@ -8,7 +8,7 @@
 === s3 input
 
 ++++
-<titleabbrev>s3</titleabbrev>
+<titleabbrev>S3</titleabbrev>
 ++++
 
 beta[]

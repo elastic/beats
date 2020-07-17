@@ -89,7 +89,7 @@ func (a *azureInput) runWithEPH() error {
 
 func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
 	// if no overrride is set then the azure public cloud is used
-	if overrideResManager == "" {
+	if overrideResManager == "" || overrideResManager == "<no value>" {
 		return azure.PublicCloud, nil
 	}
 	if env, ok := environments[overrideResManager]; ok {

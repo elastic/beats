@@ -18,6 +18,7 @@
 package outputs
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -56,8 +57,8 @@ func (b *backoffClient) Close() error {
 	return err
 }
 
-func (b *backoffClient) Publish(batch publisher.Batch) error {
-	err := b.client.Publish(batch)
+func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) error {
+	err := b.client.Publish(ctx, batch)
 	if err != nil {
 		b.client.Close()
 	}

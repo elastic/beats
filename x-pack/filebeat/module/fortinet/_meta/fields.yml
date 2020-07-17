@@ -1,0 +1,14 @@
+- key: fortinet
+  title: Fortinet
+  description: >
+    fortinet Module
+  fields:
+    - name: fortinet
+      type: group
+      description: >
+        Fields from fortinet FortiOS
+      fields:
+        - name: file.hash.crc32
+          type: keyword
+          description: >
+            CRC32 Hash of file

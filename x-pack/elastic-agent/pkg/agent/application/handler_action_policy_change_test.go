@@ -29,7 +29,7 @@ func (m *mockEmitter) Emitter(policy *config.Config) error {
 }
 
 func TestPolicyChange(t *testing.T) {
-	log, _ := logger.New()
+	log, _ := logger.New("")
 	ack := newNoopAcker()
 
 	t.Run("Receive a config change and successfully emits a raw configuration", func(t *testing.T) {
@@ -68,7 +68,7 @@ func TestPolicyChange(t *testing.T) {
 }
 
 func TestPolicyAcked(t *testing.T) {
-	log, _ := logger.New()
+	log, _ := logger.New("")
 	t.Run("Config change should not ACK on error", func(t *testing.T) {
 		tacker := &testAcker{}
 

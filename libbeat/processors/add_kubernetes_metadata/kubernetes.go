@@ -90,24 +90,12 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	config := defaultKubernetesAnnotatorConfig()
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
-
-	err := cfg.Unpack(&config)
+	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+		return nil, err
 	}
 
-	//Load default indexer configs
-	if config.DefaultIndexers.Enabled == true {
-		config.Indexers = Indexing.GetDefaultIndexerConfigs()
-	}
-
-	//Load default matcher configs
-	if config.DefaultMatchers.Enabled == true {
-		config.Matchers = Indexing.GetDefaultMatcherConfigs()
-	}
-
+	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
@@ -119,6 +107,27 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	go processor.init(config, cfg)
 
 	return processor, nil
+}
+
+func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorConfig, error) {
+	config := defaultKubernetesAnnotatorConfig()
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+	}
+
+	//Load and append default indexer configs
+	if config.DefaultIndexers.Enabled {
+		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
+	}
+
+	//Load and append default matcher configs
+	if config.DefaultMatchers.Enabled {
+		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
+	}
+
+	return config, nil
 }
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {

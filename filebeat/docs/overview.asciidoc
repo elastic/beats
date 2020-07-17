@@ -1,10 +1,6 @@
 [[filebeat-overview]]
 == Filebeat overview
 
-++++
-<titleabbrev>Overview</titleabbrev>
-++++
-
 {beatname_uc} is a lightweight shipper for forwarding and centralizing log data.
 Installed as an agent on your servers, {beatname_uc} monitors the log
 files or locations that you specify, collects log events, and forwards them 

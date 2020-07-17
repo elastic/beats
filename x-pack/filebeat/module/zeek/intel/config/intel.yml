@@ -4,7 +4,8 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - rename:
@@ -61,3 +62,16 @@ processors:
         - zeek.intel.id.orig_p
         - zeek.intel.id.resp_h
         - zeek.intel.id.resp_p
+  - add_fields:
+      target: event
+      fields:
+        kind: alert
+        type:
+          - info
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

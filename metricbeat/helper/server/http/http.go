@@ -138,7 +138,8 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		meta := server.Meta{
-			"path": req.URL.String(),
+			"path":    req.URL.String(),
+			"address": req.RemoteAddr,
 		}
 
 		contentType := req.Header.Get("Content-Type")

@@ -47,6 +47,7 @@ func TestMultilineAfterOK(t *testing.T) {
 	pattern := match.MustCompile(`^[ \t] +`) // next line is indented by spaces
 	testMultilineOK(t,
 		Config{
+			Type:    patternMode,
 			Pattern: &pattern,
 			Match:   "after",
 		},
@@ -61,6 +62,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 
 	testMultilineOK(t,
 		Config{
+			Type:    patternMode,
 			Pattern: &pattern,
 			Match:   "before",
 		},
@@ -75,6 +77,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 
 	testMultilineOK(t,
 		Config{
+			Type:    patternMode,
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "after",
@@ -90,6 +93,7 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 
 	testMultilineOK(t,
 		Config{
+			Type:    patternMode,
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
@@ -106,6 +110,7 @@ func TestMultilineAfterNegateOKFlushPattern(t *testing.T) {
 
 	testMultilineOK(t,
 		Config{
+			Type:         patternMode,
 			Pattern:      &pattern,
 			Negate:       true,
 			Match:        "after",
@@ -124,6 +129,7 @@ func TestMultilineAfterNegateOKFlushPatternWhereTheFirstLinesDosentMatchTheStart
 
 	testMultilineOK(t,
 		Config{
+			Type:         patternMode,
 			Pattern:      &pattern,
 			Negate:       true,
 			Match:        "after",
@@ -140,6 +146,7 @@ func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	pattern := match.MustCompile(`;$`) // last line ends with ';'
 	testMultilineOK(t,
 		Config{
+			Type:    patternMode,
 			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
@@ -155,6 +162,7 @@ func TestMultilineAfterTruncated(t *testing.T) {
 	maxLines := 2
 	testMultilineTruncated(t,
 		Config{
+			Type:     patternMode,
 			Pattern:  &pattern,
 			Match:    "after",
 			MaxLines: &maxLines,
@@ -170,6 +178,7 @@ func TestMultilineAfterTruncated(t *testing.T) {
 	)
 	testMultilineTruncated(t,
 		Config{
+			Type:     patternMode,
 			Pattern:  &pattern,
 			Match:    "after",
 			MaxLines: &maxLines,
@@ -182,6 +191,53 @@ func TestMultilineAfterTruncated(t *testing.T) {
 		[]string{
 			"line1\n line1.1",
 			"line2\n line2.1"},
+	)
+}
+
+func TestMultilineCount(t *testing.T) {
+	maxLines := 2
+	testMultilineOK(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 2,
+		},
+		2,
+		"line1\n line1.1\n",
+		"line2\n line2.1\n",
+	)
+	maxLines = 4
+	testMultilineOK(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 4,
+		},
+		2,
+		"line1\n line1.1\nline2\n line2.1\n",
+		"line3\n line3.1\nline4\n line4.1\n",
+	)
+	maxLines = 1
+	testMultilineOK(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 1,
+		},
+		8,
+		"line1\n", "line1.1\n", "line2\n", "line2.1\n", "line3\n", "line3.1\n", "line4\n", "line4.1\n",
+	)
+	maxLines = 2
+	testMultilineTruncated(t,
+		Config{
+			Type:       countMode,
+			MaxLines:   &maxLines,
+			LinesCount: 3,
+		},
+		4,
+		true,
+		[]string{"line1\n line1.1\n line1.2\n", "line2\n line2.1\n line2.2\n", "line3\n line3.1\n line3.2\n", "line4\n line4.1\n line4.3\n"},
+		[]string{"line1\n", "line2\n", "line3\n", "line4\n"},
 	)
 }
 

@@ -331,7 +331,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -350,7 +350,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.oldest_unacked_message_age",
+                    "field": "googlecloud.pubsub.subscription.oldest_unacked_message_age.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -406,7 +406,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -421,7 +421,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages",
+                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -490,7 +490,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -509,7 +509,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.backlog_bytes",
+                    "field": "googlecloud.pubsub.subscription.backlog_bytes.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -572,7 +572,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -587,7 +587,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.pull_request_count",
+                    "field": "googlecloud.pubsub.subscription.pull_request_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -651,7 +651,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -666,7 +666,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.topic.message_sizes.bucket_options.Options.ExponentialBuckets.num_finite_buckets",
+                    "field": "googlecloud.pubsub.topic.message_sizes.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -717,7 +717,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -732,7 +732,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages",
+                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -796,7 +796,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -811,7 +811,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.pull_message_operation_count",
+                    "field": "googlecloud.pubsub.subscription.pull_message_operation_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -875,7 +875,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "isModelInvalid": false,
             "series": [
@@ -890,7 +890,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.sent_message_count",
+                    "field": "googlecloud.pubsub.subscription.sent_message_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }

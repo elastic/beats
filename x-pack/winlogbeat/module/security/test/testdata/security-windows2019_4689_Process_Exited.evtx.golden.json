@@ -7,8 +7,9 @@
       "code": 4689,
       "kind": "event",
       "module": "security",
+      "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "process_end"
+      "type": "end"
     },
     "host": {
       "name": "vagrant"
@@ -44,6 +45,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x274a2"
+      },
       "opcode": "Info",
       "process": {
         "pid": 4,
@@ -65,8 +69,9 @@
       "code": 4689,
       "kind": "event",
       "module": "security",
+      "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "process_end"
+      "type": "end"
     },
     "host": {
       "name": "vagrant"
@@ -102,6 +107,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x274f1"
+      },
       "opcode": "Info",
       "process": {
         "pid": 4,
@@ -123,8 +131,9 @@
       "code": 4689,
       "kind": "event",
       "module": "security",
+      "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "process_end"
+      "type": "end"
     },
     "host": {
       "name": "vagrant"
@@ -160,6 +169,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x274a2"
+      },
       "opcode": "Info",
       "process": {
         "pid": 4,

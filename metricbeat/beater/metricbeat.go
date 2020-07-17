@@ -134,7 +134,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.ConfigManager.Enabled()
+	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()
 	if !dynamicCfgEnabled && len(config.Modules) == 0 {
 		return nil, mb.ErrEmptyConfig
 	}
@@ -166,7 +166,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 			continue
 		}
 
-		runner, err := factory.Create(b.Publisher, moduleCfg, nil)
+		runner, err := factory.Create(b.Publisher, moduleCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +181,12 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	if config.Autodiscover != nil {
 		var err error
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
-			"metricbeat", b.Publisher, factory, autodiscover.QueryConfig(), config.Autodiscover)
+			"metricbeat",
+			b.Publisher,
+			factory, autodiscover.QueryConfig(),
+			config.Autodiscover,
+			b.Keystore,
+		)
 		if err != nil {
 			return nil, err
 		}

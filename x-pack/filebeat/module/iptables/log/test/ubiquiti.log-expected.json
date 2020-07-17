@@ -44,7 +44,8 @@
         "source.mac": "90:10:73:ba:d6:77",
         "source.port": 48689,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -100,7 +101,8 @@
         "source.mac": "90:10:24:67:f4:89",
         "source.port": 43189,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -159,7 +161,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -214,7 +217,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -269,7 +273,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

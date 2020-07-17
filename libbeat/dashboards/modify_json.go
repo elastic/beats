@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// JSONObjectAttribute contains the attributes for a Kibana json object
 type JSONObjectAttribute struct {
 	Description           string                 `json:"description"`
 	KibanaSavedObjectMeta map[string]interface{} `json:"kibanaSavedObjectMeta"`
@@ -35,14 +36,17 @@ type JSONObjectAttribute struct {
 	Type                  string                 `json:"type"`
 }
 
+// JSONObject is an Object with a given JSON attribute
 type JSONObject struct {
 	Attributes JSONObjectAttribute `json:"attributes"`
 }
 
+// JSONFormat contains a list of JSON object
 type JSONFormat struct {
 	Objects []JSONObject `json:"objects"`
 }
 
+// ReplaceIndexInIndexPattern replaces an index in a dashboard content body
 func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error) {
 	if index == "" {
 		return nil
@@ -108,12 +112,13 @@ func replaceIndexInSearchObject(index string, savedObject string) (string, error
 	return string(searchSourceJSON), nil
 }
 
-func ReplaceIndexInSavedObject(index string, kibanaSavedObject map[string]interface{}) map[string]interface{} {
+// ReplaceIndexInSavedObject replaces an index in a kibana object
+func ReplaceIndexInSavedObject(logger *logp.Logger, index string, kibanaSavedObject map[string]interface{}) map[string]interface{} {
 
 	if searchSourceJSON, ok := kibanaSavedObject["searchSourceJSON"].(string); ok {
 		searchSourceJSON, err := replaceIndexInSearchObject(index, searchSourceJSON)
 		if err != nil {
-			logp.Err("Fail to replace searchSourceJSON: %v", err)
+			logger.Errorf("Fail to replace searchSourceJSON: %v", err)
 			return kibanaSavedObject
 		}
 		kibanaSavedObject["searchSourceJSON"] = searchSourceJSON
@@ -123,12 +128,12 @@ func ReplaceIndexInSavedObject(index string, kibanaSavedObject map[string]interf
 }
 
 // ReplaceIndexInVisState replaces index appearing in visState params objects
-func ReplaceIndexInVisState(index string, visStateJSON string) string {
+func ReplaceIndexInVisState(logger *logp.Logger, index string, visStateJSON string) string {
 
 	var visState map[string]interface{}
 	err := json.Unmarshal([]byte(visStateJSON), &visState)
 	if err != nil {
-		logp.Err("Fail to unmarshal visState: %v", err)
+		logger.Errorf("Fail to unmarshal visState: %v", err)
 		return visStateJSON
 	}
 
@@ -146,7 +151,7 @@ func ReplaceIndexInVisState(index string, visStateJSON string) string {
 
 	d, err := json.Marshal(visState)
 	if err != nil {
-		logp.Err("Fail to marshal visState: %v", err)
+		logger.Errorf("Fail to marshal visState: %v", err)
 		return visStateJSON
 	}
 
@@ -155,6 +160,7 @@ func ReplaceIndexInVisState(index string, visStateJSON string) string {
 
 // ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
 func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.MapStr {
+	logger := logp.NewLogger("dashboards")
 	if index == "" {
 		return content
 	}
@@ -176,11 +182,11 @@ func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.M
 		}
 
 		if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-			attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
+			attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(logger, index, kibanaSavedObject)
 		}
 
 		if visState, ok := attributes["visState"].(string); ok {
-			attributes["visState"] = ReplaceIndexInVisState(index, visState)
+			attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
 		}
 
 		objects[i] = objectMap
@@ -190,6 +196,7 @@ func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.M
 	return content
 }
 
+// ReplaceStringInDashboard replaces a string field in a dashboard
 func ReplaceStringInDashboard(old, new string, content common.MapStr) (common.MapStr, error) {
 	marshaled, err := json.Marshal(content)
 	if err != nil {

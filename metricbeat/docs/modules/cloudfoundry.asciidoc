@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-cloudfoundry]]
 [role="xpack"]
-== cloudfoundry module
+== Cloudfoundry module
 
 beta[]
 
@@ -85,7 +85,7 @@ The URL of the Cloud Foundry UAA API. Optional. Default: "(value from ${api_addr
 [float]
 === `rlp_address`
 
-The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(value from ${api_address}/v2/info)".
+The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(`log-stream` subdomain under the same domain as `api_server`)".
 
 [float]
 === `client_id`
@@ -104,6 +104,12 @@ Shard ID for connection to the RLP Gateway. Use the same ID across multiple {bea
 from the RLP Gateway. Default: "(generated UUID)".
 
 [float]
+==== `version`
+
+Consumer API version to connect with Cloud Foundry to collect events. Use `v1` to collect events using Doppler/Traffic Control.
+Use `v2` to collect events from the RLP Gateway. Default: "`v1`".
+
+[float]
 === `ssl`
 
 This specifies SSL/TLS common config. Default: not used.
@@ -112,7 +118,7 @@ This specifies SSL/TLS common config. Default: not used.
 [float]
 === Example configuration
 
-The cloudfoundry module supports the standard configuration options that are described
+The Cloudfoundry module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -130,6 +136,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  version: v1
 ----
 
 [float]

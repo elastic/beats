@@ -18,6 +18,7 @@
 package redis
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"strconv"
@@ -134,7 +135,7 @@ func (c *client) Close() error {
 	return c.Client.Close()
 }
 
-func (c *client) Publish(batch publisher.Batch) error {
+func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	if c == nil {
 		panic("no client")
 	}

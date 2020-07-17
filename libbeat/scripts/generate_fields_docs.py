@@ -6,6 +6,8 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
+    if "skipdocs" in section:
+        return
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
 
@@ -119,9 +121,8 @@ grouped in the following categories:
         for field in section["fields"]:
             name = field["name"]
             if name in fields:
-                assert field["type"] == (fields[name]["type"],
-                                         'field "{}" redefined with different type "{}"'.format(
-                    name, field["type"]))
+                assert field["type"] == fields[name]["type"], 'field "{}" redefined with different type "{}"'.format(
+                    name, field["type"])
                 fields[name].update(field)
             else:
                 fields[name] = field
@@ -136,7 +137,8 @@ grouped in the following categories:
         if "anchor" not in section:
             section["anchor"] = section["key"]
 
-        output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
+        if "skipdocs" not in section:
+            output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 
     # Sort alphabetically by key

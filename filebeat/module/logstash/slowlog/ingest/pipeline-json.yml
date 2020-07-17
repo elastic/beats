@@ -7,9 +7,6 @@ processors:
 - json:
     field: message
     target_field: logstash.slowlog
-- rename:
-    field: '@timestamp'
-    target_field: event.created
 - convert:
     field: logstash.slowlog.timeMillis
     type: string

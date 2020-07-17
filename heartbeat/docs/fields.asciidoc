@@ -40,9 +40,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
-type: keyword
+
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -79,7 +82,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -215,6 +218,13 @@ type: keyword
 
 --
 
+*`monitor.name.text`*::
++
+--
+type: text
+
+--
+
 *`monitor.id`*::
 +
 --
@@ -222,6 +232,13 @@ The monitors full job ID as used by heartbeat.
 
 
 type: keyword
+
+--
+
+*`monitor.id.text`*::
++
+--
+type: text
 
 --
 
@@ -7266,6 +7283,18 @@ type: keyword
 
 --
 
+*`http.response.headers.*`*::
++
+--
+The canonical headers of the monitored HTTP response.
+
+
+type: object
+
+Object is not enabled.
+
+--
+
 [float]
 === rtt
 
@@ -7824,7 +7853,10 @@ TLS layer related fields.
 *`tls.certificate_not_valid_before`*::
 +
 --
-Earliest time at which the connection's certificates are valid.
+
+deprecated:[7.8.0]
+
+Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
 
 type: date
 
@@ -7833,7 +7865,10 @@ type: date
 *`tls.certificate_not_valid_after`*::
 +
 --
-Latest time at which the connection's certificates are valid.
+
+deprecated:[7.8.0]
+
+Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
 
 type: date
 
@@ -7859,6 +7894,183 @@ Time required to finish TLS handshake based on already available network connect
 Duration in microseconds
 
 type: long
+
+--
+
+[float]
+=== server
+
+Detailed x509 certificate metadata
+
+
+
+*`tls.server.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+
+*`tls.server.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.issuer.common_name.text`*::
++
+--
+type: text
+
+--
+
+*`tls.server.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert SHA2 High Assurance Server CA
+
+--
+
+*`tls.server.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39
+
+--
+
+*`tls.server.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25
+
+--
+
+*`tls.server.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`tls.server.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`tls.server.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+--
+
+*`tls.server.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`tls.server.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`tls.server.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. Recommend using names found in Go Lang Crypto library (See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353).
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+
+*`tls.server.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: r2.shared.global.fastly.net
+
+--
+
+*`tls.server.x509.subject.common_name.text`*::
++
+--
+type: text
+
+--
+
+*`tls.server.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.global.fastly.net
+
+--
+
+*`tls.server.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 

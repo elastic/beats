@@ -15,7 +15,8 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - rename:
@@ -24,3 +25,7 @@ processors:
   - decode_cef:
       field: event.original
   - community_id:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

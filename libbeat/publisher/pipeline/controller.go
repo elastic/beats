@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -105,7 +106,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
+		logger := logp.NewLogger("publisher_pipeline_output")
+		worker[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
 	}
 	grp := &outputGroup{
 		workQueue:  c.workQueue,

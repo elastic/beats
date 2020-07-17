@@ -51,7 +51,13 @@ type Query struct {
 type CounterValue struct {
 	Instance    string
 	Measurement interface{}
-	Err         error
+	Err         CounterValueError
+}
+
+// CounterValueError contains the performance counter error.
+type CounterValueError struct {
+	Error   error
+	CStatus uint32
 }
 
 // Open creates a new query.
@@ -235,31 +241,40 @@ func MatchInstanceName(counterPath string) (string, error) {
 
 // getCounterValue will retrieve the counter value based on the format applied in the config options
 func getCounterValue(counter *Counter) CounterValue {
-	counterValue := CounterValue{Instance: counter.instanceName}
+	counterValue := CounterValue{Instance: counter.instanceName, Err: CounterValueError{CStatus: 0}}
 	switch counter.format {
 	case PdhFmtLong:
 		_, value, err := PdhGetFormattedCounterValueLong(counter.handle)
 		if err != nil {
-			counterValue.Err = err
+			counterValue.Err.Error = err
+			if value != nil {
+				counterValue.Err.CStatus = value.CStatus
+			}
 		} else {
 			counterValue.Measurement = value.Value
 		}
 	case PdhFmtLarge:
 		_, value, err := PdhGetFormattedCounterValueLarge(counter.handle)
 		if err != nil {
-			counterValue.Err = err
+			counterValue.Err.Error = err
+			if value != nil {
+				counterValue.Err.CStatus = value.CStatus
+			}
 		} else {
 			counterValue.Measurement = value.Value
 		}
 	case PdhFmtDouble:
 		_, value, err := PdhGetFormattedCounterValueDouble(counter.handle)
 		if err != nil {
-			counterValue.Err = err
+			counterValue.Err.Error = err
+			if value != nil {
+				counterValue.Err.CStatus = value.CStatus
+			}
 		} else {
 			counterValue.Measurement = value.Value
 		}
 	default:
-		counterValue.Err = errors.Errorf("initialization failed: format '%#v' "+
+		counterValue.Err.Error = errors.Errorf("initialization failed: format '%#v' "+
 			"for instance '%s' is invalid (must be PdhFmtDouble, PdhFmtLarge or PdhFmtLong)",
 			counter.format, counter.instanceName)
 	}

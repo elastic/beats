@@ -111,11 +111,13 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New()
+		log, _ := logger.New("fleet_gateway")
 		rep := getReporter(agentInfo, log, t)
 
+		ctx, cancel := context.WithCancel(context.Background())
+
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			settings,
 			agentInfo,
@@ -127,7 +129,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		)
 
 		go gateway.Start()
-		defer gateway.Stop()
+		defer cancel()
 
 		require.NoError(t, err)
 
@@ -240,9 +242,10 @@ func TestFleetGateway(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New()
+		ctx, cancel := context.WithCancel(context.Background())
+		log, _ := logger.New("tst")
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			settings,
 			agentInfo,
@@ -254,7 +257,7 @@ func TestFleetGateway(t *testing.T) {
 		)
 
 		go gateway.Start()
-		defer gateway.Stop()
+		defer cancel()
 
 		require.NoError(t, err)
 
@@ -324,9 +327,10 @@ func TestFleetGateway(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New()
+		ctx, cancel := context.WithCancel(context.Background())
+		log, _ := logger.New("tst")
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			&fleetGatewaySettings{
 				Duration: d,
@@ -370,8 +374,9 @@ func TestFleetGateway(t *testing.T) {
 		// 1. Gateway will check the API on boot.
 		// 2. WaitTick() will block for 20 minutes.
 		// 3. Stop will should unblock the wait.
-		gateway.Stop()
+		cancel()
 	})
+
 }
 
 func TestRetriesOnFailures(t *testing.T) {
@@ -463,7 +468,7 @@ func TestRetriesOnFailures(t *testing.T) {
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
-	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultFleetManagementConfig())
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
 	}

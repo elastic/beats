@@ -59,7 +59,10 @@
         "source.address": "10.128.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.128.0.16",
-        "source.port": 60094
+        "source.port": 60094,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-30T13:52:42.191Z",
@@ -120,7 +123,10 @@
         "source.geo.continent_name": "Asia",
         "source.geo.country_name": "omn",
         "source.ip": "192.0.2.126",
-        "source.port": 64853
+        "source.port": 64853,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:31:19.421Z",
@@ -184,7 +190,10 @@
         "source.geo.country_name": "rus",
         "source.geo.region_name": "Krasnodar Krai",
         "source.ip": "192.0.2.219",
-        "source.port": 2897
+        "source.port": 2897,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:41:31.079Z",
@@ -246,7 +255,10 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_name": "deu",
         "source.ip": "192.0.2.14",
-        "source.port": 61000
+        "source.port": 61000,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:41:34.190Z",
@@ -308,7 +320,10 @@
         "source.geo.continent_name": "Europe",
         "source.geo.country_name": "deu",
         "source.ip": "192.0.2.14",
-        "source.port": 61000
+        "source.port": 61000,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:48:41.449Z",
@@ -372,7 +387,10 @@
         "source.geo.country_name": "ukr",
         "source.geo.region_name": "Zhytomyr Oblast",
         "source.ip": "192.0.2.151",
-        "source.port": 62551
+        "source.port": 62551,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T13:10:24.214Z",
@@ -436,7 +454,10 @@
         "source.geo.country_name": "ita",
         "source.geo.region_name": "Veneto",
         "source.ip": "192.0.2.241",
-        "source.port": 44542
+        "source.port": 44542,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T13:35:23.504Z",
@@ -500,7 +521,10 @@
         "source.geo.country_name": "rus",
         "source.geo.region_name": "Tula Oblast",
         "source.ip": "192.0.2.114",
-        "source.port": 41293
+        "source.port": 41293,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T13:36:52.135Z",
@@ -564,7 +588,10 @@
         "source.geo.country_name": "rus",
         "source.geo.region_name": "Stavropol Krai",
         "source.ip": "192.0.2.251",
-        "source.port": 59106
+        "source.port": 59106,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T14:06:16.593Z",
@@ -628,7 +655,10 @@
         "source.geo.country_name": "fra",
         "source.geo.region_name": "Provence-Alpes-C\u00f4te d'Azur",
         "source.ip": "192.0.2.189",
-        "source.port": 61000
+        "source.port": 61000,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T14:06:22.930Z",
@@ -692,7 +722,10 @@
         "source.geo.country_name": "fra",
         "source.geo.region_name": "Provence-Alpes-C\u00f4te d'Azur",
         "source.ip": "192.0.2.189",
-        "source.port": 61000
+        "source.port": 61000,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T14:32:07.407Z",
@@ -756,7 +789,10 @@
         "source.geo.country_name": "tur",
         "source.geo.region_name": "\u0130zmir",
         "source.ip": "192.0.2.200",
-        "source.port": 42716
+        "source.port": 42716,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-12T12:41:20.972Z",
@@ -818,7 +854,10 @@
         "source.address": "10.28.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.28.0.16",
-        "source.port": 46418
+        "source.port": 46418,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-12T12:42:26.505Z",
@@ -880,7 +919,10 @@
         "source.address": "10.28.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.28.0.16",
-        "source.port": 58725
+        "source.port": 58725,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:54:13.531Z",
@@ -948,7 +990,10 @@
         "source.geo.continent_name": "America",
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.114",
-        "source.port": 44666
+        "source.port": 44666,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:54:13.551Z",
@@ -1016,7 +1061,10 @@
         "source.geo.continent_name": "America",
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.114",
-        "source.port": 44668
+        "source.port": 44668,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:54:15.771Z",
@@ -1079,7 +1127,10 @@
         "source.geo.country_name": "nld",
         "source.geo.region_name": "Overijssel",
         "source.ip": "192.0.2.7",
-        "source.port": 1683
+        "source.port": 1683,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:54:35.850Z",
@@ -1147,7 +1198,10 @@
         "source.geo.continent_name": "America",
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.114",
-        "source.port": 45068
+        "source.port": 45068,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-11T12:54:35.850Z",
@@ -1215,7 +1269,10 @@
         "source.geo.continent_name": "America",
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.114",
-        "source.port": 45062
+        "source.port": 45062,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-06T16:41:38.394Z",
@@ -1282,6 +1339,9 @@
         "source.address": "10.42.0.10",
         "source.domain": "test-es",
         "source.ip": "10.42.0.10",
-        "source.port": 57794
+        "source.port": 57794,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

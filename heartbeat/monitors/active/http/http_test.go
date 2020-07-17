@@ -22,6 +22,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -48,13 +49,13 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func testRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
-	return testTLSRequest(t, testURL, useUrls, nil)
+func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
+	return sendTLSRequest(t, testURL, useUrls, nil)
 }
 
-// testTLSRequest tests the given request. certPath is optional, if given
+// sendTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
+func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"timeout": "1s",
 	}
@@ -92,14 +93,14 @@ func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
-	event := testRequest(t, server.URL, useUrls)
+	event := sendSimpleTLSRequest(t, server.URL, useUrls)
 
 	return server, event
 }
 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
-func httpBaseChecks(urlStr string) validator.Validator {
+func urlChecks(urlStr string) validator.Validator {
 	u, _ := url.Parse(urlStr)
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
@@ -108,24 +109,28 @@ func httpBaseChecks(urlStr string) validator.Validator {
 
 func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		httpBaseChecks(url),
-		httpBodyChecks(),
-		lookslike.MustCompile(map[string]interface{}{
-			"http": map[string]interface{}{
-				"response.status_code":   statusCode,
-				"rtt.content.us":         isdef.IsDuration,
-				"rtt.response_header.us": isdef.IsDuration,
-				"rtt.total.us":           isdef.IsDuration,
-				"rtt.validate.us":        isdef.IsDuration,
-				"rtt.write_request.us":   isdef.IsDuration,
-			},
-		}),
+		minimalRespondingHTTPChecks(url, statusCode),
+		respondingHTTPStatusAndTimingChecks(statusCode),
+		respondingHTTPHeaderChecks(),
 	)
+}
+
+func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http": map[string]interface{}{
+			"response.status_code":   statusCode,
+			"rtt.content.us":         isdef.IsDuration,
+			"rtt.response_header.us": isdef.IsDuration,
+			"rtt.total.us":           isdef.IsDuration,
+			"rtt.validate.us":        isdef.IsDuration,
+			"rtt.write_request.us":   isdef.IsDuration,
+		},
+	})
 }
 
 func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		httpBaseChecks(url),
+		urlChecks(url),
 		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
@@ -147,6 +152,17 @@ func respondingHTTPBodyChecks(body string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http.response.body.content": body,
 		"http.response.body.bytes":   len(body),
+	})
+}
+
+func respondingHTTPHeaderChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http.response.headers": map[string]interface{}{
+			"Date":           isdef.IsString,
+			"Content-Length": isdef.Optional(isdef.IsString),
+			"Content-Type":   isdef.Optional(isdef.IsString),
+			"Location":       isdef.Optional(isdef.IsString),
+		},
 	})
 }
 
@@ -220,51 +236,47 @@ var downStatuses = []int{
 	http.StatusNetworkAuthenticationRequired,
 }
 
-func serverHostname(t *testing.T, server *httptest.Server) string {
-	surl, err := url.Parse(server.URL)
-	require.NoError(t, err)
-
-	return surl.Hostname()
-}
-
 func TestUpStatuses(t *testing.T) {
-	for _, status := range upStatuses {
-		status := status
-		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
+	for _, useURLs := range []bool{true, false} {
+		for _, status := range upStatuses {
+			status := status
 
-			testslike.Test(
-				t,
-				lookslike.Strict(lookslike.Compose(
-					hbtest.BaseChecks("127.0.0.1", "up", "http"),
-					hbtest.RespondingTCPChecks(),
-					hbtest.SummaryChecks(1, 0),
-					respondingHTTPChecks(server.URL, status),
-				)),
-				event.Fields,
-			)
-		})
+			field := "hosts"
+			if useURLs {
+				field = "urls"
+			}
+
+			testName := fmt.Sprintf("Test OK HTTP status %d using %s config field", status, field)
+			t.Run(testName, func(t *testing.T) {
+				server, event := checkServer(t, hbtest.HelloWorldHandler(status), useURLs)
+
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "up", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(1, 0),
+						respondingHTTPChecks(server.URL, status),
+					)),
+					event.Fields,
+				)
+			})
+		}
 	}
 }
 
-func TestUpStatusesWithUrlsConfig(t *testing.T) {
-	for _, status := range upStatuses {
-		status := status
-		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status), true)
-
-			testslike.Test(
-				t,
-				lookslike.Strict(lookslike.Compose(
-					hbtest.BaseChecks("127.0.0.1", "up", "http"),
-					hbtest.RespondingTCPChecks(),
-					hbtest.SummaryChecks(1, 0),
-					respondingHTTPChecks(server.URL, status),
-				)),
-				event.Fields,
-			)
-		})
-	}
+func TestHeadersDisabled(t *testing.T) {
+	server, event := checkServer(t, hbtest.HelloWorldHandler(200), false)
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
+			hbtest.RespondingTCPChecks(),
+			hbtest.SummaryChecks(1, 0),
+			respondingHTTPChecks(server.URL, 200),
+		)),
+		event.Fields,
+	)
 }
 
 func TestDownStatuses(t *testing.T) {
@@ -347,7 +359,7 @@ func runHTTPSServerCheck(
 	// we give it a few attempts to see if the server can come up before we run the real assertions.
 	var event *beat.Event
 	for i := 0; i < 10; i++ {
-		event = testTLSRequest(t, server.URL, false, mergedExtraConfig)
+		event = sendTLSRequest(t, server.URL, false, mergedExtraConfig)
 		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
 			break
 		}
@@ -371,6 +383,30 @@ func TestHTTPSServer(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 
 	runHTTPSServerCheck(t, server, nil)
+}
+
+func TestExpiredHTTPSServer(t *testing.T) {
+	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
+	require.NoError(t, err)
+	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	defer closeSrv()
+	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
+
+	extraConfig := map[string]interface{}{"ssl.certificate_authorities": "../fixtures/expired.cert"}
+	event := sendTLSRequest(t, u.String(), true, extraConfig)
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "down", "http"),
+			hbtest.RespondingTCPChecks(),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.ExpiredCertChecks(cert),
+			hbtest.URLChecks(t, &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}),
+			// No HTTP fields expected because we fail at the TCP level
+		)),
+		event.Fields,
+	)
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
@@ -418,7 +454,7 @@ func TestConnRefusedJob(t *testing.T) {
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url, false)
+	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -426,7 +462,7 @@ func TestConnRefusedJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
-			httpBaseChecks(url),
+			urlChecks(url),
 		)),
 		event.Fields,
 	)
@@ -440,7 +476,7 @@ func TestUnreachableJob(t *testing.T) {
 	port := uint16(1234)
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url, false)
+	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -448,7 +484,7 @@ func TestUnreachableJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
-			httpBaseChecks(url),
+			urlChecks(url),
 		)),
 		event.Fields,
 	)
@@ -493,7 +529,11 @@ func TestRedirect(t *testing.T) {
 				hbtest.BaseChecks("", "up", "http"),
 				hbtest.SummaryChecks(1, 0),
 				minimalRespondingHTTPChecks(testURL, 200),
+				respondingHTTPHeaderChecks(),
 				lookslike.MustCompile(map[string]interface{}{
+					// For redirects that are followed we shouldn't record this header because there's no sensible
+					// value
+					"http.response.headers.Location": isdef.KeyMissing,
 					"http.response.redirects": []string{
 						server.URL + redirectingPaths["/redirect_one"],
 						server.URL + redirectingPaths["/redirect_two"],
@@ -503,6 +543,44 @@ func TestRedirect(t *testing.T) {
 			event.Fields,
 		)
 	}
+}
+
+func TestNoHeaders(t *testing.T) {
+	server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+	defer server.Close()
+
+	configSrc := map[string]interface{}{
+		"urls":                     server.URL,
+		"response.include_headers": false,
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	jobs, _, err := create("http", config)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
+			hbtest.SummaryChecks(1, 0),
+			hbtest.RespondingTCPChecks(),
+			respondingHTTPStatusAndTimingChecks(200),
+			minimalRespondingHTTPChecks(server.URL, 200),
+			lookslike.MustCompile(map[string]interface{}{
+				"http.response.headers": isdef.KeyMissing,
+			}),
+		)),
+		event.Fields,
+	)
 }
 
 func TestNewRoundTripper(t *testing.T) {

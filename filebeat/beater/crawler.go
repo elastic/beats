@@ -62,7 +62,7 @@ func newCrawler(
 
 // Start starts the crawler with all inputs
 func (c *crawler) Start(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	configInputs *common.Config,
 	configModules *common.Config,
 ) error {
@@ -111,7 +111,7 @@ func (c *crawler) Start(
 }
 
 func (c *crawler) startInput(
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
 	if !config.Enabled() {
@@ -128,7 +128,7 @@ func (c *crawler) startInput(
 		return fmt.Errorf("input with same ID already exists: %v", id)
 	}
 
-	runner, err := c.inputsFactory.Create(pipeline, config, nil)
+	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
 		return fmt.Errorf("Error while initializing input: %+v", err)
 	}
@@ -138,7 +138,7 @@ func (c *crawler) startInput(
 
 	c.inputs[id] = runner
 
-	c.log.Info("Starting input (ID: %d)", id)
+	c.log.Infof("Starting input (ID: %d)", id)
 	runner.Start()
 
 	return nil

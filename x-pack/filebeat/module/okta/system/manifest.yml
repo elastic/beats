@@ -4,48 +4,33 @@ var:
   - name: input
     default: httpjson
   - name: api_key
-    default: ""
   - name: authentication_scheme
     default: "SSWS"
   - name: http_client_timeout
-    default: 60
   - name: http_method
-    default: GET
   - name: http_headers
-    default: |-
-      {}
   - name: http_request_body
-    default: |-
-      {}
-  - name: no_http_body
-    default: true
   - name: interval
-    default: 60
+    default: 60s
   - name: json_objects_array
-    default: ""
   - name: keep_original_message
     default: true
+  - name: no_http_body
+    default: true
   - name: pagination
-    default: |-
-      {
-        "enabled": true,
-        "header": {
-          "field_name": "Link",
-          "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"
-        },
-      }
+    default:
+      header:
+        field_name: Link
+        regex_pattern: '<([^>]+)>; *rel="next"(?:,|$)'
   - name: rate_limit
-    default: |-
-      {
-        "limit": "X-Rate-Limit-Limit",
-        "remaining": "X-Rate-Limit-Remaining",
-        "reset": "X-Rate-Limit-Reset"
-      }
-  - name: url
-    default: ""
+    default:
+      limit: X-Rate-Limit-Limit
+      remaining: X-Rate-Limit-Remaining
+      reset: X-Rate-Limit-Reset
   - name: ssl
-    default: |-
-      {}
+  - name: tags
+    default: [forwarded]
+  - name: url
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.yml

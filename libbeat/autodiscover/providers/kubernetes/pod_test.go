@@ -21,8 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -33,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -354,7 +353,7 @@ func TestEmitEvent(t *testing.T) {
 		Message  string
 		Flag     string
 		Pod      *kubernetes.Pod
-		Expected bus.Event
+		Expected []bus.Event
 	}{
 		{
 			Message: "Test common pod start",
@@ -390,43 +389,234 @@ func TestEmitEvent(t *testing.T) {
 					},
 				},
 			},
-			Expected: bus.Event{
-				"start":    true,
-				"host":     "127.0.0.1",
-				"id":       cid,
-				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"id":      "foobar",
-						"name":    "filebeat",
-						"image":   "elastic/filebeat:6.3.0",
-						"runtime": "docker",
-					},
-					"pod": common.MapStr{
-						"name": "filebeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-					},
-					"node": common.MapStr{
-						"name": "node",
-					},
-					"namespace":   "default",
-					"annotations": common.MapStr{},
-				},
-				"meta": common.MapStr{
+			Expected: []bus.Event{
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
-						"namespace": "default",
-						"container": common.MapStr{
-							"name":  "filebeat",
-							"image": "elastic/filebeat:6.3.0",
-						}, "pod": common.MapStr{
+						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-						}, "node": common.MapStr{
+						},
+						"node": common.MapStr{
 							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"port":     0,
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+			},
+		},
+		{
+			Message: "Test common pod start with multiple ports exposed",
+			Flag:    "start",
+			Pod: &kubernetes.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        name,
+							ContainerID: containerID,
+							State: v1.ContainerState{
+								Running: &v1.ContainerStateRunning{},
+							},
 						},
 					},
 				},
-				"config": []*common.Config{},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+							Ports: []v1.ContainerPort{
+								{
+									ContainerPort: 8080,
+									Name:          "port1",
+								},
+								{
+									ContainerPort: 9090,
+									Name:          "port2",
+								},
+							},
+						},
+					},
+				},
+			},
+			Expected: []bus.Event{
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports": common.MapStr{
+						"port1": int32(8080),
+						"port2": int32(9090),
+					},
+					"kubernetes": common.MapStr{
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"port":     int32(8080),
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"start":    true,
+					"host":     "127.0.0.1",
+					"port":     int32(9090),
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
 			},
 		},
 		{
@@ -522,43 +712,76 @@ func TestEmitEvent(t *testing.T) {
 					},
 				},
 			},
-			Expected: bus.Event{
-				"stop":     true,
-				"host":     "",
-				"id":       cid,
-				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"id":      "",
-						"name":    "filebeat",
-						"image":   "elastic/filebeat:6.3.0",
-						"runtime": "",
-					},
-					"pod": common.MapStr{
-						"name": "filebeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-					},
-					"node": common.MapStr{
-						"name": "node",
-					},
-					"namespace":   "default",
-					"annotations": common.MapStr{},
-				},
-				"meta": common.MapStr{
+			Expected: []bus.Event{
+				{
+					"stop":     true,
+					"host":     "",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
-						"namespace": "default",
-						"container": common.MapStr{
-							"name":  "filebeat",
-							"image": "elastic/filebeat:6.3.0",
-						}, "pod": common.MapStr{
+						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-						}, "node": common.MapStr{
+						},
+						"node": common.MapStr{
 							"name": "node",
 						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
 					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
 				},
-				"config": []*common.Config{},
+				{
+					"stop":     true,
+					"host":     "",
+					"id":       cid,
+					"port":     0,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
 			},
 		},
 		{
@@ -591,50 +814,185 @@ func TestEmitEvent(t *testing.T) {
 					},
 				},
 			},
-			Expected: bus.Event{
-				"stop":     true,
-				"host":     "127.0.0.1",
-				"id":       cid,
-				"provider": UUID,
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"id":      "",
-						"name":    "filebeat",
-						"image":   "elastic/filebeat:6.3.0",
-						"runtime": "",
-					},
-					"pod": common.MapStr{
-						"name": "filebeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-					},
-					"node": common.MapStr{
-						"name": "node",
-					},
-					"namespace":   "default",
-					"annotations": common.MapStr{},
-				},
-				"meta": common.MapStr{
+			Expected: []bus.Event{
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
 					"kubernetes": common.MapStr{
-						"namespace": "default",
-						"container": common.MapStr{
-							"name":  "filebeat",
-							"image": "elastic/filebeat:6.3.0",
-						}, "pod": common.MapStr{
+						"pod": common.MapStr{
 							"name": "filebeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
-						}, "node": common.MapStr{
+						},
+						"node": common.MapStr{
 							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"port":     0,
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+			},
+		},
+		{
+			Message: "Test stop pod without container id",
+			Flag:    "stop",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name: name,
 						},
 					},
 				},
-				"config": []*common.Config{},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: []bus.Event{
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
+					"kubernetes": common.MapStr{
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"port":     0,
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							}, "pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -661,14 +1019,17 @@ func TestEmitEvent(t *testing.T) {
 
 			pod.emit(test.Pod, test.Flag)
 
-			select {
-			case event := <-listener.Events():
-				assert.Equal(t, test.Expected, event, test.Message)
-			case <-time.After(2 * time.Second):
-				if test.Expected != nil {
-					t.Fatal("Timeout while waiting for event")
+			for i := 0; i < len(test.Expected); i++ {
+				select {
+				case event := <-listener.Events():
+					assert.Equal(t, test.Expected[i], event, test.Message)
+				case <-time.After(2 * time.Second):
+					if test.Expected != nil {
+						t.Fatal("Timeout while waiting for event")
+					}
 				}
 			}
+
 		})
 	}
 }

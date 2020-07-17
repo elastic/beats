@@ -124,7 +124,7 @@ func (f *Field) Validate() error {
 
 func (f *Field) validateType() error {
 	switch strings.ToLower(f.Type) {
-	case "text", "keyword":
+	case "text", "keyword", "wildcard":
 		return stringType.validate(f.Format)
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
 		return numberType.validate(f.Format)
@@ -138,7 +138,7 @@ func (f *Field) validateType() error {
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
 		}
-	case "object", "group", "nested":
+	case "object", "group", "nested", "flattened":
 		// No check for them yet
 	case "":
 		// Module keys, not used as fields

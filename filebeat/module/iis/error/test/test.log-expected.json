@@ -16,7 +16,7 @@
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 503,
         "http.version": "1.1",
         "iis.error.reason_phrase": "ConnLimit",
@@ -49,7 +49,7 @@
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 400,
         "http.version": "1.1",
         "iis.error.reason_phrase": "Hostname",
@@ -91,7 +91,7 @@
             "connection"
         ],
         "fileset.name": "error",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 505,
         "http.version": "2.0",
         "iis.error.reason_phrase": "Version_N/S",

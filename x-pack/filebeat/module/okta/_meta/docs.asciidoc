@@ -7,13 +7,103 @@
 
 beta[]
 
-This is a filebeat module for retrieving system logs from Okta (www.okta.com) via API. 
+The Okta module collects events from the
+https://developer.okta.com/docs/reference/[Okta API]. Specifically this supports
+reading from the https://developer.okta.com/docs/reference/api/system-log/[Okta
+System Log API].
 
-:has-dashboards!:
+:fileset_ex: system
 
-This module comes with a sample dashboard. For example:
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `system` fileset settings
+
+The Okta System Log records system events related to your organization in order
+to provide an audit trail that can be used to understand platform activity and
+to diagnose problems. This module is implemented using the
+<<filebeat-input-httpjson,httpjson>> input and is configured to paginate through
+the logs while honoring any
+https://developer.okta.com/docs/reference/rate-limits/[rate-limiting] headers
+sent by Okta.
+
+NOTE: This module does not persist the timestamp of the last read event in
+order to facilitate resuming on restart. This feature will be coming in a future
+version. When you restart the module will read events from the beginning of the
+log. To minimize duplicates documents the module uses the event's Okta UUID
+value as the Elasticsearch `_id`.
+
+This is an example configuration for the module.
+
+[source,yaml]
+----
+- module okta
+  system:
+    var.url: https://yourOktaDomain/api/v1/logs
+    var.api_key: '00QCjAl4MlV-WPXM...0HmjFx-vbGua'
+----
+
+[float]
+===== Configuration options
+
+*`var.url`*::
+
+Specifies the URL to the Okta System Log API. Required.
++
+[source,yaml]
+----
+    var.url: https://mycompany.okta.com/api/v1/logs
+----
+
+*`var.api_key`*::
+
+Specifies the Okta API token to use in requests to the API. Required.
+The token is used in an HTTP `Authorization` header with the `SSWS` scheme.
+See https://developer.okta.com/docs/guides/create-an-api-token/create-the-token/[
+Create an API token] for information on how to obtain a token.
++
+[source,yaml]
+----
+    var.api_key: '00QCjAl4MlV-WPXM...0HmjFx-vbGua'
+----
+
+*`var.http_client_timeout`*::
+
+Duration of the time limit on HTTP requests made by the module. Defaults to
+`60s`.
+
+*`var.interval`*::
+
+Duration between requests to the API. Defaults to `60s`.
+
+*`var.keep_original_message`*::
+
+Boolean flag indicating if the original JSON event string should be included in
+the `event.original` field. Defaults to `true`.
+
+*`var.ssl`*::
+
+Configuration options for SSL parameters like the certificate authority to use
+for HTTPS-based connections. If the `ssl` section is missing, the host CAs are
+used for HTTPS connections to Okta. See <<configuration-ssl>> for more
+information.
++
+[source,yaml]
+----
+    var.ssl:
+      supported_protocols: [TLSv1.2]
+----
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard:
 
 [role="screenshot"]
 image::./images/filebeat-okta-dashboard.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
 
 :modulename!:

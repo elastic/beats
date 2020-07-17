@@ -103,18 +103,33 @@ func toMACAddress(v string) (string, error) {
 var timeLayouts = []string{
 	// MMM dd HH:mm:ss.SSS zzz
 	"Jan _2 15:04:05.000 MST",
+	"Jan _2 15:04:05.000 Z0700",
+	"Jan _2 15:04:05.000 Z07:00",
+
 	// MMM dd HH:mm:sss.SSS
 	"Jan _2 15:04:05.000",
+
 	// MMM dd HH:mm:ss zzz
 	"Jan _2 15:04:05 MST",
+	"Jan _2 15:04:05 Z0700",
+	"Jan _2 15:04:05 Z07:00",
+
 	// MMM dd HH:mm:ss
 	"Jan _2 15:04:05",
+
 	// MMM dd yyyy HH:mm:ss.SSS zzz
 	"Jan _2 2006 15:04:05.000 MST",
+	"Jan _2 2006 15:04:05.000 Z0700",
+	"Jan _2 2006 15:04:05.000 Z07:00",
+
 	// MMM dd yyyy HH:mm:ss.SSS
 	"Jan _2 2006 15:04:05.000",
+
 	// MMM dd yyyy HH:mm:ss zzz
 	"Jan _2 2006 15:04:05 MST",
+	"Jan _2 2006 15:04:05 Z0700",
+	"Jan _2 2006 15:04:05 Z07:00",
+
 	// MMM dd yyyy HH:mm:ss
 	"Jan _2 2006 15:04:05",
 }

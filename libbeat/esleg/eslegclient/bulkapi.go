@@ -19,12 +19,16 @@ package eslegclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -40,6 +44,10 @@ type BulkIndexAction struct {
 
 type BulkCreateAction struct {
 	Create BulkMeta `json:"create" struct:"create"`
+}
+
+type BulkDeleteAction struct {
+	Delete BulkMeta `json:"delete" struct:"delete"`
 }
 
 type BulkMeta struct {
@@ -59,6 +67,7 @@ type BulkResult json.RawMessage
 // Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 func (conn *Connection) Bulk(
+	ctx context.Context,
 	index, docType string,
 	params map[string]string, body []interface{},
 ) (int, BulkResult, error) {
@@ -69,13 +78,18 @@ func (conn *Connection) Bulk(
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
+		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
 
-	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+
+	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
 	if err != nil {
+		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
+	requ.requ = apmhttp.RequestWithContext(ctx, requ.requ)
 
 	return conn.sendBulkRequest(requ)
 }
@@ -103,7 +117,9 @@ func (conn *Connection) SendMonitoringBulk(
 		}
 	}
 
-	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, params, enc)
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+
+	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, mergedParams, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -135,14 +151,7 @@ func newMonitoringBulkRequest(
 	params map[string]string,
 	body BodyEncoder,
 ) (*bulkRequest, error) {
-	var path string
-	var err error
-	if esVersion.Major < 7 {
-		path, err = makePath("_xpack", "monitoring", "_bulk")
-	} else {
-		path, err = makePath("_monitoring", "bulk", "")
-	}
-
+	path, err := makePath("_monitoring", "bulk", "")
 	if err != nil {
 		return nil, err
 	}
@@ -216,4 +225,24 @@ func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
 		}
 	}
 	return nil
+}
+
+func mergeParams(m1, m2 map[string]string) map[string]string {
+	if len(m1) == 0 {
+		return m2
+	}
+	if len(m2) == 0 {
+		return m1
+	}
+	merged := make(map[string]string, len(m1)+len(m2))
+
+	for k, v := range m1 {
+		merged[k] = v
+	}
+
+	for k, v := range m2 {
+		merged[k] = v
+	}
+
+	return merged
 }

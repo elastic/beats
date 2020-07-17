@@ -39,7 +39,7 @@ processors:
     if: ctx.source?.address == null
     value: ""
 - script:
-    if: ctx.nginx?.access?.remote_ip_list != null && ctx.nginx.ingress_controller.remote_ip_list.length > 0
+    if: ctx.nginx?.ingress_controller?.remote_ip_list != null && ctx.nginx.ingress_controller.remote_ip_list.length > 0
     lang: painless
     source: >-
       boolean isPrivate(def dot, def ip) {
@@ -151,9 +151,6 @@ processors:
     field: event.outcome
     value: failure
     if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - append:
     field: related.ip
     value: "{{source.ip}}"

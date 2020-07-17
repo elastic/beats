@@ -23,7 +23,7 @@ include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
 
-include::./gettingstarted.asciidoc[]
+include::./getting-started.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 

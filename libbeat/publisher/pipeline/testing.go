@@ -18,19 +18,14 @@
 package pipeline
 
 import (
-	"flag"
+	"context"
 	"math/rand"
 	"sync"
-	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-)
-
-var (
-	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
 type mockPublishFn func(publisher.Batch) error
@@ -45,7 +40,7 @@ type mockClient struct {
 
 func (c *mockClient) String() string { return "mock_client" }
 func (c *mockClient) Close() error   { return nil }
-func (c *mockClient) Publish(batch publisher.Batch) error {
+func (c *mockClient) Publish(_ context.Context, batch publisher.Batch) error {
 	return c.publishFn(batch)
 }
 
@@ -155,16 +150,6 @@ func randomBatch(min, max int) *mockBatch {
 // randIntBetween returns a random integer in [min, max)
 func randIntBetween(min, max int) int {
 	return rand.Intn(max-min) + min
-}
-
-func seedPRNG(t *testing.T) {
-	seed := *SeedFlag
-	if seed == 0 {
-		seed = time.Now().UnixNano()
-	}
-
-	t.Logf("reproduce test with `go test ... -seed %v`", seed)
-	rand.Seed(seed)
 }
 
 func waitUntilTrue(duration time.Duration, fn func() bool) bool {

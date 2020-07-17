@@ -30,11 +30,11 @@ in two fields.
 [source,yaml]
 ----
 processors:
-- dns:
-    type: reverse
-    fields:
-      source.ip: source.hostname
-      destination.ip: destination.hostname
+  - dns:
+      type: reverse
+      fields:
+        source.ip: source.hostname
+        destination.ip: destination.hostname
 ----
 
 Next is a configuration example showing all options.

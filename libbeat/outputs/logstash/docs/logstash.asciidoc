@@ -15,9 +15,9 @@ generated events.
 .Prerequisite
 To send events to {ls}, you also need to create a {ls} configuration pipeline
 that listens for incoming Beats connections and indexes the received events into
-{es}. For more information, see the section about
-{stack-gs}/get-started-elastic-stack.html#logstash-setup[configuring {ls}] in
-the {stack} getting started tutorial. Also see the documentation for the
+{es}. For more information, see
+{logstash-ref}/getting-started-with-logstash.html[Getting Started with {ls}].
+Also see the documentation for the
 {logstash-ref}/plugins-inputs-beats.html[{beats} input] and
 {logstash-ref}/plugins-outputs-elasticsearch.html[{es} output] plugins.
 
@@ -46,20 +46,6 @@ Want to use <<filebeat-modules,{beatname_uc} modules>> with {ls}? You need to do
 some extra setup. For more information, see
 {logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 endif::[]
-
-ifndef::win-only[]
- 
-include::{libbeat-dir}/step-test-config.asciidoc[]
-
-endif::win-only[]
-
-ifdef::win-only[]
-
-TIP: To test your configuration file, change to the directory where the {beatname_uc}
-binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
-
-endif::win-only[]
 
 // end::shared-logstash-config[]
 

@@ -6,10 +6,12 @@ package application
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
@@ -20,27 +22,22 @@ func TestConfig(t *testing.T) {
 
 func testMgmtMode(t *testing.T) {
 	t.Run("succeed when local mode is selected", func(t *testing.T) {
-		c := mustWithConfigMode("local")
-		m := ManagementConfig{}
+		c := mustWithConfigMode(true)
+		m := localConfig{}
 		err := c.Unpack(&m)
 		require.NoError(t, err)
-		assert.Equal(t, localMode, m.Mode)
+		assert.Equal(t, false, m.Fleet.Enabled)
+		assert.Equal(t, true, isStandalone(m.Fleet))
 
 	})
 
 	t.Run("succeed when fleet mode is selected", func(t *testing.T) {
-		c := mustWithConfigMode("fleet")
-		m := ManagementConfig{}
+		c := mustWithConfigMode(false)
+		m := localConfig{}
 		err := c.Unpack(&m)
 		require.NoError(t, err)
-		assert.Equal(t, fleetMode, m.Mode)
-	})
-
-	t.Run("fails on unknown mode", func(t *testing.T) {
-		c := mustWithConfigMode("what")
-		m := ManagementConfig{}
-		err := c.Unpack(&m)
-		require.Error(t, err)
+		assert.Equal(t, true, m.Fleet.Enabled)
+		assert.Equal(t, false, isStandalone(m.Fleet))
 	})
 }
 
@@ -51,9 +48,9 @@ func testLocalConfig(t *testing.T) {
 			"period":  0,
 		})
 
-		m := reloadConfig{}
+		m := configuration.ReloadConfig{}
 		err := c.Unpack(&m)
-		require.Error(t, err)
+		assert.Error(t, err)
 
 		c = config.MustNewConfigFrom(map[string]interface{}{
 			"enabled": true,
@@ -61,14 +58,19 @@ func testLocalConfig(t *testing.T) {
 		})
 
 		err = c.Unpack(&m)
-		require.NoError(t, err)
+		assert.NoError(t, err)
+		assert.Equal(t, 1*time.Second, m.Period)
 	})
 }
 
-func mustWithConfigMode(m string) *config.Config {
+func mustWithConfigMode(standalone bool) *config.Config {
 	return config.MustNewConfigFrom(
 		map[string]interface{}{
-			"mode": m,
+			"fleet": map[string]interface{}{
+				"enabled":        !standalone,
+				"kibana":         map[string]interface{}{"host": "demo"},
+				"access_api_key": "123",
+			},
 		},
 	)
 }

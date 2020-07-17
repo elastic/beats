@@ -15,6 +15,62 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+// ECSMeta is a collection of agent related metadata in ECS compliant object form.
+type ECSMeta struct {
+	Elastic *ElasticECSMeta `json:"elastic"`
+	Host    *HostECSMeta    `json:"host"`
+	OS      *SystemECSMeta  `json:"os"`
+}
+
+// ElasticECSMeta is a collection of elastic vendor metadata in ECS compliant object form.
+type ElasticECSMeta struct {
+	Agent *AgentECSMeta `json:"agent"`
+}
+
+// AgentECSMeta is a collection of agent metadata in ECS compliant object form.
+type AgentECSMeta struct {
+	// ID is a generated (in standalone) or assigned (in fleet) agent identifier.
+	ID string `json:"id"`
+	// Version specifies current version of an agent.
+	Version string `json:"version"`
+}
+
+// SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
+type SystemECSMeta struct {
+	// Family defines a family of underlying operating system (e.g. redhat, debian, freebsd, windows).
+	Family string `json:"family"`
+	// Kernel specifies current version of a kernel in a semver format.
+	Kernel string `json:"kernel"`
+	// Platform specifies platform agent is running on (e.g. centos, ubuntu, windows).
+	Platform string `json:"platform"`
+	// Version specifies version of underlying operating system (e.g. 10.12.6).
+	Version string `json:"version"`
+	// Name is a operating system name.
+	// Currently we just normalize the name (i.e. macOS, Windows, Linux). See https://www.elastic.co/guide/en/ecs/current/ecs-html
+	Name string `json:"name"`
+	// Full is an operating system name, including the version or code name.
+	FullName string `json:"full"`
+}
+
+// HostECSMeta is a collection of host metadata in ECS compliant object form.
+type HostECSMeta struct {
+	// Arch defines architecture of a host (e.g. x86_64, arm, ppc, mips).
+	Arch string `json:"architecture"`
+	// Hostname specifies hostname of the host.
+	Hostname string `json:"hostname"`
+	// Name specifies hostname of the host.
+	Name string `json:"name"`
+	// ID is a Unique host id.
+	// As hostname is not always unique, use values that are meaningful in your environment.
+	ID string `json:"id"`
+	// IP is Host ip addresses.
+	// Note: this field should contain an array of values.
+	IP []string `json:"ip"`
+	// Mac is Host mac addresses.
+	// Note: this field should contain an array of values.
+	MAC []string `json:"mac"`
+}
+
 // List of variables available to be used in constraint definitions.
 const (
 	// `agent.id` is a generated (in standalone) or assigned (in fleet) agent identifier.
@@ -54,18 +110,56 @@ const (
 )
 
 // ECSMetadata returns an agent ECS compliant metadata.
-func (i *AgentInfo) ECSMetadata() (map[string]interface{}, error) {
+func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, err
+	}
+
+	info := sysInfo.Info()
+
+	return &ECSMeta{
+		Elastic: &ElasticECSMeta{
+			Agent: &AgentECSMeta{
+				ID:      i.agentID,
+				Version: release.Version(),
+			},
+		},
+		Host: &HostECSMeta{
+			Arch:     info.Architecture,
+			Hostname: hostname,
+			Name:     hostname,
+			ID:       info.UniqueID,
+			IP:       info.IPs,
+			MAC:      info.MACs,
+		},
+
+		// Operating system
+		OS: &SystemECSMeta{
+			Family:   info.OS.Family,
+			Kernel:   info.KernelVersion,
+			Platform: info.OS.Platform,
+			Version:  info.OS.Version,
+			Name:     info.OS.Name,
+			FullName: getFullOSName(info),
+		},
+	}, nil
+}
+
+// ECSMetadataFlatMap returns an agent ECS compliant metadata in a form of flattened map.
+func (i *AgentInfo) ECSMetadataFlatMap() (map[string]interface{}, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: remove these values when kibana migrates to ECS
-	meta := map[string]interface{}{
-		"platform": runtime.GOOS,
-		"version":  release.Version(),
-		"host":     hostname,
-	}
+	meta := make(map[string]interface{})
 
 	sysInfo, err := sysinfo.Host()
 	if err != nil {

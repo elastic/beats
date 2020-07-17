@@ -13,41 +13,64 @@ beta[]
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-For example, this input is used to retrieve MISP threat indicators in the filebeat 
-x-pack misp module.
+For example, this input is used to retrieve MISP threat indicators in the
+Filebeat <<filebeat-module-misp,MISP>> module.
 
-This input supports timed retrieval at a configurable interval and pagination.
+This input supports retrieval at a configurable interval and pagination.
 
 Example configurations:
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
+# Fetch your public IP every minute.
 - type: httpjson
-  api_key: <YOUR API KEY>
-  interval: 12h
-  url: <URL to access>
+  url: https://api.ipify.org/?format=json
+  interval: 1m
+  processors:
+    - decode_json_fields
+        fields: [message]
+        target: json
 ----
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: httpjson
+  url: http://localhost:9200/_search?scroll=5m
   http_method: POST
   json_objects_array: hits.hits
-  pagination: |-
-  {
-    "enabled": true,
-    "extra_body_content": {
-      "scroll": "5m"
-    },
-    "id_field": "_scroll_id",
-    "req_field": "scroll_id",
-    "url": "http://localhost:9200/_search/scroll"
-   }
-   url: http://localhost:9200/filebeat-test/_search?scroll=5m
+  pagination:
+    extra_body_content:
+      scroll: 5m
+    id_field: _scroll_id
+    req_field: scroll_id
+    url: http://localhost:9200/_search/scroll
 ----
 
+Additionally, it supports authentication via HTTP Headers, API key or oauth2.
+
+Example configurations with authentication:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  http_headers:
+    Authorization: 'Basic aGVsbG86d29ybGQ='
+  url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  oauth2:
+    client.id: 12345678901234567890abcdef
+    client.secret: abcdef12345678901234567890
+    token_url: http://localhost/oauth2/token
+  url: http://localhost
+----
 
 ==== Configuration options
 
@@ -57,109 +80,383 @@ The `httpjson` input supports the following configuration options plus the
 [float]
 ==== `api_key`
 
-API key to access the HTTP API. Optional. Default: "", which means no API key is used.
+API key to access the HTTP API. When set, this adds an `Authorization` header to
+the HTTP request with this as the value.
 
 [float]
 ==== `http_client_timeout`
 
-Time duration before declaring that the HTTP client connection has timed out. Default: 60s.
+Duration before declaring that the HTTP client connection has timed out.
+Defaults to `60s`. Valid time units are `ns`, `us`, `ms`, `s` (default), `m`,
+`h`.
 
 [float]
 ==== `http_headers`
 
-Extra HTTP header options can be set by specifying this JSON object. Default: not used.
+Additional HTTP headers to set in the requests. The default value is `null`
+(no additional headers).
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  http_headers:
+    Authorization: 'Basic aGVsbG86d29ybGQ='
+----
 
 [float]
 ==== `http_method`
 
-This option specifies which HTTP method to use, GET or POST. Default: GET. 
+HTTP method to use when making requests. `GET` or `POST` are the options.
+Defaults to `GET`.
 
 [float]
 ==== `http_request_body`
 
-Any additional data that needs to be set in the HTTP request can be specified in
-this JSON blob. Default: not used.
+An optional HTTP POST body. The configuration value must be an object, and it
+will be encoded to JSON. This is only valid when `http_method` is `POST`.
+Defaults to `null` (no HTTP body).
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  http_method: POST
+  http_request_body:
+    query:
+      bool:
+        filter:
+          term:
+            type: authentication
+----
 
 [float]
 ==== `interval`
 
-Time duration between repeated data retrievals. Default: 0s, meaning no repeated data retrieval.
+Duration between repeated requests. By default, the interval is `0` which means
+it performs a single request then stops. It may make additional pagination
+requests in response to the initial request if pagination is enabled.
 
 [float]
 ==== `json_objects_array`
 
-If the HTTP API returns data in a JSON array, then this option can be set to decode these records 
-from the array. Default: not used.
+If the response body contains a JSON object containing an array then this option
+specifies the key containing that array. Each object in that array will generate
+an event. This example response contains an array called `events` that we want
+to index.
+
+["source","json",subs="attributes"]
+----
+{
+  "time": "2020-06-02 23:22:32 UTC",
+  "events": [
+    {
+      "timestamp": "2020-05-02 11:10:03 UTC",
+      "event": {
+        "category": "authorization"
+      },
+      "user": {
+        "name": "fflintstone"
+      }
+    },
+    {
+      "timestamp": "2020-05-05 13:03:11 UTC",
+      "event": {
+        "category": "authorization"
+      },
+      "user": {
+        "name": "brubble"
+      }
+    }
+  ]
+}
+----
+
+The config needs to specify `events` as the `json_objects_array` value.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  json_objects_array: events
+----
+
+[float]
+==== `split_events_by`
+
+If the response body contains a JSON object containing an array then this option
+specifies the key containing that array. Each object in that array will generate
+an event, but will maintain the common fields of the document as well.
+
+["source","json",subs="attributes"]
+----
+{
+  "time": "2020-06-02 23:22:32 UTC",
+  "user": "Bob",
+  "events": [
+    {
+      "timestamp": "2020-05-02 11:10:03 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    },
+    {
+      "timestamp": "2020-05-05 13:03:11 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  ]
+}
+----
+
+The config needs to specify `events` as the `split_events_by` value.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  split_events_by: events
+----
+
+And will output the following events:
+
+["source","json",subs="attributes"]
+----
+[
+  {
+    "time": "2020-06-02 23:22:32 UTC",
+    "user": "Bob",
+    "events": {
+      "timestamp": "2020-05-02 11:10:03 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  },
+  {
+    "time": "2020-06-02 23:22:32 UTC",
+    "user": "Bob",
+    "events": {
+      "timestamp": "2020-05-05 13:03:11 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  }
+]
+----
+
+It can be used in combination with `json_objects_array`, which will look for the field inside each element.
 
 [float]
 ==== `no_http_body`
 
-If set, do not use HTTP request body. Default: false.
+Force HTTP requests to be sent with an empty HTTP body. Defaults to `false`.
+This option cannot be used with `http_request_body`,
+`pagination.extra_body_content`, or `pagination.req_field`.
 
 [float]
 ==== `pagination.enabled`
 
-This option specifies whether pagination is enabled. Default: true.
+The `enabled` setting can be used to disable the pagination configuration by
+setting it to `false`. The default value is `true`.
+
+NOTE: Pagination settings are disabled if either `enabled` is set to `false` or
+the `pagination` section is missing.
 
 [float]
 ==== `pagination.extra_body_content`
 
-Any additional data that needs to be set in the HTTP pagination request can be specified in
-this JSON blob. Default: not used.
+An object containing additional fields that should be included in the pagination
+request body. Defaults to `null`.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  pagination.extra_body_content:
+    max_items: 500
+----
 
 [float]
 ==== `pagination.header.field_name`
 
-The field name in the HTTP Header that is used for pagination control. 
+The name of the HTTP header in the response that is used for pagination control.
+The header value will be extracted from the response and used to make the next
+pagination response. `pagination.header.regex_pattern` can be used to select
+a subset of the value.
 
 [float]
 ==== `pagination.header.regex_pattern`
 
-The regular expression pattern to use for retrieving the pagination information from the HTTP Header field specified above.
+The regular expression pattern to use for retrieving the pagination information
+from the HTTP header field specified above. The first match becomes as the
+value.
 
 [float]
 ==== `pagination.id_field`
 
-This specifies which field to use as the pagination id, to retrieve the id from the pagination 
-result JSON document.  Required when pagination is enabled.
+The name of a field in the JSON response body to use as the pagination ID.
+The value will be included in the next pagination request under the key
+specified by the `pagination.req_field` value.
 
 [float]
 ==== `pagination.req_field`
 
-This specifies which field to use as the pagination request id, to send to the HTTP API. 
-Required when pagination is enabled. 
+The name of the field to include in the pagination JSON request body containing
+the pagination ID defined by the `pagination.id_field` field.
 
 [float]
 ==== `pagination.url`
 
-This specifies the URL for sending pagination request. Required if the pagination URL is different 
-than the HTTP API URL.
+This specifies the URL for sending pagination requests. Defaults to the `url`
+value. This is only needed when the pagination requests need to be routed to
+a different URL.
 
 [float]
 ==== `rate_limit.limit`
 
-This specifies the field in the HTTP Header of the response that specifies the total limit.
+This specifies the field in the HTTP header of the response that specifies the
+total limit.
 
 [float]
 ==== `rate_limit.remaining`
 
-This specifies the field in the HTTP Header of the response that specifies the remaining quota of the rate limit.
+This specifies the field in the HTTP header of the response that specifies the
+remaining quota of the rate limit.
 
 [float]
 ==== `rate_limit.reset`
 
-This specifies the field in the HTTP Header of the response that specifies the epoch time 
-when the rate limit will be reset.
+This specifies the field in the HTTP Header of the response that specifies the
+epoch time when the rate limit will reset.
+
+[float]
+==== `retry.max_attempts`
+
+This specifies the maximum number of retries for the retryable HTTP client. Default: 5.
+
+[float]
+==== `retry.wait_min`
+
+This specifies the minimum time to wait before a retry is attempted. Default: 1s.
+
+[float]
+==== `retry.wait_max`
+
+This specifies the maximum time to wait before a retry is attempted. Default: 60s.
 
 [float]
 ==== `ssl`
 
-This specifies SSL/TLS common config. Default: not used.
+This specifies SSL/TLS configuration. If the ssl section is missing, the host's
+CAs are used for HTTPS connections. See <<configuration-ssl>> for more
+information.
 
 [float]
 ==== `url`
 
 The URL of the HTTP API. Required.
+
+[float]
+==== `oauth2.enabled`
+
+The `enabled` setting can be used to disable the oauth2 configuration by
+setting it to `false`. The default value is `true`.
+
+NOTE: OAuth2 settings are disabled if either `enabled` is set to `false` or
+the `oauth2` section is missing.
+
+[float]
+==== `oauth2.provider`
+
+The `provider` setting can be used to configure supported oauth2 providers.
+Each supported provider will require specific settings. It is not set by default.
+Supported providers are: `azure`, `google`.
+
+[float]
+==== `oauth2.client.id`
+
+The `client.id` setting is used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `oauth2.client.secret`
+
+The `client.secret` setting is used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `oauth2.scopes`
+
+The `scopes` setting defines a list of scopes that will be requested during the oauth2 flow.
+It is optional for all providers.
+
+[float]
+==== `oauth2.token_url`
+
+The `token_url` setting specifies the endpoint that will be used to generate the
+tokens during the oauth2 flow. It is required if no provider is specified.
+
+NOTE: For `azure` provider either `token_url` or `azure.tenant_id` is required.
+
+[float]
+==== `oauth2.endpoint_params`
+
+The `endpoint_params` setting specifies a set of values that will be sent on each
+request to the `token_url`. Each param key can have multiple values.
+Can be set for all providers except `google`.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  oauth2:
+    endpoint_params:
+      Param1:
+        - ValueA
+        - ValueB
+      Param2:
+        - Value
+----
+
+[float]
+==== `oauth2.azure.tenant_id`
+
+The `azure.tenant_id` is used for authentication when using `azure` provider.
+Since it is used in the process to generate the `token_url`, it can't be used in
+combination with it. It is not required.
+
+For information about where to find it, you can refer to
+https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
+
+[float]
+==== `oauth2.azure.resource`
+
+The `azure.resource` is used to identify the accessed WebAPI resource when using `azure` provider.
+It is not required.
+
+[float]
+==== `oauth2.google.credentials_file`
+
+The `google.credentials_file` setting specifies the credentials file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `oauth2.google.credentials_json`
+
+The `google.credentials_json` setting allows to write your credentials information as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `oauth2.google.jwt_file`
+
+The `google.jwt_file` setting specifies the JWT Account Key file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

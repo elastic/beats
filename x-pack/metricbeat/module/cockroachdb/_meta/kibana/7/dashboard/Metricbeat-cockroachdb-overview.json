@@ -189,7 +189,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -260,7 +260,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -444,7 +444,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -514,7 +514,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -582,7 +582,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -715,7 +715,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {
@@ -823,7 +823,7 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
               {

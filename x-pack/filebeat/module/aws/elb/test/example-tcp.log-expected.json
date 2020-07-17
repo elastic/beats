@@ -21,7 +21,10 @@
         "service.type": "aws",
         "source.bytes": 82,
         "source.ip": "192.168.131.39",
-        "source.port": "2817"
+        "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2015-05-13T23:39:43.945Z",
@@ -40,6 +43,9 @@
         "service.type": "aws",
         "source.bytes": 82,
         "source.ip": "192.168.131.39",
-        "source.port": "2817"
+        "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

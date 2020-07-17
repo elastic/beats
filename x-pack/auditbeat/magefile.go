@@ -20,7 +20,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
@@ -29,6 +29,7 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(fieldsYML)
 
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 	devtools.BeatLicense = "Elastic License"

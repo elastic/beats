@@ -1,0 +1,67 @@
+[[run-elastic-agent]]
+[role="xpack"]
+= Run {agent}
+
+experimental[]
+
+{agent} runs in two modes: standalone or fleet. The two modes differ in how you
+configure and manage the Agent.
+
+[discrete]
+[[fleet-mode]]
+== Run in {fleet} mode
+
+With _fleet mode_, you manage {agent} remotely. The Agent uses a trusted {kib}
+instance to retrieve configurations and report Agent events. This trusted {kib}
+instance must have {ingest-manager} and {fleet} enabled.
+
+To create a trusted communication channel between {agent} and {kib}, enroll the
+Agent to {fleet}.
+
+To enroll an {agent} to {fleet}:
+
+. Stop the Agent, if it's already running.
+
+. Go the **{fleet}** tab in {ingest-manager}, and click **Enroll new agent** to
+generate a token. See <<ingest-management-getting-started>> for detailed steps.
+
+. Enroll the Agent:
++
+[source,shell]
+----
+./elastic-agent enroll http://localhost:5601 $token
+----
++
+Where `$token` is an enrollment token acquired from {fleet}.
+
+To start {agent}, run:
+[source,shell]
+----
+./elastic-agent run
+----
+
+[discrete]
+[[standalone-mode]]
+== Run in standalone mode (default)
+
+With _standalone mode_, you manually configure and manage the Agent locally.
+Each Agent is configured to be in standalone mode by default after installation.
+
+If {agent} is installed as an auto-starting service, it will run automatically
+when you restart your system.
+
+To start {agent} manually, run:
+
+[source,shell]
+----
+./elastic-agent run
+----
+
+If no configuration file is specified, {agent} uses the default configuration,
+`elastic-agent.yml`, which is located in the same directory as {agent}. Specify
+the `-c` flag to use a different configuration file.
+
+For configuration options, see <<elastic-agent-configuration>>.
+
+//<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
+

@@ -18,7 +18,13 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"context"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
+
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
@@ -42,10 +48,12 @@ type netClientWorker struct {
 
 	batchSize  int
 	batchSizer func() int
-	logger     *logp.Logger
+	logger     logger
+
+	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
+func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
 		observer: observer,
 		qu:       qu,
@@ -61,7 +69,8 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		c = &netClientWorker{
 			worker: w,
 			client: nc,
-			logger: logp.NewLogger("publisher_pipeline_output"),
+			logger: logger,
+			tracer: tracer,
 		}
 	} else {
 		c = &clientWorker{worker: w, client: client}
@@ -94,8 +103,7 @@ func (w *clientWorker) run() {
 				continue
 			}
 			w.observer.outBatchSend(len(batch.Events()))
-
-			if err := w.client.Publish(batch); err != nil {
+			if err := w.client.Publish(context.TODO(), batch); err != nil {
 				return
 			}
 		}
@@ -150,11 +158,28 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			if err := w.client.Publish(batch); err != nil {
-				w.logger.Errorf("Failed to publish events: %v", err)
-				// on error return to connect loop
+			if err := w.publishBatch(batch); err != nil {
 				connected = false
 			}
 		}
 	}
+}
+
+func (w *netClientWorker) publishBatch(batch publisher.Batch) error {
+	ctx := context.Background()
+	if w.tracer != nil {
+		tx := w.tracer.StartTransaction("publish", "output")
+		defer tx.End()
+		tx.Context.SetLabel("worker", "netclient")
+		ctx = apm.ContextWithTransaction(ctx, tx)
+	}
+	err := w.client.Publish(ctx, batch)
+	if err != nil {
+		err = fmt.Errorf("failed to publish events: %w", err)
+		apm.CaptureError(ctx, err).Send()
+		w.logger.Error(err)
+		// on error return to connect loop
+		return err
+	}
+	return nil
 }

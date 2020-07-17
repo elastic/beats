@@ -1,0 +1,89 @@
+- module: aws
+  period: 12h
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - billing
+- module: aws
+  period: 1m
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - natgateway
+    - transitgateway
+    - usage
+    - vpn
+- module: aws
+  period: 5m
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - sqs
+- module: aws
+  period: 24h
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - s3_daily_storage
+    - s3_request
+- module: aws
+  period: 1m
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - elb
+    - rds
+  tags_filter:
+    - key: ""
+      value: ""
+- module: aws
+  period: 5m
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - dynamodb
+    - ebs
+    - ec2
+    - lambda
+    - sns
+  tags_filter:
+    - key: ""
+      value: ""
+- module: aws
+  period: 300s
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: AWS/EC2
+      name: [""]
+      resource_type: ""
+      dimensions:
+        - name: ""
+          value: ""
+      statistic: [""]
+      tags:
+        - key: ""
+          value: ""

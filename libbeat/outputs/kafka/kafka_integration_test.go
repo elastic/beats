@@ -20,6 +20,7 @@
 package kafka
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -220,7 +221,7 @@ func TestKafkaPublish(t *testing.T) {
 				}
 
 				wg.Add(1)
-				output.Publish(batch)
+				output.Publish(context.Background(), batch)
 			}
 
 			// wait for all published batches to be ACKed

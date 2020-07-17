@@ -14,8 +14,3 @@
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
-
-    # Set the log level from 1 (alerts only) to 7 (include all messages).
-    # Messages with a log level higher than the specified will be dropped.
-    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
-    #var.log_level: 7

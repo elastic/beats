@@ -1,0 +1,57 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "instance": {
+            "id": "7692260917184259934",
+            "name": "instance-test-ks"
+        },
+        "machine": {
+            "type": "e2-standard-2"
+        },
+        "provider": "googlecloud"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "event": {
+        "dataset": "googlecloud.compute",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "compute": {
+            "instance": {
+                "network": {
+                    "received_bytes_count": {
+                        "value": 13073
+                    },
+                    "received_packets_count": {
+                        "value": 95
+                    },
+                    "sent_bytes_count": {
+                        "value": 0
+                    },
+                    "sent_packets_count": {
+                        "value": 0
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "loadbalanced": "false"
+            },
+            "user": {
+                "created-by": "ks"
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

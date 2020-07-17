@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-nats-subscriptions]]
-=== Nats subscriptions metricset
+=== NATS subscriptions metricset
 
 include::../../../module/nats/subscriptions/_meta/docs.asciidoc[]
 

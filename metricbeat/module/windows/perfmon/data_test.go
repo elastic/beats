@@ -49,7 +49,7 @@ func TestGroupToEvents(t *testing.T) {
 			{
 				Instance:    "",
 				Measurement: 23,
-				Err:         nil,
+				Err:         pdh.CounterValueError{},
 			},
 		},
 	}

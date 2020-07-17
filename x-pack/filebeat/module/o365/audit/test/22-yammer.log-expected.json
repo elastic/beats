@@ -54,6 +54,9 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "source.port": "12345",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "36787265537"
     },
@@ -103,6 +106,9 @@
         "service.type": "o365",
         "source.ip": "fdfd::555",
         "source.port": "12346",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "asr@testsiem2.onmicrosoft.com",
         "user.id": "36085768193"
     }

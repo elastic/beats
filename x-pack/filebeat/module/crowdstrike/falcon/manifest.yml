@@ -4,5 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/crowdstrike/falconhoseclient/output
+  - name: tags
+    default: [forwarded]
 
 input: config/falcon.yml
