@@ -7,7 +7,9 @@ package application
 import (
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
@@ -19,8 +21,9 @@ var defautlRK = "DEFAULT"
 type routingKey = string
 
 type stream interface {
-	Execute(*configRequest) error
+	Execute(configrequest.Request) error
 	Close() error
+	Shutdown()
 }
 
 type streamFunc func(*logger.Logger, routingKey) (stream, error)
@@ -34,7 +37,7 @@ type router struct {
 func newRouter(log *logger.Logger, factory streamFunc) (*router, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New()
+		log, err = logger.New("router")
 		if err != nil {
 			return nil, err
 		}
@@ -72,10 +75,7 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 			return fmt.Errorf("could not find programs for routing key %s", rk)
 		}
 
-		req := &configRequest{
-			id:       id,
-			programs: programs.([]program.Program),
-		}
+		req := configrequest.New(id, time.Now(), programs.([]program.Program))
 
 		r.log.Debugf(
 			"Streams %s need to run config with ID %s and programs: %s",
@@ -111,4 +111,17 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 	}
 
 	return nil
+}
+
+// Shutdown shutdowns the router because Agent is stopping.
+func (r *router) Shutdown() {
+	keys := r.routes.Keys()
+	for _, k := range keys {
+		p, ok := r.routes.Get(k)
+		if !ok {
+			continue
+		}
+		p.(stream).Shutdown()
+		r.routes.Remove(k)
+	}
 }

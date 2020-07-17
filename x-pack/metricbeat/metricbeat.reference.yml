@@ -219,7 +219,7 @@ metricbeat.modules:
           value: i-0686946e22cf9494a
     - namespace: AWS/EBS
     - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
       tags:
         - key: "Organization"
           value: "Engineering"
@@ -313,7 +313,6 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
-
 - module: azure
   metricsets:
   - database_account
@@ -323,6 +322,24 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - billing
+  enabled: true
+  period: 24h
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - app_insights
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
 
 
 #--------------------------------- Beat Module ---------------------------------
@@ -372,6 +389,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  version: v1
 
 #----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
@@ -525,7 +543,7 @@ metricbeat.modules:
 
 - module: googlecloud
   metricsets:
-    - stackdriver
+    - metrics
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
@@ -1296,10 +1314,10 @@ metricbeat.modules:
 #  - object: 'Process'
 #    instance: ["*"]
 #    counters:
-#    - name: 'Disk Writes/sec'
-#      field: physical_disk.write.per_sec
+#    - name: '% Processor Time'
+#      field: cpu_usage
 #      format: "float"
-#    - name: "% Disk Write Time"
+#    - name: "Thread Count"
 
 - module: windows
   metricsets: ["service"]
@@ -2678,6 +2696,41 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the metricbeat.
+#instrumentation:
+    # Set to true to enable instrumentation of metricbeat.
+    #enabled: false
+
+    # Environment in which metricbeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
 
 # ================================= Migration ==================================
 

@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -73,7 +73,7 @@ func TestServer_InitialCheckIn(t *testing.T) {
 	}))
 
 	// set status as healthy and running
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 
 	// application state should be updated
 	assert.NoError(t, waitFor(func() error {
@@ -119,8 +119,8 @@ func TestServer_MultiClients(t *testing.T) {
 	}))
 
 	// set status differently
-	c1.Status(proto.StateObserved_HEALTHY, "Running")
-	c2.Status(proto.StateObserved_DEGRADED, "No upstream connection")
+	c1.Status(proto.StateObserved_HEALTHY, "Running", nil)
+	c2.Status(proto.StateObserved_DEGRADED, "No upstream connection", nil)
 
 	// application states should be updated
 	assert.NoError(t, waitFor(func() error {
@@ -243,7 +243,7 @@ func TestServer_UpdateConfig(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 	assert.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
@@ -287,7 +287,7 @@ func TestServer_UpdateConfigDisconnected(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 	assert.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
@@ -329,7 +329,7 @@ func TestServer_UpdateConfigStopping(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 	assert.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
@@ -367,7 +367,7 @@ func TestServer_Stop(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 	assert.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
@@ -395,14 +395,14 @@ func TestServer_Stop(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_CONFIGURING, "Configuring")
+	c.Status(proto.StateObserved_CONFIGURING, "Configuring", nil)
 	require.NoError(t, waitFor(func() error {
 		if cImpl.Stop() < 1 {
 			return fmt.Errorf("client never got expected stop again")
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_STOPPING, "Stopping")
+	c.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 	require.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_STOPPING {
 			return fmt.Errorf("server never updated to stopping")
@@ -435,7 +435,7 @@ func TestServer_StopTimeout(t *testing.T) {
 		}
 		return nil
 	}))
-	c.Status(proto.StateObserved_HEALTHY, "Running")
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
 	assert.NoError(t, waitFor(func() error {
 		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
@@ -572,13 +572,11 @@ func TestServer_PerformAction(t *testing.T) {
 
 func newErrorLogger(t *testing.T) *logger.Logger {
 	t.Helper()
-	cfg, err := config.NewConfigFrom(map[string]interface{}{
-		"logging": map[string]interface{}{
-			"level": "error",
-		},
-	})
-	require.NoError(t, err)
-	log, err := logger.NewFromConfig(cfg)
+
+	loggerCfg := logger.DefaultLoggingConfig()
+	loggerCfg.Level = logp.ErrorLevel
+
+	log, err := logger.NewFromConfig("", loggerCfg)
 	require.NoError(t, err)
 	return log
 }
@@ -594,11 +592,11 @@ func createAndStartServer(t *testing.T, handler Handler, extraConfigs ...func(*S
 	return srv
 }
 
-func newClientFromApplicationState(t *testing.T, as *ApplicationState, impl client.StateInterface, actions ...client.Action) *client.Client {
+func newClientFromApplicationState(t *testing.T, as *ApplicationState, impl client.StateInterface, actions ...client.Action) client.Client {
 	t.Helper()
 
 	var err error
-	var c *client.Client
+	var c client.Client
 	var wg sync.WaitGroup
 	r, w := io.Pipe()
 	wg.Add(1)
@@ -617,6 +615,7 @@ type StubApp struct {
 	lock    sync.RWMutex
 	status  proto.StateObserved_Status
 	message string
+	payload map[string]interface{}
 }
 
 func (a *StubApp) Status() proto.StateObserved_Status {
@@ -633,12 +632,13 @@ func (a *StubApp) Message() string {
 
 type StubHandler struct{}
 
-func (h *StubHandler) OnStatusChange(as *ApplicationState, status proto.StateObserved_Status, message string) {
+func (h *StubHandler) OnStatusChange(as *ApplicationState, status proto.StateObserved_Status, message string, payload map[string]interface{}) {
 	stub := as.app.(*StubApp)
 	stub.lock.Lock()
 	defer stub.lock.Unlock()
 	stub.status = status
 	stub.message = message
+	stub.payload = payload
 }
 
 type StubClientImpl struct {

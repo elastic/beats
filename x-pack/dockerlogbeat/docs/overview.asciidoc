@@ -2,10 +2,6 @@
 [role="xpack"]
 == {log-driver} overview
 
-++++
-<titleabbrev>Overview</titleabbrev>
-++++
-
 experimental[]
 
 The {log-driver} is a Docker plugin that sends container logs to the

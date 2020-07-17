@@ -7,16 +7,13 @@ package application
 import (
 	"fmt"
 
-	"github.com/urso/ecslog"
-	"github.com/urso/ecslog/backend"
-	"github.com/urso/ecslog/backend/appender"
-	"github.com/urso/ecslog/backend/layout"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 )
 
 // IntrospectOutputCmd is an introspect subcommand that shows configurations of the agent.
@@ -45,12 +42,12 @@ func (c *IntrospectOutputCmd) Execute() error {
 }
 
 func (c *IntrospectOutputCmd) introspectOutputs() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
+	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return err
 	}
@@ -60,11 +57,11 @@ func (c *IntrospectOutputCmd) introspectOutputs() error {
 		return err
 	}
 
-	if isLocal {
-		return listOutputsFromConfig(l, cfg)
+	if isStandalone(cfg.Fleet) {
+		return listOutputsFromConfig(l, rawConfig)
 	}
 
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
@@ -98,7 +95,12 @@ func listOutputsFromMap(log *logger.Logger, cfg map[string]interface{}) error {
 }
 
 func (c *IntrospectOutputCmd) introspectOutput() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
+	if err != nil {
+		return err
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return err
 	}
@@ -108,16 +110,11 @@ func (c *IntrospectOutputCmd) introspectOutput() error {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
-	if err != nil {
-		return err
+	if isStandalone(cfg.Fleet) {
+		return printOutputFromConfig(l, c.output, c.program, rawConfig)
 	}
 
-	if isLocal {
-		return printOutputFromConfig(l, c.output, c.program, cfg)
-	}
-
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
@@ -202,9 +199,5 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	backend, err := appender.Console(backend.Error, layout.Text(true))
-	if err != nil {
-		return nil, err
-	}
-	return ecslog.New(backend), nil
+	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }

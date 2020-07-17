@@ -11,8 +11,10 @@ import (
 )
 
 var (
-	homePath string
-	dataPath string
+	homePath   string
+	configPath string
+	dataPath   string
+	logsPath   string
 )
 
 func init() {
@@ -20,7 +22,9 @@ func init() {
 
 	fs := flag.CommandLine
 	fs.StringVar(&homePath, "path.home", exePath, "Agent root path")
+	fs.StringVar(&configPath, "path.config", exePath, "Config path is the directory Agent looks for its config file")
 	fs.StringVar(&dataPath, "path.data", filepath.Join(exePath, "data"), "Data path contains Agent managed binaries")
+	fs.StringVar(&logsPath, "path.logs", exePath, "Logs path contains Agent log output")
 }
 
 // Home returns a directory where binary lives
@@ -29,13 +33,22 @@ func Home() string {
 	return homePath
 }
 
-// Data returns a home directory of current user
+// Config returns a directory where configuration file lives
+func Config() string {
+	return configPath
+}
+
+// Data returns the data directory for Agent
 func Data() string {
 	return dataPath
 }
 
-func retrieveExecutablePath() string {
+// Logs returns a the log directory for Agent
+func Logs() string {
+	return logsPath
+}
 
+func retrieveExecutablePath() string {
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)

@@ -35,7 +35,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg := ContainerOutputConfig{}
 	endpoint, ok := input["hosts"]
 	if !ok {
-		return newCfg, errors.New("An endpoint flag is required")
+		return newCfg, errors.New("A hosts flag is required")
 	}
 
 	endpointList := strings.Split(endpoint, ",")

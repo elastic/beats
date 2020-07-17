@@ -10,21 +10,23 @@ import (
 	"os"
 	"strings"
 	"sync"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 const (
@@ -38,23 +40,24 @@ const (
 // Enables running sidecars for processes.
 // TODO: implement retry strategies
 type Operator struct {
-	bgContext      context.Context
-	pipelineID     string
-	logger         *logger.Logger
-	config         *operatorCfg.Config
-	handlers       map[string]handleFunc
-	stateResolver  *stateresolver.StateResolver
-	srv            *server.Server
-	eventProcessor callbackHooks
-	monitor        monitoring.Monitor
-	isMonitoring   int
+	bgContext     context.Context
+	pipelineID    string
+	logger        *logger.Logger
+	config        *configuration.SettingsConfig
+	handlers      map[string]handleFunc
+	stateResolver *stateresolver.StateResolver
+	srv           *server.Server
+	reporter      state.Reporter
+	monitor       monitoring.Monitor
+	isMonitoring  int
 
 	apps     map[string]Application
 	appsLock sync.Mutex
 
-	downloader download.Downloader
-	verifier   download.Verifier
-	installer  install.Installer
+	downloader  download.Downloader
+	verifier    download.Verifier
+	installer   install.InstallerChecker
+	uninstaller uninstall.Uninstaller
 }
 
 // NewOperator creates a new operator, this operator holds
@@ -64,47 +67,39 @@ func NewOperator(
 	ctx context.Context,
 	logger *logger.Logger,
 	pipelineID string,
-	config *config.Config,
+	config *configuration.SettingsConfig,
 	fetcher download.Downloader,
 	verifier download.Verifier,
-	installer install.Installer,
+	installer install.InstallerChecker,
+	uninstaller uninstall.Uninstaller,
 	stateResolver *stateresolver.StateResolver,
 	srv *server.Server,
-	eventProcessor callbackHooks,
+	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Operator, error) {
-
-	operatorConfig := operatorCfg.DefaultConfig()
-	if err := config.Unpack(&operatorConfig); err != nil {
-		return nil, err
-	}
-
-	if operatorConfig.DownloadConfig == nil {
+	if config.DownloadConfig == nil {
 		return nil, fmt.Errorf("artifacts configuration not provided")
 	}
 
-	if eventProcessor == nil {
-		eventProcessor = &noopCallbackHooks{}
-	}
-
 	operator := &Operator{
-		bgContext:      ctx,
-		config:         operatorConfig,
-		pipelineID:     pipelineID,
-		logger:         logger,
-		downloader:     fetcher,
-		verifier:       verifier,
-		installer:      installer,
-		stateResolver:  stateResolver,
-		srv:            srv,
-		apps:           make(map[string]Application),
-		eventProcessor: eventProcessor,
-		monitor:        monitor,
+		bgContext:     ctx,
+		config:        config,
+		pipelineID:    pipelineID,
+		logger:        logger,
+		downloader:    fetcher,
+		verifier:      verifier,
+		installer:     installer,
+		uninstaller:   uninstaller,
+		stateResolver: stateResolver,
+		srv:           srv,
+		apps:          make(map[string]Application),
+		reporter:      reporter,
+		monitor:       monitor,
 	}
 
 	operator.initHandlerMap()
 
-	os.MkdirAll(operatorConfig.DownloadConfig.TargetDirectory, 0755)
-	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
+	os.MkdirAll(config.DownloadConfig.TargetDirectory, 0755)
+	os.MkdirAll(config.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
 }
@@ -125,6 +120,12 @@ func (o *Operator) State() map[string]state.State {
 	return result
 }
 
+// Close stops all programs handled by operator and clears state
+func (o *Operator) Close() error {
+	o.monitor.Close()
+	return o.HandleConfig(configrequest.New("", time.Now(), nil))
+}
+
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, steps, ack, err := o.stateResolver.Resolve(cfg)
@@ -133,11 +134,11 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	}
 
 	for _, step := range steps {
-		if strings.ToLower(step.Process) != strings.ToLower(monitoringName) {
-			if _, isSupported := program.SupportedMap[strings.ToLower(step.Process)]; !isSupported {
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.Process),
+		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
+			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
+				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
 					errors.TypeApplication,
-					errors.M(errors.MetaKeyAppName, step.Process))
+					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
 		}
 
@@ -157,15 +158,26 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	return nil
 }
 
+// Shutdown handles shutting down the running apps for Agent shutdown.
+func (o *Operator) Shutdown() {
+	for _, app := range o.apps {
+		app.Shutdown()
+	}
+}
+
 // Start starts a new process based on a configuration
 // specific configuration of new process is passed
 func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 	flow := []operation{
-		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
-		newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
-		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
-		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
-		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
+		newRetryableOperations(
+			o.logger,
+			o.config.RetryConfig,
+			newOperationFetch(o.logger, p, o.config, o.downloader),
+			newOperationVerify(p, o.config, o.verifier),
+		),
+		newOperationInstall(o.logger, p, o.config, o.installer),
+		newOperationStart(o.logger, p, o.config, cfg),
+		newOperationConfig(o.logger, o.config, cfg),
 	}
 	return o.runFlow(p, flow)
 }
@@ -173,7 +185,8 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 // Stop stops the running process, if process is already stopped it does not return an error
 func (o *Operator) stop(p Descriptor) (err error) {
 	flow := []operation{
-		newOperationStop(o.logger, o.config, o.eventProcessor),
+		newOperationStop(o.logger, o.config),
+		newOperationUninstall(o.logger, p, o.uninstaller),
 	}
 
 	return o.runFlow(p, flow)
@@ -182,7 +195,7 @@ func (o *Operator) stop(p Descriptor) (err error) {
 // PushConfig tries to push config to a running process
 func (o *Operator) pushConfig(p Descriptor, cfg map[string]interface{}) error {
 	flow := []operation{
-		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
+		newOperationConfig(o.logger, o.config, cfg),
 	}
 
 	return o.runFlow(p, flow)
@@ -204,7 +217,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			return err
 		}
 
-		shouldRun, err := op.Check(app)
+		shouldRun, err := op.Check(o.bgContext, app)
 		if err != nil {
 			return err
 		}
@@ -245,18 +258,39 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	}
 
 	// TODO: (michal) join args into more compact options version
-	a, err := app.NewApplication(
-		o.bgContext,
-		p.ID(),
-		p.BinaryName(),
-		o.pipelineID,
-		o.config.LoggingConfig.Level.String(),
-		specifier,
-		o.srv,
-		o.config,
-		o.logger,
-		o.eventProcessor.OnFailing,
-		o.monitor)
+	var a Application
+	var err error
+	if p.ServicePort() == 0 {
+		// Applications without service ports defined are ran as through the process application type.
+		a, err = process.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	} else {
+		// Service port is defined application is ran with service application type, with it fetching
+		// the connection credentials through the defined service port.
+		a, err = service.NewApplication(
+			o.bgContext,
+			p.ID(),
+			p.BinaryName(),
+			o.pipelineID,
+			o.config.LoggingConfig.Level.String(),
+			p.ServicePort(),
+			specifier,
+			o.srv,
+			o.config,
+			o.logger,
+			o.reporter,
+			o.monitor)
+	}
 
 	if err != nil {
 		return nil, err

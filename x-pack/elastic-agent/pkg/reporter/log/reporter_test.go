@@ -15,7 +15,6 @@ import (
 
 type testCase struct {
 	event         reporter.Event
-	format        Format
 	expectedInfo  string
 	expectedError string
 }
@@ -25,27 +24,22 @@ func TestReport(t *testing.T) {
 	errorEvent := generateEvent(reporter.EventTypeError, reporter.EventSubTypeConfig)
 
 	testCases := []testCase{
-		testCase{infoEvent, DefaultFormat, DefaultString(infoEvent), ""},
-		testCase{infoEvent, JSONFormat, JSONString(infoEvent), ""},
-		testCase{errorEvent, DefaultFormat, "", DefaultString(errorEvent)},
-		testCase{errorEvent, JSONFormat, "", JSONString(errorEvent)},
+		{infoEvent, DefaultString(infoEvent), ""},
+		{errorEvent, "", DefaultString(errorEvent)},
 	}
 
 	for _, tc := range testCases {
-		cfg := DefaultLogConfig()
-		cfg.Format = tc.format
-
 		log := newTestLogger()
-		rep := NewReporter(log, cfg)
+		rep := NewReporter(log)
 
 		rep.Report(context.Background(), tc.event)
 
 		if got := log.info(); tc.expectedInfo != got {
-			t.Errorf("[%s.%s(%v)] expected info '%s' got '%s'", tc.event.Type(), tc.event.SubType(), tc.format, tc.expectedInfo, got)
+			t.Errorf("[%s(%v)] expected info '%s' got '%s'", tc.event.Type(), tc.event.SubType(), tc.expectedInfo, got)
 		}
 
 		if got := log.error(); tc.expectedError != got {
-			t.Errorf("[%s.%s(%v)] expected error '%s' got '%s'", tc.event.Type(), tc.event.SubType(), tc.format, tc.expectedError, got)
+			t.Errorf("[%s(%v)] expected error '%s' got '%s'", tc.event.Type(), tc.event.SubType(), tc.expectedError, got)
 		}
 	}
 }
@@ -98,10 +92,6 @@ func (t testEvent) Time() time.Time               { return t.timestamp }
 func (t testEvent) Message() string               { return t.message }
 func (testEvent) Payload() map[string]interface{} { return map[string]interface{}{} }
 
-func JSONString(event testEvent) string {
-	timestamp := event.timestamp.Format(timeFormat)
-	return fmt.Sprintf(`{"Type":"%s","SubType":"%s","Time":"%s","Message":"message"}`, event.Type(), event.SubType(), timestamp)
-}
 func DefaultString(event testEvent) string {
 	timestamp := event.timestamp.Format(timeFormat)
 	return fmt.Sprintf("%s: type: '%s': sub_type: '%s' message: message", timestamp, event.Type(), event.SubType())

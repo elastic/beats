@@ -77,7 +77,7 @@ processors:
 - set:
     field: tls.cipher
     value: '{{apache.access.ssl.cipher}}'
-    if: ctx?.apache?.access?.ssl?.cipher != null
+    ignore_empty_value: true
 
 - script:
     lang: painless

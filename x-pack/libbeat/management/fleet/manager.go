@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"sync"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -34,13 +35,16 @@ type Manager struct {
 	beatUUID  uuid.UUID
 	registry  *reload.Registry
 	blacklist *xmanagement.ConfigBlacklist
-	client    *client.Client
+	client    client.Client
+	lock      sync.Mutex
+	status    management.Status
+	msg       string
 
 	stopFunc func()
 }
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
-func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -51,7 +55,7 @@ func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID 
 }
 
 // NewFleetManagerWithConfig returns a X-Pack Beats Fleet Management manager.
-func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.Manager, error) {
 	log := logp.NewLogger(management.DebugK)
 
 	m := &Manager{
@@ -63,7 +67,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 	var err error
 	var blacklist *xmanagement.ConfigBlacklist
-	var eac *client.Client
+	var eac client.Client
 	if c.Enabled && c.Mode == xmanagement.ModeFleet {
 		// Initialize configs blacklist
 		blacklist, err = xmanagement.NewConfigBlacklist(c.Blacklist)
@@ -122,15 +126,28 @@ func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 	return nil
 }
 
+// UpdateStatus updates the manager with the current status for the beat.
+func (cm *Manager) UpdateStatus(status management.Status, msg string) {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
+	if cm.status != status || cm.msg != msg {
+		cm.status = status
+		cm.msg = msg
+		cm.client.Status(statusToProtoStatus(status), msg, nil)
+		cm.logger.Infof("Status change to %s: %s", status, msg)
+	}
+}
+
 func (cm *Manager) OnConfig(s string) {
-	cm.client.Status(proto.StateObserved_CONFIGURING, "Updating configuration")
+	cm.UpdateStatus(management.Configuring, "Updating configuration")
 
 	var configMap common.MapStr
 	uconfig, err := common.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
-		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		cm.UpdateStatus(management.Failed, err.Error())
 		return
 	}
 
@@ -138,31 +155,30 @@ func (cm *Manager) OnConfig(s string) {
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
-		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		cm.UpdateStatus(management.Failed, err.Error())
 		return
 	}
 
 	blocks, err := cm.toConfigBlocks(configMap)
 	if err != nil {
-		err = errors.Wrap(err, "could not apply the configuration")
+		err = errors.Wrap(err, "failed to parse configuration")
 		cm.logger.Error(err)
-		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		cm.UpdateStatus(management.Failed, err.Error())
 		return
 	}
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
-		err = errors.Wrap(err, "could not apply the configuration")
-		cm.logger.Error(err)
-		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		// `cm.apply` already logs the errors; currently allow beat to run degraded
+		cm.UpdateStatus(management.Degraded, errs.Error())
 		return
 	}
 
-	cm.client.Status(proto.StateObserved_HEALTHY, "Running")
+	cm.client.Status(proto.StateObserved_HEALTHY, "Running", nil)
 }
 
 func (cm *Manager) OnStop() {
 	if cm.stopFunc != nil {
-		cm.client.Status(proto.StateObserved_STOPPING, "Stopping")
+		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 		cm.stopFunc()
 	}
 }
@@ -284,4 +300,26 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 	}
 
 	return res, nil
+}
+
+func statusToProtoStatus(status management.Status) proto.StateObserved_Status {
+	switch status {
+	case management.Unknown:
+		// unknown is reported as healthy, as the status is unknown
+		return proto.StateObserved_HEALTHY
+	case management.Starting:
+		return proto.StateObserved_STARTING
+	case management.Configuring:
+		return proto.StateObserved_CONFIGURING
+	case management.Running:
+		return proto.StateObserved_HEALTHY
+	case management.Degraded:
+		return proto.StateObserved_DEGRADED
+	case management.Failed:
+		return proto.StateObserved_FAILED
+	case management.Stopping:
+		return proto.StateObserved_STOPPING
+	}
+	// unknown status, still reported as healthy
+	return proto.StateObserved_HEALTHY
 }

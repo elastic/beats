@@ -9,30 +9,28 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // operationVerify verifies downloaded artifact for correct signature
 // skips if artifact is already installed
 type operationVerify struct {
-	eventProcessor callbackHooks
 	program        Descriptor
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	verifier       download.Verifier
 }
 
 func newOperationVerify(
 	program Descriptor,
-	operatorConfig *config.Config,
-	verifier download.Verifier,
-	eventProcessor callbackHooks) *operationVerify {
+	operatorConfig *configuration.SettingsConfig,
+	verifier download.Verifier) *operationVerify {
 	return &operationVerify{
 		program:        program,
 		operatorConfig: operatorConfig,
-		eventProcessor: eventProcessor,
 		verifier:       verifier,
 	}
 }
@@ -45,7 +43,7 @@ func (o *operationVerify) Name() string {
 // Check checks whether verify needs to occur.
 //
 // Only if the artifacts exists does it need to be verified.
-func (o *operationVerify) Check(_ Application) (bool, error) {
+func (o *operationVerify) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
@@ -61,14 +59,10 @@ func (o *operationVerify) Check(_ Application) (bool, error) {
 }
 
 // Run runs the operation
-func (o *operationVerify) Run(ctx context.Context, application Application) (err error) {
+func (o *operationVerify) Run(_ context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			err = errors.New(err,
-				o.Name(),
-				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, application.Name()))
-			o.eventProcessor.OnFailing(ctx, application.Name(), err)
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 

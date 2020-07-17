@@ -4520,6 +4520,170 @@ type: object
 
 --
 
+[float]
+=== app_insights
+
+application insights
+
+
+
+*`azure.app_insights.application_id`*::
++
+--
+The application ID
+
+
+type: keyword
+
+--
+
+*`azure.app_insights.start_date`*::
++
+--
+The start date
+
+
+type: date
+
+--
+
+*`azure.app_insights.end_date`*::
++
+--
+The end date
+
+
+type: date
+
+--
+
+*`azure.app_insights.metrics.*.*`*::
++
+--
+The metrics
+
+
+type: object
+
+--
+
+[float]
+=== billing
+
+billing and usage details
+
+
+
+*`azure.billing.currency`*::
++
+--
+The currency
+
+
+type: keyword
+
+--
+
+*`azure.billing.pretax_cost`*::
++
+--
+Cost
+
+
+type: float
+
+--
+
+*`azure.billing.department_name`*::
++
+--
+The department name
+
+
+type: keyword
+
+--
+
+*`azure.billing.product`*::
++
+--
+The product type
+
+
+type: keyword
+
+--
+
+*`azure.billing.usage_start`*::
++
+--
+The usage start date
+
+
+type: date
+
+--
+
+*`azure.billing.usage_end`*::
++
+--
+The usage end date
+
+
+type: date
+
+--
+
+*`azure.billing.billing_period_id`*::
++
+--
+The billing period id
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_name`*::
++
+--
+The billing account name
+
+
+type: keyword
+
+--
+
+*`azure.billing.actual_cost`*::
++
+--
+The actual cost
+
+
+type: float
+
+--
+
+*`azure.billing.forecast_cost`*::
++
+--
+The forecast cost
+
+
+type: float
+
+--
+
+*`azure.billing.usage_date`*::
++
+--
+The usage date
+
+
+type: date
+
+--
+
 *`azure.compute_vm.*.*`*::
 +
 --
@@ -6652,7 +6816,7 @@ format: bytes
 Number of disk fetches.
 
 
-type: long
+type: double
 
 --
 
@@ -6710,7 +6874,7 @@ format: percent
 Number of operations per second.
 
 
-type: long
+type: double
 
 --
 
@@ -6807,7 +6971,7 @@ type: long
 Memory quota setting for the Index service (Mbyte).
 
 
-type: long
+type: double
 
 --
 
@@ -6817,7 +6981,7 @@ type: long
 Memory quota setting for the cluster (Mbyte).
 
 
-type: long
+type: double
 
 --
 
@@ -6918,7 +7082,7 @@ Couchbase node metrics.
 Number of get commands
 
 
-type: long
+type: double
 
 --
 
@@ -18234,10 +18398,10 @@ type: object
 
 --
 
-*`googlecloud.stackdriver.*.*.*.*`*::
+*`googlecloud.metrics.*.*.*.*`*::
 +
 --
-Metrics that returned from StackDriver API query.
+Metrics that returned from Google Cloud API query.
 
 
 type: object
@@ -18430,57 +18594,6 @@ Google Cloud Load Balancing metrics
 Google Cloud Load Balancing metrics
 
 
-[float]
-=== backend_latencies
-
-A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
-
-
-*`googlecloud.loadbalancing.https.backend_latencies.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.backend_latencies.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
-type: long
-
---
-
 *`googlecloud.loadbalancing.https.backend_request_bytes_count.value`*::
 +
 --
@@ -18495,196 +18608,6 @@ type: long
 --
 The number of requests served by backends of HTTP/S load balancer.
 
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.backend_response_bytes_count.value`*::
-+
---
-The number of bytes sent as responses from backends (or cache) to HTTP/S load balancer.
-
-type: long
-
---
-
-[float]
-=== frontend_tcp_rtt
-
-A distribution of the RTT measured for each connection between client and proxy.
-
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
-type: long
-
---
-
-
-[float]
-=== backend_latencies
-
-A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
-
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.request_bytes_count.value`*::
-+
---
-The number of bytes sent as requests from clients to HTTP/S load balancer.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.request_count.value`*::
-+
---
-The number of requests served by HTTP/S load balancer.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.response_bytes_count.value`*::
-+
---
-The number of bytes sent as responses from HTTP/S load balancer to clients.
-
-type: long
-
---
-
-[float]
-=== total_latencies
-
-A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
-
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
 type: long
 
 --
@@ -18712,57 +18635,6 @@ type: long
 --
 The number of bytes sent as responses from HTTP/S load balancer to clients.
 
-type: long
-
---
-
-[float]
-=== total_latencies
-
-A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
-
-
-*`googlecloud.loadbalancing.https.total_latencies.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.total_latencies.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.total_latencies.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
 type: long
 
 --
@@ -18810,57 +18682,6 @@ type: long
 --
 
 [float]
-=== rtt_latencies
-
-A distribution of RTT measured over TCP connections for ILB flows.
-
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
-type: long
-
---
-
-[float]
 === tcp_ssl_proxy
 
 Google Cloud Load Balancing metrics
@@ -18880,57 +18701,6 @@ type: long
 --
 Number of bytes sent from VM to client using proxy.
 
-type: long
-
---
-
-[float]
-=== frontend_tcp_rtt
-
-A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
-
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.count.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.mean.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_counts.value`*::
-+
---
-type: long
-
---
-
-
-
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
-+
---
-type: double
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.value`*::
-+
---
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
-+
---
 type: long
 
 --
@@ -19811,6 +19581,7 @@ type: long
 *`haproxy.info.compress.bps.in`*::
 +
 --
+Incoming compressed data in bits per second.
 
 
 type: long
@@ -19820,6 +19591,7 @@ type: long
 *`haproxy.info.compress.bps.out`*::
 +
 --
+Outgoing compressed data in bits per second.
 
 
 type: long
@@ -19829,6 +19601,7 @@ type: long
 *`haproxy.info.compress.bps.rate_limit`*::
 +
 --
+Rate limit of compressed data in bits per second.
 
 
 type: long
@@ -19850,6 +19623,7 @@ type: long
 *`haproxy.info.connection.rate.value`*::
 +
 --
+Number of connections in the last second.
 
 
 type: long
@@ -19859,6 +19633,7 @@ type: long
 *`haproxy.info.connection.rate.limit`*::
 +
 --
+Rate limit of connections.
 
 
 type: long
@@ -19868,6 +19643,7 @@ type: long
 *`haproxy.info.connection.rate.max`*::
 +
 --
+Maximum rate of connections.
 
 
 type: long
@@ -19946,6 +19722,7 @@ type: long
 *`haproxy.info.requests.total`*::
 +
 --
+Total number of requests.
 
 
 type: long
@@ -19955,6 +19732,7 @@ type: long
 *`haproxy.info.sockets.max`*::
 +
 --
+Maximum number of sockets.
 
 
 type: long
@@ -19964,6 +19742,7 @@ type: long
 *`haproxy.info.requests.max`*::
 +
 --
+Maximum number of requests.
 
 
 type: long
@@ -19979,6 +19758,7 @@ type: long
 *`haproxy.info.pipes.used`*::
 +
 --
+Number of used pipes during kernel-based tcp splicing.
 
 
 type: integer
@@ -19988,6 +19768,7 @@ type: integer
 *`haproxy.info.pipes.free`*::
 +
 --
+Number of free pipes.
 
 
 type: integer
@@ -19997,6 +19778,7 @@ type: integer
 *`haproxy.info.pipes.max`*::
 +
 --
+Maximum number of used pipes.
 
 
 type: integer
@@ -20012,6 +19794,7 @@ None
 *`haproxy.info.session.rate.value`*::
 +
 --
+Rate of session per seconds.
 
 
 type: integer
@@ -20021,6 +19804,7 @@ type: integer
 *`haproxy.info.session.rate.limit`*::
 +
 --
+Rate limit of sessions.
 
 
 type: integer
@@ -20030,6 +19814,7 @@ type: integer
 *`haproxy.info.session.rate.max`*::
 +
 --
+Maximum rate of sessions.
 
 
 type: integer
@@ -20045,7 +19830,8 @@ None
 *`haproxy.info.ssl.rate.value`*::
 +
 --
-None
+Rate of SSL requests.
+
 
 type: integer
 
@@ -20054,7 +19840,8 @@ type: integer
 *`haproxy.info.ssl.rate.limit`*::
 +
 --
-None
+Rate limit of SSL requests.
+
 
 type: integer
 
@@ -20063,7 +19850,8 @@ type: integer
 *`haproxy.info.ssl.rate.max`*::
 +
 --
-None
+Maximum rate of SSL requests.
+
 
 type: integer
 
@@ -20078,7 +19866,8 @@ None
 *`haproxy.info.ssl.frontend.key_rate.value`*::
 +
 --
-None
+Key rate of SSL frontend.
+
 
 type: integer
 
@@ -20087,7 +19876,8 @@ type: integer
 *`haproxy.info.ssl.frontend.key_rate.max`*::
 +
 --
-None
+Maximum key rate of SSL frontend.
+
 
 type: integer
 
@@ -20096,7 +19886,8 @@ type: integer
 *`haproxy.info.ssl.frontend.session_reuse.pct`*::
 +
 --
-None
+Rate of reuse of SSL frontend sessions.
+
 
 type: scaled_float
 
@@ -20113,7 +19904,8 @@ None
 *`haproxy.info.ssl.backend.key_rate.value`*::
 +
 --
-None
+Key rate of SSL backend sessions.
+
 
 type: integer
 
@@ -20122,7 +19914,8 @@ type: integer
 *`haproxy.info.ssl.backend.key_rate.max`*::
 +
 --
-MaxConnRate
+Maximum key rate of SSL backend sessions.
+
 
 type: integer
 
@@ -20131,7 +19924,8 @@ type: integer
 *`haproxy.info.ssl.cached_lookups`*::
 +
 --
-None
+Number of SSL cache lookups.
+
 
 type: long
 
@@ -20140,7 +19934,8 @@ type: long
 *`haproxy.info.ssl.cache_misses`*::
 +
 --
-None
+Number of SSL cache misses.
+
 
 type: long
 
@@ -20155,6 +19950,7 @@ type: long
 *`haproxy.info.zlib_mem_usage.value`*::
 +
 --
+Memory usage of zlib.
 
 
 type: integer
@@ -20164,6 +19960,7 @@ type: integer
 *`haproxy.info.zlib_mem_usage.max`*::
 +
 --
+Maximum memory usage of zlib.
 
 
 type: integer
@@ -20173,6 +19970,7 @@ type: integer
 *`haproxy.info.idle.pct`*::
 +
 --
+Percentage of idle time.
 
 
 type: scaled_float
@@ -26238,10 +26036,28 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.bucket.*`*::
 +
 --
 Pod preemption victims
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.sum`*::
++
+--
+Pod preemption victims sum
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
++
+--
+Pod preemption victims count
 
 type: long
 
@@ -32383,6 +32199,123 @@ type: long
 --
 
 [float]
+=== performance
+
+`performance` contains metrics related to the performance of a MySQL instance
+
+
+
+[float]
+=== events_statements
+
+Records statement events summarized by schema and digest
+
+
+*`mysql.performance.events_statements.max.timer.wait`*::
++
+--
+Maximum wait time of the summarized events that are timed
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.last.seen`*::
++
+--
+Time at which the digest was most recently seen
+
+type: date
+
+--
+
+*`mysql.performance.events_statements.quantile.95`*::
++
+--
+The 95th percentile of the statement latency, in picoseconds
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.digest`*::
++
+--
+Performance schema digest
+
+type: text
+
+--
+
+*`mysql.performance.events_statements.count.star`*::
++
+--
+Number of summarized events
+
+type: long
+
+--
+
+*`mysql.performance.events_statements.avg.timer.wait`*::
++
+--
+Average wait time of the summarized events that are timed
+
+type: long
+
+--
+
+[float]
+=== table_io_waits
+
+Records table I/O waits by index
+
+
+
+*`mysql.performance.table_io_waits.object.schema`*::
++
+--
+Schema name
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.object.name`*::
++
+--
+Table name
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.index.name`*::
++
+--
+Name of the index that was used when the table I/O wait event was recorded. PRIMARY indicates that table I/O used the primary index. NULL means that table I/O used no index. Inserts are counted against INDEX_NAME = NULL
+
+
+type: keyword
+
+--
+
+*`mysql.performance.table_io_waits.count.fetch`*::
++
+--
+Number of all fetch operations > 0
+
+type: long
+
+--
+
+[float]
+=== query
+
+`query` metricset fetches custom queries from the user to a MySQL instance.
+
+
+[float]
 === status
 
 `status` contains the metrics that were obtained by the status SQL query.
@@ -32410,6 +32343,153 @@ type: long
 +
 --
 The number of failed attempts to connect to the MySQL server.
+
+
+type: long
+
+--
+
+[float]
+=== connection
+
+
+
+
+[float]
+=== errors
+
+
+
+
+*`mysql.status.connection.errors.peer_address`*::
++
+--
+The number of errors that occurred while searching for connecting client IP addresses.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.accept`*::
++
+--
+The number of errors that occurred during calls to accept() on the listening port.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.internal`*::
++
+--
+The number of connections refused due to internal errors in the server, such as failure to start a new thread or an out-of-memory condition.
+
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.max`*::
++
+--
+The number of connections refused because the server max_connections limit was reached. thread or an out-of-memory condition.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.tcpwrap`*::
++
+--
+The number of connections refused by the libwrap library.
+
+type: long
+
+--
+
+*`mysql.status.connection.errors.select`*::
++
+--
+The number of errors that occurred during calls to select() or poll() on the listening port. (Failure of this operation does not necessarily means a client connection was rejected.)
+
+
+type: long
+
+--
+
+[float]
+=== cache
+
+
+
+
+[float]
+=== ssl
+
+SSL session cache hits and misses.
+
+
+*`mysql.status.cache.ssl.hits`*::
++
+--
+The number of SSL session cache hits.
+
+type: long
+
+--
+
+*`mysql.status.cache.ssl.misses`*::
++
+--
+The number of SSL session cache misses.
+
+type: long
+
+--
+
+*`mysql.status.cache.ssl.size`*::
++
+--
+The SSL session cache size.
+
+type: long
+
+--
+
+[float]
+=== table
+
+
+
+
+[float]
+=== open_cache
+
+
+
+
+*`mysql.status.cache.table.open_cache.hits`*::
++
+--
+The number of hits for open tables cache lookups.
+
+type: long
+
+--
+
+*`mysql.status.cache.table.open_cache.misses`*::
++
+--
+The number of misses for open tables cache lookups.
+
+type: long
+
+--
+
+*`mysql.status.cache.table.open_cache.overflows`*::
++
+--
+Number of times, after a table is opened or closed, a cache instance has an unused entry and the size of the instance is larger than table_open_cache / table_open_cache_instances
 
 
 type: long
@@ -32804,7 +32884,7 @@ type: long
 *`mysql.status.handler.read.last`*::
 +
 --
-The number of requests to read the last key in an index. 
+The number of requests to read the last key in an index.
 
 
 type: long
@@ -32834,7 +32914,7 @@ type: long
 *`mysql.status.handler.read.rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 type: long
@@ -32844,7 +32924,7 @@ type: long
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-The number of requests to read the next row in the data file. 
+The number of requests to read the next row in the data file.
 
 
 type: long
@@ -32908,6 +32988,48 @@ type: long
 
 
 [float]
+=== rows
+
+
+
+
+*`mysql.status.innodb.rows.reads`*::
++
+--
+The number of rows reads into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.inserted`*::
++
+--
+The number of rows inserted into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.deleted`*::
++
+--
+The number of rows deleted into InnoDB tables.
+
+type: long
+
+--
+
+*`mysql.status.innodb.rows.updated`*::
++
+--
+The number of rows updated into InnoDB tables.
+
+type: long
+
+--
+
+[float]
 === buffer_pool
 
 
@@ -32942,7 +33064,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-The total number of bytes in the InnoDB buffer pool containing data. 
+The total number of bytes in the InnoDB buffer pool containing data.
 
 
 type: long
@@ -37487,6 +37609,16 @@ type: object
 +
 --
 Non-numeric values collected.
+
+
+type: object
+
+--
+
+*`sql.metrics.boolean.*`*::
++
+--
+Boolean values collected.
 
 
 type: object
