@@ -17,7 +17,27 @@
 
 package diskqueue
 
-import "os"
+import (
+	"bytes"
+	"io"
+	"os"
+	"syscall"
+)
+
+// frameForContent wraps the given content buffer in a
+// frame header / footer and returns the resulting larger buffer.
+func frameForContent(
+	frameContent []byte, checksumType ChecksumType,
+) bytes.Buffer {
+	buf := bytes.Buffer{}
+	//checksum := computeChecksum(frameContent, checksumType)
+	/*buf
+	frameLength := len(frameContent) + frameMetadataSize;
+	frameBytes := make([]byte, frameLength)
+	frameWriter :=
+	binary.Write(reader.raw, binary.LittleEndian, &frameLength)*/
+	return buf
+}
 
 // The writer loop's job is to continuously read a data frame from the
 // queue's intake channel, if there is one, and write it to disk.
@@ -26,11 +46,11 @@ func (dq *diskQueue) writerLoop() {
 	// This should be non-nil if and only if dq.segments.writing is.
 	var file *os.File
 	var filePosition int64
+	var frameBuffer bytes.Buffer
 	for {
-		var frameBytes []byte
 		select {
-		case frameBytes = <-dq.inChan:
-
+		case frameContent := <-dq.inChan:
+			frameBuffer = frameForContent(frameContent, dq.settings.ChecksumType)
 		case <-dq.done:
 			break
 		}
@@ -38,10 +58,9 @@ func (dq *diskQueue) writerLoop() {
 		defer dq.segments.Unlock()
 		// TODO: try to delete dq.segments.finished
 
-		var newFrameSize = uint64(len(frameBytes) + frameMetadataSize)
-
+		frameLen := uint64(frameBuffer.Len())
 		if dq.segments.writing != nil &&
-			dq.segments.writing.size+newFrameSize > dq.settings.MaxSegmentSize {
+			dq.segments.writing.size+frameLen > dq.settings.MaxSegmentSize {
 			// This segment is full. Close the file handle and move it to the
 			// reading list.
 			// TODO: make reasonable efforts to sync to disk.
@@ -61,7 +80,7 @@ func (dq *diskQueue) writerLoop() {
 
 		// We now have a frame we want to write to disk, and enough free capacity
 		// to write it.
-
+		writeAll(file, frameBuffer.Bytes())
 	}
 }
 
@@ -80,4 +99,20 @@ func (segments *diskQueueSegments) sizeOnDiskWithLock() uint64 {
 		total += segment.size
 	}
 	return total
+}
+
+func writeAll(writer io.Writer, p []byte) (int, error) {
+	var N int
+	for len(p) > 0 {
+		n, err := writer.Write(p)
+		N, p = N+n, p[n:]
+		if err != nil && isRetryErr(err) {
+			return N, err
+		}
+	}
+	return N, nil
+}
+
+func isRetryErr(err error) bool {
+	return err == syscall.EINTR || err == syscall.EAGAIN
 }

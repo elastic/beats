@@ -44,6 +44,10 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 	if err := config.Unpack(&userConfig); err != nil {
 		return Settings{}, err
 	}
+	settings := Settings{
+		ChecksumType: ChecksumTypeCRC32,
+	}
+	settings.Path = userConfig.Path
 
 	return Settings{}, nil
 }

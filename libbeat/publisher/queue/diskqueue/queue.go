@@ -66,6 +66,8 @@ type Settings struct {
 	// after it is opened (there is no way to acknowledge input from a
 	// previous execution). It is ignored for events before that.
 	//WriteToOutputACKListener queue.ACKListener
+
+	ChecksumType ChecksumType
 }
 
 type segmentID uint64
@@ -75,7 +77,9 @@ type queuePosition struct {
 	segment segmentID
 
 	// The byte offset of this position within its segment.
-	byteIndex segmentPos
+	// This is specified relative to the start of the segment's data region, i.e.
+	// an offset of 0 means the first byte after the end of the segment header.
+	offset segmentOffset
 }
 
 type diskQueueOutput struct {
@@ -119,7 +123,7 @@ type diskQueue struct {
 	//writer *segmentWriter
 
 	// The ol
-	firstPosition bufferPosition
+	//firstPosition bufferPosition
 
 	// The position of the next event to read from the queue. If this equals
 	// writePosition, then there are no events left to read.
@@ -130,7 +134,7 @@ type diskQueue struct {
 	// from the queue).
 	// This is part of diskQueue and not diskQueueState since it represents
 	// in-memory state that should not persist through a restart.
-	readPosition bufferPosition
+	//readPosition bufferPosition
 
 	// A condition that is signalled when a segment file is deleted.
 	// Used by writerLoop when the queue is full, to detect when to try again.
@@ -263,7 +267,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 
 	return &diskQueue{
 		settings: settings,
-		segments: diskQueueSegments{
+		segments: &diskQueueSegments{
 			reading: segments,
 		},
 		closed: atomic.MakeBool(false),
@@ -292,7 +296,7 @@ func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
 		// Remove the segment from the active list and move it to
 		// completedSegments until all its data has been acknowledged.
 		dq.segments.reading = dq.segments.reading[1:]
-		dq.segments.completed = append(dq.segments.completed, segment)
+		dq.segments.waiting = append(dq.segments.waiting, segment)
 		return reader, errors
 	}
 	// TODO: if segments.reading is empty we may still be able to
@@ -322,14 +326,14 @@ func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 	return &segmentReader{
 		raw:          reader,
 		curPosition:  0,
-		endPosition:  segmentPos(dataSize),
+		endPosition:  segmentOffset(dataSize),
 		checksumType: header.checksumType,
 	}, nil
 }
 
 type segmentHeader struct {
 	version      uint32
-	checksumType checksumType
+	checksumType ChecksumType
 }
 
 func readSegmentHeader(in io.Reader) (*segmentHeader, error) {

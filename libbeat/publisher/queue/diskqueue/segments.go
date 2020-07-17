@@ -39,8 +39,8 @@ import (
 // to the oldest remaining frame on startup.
 type frameID uint64
 
-// segmentPos is a byte index into the segment's data region.
-type segmentPos uint64
+// segmentOffset is a byte index into the segment's data region.
+type segmentOffset uint64
 
 // The metadata for a single segment file.
 type queueSegment struct {
@@ -70,15 +70,15 @@ type segmentReader struct {
 	raw io.Reader
 
 	// The current byte offset of the reader within the file.
-	curPosition segmentPos
+	curPosition segmentOffset
 
 	// The position at which this reader should stop reading. This is often
 	// the end of the file, but it may be earlier when the queue is reading
 	// and writing to the same segment.
-	endPosition segmentPos
+	endPosition segmentOffset
 
 	// The checksumType field from this segment file's header.
-	checksumType checksumType
+	checksumType ChecksumType
 }
 
 type segmentWriter struct {
@@ -87,11 +87,17 @@ type segmentWriter struct {
 	position int64
 }
 
-type checksumType int
+// ChecksumType specifies what checksum algorithm the queue should use to
+// verify its data frames.
+type ChecksumType int
 
+// ChecksumTypeNone: Don't compute or verify checksums.
+// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
+//   "hash/crc32" package.
 const (
-	checksumTypeNone = iota
-	checksumTypeCRC32
+	ChecksumTypeNone = iota
+
+	ChecksumTypeCRC32
 )
 
 // Each data frame has 2 32-bit lengths and 1 32-bit checksum.
@@ -156,7 +162,7 @@ func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 	}
 
 	// Bounds checking to make sure we can read this frame.
-	if reader.curPosition+int64(frameLength) > reader.endPosition {
+	if reader.curPosition+segmentOffset(frameLength) > reader.endPosition {
 		// This frame extends past the end of our data region, which
 		// should never happen unless there is data corruption.
 		return nil, fmt.Errorf(
@@ -202,7 +208,7 @@ func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 		return nil, fmt.Errorf("Disk queue: bad data frame checksum")
 	}
 
-	reader.curPosition += int64(frameLength)
+	reader.curPosition += segmentOffset(frameLength)
 	return data, nil
 }
 
@@ -219,11 +225,11 @@ func (dq *diskQueue) ack(frame frameID) int {
 	return ackedCount
 }
 
-func computeChecksum(data []byte, checksumType checksumType) uint32 {
+func computeChecksum(data []byte, checksumType ChecksumType) uint32 {
 	switch checksumType {
-	case checksumTypeNone:
+	case ChecksumTypeNone:
 		return 0
-	case checksumTypeCRC32:
+	case ChecksumTypeCRC32:
 		hash := crc32.NewIEEE()
 		frameLength := uint32(len(data) + frameMetadataSize)
 		binary.Write(hash, binary.LittleEndian, &frameLength)
@@ -234,8 +240,10 @@ func computeChecksum(data []byte, checksumType checksumType) uint32 {
 	}
 }
 
+/*
 func (dq *diskQueue) segmentReaderForPosition(
 	pos bufferPosition,
 ) (*segmentReader, error) {
 	panic("TODO: not implemented")
 }
+*/

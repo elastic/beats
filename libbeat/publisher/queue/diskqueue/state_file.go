@@ -33,7 +33,7 @@ type diskQueuePersistentState struct {
 
 	// The oldest position in the queue. This is advanced as we receive ACKs from
 	// downstream consumers indicating it is safe to remove old events.
-	firstPosition bufferPosition
+	firstPosition queuePosition
 }
 
 // A wrapper around os.File that saves and loads the queue state.
@@ -74,7 +74,7 @@ func persistentStateFromHandle(
 	}
 
 	err = binary.Read(
-		reader, binary.LittleEndian, &state.firstPosition.byteIndex)
+		reader, binary.LittleEndian, &state.firstPosition.offset)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func persistentStateFromHandle(
 // file with the result. Returns nil if successful, otherwise an error.
 func writePersistentStateToHandle(
 	file *os.File,
-	firstPosition bufferPosition,
+	firstPosition queuePosition,
 ) error {
 	_, err := file.Seek(0, 0)
 	if err != nil {
@@ -105,7 +105,7 @@ func writePersistentStateToHandle(
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian, &firstPosition.byteIndex)
+	err = binary.Write(file, binary.LittleEndian, &firstPosition.offset)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func stateFileForPath(path string) (*stateFile, error) {
 	}
 	if state == nil {
 		// Initialize with new zero state.
-		err = writePersistentStateToHandle(file, bufferPosition{0, 0})
+		err = writePersistentStateToHandle(file, queuePosition{0, 0})
 		if err != nil {
 			return nil, fmt.Errorf("Couldn't write queue state to disk: %w", err)
 		}
