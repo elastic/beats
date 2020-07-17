@@ -1,0 +1,597 @@
+- name: firewall
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing junipersrx syslog.
+  fields:
+    - name: reason
+      type: keyword
+      description: >
+        reason
+
+    - name: source-address
+      type: ip
+      description: >
+        source address
+
+    - name: source-port
+      type: integer
+      description: >
+        source port
+
+    - name: destination-address
+      type: ip
+      description: >
+        destination address
+
+    - name: destination-port
+      type: integer
+      description: >
+        destination port
+
+    - name: connection-tag
+      type: keyword
+      description: >
+        connection tag
+
+    - name: service-name
+      type: keyword
+      description: >
+        service name
+
+    - name: nat-source-address
+      type: ip
+      description: >
+        nat source address
+
+    - name: nat-source-port
+      type: integer
+      description: >
+        nat source port
+
+    - name: nat-destination-address
+      type: ip
+      description: >
+        nat destination address
+
+    - name: nat-destination-port
+      type: integer
+      description: >
+        nat destination port
+
+    - name: nat-connection-tag
+      type: keyword
+      description: >
+        nat connection tag
+
+    - name: src-nat-rule-type
+      type: keyword
+      description: >
+        src nat rule type
+
+    - name: src-nat-rule-name
+      type: keyword
+      description: >
+        src nat rule name
+
+    - name: dst-nat-rule-type
+      type: keyword
+      description: >
+        dst nat rule type
+
+    - name: dst-nat-rule-name
+      type: keyword
+      description: >
+        dst nat rule name
+
+    - name: protocol-id
+      type: keyword
+      description: >
+        protocol id
+
+    - name: policy-name
+      type: keyword
+      description: >
+        policy name
+
+    - name: source-zone-name
+      type: keyword
+      description: >
+        source zone name
+
+    - name: source-zone
+      type: keyword
+      description: >
+        source zone
+
+    - name: destination-zone-name
+      type: keyword
+      description: >
+        destination zone name
+
+    - name: destination-zone
+      type: keyword
+      description: >
+        destination zone
+
+    - name: session-id-32
+      type: keyword
+      description: >
+        session id 32
+
+    - name: session-id
+      type: keyword
+      description: >
+        session id
+
+    - name: packets-from-client
+      type: integer
+      description: >
+        packets from client
+
+    - name: outbound-packets
+      type: integer
+      description: >
+        packets from client
+
+    - name: bytes-from-client
+      type: integer
+      description: >
+        bytes from client
+
+    - name: outbound-bytes
+      type: integer
+      description: >
+        bytes from client
+
+    - name: packets-from-server
+      type: integer
+      description: >
+        packets from server
+
+    - name: inbound-packets
+      type: integer
+      description: >
+        packets from server
+
+    - name: bytes-from-server
+      type: integer
+      description: >
+        bytes from server
+
+    - name: inbound-bytes
+      type: integer
+      description: >
+        bytes from server
+
+    - name: elapsed-time
+      type: date
+      description: >
+        elapsed time
+
+    - name: application
+      type: keyword
+      description: >
+        application
+
+    - name: nested-application
+      type: keyword
+      description: >
+        nested application
+
+    - name: username
+      type: keyword
+      description: >
+        username
+
+    - name: roles
+      type: keyword
+      description: >
+        roles
+
+    - name: packet-incoming-interface
+      type: keyword
+      description: >
+        packet incoming interface
+
+    - name: encrypted
+      type: keyword
+      description: >
+        encrypted
+
+    - name: application-category
+      type: keyword
+      description: >
+        application category
+
+    - name: application-sub-category
+      type: keyword
+      description: >
+        application sub category
+
+    - name: application-risk
+      type: integer
+      description: >
+        application risk
+  
+    - name: urlcategory-risk
+      type: integer
+      description: >
+        urlcategory risk
+
+    - name: application-characteristics
+      type: keyword
+      description: >
+        application characteristics
+
+    - name: secure-web-proxy-session-type
+      type: keyword
+      description: >
+        secure web proxy session type
+
+    - name: peer-session-id
+      type: keyword
+      description: >
+        peer session id
+
+    - name: peer-source-address
+      type: ip
+      description: >
+        peer source address
+
+    - name: peer-source-port
+      type: integer
+      description: >
+        peer source port
+
+    - name: peer-destination-address
+      type: ip
+      description: >
+        peer destination address
+
+    - name: peer-destination-port
+      type: integer
+      description: >
+        peer destination port
+
+    - name: hostname
+      type: keyword
+      description: >
+        hostname
+
+    - name: src-vrf-grp
+      type: keyword
+      description: >
+        src-vrf-grp
+
+    - name: dst-vrf-grp
+      type: keyword
+      description: >
+        dst-vrf-grp
+
+    - name: icmp-type
+      type: integer
+      description: >
+        icmp type
+
+    - name: process
+      type: keyword
+      description: >
+        process that generated the message
+  
+    - name: apbr-rule-type
+      type: keyword
+      description: >
+        apbr rule type
+
+    - name: dscp-value
+      type: integer
+      description: >
+        apbr rule type
+
+    - name: logical-system-name
+      type: keyword
+      description: >
+        logical system name
+
+    - name: destination-interface-name
+      type: keyword
+      description: >
+        destination interface name
+
+    - name: profile-name
+      type: keyword
+      description: >
+        profile name
+
+    - name: routing-instance
+      type: keyword
+      description: >
+        routing instance
+
+    - name: rule-name
+      type: keyword
+      description: >
+        rule name
+  
+    - name: uplink-tx-bytes
+      type: integer
+      description: >
+        uplink tx bytes
+  
+    - name: uplink-rx-bytes
+      type: integer
+      description: >
+        uplink rx bytes
+
+    - name: obj
+      type: keyword
+      description: >
+        url path
+
+    - name: url
+      type: keyword
+      description: >
+        url domain
+
+    - name: profile
+      type: keyword
+      description: >
+        filter profile
+
+    - name: category
+      type: keyword
+      description: >
+        filter category
+
+    - name: filename
+      type: keyword
+      description: >
+        filename
+
+    - name: temporary-filename
+      type: keyword
+      description: >
+        temporary-filename
+
+    - name: name
+      type: keyword
+      description: >
+        name
+
+    - name: error-message
+      type: keyword
+      description: >
+        error-message
+
+    - name: error-code
+      type: keyword
+      description: >
+        error-code
+
+    - name: action
+      type: keyword
+      description: >
+        action
+
+    - name: protocol
+      type: keyword
+      description: >
+        protocol
+
+    - name: protocol-name
+      type: keyword
+      description: >
+        protocol name
+
+    - name: type
+      type: keyword
+      description: >
+        type
+
+    - name: repeat-count
+      type: integer
+      description: >
+        repeat count
+
+    - name: alert
+      type: keyword
+      description: >
+        repeat alert
+
+    - name: message-type
+      type: keyword
+      description: >
+        message type
+
+    - name: threat-severity
+      type: keyword
+      description: >
+        threat severity
+
+    - name: application-name
+      type: keyword
+      description: >
+        application name
+
+    - name: attack-name
+      type: keyword
+      description: >
+        attack name
+
+    - name: index
+      type: keyword
+      description: >
+        index
+
+    - name: message
+      type: keyword
+      description: >
+        mesagge
+
+    - name: epoch-time
+      type: date
+      description: >
+        epoch time
+
+    - name: packet-log-id
+      type: integer
+      description: >
+        packet log id
+
+    - name: export-id
+      type: integer
+      description: >
+        packet log id
+
+    - name: ddos-application-name
+      type: keyword
+      description: >
+        ddos application name
+
+    - name: connection-hit-rate
+      type: integer
+      description: >
+        connection hit rate
+
+    - name: time-scope
+      type: keyword
+      description: >
+        time scope
+
+    - name: context-hit-rate
+      type: integer
+      description: >
+        context hit rate
+
+    - name: context-value-hit-rate
+      type: integer
+      description: >
+        context value hit rate
+
+    - name: time-count
+      type: integer
+      description: >
+        time count
+
+    - name: time-period
+      type: integer
+      description: >
+        time period
+
+    - name: context-value
+      type: keyword
+      description: >
+        context value
+
+    - name: context-name
+      type: keyword
+      description: >
+        context name
+
+    - name: ruleebase-name
+      type: keyword
+      description: >
+        ruleebase name
+
+    - name: interface-name
+      type: keyword
+      description: >
+        interface name
+
+    - name: verdict-source
+      type: keyword
+      description: >
+        verdict source
+
+    - name: verdict-number
+      type: integer
+      description: >
+        verdict number
+
+    - name: http-host
+      type: keyword
+      description: >
+        http host
+
+    - name: file-category
+      type: keyword
+      description: >
+        file category
+
+    - name: sample-sha256
+      type: keyword
+      description: >
+        sample sha256
+
+    - name: malware-info
+      type: keyword
+      description: >
+        malware info
+
+    - name: client-ip
+      type: ip
+      description: >
+        client ip
+
+    - name: tenant-id
+      type: keyword
+      description: >
+        tenant id
+
+    - name: timestamp
+      type: date
+      description: >
+        timestamp
+
+    - name: th
+      type: keyword
+      description: >
+        th
+
+    - name: status
+      type: keyword
+      description: >
+        status
+  
+    - name: state
+      type: keyword
+      description: >
+        state
+
+    - name: file-hash-lookup
+      type: keyword
+      description: >
+       file hash lookup
+
+    - name: file-name
+      type: keyword
+      description: >
+       file name
+
+    - name: action-detail
+      type: keyword
+      description: >
+       action detail
+
+    - name: sub-category
+      type: keyword
+      description: >
+       sub category
+
+    - name: feed-name
+      type: keyword
+      description: >
+       feed name
+
+    - name: occur-count
+      type: integer
+      description: >
+       occur count
+
+    - name: tag
+      type: keyword
+      description: >
+        system log message tag, which uniquely identifies the message.
+

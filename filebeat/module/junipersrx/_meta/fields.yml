@@ -1,0 +1,9 @@
+- key: junipersrx
+  title: "junipersrx"
+  description: >
+    junipersrx Module
+  fields:
+    - name: junipersrx
+      type: group
+      description: >
+      fields:

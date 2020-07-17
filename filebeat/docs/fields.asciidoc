@@ -49,6 +49,7 @@ grouped in the following categories:
 * <<exported-fields-iptables>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-juniper>>
+* <<exported-fields-junipersrx>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -88075,6 +88076,1206 @@ type: keyword
 +
 --
 This key captures values or decorators used within a registry entry
+
+type: keyword
+
+--
+
+[[exported-fields-junipersrx]]
+== junipersrx fields
+
+junipersrx Module
+
+
+
+[float]
+=== junipersrx
+
+
+
+
+[float]
+=== firewall
+
+Module for parsing junipersrx syslog.
+
+
+
+*`junipersrx.firewall.reason`*::
++
+--
+reason
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.source-address`*::
++
+--
+source address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.source-port`*::
++
+--
+source port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.destination-address`*::
++
+--
+destination address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.destination-port`*::
++
+--
+destination port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.connection-tag`*::
++
+--
+connection tag
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.service-name`*::
++
+--
+service name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.nat-source-address`*::
++
+--
+nat source address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.nat-source-port`*::
++
+--
+nat source port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.nat-destination-address`*::
++
+--
+nat destination address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.nat-destination-port`*::
++
+--
+nat destination port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.nat-connection-tag`*::
++
+--
+nat connection tag
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.src-nat-rule-type`*::
++
+--
+src nat rule type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.src-nat-rule-name`*::
++
+--
+src nat rule name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.dst-nat-rule-type`*::
++
+--
+dst nat rule type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.dst-nat-rule-name`*::
++
+--
+dst nat rule name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.protocol-id`*::
++
+--
+protocol id
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.policy-name`*::
++
+--
+policy name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.source-zone-name`*::
++
+--
+source zone name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.source-zone`*::
++
+--
+source zone
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.destination-zone-name`*::
++
+--
+destination zone name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.destination-zone`*::
++
+--
+destination zone
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.session-id-32`*::
++
+--
+session id 32
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.session-id`*::
++
+--
+session id
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.packets-from-client`*::
++
+--
+packets from client
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.outbound-packets`*::
++
+--
+packets from client
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.bytes-from-client`*::
++
+--
+bytes from client
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.outbound-bytes`*::
++
+--
+bytes from client
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.packets-from-server`*::
++
+--
+packets from server
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.inbound-packets`*::
++
+--
+packets from server
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.bytes-from-server`*::
++
+--
+bytes from server
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.inbound-bytes`*::
++
+--
+bytes from server
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.elapsed-time`*::
++
+--
+elapsed time
+
+
+type: date
+
+--
+
+*`junipersrx.firewall.application`*::
++
+--
+application
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.nested-application`*::
++
+--
+nested application
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.username`*::
++
+--
+username
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.roles`*::
++
+--
+roles
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.packet-incoming-interface`*::
++
+--
+packet incoming interface
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.encrypted`*::
++
+--
+encrypted
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.application-category`*::
++
+--
+application category
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.application-sub-category`*::
++
+--
+application sub category
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.application-risk`*::
++
+--
+application risk
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.urlcategory-risk`*::
++
+--
+urlcategory risk
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.application-characteristics`*::
++
+--
+application characteristics
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.secure-web-proxy-session-type`*::
++
+--
+secure web proxy session type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.peer-session-id`*::
++
+--
+peer session id
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.peer-source-address`*::
++
+--
+peer source address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.peer-source-port`*::
++
+--
+peer source port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.peer-destination-address`*::
++
+--
+peer destination address
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.peer-destination-port`*::
++
+--
+peer destination port
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.hostname`*::
++
+--
+hostname
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.src-vrf-grp`*::
++
+--
+src-vrf-grp
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.dst-vrf-grp`*::
++
+--
+dst-vrf-grp
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.icmp-type`*::
++
+--
+icmp type
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.process`*::
++
+--
+process that generated the message
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.apbr-rule-type`*::
++
+--
+apbr rule type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.dscp-value`*::
++
+--
+apbr rule type
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.logical-system-name`*::
++
+--
+logical system name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.destination-interface-name`*::
++
+--
+destination interface name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.profile-name`*::
++
+--
+profile name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.routing-instance`*::
++
+--
+routing instance
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.rule-name`*::
++
+--
+rule name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.uplink-tx-bytes`*::
++
+--
+uplink tx bytes
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.uplink-rx-bytes`*::
++
+--
+uplink rx bytes
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.obj`*::
++
+--
+url path
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.url`*::
++
+--
+url domain
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.profile`*::
++
+--
+filter profile
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.category`*::
++
+--
+filter category
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.filename`*::
++
+--
+filename
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.temporary-filename`*::
++
+--
+temporary-filename
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.name`*::
++
+--
+name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.error-message`*::
++
+--
+error-message
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.error-code`*::
++
+--
+error-code
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.action`*::
++
+--
+action
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.protocol`*::
++
+--
+protocol
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.protocol-name`*::
++
+--
+protocol name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.type`*::
++
+--
+type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.repeat-count`*::
++
+--
+repeat count
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.alert`*::
++
+--
+repeat alert
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.message-type`*::
++
+--
+message type
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.threat-severity`*::
++
+--
+threat severity
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.application-name`*::
++
+--
+application name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.attack-name`*::
++
+--
+attack name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.index`*::
++
+--
+index
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.message`*::
++
+--
+mesagge
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.epoch-time`*::
++
+--
+epoch time
+
+
+type: date
+
+--
+
+*`junipersrx.firewall.packet-log-id`*::
++
+--
+packet log id
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.export-id`*::
++
+--
+packet log id
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.ddos-application-name`*::
++
+--
+ddos application name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.connection-hit-rate`*::
++
+--
+connection hit rate
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.time-scope`*::
++
+--
+time scope
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.context-hit-rate`*::
++
+--
+context hit rate
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.context-value-hit-rate`*::
++
+--
+context value hit rate
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.time-count`*::
++
+--
+time count
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.time-period`*::
++
+--
+time period
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.context-value`*::
++
+--
+context value
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.context-name`*::
++
+--
+context name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.ruleebase-name`*::
++
+--
+ruleebase name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.interface-name`*::
++
+--
+interface name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.verdict-source`*::
++
+--
+verdict source
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.verdict-number`*::
++
+--
+verdict number
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.http-host`*::
++
+--
+http host
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.file-category`*::
++
+--
+file category
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.sample-sha256`*::
++
+--
+sample sha256
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.malware-info`*::
++
+--
+malware info
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.client-ip`*::
++
+--
+client ip
+
+
+type: ip
+
+--
+
+*`junipersrx.firewall.tenant-id`*::
++
+--
+tenant id
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.timestamp`*::
++
+--
+timestamp
+
+
+type: date
+
+--
+
+*`junipersrx.firewall.th`*::
++
+--
+th
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.status`*::
++
+--
+status
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.state`*::
++
+--
+state
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.file-hash-lookup`*::
++
+--
+file hash lookup
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.file-name`*::
++
+--
+file name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.action-detail`*::
++
+--
+action detail
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.sub-category`*::
++
+--
+sub category
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.feed-name`*::
++
+--
+feed name
+
+
+type: keyword
+
+--
+
+*`junipersrx.firewall.occur-count`*::
++
+--
+occur count
+
+
+type: integer
+
+--
+
+*`junipersrx.firewall.tag`*::
++
+--
+system log message tag, which uniquely identifies the message.
+
 
 type: keyword
 
