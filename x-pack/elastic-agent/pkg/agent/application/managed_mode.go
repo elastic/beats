@@ -81,9 +81,15 @@ func newManaged(
 	}
 
 	// merge local configuration and configuration persisted from fleet.
-	rawConfig.Merge(config)
+	err = rawConfig.Merge(config)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyPath, path))
+	}
 
-	cfg, err := configuration.NewFromConfig(config)
+	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
