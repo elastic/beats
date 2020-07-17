@@ -13,8 +13,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -24,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 type store interface {
