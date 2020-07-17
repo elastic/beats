@@ -107,4 +107,4 @@ tags are only added once even if multiple lookups fail. By default no tags are
 added upon failure.
 
 `transport`:: The type of transport connection that should be used can either be
-`tls` (DNS over TLS) or UDP. By default `udp`
+`tls` (DNS over TLS) or `udp`. Defaults to `udp`.

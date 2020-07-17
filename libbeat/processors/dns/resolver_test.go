@@ -142,7 +142,7 @@ func ServeDNS(h dns.HandlerFunc) (cancel func() error, addr string, err error) {
 
 func ServeDNSTLS(h dns.HandlerFunc, config *tls.Config) (cancel func() error, addr string, err error) {
 	// Setup listener on ephemeral port.
-	l, err := tls.Listen("tcp", ":0", config)
+	l, err := tls.Listen("tcp", "localhost:0", config)
 	if err != nil {
 		return nil, "", err
 	}
