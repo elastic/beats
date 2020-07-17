@@ -6,9 +6,10 @@ import shutil
 from metricbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
