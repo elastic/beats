@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-01-29T08:09:59.000Z",
         "destination.ip": [
             "10.102.123.34"
         ],
@@ -43,7 +42,6 @@
         ],
         "rsa.network.domain": "litesse6379.api.domain",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
         "server.domain": "litesse6379.api.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -57,7 +55,6 @@
         "user.name": "sumdo"
     },
     {
-        "@timestamp": "2020-02-12T15:12:33.000Z",
         "destination.ip": [
             "10.149.203.46"
         ],
@@ -100,7 +97,6 @@
         ],
         "rsa.network.domain": "gnaali6189.internal.localhost",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
         "server.domain": "gnaali6189.internal.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -114,7 +110,6 @@
         "user.name": "mipsumq"
     },
     {
-        "@timestamp": "2020-02-26T22:15:08.000Z",
         "destination.ip": [
             "10.118.175.9"
         ],
@@ -136,8 +131,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 445,
         "related.ip": [
-            "10.173.116.41",
-            "10.118.175.9"
+            "10.118.175.9",
+            "10.173.116.41"
         ],
         "related.user": [
             "uame"
@@ -157,7 +152,6 @@
         ],
         "rsa.network.domain": "quis1130.internal.corp",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "server.domain": "quis1130.internal.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -171,7 +165,6 @@
         "user.name": "uame"
     },
     {
-        "@timestamp": "2020-03-12T05:17:42.000Z",
         "destination.ip": [
             "10.202.204.154"
         ],
@@ -193,8 +186,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5712,
         "related.ip": [
-            "10.202.204.154",
-            "10.134.137.177"
+            "10.134.137.177",
+            "10.202.204.154"
         ],
         "related.user": [
             "orsitame"
@@ -214,7 +207,6 @@
         ],
         "rsa.network.domain": "reprehe189.internal.home",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-03-12T05:17:42.000Z",
         "server.domain": "reprehe189.internal.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -228,7 +220,6 @@
         "user.name": "orsitame"
     },
     {
-        "@timestamp": "2020-03-26T12:20:16.000Z",
         "destination.ip": [
             "10.70.0.60"
         ],
@@ -271,7 +262,6 @@
         ],
         "rsa.network.domain": "enimad2283.internal.domain",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-03-26T12:20:16.000Z",
         "server.domain": "enimad2283.internal.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -285,7 +275,6 @@
         "user.name": "eos"
     },
     {
-        "@timestamp": "2020-04-09T19:22:51.000Z",
         "destination.ip": [
             "10.200.188.142"
         ],
@@ -328,7 +317,6 @@
         ],
         "rsa.network.domain": "doloreeu3553.www5.home",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
         "server.domain": "doloreeu3553.www5.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -342,7 +330,6 @@
         "user.name": "iusmodt"
     },
     {
-        "@timestamp": "2020-04-24T02:25:25.000Z",
         "destination.ip": [
             "10.214.225.125"
         ],
@@ -364,8 +351,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5722,
         "related.ip": [
-            "10.12.44.169",
-            "10.214.225.125"
+            "10.214.225.125",
+            "10.12.44.169"
         ],
         "related.user": [
             "erep"
@@ -385,7 +372,6 @@
         ],
         "rsa.network.domain": "iutal13.api.localdomain",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-04-24T02:25:25.000Z",
         "server.domain": "iutal13.api.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -399,7 +385,6 @@
         "user.name": "erep"
     },
     {
-        "@timestamp": "2020-05-08T09:27:59.000Z",
         "destination.ip": [
             "10.198.136.50"
         ],
@@ -442,7 +427,6 @@
         ],
         "rsa.network.domain": "uovol492.www.localhost",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
         "server.domain": "uovol492.www.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -456,7 +440,6 @@
         "user.name": "uptatev"
     },
     {
-        "@timestamp": "2020-05-22T16:30:33.000Z",
         "destination.ip": [
             "10.69.20.77"
         ],
@@ -499,7 +482,6 @@
         ],
         "rsa.network.domain": "osquir6997.corp",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
         "server.domain": "osquir6997.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -513,7 +495,6 @@
         "user.name": "umdolor"
     },
     {
-        "@timestamp": "2020-06-05T23:33:08.000Z",
         "destination.ip": [
             "10.203.5.162"
         ],
@@ -556,7 +537,6 @@
         ],
         "rsa.network.domain": "eniam7007.api.invalid",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
         "server.domain": "eniam7007.api.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -570,7 +550,6 @@
         "user.name": "umdolore"
     },
     {
-        "@timestamp": "2020-06-20T06:35:42.000Z",
         "destination.ip": [
             "10.136.252.240"
         ],
@@ -592,8 +571,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7307,
         "related.ip": [
-            "10.65.83.160",
-            "10.136.252.240"
+            "10.136.252.240",
+            "10.65.83.160"
         ],
         "related.user": [
             "ender"
@@ -613,7 +592,6 @@
         ],
         "rsa.network.domain": "snulapar3794.api.domain",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-06-20T06:35:42.000Z",
         "server.domain": "snulapar3794.api.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -627,7 +605,6 @@
         "user.name": "ender"
     },
     {
-        "@timestamp": "2020-07-04T13:38:16.000Z",
         "destination.ip": [
             "10.210.213.18"
         ],
@@ -649,8 +626,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2703,
         "related.ip": [
-            "10.210.213.18",
-            "10.57.40.29"
+            "10.57.40.29",
+            "10.210.213.18"
         ],
         "related.user": [
             "onse"
@@ -670,7 +647,6 @@
         ],
         "rsa.network.domain": "liq5883.localdomain",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-07-04T13:38:16.000Z",
         "server.domain": "liq5883.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -684,7 +660,6 @@
         "user.name": "onse"
     },
     {
-        "@timestamp": "2019-07-18T20:40:50.000Z",
         "destination.ip": [
             "10.200.156.102"
         ],
@@ -706,8 +681,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5166,
         "related.ip": [
-            "10.200.156.102",
-            "10.144.82.69"
+            "10.144.82.69",
+            "10.200.156.102"
         ],
         "related.user": [
             "rveli"
@@ -727,7 +702,6 @@
         ],
         "rsa.network.domain": "rsint7026.test",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
         "server.domain": "rsint7026.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -741,7 +715,6 @@
         "user.name": "rveli"
     },
     {
-        "@timestamp": "2019-08-02T03:43:25.000Z",
         "destination.ip": [
             "10.72.58.135"
         ],
@@ -763,8 +736,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7668,
         "related.ip": [
-            "10.109.232.112",
-            "10.72.58.135"
+            "10.72.58.135",
+            "10.109.232.112"
         ],
         "related.user": [
             "xea"
@@ -784,7 +757,6 @@
         ],
         "rsa.network.domain": "qua2945.www.local",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-08-02T03:43:25.000Z",
         "server.domain": "qua2945.www.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -798,7 +770,6 @@
         "user.name": "xea"
     },
     {
-        "@timestamp": "2019-08-16T10:45:59.000Z",
         "destination.ip": [
             "10.72.29.73"
         ],
@@ -841,7 +812,6 @@
         ],
         "rsa.network.domain": "luptat6494.www.example",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-08-16T10:45:59.000Z",
         "server.domain": "luptat6494.www.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -855,7 +825,6 @@
         "user.name": "onproide"
     },
     {
-        "@timestamp": "2019-08-30T17:48:33.000Z",
         "destination.ip": [
             "10.76.72.111"
         ],
@@ -877,8 +846,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7183,
         "related.ip": [
-            "10.70.95.74",
-            "10.76.72.111"
+            "10.76.72.111",
+            "10.70.95.74"
         ],
         "related.user": [
             "ivelits"
@@ -898,7 +867,6 @@
         ],
         "rsa.network.domain": "moenimi6317.internal.invalid",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-08-30T17:48:33.000Z",
         "server.domain": "moenimi6317.internal.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -912,7 +880,6 @@
         "user.name": "ivelits"
     },
     {
-        "@timestamp": "2019-09-14T00:51:07.000Z",
         "destination.ip": [
             "10.73.69.75"
         ],
@@ -934,8 +901,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6907,
         "related.ip": [
-            "10.73.69.75",
-            "10.19.201.13"
+            "10.19.201.13",
+            "10.73.69.75"
         ],
         "related.user": [
             "tat"
@@ -955,7 +922,6 @@
         ],
         "rsa.network.domain": "tion1761.home",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-09-14T00:51:07.000Z",
         "server.domain": "tion1761.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -969,7 +935,6 @@
         "user.name": "tat"
     },
     {
-        "@timestamp": "2019-09-28T07:53:42.000Z",
         "destination.ip": [
             "10.84.105.75"
         ],
@@ -1012,7 +977,6 @@
         ],
         "rsa.network.domain": "santium4235.api.local",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-09-28T07:53:42.000Z",
         "server.domain": "santium4235.api.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -1026,7 +990,6 @@
         "user.name": "iquaUten"
     },
     {
-        "@timestamp": "2019-10-12T14:56:16.000Z",
         "destination.ip": [
             "10.25.192.202"
         ],
@@ -1069,7 +1032,6 @@
         ],
         "rsa.network.domain": "CSed2857.www5.example",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
         "server.domain": "CSed2857.www5.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -1083,7 +1045,6 @@
         "user.name": "emeumfu"
     },
     {
-        "@timestamp": "2019-10-26T21:58:50.000Z",
         "destination.ip": [
             "10.104.134.200"
         ],
@@ -1126,7 +1087,6 @@
         ],
         "rsa.network.domain": "equep5085.mail.domain",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-10-26T21:58:50.000Z",
         "server.domain": "equep5085.mail.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -1140,7 +1100,6 @@
         "user.name": "uptat"
     },
     {
-        "@timestamp": "2019-11-10T05:01:24.000Z",
         "destination.ip": [
             "10.225.160.182"
         ],
@@ -1162,8 +1121,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6994,
         "related.ip": [
-            "10.225.160.182",
-            "10.191.105.82"
+            "10.191.105.82",
+            "10.225.160.182"
         ],
         "related.user": [
             "eirure"
@@ -1183,7 +1142,6 @@
         ],
         "rsa.network.domain": "conseq557.mail.lan",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-11-10T05:01:24.000Z",
         "server.domain": "conseq557.mail.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -1197,7 +1155,6 @@
         "user.name": "eirure"
     },
     {
-        "@timestamp": "2019-11-24T12:03:59.000Z",
         "destination.ip": [
             "10.161.57.8"
         ],
@@ -1219,8 +1176,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5200,
         "related.ip": [
-            "10.141.44.153",
-            "10.161.57.8"
+            "10.161.57.8",
+            "10.141.44.153"
         ],
         "related.user": [
             "quisnos"
@@ -1240,7 +1197,6 @@
         ],
         "rsa.network.domain": "ite2026.www.invalid",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-11-24T12:03:59.000Z",
         "server.domain": "ite2026.www.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -1254,7 +1210,6 @@
         "user.name": "quisnos"
     },
     {
-        "@timestamp": "2019-12-08T19:06:33.000Z",
         "destination.ip": [
             "10.6.167.7"
         ],
@@ -1297,7 +1252,6 @@
         ],
         "rsa.network.domain": "lit5929.test",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-12-08T19:06:33.000Z",
         "server.domain": "lit5929.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -1311,7 +1265,6 @@
         "user.name": "eumfug"
     },
     {
-        "@timestamp": "2019-12-23T02:09:07.000Z",
         "destination.ip": [
             "10.134.148.219"
         ],
@@ -1354,7 +1307,6 @@
         ],
         "rsa.network.domain": "oru6938.invalid",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "server.domain": "oru6938.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -1368,7 +1320,6 @@
         "user.name": "uioffi"
     },
     {
-        "@timestamp": "2020-01-06T09:11:41.000Z",
         "destination.ip": [
             "10.163.5.243"
         ],
@@ -1411,7 +1362,6 @@
         ],
         "rsa.network.domain": "etdol5473.local",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-01-06T09:11:41.000Z",
         "server.domain": "etdol5473.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -1425,7 +1375,6 @@
         "user.name": "liquide"
     },
     {
-        "@timestamp": "2020-01-20T16:14:16.000Z",
         "destination.ip": [
             "10.221.89.228"
         ],
@@ -1447,8 +1396,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2493,
         "related.ip": [
-            "10.221.89.228",
-            "10.177.194.18"
+            "10.177.194.18",
+            "10.221.89.228"
         ],
         "related.user": [
             "aliquam"
@@ -1468,7 +1417,6 @@
         ],
         "rsa.network.domain": "nimid893.mail.corp",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "server.domain": "nimid893.mail.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -1482,7 +1430,6 @@
         "user.name": "aliquam"
     },
     {
-        "@timestamp": "2020-02-03T23:16:50.000Z",
         "destination.ip": [
             "10.32.239.1"
         ],
@@ -1504,8 +1451,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3022,
         "related.ip": [
-            "10.241.65.49",
-            "10.32.239.1"
+            "10.32.239.1",
+            "10.241.65.49"
         ],
         "related.user": [
             "idata"
@@ -1525,7 +1472,6 @@
         ],
         "rsa.network.domain": "rumwritt6003.host",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
         "server.domain": "rumwritt6003.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -1539,7 +1485,6 @@
         "user.name": "idata"
     },
     {
-        "@timestamp": "2020-02-18T06:19:24.000Z",
         "destination.ip": [
             "10.101.57.120"
         ],
@@ -1582,7 +1527,6 @@
         ],
         "rsa.network.domain": "xeacomm6855.api.corp",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-02-18T06:19:24.000Z",
         "server.domain": "xeacomm6855.api.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -1596,7 +1540,6 @@
         "user.name": "eporr"
     },
     {
-        "@timestamp": "2020-03-04T13:21:59.000Z",
         "destination.ip": [
             "10.130.14.60"
         ],
@@ -1618,8 +1561,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1156,
         "related.ip": [
-            "10.130.14.60",
-            "10.14.211.43"
+            "10.14.211.43",
+            "10.130.14.60"
         ],
         "related.user": [
             "litse"
@@ -1639,7 +1582,6 @@
         ],
         "rsa.network.domain": "icabo4125.mail.domain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
         "server.domain": "icabo4125.mail.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -1653,7 +1595,6 @@
         "user.name": "litse"
     },
     {
-        "@timestamp": "2020-03-18T20:24:33.000Z",
         "destination.ip": [
             "10.248.101.25"
         ],
@@ -1675,8 +1616,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6003,
         "related.ip": [
-            "10.248.101.25",
-            "10.60.129.15"
+            "10.60.129.15",
+            "10.248.101.25"
         ],
         "related.user": [
             "evolup"
@@ -1696,7 +1637,6 @@
         ],
         "rsa.network.domain": "ionofdeF5643.www.localhost",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-03-18T20:24:33.000Z",
         "server.domain": "ionofdeF5643.www.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -1710,7 +1650,6 @@
         "user.name": "evolup"
     },
     {
-        "@timestamp": "2020-04-02T03:27:07.000Z",
         "destination.ip": [
             "10.111.187.12"
         ],
@@ -1732,8 +1671,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5651,
         "related.ip": [
-            "10.111.187.12",
-            "10.72.93.28"
+            "10.72.93.28",
+            "10.111.187.12"
         ],
         "related.user": [
             "niamqui"
@@ -1753,7 +1692,6 @@
         ],
         "rsa.network.domain": "orem6702.invalid",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "server.domain": "orem6702.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -1767,7 +1705,6 @@
         "user.name": "niamqui"
     },
     {
-        "@timestamp": "2020-04-16T10:29:41.000Z",
         "destination.ip": [
             "10.66.2.232"
         ],
@@ -1789,8 +1726,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3470,
         "related.ip": [
-            "10.66.2.232",
-            "10.27.14.168"
+            "10.27.14.168",
+            "10.66.2.232"
         ],
         "related.user": [
             "uirati"
@@ -1810,7 +1747,6 @@
         ],
         "rsa.network.domain": "oin6780.mail.domain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
         "server.domain": "oin6780.mail.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -1824,7 +1760,6 @@
         "user.name": "uirati"
     },
     {
-        "@timestamp": "2020-04-30T17:32:16.000Z",
         "destination.ip": [
             "10.195.2.130"
         ],
@@ -1867,7 +1802,6 @@
         ],
         "rsa.network.domain": "eprehen3224.www5.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
         "server.domain": "eprehen3224.www5.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -1881,7 +1815,6 @@
         "user.name": "inibusB"
     },
     {
-        "@timestamp": "2020-05-15T00:34:50.000Z",
         "destination.ip": [
             "10.245.104.182"
         ],
@@ -1924,7 +1857,6 @@
         ],
         "rsa.network.domain": "ptasn6599.www.localhost",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
         "server.domain": "ptasn6599.www.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -1938,7 +1870,6 @@
         "user.name": "ovol"
     },
     {
-        "@timestamp": "2020-05-29T07:37:24.000Z",
         "destination.ip": [
             "10.105.91.31"
         ],
@@ -1960,8 +1891,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 853,
         "related.ip": [
-            "10.217.150.196",
-            "10.105.91.31"
+            "10.105.91.31",
+            "10.217.150.196"
         ],
         "related.user": [
             "con"
@@ -1981,7 +1912,6 @@
         ],
         "rsa.network.domain": "nisist2752.home",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "server.domain": "nisist2752.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -1995,7 +1925,6 @@
         "user.name": "con"
     },
     {
-        "@timestamp": "2020-06-12T14:39:58.000Z",
         "destination.ip": [
             "10.184.18.202"
         ],
@@ -2017,8 +1946,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4153,
         "related.ip": [
-            "10.4.157.1",
-            "10.184.18.202"
+            "10.184.18.202",
+            "10.4.157.1"
         ],
         "related.user": [
             "oditem"
@@ -2038,7 +1967,6 @@
         ],
         "rsa.network.domain": "gitsedqu2649.mail.lan",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
         "server.domain": "gitsedqu2649.mail.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -2052,7 +1980,6 @@
         "user.name": "oditem"
     },
     {
-        "@timestamp": "2020-06-26T21:42:33.000Z",
         "destination.ip": [
             "10.113.95.59"
         ],
@@ -2095,7 +2022,6 @@
         ],
         "rsa.network.domain": "entsunt3962.www.example",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "server.domain": "entsunt3962.www.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -2109,7 +2035,6 @@
         "user.name": "persp"
     },
     {
-        "@timestamp": "2020-07-11T04:45:07.000Z",
         "destination.ip": [
             "10.83.177.2"
         ],
@@ -2131,8 +2056,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 337,
         "related.ip": [
-            "10.27.16.118",
-            "10.83.177.2"
+            "10.83.177.2",
+            "10.27.16.118"
         ],
         "related.user": [
             "borios"
@@ -2152,7 +2077,6 @@
         ],
         "rsa.network.domain": "tut2703.www.host",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-07-11T04:45:07.000Z",
         "server.domain": "tut2703.www.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -2166,7 +2090,6 @@
         "user.name": "borios"
     },
     {
-        "@timestamp": "2019-07-25T11:47:41.000Z",
         "destination.ip": [
             "10.167.227.44"
         ],
@@ -2188,8 +2111,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7041,
         "related.ip": [
-            "10.38.54.72",
-            "10.167.227.44"
+            "10.167.227.44",
+            "10.38.54.72"
         ],
         "related.user": [
             "riamea"
@@ -2209,7 +2132,6 @@
         ],
         "rsa.network.domain": "entorev160.test",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
         "server.domain": "entorev160.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -2223,7 +2145,6 @@
         "user.name": "riamea"
     },
     {
-        "@timestamp": "2019-08-08T18:50:15.000Z",
         "destination.ip": [
             "10.215.205.216"
         ],
@@ -2245,8 +2166,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3854,
         "related.ip": [
-            "10.216.54.184",
-            "10.215.205.216"
+            "10.215.205.216",
+            "10.216.54.184"
         ],
         "related.user": [
             "ameiusm"
@@ -2266,7 +2187,6 @@
         ],
         "rsa.network.domain": "proide3714.mail.localdomain",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-08-08T18:50:15.000Z",
         "server.domain": "proide3714.mail.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -2280,7 +2200,6 @@
         "user.name": "ameiusm"
     },
     {
-        "@timestamp": "2019-08-23T01:52:50.000Z",
         "destination.ip": [
             "10.9.18.237"
         ],
@@ -2302,8 +2221,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 55,
         "related.ip": [
-            "10.9.18.237",
-            "10.9.12.248"
+            "10.9.12.248",
+            "10.9.18.237"
         ],
         "related.user": [
             "uradi"
@@ -2323,7 +2242,6 @@
         ],
         "rsa.network.domain": "tot5313.mail.invalid",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-08-23T01:52:50.000Z",
         "server.domain": "tot5313.mail.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -2337,7 +2255,6 @@
         "user.name": "uradi"
     },
     {
-        "@timestamp": "2019-09-06T08:55:24.000Z",
         "destination.ip": [
             "10.41.123.102"
         ],
@@ -2359,8 +2276,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 228,
         "related.ip": [
-            "10.83.130.226",
-            "10.41.123.102"
+            "10.41.123.102",
+            "10.83.130.226"
         ],
         "related.user": [
             "tenim"
@@ -2380,7 +2297,6 @@
         ],
         "rsa.network.domain": "rumet3801.internal.domain",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-09-06T08:55:24.000Z",
         "server.domain": "rumet3801.internal.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -2394,7 +2310,6 @@
         "user.name": "tenim"
     },
     {
-        "@timestamp": "2019-09-20T15:57:58.000Z",
         "destination.ip": [
             "10.80.152.108"
         ],
@@ -2437,7 +2352,6 @@
         ],
         "rsa.network.domain": "liqua2834.www5.lan",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-09-20T15:57:58.000Z",
         "server.domain": "liqua2834.www5.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -2451,7 +2365,6 @@
         "user.name": "tametcon"
     },
     {
-        "@timestamp": "2019-10-04T23:00:32.000Z",
         "destination.ip": [
             "10.142.25.100"
         ],
@@ -2494,7 +2407,6 @@
         ],
         "rsa.network.domain": "sequat7273.api.host",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-10-04T23:00:32.000Z",
         "server.domain": "sequat7273.api.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -2508,7 +2420,6 @@
         "user.name": "osqui"
     },
     {
-        "@timestamp": "2019-10-19T06:03:07.000Z",
         "destination.ip": [
             "10.223.119.218"
         ],
@@ -2551,7 +2462,6 @@
         ],
         "rsa.network.domain": "uidol4575.localhost",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
         "server.domain": "uidol4575.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -2565,7 +2475,6 @@
         "user.name": "ntsunt"
     },
     {
-        "@timestamp": "2019-11-02T13:05:41.000Z",
         "destination.ip": [
             "10.47.28.48"
         ],
@@ -2587,8 +2496,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4469,
         "related.ip": [
-            "10.110.114.175",
-            "10.47.28.48"
+            "10.47.28.48",
+            "10.110.114.175"
         ],
         "related.user": [
             "plicab"
@@ -2608,7 +2517,6 @@
         ],
         "rsa.network.domain": "oremq2000.api.corp",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-11-02T13:05:41.000Z",
         "server.domain": "oremq2000.api.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -2622,7 +2530,6 @@
         "user.name": "plicab"
     },
     {
-        "@timestamp": "2019-11-16T20:08:15.000Z",
         "destination.ip": [
             "10.90.33.138"
         ],
@@ -2665,7 +2572,6 @@
         ],
         "rsa.network.domain": "oremi1485.api.localhost",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-11-16T20:08:15.000Z",
         "server.domain": "oremi1485.api.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -2679,7 +2585,6 @@
         "user.name": "nvolupt"
     },
     {
-        "@timestamp": "2019-12-01T03:10:49.000Z",
         "destination.ip": [
             "10.227.173.252"
         ],
@@ -2701,8 +2606,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3624,
         "related.ip": [
-            "10.65.2.106",
-            "10.227.173.252"
+            "10.227.173.252",
+            "10.65.2.106"
         ],
         "related.user": [
             "itation"
@@ -2722,7 +2627,6 @@
         ],
         "rsa.network.domain": "sequatD5469.www5.lan",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-12-01T03:10:49.000Z",
         "server.domain": "sequatD5469.www5.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -2736,7 +2640,6 @@
         "user.name": "itation"
     },
     {
-        "@timestamp": "2019-12-15T10:13:24.000Z",
         "destination.ip": [
             "10.28.84.106"
         ],
@@ -2758,8 +2661,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1609,
         "related.ip": [
-            "10.193.233.229",
-            "10.28.84.106"
+            "10.28.84.106",
+            "10.193.233.229"
         ],
         "related.user": [
             "tla"
@@ -2779,7 +2682,6 @@
         ],
         "rsa.network.domain": "item2738.test",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
         "server.domain": "item2738.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -2793,7 +2695,6 @@
         "user.name": "tla"
     },
     {
-        "@timestamp": "2019-12-29T17:15:58.000Z",
         "destination.ip": [
             "10.210.89.183"
         ],
@@ -2836,7 +2737,6 @@
         ],
         "rsa.network.domain": "iosamnis1047.internal.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-12-29T17:15:58.000Z",
         "server.domain": "iosamnis1047.internal.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -2850,7 +2750,6 @@
         "user.name": "sequa"
     },
     {
-        "@timestamp": "2020-01-13T00:18:32.000Z",
         "destination.ip": [
             "10.85.185.13"
         ],
@@ -2893,7 +2792,6 @@
         ],
         "rsa.network.domain": "orroq6677.internal.example",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
         "server.domain": "orroq6677.internal.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -2907,7 +2805,6 @@
         "user.name": "voluptas"
     },
     {
-        "@timestamp": "2020-01-27T07:21:06.000Z",
         "destination.ip": [
             "10.210.28.247"
         ],
@@ -2929,8 +2826,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 430,
         "related.ip": [
-            "10.207.211.230",
-            "10.210.28.247"
+            "10.210.28.247",
+            "10.207.211.230"
         ],
         "related.user": [
             "tate"
@@ -2950,7 +2847,6 @@
         ],
         "rsa.network.domain": "onevo4326.internal.local",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-01-27T07:21:06.000Z",
         "server.domain": "onevo4326.internal.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -2964,7 +2860,6 @@
         "user.name": "tate"
     },
     {
-        "@timestamp": "2020-02-10T14:23:41.000Z",
         "destination.ip": [
             "10.248.165.185"
         ],
@@ -2986,8 +2881,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3589,
         "related.ip": [
-            "10.86.11.48",
-            "10.248.165.185"
+            "10.248.165.185",
+            "10.86.11.48"
         ],
         "related.user": [
             "dquiac"
@@ -3007,7 +2902,6 @@
         ],
         "rsa.network.domain": "itaedict7233.mail.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
         "server.domain": "itaedict7233.mail.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -3021,7 +2915,6 @@
         "user.name": "dquiac"
     },
     {
-        "@timestamp": "2020-02-24T21:26:15.000Z",
         "destination.ip": [
             "10.47.125.38"
         ],
@@ -3064,7 +2957,6 @@
         ],
         "rsa.network.domain": "numquam5869.internal.example",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-02-24T21:26:15.000Z",
         "server.domain": "numquam5869.internal.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -3078,7 +2970,6 @@
         "user.name": "quunt"
     },
     {
-        "@timestamp": "2020-03-11T04:28:49.000Z",
         "destination.ip": [
             "10.60.142.127"
         ],
@@ -3100,8 +2991,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 276,
         "related.ip": [
-            "10.60.142.127",
-            "10.50.233.155"
+            "10.50.233.155",
+            "10.60.142.127"
         ],
         "related.user": [
             "atv"
@@ -3121,7 +3012,6 @@
         ],
         "rsa.network.domain": "onu6137.api.home",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
         "server.domain": "onu6137.api.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -3135,7 +3025,6 @@
         "user.name": "atv"
     },
     {
-        "@timestamp": "2020-03-25T11:31:24.000Z",
         "destination.ip": [
             "10.120.10.211"
         ],
@@ -3157,8 +3046,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2452,
         "related.ip": [
-            "10.120.10.211",
-            "10.28.82.189"
+            "10.28.82.189",
+            "10.120.10.211"
         ],
         "related.user": [
             "rcit"
@@ -3178,7 +3067,6 @@
         ],
         "rsa.network.domain": "aecatcup2241.www5.test",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
         "server.domain": "aecatcup2241.www5.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -3192,7 +3080,6 @@
         "user.name": "rcit"
     },
     {
-        "@timestamp": "2020-04-08T18:33:58.000Z",
         "destination.ip": [
             "10.6.38.163"
         ],
@@ -3214,8 +3101,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3453,
         "related.ip": [
-            "10.31.237.225",
-            "10.6.38.163"
+            "10.6.38.163",
+            "10.31.237.225"
         ],
         "related.user": [
             "olup"
@@ -3235,7 +3122,6 @@
         ],
         "rsa.network.domain": "labor6360.mail.local",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "server.domain": "labor6360.mail.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -3249,7 +3135,6 @@
         "user.name": "olup"
     },
     {
-        "@timestamp": "2020-04-23T01:36:32.000Z",
         "destination.ip": [
             "10.125.165.144"
         ],
@@ -3292,7 +3177,6 @@
         ],
         "rsa.network.domain": "mveleum4322.www5.host",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
         "server.domain": "mveleum4322.www5.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -3306,7 +3190,6 @@
         "user.name": "mvolu"
     },
     {
-        "@timestamp": "2020-05-07T08:39:06.000Z",
         "destination.ip": [
             "10.46.56.204"
         ],
@@ -3328,8 +3211,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7079,
         "related.ip": [
-            "10.97.149.97",
-            "10.46.56.204"
+            "10.46.56.204",
+            "10.97.149.97"
         ],
         "related.user": [
             "dolorsit"
@@ -3349,7 +3232,6 @@
         ],
         "rsa.network.domain": "archite1843.mail.home",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-05-07T08:39:06.000Z",
         "server.domain": "archite1843.mail.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -3363,7 +3245,6 @@
         "user.name": "dolorsit"
     },
     {
-        "@timestamp": "2020-05-21T15:41:41.000Z",
         "destination.ip": [
             "10.28.105.124"
         ],
@@ -3406,7 +3287,6 @@
         ],
         "rsa.network.domain": "itanim4024.api.example",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-05-21T15:41:41.000Z",
         "server.domain": "itanim4024.api.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -3420,7 +3300,6 @@
         "user.name": "ntNe"
     },
     {
-        "@timestamp": "2020-06-04T22:44:15.000Z",
         "destination.ip": [
             "10.17.87.79"
         ],
@@ -3442,8 +3321,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1586,
         "related.ip": [
-            "10.17.87.79",
-            "10.123.199.198"
+            "10.123.199.198",
+            "10.17.87.79"
         ],
         "related.user": [
             "ratvolu"
@@ -3463,7 +3342,6 @@
         ],
         "rsa.network.domain": "nreprehe715.api.home",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-06-04T22:44:15.000Z",
         "server.domain": "nreprehe715.api.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -3477,7 +3355,6 @@
         "user.name": "ratvolu"
     },
     {
-        "@timestamp": "2020-06-19T05:46:49.000Z",
         "destination.ip": [
             "10.115.68.40"
         ],
@@ -3499,8 +3376,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5137,
         "related.ip": [
-            "10.115.68.40",
-            "10.38.86.177"
+            "10.38.86.177",
+            "10.115.68.40"
         ],
         "related.user": [
             "mpo"
@@ -3520,7 +3397,6 @@
         ],
         "rsa.network.domain": "unte893.internal.host",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "server.domain": "unte893.internal.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -3534,7 +3410,6 @@
         "user.name": "mpo"
     },
     {
-        "@timestamp": "2020-07-03T12:49:23.000Z",
         "destination.ip": [
             "10.115.174.107"
         ],
@@ -3556,8 +3431,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5704,
         "related.ip": [
-            "10.115.174.107",
-            "10.193.118.163"
+            "10.193.118.163",
+            "10.115.174.107"
         ],
         "related.user": [
             "exeacomm"
@@ -3577,7 +3452,6 @@
         ],
         "rsa.network.domain": "aspe951.mail.domain",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "server.domain": "aspe951.mail.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -3591,7 +3465,6 @@
         "user.name": "exeacomm"
     },
     {
-        "@timestamp": "2019-07-17T19:51:58.000Z",
         "destination.ip": [
             "10.77.77.208"
         ],
@@ -3634,7 +3507,6 @@
         ],
         "rsa.network.domain": "dipiscin4957.www.home",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-07-17T19:51:58.000Z",
         "server.domain": "dipiscin4957.www.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -3648,7 +3520,6 @@
         "user.name": "moles"
     },
     {
-        "@timestamp": "2019-08-01T02:54:32.000Z",
         "destination.ip": [
             "10.1.96.93"
         ],
@@ -3691,7 +3562,6 @@
         ],
         "rsa.network.domain": "econs2687.internal.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-08-01T02:54:32.000Z",
         "server.domain": "econs2687.internal.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -3705,7 +3575,6 @@
         "user.name": "lloinven"
     },
     {
-        "@timestamp": "2019-08-15T09:57:06.000Z",
         "destination.ip": [
             "10.182.152.242"
         ],
@@ -3727,8 +3596,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2465,
         "related.ip": [
-            "10.131.126.109",
-            "10.182.152.242"
+            "10.182.152.242",
+            "10.131.126.109"
         ],
         "related.user": [
             "dolor"
@@ -3748,7 +3617,6 @@
         ],
         "rsa.network.domain": "tiumto5834.api.lan",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-08-15T09:57:06.000Z",
         "server.domain": "tiumto5834.api.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -3762,7 +3630,6 @@
         "user.name": "dolor"
     },
     {
-        "@timestamp": "2019-08-29T16:59:40.000Z",
         "destination.ip": [
             "10.77.229.168"
         ],
@@ -3784,8 +3651,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6064,
         "related.ip": [
-            "10.181.247.224",
-            "10.77.229.168"
+            "10.77.229.168",
+            "10.181.247.224"
         ],
         "related.user": [
             "adol"
@@ -3805,7 +3672,6 @@
         ],
         "rsa.network.domain": "iutal6032.www.test",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-08-29T16:59:40.000Z",
         "server.domain": "iutal6032.www.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -3819,7 +3685,6 @@
         "user.name": "adol"
     },
     {
-        "@timestamp": "2019-09-13T00:02:15.000Z",
         "destination.ip": [
             "10.72.162.6"
         ],
@@ -3862,7 +3727,6 @@
         ],
         "rsa.network.domain": "inculp2078.host",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-09-13T00:02:15.000Z",
         "server.domain": "inculp2078.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -3876,7 +3740,6 @@
         "user.name": "oinv"
     },
     {
-        "@timestamp": "2019-09-27T07:04:49.000Z",
         "destination.ip": [
             "10.28.124.236"
         ],
@@ -3919,7 +3782,6 @@
         ],
         "rsa.network.domain": "mexerc2757.internal.home",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-09-27T07:04:49.000Z",
         "server.domain": "mexerc2757.internal.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -3933,7 +3795,6 @@
         "user.name": "mullam"
     },
     {
-        "@timestamp": "2019-10-11T14:07:23.000Z",
         "destination.ip": [
             "10.196.96.162"
         ],
@@ -3976,7 +3837,6 @@
         ],
         "rsa.network.domain": "squira4455.api.domain",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-10-11T14:07:23.000Z",
         "server.domain": "squira4455.api.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -3990,7 +3850,6 @@
         "user.name": "tnonproi"
     },
     {
-        "@timestamp": "2019-10-25T21:09:57.000Z",
         "destination.ip": [
             "10.77.78.180"
         ],
@@ -4012,8 +3871,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4984,
         "related.ip": [
-            "10.97.236.123",
-            "10.77.78.180"
+            "10.77.78.180",
+            "10.97.236.123"
         ],
         "related.user": [
             "nisi"
@@ -4033,7 +3892,6 @@
         ],
         "rsa.network.domain": "emveleum3661.localhost",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-10-25T21:09:57.000Z",
         "server.domain": "emveleum3661.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -4047,7 +3905,6 @@
         "user.name": "nisi"
     },
     {
-        "@timestamp": "2019-11-09T04:12:32.000Z",
         "destination.ip": [
             "10.45.54.107"
         ],
@@ -4069,8 +3926,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3421,
         "related.ip": [
-            "10.82.133.66",
-            "10.45.54.107"
+            "10.45.54.107",
+            "10.82.133.66"
         ],
         "related.user": [
             "olorem"
@@ -4090,7 +3947,6 @@
         ],
         "rsa.network.domain": "sedquiac6517.internal.localhost",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
         "server.domain": "sedquiac6517.internal.localhost",
         "service.type": "fortinet",
         "source.ip": [
@@ -4104,7 +3960,6 @@
         "user.name": "olorem"
     },
     {
-        "@timestamp": "2019-11-23T11:15:06.000Z",
         "destination.ip": [
             "10.170.252.219"
         ],
@@ -4126,8 +3981,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4020,
         "related.ip": [
-            "10.180.180.230",
-            "10.170.252.219"
+            "10.170.252.219",
+            "10.180.180.230"
         ],
         "related.user": [
             "nse"
@@ -4147,7 +4002,6 @@
         ],
         "rsa.network.domain": "veniam3148.www5.home",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-11-23T11:15:06.000Z",
         "server.domain": "veniam3148.www5.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -4161,7 +4015,6 @@
         "user.name": "nse"
     },
     {
-        "@timestamp": "2019-12-07T18:17:40.000Z",
         "destination.ip": [
             "10.65.144.51"
         ],
@@ -4183,8 +4036,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 617,
         "related.ip": [
-            "10.5.11.205",
-            "10.65.144.51"
+            "10.65.144.51",
+            "10.5.11.205"
         ],
         "related.user": [
             "uptat"
@@ -4204,7 +4057,6 @@
         ],
         "rsa.network.domain": "unt3559.www.home",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-12-07T18:17:40.000Z",
         "server.domain": "unt3559.www.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -4218,7 +4070,6 @@
         "user.name": "uptat"
     },
     {
-        "@timestamp": "2019-12-22T01:20:14.000Z",
         "destination.ip": [
             "10.76.122.196"
         ],
@@ -4261,7 +4112,6 @@
         ],
         "rsa.network.domain": "rere5274.mail.domain",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
         "server.domain": "rere5274.mail.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -4275,7 +4125,6 @@
         "user.name": "umiurer"
     },
     {
-        "@timestamp": "2020-01-05T08:22:49.000Z",
         "destination.ip": [
             "10.225.255.211"
         ],
@@ -4297,8 +4146,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2442,
         "related.ip": [
-            "10.138.210.116",
-            "10.225.255.211"
+            "10.225.255.211",
+            "10.138.210.116"
         ],
         "related.user": [
             "fugiatn"
@@ -4318,7 +4167,6 @@
         ],
         "rsa.network.domain": "uaeabi3728.www5.invalid",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "server.domain": "uaeabi3728.www5.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -4332,7 +4180,6 @@
         "user.name": "fugiatn"
     },
     {
-        "@timestamp": "2020-01-19T15:25:23.000Z",
         "destination.ip": [
             "10.219.1.151"
         ],
@@ -4375,7 +4222,6 @@
         ],
         "rsa.network.domain": "uamqu2804.test",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-01-19T15:25:23.000Z",
         "server.domain": "uamqu2804.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -4389,7 +4235,6 @@
         "user.name": "ori"
     },
     {
-        "@timestamp": "2020-02-02T22:27:57.000Z",
         "destination.ip": [
             "10.76.125.70"
         ],
@@ -4411,8 +4256,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7128,
         "related.ip": [
-            "10.54.23.133",
-            "10.76.125.70"
+            "10.76.125.70",
+            "10.54.23.133"
         ],
         "related.user": [
             "oloreeu"
@@ -4432,7 +4277,6 @@
         ],
         "rsa.network.domain": "olor5201.host",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
         "server.domain": "olor5201.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -4446,7 +4290,6 @@
         "user.name": "oloreeu"
     },
     {
-        "@timestamp": "2020-02-17T05:30:32.000Z",
         "destination.ip": [
             "10.189.42.62"
         ],
@@ -4489,7 +4332,6 @@
         ],
         "rsa.network.domain": "eufug3348.www.lan",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-02-17T05:30:32.000Z",
         "server.domain": "eufug3348.www.lan",
         "service.type": "fortinet",
         "source.ip": [
@@ -4503,7 +4345,6 @@
         "user.name": "eque"
     },
     {
-        "@timestamp": "2020-03-03T12:33:06.000Z",
         "destination.ip": [
             "10.183.202.82"
         ],
@@ -4546,7 +4387,6 @@
         ],
         "rsa.network.domain": "stquidol239.www5.invalid",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
         "server.domain": "stquidol239.www5.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -4560,7 +4400,6 @@
         "user.name": "umfugi"
     },
     {
-        "@timestamp": "2020-03-17T19:35:40.000Z",
         "destination.ip": [
             "10.221.206.74"
         ],
@@ -4582,8 +4421,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2314,
         "related.ip": [
-            "10.221.206.74",
-            "10.73.28.165"
+            "10.73.28.165",
+            "10.221.206.74"
         ],
         "related.user": [
             "quas"
@@ -4603,7 +4442,6 @@
         ],
         "rsa.network.domain": "gia6531.mail.invalid",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
         "server.domain": "gia6531.mail.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -4617,7 +4455,6 @@
         "user.name": "quas"
     },
     {
-        "@timestamp": "2020-04-01T02:38:14.000Z",
         "destination.ip": [
             "10.14.204.36"
         ],
@@ -4639,8 +4476,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5284,
         "related.ip": [
-            "10.14.204.36",
-            "10.85.104.146"
+            "10.85.104.146",
+            "10.14.204.36"
         ],
         "related.user": [
             "emp"
@@ -4660,7 +4497,6 @@
         ],
         "rsa.network.domain": "lamcola4879.www5.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2020-04-01T02:38:14.000Z",
         "server.domain": "lamcola4879.www5.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -4674,7 +4510,6 @@
         "user.name": "emp"
     },
     {
-        "@timestamp": "2020-04-15T09:40:49.000Z",
         "destination.ip": [
             "10.30.246.132"
         ],
@@ -4717,7 +4552,6 @@
         ],
         "rsa.network.domain": "edquian330.mail.local",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
         "server.domain": "edquian330.mail.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -4731,7 +4565,6 @@
         "user.name": "veniam"
     },
     {
-        "@timestamp": "2020-04-29T16:43:23.000Z",
         "destination.ip": [
             "10.19.119.17"
         ],
@@ -4774,7 +4607,6 @@
         ],
         "rsa.network.domain": "santi837.api.domain",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2020-04-29T16:43:23.000Z",
         "server.domain": "santi837.api.domain",
         "service.type": "fortinet",
         "source.ip": [
@@ -4788,7 +4620,6 @@
         "user.name": "lit"
     },
     {
-        "@timestamp": "2020-05-13T23:45:57.000Z",
         "destination.ip": [
             "10.181.41.154"
         ],
@@ -4831,7 +4662,6 @@
         ],
         "rsa.network.domain": "lpaquiof804.internal.invalid",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2020-05-13T23:45:57.000Z",
         "server.domain": "lpaquiof804.internal.invalid",
         "service.type": "fortinet",
         "source.ip": [
@@ -4845,7 +4675,6 @@
         "user.name": "labo"
     },
     {
-        "@timestamp": "2020-05-28T06:48:31.000Z",
         "destination.ip": [
             "10.164.120.197"
         ],
@@ -4888,7 +4717,6 @@
         ],
         "rsa.network.domain": "nonn4478.host",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
         "server.domain": "nonn4478.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -4902,7 +4730,6 @@
         "user.name": "pta"
     },
     {
-        "@timestamp": "2020-06-11T13:51:06.000Z",
         "destination.ip": [
             "10.154.191.225"
         ],
@@ -4924,8 +4751,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2990,
         "related.ip": [
-            "10.154.191.225",
-            "10.183.189.133"
+            "10.183.189.133",
+            "10.154.191.225"
         ],
         "related.user": [
             "ita"
@@ -4945,7 +4772,6 @@
         ],
         "rsa.network.domain": "amquaer3985.www5.example",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-06-11T13:51:06.000Z",
         "server.domain": "amquaer3985.www5.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -4959,7 +4785,6 @@
         "user.name": "ita"
     },
     {
-        "@timestamp": "2020-06-25T20:53:40.000Z",
         "destination.ip": [
             "10.103.189.199"
         ],
@@ -5002,7 +4827,6 @@
         ],
         "rsa.network.domain": "orem6317.local",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
         "server.domain": "orem6317.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -5016,7 +4840,6 @@
         "user.name": "emu"
     },
     {
-        "@timestamp": "2020-07-10T03:56:14.000Z",
         "destination.ip": [
             "10.210.153.7"
         ],
@@ -5059,7 +4882,6 @@
         ],
         "rsa.network.domain": "velill3230.www.corp",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "server.domain": "velill3230.www.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -5073,7 +4895,6 @@
         "user.name": "voluptas"
     },
     {
-        "@timestamp": "2019-07-24T10:58:48.000Z",
         "destination.ip": [
             "10.91.2.135"
         ],
@@ -5116,7 +4937,6 @@
         ],
         "rsa.network.domain": "orumS757.www5.corp",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "server.domain": "orumS757.www5.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -5130,7 +4950,6 @@
         "user.name": "olore"
     },
     {
-        "@timestamp": "2019-08-07T18:01:23.000Z",
         "destination.ip": [
             "10.137.85.123"
         ],
@@ -5173,7 +4992,6 @@
         ],
         "rsa.network.domain": "emi4534.www.localdomain",
         "rsa.network.network_service": "https",
-        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "server.domain": "emi4534.www.localdomain",
         "service.type": "fortinet",
         "source.ip": [
@@ -5187,7 +5005,6 @@
         "user.name": "cid"
     },
     {
-        "@timestamp": "2019-08-22T01:03:57.000Z",
         "destination.ip": [
             "10.10.86.55"
         ],
@@ -5209,8 +5026,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1585,
         "related.ip": [
-            "10.10.86.55",
-            "10.61.225.196"
+            "10.61.225.196",
+            "10.10.86.55"
         ],
         "related.user": [
             "eniamqu"
@@ -5230,7 +5047,6 @@
         ],
         "rsa.network.domain": "inimav1576.mail.example",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "server.domain": "inimav1576.mail.example",
         "service.type": "fortinet",
         "source.ip": [
@@ -5244,7 +5060,6 @@
         "user.name": "eniamqu"
     },
     {
-        "@timestamp": "2019-09-05T08:06:31.000Z",
         "destination.ip": [
             "10.79.73.195"
         ],
@@ -5287,7 +5102,6 @@
         ],
         "rsa.network.domain": "aturQu7083.mail.host",
         "rsa.network.network_service": "http",
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "server.domain": "aturQu7083.mail.host",
         "service.type": "fortinet",
         "source.ip": [
@@ -5301,7 +5115,6 @@
         "user.name": "emip"
     },
     {
-        "@timestamp": "2019-09-19T15:09:05.000Z",
         "destination.ip": [
             "10.64.139.17"
         ],
@@ -5323,8 +5136,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6331,
         "related.ip": [
-            "10.240.216.85",
-            "10.64.139.17"
+            "10.64.139.17",
+            "10.240.216.85"
         ],
         "related.user": [
             "nimadmin"
@@ -5344,7 +5157,6 @@
         ],
         "rsa.network.domain": "lumqui7769.mail.local",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "server.domain": "lumqui7769.mail.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -5358,7 +5170,6 @@
         "user.name": "nimadmin"
     },
     {
-        "@timestamp": "2019-10-03T22:11:40.000Z",
         "destination.ip": [
             "10.222.245.80"
         ],
@@ -5380,8 +5191,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4474,
         "related.ip": [
-            "10.222.245.80",
-            "10.87.90.49"
+            "10.87.90.49",
+            "10.222.245.80"
         ],
         "related.user": [
             "ptatemse"
@@ -5401,7 +5212,6 @@
         ],
         "rsa.network.domain": "siarc6339.internal.corp",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "server.domain": "siarc6339.internal.corp",
         "service.type": "fortinet",
         "source.ip": [
@@ -5415,7 +5225,6 @@
         "user.name": "ptatemse"
     },
     {
-        "@timestamp": "2019-10-18T05:14:14.000Z",
         "destination.ip": [
             "10.87.144.208"
         ],
@@ -5437,8 +5246,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4855,
         "related.ip": [
-            "10.87.144.208",
-            "10.143.53.214"
+            "10.143.53.214",
+            "10.87.144.208"
         ],
         "related.user": [
             "psumq"
@@ -5458,7 +5267,6 @@
         ],
         "rsa.network.domain": "ptatev6552.www.test",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "server.domain": "ptatev6552.www.test",
         "service.type": "fortinet",
         "source.ip": [
@@ -5472,7 +5280,6 @@
         "user.name": "psumq"
     },
     {
-        "@timestamp": "2019-11-01T12:16:48.000Z",
         "destination.ip": [
             "10.105.97.134"
         ],
@@ -5515,7 +5322,6 @@
         ],
         "rsa.network.domain": "byC5766.internal.home",
         "rsa.network.network_service": "pop3",
-        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "server.domain": "byC5766.internal.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -5529,7 +5335,6 @@
         "user.name": "mexercit"
     },
     {
-        "@timestamp": "2019-11-15T19:19:22.000Z",
         "destination.ip": [
             "10.194.67.223"
         ],
@@ -5551,8 +5356,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4493,
         "related.ip": [
-            "10.161.64.168",
-            "10.194.67.223"
+            "10.194.67.223",
+            "10.161.64.168"
         ],
         "related.user": [
             "tion"
@@ -5572,7 +5377,6 @@
         ],
         "rsa.network.domain": "hender6628.local",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "server.domain": "hender6628.local",
         "service.type": "fortinet",
         "source.ip": [
@@ -5586,7 +5390,6 @@
         "user.name": "tion"
     },
     {
-        "@timestamp": "2019-11-30T02:21:57.000Z",
         "destination.ip": [
             "10.120.148.241"
         ],
@@ -5608,8 +5411,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6094,
         "related.ip": [
-            "10.100.154.220",
-            "10.120.148.241"
+            "10.120.148.241",
+            "10.100.154.220"
         ],
         "related.user": [
             "rsitam"
@@ -5629,7 +5432,6 @@
         ],
         "rsa.network.domain": "xercit7649.www5.home",
         "rsa.network.network_service": "smtp",
-        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "server.domain": "xercit7649.www5.home",
         "service.type": "fortinet",
         "source.ip": [
@@ -5643,7 +5445,6 @@
         "user.name": "rsitam"
     },
     {
-        "@timestamp": "2019-12-14T09:24:31.000Z",
         "destination.ip": [
             "10.180.90.112"
         ],
@@ -5686,7 +5487,6 @@
         ],
         "rsa.network.domain": "porissu1470.domain",
         "rsa.network.network_service": "ms-wbt-server",
-        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "server.domain": "porissu1470.domain",
         "service.type": "fortinet",
         "source.ip": [
