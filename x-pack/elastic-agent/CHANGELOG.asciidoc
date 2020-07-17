@@ -50,6 +50,7 @@
 - Forward revision number of the configuration to the endpoint. {pull}19759[19759]
 - Remove support for logs type and use logfile {pull}19761[19761]
 - Avoid comparing uncomparable types on enroll {issue}19976[19976]
+- Fix issues with merging of elastic-agent.yml and fleet.yml {pull}20026[20026]
 
 ==== New features
 
@@ -88,3 +89,4 @@
 - Agent now sends its own logs to elasticsearch {pull}19811[19811]
 - Add --insecure option to enroll command {pull}19900[19900]
 - Will retry to enroll if the server return a 429. {pull}19918[19811]
+- Add --staging option to enroll command {pull}20026[20026]
