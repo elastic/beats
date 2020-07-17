@@ -38,3 +38,6 @@ Force overwrite the current and do not prompt for confirmation.
 
 `--insecure`::
 Allow insecure connection to Kibana.
+
+`--staging`::
+Configures agent to download artifacts from a staging build.
