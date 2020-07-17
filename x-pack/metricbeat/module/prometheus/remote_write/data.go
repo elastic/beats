@@ -70,6 +70,12 @@ func (g *RemoteWriteTypedGenerator) Stop() {
 	g.CounterCache.Stop()
 }
 
+
+// GenerateEvents receives a list of Sample and:
+// 1. guess the type of the sample metric
+// 2. handle it properly using "types" logic
+// 3. if metrics of histogram type then it is converted to ES histogram
+// 4. metrics with the same set of labels are grouped into same events
 func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	var data common.MapStr
 	histograms := map[string]histogram{}
@@ -160,6 +166,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 	}
 
+	// process histograms together
 	g.processPromHistograms(eventList, histograms)
 	return eventList
 }
@@ -189,6 +196,7 @@ func (g *RemoteWriteTypedGenerator) rateCounterFloat64(name string, labels commo
 	return d
 }
 
+// processPromHistograms receives a group of Histograms and converts each one to ES histogram
 func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
 	for _, histogram := range histograms {
 		labelsHash := histogram.labels.String()
@@ -219,6 +227,7 @@ func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 	}
 }
 
+// findType evaluates the type of the metric by check the metricname format in order to handle it properly
 func findType(metricName string, labels common.MapStr) string {
 	leLabel := false
 	if _, ok := labels["le"]; ok {
