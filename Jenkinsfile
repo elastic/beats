@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/gh-comment') _
 
 import groovy.transform.Field
 
