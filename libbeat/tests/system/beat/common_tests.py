@@ -24,7 +24,9 @@ class TestExportsMixin:
         assert exit_code == 0
         output = self.get_log()
         trailer = "\nPASS\n"
-        assert output.endswith(trailer)
+        if not output.endswith(trailer):
+            raise Exception("didn't return expected trailer:{} got:{}".format(trailer.__repr__(),
+                                                                              output[-100:].__repr__()))
         return output[:-len(trailer)]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
