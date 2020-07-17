@@ -20,6 +20,7 @@ package remote_write
 import (
 	"io/ioutil"
 	"net/http"
+	"fmt"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
@@ -97,6 +98,7 @@ func MetricSetBuilder(namespace string, genFactory RemoteWriteEventsGeneratorFac
 
 		m := &MetricSet{
 			BaseMetricSet:   base,
+			events:        make(chan mb.Event),
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
 		}
@@ -113,13 +115,15 @@ func MetricSetBuilder(namespace string, genFactory RemoteWriteEventsGeneratorFac
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()
-
+	//fmt.Println("Run server")
 	for {
 		select {
 		case <-reporter.Done():
 			m.server.Stop()
 			return
 		case e := <-m.events:
+			//fmt.Println("reporter")
+			//fmt.Println(e)
 			reporter.Event(e)
 		}
 	}
@@ -134,6 +138,7 @@ func (m *MetricSet) Close() error {
 }
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
+	fmt.Println("handleFunc 1")
 	if !m.eventGenStarted {
 		m.promEventsGen.Start()
 		m.eventGenStarted = true
@@ -159,11 +164,14 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	//fmt.Println("handleFunc 2")
 	samples := protoToSamples(&protoReq)
+	//fmt.Println("handleFunc 3")
 	events := m.promEventsGen.GenerateEvents(samples)
+	//fmt.Println("handleFunc 4")
 
 	for _, e := range events {
+		//fmt.Println(e)
 		select {
 		case <-req.Context().Done():
 			return

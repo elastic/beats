@@ -95,9 +95,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			labelsHash := labels.String()
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = mb.Event{
-					ModuleFields: common.MapStr{
-						"metrics": common.MapStr{},
-					},
+					ModuleFields: common.MapStr{},
 				}
 
 				// Add labels
@@ -146,7 +144,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				histKey := name + labelsClone.String()
 
 				le, _ := labels.GetValue("le")
-				upperBound := le.(string)
+				upperBound := string(le.(model.LabelValue))
 
 				bucket, err := strconv.ParseFloat(upperBound, 64)
 				if err != nil {
@@ -167,7 +165,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				hist.metricName = name
 				continue
 			}
-			e.ModuleFields["metrics"].(common.MapStr).Update(data)
+			e.ModuleFields.Update(data)
 		}
 	}
 
