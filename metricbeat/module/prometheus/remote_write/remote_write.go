@@ -114,6 +114,7 @@ func MetricSetBuilder(namespace string, genFactory RemoteWriteEventsGeneratorFac
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()
+
 	for {
 		select {
 		case <-reporter.Done():
