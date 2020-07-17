@@ -212,7 +212,7 @@ func max(a, b int) int {
 	return b
 }
 
-func maxDuration(a time.Duration, b time.Duration) time.Duration {
+func maxDuration(a, b time.Duration) time.Duration {
 	if a >= b {
 		return a
 	}

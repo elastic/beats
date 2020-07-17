@@ -84,11 +84,11 @@ type CacheConfig struct {
 // CacheSettings define the caching behavior for an individual cache.
 type CacheSettings struct {
 	// TTL value for items in cache. Not used for success because we use TTL
-	// from the DNS record or the minimum configured TTL.
+	// from the DNS record.
 	TTL time.Duration `config:"ttl"`
 
 	// Minimum TTL value for successful DNS responses.
-	MinTTL time.Duration `config:"ttl.min" validate:"min=1"`
+	MinTTL time.Duration `config:"min_ttl" validate:"min=1"`
 
 	// Initial capacity. How much space is allocated at initialization.
 	InitialCapacity int `config:"capacity.initial" validate:"min=0"`

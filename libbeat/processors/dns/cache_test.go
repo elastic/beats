@@ -105,7 +105,6 @@ func TestCache(t *testing.T) {
 	ptr, err = c.LookupPTR(gatewayIP + "2")
 	if assert.NoError(t, err) {
 		assert.EqualValues(t, gatewayName, ptr.Host)
-		// TTL counts down while in cache.
 		assert.EqualValues(t, 0, ptr.TTL)
 		assert.EqualValues(t, 3, c.stats.Hit.Get())
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
