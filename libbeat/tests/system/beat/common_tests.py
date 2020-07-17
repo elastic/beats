@@ -26,7 +26,8 @@ class TestExportsMixin:
         trailer = "\nPASS\n"
         pos = output.rfind(trailer)
         if pos == -1:
-            raise Exception("didn't return expected trailer:{} got:{}".format(trailer.__repr__(),                                                   output[-100:].__repr__()))
+            raise Exception("didn't return expected trailer:{} got:{}".format(
+                trailer.__repr__(),                                                   output[-100:].__repr__()))
         return output[:pos]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
