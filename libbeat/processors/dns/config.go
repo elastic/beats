@@ -126,7 +126,7 @@ func (c *Config) Validate() error {
 // Validate validates the data contained in the CacheConfig.
 func (c *CacheConfig) Validate() error {
 	if c.SuccessCache.MinTTL <= 0 {
-		return errors.Errorf("success_cache.ttl.min must be > 0")
+		return errors.Errorf("success_cache.min_ttl must be > 0")
 	}
 	if c.FailureCache.TTL <= 0 {
 		return errors.Errorf("failure_cache.ttl must be > 0")
