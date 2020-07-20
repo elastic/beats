@@ -6,9 +6,10 @@ import unittest
 import time
 import yaml
 from shutil import copyfile
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
     def test_start_with_local_journal(self):
