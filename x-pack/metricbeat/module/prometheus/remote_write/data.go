@@ -6,9 +6,12 @@ package remote_write
 
 import (
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/model"
@@ -16,9 +19,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+)
+
+const (
+	counterType   = "counter_type"
+	histogramType = "histgram_type"
+	otherType     = "other_type"
 )
 
 type histogram struct {
@@ -29,8 +39,9 @@ type histogram struct {
 }
 
 func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.RemoteWriteEventsGenerator, error) {
-	config := config{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	var err error
+	config := defaultConfig
+	if err = base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
@@ -39,9 +50,18 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 		// to make sure that all counters are available between fetches
 		counters := collector.NewCounterCache(base.Module().Config().Period * 5)
 
-		g := RemoteWriteTypedGenerator{
-			CounterCache: counters,
-			RateCounters: config.RateCounters,
+		g := remoteWriteTypedGenerator{
+			counterCache: counters,
+			rateCounters: config.RateCounters,
+		}
+
+		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to compile counter patterns")
+		}
+		g.histogramPatterns, err = p.CompilePatternList(config.TypesPatterns.HistogramPatterns)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to compile histogram patterns")
 		}
 
 		return &g, nil
@@ -50,24 +70,26 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 	return remote_write.DefaultRemoteWriteEventsGeneratorFactory(base)
 }
 
-type RemoteWriteTypedGenerator struct {
-	CounterCache collector.CounterCache
-	RateCounters bool
+type remoteWriteTypedGenerator struct {
+	counterCache      collector.CounterCache
+	rateCounters      bool
+	counterPatterns   []*regexp.Regexp
+	histogramPatterns []*regexp.Regexp
 }
 
-func (g *RemoteWriteTypedGenerator) Start() {
+func (g *remoteWriteTypedGenerator) Start() {
 	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
 
-	if g.RateCounters {
+	if g.rateCounters {
 		cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental")
 	}
 
-	g.CounterCache.Start()
+	g.counterCache.Start()
 }
 
-func (g *RemoteWriteTypedGenerator) Stop() {
-	logp.Debug("prometheus.remote_write.cache", "stopping CounterCache")
-	g.CounterCache.Stop()
+func (g *remoteWriteTypedGenerator) Stop() {
+	logp.Debug("prometheus.remote_write.cache", "stopping counterCache")
+	g.counterCache.Stop()
 }
 
 // GenerateEvents receives a list of Sample and:
@@ -75,7 +97,7 @@ func (g *RemoteWriteTypedGenerator) Stop() {
 // 2. handle it properly using "types" logic
 // 3. if metrics of histogram type then it is converted to ES histogram
 // 4. metrics with the same set of labels are grouped into same events
-func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
+func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	var data common.MapStr
 	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
@@ -93,14 +115,14 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			labels[string(k)] = v
 		}
 
-		promType := findType(name, labels)
+		promType := g.findMetricType(name, labels)
 		val := float64(metric.Value)
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
 			// join metrics with same labels in a single event
 			labelsHash := labels.String()
 			labelsClone := labels.Clone()
 			labelsClone.Delete("le")
-			if promType == "histogram" {
+			if promType == histogramType {
 				labelsHash = labelsClone.String()
 			}
 			if _, ok := eventList[labelsHash]; !ok {
@@ -110,7 +132,7 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 				// Add labels
 				if len(labels) > 0 {
-					if promType == "histogram" {
+					if promType == histogramType {
 						eventList[labelsHash].ModuleFields["labels"] = labelsClone
 					} else {
 						eventList[labelsHash].ModuleFields["labels"] = labels
@@ -121,17 +143,17 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			e := eventList[labelsHash]
 			e.Timestamp = metric.Timestamp.Time()
 			switch promType {
-			case "counter":
+			case counterType:
 				data = common.MapStr{
 					name: g.rateCounterFloat64(name, labels, val),
 				}
-			case "other":
+			case otherType:
 				data = common.MapStr{
 					name: common.MapStr{
 						"value": val,
 					},
 				}
-			case "histogram":
+			case histogramType:
 				histKey := name + labelsClone.String()
 
 				le, _ := labels.GetValue("le")
@@ -167,32 +189,32 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *RemoteWriteTypedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
+func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}
 
-	if g.RateCounters {
-		d["rate"], _ = g.CounterCache.RateUint64(name+labels.String(), value)
+	if g.rateCounters {
+		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
 	}
 
 	return d
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *RemoteWriteTypedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
+func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}
-	if g.RateCounters {
-		d["rate"], _ = g.CounterCache.RateFloat64(name+labels.String(), value)
+	if g.rateCounters {
+		d["rate"], _ = g.counterCache.RateFloat64(name+labels.String(), value)
 	}
 
 	return d
 }
 
 // processPromHistograms receives a group of Histograms and converts each one to ES histogram
-func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
+func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
 	for _, histogram := range histograms {
 		labelsHash := histogram.labels.String()
 		if _, ok := eventList[labelsHash]; !ok {
@@ -215,24 +237,36 @@ func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 		name := strings.TrimSuffix(histogram.metricName, "_bucket")
 		data := common.MapStr{
 			name: common.MapStr{
-				"histogram": collector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
+				"histogram": collector.PromHistogramToES(g.counterCache, histogram.metricName, histogram.labels, &hist),
 			},
 		}
 		e.ModuleFields.Update(data)
 	}
 }
 
-// findType evaluates the type of the metric by check the metricname format in order to handle it properly
-func findType(metricName string, labels common.MapStr) string {
+// findMetricType evaluates the type of the metric by check the metricname format in order to handle it properly
+func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels common.MapStr) string {
 	leLabel := false
 	if _, ok := labels["le"]; ok {
 		leLabel = true
 	}
 	if strings.Contains(metricName, "_total") || strings.Contains(metricName, "_sum") ||
 		strings.Contains(metricName, "_count") {
-		return "counter"
+		return counterType
 	} else if strings.Contains(metricName, "_bucket") && leLabel {
-		return "histogram"
+		return histogramType
 	}
-	return "other"
+
+	// handle user provided patterns
+	if len(g.counterPatterns) > 0 {
+		if !p.MatchMetricFamily(metricName, g.counterPatterns) {
+			return counterType
+		}
+	}
+	if len(g.histogramPatterns) > 0 {
+		if !p.MatchMetricFamily(metricName, g.histogramPatterns) {
+			return histogramType
+		}
+	}
+	return otherType
 }

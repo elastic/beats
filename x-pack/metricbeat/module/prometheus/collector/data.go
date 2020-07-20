@@ -29,8 +29,8 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 		counters := NewCounterCache(base.Module().Config().Period * 5)
 
 		g := typedGenerator{
-			CounterCache: counters,
-			RateCounters: config.RateCounters,
+			counterCache: counters,
+			rateCounters: config.RateCounters,
 		}
 
 		return &g, nil
@@ -40,23 +40,23 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 }
 
 type typedGenerator struct {
-	CounterCache CounterCache
-	RateCounters bool
+	counterCache CounterCache
+	rateCounters bool
 }
 
 func (g *typedGenerator) Start() {
 	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
 
-	if g.RateCounters {
+	if g.rateCounters {
 		cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental")
 	}
 
-	g.CounterCache.Start()
+	g.counterCache.Start()
 }
 
 func (g *typedGenerator) Stop() {
-	logp.Debug("prometheus.collector.cache", "stopping CounterCache")
-	g.CounterCache.Stop()
+	logp.Debug("prometheus.collector.cache", "stopping counterCache")
+	g.counterCache.Stop()
 }
 
 // GeneratePromEvents stores all Prometheus metrics using
@@ -138,7 +138,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			events = append(events, collector.PromEvent{
 				Data: common.MapStr{
 					name: common.MapStr{
-						"histogram": PromHistogramToES(g.CounterCache, name, labels, histogram),
+						"histogram": PromHistogramToES(g.counterCache, name, labels, histogram),
 					},
 				},
 				Labels: labels,
@@ -172,8 +172,8 @@ func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, va
 		"counter": value,
 	}
 
-	if g.RateCounters {
-		d["rate"], _ = g.CounterCache.RateUint64(name+labels.String(), value)
+	if g.rateCounters {
+		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
 	}
 
 	return d
@@ -185,8 +185,8 @@ func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, v
 		"counter": value,
 	}
 
-	if g.RateCounters {
-		d["rate"], _ = g.CounterCache.RateFloat64(name+labels.String(), value)
+	if g.rateCounters {
+		d["rate"], _ = g.counterCache.RateFloat64(name+labels.String(), value)
 	}
 
 	return d

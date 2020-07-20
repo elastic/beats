@@ -7,8 +7,20 @@ package remote_write
 import "errors"
 
 type config struct {
-	UseTypes     bool `config:"use_types"`
-	RateCounters bool `config:"rate_counters"`
+	UseTypes      bool          `config:"use_types"`
+	RateCounters  bool          `config:"rate_counters"`
+	TypesPatterns TypesPatterns `config:"types_patterns" yaml:"types_patterns,omitempty"`
+}
+
+type TypesPatterns struct {
+	CounterPatterns   *[]string `config:"counter_patterns" yaml:"include,omitempty"`
+	HistogramPatterns *[]string `config:"histogram_patterns" yaml:"exclude,omitempty"`
+}
+
+var defaultConfig = config{
+	TypesPatterns: TypesPatterns{
+		CounterPatterns:   nil,
+		HistogramPatterns: nil},
 }
 
 func (c *config) Validate() error {

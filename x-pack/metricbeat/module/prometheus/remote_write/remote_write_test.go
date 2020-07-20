@@ -23,11 +23,11 @@ func TestGenerateEventsCounter(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
@@ -89,11 +89,11 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
@@ -179,11 +179,11 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
@@ -309,11 +309,11 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
@@ -463,11 +463,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.25"),
@@ -653,11 +653,11 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 
 	counters := xcollector.NewCounterCache(1 * time.Second)
 
-	g := RemoteWriteTypedGenerator{
-		CounterCache: counters,
-		RateCounters: true,
+	g := remoteWriteTypedGenerator{
+		counterCache: counters,
+		rateCounters: true,
 	}
-	g.CounterCache.Start()
+	g.counterCache.Start()
 	labels := common.MapStr{
 		"runtime": model.LabelValue("linux"),
 	}
