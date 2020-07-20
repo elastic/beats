@@ -275,7 +275,7 @@ var (
 						"bytes": c.Str("usage_in_bytes"),
 					},
 				}),
-			}),
+			}, c.DictOptional),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
