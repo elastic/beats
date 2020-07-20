@@ -22,7 +22,7 @@ type contentBlob struct {
 	env     apiEnvironment
 	id, url string
 	// cursor is used to ACK the resulting events.
-	cursor cursor
+	cursor checkpoint
 	// skipLines is used when resuming from a saved cursor so that already
 	// acknowledged objects are not duplicated.
 	skipLines int
@@ -115,7 +115,7 @@ func (c contentBlob) handleError(response *http.Response) (actions []poll.Action
 }
 
 // ContentBlob creates a new contentBlob.
-func ContentBlob(url string, cursor cursor, env apiEnvironment) contentBlob {
+func ContentBlob(url string, cursor checkpoint, env apiEnvironment) contentBlob {
 	return contentBlob{
 		url:    url,
 		env:    env,

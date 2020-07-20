@@ -20,6 +20,7 @@ package memlog
 import (
 	"io"
 	"os"
+	"runtime"
 	"syscall"
 )
 
@@ -75,4 +76,46 @@ func trySyncPath(path string) {
 	}
 	defer f.Close()
 	syncFile(f)
+}
+
+// pathEnsurePermissions checks if the file permissions for the given file match wantPerm.
+// The permissions are updated using chmod if needed.
+// No file will be created if the file does not yet exist.
+func pathEnsurePermissions(path string, wantPerm os.FileMode) error {
+	f, err := os.OpenFile(path, os.O_RDWR, wantPerm)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+	return fileEnsurePermissions(f, wantPerm)
+}
+
+// fileEnsurePermissions checks if the file permissions for the given file
+// matches wantPerm. If not fileEnsurePermissions tries to update
+// the current permissions via chmod.
+// The file is not created or updated if it does not exist.
+func fileEnsurePermissions(f *os.File, wantPerm os.FileMode) error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	fi, err := f.Stat()
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	wantPerm = wantPerm & os.ModePerm
+	perm := fi.Mode() & os.ModePerm
+	if wantPerm == perm {
+		return nil
+	}
+
+	return f.Chmod((fi.Mode() &^ os.ModePerm) | wantPerm)
 }

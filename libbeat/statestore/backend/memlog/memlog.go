@@ -54,6 +54,9 @@ type Settings struct {
 	// Checkpoint predicate that can trigger a registry file rotation.  If not
 	// configured, memlog will automatically trigger a checkpoint every 10MB.
 	Checkpoint CheckpointPredicate
+
+	// If set memlog will not check the version of the meta file.
+	IgnoreVersionCheck bool
 }
 
 // CheckpointPredicate is the type for configurable checkpoint checks.
@@ -62,7 +65,7 @@ type CheckpointPredicate func(fileSize uint64) bool
 
 const defaultFileMode os.FileMode = 0600
 
-const defaultBufferSize = 4096
+const defaultBufferSize = 4 * 1024
 
 func defaultCheckpoint(filesize uint64) bool {
 	const limit = 10 * 1 << 20 // set rotation limit to 10MB by default
@@ -110,7 +113,7 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 	home := filepath.Join(r.settings.Root, name)
 	fileMode := r.settings.FileMode
 	bufSz := r.settings.BufferSize
-	store, err := openStore(logger, home, fileMode, bufSz, r.settings.Checkpoint)
+	store, err := openStore(logger, home, fileMode, bufSz, r.settings.IgnoreVersionCheck, r.settings.Checkpoint)
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,31 @@
     ],
     "socket": "beatSocket.sock"
   },
+  "mounts": [
+    {
+      "name": "LOG_DIR",
+      "description": "Mount for local log cache",
+      "destination": "/var/log/docker",
+      "source": "/var/lib/docker",
+      "type": "none",
+      "options": [
+        "rw",
+        "rbind"
+      ],
+      "Settable": [
+        "source"
+      ]
+    }
+  ],
   "env": [
+    {
+      "description": "Destroy logs after a container has stopped",
+      "name": "DESTROY_LOGS_ON_STOP",
+      "value": "false",
+      "Settable": [
+        "value"
+      ]
+    },
     {
       "description": "debug level",
       "name": "LOG_DRIVER_LEVEL",

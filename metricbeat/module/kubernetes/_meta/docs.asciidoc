@@ -38,6 +38,16 @@ Note: Kube-state-metrics is not deployed by default in Kubernetes. For these cas
 
 The apiserver metricset requires access to the Kubernetes API, which should be easily available in all Kubernetes environments. Depending on the Kubernetes configuration, the API access might require SSL (`https`) and token based authentication.
 
+In order to access the `/metrics` path of the API service, some Kubernetes environments might require the following permission to be added to a ClusterRole.
+
+```yaml
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+```
+
 [float]
 ==== proxy
 

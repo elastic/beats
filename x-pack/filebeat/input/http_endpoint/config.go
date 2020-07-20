@@ -44,5 +44,11 @@ func (c *config) Validate() error {
 		return errors.New("response_body must be valid JSON")
 	}
 
+	if c.BasicAuth {
+		if c.Username == "" || c.Password == "" {
+			return errors.New("Username and password required when basicauth is enabled")
+		}
+	}
+
 	return nil
 }

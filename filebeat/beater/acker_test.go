@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 type mockStatefulLogger struct {
@@ -78,9 +79,13 @@ func TestACKer(t *testing.T) {
 			sl := &mockStatelessLogger{}
 			sf := &mockStatefulLogger{}
 
-			h := newEventACKer(sl, sf)
+			h := eventACKer(sl, sf)
 
-			h.ackEvents(test.data)
+			for _, datum := range test.data {
+				h.AddEvent(beat.Event{Private: datum}, true)
+			}
+
+			h.ACKEvents(len(test.data))
 			assert.Equal(t, test.stateless, sl.count)
 			assert.Equal(t, test.stateful, sf.states)
 		})

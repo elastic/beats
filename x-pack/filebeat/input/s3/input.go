@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -137,13 +138,15 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKEvents: func(privates []interface{}) {
-			for _, private := range privates {
-				if s3Context, ok := private.(*s3Context); ok {
-					s3Context.done()
+		ACKHandler: acker.ConnectionOnly(
+			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+				for _, private := range privates {
+					if s3Context, ok := private.(*s3Context); ok {
+						s3Context.done()
+					}
 				}
-			}
-		},
+			}),
+		),
 	})
 	if err != nil {
 		return nil, err
@@ -474,7 +477,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	// handle s3 objects that are not json content-type
 	offset := 0
 	for {
-		log, err := reader.ReadString('\n')
+		log, err := readStringAndTrimDelimiter(reader)
+		if err != nil {
+			err = errors.Wrap(err, "readStringAndTrimDelimiter failed")
+			p.logger.Error(err)
+			return err
+		}
+
 		if log == "" {
 			break
 		}
@@ -563,7 +572,8 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 
 func (p *s3Input) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
 	vJSON, err := json.Marshal(jsonFields)
-	log := string(vJSON)
+	logOriginal := string(vJSON)
+	log := trimLogDelimiter(logOriginal)
 	offset += len([]byte(log))
 	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
 
@@ -604,6 +614,18 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 		return errors.Wrapf(err, "SQS DeleteMessageRequest failed in queue %s", queueURL)
 	}
 	return nil
+}
+
+func trimLogDelimiter(log string) string {
+	return strings.TrimSuffix(log, "\n")
+}
+
+func readStringAndTrimDelimiter(reader *bufio.Reader) (string, error) {
+	logOriginal, err := reader.ReadString('\n')
+	if err != nil {
+		return logOriginal, err
+	}
+	return trimLogDelimiter(logOriginal), nil
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {

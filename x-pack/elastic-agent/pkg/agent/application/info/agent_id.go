@@ -37,7 +37,7 @@ type ioStore interface {
 
 // AgentConfigFile is a name of file used to store agent information
 func AgentConfigFile() string {
-	return filepath.Join(paths.Home(), defaultAgentConfigFile)
+	return filepath.Join(paths.Config(), defaultAgentConfigFile)
 }
 
 // AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
@@ -56,7 +56,7 @@ func generateAgentID() (string, error) {
 
 func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 	agentConfigFile := AgentConfigFile()
-	s := storage.NewEncryptedDiskStore(agentConfigFile, []byte(""))
+	s := storage.NewDiskStore(agentConfigFile)
 
 	agentinfo, err := getInfoFromStore(s)
 	if err != nil {

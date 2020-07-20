@@ -132,7 +132,7 @@ func NewHarvester(
 	}
 
 	h := &Harvester{
-		config:        defaultConfig,
+		config:        defaultConfig(),
 		state:         state,
 		states:        states,
 		publishState:  publishState,

@@ -32,10 +32,12 @@ type MockS3Client struct {
 }
 
 var (
-	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
-	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
-	mockSvc      = &MockS3Client{}
-	info         = s3Info{
+	s3LogString1        = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png\n"
+	s3LogString1Trimmed = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png"
+	s3LogString2        = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png\n"
+	s3LogString2Trimmed = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png"
+	mockSvc             = &MockS3Client{}
+	info                = s3Info{
 		name:   "test-s3-ks",
 		key:    "log2019-06-21-16-16-54",
 		region: "us-west-1",
@@ -182,15 +184,15 @@ func TestNewS3BucketReader(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		switch i {
 		case 0:
-			log, err := reader.ReadString('\n')
+			log, err := readStringAndTrimDelimiter(reader)
 			assert.NoError(t, err)
-			assert.Equal(t, s3LogString1, log)
+			assert.Equal(t, s3LogString1Trimmed, log)
 		case 1:
-			log, err := reader.ReadString('\n')
+			log, err := readStringAndTrimDelimiter(reader)
 			assert.NoError(t, err)
-			assert.Equal(t, s3LogString2, log)
+			assert.Equal(t, s3LogString2Trimmed, log)
 		case 2:
-			log, err := reader.ReadString('\n')
+			log, err := readStringAndTrimDelimiter(reader)
 			assert.Error(t, io.EOF, err)
 			assert.Equal(t, "", log)
 		}
@@ -370,6 +372,35 @@ May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED
 
 			require.NoError(t, err)
 			require.Equal(t, test.expected, actual)
+		})
+	}
+}
+
+func TestTrimLogDelimiter(t *testing.T) {
+	cases := []struct {
+		title       string
+		logOriginal string
+		expectedLog string
+	}{
+		{"string with delimiter",
+			`test
+`,
+			"test",
+		},
+		{"string without delimiter",
+			"test",
+			"test",
+		},
+		{"string just with delimiter",
+			`
+`,
+			"",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			log := trimLogDelimiter(c.logOriginal)
+			assert.Equal(t, c.expectedLog, log)
 		})
 	}
 }

@@ -188,9 +188,9 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 		}
 
 		for _, resourceTag := range output.ResourceTagMappingList {
-			identifier, err := findIdentifierFromARN(*resourceTag.ResourceARN)
+			identifier, err := FindIdentifierFromARN(*resourceTag.ResourceARN)
 			if err != nil {
-				err = errors.Wrap(err, "error findIdentifierFromARN")
+				err = errors.Wrap(err, "error FindIdentifierFromARN")
 				return nil, err
 			}
 			resourceTagMap[identifier] = resourceTag.Tags
@@ -199,7 +199,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 	return resourceTagMap, nil
 }
 
-func findIdentifierFromARN(resourceARN string) (string, error) {
+func FindIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
 		err = errors.Wrap(err, "error Parse arn")
