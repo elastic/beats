@@ -214,7 +214,6 @@ func isUpdated(o, n interface{}) bool {
 	newCopy.ResourceVersion = ""
 
 	// If the old object and new object are different in either meta or spec then there is a valid change
-	fmt.Println(equality.Semantic.DeepDerivative(oldCopy.Spec, newCopy.Spec), equality.Semantic.DeepDerivative(oldCopy.ObjectMeta, newCopy.ObjectMeta))
 	if !equality.Semantic.DeepEqual(oldCopy.Spec, newCopy.Spec) || !equality.Semantic.DeepEqual(oldCopy.ObjectMeta, newCopy.ObjectMeta) {
 		return true
 	}
