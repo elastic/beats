@@ -70,7 +70,6 @@ func (g *RemoteWriteTypedGenerator) Stop() {
 	g.CounterCache.Stop()
 }
 
-
 // GenerateEvents receives a list of Sample and:
 // 1. guess the type of the sample metric
 // 2. handle it properly using "types" logic
