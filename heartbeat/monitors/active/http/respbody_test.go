@@ -246,7 +246,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 			expectedHash := sha256.Sum256([]byte(tt.body))
 			assert.Equal(t, hex.EncodeToString(expectedHash[:]), gotHashStr)
 
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 		})
 	}
 }
