@@ -28,7 +28,7 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 		// to make sure that all counters are available between fetches
 		counters := NewCounterCache(base.Module().Config().Period * 5)
 
-		g := TypedGenerator{
+		g := typedGenerator{
 			CounterCache: counters,
 			RateCounters: config.RateCounters,
 		}
@@ -39,12 +39,12 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 	return collector.DefaultPromEventsGeneratorFactory(base)
 }
 
-type TypedGenerator struct {
+type typedGenerator struct {
 	CounterCache CounterCache
 	RateCounters bool
 }
 
-func (g *TypedGenerator) Start() {
+func (g *typedGenerator) Start() {
 	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
 
 	if g.RateCounters {
@@ -54,14 +54,14 @@ func (g *TypedGenerator) Start() {
 	g.CounterCache.Start()
 }
 
-func (g *TypedGenerator) Stop() {
+func (g *typedGenerator) Stop() {
 	logp.Debug("prometheus.collector.cache", "stopping CounterCache")
 	g.CounterCache.Stop()
 }
 
 // GeneratePromEvents stores all Prometheus metrics using
 // specific Elasticsearch data types.
-func (g *TypedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
+func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
 	name := *mf.Name
@@ -167,7 +167,7 @@ func (g *TypedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *TypedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
+func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}
@@ -180,7 +180,7 @@ func (g *TypedGenerator) rateCounterUint64(name string, labels common.MapStr, va
 }
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *TypedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
+func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
 	d := common.MapStr{
 		"counter": value,
 	}

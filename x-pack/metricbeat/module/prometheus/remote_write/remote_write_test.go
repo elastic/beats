@@ -545,8 +545,8 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 	expected3 := common.MapStr{
 		"go_gc_duration_seconds_count": common.MapStr{
-			"counter": uint64(45),
-			"rate":    uint64(0),
+			"counter": float64(45),
+			"rate":    float64(0),
 		},
 		"go_gc_duration_seconds_sum": common.MapStr{
 			"counter": float64(44),
@@ -628,8 +628,8 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 	expected3 = common.MapStr{
 		"go_gc_duration_seconds_count": common.MapStr{
-			"counter": uint64(55),
-			"rate":    uint64(10),
+			"counter": float64(55),
+			"rate":    float64(10),
 		},
 		"go_gc_duration_seconds_sum": common.MapStr{
 			"counter": float64(54),
@@ -813,8 +813,8 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(0),
 		},
 		"http_request_duration_seconds_count": common.MapStr{
-			"counter": uint64(46),
-			"rate":    uint64(0),
+			"counter": float64(46),
+			"rate":    float64(0),
 		},
 		"http_request_bytes": common.MapStr{
 			"histogram": common.MapStr{
@@ -827,8 +827,8 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(0),
 		},
 		"http_request_bytes_count": common.MapStr{
-			"counter": uint64(56),
-			"rate":    uint64(0),
+			"counter": float64(56),
+			"rate":    float64(0),
 		},
 		"labels": labels,
 	}
@@ -844,8 +844,8 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(0),
 		},
 		"http_request_bytes_count": common.MapStr{
-			"counter": uint64(66),
-			"rate":    uint64(0),
+			"counter": float64(66),
+			"rate":    float64(0),
 		},
 		"labels": labels2,
 	}
@@ -996,7 +996,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 		"http_request_duration_seconds": common.MapStr{
 			"histogram": common.MapStr{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
-				"counts": []uint64{uint64(100), uint64(100), uint64(100)},
+				"counts": []uint64{uint64(100), uint64(0), uint64(0)},
 			},
 		},
 		"http_request_duration_seconds_sum": common.MapStr{
@@ -1004,13 +1004,13 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(100),
 		},
 		"http_request_duration_seconds_count": common.MapStr{
-			"counter": uint64(146),
-			"rate":    uint64(100),
+			"counter": float64(146),
+			"rate":    float64(100),
 		},
 		"http_request_bytes": common.MapStr{
 			"histogram": common.MapStr{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
-				"counts": []uint64{uint64(200), uint64(200), uint64(200)},
+				"counts": []uint64{uint64(200), uint64(0), uint64(0)},
 			},
 		},
 		"http_request_bytes_sum": common.MapStr{
@@ -1018,8 +1018,8 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(200),
 		},
 		"http_request_bytes_count": common.MapStr{
-			"counter": uint64(256),
-			"rate":    uint64(200),
+			"counter": float64(256),
+			"rate":    float64(200),
 		},
 		"labels": labels,
 	}
@@ -1027,7 +1027,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 		"http_request_bytes": common.MapStr{
 			"histogram": common.MapStr{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
-				"counts": []uint64{uint64(300), uint64(300), uint64(300)},
+				"counts": []uint64{uint64(300), uint64(0), uint64(0)},
 			},
 		},
 		"http_request_bytes_sum": common.MapStr{
@@ -1035,8 +1035,8 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 			"rate":    float64(300),
 		},
 		"http_request_bytes_count": common.MapStr{
-			"counter": uint64(366),
-			"rate":    uint64(300),
+			"counter": float64(366),
+			"rate":    float64(300),
 		},
 		"labels": labels2,
 	}

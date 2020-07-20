@@ -12,7 +12,7 @@ import (
 
 func init() {
 	mb.Registry.MustAddMetricSet("prometheus", "remote_write",
-		remote_write.MetricSetBuilder("prometheus", remoteWriteEventsGeneratorFactory),
+		remote_write.MetricSetBuilder(remoteWriteEventsGeneratorFactory),
 		mb.WithHostParser(parse.EmptyHostParser),
 
 		// must replace ensures that we are replacing the oss implementation with this one

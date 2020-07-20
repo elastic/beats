@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
-	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 )
 
 type histogram struct {
@@ -37,7 +37,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 	if config.UseTypes {
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
-		counters := xcollector.NewCounterCache(base.Module().Config().Period * 5)
+		counters := collector.NewCounterCache(base.Module().Config().Period * 5)
 
 		g := RemoteWriteTypedGenerator{
 			CounterCache: counters,
@@ -51,7 +51,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 }
 
 type RemoteWriteTypedGenerator struct {
-	CounterCache xcollector.CounterCache
+	CounterCache collector.CounterCache
 	RateCounters bool
 }
 
@@ -121,13 +121,9 @@ func (g RemoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			e := eventList[labelsHash]
 			e.Timestamp = metric.Timestamp.Time()
 			switch promType {
-			case "counter_float":
+			case "counter":
 				data = common.MapStr{
 					name: g.rateCounterFloat64(name, labels, val),
-				}
-			case "counter_int":
-				data = common.MapStr{
-					name: g.rateCounterUint64(name, labels, uint64(val)),
 				}
 			case "other":
 				data = common.MapStr{
@@ -219,7 +215,7 @@ func (g *RemoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 		name := strings.TrimSuffix(histogram.metricName, "_bucket")
 		data := common.MapStr{
 			name: common.MapStr{
-				"histogram": xcollector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
+				"histogram": collector.PromHistogramToES(g.CounterCache, histogram.metricName, histogram.labels, &hist),
 			},
 		}
 		e.ModuleFields.Update(data)
@@ -232,10 +228,9 @@ func findType(metricName string, labels common.MapStr) string {
 	if _, ok := labels["le"]; ok {
 		leLabel = true
 	}
-	if strings.Contains(metricName, "_total") || strings.Contains(metricName, "_sum") {
-		return "counter_float"
-	} else if strings.Contains(metricName, "_count") {
-		return "counter_int"
+	if strings.Contains(metricName, "_total") || strings.Contains(metricName, "_sum") ||
+		strings.Contains(metricName, "_count") {
+		return "counter"
 	} else if strings.Contains(metricName, "_bucket") && leLabel {
 		return "histogram"
 	}
