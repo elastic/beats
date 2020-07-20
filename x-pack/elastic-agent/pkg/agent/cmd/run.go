@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
+
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/service"
@@ -74,6 +76,12 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	service.BeforeRun()
 	defer service.Cleanup()
 
+	execPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	rex := reexec.Manager(execPath)
+
 	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
 		return err
@@ -91,16 +99,34 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	// listen for kill signal
+	// listen for signals
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	select {
-	case <-stop:
-		break
-	case <-signals:
-		break
+	reexecing := false
+	for {
+		breakout := false
+		select {
+		case <-rex.ShutdownChan():
+			reexecing = true
+			breakout = true
+		case sig := <-signals:
+			if sig == syscall.SIGHUP {
+				fmt.Fprint(streams.Err, "SIGHUP: triggered re-exec")
+				rex.ReExec()
+			} else {
+				breakout = true
+			}
+		}
+		if breakout {
+			break
+		}
 	}
 
-	return app.Stop()
+	err = app.Stop()
+	if !reexecing {
+		return err
+	}
+	rex.ShutdownComplete()
+	return err
 }
