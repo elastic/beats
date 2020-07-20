@@ -12,6 +12,12 @@ filebeat:
             type: logs
             name: generic
             namespace: default
+      - add_fields:
+          target: "event.dataset"
+          fields:
+            type: logs
+            name: generic
+            namespace: default
 output:
   elasticsearch:
     hosts:

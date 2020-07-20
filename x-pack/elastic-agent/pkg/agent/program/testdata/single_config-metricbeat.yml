@@ -11,6 +11,12 @@ metricbeat:
           type: metrics
           name: docker.status
           namespace: default
+    - add_fields:
+        target: "event.dataset"
+        fields:
+          type: metrics
+          name: docker.status
+          namespace: default
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
@@ -18,6 +24,12 @@ metricbeat:
     processors:
     - add_fields:
         target: "dataset"
+        fields:
+          type: metrics
+          name: generic
+          namespace: default
+    - add_fields:
+        target: "event.dataset"
         fields:
           type: metrics
           name: generic
@@ -32,6 +44,12 @@ metricbeat:
             should_be: first
       - add_fields:
           target: "dataset"
+          fields:
+            type: metrics
+            name: generic
+            namespace: testing
+      - add_fields:
+          target: "event.dataset"
           fields:
             type: metrics
             name: generic

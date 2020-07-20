@@ -639,8 +639,17 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 				&Key{name: "namespace", value: &StrVal{value: namespace}},
 				&Key{name: "name", value: &StrVal{value: dataset}},
 			}}})
-
 			addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
+
+			processorMap = &Dict{value: make([]Node, 0)}
+			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "event.dataset"}})
+			processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+				&Key{name: "type", value: &StrVal{value: datasetType}},
+				&Key{name: "namespace", value: &StrVal{value: namespace}},
+				&Key{name: "name", value: &StrVal{value: dataset}},
+			}}})
+			addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
 		}
 	}
