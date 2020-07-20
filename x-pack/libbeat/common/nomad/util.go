@@ -8,12 +8,12 @@ import (
 	api "github.com/hashicorp/nomad/api"
 )
 
-// Default Nomad configuration, reads configuration from environment variables
+// Default Nomad configuration, reads configuration from environment variables.
 var defaultConfig = api.DefaultConfig()
 
-// GetNomadClient returns a new Nomad config, using the default configuration or
-// the one passed as a parameter.
-func GetNomadClient() (*Client, error) {
+// NewClient returns a new Nomad client, using the default configuration or the configuration options
+// provided through environment variables.
+func NewClient() (*Client, error) {
 	return api.NewClient(defaultConfig)
 }
 

@@ -33,6 +33,8 @@ func init() {
 	// Register default indexers
 	Indexing.AddIndexer(AllocationNameIndexerName, NewAllocationNameIndexer)
 	Indexing.AddIndexer(AllocationUUIDIndexerName, NewAllocationUUIDIndexer)
+	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
+	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
 // New constructs a new add_nomad_metadata processor.
@@ -64,7 +66,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	client, err := nomad.GetNomadClient()
+	client, err := nomad.NewClient()
 	if err != nil {
 		logp.Err("nomad: Couldn't create client")
 		return nil, err

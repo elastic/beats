@@ -69,28 +69,13 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 		done:      make(chan struct{}),
 	}
 
-	queryOpts := &api.QueryOptions{
-		WaitTime:   w.options.SyncTimeout,
-		AllowStale: w.options.AllowStale,
-		WaitIndex:  uint64(1),
-	}
-
 	if w.nodeID == "" {
-		// Fetch the nodeId from the node name, used to filter the allocations
-		// If for some reason the NodeID changes filebeat will have to be restarted
-		nodes, _, err := w.client.Nodes().List(queryOpts)
-
+		nodeID, err := w.fetchNodeID()
 		if err != nil {
-			w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
 			return nil, err
 		}
 
-		for _, node := range nodes {
-			if node.Name == w.options.Node {
-				w.nodeID = node.ID
-				break
-			}
-		}
+		w.nodeID = nodeID
 	}
 
 	return w, nil
@@ -219,6 +204,51 @@ func (w *watcher) watch() {
 			}
 		}
 	}
+}
+
+func (w *watcher) fetchNodeID() (string, error) {
+	queryOpts := &api.QueryOptions{
+		WaitTime:   w.options.SyncTimeout,
+		AllowStale: w.options.AllowStale,
+	}
+
+	// Fetch the nodeId from the node name, used to filter the allocations
+	// If for some reason the NodeID changes filebeat will have to be restarted
+	if w.options.Node != "" {
+		nodes, _, err := w.client.Nodes().List(queryOpts)
+
+		if err != nil {
+			w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
+			return "", err
+		}
+
+		for _, node := range nodes {
+			if node.Name == w.options.Node {
+				return node.ID, nil
+				break
+			}
+		}
+	}
+
+	agent, err := w.client.Agent().Self()
+	if err != nil {
+		w.logger.Fatalf("Nomad: Error connecting to the nomad agent: %s", err)
+		return "", err
+	}
+
+	stats, ok := agent.Stats["client"]
+	if !ok {
+		w.logger.Fatalf("Nomad: Error getting client from the nomad agent: %s", err)
+		return "", err
+	}
+
+	nodeID, ok := stats["node_id"]
+	if !ok {
+		w.logger.Fatalf("Nomad: Error getting node_id from the nomad agent: %s", err)
+		return "", err
+	}
+
+	return nodeID, nil
 }
 
 func backoff(failures uint) {

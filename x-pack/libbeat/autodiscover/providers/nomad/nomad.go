@@ -51,7 +51,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, err
 	}
 
-	client, err := nomad.GetNomadClient()
+	client, err := nomad.NewClient()
 	if err != nil {
 		logp.Err("nomad: Couldn't create client")
 		return nil, err
@@ -78,8 +78,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	options := nomad.WatchOptions{
-		SyncTimeout:     config.WaitTime,
-		RefreshInterval: config.SyncPeriod,
+		SyncTimeout:     config.waitTime,
+		RefreshInterval: config.syncPeriod,
 		Node:            config.Host,
 	}
 

@@ -17,7 +17,9 @@ import (
 )
 
 const (
-	FieldMatcherName       = "fields"
+	// FieldMatcherName fields to be used as key for the allocation metadata lookup
+	FieldMatcherName = "fields"
+	// FieldFormatMatcherName format of the string used to create a key for the allocation metadata lookup
 	FieldFormatMatcherName = "field_format"
 )
 

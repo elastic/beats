@@ -18,9 +18,6 @@ type Config struct {
 	Namespace      string        `config:"namespace"`
 	SecretID       string        `config:"secret_id"`
 	Host           string        `config:"host" validate:"required"`
-	WaitTime       time.Duration `config:"wait_time"`
-	SyncPeriod     time.Duration `config:"sync_period"`
-	AllowStale     bool          `config:"allow_stale"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
@@ -28,6 +25,10 @@ type Config struct {
 	Builders  []*common.Config        `config:"builders"`
 	Appenders []*common.Config        `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
+
+	waitTime   time.Duration
+	syncPeriod time.Duration
+	allowStale bool
 }
 
 func defaultConfig() *Config {
@@ -36,9 +37,9 @@ func defaultConfig() *Config {
 		Region:         "",
 		Namespace:      "",
 		SecretID:       "",
-		AllowStale:     true,
-		WaitTime:       15 * time.Second,
-		SyncPeriod:     30 * time.Second,
+		allowStale:     true,
+		waitTime:       15 * time.Second,
+		syncPeriod:     30 * time.Second,
 		CleanupTimeout: 15 * time.Second,
 		Prefix:         "co.elastic",
 	}

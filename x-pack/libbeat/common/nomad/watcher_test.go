@@ -26,6 +26,8 @@ const (
 
 func TestWatcherAddAllocation(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
+
 	alloc := api.Allocation{}
 	alloc.ModifyIndex = 20
 	alloc.CreateIndex = 20
@@ -112,6 +114,8 @@ func TestWatcherAddAllocation(t *testing.T) {
 
 func TestWatcherUnchangedIndex(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
+
 	alloc := api.Allocation{}
 
 	mux := http.NewServeMux()
@@ -192,6 +196,7 @@ func TestWatcherUnchangedIndex(t *testing.T) {
 
 func TestWatcherIgnoreOldAllocations(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
 
 	// The Watcher is initialized with an initial WaitIndex of 1
 	// this allocation should be ignored
@@ -288,6 +293,8 @@ func TestWatcherIgnoreOldAllocations(t *testing.T) {
 
 func TestWatcherAddAllocationOnFirstRun(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
+
 	alloc := api.Allocation{}
 	alloc.ModifyIndex = 72975148
 	alloc.CreateIndex = 72636274
@@ -373,6 +380,8 @@ func TestWatcherAddAllocationOnFirstRun(t *testing.T) {
 
 func TestWatcherUpdateAllocation(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
+
 	alloc := api.Allocation{}
 	alloc.ModifyIndex = 20
 	alloc.CreateIndex = 10
@@ -458,6 +467,7 @@ func TestWatcherUpdateAllocation(t *testing.T) {
 
 func TestWatcherAllocationCreatedWhenChecked(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
 
 	// The Watcher is initialized with an initial WaitIndex of 1
 	// this allocation should be ignored
@@ -547,6 +557,7 @@ func TestWatcherAllocationCreatedWhenChecked(t *testing.T) {
 
 func TestWatcherAllocationUpdatedWhenChecked(t *testing.T) {
 	node := api.Node{}
+	node.Name = "nomad1"
 
 	// The Watcher is initialized with an initial WaitIndex of 1
 	// this allocation should be ignored
