@@ -947,7 +947,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
-        reportCoverage()
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+          sh(label: 'Report to Codecov', script: '.ci/scripts/report-codecov.sh auditbeat filebeat heartbeat journalbeat libbeat metricbeat packetbeat winlogbeat')
+        }
       }
     }
   }
@@ -1125,23 +1127,6 @@ def k8sTest(versions){
           }
         }
       }
-    }
-  }
-}
-
-def reportCoverage(){
-  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){
-      sh(label: 'Report to Codecov', script: '''
-        curl -sSLo codecov https://codecov.io/bash
-        for i in auditbeat filebeat heartbeat libbeat metricbeat packetbeat winlogbeat journalbeat
-        do
-          FILE="${i}/build/coverage/full.cov"
-          if [ -f "${FILE}" ]; then
-            bash codecov -f "${FILE}"
-          fi
-        done
-      ''')
     }
   }
 }
