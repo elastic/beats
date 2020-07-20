@@ -39,7 +39,7 @@ func TestList(t *testing.T) {
 
 	list, err := n.List()
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expected := []string{"cpu", "df", "uptime"}
 	assert.ElementsMatch(t, expected, list)
