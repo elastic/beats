@@ -15,11 +15,9 @@ filebeat:
             name: generic
             namespace: default
       - add_fields:
-          target: "event.dataset"
+          target: "event"
           fields:
-            type: logs
-            name: generic
-            namespace: default
+            dataset: generic
   - type: log
     paths:
       - /var/log/hello3.log
@@ -35,11 +33,9 @@ filebeat:
             name: generic
             namespace: default
       - add_fields:
-          target: "event.dataset"
+          target: "event"
           fields:
-            type: testtype
-            name: generic
-            namespace: default
+            dataset: generic
 output:
   elasticsearch:
     hosts:

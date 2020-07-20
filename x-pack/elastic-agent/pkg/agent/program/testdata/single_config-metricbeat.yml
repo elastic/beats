@@ -12,11 +12,9 @@ metricbeat:
           name: docker.status
           namespace: default
     - add_fields:
-        target: "event.dataset"
+        target: "event"
         fields:
-          type: metrics
-          name: docker.status
-          namespace: default
+          dataset: docker.status
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
@@ -29,11 +27,9 @@ metricbeat:
           name: generic
           namespace: default
     - add_fields:
-        target: "event.dataset"
+        target: "event"
         fields:
-          type: metrics
-          name: generic
-          namespace: default
+          dataset: generic
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
@@ -49,11 +45,9 @@ metricbeat:
             name: generic
             namespace: testing
       - add_fields:
-          target: "event.dataset"
+          target: "event"
           fields:
-            type: metrics
-            name: generic
-            namespace: testing
+            dataset: generic
 
 output:
   elasticsearch:
