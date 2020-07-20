@@ -40,5 +40,3 @@ include::monitoring-internal-collection.asciidoc[]
 ifndef::serverless[]
 include::monitoring-metricbeat.asciidoc[]
 endif::[]
-
-include::monitoring-internal-collection-legacy.asciidoc[]
