@@ -50,7 +50,7 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests\\W+(?:for\\W+macos)?(?:\\W+please)?.*')
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
@@ -126,7 +126,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -170,7 +170,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false" && params.macosTest
+              return env.BUILD_FILEBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -188,7 +188,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_FILEBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -247,7 +247,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -306,7 +306,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -350,7 +350,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -503,7 +503,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false" && params.macosTest
+              return env.BUILD_METRICBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -516,7 +516,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_METRICBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -575,7 +575,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -686,7 +686,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -758,7 +758,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -776,7 +776,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -1342,6 +1342,12 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Enable MacOSX when required:
+  //  - UI parameter is set
+  //  - by default for branches and tags
+  //  - if GH comment that contains `for macos`
+  env.BUILD_ON_MACOS = params.macosTest || !isPR() || (env.GITHUB_COMMENT?.contains('for macos'))
 }
 
 /**
