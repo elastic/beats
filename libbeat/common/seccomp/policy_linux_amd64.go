@@ -53,6 +53,7 @@ func init() {
 					"fchmod",
 					"fchmodat",
 					"fchown",
+					"fchownat",
 					"fcntl",
 					"fdatasync",
 					"flock",
