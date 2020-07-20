@@ -10,6 +10,7 @@ heartbeat.monitors:
   name: My Monitor
   script: |-
     j.step("load homepage", async (page) => {
+        console.log("SCRIPT PARAMS STEP", script_params);
         await page.goto('https://www.elastic.co');
     });
     j.step("hover over products menu", async (page) => {
@@ -18,16 +19,20 @@ heartbeat.monitors:
     j.step("click uptime", async (page) => {
         await page.click('css=a[href="/uptime-monitoring"]');
     });
+    /*
     j.step("broken step", async (page) => {
         await page.click('css=a#missing-id-that-is-not-real');
     });
     j.step("unreachable step", async (page) => {
         await page.click('css=a#missing-id-that-is-not-real');
     });
+    */
   api_key: "changeme"
-  runner_url: "https://us-central1-elastic-observability.cloudfunctions.net/synthproxy-test2"
-  browsers: ["chromium", "webkit", "firefox"]
-  schedule: "@every 10m"
+  script_params:
+    foo: bar
+  runner_url: "http://localhost:5678"
+  browsers: ["chromium"]
+  schedule: "@every 1m"
 
 setup.template.settings:
   index.number_of_shards: 1
