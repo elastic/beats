@@ -23,6 +23,7 @@ func GetConfigFromEnv(t *testing.T) map[string]interface{} {
 	optionalConfig(config, "uaa_address", "CLOUDFOUNDRY_UAA_ADDRESS")
 	optionalConfig(config, "rlp_address", "CLOUDFOUNDRY_RLP_ADDRESS")
 	optionalConfig(config, "doppler_address", "CLOUDFOUNDRY_DOPPLER_ADDRESS")
+	optionalConfig(config, "shard_id", "CLOUDFOUNDRY_SHARD_ID")
 
 	if t.Failed() {
 		t.FailNow()

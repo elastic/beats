@@ -35,7 +35,7 @@ type Manager struct {
 	beatUUID  uuid.UUID
 	registry  *reload.Registry
 	blacklist *xmanagement.ConfigBlacklist
-	client    *client.Client
+	client    client.Client
 	lock      sync.Mutex
 	status    management.Status
 	msg       string
@@ -67,7 +67,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 	var err error
 	var blacklist *xmanagement.ConfigBlacklist
-	var eac *client.Client
+	var eac client.Client
 	if c.Enabled && c.Mode == xmanagement.ModeFleet {
 		// Initialize configs blacklist
 		blacklist, err = xmanagement.NewConfigBlacklist(c.Blacklist)
@@ -134,7 +134,7 @@ func (cm *Manager) UpdateStatus(status management.Status, msg string) {
 	if cm.status != status || cm.msg != msg {
 		cm.status = status
 		cm.msg = msg
-		cm.client.Status(statusToProtoStatus(status), msg)
+		cm.client.Status(statusToProtoStatus(status), msg, nil)
 		cm.logger.Infof("Status change to %s: %s", status, msg)
 	}
 }
@@ -161,25 +161,24 @@ func (cm *Manager) OnConfig(s string) {
 
 	blocks, err := cm.toConfigBlocks(configMap)
 	if err != nil {
-		err = errors.Wrap(err, "could not apply the configuration")
+		err = errors.Wrap(err, "failed to parse configuration")
 		cm.logger.Error(err)
 		cm.UpdateStatus(management.Failed, err.Error())
 		return
 	}
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
-		err = errors.Wrap(err, "could not apply the configuration")
-		cm.logger.Error(err)
-		cm.UpdateStatus(management.Failed, err.Error())
+		// `cm.apply` already logs the errors; currently allow beat to run degraded
+		cm.UpdateStatus(management.Degraded, errs.Error())
 		return
 	}
 
-	cm.client.Status(proto.StateObserved_HEALTHY, "Running")
+	cm.client.Status(proto.StateObserved_HEALTHY, "Running", nil)
 }
 
 func (cm *Manager) OnStop() {
 	if cm.stopFunc != nil {
-		cm.client.Status(proto.StateObserved_STOPPING, "Stopping")
+		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 		cm.stopFunc()
 	}
 }

@@ -35,6 +35,11 @@ func TestConfigsMapping(t *testing.T) {
 		"correct": "config",
 	})
 
+	configPorts, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct": "config",
+		"hosts":   [1]string{"1.2.3.4:8080"},
+	})
+
 	tests := []struct {
 		mapping  string
 		event    bus.Event
@@ -73,6 +78,38 @@ func TestConfigsMapping(t *testing.T) {
 				"foo": 3,
 			},
 			expected: []*common.Config{config},
+		},
+		// Match config and replace data.host and data.ports.<name> properly
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    hosts: ["${data.host}:${data.ports.web}"]`,
+			event: bus.Event{
+				"foo":  3,
+				"host": "1.2.3.4",
+				"ports": common.MapStr{
+					"web": 8080,
+				},
+			},
+			expected: []*common.Config{configPorts},
+		},
+		// Match config and replace data.host and data.port properly
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    hosts: ["${data.host}:${data.port}"]`,
+			event: bus.Event{
+				"foo":  3,
+				"host": "1.2.3.4",
+				"port": 8080,
+			},
+			expected: []*common.Config{configPorts},
 		},
 	}
 

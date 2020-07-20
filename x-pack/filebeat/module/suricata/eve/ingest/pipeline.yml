@@ -30,9 +30,10 @@ processors:
         }
       ignore_failure: true
   - set:
-      if: "ctx?.destination?.domain != null && ctx?.network?.protocol == 'http'"
+      if: "ctx?.network?.protocol == 'http'"
       field: url.domain
       value: '{{destination.domain}}'
+      ignore_empty_value: true
   - grok:
       field: suricata.eve.http.url
       patterns:
@@ -73,15 +74,15 @@ processors:
   - set:
       field: rule.category
       value: "{{suricata.eve.alert.category}}"
-      if: "ctx?.suricata?.eve?.alert?.category != null"
+      ignore_empty_value: true
   - set:
       field: rule.id
       value: "{{suricata.eve.alert.signature_id}}"
-      if: "ctx?.suricata?.eve?.alert?.signature_id != null"
+      ignore_empty_value: true
   - set:
       field: rule.name
       value: "{{suricata.eve.alert.signature}}"
-      if: "ctx?.suricata?.eve?.alert?.signature != null"
+      ignore_empty_value: true
   - set:
       field: suricata.eve.alert.action
       value: denied

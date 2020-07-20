@@ -59,7 +59,7 @@
         "set": {
             "field": "event.action",
             "value": "{{osquery.result.action}}",
-            "if": "ctx?.osquery?.result?.action != null"
+            "ignore_empty_value": true
         }
     },
     {
@@ -93,70 +93,70 @@
         "set": {
             "field": "file.directory",
             "value": "{{osquery.result.columns.directory}}",
-            "if": "ctx?.osquery?.result?.columns?.directory != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.name",
             "value": "{{osquery.result.columns.filename}}",
-            "if": "ctx?.osquery?.result?.columns?.filename != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.gid",
             "value": "{{osquery.result.columns.gid}}",
-            "if": "ctx?.osquery?.result?.columns?.gid != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.inode",
             "value": "{{osquery.result.columns.inode}}",
-            "if": "ctx?.osquery?.result?.columns?.inode != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.mode",
             "value": "{{osquery.result.columns.mode}}",
-            "if": "ctx?.osquery?.result?.columns?.mode != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.path",
             "value": "{{osquery.result.columns.path}}",
-            "if": "ctx?.osquery?.result?.columns?.path != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.size",
             "value": "{{osquery.result.columns.size}}",
-            "if": "ctx?.osquery?.result?.columns?.size != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.type",
             "value": "{{osquery.result.columns.type}}",
-            "if": "ctx?.osquery?.result?.columns?.type != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "file.uid",
             "value": "{{osquery.result.columns.uid}}",
-            "if": "ctx?.osquery?.result?.columns?.uid != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "user.name",
             "value": "{{osquery.result.decorations.username}}",
-            "if": "ctx?.osquery?.result?.decorations?.username != null"
+            "ignore_empty_value": true
         }
     },
     {
@@ -170,35 +170,36 @@
         "set": {
             "field": "host.hostname",
             "value": "{{osquery.result.host_identifier}}",
-            "if": "ctx?.osquery?.result?.host_identifier != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "host.id",
             "value": "{{osquery.result.decorations.host_uuid}}",
-            "if": "ctx?.osquery?.result?.decorations?.host_uuid != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "process.name",
             "value": "{{osquery.result.columns.process}}",
-            "if": "ctx?.osquery?.result?.columns?.process != null"
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "url.full",
             "value": "{{osquery.result.columns.source_url}}",
-            "if": "ctx?.osquery?.result?.columns?.source_url != null && ctx.osquery.result.columns.source_url != 'null'"
+            "if": "ctx?.osquery?.result?.columns?.source_url != 'null'",
+            "ignore_empty_value": true
         }
     },
     {
         "set": {
             "field": "rule.name",
             "value": "{{osquery.result.name}}",
-            "if": "ctx?.osquery?.result?.name != null"
+            "ignore_empty_value": true
         }
     }
   ],

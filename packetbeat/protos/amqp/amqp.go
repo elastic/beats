@@ -435,6 +435,7 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 	pbf.Event.Start = t.ts
 	pbf.Event.End = t.endTime
 	pbf.Event.Dataset = "amqp"
+	pbf.Event.Action = "amqp." + t.method
 	pbf.Network.Protocol = pbf.Event.Dataset
 	pbf.Network.Transport = "tcp"
 	pbf.Error.Message = t.notes

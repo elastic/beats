@@ -1,6 +1,0 @@
-data:
-  bits: [8, 16, 32, 64]
-  endianess: {le: little, be: big}
-  signdness: {i: signed, u: unsigned}
-  baseType: {i: int, u: uint}
-

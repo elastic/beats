@@ -23,9 +23,10 @@ import (
 
 const (
 	beatName      = "filebeat"
+	artifactName  = "beats/filebeat"
 	version       = "7.5.1"
 	sourcePattern = "/downloads/beats/filebeat/"
-	source        = "http://artifacts.elastic.co/downloads/beats/"
+	source        = "http://artifacts.elastic.co/downloads/"
 )
 
 type testCase struct {
@@ -44,7 +45,7 @@ func TestDownload(t *testing.T) {
 	elasticClient := getElasticCoClient()
 
 	config := &artifact.Config{
-		BeatsSourceURI:  source,
+		SourceURI:       source,
 		TargetDirectory: targetDir,
 		Timeout:         timeout,
 	}
@@ -56,7 +57,7 @@ func TestDownload(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifactPath, err := testClient.Download(context.Background(), beatName, version)
+			artifactPath, err := testClient.Download(context.Background(), beatName, artifactName, version)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -82,7 +83,7 @@ func TestVerify(t *testing.T) {
 	elasticClient := getElasticCoClient()
 
 	config := &artifact.Config{
-		BeatsSourceURI:  source,
+		SourceURI:       source,
 		TargetDirectory: targetDir,
 		Timeout:         timeout,
 	}
@@ -94,7 +95,7 @@ func TestVerify(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifact, err := testClient.Download(context.Background(), beatName, version)
+			artifact, err := testClient.Download(context.Background(), beatName, artifactName, version)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -66,8 +66,8 @@ func (c *RlpListener) Start(ctx context.Context) {
 	}
 	es := rlpClient.Stream(ctx, l)
 
+	c.wg.Add(1)
 	go func() {
-		c.wg.Add(1)
 		defer c.wg.Done()
 		for {
 			select {
@@ -107,6 +107,10 @@ func (c *RlpListener) Stop() {
 	if c.cancel != nil {
 		c.cancel()
 	}
+	c.wg.Wait()
+}
+
+func (c *RlpListener) Wait() {
 	c.wg.Wait()
 }
 

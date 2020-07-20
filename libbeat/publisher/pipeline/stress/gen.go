@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
@@ -68,9 +69,9 @@ func generate(
 
 	logger := logp.NewLogger("publisher_pipeline_stress_generate")
 	if config.ACK {
-		settings.ACKCount = func(n int) {
+		settings.ACKHandler = acker.Counting(func(n int) {
 			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
-		}
+		})
 	}
 
 	if m := config.PublishMode; m != "" {

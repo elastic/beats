@@ -7,15 +7,15 @@ input:
       - namespace: AWS/ELB
         statistic: ["Sum"]
         name: ["BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX", "HTTPCode_Backend_4XX", "HTTPCode_Backend_5XX", "HTTPCode_ELB_4XX", "HTTPCode_ELB_5XX", "RequestCount", "SpilloverCount"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/ELB
         statistic: ["Maximum"]
         name: ["HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/ELB
         statistic: ["Average"]
         name: ["Latency", "EstimatedALBActiveConnectionCount", "EstimatedALBConsumedLCUs", "EstimatedALBNewConnectionCount", "EstimatedProcessedBytes"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/ApplicationELB
         statistic: ["Sum"]
         name: ["ActiveConnectionCount", "ClientTLSNegotiationErrorCount", "HTTP_Fixed_Response_Count",
@@ -25,22 +25,22 @@ input:
                "HTTPCode_ELB_504_Count", "IPv6ProcessedBytes", "IPv6RequestCount",
                "NewConnectionCount", "ProcessedBytes", "RejectedConnectionCount",
                "RequestCount", "RuleEvaluations"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/ApplicationELB
         statistic: ["Average"]
         name: ["ConsumedLCUs"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Average"]
         name: ["ActiveFlowCount", "ActiveFlowCount_TCP", "ActiveFlowCount_TLS", "ActiveFlowCount_UDP", "ConsumedLCUs", "ConsumedLCUs_TCP", "ConsumedLCUs_TLS", "ConsumedLCUs_UDP"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Sum"]
         name: ["ClientTLSNegotiationErrorCount", "NewFlowCount", "NewFlowCount_TLS", "NewFlowCount_TCP", "NewFlowCount_UDP",
                "ProcessedBytes", "ProcessedBytes_TCP", "ProcessedBytes_TLS", "ProcessedBytes_UDP", "TargetTLSNegotiationErrorCount",
                "TCP_Client_Reset_Count", "TCP_ELB_Reset_Count", "TCP_Target_Reset_Count"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Maximum"]
         name: ["HealthyHostCount", "UnHealthyHostCount"]
-        tags.resource_type_filter: elasticloadbalancing
+        resource_type: elasticloadbalancing

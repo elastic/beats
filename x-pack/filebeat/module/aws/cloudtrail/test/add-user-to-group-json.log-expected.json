@@ -2,6 +2,8 @@
     {
         "@timestamp": "2014-03-25T21:08:14.000Z",
         "aws.cloudtrail.event_version": "1.0",
+        "aws.cloudtrail.flattened.request_parameters.groupName": "admin",
+        "aws.cloudtrail.flattened.request_parameters.userName": "Bob",
         "aws.cloudtrail.request_parameters": "{groupName=admin, userName=Bob}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::123456789012:user/Alice",

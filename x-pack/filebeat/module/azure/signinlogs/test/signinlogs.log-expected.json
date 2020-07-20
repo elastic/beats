@@ -4,6 +4,7 @@
         "azure.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "azure.resource.id": "/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam",
         "azure.resource.provider": "Microsoft.aadiam",
+        "azure.signinlogs.category": "SignInLogs",
         "azure.signinlogs.identity": "Test LTest",
         "azure.signinlogs.operation_name": "Sign-in activity",
         "azure.signinlogs.operation_version": "1.0",
@@ -34,13 +35,21 @@
         "azure.signinlogs.properties.user_principal_name": "test@elastic.co",
         "azure.signinlogs.result_description": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "azure.signinlogs.result_signature": "None",
+        "azure.signinlogs.result_type": "50140",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "cloud.provider": "azure",
-        "event.category": "SignInLogs",
+        "event.action": "Sign-in activity",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "azure.signinlogs",
-        "event.duration": 0.0,
+        "event.duration": 0,
+        "event.kind": "event",
         "event.module": "azure",
-        "event.outcome": "50140",
+        "event.outcome": "failure",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "signinlogs",
         "geo.city_name": "Champs-Sur-Marne",
         "geo.country_iso_code": "FR",
@@ -52,9 +61,22 @@
         "log.offset": 0,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "service.type": "azure",
+        "source.as.number": 8426,
+        "source.as.organization.name": "Claranet Ltd",
+        "source.geo.city_name": "Farnham Royal",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.location.lat": 51.5333,
+        "source.geo.location.lon": -0.6167,
+        "source.geo.region_iso_code": "GB-BKM",
+        "source.geo.region_name": "Buckinghamshire",
         "source.ip": "81.171.241.231",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "elastic.co",
+        "user.full_name": "Test LTest",
+        "user.id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "user.name": "test"
     }
 ]

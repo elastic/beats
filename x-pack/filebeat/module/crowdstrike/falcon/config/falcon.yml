@@ -20,3 +20,7 @@ processors:
     lang: javascript
     id: crowdstrike_falcon
     file: ${path.home}/module/crowdstrike/falcon/config/pipeline.js
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.5.0

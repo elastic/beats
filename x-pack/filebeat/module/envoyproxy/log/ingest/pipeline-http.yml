@@ -44,6 +44,7 @@ processors:
 - set:
     field: url.domain
     value: '{{envoyproxy.authority}}'
+    ignore_empty_value: true
 - user_agent:
     field: user_agent.original
     ignore_missing: true

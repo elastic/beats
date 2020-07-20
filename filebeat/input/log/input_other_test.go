@@ -147,8 +147,9 @@ func TestInit(t *testing.T) {
 			config: config{
 				Paths: test.paths,
 			},
-			states: file.NewStates(),
-			outlet: TestOutlet{},
+			states:              file.NewStates(),
+			outlet:              TestOutlet{},
+			fileStateIdentifier: &file.MockIdentifier{},
 		}
 
 		// Set states to finished

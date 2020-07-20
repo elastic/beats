@@ -21,13 +21,13 @@
 package pipeline
 
 import (
-	"errors"
 	"reflect"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -71,11 +71,7 @@ type Pipeline struct {
 	waitCloser       *waitCloser
 
 	// pipeline ack
-	ackMode    pipelineACKMode
-	ackActive  atomic.Bool
-	ackDone    chan struct{}
-	ackBuilder ackBuilder
-	eventSema  *sema
+	eventSema *sema
 
 	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
@@ -128,7 +124,6 @@ type pipelineEventer struct {
 
 	observer  queueObserver
 	waitClose *waitCloser
-	cb        *pipelineEventCB
 }
 
 type waitCloser struct {
@@ -162,8 +157,6 @@ func New(
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
 	}
-	p.ackBuilder = &pipelineEmptyACK{p}
-	p.ackActive = atomic.MakeBool(true)
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
@@ -195,45 +188,6 @@ func New(
 	p.output.Set(out)
 
 	return p, nil
-}
-
-// SetACKHandler sets a global ACK handler on all events published to the pipeline.
-// SetACKHandler must be called before any connection is made.
-func (p *Pipeline) SetACKHandler(handler beat.PipelineACKHandler) error {
-	p.eventer.mutex.Lock()
-	defer p.eventer.mutex.Unlock()
-
-	if !p.eventer.modifyable {
-		return errors.New("can not set ack handler on already active pipeline")
-	}
-
-	// TODO: check only one type being configured
-
-	cb, err := newPipelineEventCB(handler)
-	if err != nil {
-		return err
-	}
-
-	if cb == nil {
-		p.ackBuilder = &pipelineEmptyACK{p}
-		p.eventer.cb = nil
-		return nil
-	}
-
-	p.eventer.cb = cb
-	if cb.mode == countACKMode {
-		p.ackBuilder = &pipelineCountACK{
-			pipeline: p,
-			cb:       cb.onCounts,
-		}
-	} else {
-		p.ackBuilder = &pipelineEventsACK{
-			pipeline: p,
-			cb:       cb.onEvents,
-		}
-	}
-
-	return nil
 }
 
 // Close stops the pipeline, outputs and queue.
@@ -292,9 +246,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // If not set otherwise the defaut publish mode is OutputChooses.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
-		canDrop      bool
-		dropOnCancel bool
-		eventFlags   publisher.EventFlags
+		canDrop    bool
+		eventFlags publisher.EventFlags
 	)
 
 	err := validateClientConfig(&cfg)
@@ -309,7 +262,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	switch cfg.PublishMode {
 	case beat.GuaranteedSend:
 		eventFlags = publisher.GuaranteedSend
-		dropOnCancel = true
 	case beat.DropIfFull:
 		canDrop = true
 	}
@@ -343,12 +295,9 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		reportEvents: reportEvents,
 	}
 
-	acker := p.makeACKer(processors != nil, &cfg, waitClose, client.unlink)
-	producerCfg := queue.ProducerConfig{
-		// Cancel events from queue if acker is configured
-		// and no pipeline-wide ACK handler is registered.
-		DropOnCancel: dropOnCancel && acker != nil && p.eventer.cb == nil,
-	}
+	ackHandler := cfg.ACKHandler
+
+	producerCfg := queue.ProducerConfig{}
 
 	if reportEvents || cfg.Events != nil {
 		producerCfg.OnDrop = func(event beat.Event) {
@@ -361,13 +310,27 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	if acker != nil {
-		producerCfg.ACK = acker.ackEvents
-	} else {
-		acker = newCloseACKer(nilACKer, client.unlink)
+	var waiter *clientCloseWaiter
+	if waitClose > 0 {
+		waiter = newClientCloseWaiter(waitClose)
 	}
 
-	client.acker = acker
+	if waiter != nil {
+		if ackHandler == nil {
+			ackHandler = waiter
+		} else {
+			ackHandler = acker.Combine(waiter, ackHandler)
+		}
+	}
+
+	if ackHandler != nil {
+		producerCfg.ACK = ackHandler.ACKEvents
+	} else {
+		ackHandler = acker.Nil()
+	}
+
+	client.acker = ackHandler
+	client.waiter = waiter
 	client.producer = p.queue.Producer(producerCfg)
 
 	p.observer.clientConnected()
@@ -429,7 +392,7 @@ func (p *Pipeline) runSignalPropagation() {
 		isSig := (chosen & 1) == 1
 		if isSig {
 			client := clients[i]
-			client.doClose()
+			client.Close()
 		}
 
 		// remove:
@@ -469,9 +432,6 @@ func (e *pipelineEventer) OnACK(n int) {
 
 	if wc := e.waitClose; wc != nil {
 		wc.dec(n)
-	}
-	if e.cb != nil {
-		e.cb.reportQueueACK(n)
 	}
 }
 

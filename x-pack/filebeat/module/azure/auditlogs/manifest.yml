@@ -15,6 +15,6 @@ var:
     default: [forwarded]
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ../azure-shared-pipeline.json
+  - ingest/pipeline.yml
+  - ../azure-shared-pipeline.yml
 input: config/{{.input}}.yml

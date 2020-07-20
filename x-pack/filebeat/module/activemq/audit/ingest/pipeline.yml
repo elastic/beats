@@ -13,9 +13,9 @@ processors:
       field: event.kind
       value: event
   - set:
-      if: "ctx?.activemq?.user != null"
       field: user.name
       value: "{{activemq.user}}"
+      ignore_empty_value: true
   - script:
       if: "ctx?.log?.level != null"
       lang: painless

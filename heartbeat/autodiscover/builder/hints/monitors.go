@@ -19,8 +19,6 @@ package hints
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/go-ucfg"
@@ -97,7 +95,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	}
 
 	tempCfg := common.MapStr{}
-	monitors := hb.getMonitors(hints)
+	monitors := builder.GetHintsAsList(hints, hb.config.Key)
 
 	var configs []*common.Config
 	for _, monitor := range monitors {
@@ -136,44 +134,6 @@ func (hb *heartbeatHints) getSchedule(hints common.MapStr) []string {
 
 func (hb *heartbeatHints) getRawConfigs(hints common.MapStr) []common.MapStr {
 	return builder.GetHintAsConfigs(hints, hb.config.Key)
-}
-
-func (hb *heartbeatHints) getMonitors(hints common.MapStr) []common.MapStr {
-	raw := builder.GetHintMapStr(hints, hb.config.Key, "")
-	if raw == nil {
-		return nil
-	}
-
-	var words, nums []string
-
-	for key := range raw {
-		if _, err := strconv.Atoi(key); err != nil {
-			words = append(words, key)
-			continue
-		} else {
-			nums = append(nums, key)
-		}
-	}
-
-	sort.Strings(nums)
-
-	var configs []common.MapStr
-	for _, key := range nums {
-		rawCfg, _ := raw[key]
-		if config, ok := rawCfg.(common.MapStr); ok {
-			configs = append(configs, config)
-		}
-	}
-
-	defaultMap := common.MapStr{}
-	for _, word := range words {
-		defaultMap[word] = raw[word]
-	}
-
-	if len(defaultMap) != 0 {
-		configs = append(configs, defaultMap)
-	}
-	return configs
 }
 
 func (hb *heartbeatHints) getProcessors(hints common.MapStr) []common.MapStr {
