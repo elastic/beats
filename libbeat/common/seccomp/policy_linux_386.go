@@ -46,6 +46,7 @@ func init() {
 					"exit_group",
 					"fchdir",
 					"fchmod",
+					"fchmodat",
 					"fchown32",
 					"fcntl",
 					"fcntl64",

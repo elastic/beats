@@ -51,6 +51,7 @@ func init() {
 					"exit_group",
 					"fchdir",
 					"fchmod",
+					"fchmodat",
 					"fchown",
 					"fcntl",
 					"fdatasync",
