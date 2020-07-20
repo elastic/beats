@@ -12,6 +12,7 @@ json.keys_under_root: false
 processors:
   - drop_fields:
       fields: ["json.x509"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
