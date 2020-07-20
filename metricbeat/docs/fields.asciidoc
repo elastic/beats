@@ -35084,7 +35084,7 @@ type: object
 *`prometheus.*.histogram`*::
 +
 --
-Prometheus histogram metric - release: ga return nil
+Prometheus histogram metric - release: ga
 
 
 type: object
