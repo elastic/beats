@@ -109,7 +109,6 @@ pipeline {
             mageTarget(context: "Elastic Agent x-pack Linux", directory: "x-pack/elastic-agent", target: "build test")
           }
         }
-
         stage('Elastic Agent x-pack Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -123,7 +122,6 @@ pipeline {
             mageTargetWin(context: "Elastic Agent x-pack Windows Unit test", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
         }
-
         stage('Elastic Agent Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
@@ -142,7 +140,6 @@ pipeline {
             }
           }
         }
-
         stage('Filebeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -1146,11 +1143,18 @@ def reportCoverage(){
   }
 }
 
-// isChanged treats the patterns as regular expressions. In order to check if
-// any file in a directoy is modified use `^<path to dir>/.*`.
+/**
+*  isChanged treats the patterns as regular expressions. In order to check if
+*  any file in a directoy is modified use `^<path to dir>/.*`.
+*
+*  In addition, there are another two alternatives to report that there are
+*  changes, when `runAllStages` parameter is set to true or when running on a
+*  branch/tag basis.
+*/
 def isChanged(patterns){
   return (
-    params.runAllStages
+    params.runAllStages   // when runAllStages UI parameter is set to true
+    || !isPR()            // when running on a branch/tag
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
   )
 }
