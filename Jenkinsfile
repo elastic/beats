@@ -945,12 +945,34 @@ def withBeatsEnv(Map args = [:], Closure body) {
         }
       } finally {
         if (archive) {
-          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
-          }
+          archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
         reportCoverage()
+      }
+    }
+  }
+}
+
+/**
+  This method archives and report the tests output, for such, it searches in certain folders
+  to bypass some issues when working with big repositories.
+*/
+def archiveTestOutput(Map args = [:]) {
+  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    if (isUnix()) {
+      fixPermissions("${WORKSPACE}")
+    }
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    dir('build') {
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+    }
+    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+      if (folder.trim()) {
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + goos()
+        tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
   }
@@ -990,10 +1012,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
           body()
         }
       } finally {
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
-        }
+        archiveTestOutput(testResults: "**\\build\\TEST*.xml", artifacts: "**\\build\\TEST*.out")
       }
     }
   }
