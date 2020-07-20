@@ -18,12 +18,12 @@ include::../include/configuring-intro.asciidoc[]
 
 :fileset_ex: defender_atp
 
-beta[]
-
 include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `defender_atp` fileset settings
+
+beta[]
 
 To allow the filebeat module to ingest data from the Microsoft Defender API, you would need to create a new application on your Azure domain.
 
@@ -37,9 +37,9 @@ After the application has been created, it should contain 3 values that you need
 
 These values are:
 
-Client ID
-Client Secret
-Tenant ID
+- Client ID
+- Client Secret
+- Tenant ID
 
 Example config:
 
@@ -52,8 +52,6 @@ Example config:
     var.oauth2.client.secret: "980453~-Sg99gedf"
     var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/token"
 ----
-
-include::../include/var-paths.asciidoc[]
 
 *`var.oauth2.client.id`*::
 
@@ -73,7 +71,7 @@ A predefined URL towards the Oauth2 service for Microsoft. The URL should always
 This is a list of Defender ATP fields that are mapped to ECS.
 
 [options="header"]
-|======================================================================|
+|======================================================================
 | Defender ATP Fields                 | ECS Fields                     |
 | alertCreationTime                   | @timestamp                     |
 | aadTenantId                         | cloud.account.id               |
@@ -99,14 +97,19 @@ This is a list of Defender ATP fields that are mapped to ECS.
 | relatedUser.domainName              | host.user.domain               |
 | title                               | message                        |
 | severity                            | event.severity                 |
-|======================================================================|
+|======================================================================
 
 :has-dashboards!:
 
 [float]
 === Dashboards
 
-The best way to view CrowdStrike events and alert data is in the SIEM. 
+This module comes with a sample dashboard for Defender ATP.
+
+[role="screenshot"]
+image::./images/filebeat-defender-atp-overview.png[]
+
+The best way to view Defender ATP events and alert data is in the SIEM. 
 
 [role="screenshot"]
 image::./images/siem-alerts-cs.jpg[]
@@ -118,7 +121,7 @@ For alerts, go to Detections -> External alerts.
 image::./images/siem-events-cs.jpg[]
 
 [float]
-And for all over event CrowdStrike Falcon event types, go to Host -> Events.
+And for all other Defender ATP event types, go to Host -> Events.
 
 :fileset_ex: dhcp
 
