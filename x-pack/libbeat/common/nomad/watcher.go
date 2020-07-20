@@ -150,7 +150,8 @@ func (w *watcher) sync() error {
 	}
 
 	for _, alloc := range allocations {
-		if alloc.ModifyIndex < w.waitIndex {
+		// the allocation has not changed since last seen, ignore
+		if w.waitIndex > alloc.AllocModifyIndex {
 			continue
 		}
 
@@ -164,16 +165,24 @@ func (w *watcher) sync() error {
 			alloc.NodeName = w.options.Node
 		}
 
-		w.logger.Debugf("Received allocation: %s DesiredStatus:%s ClientStatus:%s", alloc.ID,
+		w.logger.Debugf("Received allocation:%s DesiredStatus:%s ClientStatus:%s", alloc.ID,
 			alloc.DesiredStatus, alloc.ClientStatus)
 
 		switch alloc.ClientStatus {
 		case AllocClientStatusComplete, AllocClientStatusFailed, AllocClientStatusLost:
+			// the allocation is in a terminal state
 			w.handler.OnDelete(*alloc)
 		case AllocClientStatusRunning:
 			// Handle in-place allocation updates (like adding tags to a service definition) that
 			// don't trigger a new allocation
-			if (alloc.CreateIndex < alloc.AllocModifyIndex) && (w.waitIndex > 1) {
+			updated := (w.waitIndex != 0) && (alloc.CreateIndex < w.waitIndex) && (alloc.AllocModifyIndex >= w.waitIndex)
+
+			w.logger.Debugf("alloc_id=%s waitIndex=%v CreateIndex=%v ModifyIndex=%v AllocModifyIndex=%v updated=%v",
+				alloc.ID, w.waitIndex, alloc.CreateIndex, alloc.ModifyIndex,
+				alloc.AllocModifyIndex, updated,
+			)
+
+			if updated {
 				w.handler.OnUpdate(*alloc)
 				continue
 			}

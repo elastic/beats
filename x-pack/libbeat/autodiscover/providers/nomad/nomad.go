@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
@@ -41,7 +42,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The nomad autodiscover is experimental")
 	config := defaultConfig()
 
@@ -56,12 +57,12 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -105,12 +106,14 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		},
 		UpdateFunc: func(obj nomad.Resource) {
 			logp.Debug("nomad", "Watcher Allocation update: %+v", obj.ID)
-			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "stop") })
+			p.emit(&obj, "stop")
+			// We have a CleanupTimeout grace period (defaults to 15s) to wait for the stop event
+			// to be processed
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "start") })
 		},
 		DeleteFunc: func(obj nomad.Resource) {
 			logp.Debug("nomad", "Watcher Allocation delete: %+v", obj.ID)
-			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "stop") })
+			p.emit(&obj, "stop")
 		},
 	})
 
@@ -162,6 +165,20 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 
 	// emit per-task separated events
 	for _, task := range tasks {
+		taskName, ok := task["name"]
+		if !ok {
+			logp.Err("A task must contain a name property")
+			continue
+		}
+
+		// avoid emitting events when the associated task is in a TaskStatePending state
+		if state, ok := obj.TaskStates[fmt.Sprintf("%v", taskName)]; ok {
+			if state.State == nomad.TaskStatePending {
+				logp.Debug("nomad", "Skipping pending allocation: %s", fmt.Sprintf("%s-%s", obj.ID, task["name"]))
+				continue
+			}
+		}
+
 		event := bus.Event{
 			"provider": p.uuid,
 			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
@@ -179,6 +196,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	}
 }
 
+// deltaQuery="SELECT ID FROM MSDS_Master WHERE Last_Updated_Date >= '${dih.last_index_time}'"
 func (p *Provider) publish(event bus.Event) {
 	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
@@ -208,6 +226,10 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	rawMeta, ok := event["meta"]
 	if ok {
 		meta = rawMeta.(common.MapStr)
+		if nomadMeta, ok := meta["nomad"]; ok {
+			meta = nomadMeta.(common.MapStr)
+		}
+
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["meta"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
@@ -222,7 +244,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
-	// metadata about the runtime driver
+	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
 		container = rawCont.(common.MapStr)
 		e["container"] = container
@@ -240,7 +262,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
 
-	logp.Debug("nomad", "Generated hints %+v", hints)
+	logp.Debug("nomad", "Generated hints from %+v %+v", tasks, hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}

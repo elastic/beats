@@ -29,10 +29,10 @@ func TestGenerateHints(t *testing.T) {
 		result bus.Event
 	}{
 		// Empty events should return empty hints
-		{
-			event:  bus.Event{},
-			result: bus.Event{},
-		},
+		// {
+		// 	event:  bus.Event{},
+		// 	result: bus.Event{},
+		// },
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
@@ -40,14 +40,20 @@ func TestGenerateHints(t *testing.T) {
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			event: bus.Event{
+				"nomad": common.MapStr{
+					"alloc_id":    "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
+					"datacenters": []string{"europe-west4"},
+				},
 				"meta": common.MapStr{
-					"task": getNestedAnnotations(common.MapStr{
-						"alloc_id":                          "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
-						"co.elastic.logs/multiline.pattern": "^test",
-						"co.elastic.metrics/module":         "prometheus",
-						"co.elastic.metrics/period":         "10s",
-						"not.to.include":                    "true",
-					}),
+					"nomad": common.MapStr{
+						"task": getNestedAnnotations(common.MapStr{
+							"alloc_id":                          "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+							"co.elastic.logs/multiline.pattern": "^test",
+							"co.elastic.metrics/module":         "prometheus",
+							"co.elastic.metrics/period":         "10s",
+							"not.to.include":                    "true",
+						}),
+					},
 				},
 			},
 			result: bus.Event{
@@ -147,6 +153,11 @@ func TestEmitEvent(t *testing.T) {
 								},
 							},
 						},
+					},
+				},
+				TaskStates: map[string]*api.TaskState{
+					"task1": {
+						State: nomad.TaskStateRunning,
 					},
 				},
 			},
@@ -273,7 +284,7 @@ func TestEmitEvent(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -297,6 +308,7 @@ func TestEmitEvent(t *testing.T) {
 			select {
 			case event := <-listener.Events():
 				assert.Equal(t, test.Expected, event, test.Message)
+
 			case <-time.After(2 * time.Second):
 				if test.Expected != nil {
 					t.Fatal("Timeout while waiting for event")

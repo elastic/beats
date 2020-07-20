@@ -1,4 +1,4 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// Copyright Ela1icsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
@@ -62,4 +62,11 @@ const (
 
 	// JobStatusDead Dead means all evaluation's and allocations are terminal
 	JobStatusDead = "dead"
+)
+
+// Set of possible states for a task.
+const (
+	TaskStatePending = "pending" // The task is waiting to be run.
+	TaskStateRunning = "running" // The task is currently running.
+	TaskStateDead    = "dead"    // Terminal state of task.
 )

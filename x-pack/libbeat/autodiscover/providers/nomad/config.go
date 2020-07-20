@@ -39,7 +39,7 @@ func defaultConfig() *Config {
 		AllowStale:     true,
 		WaitTime:       15 * time.Second,
 		SyncPeriod:     30 * time.Second,
-		CleanupTimeout: 60 * time.Second,
+		CleanupTimeout: 15 * time.Second,
 		Prefix:         "co.elastic",
 	}
 }
