@@ -95,4 +95,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]
 - Events intended for the Elasticsearch output can now take an `op_type` metadata field of type events.OpType or string to indicate the `op_type` to use for bulk indexing. {pull}12606[12606]
 - Remove vendor folder from repository. {pull}18655[18655]
+- Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
 - Update Go version to 1.14.4. {pull}19753[19753]

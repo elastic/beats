@@ -8,13 +8,14 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -67,7 +68,7 @@ func NewApplication(
 	id, appName, pipelineID, logLevel string,
 	spec app.Specifier,
 	srv *server.Server,
-	cfg *config.Config,
+	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
@@ -146,7 +147,7 @@ func (a *Application) Stop() {
 		// cleanup drops
 		a.cleanUp()
 	}
-	a.setState(state.Stopped, "Stopped")
+	a.setState(state.Stopped, "Stopped", nil)
 }
 
 // Shutdown stops the application (aka. subprocess).
@@ -156,10 +157,10 @@ func (a *Application) Shutdown() {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string) {
+func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg)
+	a.setState(status, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -189,7 +190,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		}
 
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg)
+		a.setState(state.Crashed, msg, nil)
 
 		// it was a crash, cleanup anything required
 		go a.cleanUp()
@@ -214,7 +215,7 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
+func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	var status state.Status
 	switch pstatus {
 	case proto.StateObserved_STARTING:
@@ -230,13 +231,14 @@ func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg 
 	case proto.StateObserved_STOPPING:
 		status = state.Stopping
 	}
-	a.setState(status, msg)
+	a.setState(status, msg, payload)
 }
 
-func (a *Application) setState(status state.Status, msg string) {
-	if a.state.Status != status || a.state.Message != msg {
+func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
 		a.state.Status = status
 		a.state.Message = msg
+		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}

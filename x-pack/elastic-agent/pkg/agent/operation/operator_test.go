@@ -12,6 +12,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -44,7 +46,7 @@ func TestMain(m *testing.M) {
 func TestNotSupported(t *testing.T) {
 	p := getProgram("notsupported", "1.0")
 
-	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	operator := getTestOperator(t, downloadPath, installPath, p)
 	err := operator.start(p, nil)
 	if err == nil {
 		t.Fatal("was expecting error but got none")
@@ -54,7 +56,7 @@ func TestNotSupported(t *testing.T) {
 func TestConfigurableRun(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	operator := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +120,7 @@ func TestConfigurableRun(t *testing.T) {
 func TestConfigurableFailed(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	operator := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
 	}
@@ -137,6 +139,15 @@ func TestConfigurableFailed(t *testing.T) {
 		pid = item.ProcessInfo.PID
 		return nil
 	})
+	items := operator.State()
+	item, ok := items[p.ID()]
+	if !ok {
+		t.Fatalf("no state for process")
+	}
+	assert.Equal(t, map[string]interface{}{
+		"status":  float64(proto.StateObserved_HEALTHY),
+		"message": "Running",
+	}, item.Payload)
 
 	// try to configure (with failed status)
 	cfg := make(map[string]interface{})
@@ -218,7 +229,7 @@ func TestConfigurableFailed(t *testing.T) {
 func TestConfigurableCrash(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	operator := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
 	}
@@ -319,7 +330,7 @@ func TestConfigurableCrash(t *testing.T) {
 func TestConfigurableStartStop(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	operator := getTestOperator(t, downloadPath, installPath, p)
 	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
 
 	// start and stop it 3 times

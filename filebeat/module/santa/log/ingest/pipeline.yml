@@ -20,6 +20,7 @@ processors:
     field: '@timestamp'
     value: '{{ process.start }}'
     ignore_failure: true
+    ignore_empty_value: true
 - split:
     field: santa.args
     separator: ' '
@@ -69,7 +70,7 @@ processors:
 - set:
     field: event.action
     value: "{{santa.action}}"
-    if: "ctx?.santa?.action != null"
+    ignore_empty_value: true
 - lowercase:
     field: event.action
     ignore_missing: true

@@ -58,9 +58,9 @@ require (
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
 	github.com/elastic/go-concert v0.0.3
-	github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
+	github.com/elastic/go-libaudit/v2 v2.0.0
 	github.com/elastic/go-licenser v0.3.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
@@ -71,7 +71,7 @@ require (
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect
-	github.com/elastic/gosigar v0.10.5
+	github.com/elastic/gosigar v0.10.6-0.20200715000138-f115143bb233
 	github.com/fatih/color v1.5.0
 	github.com/fsnotify/fsevents v0.0.0-00010101000000-000000000000
 	github.com/fsnotify/fsnotify v1.4.7
@@ -137,7 +137,9 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v2.19.11+incompatible
+	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.2.0 // indirect
@@ -162,7 +164,7 @@ require (
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5
+	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200701041122-1837592efa10
@@ -173,6 +175,7 @@ require (
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
+	gotest.tools v2.2.0+incompatible
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.18.3
 	k8s.io/apimachinery v0.18.3

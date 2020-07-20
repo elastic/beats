@@ -1,0 +1,91 @@
+[[configuration-instrumentation]]
+== Configure APM instrumentation
+
+++++
+<titleabbrev>Instrumentation</titleabbrev>
+++++
+
+Libbeat uses the Elastic APM Go Agent to instrument its publishing pipeline.
+Currently, only the Elasticsearch output is instrumented.
+To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to APM Server.
+
+Example configuration with instrumentation enabled:
+
+["source","yaml"]
+----
+instrumentation:
+  enabled: true
+  environment: production
+  hosts:
+    - "http://localhost:8200"
+  api_key: L5ER6FEvjkmlfalBealQ3f3fLqf03fazfOV
+----
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `instrumentation` section of the +{beatname_lc}.yml+ config file:
+
+[float]
+==== `enabled`
+
+Set to `true` to enable instrumentation of {beatname_uc}.
+Defaults to `false`.
+
+[float]
+==== `environment`
+
+Set the environment in which {beatname_uc} is running, for example, `staging`, `production`, `dev`, etc.
+Environments can be filtered in the {kibana-ref}/xpack-apm.html[APM app].
+
+[float]
+==== `hosts`
+
+The {apm-server-ref-v}/getting-started-apm-server.html[APM Server] hosts to report instrumentation data to.
+Defaults to `http://localhost:8200`.
+
+[float]
+==== `api_key`
+
+{apm-server-ref-v}/api-key.html[API key] used to secure communication with the APM Server(s).
+If `api_key` is set then `secret_token` will be ignored.
+
+[float]
+==== `secret_token`
+
+{apm-server-ref-v}/secret-token.html[Secret token] used to secure communication with the APM Server(s).
+
+[float]
+==== `profiling.cpu.enabled`
+
+Set to `true` to enable CPU profiling, where profile samples are recorded as events.
+
+This feature is experimental.
+
+[float]
+==== `profiling.cpu.interval`
+
+Configure the CPU profiling interval. Defaults to `60s`.
+
+This feature is experimental.
+
+[float]
+==== `profiling.cpu.duration`
+
+Configure the CPU profiling duration. Defaults to `10s`.
+
+This feature is experimental.
+
+[float]
+==== `profiling.heap.enabled`
+
+Set to `true` to enable heap profiling.
+
+This feature is experimental.
+
+[float]
+==== `profiling.heap.interval`
+
+Configure the heap profiling interval. Defaults to `60s`.
+
+This feature is experimental.

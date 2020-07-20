@@ -18,6 +18,7 @@
 package schedule
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -59,6 +60,14 @@ func Parse(in string) (*Schedule, error) {
 		return nil, err
 	}
 	return &Schedule{s}, nil
+}
+
+func MustParse(in string) *Schedule {
+	sched, err := Parse(in)
+	if err != nil {
+		panic(fmt.Sprintf("could not parse schedule parsed with MustParse: %s", err))
+	}
+	return sched
 }
 
 func (s intervalScheduler) Next(t time.Time) time.Time {

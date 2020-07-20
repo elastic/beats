@@ -340,10 +340,9 @@ func fixStates(states []file.State) []file.State {
 		state := &states[i]
 		fixState(state)
 
-		id := state.ID()
-		old, exists := idx[id]
+		old, exists := idx[state.Id]
 		if !exists {
-			idx[id] = state
+			idx[state.Id] = state
 		} else {
 			mergeStates(old, state) // overwrite the entry in 'old'
 		}
@@ -364,9 +363,15 @@ func fixStates(states []file.State) []file.State {
 
 // fixState updates a read state to fullfil required invariantes:
 // - "Meta" must be nil if len(Meta) == 0
+// - "Id" must be initialized
 func fixState(st *file.State) {
 	if len(st.Meta) == 0 {
 		st.Meta = nil
+	}
+
+	if len(st.IdentifierName) == 0 {
+		identifier, _ := file.NewStateIdentifier(nil)
+		st.Id, st.IdentifierName = identifier.GenerateID(*st)
 	}
 }
 
