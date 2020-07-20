@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP Alert Overview",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -172,7 +172,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP Counter for new incidents",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
@@ -586,7 +586,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP counter for related domains",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
@@ -715,7 +715,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP counter for related IP Addresses",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
@@ -844,7 +844,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP counter for related Users",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
@@ -973,7 +973,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Microsoft Defender ATP Incident Table",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
