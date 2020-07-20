@@ -101,37 +101,36 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_ELASTIC_AGENT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false"
             }
           }
           steps {
             mageTarget(context: "Elastic Agent x-pack Linux", directory: "x-pack/elastic-agent", target: "build test")
           }
         }
+
         stage('Elastic Agent x-pack Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
             mageTargetWin(context: "Elastic Agent x-pack Windows Unit test", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
         }
+
         stage('Elastic Agent Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
             }
           }
           steps {
@@ -143,14 +142,14 @@ pipeline {
             }
           }
         }
+
         stage('Filebeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FILEBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT != "false"
             }
           }
           steps {
@@ -162,9 +161,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FILEBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false"
             }
           }
           steps {
@@ -176,9 +174,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FILEBEAT != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT != "false" && params.macosTest
             }
           }
           steps {
@@ -195,9 +192,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest
             }
           }
           steps {
@@ -214,9 +210,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression {  return env.BUILD_FILEBEAT != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -228,9 +223,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -242,9 +236,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_HEARTBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_HEARTBEAT != "false"
             }
           }
           stages {
@@ -258,9 +251,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.macosTest }
-                  not { changeRequest() }
+                expression {
+                  return params.macosTest
                 }
               }
               steps {
@@ -277,9 +269,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.windowsTest }
-                  not { changeRequest() }
+                expression {
+                  return params.windowsTest
                 }
               }
               steps {
@@ -293,9 +284,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT != "false"
             }
           }
           steps {
@@ -307,9 +297,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT != "false"
             }
           }
           steps {
@@ -321,9 +310,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.macosTest
             }
           }
           steps {
@@ -340,9 +328,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -354,9 +341,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false"
             }
           }
           steps {
@@ -368,9 +354,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
             }
           }
           steps {
@@ -382,9 +367,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -396,9 +380,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_LIBBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_LIBBEAT != "false"
             }
           }
           stages {
@@ -424,9 +407,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_LIBBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_LIBBEAT_XPACK != "false"
             }
           }
           steps {
@@ -438,9 +420,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false"
             }
           }
           steps {
@@ -452,9 +433,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false"
             }
           }
           steps {
@@ -466,9 +446,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false"
             }
           }
           steps {
@@ -480,9 +459,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
           stages {
@@ -516,9 +494,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false"
             }
           }
           steps {
@@ -530,9 +507,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false" && params.macosTest
             }
           }
           steps {
@@ -544,9 +520,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
             }
           }
           steps {
@@ -563,9 +538,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -577,9 +551,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -591,9 +564,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_PACKETBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_PACKETBEAT != "false"
             }
           }
           stages {
@@ -607,9 +579,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.macosTest }
-                  not { changeRequest() }
+                expression {
+                  return params.macosTest
                 }
               }
               steps {
@@ -626,9 +597,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.windowsTest }
-                  not { changeRequest() }
+                expression {
+                  return params.windowsTest
                 }
               }
               steps {
@@ -642,9 +612,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_DOCKERLOGBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_DOCKERLOGBEAT_XPACK != "false"
             }
           }
           stages {
@@ -660,9 +629,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_WINLOGBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_WINLOGBEAT != "false"
             }
           }
           stages {
@@ -676,9 +644,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.windowsTest }
-                  not { changeRequest() }
+                expression {
+                  return params.windowsTest
                 }
               }
               steps {
@@ -692,9 +659,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
             }
           }
           steps {
@@ -706,9 +672,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_FUNCTIONBEAT_XPACK != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
           stages {
@@ -725,9 +690,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.macosTest }
-                  not { changeRequest() }
+                expression {
+                  return params.macosTest
                 }
               }
               steps {
@@ -744,9 +708,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.windowsTest }
-                  not { changeRequest() }
+                expression {
+                  return params.windowsTest
                 }
               }
               steps {
@@ -760,9 +723,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_JOURNALBEAT != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_JOURNALBEAT != "false"
             }
           }
           stages {
@@ -778,9 +740,8 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            anyOf {
-              expression { return env.BUILD_GENERATOR != "false" }
-              not { changeRequest() }
+            expression {
+              return env.BUILD_GENERATOR != "false"
             }
           }
           stages {
@@ -801,11 +762,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression {
-                    return params.macosTest
-                  }
-                  not { changeRequest() }
+                expression {
+                  return params.macosTest
                 }
               }
               steps {
@@ -822,9 +780,8 @@ pipeline {
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
-                anyOf {
-                  expression { return params.macosTest }
-                  not { changeRequest() }
+                expression {
+                  return params.macosTest
                 }
               }
               steps {
@@ -843,7 +800,9 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            expression { return env.BUILD_KUBERNETES != "false" }
+            expression {
+              return env.BUILD_KUBERNETES != "false"
+            }
           }
           steps {
             k8sTest(["v1.18.2","v1.17.2","v1.16.4","v1.15.7","v1.14.10"])
