@@ -1,6 +1,7 @@
 [role="xpack"]
 
 :modulename: microsoft
+:has-dashboards: true
 
 == Microsoft module
 
@@ -9,18 +10,20 @@ This is a module for ingesting data from the different Microsoft Products. Curre
 - `defender_atp` fileset: Supports Microsoft Defender ATP
 - `dhcp` fileset: Supports Microsoft DHCP logs
 
+include::../include/what-happens.asciidoc[]
+
 include::../include/gs-link.asciidoc[]
-
-[float]
-=== Compatibility
-
-Currently this module supports Microsoft Defender ATP.
 
 include::../include/configuring-intro.asciidoc[]
 
 :fileset_ex: defender_atp
 
+beta[]
+
 include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `defender_atp` fileset settings
 
 To allow the filebeat module to ingest data from the Microsoft Defender API, you would need to create a new application on your Azure domain.
 
@@ -38,8 +41,7 @@ Client ID
 Client Secret
 Tenant ID
 
-[float]
-==== `defender_atp` fileset settings
+Example config:
 
 [source,yaml]
 ----
@@ -99,9 +101,24 @@ This is a list of Defender ATP fields that are mapped to ECS.
 | severity                            | event.severity                 |
 |======================================================================|
 
-== Microsoft module
+:has-dashboards!:
 
-experimental[]
+[float]
+=== Dashboards
+
+The best way to view CrowdStrike events and alert data is in the SIEM. 
+
+[role="screenshot"]
+image::./images/siem-alerts-cs.jpg[]
+
+[float]
+For alerts, go to Detections -> External alerts.
+
+[role="screenshot"]
+image::./images/siem-events-cs.jpg[]
+
+[float]
+And for all over event CrowdStrike Falcon event types, go to Host -> Events.
 
 :fileset_ex: dhcp
 
@@ -111,6 +128,8 @@ experimental[]
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "msdhcp" device revision 99.
+
+include::../include/var-paths.asciidoc[]
 
 *`var.input`*::
 

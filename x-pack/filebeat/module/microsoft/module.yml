@@ -1,1 +1,3 @@
----
+dashboards:
+- id: Filebeat-microsoft-atp-overview
+  file: Filebeat-microsoft-atp-overview.json
