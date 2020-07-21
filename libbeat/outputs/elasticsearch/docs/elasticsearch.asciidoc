@@ -197,9 +197,11 @@ dashboards, you also need to set the `setup.dashboards.index` option (see
 endif::no_dashboards[]
 
 ifndef::no_ilm[]
-The `index` setting is ignored when index lifecycle management is enabled. If
-you’re sending events to a cluster that supports index lifecycle management, see
-<<ilm>> to learn how to change the index name.
+When <<ilm,index lifecycle management (ILM)>> is enabled, the default `index` is
++"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}-%{index_num}"+, for example,
++"{beatname_lc}-{version}-{localdate}-000001"+. Custom `index` settings are ignored
+when ILM is enabled. If you’re sending events to a cluster that supports index
+lifecycle management, see <<ilm>> to learn how to change the index name.
 endif::no_ilm[]
 
 You can set the index dynamically by using a format string to access any event
@@ -268,9 +270,9 @@ matching rule in the array. Rules can contain conditionals, format string-based
 fields, and name mappings. If the `indices` setting is missing or no rule
 matches, the <<index-option-es,`index`>> setting is used.
 
-ifdef::apm-server[]
+ifndef::no_ilm[]
 Similar to `index`, defining custom `indices` will disable <<ilm>>.
-endif::apm-server[]
+endif::no_ilm[]
 
 Rule settings:
 
