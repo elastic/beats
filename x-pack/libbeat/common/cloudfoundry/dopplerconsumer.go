@@ -122,9 +122,11 @@ func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeF
 			}
 			cb(event)
 		case err := <-errChan:
-			// This error is an error on the connection, not a cloud foundry
-			// error envelope. Firehose should be able to reconnect, so just log it.
-			c.log.Infof("Error received on firehose: %v", err)
+			if err != nil {
+				// This error is an error on the connection, not a cloud foundry
+				// error envelope. Firehose should be able to reconnect, so just log it.
+				c.log.Infof("Error received on firehose: %v", err)
+			}
 		case <-c.stop:
 			return
 		}

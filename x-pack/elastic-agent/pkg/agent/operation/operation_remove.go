@@ -26,7 +26,7 @@ func (o *operationRemove) Name() string {
 // Check checks whether remove needs to run.
 //
 // Always returns false.
-func (o *operationRemove) Check(_ Application) (bool, error) {
+func (o *operationRemove) Check(_ context.Context, _ Application) (bool, error) {
 	return false, nil
 }
 
@@ -34,7 +34,7 @@ func (o *operationRemove) Check(_ Application) (bool, error) {
 func (o *operationRemove) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 

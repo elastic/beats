@@ -10,6 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -35,21 +36,21 @@ func (c *IntrospectConfigCmd) Execute() error {
 }
 
 func (c *IntrospectConfigCmd) introspectConfig() error {
-	cfg, err := loadConfig(c.cfgPath)
+	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	isLocal, err := isLocalMode(cfg)
+	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return err
 	}
 
-	if isLocal {
-		return printConfig(cfg)
+	if isStandalone(cfg.Fleet) {
+		return printConfig(rawConfig)
 	}
 
-	fleetConfig, err := loadFleetConfig(cfg)
+	fleetConfig, err := loadFleetConfig(rawConfig)
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
@@ -64,6 +65,27 @@ func loadConfig(configPath string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	path := info.AgentConfigFile()
+
+	store := storage.NewDiskStore(path)
+	reader, err := store.Load()
+	if err != nil {
+		return nil, errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	// merge local configuration and configuration persisted from fleet.
+	rawConfig.Merge(config)
 
 	if err := InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
@@ -93,22 +115,6 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return cfgChange.Config, nil
 	}
 	return nil, nil
-}
-
-func isLocalMode(rawConfig *config.Config) (bool, error) {
-	c := localDefaultConfig()
-	if err := rawConfig.Unpack(&c); err != nil {
-		return false, errors.New(err, "initiating application")
-	}
-
-	managementConfig := struct {
-		Mode string `config:"mode" yaml:"mode"`
-	}{}
-
-	if err := c.Management.Unpack(&managementConfig); err != nil {
-		return false, errors.New(err, "initiating application")
-	}
-	return managementConfig.Mode == "local", nil
 }
 
 func printMapStringConfig(mapStr map[string]interface{}) error {

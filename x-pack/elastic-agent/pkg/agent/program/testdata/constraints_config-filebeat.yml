@@ -12,12 +12,6 @@ filebeat:
             type: logs
             name: generic
             namespace: default
-      - add_fields:
-          target: "stream"
-          fields:
-            type: logs
-            dataset: generic
-            namespace: default
 output:
   elasticsearch:
     hosts:

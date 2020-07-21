@@ -11,6 +11,7 @@ processors:
 - set:
     field: event.created
     value: '{{@timestamp}}'
+    ignore_empty_value: true
 - append:
     field: related.ip
     value: "{{source.ip}}"
@@ -36,7 +37,7 @@ processors:
 - set:
     field: '@timestamp'
     value: '{{timestamp}}'
-    if: ctx.timestamp != null
+    ignore_empty_value: true
 - remove:
     field:
     - timestamp

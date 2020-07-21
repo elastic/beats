@@ -173,7 +173,7 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 }
 
 func (v *Verifier) composeURI(programName, filename string) (string, error) {
-	upstream := v.config.BeatsSourceURI
+	upstream := v.config.SourceURI
 	if !strings.HasPrefix(upstream, "http") && !strings.HasPrefix(upstream, "file") && !strings.HasPrefix(upstream, "/") {
 		// always default to https
 		upstream = fmt.Sprintf("https://%s", upstream)
@@ -185,7 +185,7 @@ func (v *Verifier) composeURI(programName, filename string) (string, error) {
 		return "", errors.New(err, "invalid upstream URI", errors.TypeNetwork, errors.M(errors.MetaKeyURI, upstream))
 	}
 
-	uri.Path = path.Join(uri.Path, programName, filename+ascSuffix)
+	uri.Path = path.Join(uri.Path, "beats", programName, filename+ascSuffix)
 	return uri.String(), nil
 }
 

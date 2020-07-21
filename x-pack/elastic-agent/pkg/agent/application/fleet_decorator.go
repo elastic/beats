@@ -22,15 +22,22 @@ func injectFleet(cfg *config.Config) func(*logger.Logger, *transpiler.AST) error
 		if err != nil {
 			return err
 		}
-		api, ok := transpiler.Lookup(ast, "api")
+		token, ok := transpiler.Lookup(ast, "fleet.access_api_key")
 		if !ok {
-			return fmt.Errorf("failed to get api from fleet config")
+			return fmt.Errorf("failed to get api key from fleet config")
 		}
-		agentInfo, ok := transpiler.Lookup(ast, "agent_info")
+
+		kbn, ok := transpiler.Lookup(ast, "fleet.kibana")
 		if !ok {
-			return fmt.Errorf("failed to get agent_info from fleet config")
+			return fmt.Errorf("failed to get kibana config key from fleet config")
 		}
-		fleet := transpiler.NewDict([]transpiler.Node{agentInfo, api})
+
+		agent, ok := transpiler.Lookup(ast, "agent")
+		if !ok {
+			return fmt.Errorf("failed to get agent key from fleet config")
+		}
+
+		fleet := transpiler.NewDict([]transpiler.Node{agent, token, kbn})
 		err = transpiler.Insert(rootAst, fleet, "fleet")
 		if err != nil {
 			return err

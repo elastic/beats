@@ -7,7 +7,7 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -16,12 +16,12 @@ import (
 // skips if process is already skipped
 type operationStop struct {
 	logger         *logger.Logger
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 }
 
 func newOperationStop(
 	logger *logger.Logger,
-	operatorConfig *config.Config) *operationStop {
+	operatorConfig *configuration.SettingsConfig) *operationStop {
 	return &operationStop{
 		logger:         logger,
 		operatorConfig: operatorConfig,
@@ -36,7 +36,7 @@ func (o *operationStop) Name() string {
 // Check checks whether application needs to be stopped.
 //
 // If the application state is not stopped then stop should be performed.
-func (o *operationStop) Check(application Application) (bool, error) {
+func (o *operationStop) Check(_ context.Context, application Application) (bool, error) {
 	if application.State().Status != state.Stopped {
 		return true, nil
 	}

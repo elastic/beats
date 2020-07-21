@@ -29,10 +29,10 @@ var (
 	ErrNotACertificate = errors.New("file is not a certificate")
 
 	// ErrCertificateNoKey indicate a configuration error with missing key file
-	ErrCertificateNoKey = errors.New("key file not configured")
+	ErrKeyUnspecified = errors.New("key file not configured")
 
 	// ErrKeyNoCertificate indicate a configuration error with missing certificate file
-	ErrKeyNoCertificate = errors.New("certificate file not configured")
+	ErrCertificateUnspecified = errors.New("certificate file not configured")
 )
 
 var tlsCipherSuites = map[string]tlsCipherSuite{
@@ -261,9 +261,9 @@ func (c *CertificateConfig) Validate() error {
 
 	switch {
 	case hasCertificate && !hasKey:
-		return ErrCertificateNoKey
+		return ErrKeyUnspecified
 	case !hasCertificate && hasKey:
-		return ErrKeyNoCertificate
+		return ErrCertificateUnspecified
 	}
 	return nil
 }

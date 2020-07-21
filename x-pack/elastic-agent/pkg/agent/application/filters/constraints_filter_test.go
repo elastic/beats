@@ -22,14 +22,14 @@ func TestEvaluation(t *testing.T) {
 	}
 
 	testCases := []testCase{
-		testCase{"simple version", "validate_version(%{[agent.version]}, '" + release.Version() + "')", true},
-		testCase{"~ version release", "validate_version(%{[agent.version]}, '~" + release.Version() + "')", true},
-		testCase{"^ version release", "validate_version(%{[agent.version]}, '^" + release.Version() + "')", true},
-		testCase{"range to release", "validate_version(%{[agent.version]}, '1.0.0 - " + release.Version() + "')", true},
-		testCase{"range lower", "validate_version(%{[agent.version]}, '1.0.0 - 5.0.0')", false},
-		testCase{"range include", "validate_version(%{[agent.version]}, '1.0.0 - 100.0.0')", true},
-		testCase{"family should equal", "%{[os.family]} == '" + runtime.GOOS + "'", true},
-		testCase{"family should not equal", "%{[os.family]} != '" + runtime.GOOS + "'", false},
+		{"simple version", "validate_version(%{[agent.version]}, '" + release.Version() + "')", true},
+		{"~ version release", "validate_version(%{[agent.version]}, '~" + release.Version() + "')", true},
+		{"^ version release", "validate_version(%{[agent.version]}, '^" + release.Version() + "')", true},
+		{"range to release", "validate_version(%{[agent.version]}, '1.0.0 - " + release.Version() + "')", true},
+		{"range lower", "validate_version(%{[agent.version]}, '1.0.0 - 5.0.0')", false},
+		{"range include", "validate_version(%{[agent.version]}, '1.0.0 - 100.0.0')", true},
+		{"family should equal", "%{[os.family]} == '" + runtime.GOOS + "'", true},
+		{"family should not equal", "%{[os.family]} != '" + runtime.GOOS + "'", false},
 	}
 
 	for _, tc := range testCases {

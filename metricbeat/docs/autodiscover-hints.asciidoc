@@ -11,8 +11,11 @@ it. Hints tell {beatname_uc} how to get metrics for the given container. This is
 [float]
 ===== `co.elastic.metrics/hosts`
 
-Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
-values from the autodiscover event, ie: `${data.host}:80`.
+Hosts setting to use with the given module. Hosts can include `${data.host}`, `${data.port}`,
+`${data.ports.<port_name>}` values from the autodiscover event, ie: `${data.host}:80`.
+For Kuberentes autodiscover events users can leverage port names as well,
+like `http://${data.host}:${data.ports.prometheus}/metrics`.
+In the last one we refer to the container port with name `prometheus`.
 
 [float]
 ===== `co.elastic.metrics/metricsets`

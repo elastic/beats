@@ -36,7 +36,7 @@ processors:
 - set:
     field: source.ip
     value: '{{system.auth.ssh.dropped_ip}}'
-    if: "ctx?.system?.auth?.ssh?.dropped_ip != null"
+    ignore_empty_value: true
 - date:
     if: ctx.event.timezone == null
     field: system.auth.timestamp

@@ -168,7 +168,7 @@ func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, err
 	if !cfg.IsEnabled() {
 		os.Setenv("ELASTIC_APM_ACTIVE", "false")
 		logger.Infof("APM instrumentation is disabled")
-		return nil, nil
+		return &instrumentation{}, nil
 	} else {
 		os.Setenv("ELASTIC_APM_ACTIVE", "true")
 		logger.Infof("APM instrumentation is enabled")

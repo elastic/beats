@@ -58,7 +58,7 @@ processors:
 - set:
     field: observer.product
     value: '{{checkpoint.product}}'
-    if: ctx.checkpoint?.product != null
+    ignore_empty_value: true
 - rename:
     field: checkpoint.src
     target_field: source.ip
@@ -609,79 +609,79 @@ processors:
 - set:
     field: client.ip
     value: '{{source.ip}}'
-    if: ctx.source?.ip != null
+    ignore_empty_value: true
 - set:
     field: server.ip
     value: '{{destination.ip}}'
-    if: ctx.destination?.ip != null
+    ignore_empty_value: true
 - set:
     field: client.nat.ip
     value: '{{source.nat.ip}}'
-    if: ctx.source?.nat?.ip != null
+    ignore_empty_value: true
 - set:
     field: server.nat.ip
     value: '{{destination.nat.ip}}'
-    if: ctx.destination?.nat?.ip != null
+    ignore_empty_value: true
 - set:
     field: client.port
     value: '{{source.port}}'
-    if: ctx.source?.port != null
+    ignore_empty_value: true
 - set:
     field: server.port
     value: '{{destination.port}}'
-    if: ctx.destination?.port != null
+    ignore_empty_value: true
 - set:
     field: client.nat.port
     value: '{{source.nat.port}}'
-    if: ctx.source?.nat?.port != null
+    ignore_empty_value: true
 - set:
     field: server.nat.port
     value: '{{destination.nat.port}}'
-    if: ctx.destination?.nat?.port != null
+    ignore_empty_value: true
 - set:
     field: client.packets
     value: '{{source.packets}}'
-    if: ctx.source?.packets != null
+    ignore_empty_value: true
 - set:
     field: server.packets
     value: '{{destination.packets}}'
-    if: ctx.destination?.packets != null
+    ignore_empty_value: true
 - set:
     field: client.bytes
     value: '{{source.bytes}}'
-    if: ctx.source?.bytes != null
+    ignore_empty_value: true
 - set:
     field: server.bytes
     value: '{{destination.bytes}}'
-    if: ctx.destination?.bytes != null
+    ignore_empty_value: true
 - set:
     field: client.user.id
     value: '{{source.user.id}}'
-    if: ctx.source?.user?.id != null
+    ignore_empty_value: true
 - set:
     field: client.user.name
     value: '{{source.user.name}}'
-    if: ctx.source?.user?.name != null
+    ignore_empty_value: true
 - set:
     field: client.mac
     value: '{{source.mac}}'
-    if: ctx.source?.mac != null
+    ignore_empty_value: true
 - set:
     field: client.user.email
     value: '{{source.user.email}}'
-    if: ctx.source?.user?.email != null
+    ignore_empty_value: true
 - set:
     field: client.domain
     value: '{{source.domain}}'
-    if: ctx.source?.domain != null
+    ignore_empty_value: true
 - set:
     field: server.domain
     value: '{{destination.domain}}'
-    if: ctx.destination?.domain != null
+    ignore_empty_value: true
 - set:
     field: client.user.group.name
     value: '{{source.user.group.name}}'
-    if: ctx.source?.user?.group?.name != null
+    ignore_empty_value: true
 - convert:
     field: client.port
     type: long

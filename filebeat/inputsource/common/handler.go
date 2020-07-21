@@ -19,6 +19,7 @@ package common
 
 import (
 	"bufio"
+	"context"
 	"net"
 
 	"github.com/pkg/errors"
@@ -31,7 +32,7 @@ import (
 type HandlerFactory func(config ListenerConfig) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming connections
-type ConnectionHandler func(CloseRef, net.Conn) error
+type ConnectionHandler func(context.Context, net.Conn) error
 
 // MetadataFunc defines callback executed when a line is read from the split handler.
 type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
@@ -39,7 +40,7 @@ type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
 // SplitHandlerFactory allows creation of a handler that has splitting capabilities.
 func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
 	return func(config ListenerConfig) ConnectionHandler {
-		return ConnectionHandler(func(closer CloseRef, conn net.Conn) error {
+		return ConnectionHandler(func(ctx context.Context, conn net.Conn) error {
 			metadata := metadataCallback(conn)
 			maxMessageSize := uint64(config.MaxMessageSize)
 
@@ -60,14 +61,9 @@ func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback Me
 			scanner.Buffer(buffer, int(maxMessageSize))
 			for {
 				select {
-				case <-closer.Done():
+				case <-ctx.Done():
 					break
 				default:
-				}
-
-				// Ensure that if the Conn is already closed then dont attempt to scan again
-				if closer.Err() == ErrClosed {
-					break
 				}
 
 				if !scanner.Scan() {

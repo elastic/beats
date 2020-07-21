@@ -14,12 +14,6 @@ filebeat:
             type: logs
             name: generic
             namespace: default
-      - add_fields:
-          target: "stream"
-          fields:
-            type: logs
-            dataset: generic
-            namespace: default
   - type: log
     paths:
       - /var/log/hello3.log
@@ -33,12 +27,6 @@ filebeat:
           fields:
             type: testtype
             name: generic
-            namespace: default
-      - add_fields:
-          target: "stream"
-          fields:
-            type: testtype
-            dataset: generic
             namespace: default
 output:
   elasticsearch:
