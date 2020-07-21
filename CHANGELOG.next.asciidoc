@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
+- Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 
 *Auditbeat*
 
