@@ -90,7 +90,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
         )
         journalbeat_proc = self.start_beat()
-        
+
         self.wait_until(lambda: self.log_contains("journalbeat is running"))
 
         exit_code = journalbeat_proc.kill_and_wait()
