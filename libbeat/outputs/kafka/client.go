@@ -251,21 +251,14 @@ func (r *msgRef) done() {
 }
 
 func (r *msgRef) fail(msg *message, err error) {
-	switch err {
-	case sarama.ErrInvalidMessage:
-		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
+	if !isRetriable(err) {
+		r.client.log.Errorf("Kafka (topic=%v, size=%v): unretriable error: %v", msg.topic, len(msg.key)+len(msg.value), err.Error())
 		r.client.observer.Dropped(1)
-
-	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
-		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
-			msg.topic,
-			len(msg.key)+len(msg.value))
-		r.client.observer.Dropped(1)
-
-	default:
+	} else {
 		r.failed = append(r.failed, msg.data)
 		r.err = err
 	}
+
 	r.dec()
 }
 
@@ -289,7 +282,7 @@ func (r *msgRef) dec() {
 			stats.Acked(success)
 		}
 
-		r.client.log.Debugf("Kafka publish failed with: %+v", err)
+		r.client.log.Errorf("Kafka: retrying %v events because publishing the previous batch failed with: %+v", len(r.failed), err)
 	} else {
 		r.batch.ACK()
 		stats.Acked(r.total)
