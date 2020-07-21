@@ -72,6 +72,10 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
+      environment {
+        // See https://github.com/elastic/beats/pull/19823
+        GOFLAGS = '-mod=readonly'
+      }
       steps {
         makeTarget(context: "Lint", target: "check")
       }
@@ -901,12 +905,36 @@ def withBeatsEnv(Map args = [:], Closure body) {
         }
       } finally {
         if (archive) {
-          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
-          }
+          archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
-        reportCoverage()
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+          sh(label: 'Report to Codecov', script: '.ci/scripts/report-codecov.sh auditbeat filebeat heartbeat journalbeat libbeat metricbeat packetbeat winlogbeat')
+        }
+      }
+    }
+  }
+}
+
+/**
+  This method archives and report the tests output, for such, it searches in certain folders
+  to bypass some issues when working with big repositories.
+*/
+def archiveTestOutput(Map args = [:]) {
+  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    if (isUnix()) {
+      fixPermissions("${WORKSPACE}")
+    }
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    dir('build') {
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+    }
+    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+      if (folder.trim()) {
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + goos()
+        tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
   }
@@ -946,10 +974,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
           body()
         }
       } finally {
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
-        }
+        archiveTestOutput(testResults: "**\\build\\TEST*.xml", artifacts: "**\\build\\TEST*.out")
       }
     }
   }
@@ -958,12 +983,12 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
 def installTools() {
   def i = 2 // Number of retries
   if(isUnix()) {
-    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
-    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
-    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
-    retry(i) { sh(label: "Install Mage", script: "make mage") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Mage", script: "make mage") }
   } else {
-    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -1066,28 +1091,18 @@ def k8sTest(versions){
   }
 }
 
-def reportCoverage(){
-  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    retry(2){
-      sh(label: 'Report to Codecov', script: '''
-        curl -sSLo codecov https://codecov.io/bash
-        for i in auditbeat filebeat heartbeat libbeat metricbeat packetbeat winlogbeat journalbeat
-        do
-          FILE="${i}/build/coverage/full.cov"
-          if [ -f "${FILE}" ]; then
-            bash codecov -f "${FILE}"
-          fi
-        done
-      ''')
-    }
-  }
-}
-
-// isChanged treats the patterns as regular expressions. In order to check if
-// any file in a directoy is modified use `^<path to dir>/.*`.
+/**
+*  isChanged treats the patterns as regular expressions. In order to check if
+*  any file in a directoy is modified use `^<path to dir>/.*`.
+*
+*  In addition, there are another two alternatives to report that there are
+*  changes, when `runAllStages` parameter is set to true or when running on a
+*  branch/tag basis.
+*/
 def isChanged(patterns){
   return (
-    params.runAllStages
+    params.runAllStages   // when runAllStages UI parameter is set to true
+    || !isPR()            // when running on a branch/tag
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
   )
 }
@@ -1181,7 +1196,7 @@ def startCloudTestEnv(String name, environments = []) {
       try {
         for (environment in environments) {
           if (environment.cond || runAll) {
-            retry(2) {
+            retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(environment.dir)
             }
           }
@@ -1203,7 +1218,7 @@ def terraformCleanup(String stashName, String directory) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${stashName}")
-        retry(2) {
+        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
       }
@@ -1216,7 +1231,7 @@ def loadConfigEnvVars(){
   env.GO_VERSION = readFile(".go-version").trim()
 
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
   }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
