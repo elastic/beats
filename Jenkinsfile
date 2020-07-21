@@ -50,7 +50,7 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests\\W+(?:for\\W+macos)?(?:\\W+please)?.*')
+    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^\/test(\W+macos)?$)')
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
@@ -1351,10 +1351,10 @@ def loadConfigEnvVars(){
   env.ONLY_DOCS = isDocChangedOnly()
 
   // Enable macOS builds when required
-  env.BUILD_ON_MACOS = (params.macosTest                 // UI Input parameter is set to true
+  env.BUILD_ON_MACOS = (params.macosTest                  // UI Input parameter is set to true
                         || !isPR()                        // For branches and tags
                         || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
-                        || (env.GITHUB_COMMENT?.toLowerCase().contains('for macos'))) // If `for macos` in the GH comment (Case-Insensitive)
+                        || (env.GITHUB_COMMENT?.toLowerCase().contains('/test macos'))) // If `/test macos` in the GH comment (Case-Insensitive)
 }
 
 /**
