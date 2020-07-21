@@ -85,6 +85,10 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
+      environment {
+        // See https://github.com/elastic/beats/pull/19823
+        GOFLAGS = '-mod=readonly'
+      }
       steps {
         makeTarget(context: "Lint", target: "check")
       }
