@@ -1351,10 +1351,10 @@ def loadConfigEnvVars(){
   env.ONLY_DOCS = isDocChangedOnly()
 
   // Enable macOS builds when required
-  env.BUILD_ON_MACOS = params.macosTest                 // UI Input parameter is set to true
-                      || !isPR()                        // For branches and tags
-                      || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
-                      || (env.GITHUB_COMMENT?.toLowerCase().contains('for macos')) // If `for macos` in the GH comment (Case-Insensitive)
+  env.BUILD_ON_MACOS = (params.macosTest                 // UI Input parameter is set to true
+                        || !isPR()                        // For branches and tags
+                        || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
+                        || (env.GITHUB_COMMENT?.toLowerCase().contains('for macos'))) // If `for macos` in the GH comment (Case-Insensitive)
 }
 
 /**
