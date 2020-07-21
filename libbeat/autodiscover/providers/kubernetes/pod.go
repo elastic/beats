@@ -146,6 +146,18 @@ func (p *pod) OnUpdate(obj interface{}) {
 		return
 	}
 
+	// here handle the case when a Pod is in `Terminating` phase.
+	// In this case the pod is neither `PodSucceeded` nor `PodFailed` and
+	// hence a stop/start sequence will take place. However we need to
+	// handle this as just a stop event with a cleanup timeout so as to
+	// to give time to any leftover log lines to be collected while the pod is
+	// in `Terminating` phase.
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		p.logger.Debugf("Watcher Pod update (being terminated): %+v", obj)
+		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+		return
+	}
+
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(pod, "stop")
 	p.emit(pod, "start")
