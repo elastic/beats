@@ -7,13 +7,13 @@ package zip
 import (
 	"archive/zip"
 	"context"
-	"fmt"
+	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -47,7 +47,7 @@ func (i *Installer) Install(_ context.Context, programName, version, installDir 
 		os.RemoveAll(installDir)
 	}
 
-	if err := i.unzip(artifactPath, programName, version); err != nil {
+	if err := i.unzip(artifactPath); err != nil {
 		return err
 	}
 
@@ -67,14 +67,59 @@ func (i *Installer) Install(_ context.Context, programName, version, installDir 
 	return nil
 }
 
-func (i *Installer) unzip(artifactPath, programName, version string) error {
-	if _, err := os.Stat(artifactPath); err != nil {
-		return errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
+func (i *Installer) unzip(artifactPath string) error {
+	r, err := zip.OpenReader(artifactPath)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	if err := os.MkdirAll(i.config.InstallPath, 0755); err != nil && !os.IsExist(err) {
+		// failed to create install dir
+		return err
 	}
 
-	powershellArg := fmt.Sprintf("Expand-Archive -LiteralPath \"%s\" -DestinationPath \"%s\"", artifactPath, i.config.InstallPath)
-	installCmd := exec.Command("powershell", "-command", powershellArg)
-	return installCmd.Run()
+	unpackFile := func(f *zip.File) (err error) {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := rc.Close(); cerr != nil {
+				err = multierror.Append(err, cerr)
+			}
+		}()
+
+		path := filepath.Join(i.config.InstallPath, f.Name)
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(path), f.Mode())
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if cerr := f.Close(); cerr != nil {
+					err = multierror.Append(err, cerr)
+				}
+			}()
+
+			if _, err = io.Copy(f, rc); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range r.File {
+		if err := unpackFile(f); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // retrieves root directory from zip archive
