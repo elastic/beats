@@ -18,7 +18,7 @@ import (
 func TestNewReaderValid(t *testing.T) {
 	var config Config
 	reader, err := newReader(config)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
 	assert.NotNil(t, reader.query.Handle)
@@ -31,7 +31,7 @@ func TestInitCounters(t *testing.T) {
 	var config Config
 	reader, err := newReader(config)
 	assert.NotNil(t, reader)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	// if iis is not enabled, the reader.ApplicationPools is empty
 	if len(reader.applicationPools) > 0 {
 		assert.NotZero(t, len(reader.query.Counters))

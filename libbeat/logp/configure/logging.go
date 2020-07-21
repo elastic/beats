@@ -42,7 +42,7 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "Log at INFO level")
 	flag.BoolVar(&toStderr, "e", false, "Log to stderr and disable syslog/file output")
 	common.StringArrVarFlag(nil, &debugSelectors, "d", "Enable certain debug selectors")
-	flag.Var((*environmentVar)(&environment), "environment", "set environment the Beat is run in")
+	flag.Var((*environmentVar)(&environment), "environment", "set environment being ran in")
 }
 
 // Logging builds a logp.Config based on the given common.Config and the specified

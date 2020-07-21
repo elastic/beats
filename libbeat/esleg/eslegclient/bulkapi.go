@@ -30,7 +30,6 @@ import (
 	"go.elastic.co/apm"
 	"go.elastic.co/apm/module/apmhttp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -94,43 +93,6 @@ func (conn *Connection) Bulk(
 	return conn.sendBulkRequest(requ)
 }
 
-// SendMonitoringBulk creates a HTTP request to the X-Pack Monitoring API containing a bunch of
-// operations and sends them to Elasticsearch. The request is retransmitted up to max_retries
-// before returning an error.
-func (conn *Connection) SendMonitoringBulk(
-	params map[string]string,
-	body []interface{},
-) (BulkResult, error) {
-	if len(body) == 0 {
-		return nil, nil
-	}
-
-	enc := conn.Encoder
-	enc.Reset()
-	if err := bulkEncode(conn.log, enc, body); err != nil {
-		return nil, err
-	}
-
-	if !conn.version.IsValid() {
-		if err := conn.Connect(); err != nil {
-			return nil, err
-		}
-	}
-
-	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
-
-	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, mergedParams, enc)
-	if err != nil {
-		return nil, err
-	}
-
-	_, result, err := conn.sendBulkRequest(requ)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func newBulkRequest(
 	urlStr string,
 	index, docType string,
@@ -138,20 +100,6 @@ func newBulkRequest(
 	body BodyEncoder,
 ) (*bulkRequest, error) {
 	path, err := makePath(index, docType, "_bulk")
-	if err != nil {
-		return nil, err
-	}
-
-	return newBulkRequestWithPath(urlStr, path, params, body)
-}
-
-func newMonitoringBulkRequest(
-	esVersion common.Version,
-	urlStr string,
-	params map[string]string,
-	body BodyEncoder,
-) (*bulkRequest, error) {
-	path, err := makePath("_monitoring", "bulk", "")
 	if err != nil {
 		return nil, err
 	}
