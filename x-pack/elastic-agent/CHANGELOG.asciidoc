@@ -52,6 +52,7 @@
 - Remove support for logs type and use logfile {pull}19761[19761]
 - Avoid comparing uncomparable types on enroll {issue}19976[19976]
 - Fix issues with merging of elastic-agent.yml and fleet.yml {pull}20026[20026]
+- Unzip failures on Windows 8/Windows server 2012 {pull}20088[20088]
 
 ==== New features
 
