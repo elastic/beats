@@ -1,0 +1,29 @@
+projects:
+    - "auditbeat"
+    - "filebeat"
+    - "heartbeat"
+    - "journalbeat"
+    - "libbeat"
+    - "metricbeat"
+    - "packetbeat"
+    - "winlogbeat"
+    - "x-pack/auditbeat"
+    - "x-pack/dockerlogbeat"
+    - "x-pack/filebeat"
+    - "x-pack/functionbeat"
+    - "x-pack/heartbeat"
+    - "x-pack/journalbeat"
+    - "x-pack/libbeat"
+    - "x-pack/metricbeat"
+    - "x-pack/packetbeat"
+    - "x-pack/winlogbeat"
+
+## Changeset macros that are defined here and used in each specific 2.0 pipeline.
+changeset:
+    oss:
+        - "^Jenkinsfile"
+        - "^go.mod"
+        - "^libbeat/.*"
+        - "^testing/.*"
+        - "^dev-tools/.*"
+        - "^\\.ci/scripts/.*"
