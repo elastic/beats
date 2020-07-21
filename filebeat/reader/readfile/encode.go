@@ -36,9 +36,9 @@ type EncoderReader struct {
 func NewEncodeReader(
 	r io.Reader,
 	codec encoding.Encoding,
-	bufferSize int,
+	bufferSize, maxBytes int,
 ) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
+	eReader, err := NewLineReader(r, codec, bufferSize, maxBytes)
 	return EncoderReader{eReader}, err
 }
 
