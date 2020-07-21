@@ -38,7 +38,7 @@ func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
@@ -89,7 +89,7 @@ func TestPodUIDIndexer(t *testing.T) {
 	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	ns := "testns"
@@ -138,7 +138,7 @@ func TestContainerIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
 	conIndexer, err := NewContainerIndexer(*testConfig, metagen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	ns := "testns"
@@ -227,7 +227,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	var testConfig = common.NewConfig()
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	ns := "testns"
@@ -264,12 +264,12 @@ func TestFilteredGenMeta(t *testing.T) {
 		"include_annotations": []string{"a"},
 		"include_labels":      []string{"foo"},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil)
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	indexers = podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
@@ -301,12 +301,12 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"exclude_labels": []string{"x"},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil)
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	ns := "testns"
@@ -326,7 +326,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 		Spec: v1.PodSpec{},
 	}
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
@@ -349,7 +349,7 @@ func TestIpPortIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
 	ipIndexer, err := NewIPPortIndexer(*testConfig, metagen)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	podName := "testpod"
 	ns := "testns"
@@ -386,7 +386,7 @@ func TestIpPortIndexer(t *testing.T) {
 
 	// Meta doesn't have container info
 	_, err = indexers[0].Data.GetValue("kubernetes.container.name")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	expected := common.MapStr{
 		"pod": common.MapStr{

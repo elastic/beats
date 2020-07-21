@@ -116,7 +116,7 @@ func TestAlert(t *testing.T) {
 
 	reqData, err := hex.DecodeString(
 		"1503010002022d")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -151,7 +151,7 @@ func TestInvalidAlert(t *testing.T) {
 
 	reqData, err := hex.DecodeString(
 		"1503010003010203")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -167,7 +167,7 @@ func TestClientHello(t *testing.T) {
 
 	reqData, err := hex.DecodeString(rawClientHello)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -179,7 +179,7 @@ func TestClientHello(t *testing.T) {
 	event := results.events[0]
 
 	b, err := json.Marshal(event.Fields)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
 }
 
@@ -188,7 +188,7 @@ func TestServerHello(t *testing.T) {
 
 	reqData, err := hex.DecodeString(rawServerHello)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -200,9 +200,9 @@ func TestServerHello(t *testing.T) {
 	event := results.events[0]
 
 	hello, err := event.GetValue("tls.detailed.server_hello")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	b, err := json.Marshal(hello)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedServerHello, string(b))
 }
 
@@ -215,7 +215,7 @@ func TestFragmentedHandshake(t *testing.T) {
 			"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 			"009c009d")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -227,7 +227,7 @@ func TestFragmentedHandshake(t *testing.T) {
 		"1603010083002f0035000a01000079dada0000ff0100010000000010000e00000b" +
 			"6578616d706c652e6f72670017000000230000000d0014001204030804040105" +
 			"0308050501080606010201000500050100000000001200000010000e000c0268")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -235,7 +235,7 @@ func TestFragmentedHandshake(t *testing.T) {
 	reqData, err = hex.DecodeString(
 		"3208687474702f312e3175500000000b00020100000a000a00086a6a001d0017" +
 			"0018aaaa000100")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -245,7 +245,7 @@ func TestFragmentedHandshake(t *testing.T) {
 	event := results.events[0]
 
 	b, err := json.Marshal(event.Fields)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
 }
 
@@ -258,7 +258,7 @@ func TestInterleavedRecords(t *testing.T) {
 			"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 			"009c009d")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -268,14 +268,14 @@ func TestInterleavedRecords(t *testing.T) {
 	// Then two records containing one alert each, merged in a single packet
 	reqData, err = hex.DecodeString(
 		"1503010002FFFF15030100020101")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
 	// And an application data record
 	reqData, err = hex.DecodeString(
 		"17030100080123456789abcdef")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -286,7 +286,7 @@ func TestInterleavedRecords(t *testing.T) {
 			"0308050501080606010201000500050100000000001200000010000e000c0268" +
 			"3208687474702f312e3175500000000b00020100000a000a00086a6a001d0017" +
 			"0018aaaa000100")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -297,11 +297,11 @@ func TestInterleavedRecords(t *testing.T) {
 
 	// Event contains the client hello
 	_, err = event.GetValue("tls.detailed.client_hello")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// and the alert
 	alerts, err := event.GetValue("tls.detailed.alerts")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Len(t, alerts.([]common.MapStr), 2)
 }
@@ -312,7 +312,7 @@ func TestCompletedHandshake(t *testing.T) {
 	// First, a certificates record
 	reqData, err := hex.DecodeString(certsMsg)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -357,7 +357,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 			"d809edfcd417861a3ca83e40cf631616e0791efbcc79a0fdfe0d57c6ede4dd4f" +
 			"8dc54cdb7904a8924f10c55f97e5fcc1f813e6002120720c822a09c99a10b09e" +
 			"de25dded2e4c62eff486bf7827f89613f3038d5a200a")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -391,7 +391,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 		"tls.detailed.version": "TLS 1.3",
 	} {
 		version, err := results.events[0].Fields.GetValue(key)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, version)
 	}
 }
@@ -401,7 +401,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// First, a client hello
 	reqData, err := hex.DecodeString(rawClientHello)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -430,7 +430,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 		"tls.detailed.version": "TLS 1.2",
 	} {
 		version, err := results.events[0].Fields.GetValue(key)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, expected, version)
 	}
 }
