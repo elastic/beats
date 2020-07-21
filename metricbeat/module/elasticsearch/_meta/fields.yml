@@ -9,6 +9,9 @@
     - name: type
       type: alias
       path: metricset.name
+    - name: timestamp
+      type: alias
+      path: "@timestamp"
     - name: cluster_uuid
       type: alias
       path: elasticsearch.cluster.id

@@ -15781,6 +15781,15 @@ alias to: metricset.name
 
 --
 
+*`timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
 *`cluster_uuid`*::
 +
 --
