@@ -259,12 +259,12 @@ func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels com
 
 	// handle user provided patterns
 	if len(g.counterPatterns) > 0 {
-		if !p.MatchMetricFamily(metricName, g.counterPatterns) {
+		if p.MatchMetricFamily(metricName, g.counterPatterns) {
 			return counterType
 		}
 	}
 	if len(g.histogramPatterns) > 0 {
-		if !p.MatchMetricFamily(metricName, g.histogramPatterns) {
+		if p.MatchMetricFamily(metricName, g.histogramPatterns) && leLabel {
 			return histogramType
 		}
 	}
