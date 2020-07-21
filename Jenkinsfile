@@ -903,7 +903,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
-        reportCoverage()
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+          sh(label: 'Report to Codecov', script: '.ci/scripts/report-codecov.sh auditbeat filebeat heartbeat journalbeat libbeat metricbeat packetbeat winlogbeat')
+        }
       }
     }
   }
@@ -977,12 +979,12 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
 def installTools() {
   def i = 2 // Number of retries
   if(isUnix()) {
-    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
-    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
-    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
-    retry(i) { sh(label: "Install Mage", script: "make mage") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Mage", script: "make mage") }
   } else {
-    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -1081,23 +1083,6 @@ def k8sTest(versions){
           }
         }
       }
-    }
-  }
-}
-
-def reportCoverage(){
-  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    retry(2){
-      sh(label: 'Report to Codecov', script: '''
-        curl -sSLo codecov https://codecov.io/bash
-        for i in auditbeat filebeat heartbeat libbeat metricbeat packetbeat winlogbeat journalbeat
-        do
-          FILE="${i}/build/coverage/full.cov"
-          if [ -f "${FILE}" ]; then
-            bash codecov -f "${FILE}"
-          fi
-        done
-      ''')
     }
   }
 }
@@ -1207,7 +1192,7 @@ def startCloudTestEnv(String name, environments = []) {
       try {
         for (environment in environments) {
           if (environment.cond || runAll) {
-            retry(2) {
+            retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(environment.dir)
             }
           }
@@ -1229,7 +1214,7 @@ def terraformCleanup(String stashName, String directory) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${stashName}")
-        retry(2) {
+        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
       }
@@ -1242,7 +1227,7 @@ def loadConfigEnvVars(){
   env.GO_VERSION = readFile(".go-version").trim()
 
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
   }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
