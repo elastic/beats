@@ -6,6 +6,8 @@ package reexec
 
 import (
 	"sync"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 var (
@@ -27,22 +29,24 @@ type ExecManager interface {
 	ShutdownComplete()
 }
 
-func Manager(exec string) ExecManager {
+func Manager(log *logger.Logger, exec string) ExecManager {
 	execSingletonOnce.Do(func() {
-		execSingleton = newManager(exec)
+		execSingleton = newManager(log, exec)
 	})
 	return execSingleton
 }
 
 type manager struct {
+	logger   *logger.Logger
 	exec     string
 	trigger  chan bool
 	shutdown chan bool
 	complete chan bool
 }
 
-func newManager(exec string) *manager {
+func newManager(log *logger.Logger, exec string) *manager {
 	return &manager{
+		logger:   log,
 		exec:     exec,
 		trigger:  make(chan bool),
 		shutdown: make(chan bool),
@@ -55,7 +59,7 @@ func (m *manager) ReExec() {
 		close(m.trigger)
 		<-m.shutdown
 
-		if err := exec(m.exec); err != nil {
+		if err := reexec(m.logger, m.exec); err != nil {
 			// panic; because there is no going back, everything is shutdown
 			panic(err)
 		}

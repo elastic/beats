@@ -11,10 +11,15 @@ import (
 	"path/filepath"
 
 	"golang.org/x/sys/unix"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func exec(exec string) error {
-	args := []string{filepath.Base(exec)}
+func reexec(log *logger.Logger, executable string) error {
+	// force log sync, before re-exec
+	_ = log.Sync()
+
+	args := []string{filepath.Base(executable)}
 	args = append(args, os.Args[1:]...)
 	return unix.Exec(exec, args, os.Environ())
 }

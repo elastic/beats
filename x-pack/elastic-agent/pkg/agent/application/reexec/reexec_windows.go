@@ -9,11 +9,14 @@ package reexec
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // exec performs execution on Windows.
@@ -25,13 +28,14 @@ import (
 //   current process just exits.
 //
 // * Sub-process - As a sub-process a new child is spawned and the current process just exits.
-func exec(exec string) error {
+func reexec(log *logger.Logger, executable string) error {
 	svc, status, err := getService()
 	if err == nil {
 		// running as a service; spawn re-exec windows sub-process
-		args := []string{filepath.Base(exec), "reexec_windows", svc.Name, strconv.Itoa(status.ProcessId)}
+		log.Infof("Running as Windows service %s; triggering service restart", svc.Name)
+		args := []string{filepath.Base(executable), "reexec_windows", svc.Name, strconv.Itoa(int(status.ProcessId))}
 		cmd := exec.Cmd{
-			Path:   exec,
+			Path:   executable,
 			Args:   args,
 			Stdin:  os.Stdin,
 			Stdout: os.Stdout,
@@ -41,11 +45,14 @@ func exec(exec string) error {
 			return err
 		}
 	} else {
+		log.Debugf("Discovering Windows service result: %s", err)
+
 		// running as a sub-process of another process; just execute as a child
-		args := []string{filepath.Base(exec)}
+		log.Infof("Running as Windows process; spawning new child process")
+		args := []string{filepath.Base(executable)}
 		args = append(args, os.Args[1:]...)
 		cmd := exec.Cmd{
-			Path:   exec,
+			Path:   executable,
 			Args:   args,
 			Stdin:  os.Stdin,
 			Stdout: os.Stdout,
@@ -55,12 +62,13 @@ func exec(exec string) error {
 			return err
 		}
 	}
-	os.Exit(0)
+	// force log sync before exit
+	_ = log.Sync()
 	return nil
 }
 
 func getService() (*mgr.Service, svc.Status, error) {
-	pid := os.Getpid()
+	pid := uint32(os.Getpid())
 	manager, err := mgr.Connect()
 	if err != nil {
 		return nil, svc.Status{}, err

@@ -59,7 +59,7 @@ func reExec(serviceName string, servicePid int) error {
 		if err != nil {
 			return errors.New(err, "failed to query service")
 		}
-		if status == svc.Stopped {
+		if status.State == svc.Stopped {
 			err = service.Start()
 			if err != nil {
 				return errors.New(err, "failed to start service")
@@ -67,7 +67,7 @@ func reExec(serviceName string, servicePid int) error {
 			// triggered restart; done
 			return nil
 		}
-		if status.ProcessId != servicePid {
+		if int(status.ProcessId) != servicePid {
 			// already restarted; has different PID, done!
 			return nil
 		}
