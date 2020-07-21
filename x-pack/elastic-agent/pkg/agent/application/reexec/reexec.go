@@ -21,5 +21,5 @@ func reexec(log *logger.Logger, executable string) error {
 
 	args := []string{filepath.Base(executable)}
 	args = append(args, os.Args[1:]...)
-	return unix.Exec(exec, args, os.Environ())
+	return unix.Exec(executable, args, os.Environ())
 }

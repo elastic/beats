@@ -11,7 +11,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/service"
