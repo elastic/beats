@@ -153,7 +153,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Filebeat oss Linux", directory: 'filebeat', target: 'testsuite', withModule: true)
+            mageTarget(context: "Filebeat oss Linux", directory: "filebeat", target: "build test", withModule: true)
           }
         }
         stage('Filebeat x-pack'){
@@ -166,7 +166,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget(context: "Filebeat x-pack Linux", directory: "x-pack/filebeat", target: "update build test", withModule: true)
+            mageTarget(context: "Filebeat x-pack Linux", directory: "x-pack/filebeat", target: "build test", withModule: true)
           }
         }
         stage('Filebeat Mac OS X'){
@@ -243,7 +243,7 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
-                makeTarget(context: "Heartbeat oss Linux", directory: 'heartbeat', target: "testsuite")
+                mageTarget(context: "Heartbeat oss Linux", directory: "heartbeat", target: "build test")
               }
             }
             stage('Heartbeat Mac OS X'){
@@ -289,7 +289,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Auditbeat oss Linux", directory: 'auditbeat', target: "testsuite", withModule: true)
+            mageTarget(context: "Auditbeat oss Linux", directory: "auditbeat", target: "build test")
           }
         }
         stage('Auditbeat crosscompile'){
@@ -387,7 +387,7 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
-                makeTarget(context: "Libbeat oss Linux", directory: 'libbeat', target: "testsuite")
+                mageTarget(context: "Libbeat oss Linux", directory: "libbeat", target: "build test")
               }
             }
             stage('Libbeat crosscompile'){
@@ -412,7 +412,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget(context: "Libbeat x-pack Linux", directory: 'x-pack/libbeat', target: "testsuite")
+            mageTarget(context: "Libbeat x-pack Linux", directory: "x-pack/libbeat", target: "build test")
           }
         }
         stage('Metricbeat OSS Unit tests'){
@@ -428,7 +428,7 @@ pipeline {
             mageTarget(context: "Metricbeat OSS linux/amd64 (unitTest)", directory: "metricbeat", target: "build unitTest")
           }
         }
-        stage('Metricbeat OSS Integration tests'){
+        stage('Metricbeat OSS Go Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -441,7 +441,7 @@ pipeline {
             mageTarget(context: "Metricbeat OSS linux/amd64 (goIntegTest)", directory: "metricbeat", target: "goIntegTest", withModule: true)
           }
         }
-        stage('Metricbeat Python integration tests'){
+        stage('Metricbeat OSS Python Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -559,7 +559,7 @@ pipeline {
             mageTargetWin(context: "Metricbeat x-pack Windows", directory: "x-pack/metricbeat", target: "build unitTest")
           }
         }
-        stage('Packetbeat'){
+        stage('Packetbeat OSS'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -569,9 +569,40 @@ pipeline {
             }
           }
           stages {
-            stage('Packetbeat oss'){
+            stage('Packetbeat Linux'){
               steps {
-                makeTarget(context: "Packetbeat oss Linux", directory: 'packetbeat', target: "testsuite")
+                mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
+              }
+            }
+            stage('Packetbeat Mac OS X'){
+              agent { label 'macosx' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
+              steps {
+                mageTarget(context: "Packetbeat OSS Mac OS X", directory: "packetbeat", target: "build unitTest")
+              }
+              post {
+                always {
+                  delete()
+                }
+              }
+            }
+            stage('Packetbeat Windows'){
+              agent { label 'windows-immutable && windows-2019' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
+              steps {
+                mageTargetWin(context: "Packetbeat OSS Windows", directory: "packetbeat", target: "build unitTest")
               }
             }
           }
@@ -588,7 +619,7 @@ pipeline {
           stages {
             stage('Dockerlogbeat'){
               steps {
-                mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "update build test")
+                mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "build test")
               }
             }
           }
@@ -650,7 +681,7 @@ pipeline {
               steps {
                 mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
                 withEnv(["GO_VERSION=1.13.1"]){
-                  makeTarget(context: "Functionbeat x-pack Linux", directory: 'x-pack/functionbeat', target: "test-gcp-functions")
+                  mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "testGCPFunctions")
                 }
               }
             }
@@ -699,7 +730,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                makeTarget(context: "Journalbeat Linux", directory: 'journalbeat', target: "testsuite")
+                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build goUnitTest")
               }
             }
           }
@@ -914,12 +945,34 @@ def withBeatsEnv(Map args = [:], Closure body) {
         }
       } finally {
         if (archive) {
-          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
-          }
+          archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
         reportCoverage()
+      }
+    }
+  }
+}
+
+/**
+  This method archives and report the tests output, for such, it searches in certain folders
+  to bypass some issues when working with big repositories.
+*/
+def archiveTestOutput(Map args = [:]) {
+  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    if (isUnix()) {
+      fixPermissions("${WORKSPACE}")
+    }
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    dir('build') {
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+    }
+    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+      if (folder.trim()) {
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + goos()
+        tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
   }
@@ -959,10 +1012,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
           body()
         }
       } finally {
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
-        }
+        archiveTestOutput(testResults: "**\\build\\TEST*.xml", artifacts: "**\\build\\TEST*.out")
       }
     }
   }
@@ -1096,11 +1146,18 @@ def reportCoverage(){
   }
 }
 
-// isChanged treats the patterns as regular expressions. In order to check if
-// any file in a directoy is modified use `^<path to dir>/.*`.
+/**
+*  isChanged treats the patterns as regular expressions. In order to check if
+*  any file in a directoy is modified use `^<path to dir>/.*`.
+*
+*  In addition, there are another two alternatives to report that there are
+*  changes, when `runAllStages` parameter is set to true or when running on a
+*  branch/tag basis.
+*/
 def isChanged(patterns){
   return (
-    params.runAllStages
+    params.runAllStages   // when runAllStages UI parameter is set to true
+    || !isPR()            // when running on a branch/tag
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
   )
 }
@@ -1300,7 +1357,7 @@ def loadConfigEnvVars(){
 }
 
 /**
-  This method gathers the module name, if required, in order to run the ITs only if 
+  This method gathers the module name, if required, in order to run the ITs only if
   the changeset affects a specific module.
 
   For such, it's required to look for changes under the module folder and exclude anything else

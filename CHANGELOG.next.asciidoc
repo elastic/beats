@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
+- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 
 *Auditbeat*
 
@@ -146,6 +147,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
+- Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
 
 *Auditbeat*
 
@@ -213,11 +215,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
+- Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
+- Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
+- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Add support for new `service_name` option to all monitors. {pull}19932[19932].
 
 *Journalbeat*
 
@@ -343,6 +349,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add minimum cache TTL for successful DNS responses. {pull}18986[18986]
+- Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
 
 *Auditbeat*
 

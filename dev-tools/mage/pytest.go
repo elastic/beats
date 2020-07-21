@@ -132,9 +132,7 @@ func PythonNoseTest(params PythonTestArgs) error {
 	nosetestsOptions := []string{
 		"--process-timeout=90",
 		"--with-timer",
-	}
-	if mg.Verbose() {
-		nosetestsOptions = append(nosetestsOptions, "-v")
+		"-v",
 	}
 	if params.XUnitReportFile != "" {
 		nosetestsOptions = append(nosetestsOptions,
@@ -188,7 +186,7 @@ func PythonNoseTestForModule(params PythonTestArgs) error {
 
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
 // defined in the requirements file pointed to by requirementsTxt. It returns
-// the path to the virutalenv.
+// the path to the virtualenv.
 func PythonVirtualenv() (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
@@ -221,6 +219,21 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
+	pipUpgrade := func(pkg string) error {
+		return sh.RunWith(env, pip, "install", "-U", pkg)
+	}
+
+	// Ensure we are using the latest pip version.
+	if err = pipUpgrade("pip"); err != nil {
+		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
+	}
+
+	// First ensure that wheel is installed so that bdists build cleanly.
+	if err = pipUpgrade("wheel"); err != nil {
+		return "", err
+	}
+
+	// Execute pip to install the dependencies.
 	args := []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
@@ -228,13 +241,6 @@ func PythonVirtualenv() (string, error) {
 	for _, req := range reqs {
 		args = append(args, "-Ur", req)
 	}
-
-	// First ensure that wheel is installed so that bdists build cleanly.
-	if err = sh.RunWith(env, pip, "install", "-U", "wheel"); err != nil {
-		return "", err
-	}
-
-	// Execute pip to install the dependencies.
 	if err := sh.RunWith(env, pip, args...); err != nil {
 		return "", err
 	}
