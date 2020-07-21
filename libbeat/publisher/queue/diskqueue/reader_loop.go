@@ -131,7 +131,7 @@ func (dq *diskQueue) writeFrameData(bytes []byte) error {
 }
 
 func readSegment(
-	reader io.Reader, checksumType checksumType,
+	reader io.Reader, checksumType ChecksumType,
 	start segmentOffset, stop segmentOffset,
 	output chan diskQueueOutput, cancel chan struct{},
 ) (int, error) {
