@@ -15,6 +15,7 @@ var (
 	execSingletonOnce sync.Once
 )
 
+// ExecManager is the interface that the global reexec manager implements.
 type ExecManager interface {
 	// ReExec asynchronously re-executes command in the same PID and memory address
 	// as the currently running application.
@@ -29,6 +30,7 @@ type ExecManager interface {
 	ShutdownComplete()
 }
 
+// Manager returns the global reexec manager.
 func Manager(log *logger.Logger, exec string) ExecManager {
 	execSingletonOnce.Do(func() {
 		execSingleton = newManager(log, exec)
