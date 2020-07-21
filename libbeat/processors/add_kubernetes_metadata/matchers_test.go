@@ -31,16 +31,16 @@ func TestFieldMatcher(t *testing.T) {
 	}
 	fieldCfg, err := common.NewConfigFrom(testCfg)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	matcher, err := NewFieldMatcher(*fieldCfg)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	testCfg["lookup_fields"] = "foo"
 	fieldCfg, _ = common.NewConfigFrom(testCfg)
 
 	matcher, err = NewFieldMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	input := common.MapStr{
 		"foo": "bar",
@@ -61,16 +61,16 @@ func TestFieldFormatMatcher(t *testing.T) {
 	testCfg := map[string]interface{}{}
 	fieldCfg, err := common.NewConfigFrom(testCfg)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	matcher, err := NewFieldFormatMatcher(*fieldCfg)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	testCfg["format"] = `%{[namespace]}/%{[pod]}`
 	fieldCfg, _ = common.NewConfigFrom(testCfg)
 
 	matcher, err = NewFieldFormatMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	event := common.MapStr{
 		"namespace": "foo",
@@ -90,7 +90,7 @@ func TestFieldFormatMatcher(t *testing.T) {
 	fieldCfg, _ = common.NewConfigFrom(testCfg)
 	matcher, err = NewFieldFormatMatcher(*fieldCfg)
 	assert.NotNil(t, matcher)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	event = common.MapStr{
 		"dimensions": common.MapStr{
