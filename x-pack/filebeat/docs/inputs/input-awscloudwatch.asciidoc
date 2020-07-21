@@ -5,10 +5,10 @@
 :type: awscloudwatch
 
 [id="{beatname_lc}-input-{type}"]
-=== awscloudwatch input
+=== AWS CloudWatch input
 
 ++++
-<titleabbrev>awscloudwatch</titleabbrev>
+<titleabbrev>AWS CloudWatch</titleabbrev>
 ++++
 
 beta[]

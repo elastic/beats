@@ -44,7 +44,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	config := common.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
 	err := config.Unpack(&c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	cfg1 := common.MapStr{
 		"hints.enabled": false,
@@ -52,7 +52,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	config, err = common.NewConfigFrom(&cfg1)
 	c = defaultConfig()
 	err = config.Unpack(&c)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestConfigWithIncorrectScope(t *testing.T) {
@@ -65,7 +65,7 @@ func TestConfigWithIncorrectScope(t *testing.T) {
 	config := common.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
 	err := config.Unpack(&c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "service", c.Resource)
 	assert.Equal(t, "cluster", c.Scope)

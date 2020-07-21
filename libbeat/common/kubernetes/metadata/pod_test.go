@@ -138,7 +138,7 @@ func TestPod_Generate(t *testing.T) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"include_annotations": []string{"app"},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	metagen := NewPodMetadataGenerator(config, nil, nil, nil)
 	for _, test := range tests {
@@ -254,13 +254,13 @@ func TestPod_GenerateFromName(t *testing.T) {
 		config, err := common.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"app"},
 		})
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
 		metagen := NewPodMetadataGenerator(config, pods, nil, nil)
 
 		accessor, err := meta.Accessor(test.input)
-		require.Nil(t, err)
+		require.NoError(t, err)
 
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.GenerateFromName(fmt.Sprint(accessor.GetNamespace(), "/", accessor.GetName())))
@@ -360,7 +360,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		config, err := common.NewConfigFrom(map[string]interface{}{
 			"include_annotations": []string{"app"},
 		})
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
 

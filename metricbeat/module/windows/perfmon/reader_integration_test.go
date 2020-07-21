@@ -37,7 +37,7 @@ func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 		Counters:          []Counter{counter},
 	}
 	reader, err := NewReader(config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Nil(t, reader)
 	assert.EqualValues(t, err.Error(), `failed to expand counter (query=""): no query path given`)
 }
@@ -52,7 +52,7 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 	}
 	reader, err := NewReader(config)
 	defer reader.Close()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
 	assert.NotNil(t, reader.query.Handle)
@@ -76,11 +76,11 @@ func TestReadSuccessfully(t *testing.T) {
 	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, events)
 	assert.Zero(t, len(events))
 	events, err = reader.Read()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, events)
 	assert.NotZero(t, len(events))
 }

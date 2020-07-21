@@ -55,7 +55,7 @@ func mustLoad(t *testing.T, yamlStr string) *Config {
 
 func TestEmptyTlsConfig(t *testing.T) {
 	cfg, err := load("")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, cfg, &Config{})
 }
@@ -73,20 +73,20 @@ func TestLoadWithEmptyValues(t *testing.T) {
     supported_protocols:
   `)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, cfg, &Config{})
 }
 
 func TestNoLoadNilConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
 
 func TestNoLoadDisabledConfig(t *testing.T) {
 	enabled := false
 	cfg, err := LoadTLSConfig(&Config{Enabled: &enabled})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
 
