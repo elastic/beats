@@ -12,6 +12,15 @@
     - name: cluster_uuid
       type: alias
       path: elasticsearch.cluster.id
+    - name: source_node
+      type: group
+      fields:
+        - name: uuid
+          type: alias
+          path: elasticsearch.node.id
+        - name: name
+          type: alias
+          path: elasticsearch.node.name
     - name: node_stats
       type: group
       fields:

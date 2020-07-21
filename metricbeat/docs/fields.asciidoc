@@ -15772,12 +15772,40 @@ Elasticsearch module
 
 
 
+*`type`*::
++
+--
+type: alias
+
+alias to: metricset.name
+
+--
+
 *`cluster_uuid`*::
 +
 --
 type: alias
 
 alias to: elasticsearch.cluster.id
+
+--
+
+
+*`source_node.uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.id
+
+--
+
+*`source_node.name`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.name
 
 --
 
