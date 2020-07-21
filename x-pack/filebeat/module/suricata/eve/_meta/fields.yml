@@ -665,6 +665,24 @@
       - name: subject
         type: keyword
 
+      - name: ja3s
+        type: group
+        default_field: false
+        fields:
+          - name: string
+            type: keyword
+          - name: hash
+            type: keyword
+
+      - name: ja3
+        type: group
+        default_field: false
+        fields:
+          - name: string
+            type: keyword
+          - name: hash
+            type: keyword
+
     - name: app_proto_ts
       type: keyword
 

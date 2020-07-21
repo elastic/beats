@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"time"
 
-	bolt "github.com/coreos/bbolt"
 	"github.com/pkg/errors"
+	bolt "go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/logp"

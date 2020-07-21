@@ -25,3 +25,8 @@
           object_type: keyword
           description: >
             Non-numeric values collected.
+        - name: metrics.boolean.*
+          type: object
+          object_type: keyword
+          description: >
+            Boolean values collected.

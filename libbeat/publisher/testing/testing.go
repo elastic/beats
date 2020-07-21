@@ -44,10 +44,6 @@ func (pub *TestPublisher) ConnectWith(_ beat.ClientConfig) (beat.Client, error) 
 	return pub.client, nil
 }
 
-func (pub *TestPublisher) SetACKHandler(_ beat.PipelineACKHandler) error {
-	panic("Not supported")
-}
-
 func NewChanClient(bufSize int) *ChanClient {
 	return NewChanClientWith(make(chan beat.Event, bufSize))
 }

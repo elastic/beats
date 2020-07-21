@@ -6,7 +6,7 @@ processors:
 - set:
     field: event.action
     value: "{{fortinet.firewall.action}}"
-    if: "ctx.fortinet?.firewall?.action != null"
+    ignore_empty_value: true
 - set:
     field: event.outcome
     value: success

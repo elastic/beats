@@ -19,6 +19,7 @@ package redis
 
 import (
 	"bytes"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -324,6 +325,11 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 	}
 	if redis.sendResponse {
 		fields["response"] = resp.message
+	}
+
+	pbf.Event.Action = "redis." + strings.ToLower(string(requ.method))
+	if resp.isError {
+		pbf.Event.Outcome = "failure"
 	}
 
 	return evt

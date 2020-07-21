@@ -62,7 +62,7 @@ same time, it can lead to unexpected behavior.
 For module configurations, you specify the `path` option in the
 +{beatname_lc}.config.modules+ section of the +{beatname_lc}.yml+ file. By default,
 {beatname_uc} loads the module configurations enabled in the
-<<enable-modules-d-configs,`modules.d`>> directory. For example:
+<<configure-modules-d-configs,`modules.d`>> directory. For example:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------

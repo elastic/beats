@@ -35,7 +35,7 @@ func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
 	return &artifact.Config{
 		OperatingSystem: config.OperatingSystem,
 		Architecture:    config.Architecture,
-		BeatsSourceURI:  snapshotURI,
+		SourceURI:       snapshotURI,
 		TargetDirectory: config.TargetDirectory,
 		Timeout:         config.Timeout,
 		PgpFile:         config.PgpFile,
@@ -81,7 +81,7 @@ func snapshotURI() (string, error) {
 			return "", fmt.Errorf("uri is not a string")
 		}
 
-		index := strings.Index(uri, "/elastic-agent/")
+		index := strings.Index(uri, "/beats/elastic-agent/")
 		if index == -1 {
 			return "", fmt.Errorf("not an agent uri: '%s'", uri)
 		}

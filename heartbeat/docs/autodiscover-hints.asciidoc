@@ -92,6 +92,21 @@ annotations:
 
 -----
 
+[float]
+===== Multiple sets of hints
+When a container needs multiple monitors to be defined on it, sets of annotations can be provided with numeric prefixes.
+Annotations without numeric prefixes would default into a single monitor configuration.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.monitor/type: http
+  co.elastic.monitor/hosts: ${data.host}:8080/healtlz
+  co.elastic.monitor/schedule: "@every 5s"
+  co.elastic.monitor/1.type: tcp
+  co.elastic.monitor/1.hosts: ${data.host}:8080
+  co.elastic.monitor/1.schedule: "@every 5s"
+-------------------------------------------------------------------------------------
 
 
 [float]

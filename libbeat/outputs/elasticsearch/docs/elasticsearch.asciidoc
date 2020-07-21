@@ -678,7 +678,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
-===== `kebreros`
+===== `kerberos`
 
 Configuration options for Kerberos authentication.
 

@@ -34,6 +34,10 @@ func TestEventMapping(t *testing.T) {
 				MetricsFile:  "./_meta/test/metrics.scheduler.1.14",
 				ExpectedFile: "./_meta/test/metrics.scheduler.1.14.expected",
 			},
+			{
+				MetricsFile:  "./_meta/test/metrics.scheduler.1.17",
+				ExpectedFile: "./_meta/test/metrics.scheduler.1.17.expected",
+			},
 		},
 	)
 }

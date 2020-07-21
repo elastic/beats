@@ -128,9 +128,9 @@ processors:
       value: failure
 
   - set:
-      if: "ctx?.aws?.elb?.trace_id != null"
       field: tracing.trace.id
       value: "{{aws.elb.trace_id}}"
+      ignore_empty_value: true
 
   - split:
       field: '_tmp.actions_executed'
@@ -146,6 +146,7 @@ processors:
   - set:
       field: 'event.end'
       value: '{{ @timestamp }}'
+      ignore_empty_value: true
 
   - geoip:
       field: 'source.ip'
@@ -174,7 +175,7 @@ processors:
   - set:
       field: tls.cipher
       value: '{{aws.elb.ssl_cipher}}'
-      if: ctx.aws?.elb?.ssl_cipher != null
+      ignore_empty_value: true
 
   - script:
       lang: painless

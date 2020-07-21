@@ -102,10 +102,6 @@ func (t *configuredJob) Start() {
 	var err error
 
 	fields := common.MapStr{"event": common.MapStr{"dataset": "uptime"}}
-	if t.monitor.factoryMetadata != nil {
-		fields.DeepUpdate(t.monitor.factoryMetadata.Get())
-	}
-
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			EventMetadata: t.config.EventMetadata,
@@ -120,7 +116,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.id, tf)
+	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.stdFields.ID, tf)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}

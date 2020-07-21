@@ -47,20 +47,6 @@ some extra setup. For more information, see
 {logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 endif::[]
 
-ifndef::win-only[]
- 
-include::{libbeat-dir}/step-test-config.asciidoc[]
-
-endif::win-only[]
-
-ifdef::win-only[]
-
-TIP: To test your configuration file, change to the directory where the {beatname_uc}
-binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
-
-endif::win-only[]
-
 // end::shared-logstash-config[]
 
 ==== Accessing metadata fields

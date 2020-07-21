@@ -7,6 +7,7 @@ package httpjson
 import (
 	"regexp"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/pkg/errors"
@@ -26,11 +27,16 @@ type config struct {
 	HTTPRequestBody      common.MapStr     `config:"http_request_body"`
 	Interval             time.Duration     `config:"interval"`
 	JSONObjects          string            `config:"json_objects_array"`
+	SplitEventsBy        string            `config:"split_events_by"`
 	NoHTTPBody           bool              `config:"no_http_body"`
 	Pagination           *Pagination       `config:"pagination"`
 	RateLimit            *RateLimit        `config:"rate_limit"`
+	RetryMax             int               `config:"retry.max_attempts"`
+	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
+	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  string            `config:"url" validate:"required"`
+	DateCursor           *DateCursor       `config:"date_cursor"`
 }
 
 // Pagination contains information about httpjson pagination settings
@@ -40,6 +46,7 @@ type Pagination struct {
 	Header           *Header       `config:"header"`
 	IDField          string        `config:"id_field"`
 	RequestField     string        `config:"req_field"`
+	URLField         string        `config:"url_field"`
 	URL              string        `config:"url"`
 }
 
@@ -59,6 +66,54 @@ type RateLimit struct {
 	Limit     string `config:"limit"`
 	Reset     string `config:"reset"`
 	Remaining string `config:"remaining"`
+}
+
+type DateCursor struct {
+	Enabled         *bool         `config:"enabled"`
+	Field           string        `config:"field"`
+	URLField        string        `config:"url_field" validate:"required"`
+	ValueTemplate   *Template     `config:"value_template"`
+	DateFormat      string        `config:"date_format"`
+	InitialInterval time.Duration `config:"initial_interval"`
+}
+
+type Template struct {
+	*template.Template
+}
+
+func (t *Template) Unpack(in string) error {
+	tpl, err := template.New("tpl").Parse(in)
+	if err != nil {
+		return err
+	}
+
+	*t = Template{Template: tpl}
+
+	return nil
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (dc *DateCursor) IsEnabled() bool {
+	return dc != nil && (dc.Enabled == nil || *dc.Enabled)
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (dc *DateCursor) GetDateFormat() string {
+	if dc.DateFormat == "" {
+		return time.RFC3339
+	}
+	return dc.DateFormat
+}
+
+func (dc *DateCursor) Validate() error {
+	if dc.DateFormat == "" {
+		return nil
+	}
+	now := time.Now().Format(dc.DateFormat)
+	if _, err := time.Parse(dc.DateFormat, now); err != nil {
+		return errors.New("invalid configuration: date_format is not a valid date layout")
+	}
+	return nil
 }
 
 func (c *config) Validate() error {
@@ -95,5 +150,8 @@ func defaultConfig() config {
 	var c config
 	c.HTTPMethod = "GET"
 	c.HTTPClientTimeout = 60 * time.Second
+	c.RetryWaitMin = 1 * time.Second
+	c.RetryWaitMax = 60 * time.Second
+	c.RetryMax = 5
 	return c
 }

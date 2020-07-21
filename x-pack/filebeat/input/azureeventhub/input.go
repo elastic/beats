@@ -85,11 +85,7 @@ func NewInput(
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

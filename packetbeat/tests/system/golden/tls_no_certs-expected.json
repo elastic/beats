@@ -7,14 +7,25 @@
         "destination.domain": "example.net",
         "destination.ip": "93.184.216.34",
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network_traffic",
+            "network"
+        ],
         "event.dataset": "tls",
         "event.duration": 364625000,
         "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "network.community_id": "1:fx1jENdlg6r3LIvBRG3wEboWbPY=",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.1.35",
+            "93.184.216.34"
+        ],
         "server.domain": "example.net",
         "server.ip": "93.184.216.34",
         "server.port": 443,

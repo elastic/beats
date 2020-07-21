@@ -126,7 +126,7 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	factory := monitors.NewFactory(bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg, nil)
+		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
 			return errors.Wrap(err, "could not create monitor")
 		}
