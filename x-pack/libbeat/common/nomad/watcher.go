@@ -225,7 +225,6 @@ func (w *watcher) fetchNodeID() (string, error) {
 		for _, node := range nodes {
 			if node.Name == w.options.Node {
 				return node.ID, nil
-				break
 			}
 		}
 	}
