@@ -5,7 +5,7 @@
 :type: s3
 
 [id="{beatname_lc}-input-{type}"]
-=== s3 input
+=== S3 input
 
 ++++
 <titleabbrev>S3</titleabbrev>
