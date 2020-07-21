@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 )
 
@@ -1046,4 +1046,154 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	assert.EqualValues(t, e.ModuleFields, expected)
 	e = events[labels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
+}
+
+// TestGenerateEventsCounterWithDefinedPattern tests counter with defined pattern
+func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
+
+	counters := xcollector.NewCounterCache(1 * time.Second)
+
+	counterPatterns, err := p.CompilePatternList(&[]string{"_mycounter"})
+	if err != nil {
+		panic(err)
+	}
+	g := remoteWriteTypedGenerator{
+		counterCache:    counters,
+		rateCounters:    true,
+		counterPatterns: counterPatterns,
+	}
+
+	g.counterCache.Start()
+	labels := common.MapStr{
+		"listener_name": model.LabelValue("http"),
+	}
+
+	// first fetch
+	metrics := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__":      "net_conntrack_listener_conn_closed_mycounter",
+				"listener_name": "http",
+			},
+			Value:     model.SampleValue(42),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events := g.GenerateEvents(metrics)
+
+	expected := common.MapStr{
+		"net_conntrack_listener_conn_closed_mycounter": common.MapStr{
+			"counter": float64(42),
+			"rate":    float64(0),
+		},
+		"labels": labels,
+	}
+
+	assert.Equal(t, len(events), 1)
+	e := events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+
+	// repeat in order to test the rate
+	metrics = model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__":      "net_conntrack_listener_conn_closed_mycounter",
+				"listener_name": "http",
+			},
+			Value:     model.SampleValue(45),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events = g.GenerateEvents(metrics)
+
+	expected = common.MapStr{
+		"net_conntrack_listener_conn_closed_mycounter": common.MapStr{
+			"counter": float64(45),
+			"rate":    float64(3),
+		},
+		"labels": labels,
+	}
+
+	assert.Equal(t, len(events), 1)
+	e = events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+
+}
+
+// TestGenerateEventsHistogramWithDefinedPattern tests histogram with defined pattern
+func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
+
+	counters := xcollector.NewCounterCache(1 * time.Second)
+
+	histogramPatterns, err := p.CompilePatternList(&[]string{"_myhistogram"})
+	if err != nil {
+		panic(err)
+	}
+	g := remoteWriteTypedGenerator{
+		counterCache:      counters,
+		rateCounters:      true,
+		histogramPatterns: histogramPatterns,
+	}
+
+	g.counterCache.Start()
+	labels := common.MapStr{
+		"listener_name": model.LabelValue("http"),
+	}
+
+	// first fetch
+	metrics := model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__":      "net_conntrack_listener_conn_closed_myhistogram",
+				"listener_name": "http",
+				"le":            "20",
+			},
+			Value:     model.SampleValue(42),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events := g.GenerateEvents(metrics)
+
+	expected := common.MapStr{
+		"net_conntrack_listener_conn_closed_myhistogram": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(10)},
+				"counts": []uint64{uint64(0)},
+			},
+		},
+		"labels": labels,
+	}
+
+	assert.Equal(t, len(events), 1)
+	e := events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+
+	// repeat in order to test the rate
+	metrics = model.Samples{
+		&model.Sample{
+			Metric: map[model.LabelName]model.LabelValue{
+				"__name__":      "net_conntrack_listener_conn_closed_myhistogram",
+				"listener_name": "http",
+				"le":            "20",
+			},
+			Value:     model.SampleValue(45),
+			Timestamp: model.Time(424242),
+		},
+	}
+	events = g.GenerateEvents(metrics)
+
+	expected = common.MapStr{
+		"net_conntrack_listener_conn_closed_myhistogram": common.MapStr{
+			"histogram": common.MapStr{
+				"values": []float64{float64(10)},
+				"counts": []uint64{uint64(3)},
+			},
+		},
+		"labels": labels,
+	}
+
+	assert.Equal(t, len(events), 1)
+	e = events[labels.String()]
+	assert.EqualValues(t, e.ModuleFields, expected)
+
 }
