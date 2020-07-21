@@ -217,6 +217,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug with empty filter values in system/service {pull}19812[19812]
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
+- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 
 *Heartbeat*
 
