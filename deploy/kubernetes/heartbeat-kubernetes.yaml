@@ -1,17 +1,3 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: heartbeat
-  labels:
-    k8s-app: heartbeat
-rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - namespaces
-  - pods
-  verbs: ["get", "list", "watch"]
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -40,20 +26,20 @@ data:
     #
     #  # Autodiscover nodes
     #  providers:
-    #  - node: ${NODE_NAME}
-    #    type: kubernetes
-    #    resource: node
-    #    scope: cluster
-    #    templates:
-    #    # Example, check SSH port of all cluster nodes:
-    #    - condition: ~
-    #      config:
-    #      - hosts:
-    #        - ${data.host}:22
-    #        name: ${data.kubernetes.node.name}
-    #        schedule: '@every 10s'
-    #        timeout: 5s
-    #        type: tcp
+    #    - type: kubernetes
+    #      resource: node
+    #      node: ${NODE_NAME}
+    #      scope: cluster
+    #      templates:
+    #        # Example, check SSH port of all cluster nodes:
+    #        - condition: ~
+    #          config:
+    #            - hosts:
+    #                - ${data.host}:22
+    #              name: ${data.kubernetes.node.name}
+    #              schedule: '@every 10s'
+    #              timeout: 5s
+    #              type: tcp
 
     processors:
       - add_cloud_metadata:
@@ -148,6 +134,20 @@ roleRef:
   kind: ClusterRole
   name: heartbeat
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: heartbeat
+  labels:
+    k8s-app: heartbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount
