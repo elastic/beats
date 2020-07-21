@@ -352,7 +352,7 @@ experimental[]
 
 The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
 
-These are the available fields during within config templating. The `meta.*` fields will be available
+These are the available fields during config templating. The `meta.*` fields will be available
 on each emitted event.
 
 * host
