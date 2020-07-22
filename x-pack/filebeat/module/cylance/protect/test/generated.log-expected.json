@@ -3161,7 +3161,7 @@
         "user.name": "stenatus"
     },
     {
-        "@timestamp": "2019-07-24T10:58:48.000Z",
+        "@timestamp": "2020-07-24T10:58:48.000Z",
         "event.action": "Alert",
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
@@ -3186,7 +3186,7 @@
         "rsa.network.alias_host": [
             "squ2213.www.test"
         ],
-        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
+        "rsa.time.event_time": "2020-07-24T10:58:48.000Z",
         "service.type": "cylance",
         "tags": [
             "cylance.protect",
