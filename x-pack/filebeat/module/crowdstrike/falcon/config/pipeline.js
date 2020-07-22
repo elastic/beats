@@ -11,8 +11,16 @@ var crowdstrikeFalcon = (function () {
 
     var convertToMSEpoch = function (evt, field) {
         var timestamp = evt.Get(field);
-        if (timestamp && timestamp < 100000000000) { // check if we have a seconds timestamp, this is roughly 1973 in MS
-            evt.Put(field, timestamp * 1000);
+        if (timestamp) {
+            if (timestamp < 100000000000) { // check if we have a seconds timestamp, this is roughly 1973 in MS
+                evt.Put(field, timestamp * 1000);
+            }
+            (new processor.Timestamp({
+                field: field,
+                target_field: field,
+                timezone: "UTC",
+                layouts: ["UNIX_MS"]
+            })).Run(evt);
         }
     };
 
@@ -56,18 +64,25 @@ var crowdstrikeFalcon = (function () {
         fail_on_error: false
     });
 
-    var parseTimestamp = new processor.Timestamp({
-        field: "crowdstrike.metadata.eventCreationTime",
-        target_field: "@timestamp",
-        timezone: "UTC",
-        layouts: ["UNIX_MS"],
+    var addTimestamp = new processor.Convert({
+        fields: [{
+            from: "crowdstrike.metadata.eventCreationTime",
+            to: "@timestamp",
+        }],
+        mode: "copy",
         ignore_missing: false,
+        fail_on_error: true
     });
 
     var normalizeEpochMS = function (evt) {
+        convertToMSEpoch(evt, "crowdstrike.event.ProcessStartTime")
+        convertToMSEpoch(evt, "crowdstrike.event.ProcessEndTime")
+        convertToMSEpoch(evt, "crowdstrike.event.IncidentStartTime")
+        convertToMSEpoch(evt, "crowdstrike.event.IncidentEndTime")
         convertToMSEpoch(evt, "crowdstrike.event.StartTimestamp")
         convertToMSEpoch(evt, "crowdstrike.event.EndTimestamp")
         convertToMSEpoch(evt, "crowdstrike.event.UTCTimestamp")
+        convertToMSEpoch(evt, "crowdstrike.metadata.eventCreationTime")
     };
 
     var processEvent = function (evt) {
@@ -193,9 +208,9 @@ var crowdstrikeFalcon = (function () {
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
-        .Add(parseTimestamp)
         .Add(normalizeEpochMS)
         .Add(dropFields)
+        .Add(addTimestamp)
         .Add(convertFields)
         .Add(processEvent)
         .Add(setFields)
