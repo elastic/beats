@@ -69,7 +69,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.output_has(lines=6))
+        self.wait_until(lambda: self.output_has(lines=23))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -121,7 +121,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.output_has(lines=1))
+        self.wait_until(lambda: self.output_has(lines=9))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -139,13 +139,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
                 ],
                 "seek": "head",
                 "include_matches": [
-                    "syslog.priority=5",
+                    "syslog.priority=6",
                 ]
             }],
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.output_has(lines=4))
+        self.wait_until(lambda: self.output_has(lines=6))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0

@@ -258,7 +258,7 @@ jobs:
       before_install: .ci/scripts/travis_has_changes.sh journalbeat libbeat || travis_terminate 0
       env:
         - PROJECT=journalbeat
-        - MAGE='build unitTest'
+        - MAGE='build goUnitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
