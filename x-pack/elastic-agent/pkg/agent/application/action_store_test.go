@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -19,6 +20,10 @@ import (
 )
 
 func TestActionStore(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping on windows see https://github.com/elastic/beats/issues/19919")
+	}
+
 	log, _ := logger.New("action_store")
 	withFile := func(fn func(t *testing.T, file string)) func(*testing.T) {
 		return func(t *testing.T) {

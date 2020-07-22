@@ -113,8 +113,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
+|<<metricbeat-metricset-googlecloud-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
-|<<metricbeat-metricset-googlecloud-stackdriver,stackdriver>> beta[]  
 |<<metricbeat-metricset-googlecloud-storage,storage>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   

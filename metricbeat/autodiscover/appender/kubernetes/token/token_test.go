@@ -84,7 +84,7 @@ token_path: "test"
 		writeFile("test", "foo bar")
 
 		appender, err := NewTokenAppender(config)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.NotNil(t, appender)
 
 		appender.Append(test.event)
