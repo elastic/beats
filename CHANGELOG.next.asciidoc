@@ -219,6 +219,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
+- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
 
 *Heartbeat*
 
