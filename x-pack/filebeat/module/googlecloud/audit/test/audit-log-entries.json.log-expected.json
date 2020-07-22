@@ -79,7 +79,7 @@
             "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -136,7 +136,7 @@
             "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -188,7 +188,7 @@
             "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
         "user_agent.os.full": "Mac OS X 10.15",

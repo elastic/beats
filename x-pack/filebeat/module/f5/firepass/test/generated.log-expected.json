@@ -405,8 +405,8 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.18.220.102",
-            "10.230.12.79"
+            "10.230.12.79",
+            "10.18.220.102"
         ],
         "rsa.db.index": "obeataev",
         "rsa.internal.messageid": "kernel",
@@ -835,8 +835,8 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.117.146.33",
-            "10.46.158.31"
+            "10.46.158.31",
+            "10.117.146.33"
         ],
         "rsa.db.index": "dun",
         "rsa.internal.messageid": "kernel",
@@ -2303,8 +2303,8 @@
         "observer.type": "VPN",
         "observer.vendor": "F5",
         "related.ip": [
-            "10.65.175.9",
-            "10.225.181.30"
+            "10.225.181.30",
+            "10.65.175.9"
         ],
         "rsa.db.index": "uia",
         "rsa.internal.messageid": "kernel",
