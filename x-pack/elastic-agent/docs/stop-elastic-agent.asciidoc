@@ -2,14 +2,20 @@
 [role="xpack"]
 = Stop {agent}
 
-To stop {agent} and its related executables, stop the {agent} process.
+To stop {agent} and its related executables, stop the {agent} process. Use the
+commands that work for your system. 
 
-On Windows, if you installed the Agent as a service, stop the service. If
+//TODO: Replace with tabbed panel when it's out of experimental phase.
+
+*Windows:*
+
+If you installed the Agent as a service, stop the service. If
 necessary, use Task Manager on Windows to stop {agent}. This will kill the
 {agent} process and any sub-processes it created (such as {beats}).
 
-On Linux or macOS, run the following command to get the ID of the
-`elastic-agent` process:
+*Linux or macOS:*
+
+Run the following command to get the ID of the `elastic-agent` process:
 
 [source,shell]
 ----
@@ -17,3 +23,14 @@ ps | grep elastic-agent
 ----
 
 Then kill the process.
+
+*Systemd*
+
+The DEB and RPM packages include a service unit for Linux systems with systemd.
+On these systems, you can manage {agent} by using systemd commands. Use
+`systemctl` to stop the Agent:
+
+[source,shell]
+----
+systemctl stop elastic-agent
+----
