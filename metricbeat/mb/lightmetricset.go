@@ -18,9 +18,6 @@
 package mb
 
 import (
-	"fmt"
-	"net/url"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -55,6 +52,10 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
+	// Disable the host parser, we will call it as part of the factory
+	originalHostParser := registration.HostParser
+	registration.HostParser = nil
+
 	// Light modules factory has to override defaults and reproduce builder
 	// functionality with the resulting configuration, it does:
 	// - Override defaults
@@ -83,11 +84,9 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 			base.module = module
 		}
 
-		// At this point host parser was already run, we need to run this again
-		// with the overriden defaults
-		if registration.HostParser != nil {
-			host := m.useHostURISchemeIfPossible(base.host, base.hostData.URI)
-			base.hostData, err = registration.HostParser(base.module, host)
+		// Run the host parser if there was any
+		if originalHostParser != nil {
+			base.hostData, err = originalHostParser(base.module, base.host)
 			if err != nil {
 				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
 			}
@@ -98,18 +97,6 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	}
 
 	return registration, nil
-}
-
-// useHostURISchemeIfPossible method parses given URI to extract protocol scheme and prepend it to the host.
-// It prevents from skipping protocol scheme (e.g. https) while executing HostParser.
-func (m *LightMetricSet) useHostURISchemeIfPossible(host, uri string) string {
-	u, err := url.ParseRequestURI(uri)
-	if err == nil {
-		if u.Scheme != "" {
-			return fmt.Sprintf("%s://%s", u.Scheme, u.Host)
-		}
-	}
-	return host
 }
 
 // baseModule does the configuration overrides in the base module configuration
