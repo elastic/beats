@@ -74,6 +74,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Admin support. {pull}19769[19769]
 - Adds Gsuite Drive support. {pull}19704[19704]
 - Adds Gsuite Groups support. {pull}19725[19725]
+- Move file metrics to dataset endpoint {pull}19977[19977]
 
 *Heartbeat*
 
