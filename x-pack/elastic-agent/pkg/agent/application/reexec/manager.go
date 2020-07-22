@@ -23,7 +23,7 @@ type ExecManager interface {
 
 	// ShutdownChan returns the shutdown channel the main function should use to
 	// handle shutdown of the current running application.
-	ShutdownChan() chan bool
+	ShutdownChan() <-chan bool
 
 	// ShutdownComplete gets called from the main function once ShutdownChan channel
 	// has been closed and the running application has completely shutdown.
@@ -70,7 +70,7 @@ func (m *manager) ReExec() {
 	}()
 }
 
-func (m *manager) ShutdownChan() chan bool {
+func (m *manager) ShutdownChan() <-chan bool {
 	return m.trigger
 }
 
