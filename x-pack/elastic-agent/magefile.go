@@ -331,7 +331,7 @@ func commitID() string {
 
 // Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(ControlProto, Config, BuildSpec, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
