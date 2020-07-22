@@ -44,6 +44,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
+	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
 
 	return cmd
 }
@@ -65,6 +66,13 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	staging, _ := cmd.Flags().GetString("staging")
+	if staging != "" {
+		if len(staging) < 8 {
+			return errors.New(fmt.Errorf("invalid staging build hash; must be at least 8 characters"), "Error")
+		}
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -105,6 +113,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		CASha256:             caSHA256,
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
+		Staging:              staging,
 	}
 
 	c, err := application.NewEnrollCmd(
@@ -122,7 +131,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
-	for err == fleetapi.ErrTooManyRequests {
+	for errors.Is(err, fleetapi.ErrTooManyRequests) {
 		fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
 		backExp.Wait()
 		fmt.Fprintln(streams.Out, "Retrying to enroll...")

@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-01-29T08:09:59.000Z",
         "event.code": "configuration",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -19,7 +18,6 @@
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "olab",
         "rsa.misc.version": "1.6078",
-        "rsa.time.event_time": "2020-01-29T08:09:59.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -28,7 +26,6 @@
         "user.name": "rci"
     },
     {
-        "@timestamp": "2020-02-12T15:12:33.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -44,7 +41,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2020-02-12T15:12:33.000Z",
         "rsa.time.starttime": "2016-02-12T15:12:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -54,7 +50,6 @@
         "user.name": "tatemac"
     },
     {
-        "@timestamp": "2020-02-26T22:15:08.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -71,7 +66,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-02-26T22:15:08.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -80,7 +74,6 @@
         "user.name": "nseq"
     },
     {
-        "@timestamp": "2020-03-12T05:17:42.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -92,7 +85,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-03-12T05:17:42.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -100,7 +92,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-26T12:20:16.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -114,7 +105,6 @@
         "rsa.internal.messageid": "Device",
         "rsa.misc.node": "ritquiin",
         "rsa.misc.parent_node": "umqui",
-        "rsa.time.event_time": "2020-03-26T12:20:16.000Z",
         "rsa.time.starttime": "2016-03-26T12:20:16.000Z",
         "service.type": "netscout",
         "tags": [
@@ -123,7 +113,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-09T19:22:51.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -143,7 +132,6 @@
         "rsa.misc.policy_name": "utper",
         "rsa.misc.severity": "medium",
         "rsa.time.duration_time": 116.48,
-        "rsa.time.event_time": "2020-04-09T19:22:51.000Z",
         "rsa.time.starttime": "2016-04-09T19:22:51.000Z",
         "service.type": "netscout",
         "source.ip": [
@@ -155,7 +143,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-24T02:25:25.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -171,7 +158,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2020-04-24T02:25:25.000Z",
         "rsa.time.starttime": "2016-04-24T02:25:25.000Z",
         "service.type": "netscout",
         "tags": [
@@ -181,7 +167,6 @@
         "user.name": "incidi"
     },
     {
-        "@timestamp": "2020-05-08T09:27:59.000Z",
         "event.code": "Peakflow",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -195,7 +180,6 @@
         "rsa.internal.messageid": "Peakflow",
         "rsa.misc.node": "oloremqu",
         "rsa.misc.parent_node": "temvel",
-        "rsa.time.event_time": "2020-05-08T09:27:59.000Z",
         "rsa.time.starttime": "2016-05-08T09:27:59.000Z",
         "service.type": "netscout",
         "tags": [
@@ -204,7 +188,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-22T16:30:33.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -220,7 +203,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2020-05-22T16:30:33.000Z",
         "rsa.time.starttime": "2016-05-22T16:30:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -230,7 +212,6 @@
         "user.name": "anti"
     },
     {
-        "@timestamp": "2020-06-05T23:33:08.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -242,7 +223,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-06-05T23:33:08.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -250,7 +230,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-20T06:35:42.000Z",
         "event.code": "configuration",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -269,7 +248,6 @@
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "uipexea",
         "rsa.misc.version": "1.5162",
-        "rsa.time.event_time": "2020-06-20T06:35:42.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -278,7 +256,6 @@
         "user.name": "nci"
     },
     {
-        "@timestamp": "2020-07-04T13:38:16.000Z",
         "event.code": "SNMP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -294,7 +271,6 @@
         "rsa.misc.node": "mvolu",
         "rsa.misc.parent_node": "radip",
         "rsa.time.endtime": "2016-07-04T13:38:16.000Z",
-        "rsa.time.event_time": "2020-07-04T13:38:16.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -302,7 +278,6 @@
         ]
     },
     {
-        "@timestamp": "2019-07-18T20:40:50.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -319,7 +294,6 @@
         "rsa.misc.group": "dquiac",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-07-18T20:40:50.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -328,7 +302,6 @@
         "url.original": "https://mail.example.net/uam/untutl.jpg?llu=uptassi#tamremap"
     },
     {
-        "@timestamp": "2019-08-02T03:43:25.000Z",
         "destination.ip": [
             "10.155.162.162"
         ],
@@ -350,7 +323,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-08-02T03:43:25.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.66.171.247"
@@ -362,7 +334,6 @@
         "url.original": "https://www5.example.org/seq/olorema.jpg?quid=fug#uatDuis"
     },
     {
-        "@timestamp": "2019-08-16T10:45:59.000Z",
         "event.action": "Fault Occured",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
@@ -379,7 +350,6 @@
         "rsa.internal.resource": "lupta",
         "rsa.misc.event_type": "Fault Occured",
         "rsa.misc.node": "iusmodt",
-        "rsa.time.event_time": "2019-08-16T10:45:59.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -387,7 +357,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-30T17:48:33.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -403,7 +372,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2019-08-30T17:48:33.000Z",
         "rsa.time.starttime": "2016-08-30T17:48:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -413,7 +381,6 @@
         "user.name": "uiano"
     },
     {
-        "@timestamp": "2019-09-14T00:51:07.000Z",
         "destination.ip": [
             "10.179.26.34"
         ],
@@ -429,13 +396,12 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.38.77.13",
-            "10.179.26.34"
+            "10.179.26.34",
+            "10.38.77.13"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-09-14T00:51:07.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.38.77.13"
@@ -447,7 +413,6 @@
         "url.original": "https://example.org/isiu/nimadmi.gif?ari=equun#suntinc"
     },
     {
-        "@timestamp": "2019-09-28T07:53:42.000Z",
         "event.code": "Hardware",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -461,7 +426,6 @@
         "rsa.internal.event_desc": "abilloi",
         "rsa.internal.messageid": "Hardware",
         "rsa.misc.node": "tatevel",
-        "rsa.time.event_time": "2019-09-28T07:53:42.000Z",
         "rsa.time.starttime": "2016-09-28T07:53:42.000Z",
         "service.type": "netscout",
         "tags": [
@@ -470,7 +434,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-12T14:56:16.000Z",
         "event.code": "anomaly",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -491,7 +454,6 @@
         "rsa.misc.severity": "very-high",
         "rsa.misc.sig_id": 2933,
         "rsa.network.interface": "lo5882",
-        "rsa.time.event_time": "2019-10-12T14:56:16.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -499,7 +461,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-26T21:58:50.000Z",
         "event.code": "anomaly",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -520,7 +481,6 @@
         "rsa.misc.severity": "high",
         "rsa.misc.sig_id": 2902,
         "rsa.network.interface": "lo4987",
-        "rsa.time.event_time": "2019-10-26T21:58:50.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -528,7 +488,6 @@
         ]
     },
     {
-        "@timestamp": "2019-11-10T05:01:24.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -544,7 +503,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2019-11-10T05:01:24.000Z",
         "rsa.time.starttime": "2016-11-10T05:01:24.000Z",
         "service.type": "netscout",
         "tags": [
@@ -554,7 +512,6 @@
         "user.name": "qua"
     },
     {
-        "@timestamp": "2019-11-24T12:03:59.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -566,7 +523,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2019-11-24T12:03:59.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -574,7 +530,6 @@
         ]
     },
     {
-        "@timestamp": "2019-12-08T19:06:33.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -590,7 +545,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2019-12-08T19:06:33.000Z",
         "rsa.time.starttime": "2016-12-08T19:06:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -600,7 +554,6 @@
         "user.name": "turveli"
     },
     {
-        "@timestamp": "2019-12-23T02:09:07.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -616,7 +569,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2019-12-23T02:09:07.000Z",
         "rsa.time.starttime": "2016-12-23T02:09:07.000Z",
         "service.type": "netscout",
         "tags": [
@@ -626,7 +578,6 @@
         "user.name": "caecatc"
     },
     {
-        "@timestamp": "2020-01-06T09:11:41.000Z",
         "destination.ip": [
             "10.224.68.213"
         ],
@@ -646,7 +597,6 @@
         "rsa.internal.messageid": "GRE",
         "rsa.misc.parent_node": "taed",
         "rsa.time.endtime": "2017-01-06T09:11:41.000Z",
-        "rsa.time.event_time": "2020-01-06T09:11:41.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -654,7 +604,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-20T16:14:16.000Z",
         "event.code": "Hardware",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -668,7 +617,6 @@
         "rsa.internal.event_desc": "lor",
         "rsa.internal.messageid": "Hardware",
         "rsa.misc.node": "aperi",
-        "rsa.time.event_time": "2020-01-20T16:14:16.000Z",
         "rsa.time.starttime": "2017-01-20T16:14:16.000Z",
         "service.type": "netscout",
         "tags": [
@@ -677,7 +625,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-03T23:16:50.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -691,7 +638,6 @@
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "oin",
-        "rsa.time.event_time": "2020-02-03T23:16:50.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -699,7 +645,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-18T06:19:24.000Z",
         "event.code": "Hardware",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -714,7 +659,6 @@
         "rsa.internal.messageid": "Hardware",
         "rsa.misc.node": "ritatis",
         "rsa.time.endtime": "2017-02-18T06:19:24.000Z",
-        "rsa.time.event_time": "2020-02-18T06:19:24.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -722,7 +666,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-04T13:21:59.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -739,7 +682,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-03-04T13:21:59.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -748,7 +690,6 @@
         "user.name": "mqui"
     },
     {
-        "@timestamp": "2020-03-18T20:24:33.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -762,7 +703,6 @@
         "rsa.internal.messageid": "Device",
         "rsa.misc.node": "tdolorem",
         "rsa.misc.parent_node": "ono",
-        "rsa.time.event_time": "2020-03-18T20:24:33.000Z",
         "rsa.time.starttime": "2017-03-18T20:24:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -771,7 +711,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-02T03:27:07.000Z",
         "destination.ip": [
             "10.60.185.151"
         ],
@@ -790,7 +729,6 @@
         ],
         "rsa.internal.messageid": "GRE",
         "rsa.misc.parent_node": "uidolo",
-        "rsa.time.event_time": "2020-04-02T03:27:07.000Z",
         "rsa.time.starttime": "2017-04-02T03:27:07.000Z",
         "service.type": "netscout",
         "tags": [
@@ -799,7 +737,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-16T10:29:41.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -811,7 +748,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-04-16T10:29:41.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -819,7 +755,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-30T17:32:16.000Z",
         "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
@@ -836,7 +771,6 @@
         "rsa.misc.event_type": "Script mitigation",
         "rsa.misc.node": "modoco",
         "rsa.misc.parent_node": "estqu",
-        "rsa.time.event_time": "2020-04-30T17:32:16.000Z",
         "rsa.time.starttime": "2017-04-30T17:32:16.000Z",
         "service.type": "netscout",
         "tags": [
@@ -845,7 +779,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-15T00:34:50.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -862,7 +795,6 @@
         "rsa.misc.group": "ents",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2020-05-15T00:34:50.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -871,7 +803,6 @@
         "url.original": "https://www.example.net/nse/sinto.gif?CSed=lupt#psaquae"
     },
     {
-        "@timestamp": "2020-05-29T07:37:24.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -886,7 +817,6 @@
         "rsa.internal.event_desc": "mdolore",
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "reetd",
-        "rsa.time.event_time": "2020-05-29T07:37:24.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -894,7 +824,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-12T14:39:58.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -909,7 +838,6 @@
         "rsa.misc.node": "mque",
         "rsa.misc.parent_node": "uovolup",
         "rsa.time.endtime": "2017-06-12T14:39:58.000Z",
-        "rsa.time.event_time": "2020-06-12T14:39:58.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -917,7 +845,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-26T21:42:33.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -934,7 +861,6 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.duration_time": 38.117,
         "rsa.time.endtime": "2017-06-26T21:42:33.000Z",
-        "rsa.time.event_time": "2020-06-26T21:42:33.000Z",
         "rsa.time.starttime": "2017-06-26T21:42:33.000Z",
         "service.type": "netscout",
         "tags": [
@@ -943,7 +869,6 @@
         ]
     },
     {
-        "@timestamp": "2020-07-11T04:45:07.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -958,7 +883,6 @@
         "rsa.internal.event_desc": "dol",
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "doloremi",
-        "rsa.time.event_time": "2020-07-11T04:45:07.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -966,7 +890,6 @@
         ]
     },
     {
-        "@timestamp": "2019-07-25T11:47:41.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -981,7 +904,6 @@
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "tincu",
         "rsa.misc.trigger_val": "sci",
-        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -989,7 +911,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-08T18:50:15.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1006,7 +927,6 @@
         "rsa.misc.group": "eaq",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-08-08T18:50:15.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1015,7 +935,6 @@
         "url.original": "https://mail.example.net/corp/modtemp.jpg?oluptas=tNequepo#lup"
     },
     {
-        "@timestamp": "2019-08-23T01:52:50.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1032,7 +951,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2019-08-23T01:52:50.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1041,7 +959,6 @@
         "user.name": "suntexp"
     },
     {
-        "@timestamp": "2019-09-06T08:55:24.000Z",
         "destination.ip": [
             "10.168.131.247"
         ],
@@ -1057,13 +974,12 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.136.232.108",
-            "10.168.131.247"
+            "10.168.131.247",
+            "10.136.232.108"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-09-06T08:55:24.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.136.232.108"
@@ -1075,7 +991,6 @@
         "url.original": "https://example.net/temqu/edol.jpg?ipi=reseos#pariatu"
     },
     {
-        "@timestamp": "2019-09-20T15:57:58.000Z",
         "destination.ip": [
             "10.209.182.237"
         ],
@@ -1095,7 +1010,6 @@
         "rsa.internal.messageid": "GRE",
         "rsa.misc.parent_node": "tper",
         "rsa.time.endtime": "2017-09-20T15:57:58.000Z",
-        "rsa.time.event_time": "2019-09-20T15:57:58.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1103,7 +1017,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-04T23:00:32.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1118,7 +1031,6 @@
         "rsa.misc.node": "xerc",
         "rsa.misc.parent_node": "iutali",
         "rsa.time.endtime": "2017-10-04T23:00:32.000Z",
-        "rsa.time.event_time": "2019-10-04T23:00:32.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1126,7 +1038,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-19T06:03:07.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1141,7 +1052,6 @@
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "ati",
         "rsa.misc.parent_node": "tlabo",
-        "rsa.time.event_time": "2019-10-19T06:03:07.000Z",
         "rsa.time.starttime": "2017-10-19T06:03:07.000Z",
         "service.type": "netscout",
         "tags": [
@@ -1150,7 +1060,6 @@
         ]
     },
     {
-        "@timestamp": "2019-11-02T13:05:41.000Z",
         "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
@@ -1167,7 +1076,6 @@
         "rsa.misc.event_type": "Script mitigation",
         "rsa.misc.node": "offi",
         "rsa.misc.parent_node": "giatnu",
-        "rsa.time.event_time": "2019-11-02T13:05:41.000Z",
         "rsa.time.starttime": "2017-11-02T13:05:41.000Z",
         "service.type": "netscout",
         "tags": [
@@ -1176,7 +1084,6 @@
         ]
     },
     {
-        "@timestamp": "2019-11-16T20:08:15.000Z",
         "destination.ip": [
             "10.128.31.83"
         ],
@@ -1194,8 +1101,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.128.31.83",
-            "10.97.164.220"
+            "10.97.164.220",
+            "10.128.31.83"
         ],
         "rsa.internal.messageid": "anomaly",
         "rsa.misc.category": "aera",
@@ -1204,7 +1111,6 @@
         "rsa.misc.policy_name": "ncidid",
         "rsa.misc.severity": "very-high",
         "rsa.time.duration_time": 50.929,
-        "rsa.time.event_time": "2019-11-16T20:08:15.000Z",
         "rsa.time.starttime": "2017-11-16T08:08:15.000Z",
         "service.type": "netscout",
         "source.ip": [
@@ -1218,7 +1124,6 @@
         "url.original": "https://internal.example.org/stlabo/dictasu.gif?catc=nsect#idata"
     },
     {
-        "@timestamp": "2019-12-01T03:10:49.000Z",
         "destination.ip": [
             "10.163.161.165"
         ],
@@ -1234,13 +1139,12 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.163.161.165",
-            "10.83.23.104"
+            "10.83.23.104",
+            "10.163.161.165"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-12-01T03:10:49.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.83.23.104"
@@ -1252,7 +1156,6 @@
         "url.original": "https://www5.example.org/atem/gnido.txt?tmollita=fde#nsecte"
     },
     {
-        "@timestamp": "2019-12-15T10:13:24.000Z",
         "destination.ip": [
             "10.53.248.4"
         ],
@@ -1272,7 +1175,6 @@
         "rsa.internal.messageid": "GRE",
         "rsa.misc.parent_node": "derit",
         "rsa.time.endtime": "2017-12-15T10:13:24.000Z",
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1280,7 +1182,6 @@
         ]
     },
     {
-        "@timestamp": "2019-12-29T17:15:58.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1292,7 +1193,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2019-12-29T17:15:58.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1300,7 +1200,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-13T00:18:32.000Z",
         "event.code": "Flow",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1314,7 +1213,6 @@
         "rsa.internal.messageid": "Flow",
         "rsa.misc.node": "tessec",
         "rsa.misc.parent_node": "olupta",
-        "rsa.time.event_time": "2020-01-13T00:18:32.000Z",
         "rsa.time.starttime": "2018-01-13T00:18:32.000Z",
         "service.type": "netscout",
         "tags": [
@@ -1323,7 +1221,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-27T07:21:06.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1340,7 +1237,6 @@
         "rsa.misc.severity": "medium",
         "rsa.time.duration_time": 24.633,
         "rsa.time.endtime": "2018-01-27T07:21:06.000Z",
-        "rsa.time.event_time": "2020-01-27T07:21:06.000Z",
         "rsa.time.starttime": "2018-01-27T07:21:06.000Z",
         "service.type": "netscout",
         "tags": [
@@ -1349,7 +1245,6 @@
         ]
     },
     {
-        "@timestamp": "2020-02-10T14:23:41.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1366,7 +1261,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-02-10T14:23:41.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1375,7 +1269,6 @@
         "user.name": "uiac"
     },
     {
-        "@timestamp": "2020-02-24T21:26:15.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1389,7 +1282,6 @@
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "iatisu",
-        "rsa.time.event_time": "2020-02-24T21:26:15.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1397,7 +1289,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-11T04:28:49.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1414,7 +1305,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-03-11T04:28:49.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1423,7 +1313,6 @@
         "user.name": "ersp"
     },
     {
-        "@timestamp": "2020-03-25T11:31:24.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1435,7 +1324,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-03-25T11:31:24.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1443,7 +1331,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-08T18:33:58.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1455,7 +1342,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-04-08T18:33:58.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1463,7 +1349,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-23T01:36:32.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1480,7 +1365,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-04-23T01:36:32.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1489,7 +1373,6 @@
         "user.name": "rsitv"
     },
     {
-        "@timestamp": "2020-05-07T08:39:06.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1506,7 +1389,6 @@
         "rsa.misc.group": "upida",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2020-05-07T08:39:06.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1515,7 +1397,6 @@
         "url.original": "https://api.example.com/eufugi/pici.html?ccaecat=tquiin#tse"
     },
     {
-        "@timestamp": "2020-05-21T15:41:41.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1532,7 +1413,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-05-21T15:41:41.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1541,7 +1421,6 @@
         "user.name": "udexerci"
     },
     {
-        "@timestamp": "2020-06-04T22:44:15.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1555,7 +1434,6 @@
         "rsa.internal.messageid": "Device",
         "rsa.misc.node": "illoin",
         "rsa.misc.parent_node": "tanimid",
-        "rsa.time.event_time": "2020-06-04T22:44:15.000Z",
         "rsa.time.starttime": "2018-06-04T22:44:15.000Z",
         "service.type": "netscout",
         "tags": [
@@ -1564,7 +1442,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-19T05:46:49.000Z",
         "event.code": "configuration",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1583,7 +1460,6 @@
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "natuse",
         "rsa.misc.version": "1.4425",
-        "rsa.time.event_time": "2020-06-19T05:46:49.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1592,7 +1468,6 @@
         "user.name": "ati"
     },
     {
-        "@timestamp": "2020-07-03T12:49:23.000Z",
         "event.code": "anomaly",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1613,7 +1488,6 @@
         "rsa.misc.severity": "low",
         "rsa.misc.sig_id": 2366,
         "rsa.network.interface": "enp0s4306",
-        "rsa.time.event_time": "2020-07-03T12:49:23.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1621,7 +1495,6 @@
         ]
     },
     {
-        "@timestamp": "2019-07-17T19:51:58.000Z",
         "event.code": "SNMP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1637,7 +1510,6 @@
         "rsa.misc.node": "entsunt",
         "rsa.misc.parent_node": "ihilm",
         "rsa.time.endtime": "2018-07-17T19:51:58.000Z",
-        "rsa.time.event_time": "2019-07-17T19:51:58.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1645,7 +1517,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-01T02:54:32.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1665,7 +1536,6 @@
         "rsa.misc.policy_name": "ciad",
         "rsa.misc.severity": "medium",
         "rsa.time.duration_time": 29.657,
-        "rsa.time.event_time": "2019-08-01T02:54:32.000Z",
         "rsa.time.starttime": "2018-08-01T02:54:32.000Z",
         "service.type": "netscout",
         "source.ip": [
@@ -1677,7 +1547,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-15T09:57:06.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1689,7 +1558,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2019-08-15T09:57:06.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1697,7 +1565,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-29T16:59:40.000Z",
         "event.code": "anomaly",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1718,7 +1585,6 @@
         "rsa.misc.severity": "medium",
         "rsa.misc.sig_id": 5089,
         "rsa.network.interface": "lo4293",
-        "rsa.time.event_time": "2019-08-29T16:59:40.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1726,7 +1592,6 @@
         ]
     },
     {
-        "@timestamp": "2019-09-13T00:02:15.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1741,7 +1606,6 @@
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "uptate",
         "rsa.misc.trigger_val": "tpersp",
-        "rsa.time.event_time": "2019-09-13T00:02:15.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1749,7 +1613,6 @@
         ]
     },
     {
-        "@timestamp": "2019-09-27T07:04:49.000Z",
         "event.action": "Fault Occured",
         "event.code": "TMS",
         "event.dataset": "netscout.sightline",
@@ -1766,7 +1629,6 @@
         "rsa.internal.resource": "dol",
         "rsa.misc.event_type": "Fault Occured",
         "rsa.misc.node": "proiden",
-        "rsa.time.event_time": "2019-09-27T07:04:49.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1774,7 +1636,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-11T14:07:23.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1789,7 +1650,6 @@
         "rsa.misc.node": "isis",
         "rsa.misc.parent_node": "uasiar",
         "rsa.time.endtime": "2018-10-11T14:07:23.000Z",
-        "rsa.time.event_time": "2019-10-11T14:07:23.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1797,7 +1657,6 @@
         ]
     },
     {
-        "@timestamp": "2019-10-25T21:09:57.000Z",
         "destination.ip": [
             "10.216.83.142"
         ],
@@ -1815,8 +1674,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.224.198.212",
-            "10.216.83.142"
+            "10.216.83.142",
+            "10.224.198.212"
         ],
         "rsa.internal.messageid": "anomaly",
         "rsa.misc.category": "utodita",
@@ -1825,7 +1684,6 @@
         "rsa.misc.policy_name": "ntsunt",
         "rsa.misc.severity": "low",
         "rsa.time.duration_time": 2.919,
-        "rsa.time.event_time": "2019-10-25T21:09:57.000Z",
         "rsa.time.starttime": "2018-10-25T09:09:57.000Z",
         "service.type": "netscout",
         "source.ip": [
@@ -1839,7 +1697,6 @@
         "url.original": "https://example.net/con/preh.html?quamest=mac#qui"
     },
     {
-        "@timestamp": "2019-11-09T04:12:32.000Z",
         "destination.ip": [
             "10.28.226.128"
         ],
@@ -1861,7 +1718,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-11-09T04:12:32.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.122.76.148"
@@ -1873,7 +1729,6 @@
         "url.original": "https://mail.example.org/idunt/luptat.txt?ica=lillum#remips"
     },
     {
-        "@timestamp": "2019-11-23T11:15:06.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1890,7 +1745,6 @@
         "rsa.misc.group": "amcor",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-11-23T11:15:06.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1899,7 +1753,6 @@
         "url.original": "https://internal.example.com/ineavol/iosa.html?usc=rem#amvolupt"
     },
     {
-        "@timestamp": "2019-12-07T18:17:40.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1916,7 +1769,6 @@
         "rsa.misc.group": "equepor",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-12-07T18:17:40.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1925,7 +1777,6 @@
         "url.original": "https://internal.example.org/quaUten/nisiut.txt?teturad=perspici#itation"
     },
     {
-        "@timestamp": "2019-12-22T01:20:14.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1942,7 +1793,6 @@
         "rsa.misc.group": "isciv",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-12-22T01:20:14.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -1951,7 +1801,6 @@
         "url.original": "https://mail.example.org/nofd/dipisci.txt?ilmol=eri#quunt"
     },
     {
-        "@timestamp": "2020-01-05T08:22:49.000Z",
         "destination.ip": [
             "10.98.209.10"
         ],
@@ -1973,7 +1822,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2020-01-05T08:22:49.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.31.177.226"
@@ -1985,7 +1833,6 @@
         "url.original": "https://www.example.org/ptateve/enderi.html?toccaec=fugi#labo"
     },
     {
-        "@timestamp": "2020-01-19T15:25:23.000Z",
         "destination.ip": [
             "10.179.210.218"
         ],
@@ -2007,7 +1854,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2020-01-19T15:25:23.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.44.47.27"
@@ -2019,7 +1865,6 @@
         "url.original": "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo"
     },
     {
-        "@timestamp": "2020-02-02T22:27:57.000Z",
         "event.code": "configuration",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2038,7 +1883,6 @@
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "emvele",
         "rsa.misc.version": "1.2883",
-        "rsa.time.event_time": "2020-02-02T22:27:57.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2047,7 +1891,6 @@
         "user.name": "lor"
     },
     {
-        "@timestamp": "2020-02-17T05:30:32.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2062,7 +1905,6 @@
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "iquamqua",
         "rsa.misc.trigger_val": "ita",
-        "rsa.time.event_time": "2020-02-17T05:30:32.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2070,7 +1912,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-03T12:33:06.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2082,7 +1923,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-03-03T12:33:06.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2090,7 +1930,6 @@
         ]
     },
     {
-        "@timestamp": "2020-03-17T19:35:40.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2107,7 +1946,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-03-17T19:35:40.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2116,7 +1954,6 @@
         "user.name": "tMal"
     },
     {
-        "@timestamp": "2020-04-01T02:38:14.000Z",
         "event.code": "configuration",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2135,7 +1972,6 @@
         "rsa.internal.messageid": "configuration",
         "rsa.misc.parent_node": "maveni",
         "rsa.misc.version": "1.2552",
-        "rsa.time.event_time": "2020-04-01T02:38:14.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2144,7 +1980,6 @@
         "user.name": "onu"
     },
     {
-        "@timestamp": "2020-04-15T09:40:49.000Z",
         "event.code": "BGP",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2158,7 +1993,6 @@
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "BGP",
         "rsa.misc.node": "norumet",
-        "rsa.time.event_time": "2020-04-15T09:40:49.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2166,7 +2000,6 @@
         ]
     },
     {
-        "@timestamp": "2020-04-29T16:43:23.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2183,7 +2016,6 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.duration_time": 177.586,
         "rsa.time.endtime": "2019-04-29T16:43:23.000Z",
-        "rsa.time.event_time": "2020-04-29T16:43:23.000Z",
         "rsa.time.starttime": "2019-04-29T16:43:23.000Z",
         "service.type": "netscout",
         "tags": [
@@ -2192,7 +2024,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-13T23:45:57.000Z",
         "event.action": "Script mitigation",
         "event.code": "script",
         "event.dataset": "netscout.sightline",
@@ -2209,7 +2040,6 @@
         "rsa.misc.event_type": "Script mitigation",
         "rsa.misc.node": "remipsum",
         "rsa.misc.parent_node": "tempor",
-        "rsa.time.event_time": "2020-05-13T23:45:57.000Z",
         "rsa.time.starttime": "2019-05-13T23:45:57.000Z",
         "service.type": "netscout",
         "tags": [
@@ -2218,7 +2048,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-28T06:48:31.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2235,7 +2064,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-05-28T06:48:31.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2244,7 +2072,6 @@
         "user.name": "orroqu"
     },
     {
-        "@timestamp": "2020-06-11T13:51:06.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2256,7 +2083,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2020-06-11T13:51:06.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2264,7 +2090,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-25T20:53:40.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2281,7 +2106,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2020-06-25T20:53:40.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2290,7 +2114,6 @@
         "user.name": "veniamq"
     },
     {
-        "@timestamp": "2020-07-10T03:56:14.000Z",
         "destination.ip": [
             "10.55.156.64"
         ],
@@ -2312,7 +2135,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2020-07-10T03:56:14.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.151.129.181"
@@ -2324,7 +2146,6 @@
         "url.original": "https://www.example.net/itanim/nesciun.txt?mollita=tatem#iae"
     },
     {
-        "@timestamp": "2019-07-24T10:58:48.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2341,7 +2162,6 @@
         "rsa.misc.group": "quasiarc",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2350,7 +2170,6 @@
         "url.original": "https://www.example.net/rever/ore.jpg?oluptat=metco#acom"
     },
     {
-        "@timestamp": "2019-08-07T18:01:23.000Z",
         "event.code": "Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2370,7 +2189,6 @@
         "rsa.misc.policy_name": "iacons",
         "rsa.misc.severity": "medium",
         "rsa.time.duration_time": 77.637,
-        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "rsa.time.starttime": "2019-08-07T18:01:23.000Z",
         "service.type": "netscout",
         "source.ip": [
@@ -2382,7 +2200,6 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T01:03:57.000Z",
         "event.code": "Hardware",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2396,7 +2213,6 @@
         "rsa.internal.event_desc": "radipisc",
         "rsa.internal.messageid": "Hardware",
         "rsa.misc.node": "ntiu",
-        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "rsa.time.starttime": "2019-08-22T01:03:57.000Z",
         "service.type": "netscout",
         "tags": [
@@ -2405,7 +2221,6 @@
         ]
     },
     {
-        "@timestamp": "2019-09-05T08:06:31.000Z",
         "destination.ip": [
             "10.166.90.130"
         ],
@@ -2427,7 +2242,6 @@
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
-        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "netscout",
         "source.ip": [
             "10.73.89.189"
@@ -2439,7 +2253,6 @@
         "url.original": "https://api.example.org/eosquira/pta.htm?econs=lmolesti#apariatu"
     },
     {
-        "@timestamp": "2019-09-19T15:09:05.000Z",
         "event.code": "Protection_Mode",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2456,7 +2269,6 @@
         "rsa.misc.group": "laudan",
         "rsa.misc.msgIdPart1": "Protection",
         "rsa.misc.msgIdPart2": "Mode",
-        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2465,7 +2277,6 @@
         "url.original": "https://www5.example.com/atcupida/tessequa.htm?dolores=equamnih#taliqui"
     },
     {
-        "@timestamp": "2019-10-03T22:11:40.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2482,7 +2293,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2491,7 +2301,6 @@
         "user.name": "rcitat"
     },
     {
-        "@timestamp": "2019-10-18T05:14:14.000Z",
         "event.code": "Test",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2503,7 +2312,6 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "rsa.internal.messageid": "Test",
-        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2511,7 +2319,6 @@
         ]
     },
     {
-        "@timestamp": "2019-11-01T12:16:48.000Z",
         "destination.ip": [
             "10.226.51.191"
         ],
@@ -2531,7 +2338,6 @@
         "rsa.internal.messageid": "GRE",
         "rsa.misc.parent_node": "magnid",
         "rsa.time.endtime": "2019-11-01T12:16:48.000Z",
-        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2539,7 +2345,6 @@
         ]
     },
     {
-        "@timestamp": "2019-11-15T19:19:22.000Z",
         "event.code": "Change_Log",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2556,7 +2361,6 @@
         "rsa.internal.messageid": "Change_Log",
         "rsa.misc.msgIdPart1": "Change",
         "rsa.misc.msgIdPart2": "Log",
-        "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
@@ -2565,7 +2369,6 @@
         "user.name": "tvolup"
     },
     {
-        "@timestamp": "2019-11-30T02:21:57.000Z",
         "event.code": "Autoclassification",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2581,7 +2384,6 @@
         ],
         "rsa.internal.event_desc": "Autoclassification restarted",
         "rsa.internal.messageid": "Autoclassification",
-        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "rsa.time.starttime": "2019-11-30T02:21:57.000Z",
         "service.type": "netscout",
         "tags": [
@@ -2591,7 +2393,6 @@
         "user.name": "luptas"
     },
     {
-        "@timestamp": "2019-12-14T09:24:31.000Z",
         "event.code": "Device",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2606,7 +2407,6 @@
         "rsa.misc.node": "aev",
         "rsa.misc.parent_node": "inrepr",
         "rsa.time.endtime": "2019-12-14T09:24:31.000Z",
-        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "netscout",
         "tags": [
             "netscout.sightline",
