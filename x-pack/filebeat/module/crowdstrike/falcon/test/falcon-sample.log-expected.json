@@ -390,8 +390,7 @@
         "log.offset": 5646,
         "message": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
         "process.args": [
-            "\"C:\\ProgramData\\file\\path\\filename.exe\"",
-            ""
+            "\"C:\\ProgramData\\file\\path\\filename.exe\""
         ],
         "process.command_line": "\"C:\\ProgramData\\file\\path\\filename.exe\" ",
         "process.executable": "\"C:\\ProgramData\\file\\path\\filename.exe\"",

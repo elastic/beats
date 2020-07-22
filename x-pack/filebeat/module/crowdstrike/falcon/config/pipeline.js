@@ -100,8 +100,10 @@ var crowdstrikeFalcon = (function () {
 
     var normalizeProcess = function (evt) {
         var commandLine = evt.Get("crowdstrike.event.CommandLine")
-        if (commandLine && commandLine !== "") {
-            var args = commandLine.split(' ')
+        if (commandLine && commandLine.trim() !== "") {
+            var args = commandLine.split(' ').filter(function (arg) {
+                return arg !== "";
+            });
             var executable = args[0]
 
             evt.Put("process.command_line", commandLine)
