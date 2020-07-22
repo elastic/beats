@@ -132,11 +132,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			for _, event := range events {
-				fmt.Println("************ event = ", event)
-				hostID, _ := event.RootFields.GetValue("host.id")
-				fmt.Println("************ event hostID = ", hostID)
-				hostName, _ := event.RootFields.GetValue("host.name")
-				fmt.Println("************ event hostName = ", hostName)
 				if len(event.MetricSetFields) != 0 {
 					if reported := report.Event(event); !reported {
 						m.Logger().Debug("Fetch interrupted, failed to emit event")
