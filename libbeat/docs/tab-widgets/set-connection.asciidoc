@@ -58,8 +58,8 @@ include the scheme and port: `http://mykibanahost:5601/path`.
 <2> The `username` and `password` settings for {kib} are optional. If you don't
 specify credentials for {kib}, {beatname_uc} uses the `username` and `password`
 specified for the {es} output.
-<3> To use the pre-built Kibana dashboards, this user must have the
-`kibana_user` {ref}/built-in-roles.html[built-in role] or equivalent
-privileges.
+<3> To use the pre-built {kib} dashboards, this user must be authorized to
+view dashboards or have the
+`kibana_admin` {ref}/built-in-roles.html[built-in role].
 // end::self-managed[]
 
