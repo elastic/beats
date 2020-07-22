@@ -265,6 +265,9 @@ jobs:
     # Agent
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      install:
+        - go get github.com/golang/protobuf/proto
+        - go get github.com/golang/protobuf/protoc-gen-go
       env:
         - PROJECT=x-pack/elastic-agent
         - MAGE='build test'
@@ -272,6 +275,9 @@ jobs:
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      install:
+        - go get github.com/golang/protobuf/proto
+        - go get github.com/golang/protobuf/protoc-gen-go
       env:
         - PROJECT=x-pack/elastic-agent
         - MAGE='build unitTest'
