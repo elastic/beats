@@ -20,6 +20,14 @@ enum Status {
   UPGRADING = 6;
 }
 
+// Action status codes for restart and upgrade response.
+enum ActionStatus {
+  // Action was successful.
+  SUCCESS = 0;
+  // Action failed.
+  FAILURE = 1;
+}
+
 // Empty message.
 message Empty {
 }
@@ -34,6 +42,13 @@ message VersionResponse {
   string buildTime = 3;
   // Current running version is a snapshot.
   bool snapshot = 4;
+}
+
+message RestartResponse {
+  // Response status.
+  ActionStatus status = 1;
+  // Error message when it fails to trigger restart.
+  string error = 2;
 }
 
 // Upgrade request message.
@@ -54,19 +69,14 @@ message UpgradeRequest {
 
 // A upgrade response message.
 message UpgradeResponse {
-  // Status codes for upgrade response.
-  enum UpgradeStatus {
-    // Started upgrade.
-    SUCCESS = 0;
-    // Failed upgrade.
-    FAILURE = 1;
-  }
-
   // Response status.
-  UpgradeStatus status = 1;
+  ActionStatus status = 1;
 
   // Version that is being upgraded to.
   string version = 2;
+
+  // Error message when it fails to trigger upgrade.
+  string error = 3;
 }
 
 // Current status of the application in Elastic Agent.

@@ -33,6 +33,9 @@ jobs:
     - os: linux
       env: TARGETS="check"
       go: $TRAVIS_GO_VERSION
+      install:
+        - go get github.com/golang/protobuf/proto
+        - go get github.com/golang/protobuf/protoc-gen-go
       stage: check
 
     # Filebeat
