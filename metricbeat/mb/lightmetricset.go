@@ -62,8 +62,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	// - Override defaults
 	// - Call module factory if registered (it wouldn't have been called
 	//   if light module is really a registered mixed module)
-	// - Call host parser if defined (it would have already been called
-	//   without the light module defaults)
+	// - Call host parser if there was one defined
 	// - Finally, call the original factory for the registered metricset
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		// Override default config on base module and metricset
@@ -85,7 +84,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 			base.module = module
 		}
 
-		// Run the host parser if there was any
+		// Run the host parser if there was anyone defined
 		if originalHostParser != nil {
 			base.hostData, err = originalHostParser(base.module, base.host)
 			if err != nil {
