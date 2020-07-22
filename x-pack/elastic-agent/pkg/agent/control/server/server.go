@@ -17,12 +17,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+// Server is the daemon side of the control protocol.
 type Server struct {
 	logger   *logger.Logger
 	listener net.Listener
 	server   *grpc.Server
 }
 
+// New creates a new control protocol server.
 func New(log *logger.Logger) *Server {
 	return &Server{
 		logger: log,

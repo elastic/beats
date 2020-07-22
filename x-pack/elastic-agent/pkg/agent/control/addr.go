@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
+// Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
 	data := paths.Data()
 	return fmt.Sprintf("unix://%s", filepath.Join(data, "agent.sock"))

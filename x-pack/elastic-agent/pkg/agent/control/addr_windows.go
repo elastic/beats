@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
-// Address control address for both server and client.
+// Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
 	data = paths.Data()
 	return fmt.Sprintf(`\\.\pipe\elastic-agent-%s`, sha256.Sum256(data))
