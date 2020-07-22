@@ -125,7 +125,7 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 		}
 
 		bm.registration = registration
-		bm.hostData = HostData{URI: bm.host}
+		bm.hostData = HostData{URI: bm.host, Host: bm.host}
 		if registration.HostParser != nil {
 			bm.hostData, err = registration.HostParser(bm.Module(), bm.host)
 			if err != nil {
@@ -133,7 +133,6 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 					bm.Module().Name(), bm.Name()))
 				continue
 			}
-			bm.host = bm.hostData.Host
 		}
 
 		metricSet, err := registration.Factory(bm)

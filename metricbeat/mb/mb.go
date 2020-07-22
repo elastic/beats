@@ -283,7 +283,6 @@ type HostData struct {
 	SanitizedURI string // A sanitized version of the URI without credentials.
 
 	// Parts of the URI.
-
 	Host     string // The host and possibly port.
 	User     string // Username
 	Password string // Password
@@ -357,7 +356,7 @@ func (b *BaseMetricSet) Module() Module {
 // Host returns the hostname or other module specific value that identifies a
 // specific host or service instance from which to collect metrics.
 func (b *BaseMetricSet) Host() string {
-	return b.host
+	return b.hostData.Host
 }
 
 // HostData returns the parsed host data.

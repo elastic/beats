@@ -97,3 +97,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove vendor folder from repository. {pull}18655[18655]
 - Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
 - Update Go version to 1.14.4. {pull}19753[19753]
+- Metricbeat module builders don't modify the base module host, so host parsers can be called multiple times with the original host. {pull}20143[20143]

@@ -236,7 +236,7 @@ func TestNewModulesHostParser(t *testing.T) {
 
 		// The URI is passed through in the Host() and HostData().URI.
 		assert.Equal(t, uri, ms.Host())
-		assert.Equal(t, HostData{URI: uri}, ms.HostData())
+		assert.Equal(t, HostData{URI: uri, Host: uri}, ms.HostData())
 	})
 
 	t.Run("MetricSet with HostParser", func(t *testing.T) {
