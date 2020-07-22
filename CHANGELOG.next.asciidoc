@@ -247,6 +247,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
+- Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 
 *Heartbeat*
