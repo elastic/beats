@@ -2,11 +2,18 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-var crowdstrikeFalcon = (function() {
+var crowdstrikeFalcon = (function () {
     var processor = require("processor");
 
-    var convertUnderscore = function(text) {
-        return text.split(/(?=[A-Z])/).join('_').toLowerCase(); 
+    var convertUnderscore = function (text) {
+        return text.split(/(?=[A-Z])/).join('_').toLowerCase();
+    };
+
+    var convertToMSEpoch = function (evt, field) {
+        var timestamp = evt.Get(field);
+        if (timestamp && timestamp < 100000000000) { // check if we have a seconds timestamp, this is roughly 1973 in MS
+            evt.Put(field, timestamp * 1000);
+        }
     };
 
     var decodeJson = new processor.DecodeJSONFields({
@@ -16,11 +23,19 @@ var crowdstrikeFalcon = (function() {
         max_depth: 8
     });
 
-    var dropFields = function(evt) {
+    var dropIfEmpty = function (evt, field) {
+        var value = evt.Get(field);
+        if (value && value === "") {
+            evt.Delete(field);
+        }
+    }
+
+    var dropFields = function (evt) {
         evt.Delete("message");
         evt.Delete("host.name");
+        dropIfEmpty(evt, "crowdstrike.event.UserIp");
     };
-  
+
     var setFields = function (evt) {
         evt.Put("agent.name", "falcon");
     };
@@ -28,10 +43,21 @@ var crowdstrikeFalcon = (function() {
     var convertFields = new processor.Convert({
         fields: [
             // DetectionSummaryEvent
-            { from: "crowdstrike.event.LocalIP", to: "source.ip", type: "ip" },
-            { from: "crowdstrike.event.ProcessId", to: "process.pid" },
+            {
+                from: "crowdstrike.event.LocalIP",
+                to: "source.ip",
+                type: "ip"
+            },
+            {
+                from: "crowdstrike.event.ProcessId",
+                to: "process.pid"
+            },
             // UserActivityAuditEvent and AuthActivityAuditEvent
-            { from: "crowdstrike.event.UserIp", to: "source.ip", type: "ip" },
+            {
+                from: "crowdstrike.event.UserIp",
+                to: "source.ip",
+                type: "ip"
+            },
         ],
         mode: "copy",
         ignore_missing: true,
@@ -46,7 +72,13 @@ var crowdstrikeFalcon = (function() {
         ignore_missing: false,
     });
 
-    var processEvent = function(evt) {
+    var normalizeEpochMS = function (evt) {
+        convertToMSEpoch(evt, "crowdstrike.event.StartTimestamp")
+        convertToMSEpoch(evt, "crowdstrike.event.EndTimestamp")
+        convertToMSEpoch(evt, "crowdstrike.event.UTCTimestamp")
+    };
+
+    var processEvent = function (evt) {
         var eventType = evt.Get("crowdstrike.metadata.eventType")
         var outcome = evt.Get("crowdstrike.event.Success")
 
@@ -54,11 +86,9 @@ var crowdstrikeFalcon = (function() {
 
         if (outcome === true) {
             evt.Put("event.outcome", "success")
-        }
-        else if (outcome === false) {
+        } else if (outcome === false) {
             evt.Put("event.outcome", "failure")
-        }
-        else {
+        } else {
             evt.Put("event.outcome", "unknown")
         }
 
@@ -66,7 +96,7 @@ var crowdstrikeFalcon = (function() {
             case "DetectionSummaryEvent":
                 var tactic = evt.Get("crowdstrike.event.Tactic").toLowerCase()
                 var technique = evt.Get("crowdstrike.event.Technique").toLowerCase()
-                evt.Put("threat.technique.name", technique) 
+                evt.Put("threat.technique.name", technique)
                 evt.Put("threat.tactic.name", tactic)
 
                 evt.Put("event.action", evt.Get("crowdstrike.event.PatternDispositionDescription"))
@@ -167,14 +197,16 @@ var crowdstrikeFalcon = (function() {
             default:
                 break;
         }
-    } 
+    }
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
+        .Add(normalizeEpochMS)
         .Add(dropFields)
         .Add(convertFields)
         .Add(processEvent)
+        .Add(setFields)
         .Build();
 
     return {

@@ -36,7 +36,7 @@
     Event data fields for each event and alert.
   type: group
   default_field: false
-  fields: 
+  fields:
     - name: ProcessStartTime
       type: date
       description: >
@@ -106,7 +106,7 @@
       type: keyword
       description: >
         SHA256 sum of the executable associated with the detection.
- 
+
     - name: MD5String
       type: keyword
       description: >
