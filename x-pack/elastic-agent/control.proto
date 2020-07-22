@@ -111,7 +111,7 @@ service ElasticAgent {
   rpc Status(Empty) returns (StatusResponse);
 
   // Restart restarts the current running Elastic Agent.
-  rpc Restart(Empty) returns (Empty);
+  rpc Restart(Empty) returns (RestartResponse);
 
   // Upgrade starts the upgrade process of Elastic Agent.
   rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
