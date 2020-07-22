@@ -28,6 +28,12 @@ message Empty {
 message VersionResponse {
   // Current running version.
   string version = 1;
+  // Current running commit.
+  string commit = 2;
+  // Current running build time.
+  string buildTime = 3;
+  // Current running version is a snapshot.
+  bool snapshot = 4;
 }
 
 // Upgrade request message.
