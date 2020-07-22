@@ -24,80 +24,6 @@ var crowdstrikeFalcon = (function () {
         }
     };
 
-    var decodeJson = new processor.DecodeJSONFields({
-        fields: ["message"],
-        target: "crowdstrike",
-        process_array: true,
-        max_depth: 8
-    });
-
-    var dropFields = function (evt) {
-        evt.Delete("message");
-        evt.Delete("host.name");
-    };
-
-    var setFields = function (evt) {
-        evt.Put("agent.name", "falcon");
-    };
-
-    var convertFields = new processor.Convert({
-        fields: [
-            // DetectionSummaryEvent
-            {
-                from: "crowdstrike.event.LocalIP",
-                to: "source.ip",
-                type: "ip"
-            },
-            {
-                from: "crowdstrike.event.ProcessId",
-                to: "process.pid"
-            },
-            {
-                from: "crowdstrike.event.ParentImageFileName",
-                to: "process.parent.executable"
-            },
-            {
-                from: "crowdstrike.event.ParentCommandLine",
-                to: "process.parent.command_line"
-            },
-            // UserActivityAuditEvent and AuthActivityAuditEvent
-            {
-                from: "crowdstrike.event.UserIp",
-                to: "source.ip",
-                type: "ip"
-            },
-            // FirewallRuleIP4Matched
-            {
-                from: "crowdstrike.event.Ipv",
-                to: "network.type",
-            },
-        ],
-        mode: "copy",
-        ignore_missing: true,
-        fail_on_error: false
-    });
-
-    var addTimestamp = new processor.Convert({
-        fields: [{
-            from: "crowdstrike.metadata.eventCreationTime",
-            to: "@timestamp",
-        }],
-        mode: "copy",
-        ignore_missing: false,
-        fail_on_error: true
-    });
-
-    var normalizeEpochMS = function (evt) {
-        convertToMSEpoch(evt, "crowdstrike.event.ProcessStartTime")
-        convertToMSEpoch(evt, "crowdstrike.event.ProcessEndTime")
-        convertToMSEpoch(evt, "crowdstrike.event.IncidentStartTime")
-        convertToMSEpoch(evt, "crowdstrike.event.IncidentEndTime")
-        convertToMSEpoch(evt, "crowdstrike.event.StartTimestamp")
-        convertToMSEpoch(evt, "crowdstrike.event.EndTimestamp")
-        convertToMSEpoch(evt, "crowdstrike.event.UTCTimestamp")
-        convertToMSEpoch(evt, "crowdstrike.metadata.eventCreationTime")
-    };
-
     var normalizeProcess = function (evt) {
         var commandLine = evt.Get("crowdstrike.event.CommandLine")
         if (commandLine && commandLine.trim() !== "") {
@@ -112,173 +38,430 @@ var crowdstrikeFalcon = (function () {
         }
     }
 
-    var processEvent = function (evt) {
-        var eventType = evt.Get("crowdstrike.metadata.eventType")
-        var outcome = evt.Get("crowdstrike.event.Success")
-
-        evt.Put("event.kind", "event")
-
-        if (outcome === true) {
-            evt.Put("event.outcome", "success")
-        } else if (outcome === false) {
-            evt.Put("event.outcome", "failure")
+    var normalizeSourceDestination = function (evt) {
+        var localAddress = evt.Get("crowdstrike.event.LocalAddress");
+        var localPort = evt.Get("crowdstrike.event.LocalPort");
+        var remoteAddress = evt.Get("crowdstrike.event.RemoteAddress");
+        var remotePort = evt.Get("crowdstrike.event.RemotePort");
+        if (evt.Get("crowdstrike.event.ConnectionDirection") === "1") {
+            evt.Put("network.direction", "inbound")
+            evt.Put("source.ip", remoteAddress)
+            evt.Put("source.port", remotePort)
+            evt.Put("destination.ip", localAddress)
+            evt.Put("destination.port", localPort)
         } else {
-            evt.Put("event.outcome", "unknown")
-        }
-
-        switch (eventType) {
-            case "DetectionSummaryEvent":
-                var tactic = evt.Get("crowdstrike.event.Tactic").toLowerCase()
-                var technique = evt.Get("crowdstrike.event.Technique").toLowerCase()
-                evt.Put("threat.technique.name", technique)
-                evt.Put("threat.tactic.name", tactic)
-
-                evt.Put("event.action", evt.Get("crowdstrike.event.PatternDispositionDescription"))
-                evt.Put("event.kind", "alert")
-                evt.Put("event.type", ["info"])
-                evt.Put("event.category", ["malware"])
-                evt.Put("event.url", evt.Get("crowdstrike.event.FalconHostLink"))
-                evt.Put("event.dataset", "crowdstrike.falcon_endpoint")
-
-                evt.Put("event.severity", evt.Get("crowdstrike.event.Severity"))
-                evt.Put("message", evt.Get("crowdstrike.event.DetectDescription"))
-                evt.Put("process.name", evt.Get("crowdstrike.event.FileName"))
-
-                normalizeProcess(evt);
-
-                evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
-                evt.Put("user.domain", evt.Get("crowdstrike.event.MachineDomain"))
-                evt.Put("agent.id", evt.Get("crowdstrike.event.SensorId"))
-                evt.Put("host.name", evt.Get("crowdstrike.event.ComputerName"))
-                evt.Put("agent.type", "falcon")
-                evt.Put("file.hash.sha256", evt.Get("crowdstrike.event.SHA256String"))
-                evt.Put("file.hash.md5", evt.Get("crowdstrike.event.MD5String"))
-                evt.Put("rule.name", evt.Get("crowdstrike.event.DetectName"))
-                evt.Put("rule.description", evt.Get("crowdstrike.event.DetectDescription"))
-
-                break;
-
-            case "IncidentSummaryEvent":
-                evt.Put("event.kind", "alert")
-                evt.Put("event.type", ["info"])
-                evt.Put("event.category", ["malware"])
-                evt.Put("event.action", "incident")
-                evt.Put("event.url", evt.Get("crowdstrike.event.FalconHostLink"))
-                evt.Put("event.dataset", "crowdstrike.falcon_endpoint")
-
-                evt.Put("message", "Incident score " + evt.Get("crowdstrike.event.FineScore"))
-
-                break;
-
-            case "UserActivityAuditEvent":
-                var userid = evt.Get("crowdstrike.event.UserId")
-                evt.Put("user.name", userid)
-                if (userid.split('@').length == 2) {
-                    evt.Put("user.email", userid)
-                }
-
-                evt.Put("message", evt.Get("crowdstrike.event.OperationName"))
-                evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.type", ["change"])
-                evt.Put("event.category", ["iam"])
-                evt.Put("event.dataset", "crowdstrike.falcon_audit")
-
-                break;
-
-            case "FirewallMatchEvent":
-                evt.Put("message", "Firewall Rule '" + evt.Get("crowdstrike.event.RuleName") + "' triggered")
-
-                evt.Put("event.category", ["network"])
-                evt.Put("event.type", ["connection", "start"])
-                evt.Put("event.outcome", ["unknown"])
-                evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.code", evt.Get("crowdstrike.event.EventType"))
-                evt.Put("event.dataset", "crowdstrike.falcon_endpoint")
-                evt.Put("process.pid", evt.Get("crowdstrike.event.PID"))
-
-                normalizeProcess(evt);
-
-                evt.Put("rule.id", evt.Get("crowdstrike.event.RuleId"))
-                evt.Put("rule.name", evt.Get("crowdstrike.event.RuleName"))
-                evt.Put("rule.ruleset", evt.Get("crowdstrike.event.RuleGroupName"))
-                evt.Put("rule.description", evt.Get("crowdstrike.event.RuleDescription"))
-                evt.Put("rule.category", evt.Get("crowdstrike.event.RuleFamilyID"))
-
-                evt.Put("host.name", evt.Get("crowdstrike.event.HostName"))
-
-                var localAddress = evt.Get("crowdstrike.event.LocalAddress");
-                var localPort = evt.Get("crowdstrike.event.LocalPort");
-                var remoteAddress = evt.Get("crowdstrike.event.RemoteAddress");
-                var remotePort = evt.Get("crowdstrike.event.RemotePort");
-                if (evt.Get("crowdstrike.event.ConnectionDirection") === "1") {
-                    evt.Put("network.direction", "inbound")
-                    evt.Put("source.ip", remoteAddress)
-                    evt.Put("source.port", remotePort)
-                    evt.Put("destination.ip", localAddress)
-                    evt.Put("destination.port", localPort)
-                } else {
-                    evt.Put("network.direction", "outbound")
-                    evt.Put("destination.ip", remoteAddress)
-                    evt.Put("destination.port", remotePort)
-                    evt.Put("source.ip", localAddress)
-                    evt.Put("source.port", localPort)
-                }
-                break;
-
-            case "AuthActivityAuditEvent":
-                var userid = evt.Get("crowdstrike.event.UserId")
-                evt.Put("user.name", userid)
-                if (userid.split('@').length == 2) {
-                    evt.Put("user.email", userid)
-                }
-
-                evt.Put("message", evt.Get("crowdstrike.event.ServiceName"))
-                evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
-                evt.Put("event.type", ["change"])
-                evt.Put("event.category", ["authentication"])
-                evt.Put("event.dataset", "crowdstrike.falcon_audit")
-
-                break;
-
-            case "RemoteResponseSessionStartEvent":
-            case "RemoteResponseSessionEndEvent":
-                var username = evt.Get("crowdstrike.event.UserName")
-                evt.Put("user.name", username)
-                if (username.split('@').length == 2) {
-                    evt.Put("user.email", username)
-                }
-
-                evt.Put("host.name", evt.Get("crowdstrike.event.HostnameField"))
-                evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.dataset", "crowdstrike.falcon_audit")
-
-                if (eventType == "RemoteResponseSessionStartEvent") {
-                    evt.Put("event.type", ["start"])
-                    evt.Put("message", "Remote response session started")
-                } else {
-                    evt.Put("event.type", ["end"])
-                    evt.Put("message", "Remote response session ended")
-                }
-
-                break;
-
-            default:
-                break;
+            evt.Put("network.direction", "outbound")
+            evt.Put("destination.ip", remoteAddress)
+            evt.Put("destination.port", remotePort)
+            evt.Put("source.ip", localAddress)
+            evt.Put("source.port", localPort)
         }
     }
 
-    var pipeline = new processor.Chain()
-        .Add(decodeJson)
-        .Add(normalizeEpochMS)
-        .Add(dropFields)
-        .Add(addTimestamp)
-        .Add(convertFields)
-        .Add(processEvent)
-        .Add(setFields)
+    var normalizeEventAction = function (evt) {
+        var eventType = evt.Get("crowdstrike.metadata.eventType")
+        evt.Put("event.action", convertUnderscore(eventType))
+    }
+
+    var normalizeUsername = function (evt) {
+        var username = evt.Get("crowdstrike.event.UserName")
+        if (!username || username === "") {
+            username = evt.Get("crowdstrike.event.UserId")
+        }
+        if (username && username !== "") {
+            evt.Put("user.name", username)
+            if (username.split('@').length == 2) {
+                evt.Put("user.email", username)
+            }
+        }
+    }
+
+    // DetectionSummaryEvent
+    var convertDetectionSummaryEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                kind: "alert",
+                category: ["malware"],
+                type: ["info"],
+                dataset: "crowdstrike.falcon_endpoint",
+            },
+            target: "event",
+        })
+        .AddFields({
+            fields: {
+                type: "falcon",
+            },
+            target: "agent",
+        })
+        .Convert({
+            fields: [{
+                    from: "crowdstrike.event.LocalIP",
+                    to: "source.ip",
+                    type: "ip"
+                }, {
+                    from: "crowdstrike.event.ProcessId",
+                    to: "process.pid"
+                }, {
+                    from: "crowdstrike.event.ParentImageFileName",
+                    to: "process.parent.executable"
+                }, {
+                    from: "crowdstrike.event.ParentCommandLine",
+                    to: "process.parent.command_line"
+                }, {
+                    from: "crowdstrike.event.PatternDispositionDescription",
+                    to: "event.action",
+                }, {
+                    from: "crowdstrike.event.FalconHostLink",
+                    to: "event.url",
+                }, {
+                    from: "crowdstrike.event.Severity",
+                    to: "event.severity",
+                }, {
+                    from: "crowdstrike.event.DetectDescription",
+                    to: "message",
+                }, {
+                    from: "crowdstrike.event.FileName",
+                    to: "process.name",
+                }, {
+                    from: "crowdstrike.event.UserName",
+                    to: "user.name",
+                },
+                {
+                    from: "crowdstrike.event.MachineDomain",
+                    to: "user.domain",
+                },
+                {
+                    from: "crowdstrike.event.SensorId",
+                    to: "agent.id",
+                },
+                {
+                    from: "crowdstrike.event.ComputerName",
+                    to: "host.name",
+                },
+                {
+                    from: "crowdstrike.event.SHA256String",
+                    to: "file.hash.sha256",
+                },
+                {
+                    from: "crowdstrike.event.MD5String",
+                    to: "file.hash.md5",
+                },
+                {
+                    from: "crowdstrike.event.SHA1String",
+                    to: "file.hash.sha1",
+                },
+                {
+                    from: "crowdstrike.event.DetectName",
+                    to: "rule.name",
+                },
+                {
+                    from: "crowdstrike.event.DetectDescription",
+                    to: "rule.description",
+                }
+            ],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(function (evt) {
+            var tactic = evt.Get("crowdstrike.event.Tactic").toLowerCase()
+            var technique = evt.Get("crowdstrike.event.Technique").toLowerCase()
+            evt.Put("threat.technique.name", technique)
+            evt.Put("threat.tactic.name", tactic)
+        })
+        .Add(normalizeProcess)
+        .Build()
+
+    // IncidentSummaryEvent
+    var convertIncidentSummaryEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                kind: "alert",
+                category: ["malware"],
+                type: ["info"],
+                action: "incident",
+                dataset: "crowdstrike.falcon_endpoint",
+            },
+            target: "event",
+        })
+        .AddFields({
+            fields: {
+                type: "falcon",
+            },
+            target: "agent",
+        })
+        .Convert({
+            fields: [{
+                from: "crowdstrike.event.FalconHostLink",
+                to: "event.url",
+            }],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(function (evt) {
+            evt.Put("message", "Incident score " + evt.Get("crowdstrike.event.FineScore"))
+        })
+        .Add(normalizeProcess)
+        .Build()
+
+    // UserActivityAuditEvent
+    var convertUserActivityAuditEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                category: ["iam"],
+                type: ["change"],
+                dataset: "crowdstrike.falcon_audit",
+            },
+            target: "event",
+        })
+        .Convert({
+            fields: [{
+                from: "crowdstrike.event.OperationName",
+                to: "message",
+            }, {
+                from: "crowdstrike.event.UserIp",
+                to: "source.ip",
+                type: "ip"
+            }],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(normalizeUsername)
+        .Add(normalizeEventAction)
+        .Build()
+
+    // AuthActivityAuditEvent
+    var convertAuthActivityAuditEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                category: ["authentication"],
+                type: ["change"],
+                dataset: "crowdstrike.falcon_audit",
+            },
+            target: "event",
+        })
+        .Convert({
+            fields: [{
+                from: "crowdstrike.event.ServiceName",
+                to: "message",
+            }, {
+                from: "crowdstrike.event.UserIp",
+                to: "source.ip",
+                type: "ip"
+            }],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(normalizeUsername)
+        .Add(function (evt) {
+            evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
+        })
+        .Build()
+
+    // FirewallMatchEvent
+    var convertFirewallMatchEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                category: ["network"],
+                type: ["start", "connection"],
+                outcome: ["unknown"],
+                dataset: "crowdstrike.falcon_endpoint",
+            },
+            target: "event",
+        })
+        .Convert({
+            fields: [{
+                    from: "crowdstrike.event.Ipv",
+                    to: "network.type",
+                }, {
+                    from: "crowdstrike.event.PID",
+                    to: "process.pid",
+                },
+                {
+                    from: "crowdstrike.event.RuleId",
+                    to: "rule.id"
+                },
+                {
+                    from: "crowdstrike.event.RuleName",
+                    to: "rule.name"
+                },
+                {
+                    from: "crowdstrike.event.RuleGroupName",
+                    to: "rule.ruleset"
+                },
+                {
+                    from: "crowdstrike.event.RuleDescription",
+                    to: "rule.description"
+                },
+                {
+                    from: "crowdstrike.event.RuleFamilyID",
+                    to: "rule.category"
+                },
+                {
+                    from: "crowdstrike.event.HostName",
+                    to: "host.name"
+                },
+                {
+                    from: "crowdstrike.event.Ipv",
+                    to: "network.type",
+                },
+                {
+                    from: "crowdstrike.event.EventType",
+                    to: "event.code",
+                }
+            ],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(function (evt) {
+            evt.Put("message", "Firewall Rule '" + evt.Get("crowdstrike.event.RuleName") + "' triggered")
+        })
+        .Add(normalizeEventAction)
+        .Add(normalizeProcess)
+        .Add(normalizeSourceDestination)
         .Build();
 
+    // RemoteResponseSessionStartEvent
+    var convertRemoteResponseSessionStartEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                type: ["start"],
+                dataset: "crowdstrike.falcon_audit",
+            },
+            target: "event",
+        })
+        .AddFields({
+            fields: {
+                message: "Remote response session started",
+            },
+            target: "",
+        })
+        .Convert({
+            fields: [{
+                from: "crowdstrike.event.HostnameField",
+                to: "host.name",
+            }],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(normalizeUsername)
+        .Add(normalizeEventAction)
+        .Build()
+
+
+    // RemoteResponseSessionEndEvent
+    var convertRemoteResponseSessionEndEvent = new processor.Chain()
+        .AddFields({
+            fields: {
+                type: ["end"],
+                dataset: "crowdstrike.falcon_audit",
+            },
+            target: "event",
+        })
+        .AddFields({
+            fields: {
+                message: "Remote response session ended",
+            },
+            target: "",
+        })
+        .Convert({
+            fields: [{
+                from: "crowdstrike.event.HostnameField",
+                to: "host.name",
+            }],
+            mode: "copy",
+            ignore_missing: true,
+            fail_on_error: false
+        })
+        .Add(normalizeUsername)
+        .Add(normalizeEventAction)
+        .Build()
+
     return {
-        process: pipeline.Run,
+        process: new processor.Chain()
+            .DecodeJSONFields({
+                fields: ["message"],
+                target: "crowdstrike",
+                process_array: true,
+                max_depth: 8
+            })
+            .Add(function (evt) {
+                convertToMSEpoch(evt, "crowdstrike.event.ProcessStartTime")
+                convertToMSEpoch(evt, "crowdstrike.event.ProcessEndTime")
+                convertToMSEpoch(evt, "crowdstrike.event.IncidentStartTime")
+                convertToMSEpoch(evt, "crowdstrike.event.IncidentEndTime")
+                convertToMSEpoch(evt, "crowdstrike.event.StartTimestamp")
+                convertToMSEpoch(evt, "crowdstrike.event.EndTimestamp")
+                convertToMSEpoch(evt, "crowdstrike.event.UTCTimestamp")
+                convertToMSEpoch(evt, "crowdstrike.metadata.eventCreationTime")
+            })
+            .Add(function (evt) {
+                evt.Delete("message");
+                evt.Delete("host.name");
+            })
+            .Convert({
+                fields: [{
+                    from: "crowdstrike.metadata.eventCreationTime",
+                    to: "@timestamp",
+                }],
+                mode: "copy",
+                ignore_missing: false,
+                fail_on_error: true
+            })
+            .Add(function (evt) {
+                var eventType = evt.Get("crowdstrike.metadata.eventType")
+                var outcome = evt.Get("crowdstrike.event.Success")
+
+                evt.Put("event.kind", "event")
+
+                if (outcome === true) {
+                    evt.Put("event.outcome", "success")
+                } else if (outcome === false) {
+                    evt.Put("event.outcome", "failure")
+                } else {
+                    evt.Put("event.outcome", "unknown")
+                }
+
+                switch (eventType) {
+                    case "DetectionSummaryEvent":
+                        convertDetectionSummaryEvent.Run(evt)
+                        break;
+
+                    case "IncidentSummaryEvent":
+                        convertIncidentSummaryEvent.Run(evt)
+                        break;
+
+                    case "UserActivityAuditEvent":
+                        convertUserActivityAuditEvent.Run(evt)
+                        break;
+
+                    case "FirewallMatchEvent":
+                        convertFirewallMatchEvent.Run(evt)
+                        break;
+
+                    case "AuthActivityAuditEvent":
+                        convertAuthActivityAuditEvent.Run(evt)
+                        break;
+
+                    case "RemoteResponseSessionStartEvent":
+                        convertRemoteResponseSessionStartEvent.Run(evt);
+                        break;
+
+                    case "RemoteResponseSessionEndEvent":
+                        convertRemoteResponseSessionEndEvent.Run(evt);
+                        break;
+
+                    default:
+                        break;
+                }
+            })
+            .Build()
+            .Run,
     };
 })();
 

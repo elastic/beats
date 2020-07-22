@@ -45,8 +45,8 @@
             "unknown"
         ],
         "event.type": [
-            "connection",
-            "start"
+            "start",
+            "connection"
         ],
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
@@ -380,6 +380,7 @@
         ],
         "event.url": "https://falcon.crowdstrike.com/activity/detections/detail/1abcd2345b8c4151a0cb45dcfbe6d3d0/124559902719?_cid=12345a1bc2d34fghi56jk7890lmno12p",
         "file.hash.md5": "0ab1235adca04aef6239f5496ef0a5df",
+        "file.hash.sha1": "0000000000000000000000000000000000000000",
         "file.hash.sha256": "0a123b185f9a32fde1df59897089014c92e3d08a0533b54baa72ba2a93d64deb",
         "fileset.name": "falcon",
         "host.name": "TESTDEVICE01",
