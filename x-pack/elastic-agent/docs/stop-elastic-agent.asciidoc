@@ -22,7 +22,14 @@ Run the following command to get the ID of the `elastic-agent` process:
 ps | grep elastic-agent
 ----
 
-Then kill the process.
+Then kill the process:
+
+[source,shell]
+----
+kill -9 PID
+----
+
+Where `PID` is the ID of the `elastic-agent` process.
 
 *Systemd*
 
