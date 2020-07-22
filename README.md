@@ -94,8 +94,8 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 (This service is only available for users affiliated with Elastic and not for open-source contributors.)
 
 * [beats][]
-  * `jenkins run the tests please`
-  * `jenkins run tests`
+  * `jenkins run the tests please` or `jenkins run tests` or `/test` will kick off a default build.
+  * `/test macos` will kick off a default build with also the `macos` stages.
 * [apm-beats-update][]
   * `/run apm-beats-update`
 
