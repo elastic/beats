@@ -50,17 +50,15 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test(\\W+macos)?$)')
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
-    booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
-
+    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
     booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
-
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -113,7 +111,6 @@ pipeline {
             mageTarget(context: "Elastic Agent x-pack Linux", directory: "x-pack/elastic-agent", target: "build test")
           }
         }
-
         stage('Elastic Agent x-pack Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -127,14 +124,13 @@ pipeline {
             mageTargetWin(context: "Elastic Agent x-pack Windows Unit test", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
         }
-
         stage('Elastic Agent Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -146,7 +142,6 @@ pipeline {
             }
           }
         }
-
         stage('Filebeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -179,7 +174,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false" && params.macosTest
+              return env.BUILD_FILEBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -197,7 +192,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_FILEBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -256,7 +251,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -315,7 +310,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -359,7 +354,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -512,7 +507,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false" && params.macosTest
+              return env.BUILD_METRICBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -525,7 +520,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_METRICBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -584,7 +579,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -695,7 +690,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -767,7 +762,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -785,7 +780,7 @@ pipeline {
               when {
                 beforeAgent true
                 expression {
-                  return params.macosTest
+                  return env.BUILD_ON_MACOS != 'false'
                 }
               }
               steps {
@@ -1343,6 +1338,12 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Enable macOS builds when required
+  env.BUILD_ON_MACOS = (params.macosTest                  // UI Input parameter is set to true
+                        || !isPR()                        // For branches and tags
+                        || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
+                        || (env.GITHUB_COMMENT?.toLowerCase().contains('/test macos'))) // If `/test macos` in the GH comment (Case-Insensitive)
 }
 
 /**
