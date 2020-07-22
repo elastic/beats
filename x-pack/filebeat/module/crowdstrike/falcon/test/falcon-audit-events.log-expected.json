@@ -12,6 +12,7 @@
         "crowdstrike.metadata.version": "1.0",
         "event.action": "remote_response_session_start_event",
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.471760Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -46,6 +47,7 @@
         "crowdstrike.metadata.version": "1.0",
         "event.action": "remote_response_session_end_event",
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.478195Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -107,6 +109,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.479287Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -145,6 +148,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.480239Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -184,6 +188,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.481177Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -232,6 +237,7 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.482193Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -277,6 +283,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.483103Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -316,6 +323,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.484Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -361,6 +369,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.489492Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -400,6 +409,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.493387Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -439,6 +449,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.494263Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -478,6 +489,7 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.495231Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -534,6 +546,7 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:22.496040Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",

@@ -50,6 +50,7 @@
             "malware"
         ],
         "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.ingested": "2020-07-22T16:07:07.997487Z",
         "event.kind": "alert",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -104,6 +105,7 @@
             "malware"
         ],
         "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.ingested": "2020-07-22T16:07:08.106544Z",
         "event.kind": "alert",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -139,7 +141,6 @@
         "crowdstrike.event.ServiceName": "quarantined_files",
         "crowdstrike.event.UTCTimestamp": "2020-06-26T15:55:52.000Z",
         "crowdstrike.event.UserId": "Crowdstrike",
-        "crowdstrike.event.UserIp": "",
         "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
         "crowdstrike.metadata.eventCreationTime": "2020-06-26T15:55:52.000Z",
         "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
@@ -150,6 +151,7 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
+        "event.ingested": "2020-07-22T16:07:08.107410Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",

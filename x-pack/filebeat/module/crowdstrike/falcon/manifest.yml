@@ -8,3 +8,4 @@ var:
     default: [forwarded]
 
 input: config/falcon.yml
+ingest_pipeline: ingest/pipeline.yml
