@@ -1,0 +1,9 @@
+description: Ingest pipeline for normalizing CrowdStrike Falcon logs
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

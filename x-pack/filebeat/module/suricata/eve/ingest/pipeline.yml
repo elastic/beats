@@ -3,9 +3,9 @@ description: Pipeline for parsing Suricata EVE logs
 
 processors:
   - set:
-      value: "{{suricata.eve.http.http_method}}"
+      value: '{{suricata.eve.http.http_method}}'
       field: http.request.method
-      if: "ctx?.suricata?.eve?.http?.http_method != null"
+      if: 'ctx?.suricata?.eve?.http?.http_method != null'
   - rename:
       field: suricata.eve.http.status
       target_field: http.response.status_code
@@ -73,24 +73,24 @@ processors:
       ignore_missing: true
   - set:
       field: rule.category
-      value: "{{suricata.eve.alert.category}}"
+      value: '{{suricata.eve.alert.category}}'
       ignore_empty_value: true
   - set:
       field: rule.id
-      value: "{{suricata.eve.alert.signature_id}}"
+      value: '{{suricata.eve.alert.signature_id}}'
       ignore_empty_value: true
   - set:
       field: rule.name
-      value: "{{suricata.eve.alert.signature}}"
+      value: '{{suricata.eve.alert.signature}}'
       ignore_empty_value: true
   - set:
       field: suricata.eve.alert.action
       value: denied
-      if:  "ctx?.suricata?.eve?.alert?.action == 'blocked'"
+      if: "ctx?.suricata?.eve?.alert?.action == 'blocked'"
   - append:
       field: event.type
-      value: "{{suricata.eve.alert.action}}"
-      if: "ctx?.suricata?.eve?.alert?.action != null"
+      value: '{{suricata.eve.alert.action}}'
+      if: 'ctx?.suricata?.eve?.alert?.action != null'
   - remove:
       field: suricata.eve.alert.action
       ignore_failure: true
@@ -221,16 +221,16 @@ processors:
       ignore_missing: true
   - split:
       field: tls.server.hash.sha1
-      separator: ":"
+      separator: ':'
       ignore_missing: true
   - join:
       field: tls.server.hash.sha1
-      separator: ""
+      separator: ''
       ignore_failure: true
   - append:
       field: related.hash
-      value: "{{tls.server.hash.sha1}}"
-      if: "ctx?.tls?.server?.hash?.sha1 != null"
+      value: '{{tls.server.hash.sha1}}'
+      if: 'ctx?.tls?.server?.hash?.sha1 != null'
   - remove:
       field:
         - suricata.eve.app_proto
