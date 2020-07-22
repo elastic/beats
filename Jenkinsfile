@@ -25,8 +25,7 @@ import groovy.transform.Field
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
-    REPO = 'beats'
-    BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
     TERRAFORM_VERSION = "0.12.24"
@@ -39,7 +38,6 @@ pipeline {
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
-    CODECOV_SECRET = "secret/observability-team/ci/${env.REPO}-codecov"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -953,7 +951,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
-        codecov(repo: "${env.REPO}", basedir: "${BASE_DIR}/${directory}", secret: "${CODECOV_SECRET}")
       }
     }
   }
