@@ -52,7 +52,8 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
-	// Disable the host parser, we will call it as part of the factory
+	// Disable the host parser, we will call it as part of the factory so the original
+	// host in the base module is not modified.
 	originalHostParser := registration.HostParser
 	registration.HostParser = nil
 
