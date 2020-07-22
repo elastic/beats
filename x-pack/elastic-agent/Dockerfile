@@ -5,6 +5,8 @@ FROM circleci/golang:${GO_VERSION}
 ARG TEST_RESULTS=/tmp/test-results
 
 RUN mkdir -p ${TEST_RESULTS} && mkdir -p ./code
+RUN go get github.com/golang/protobuf/proto
+RUN go get github.com/golang/protobuf/protoc-gen-go
 RUN go get github.com/magefile/mage
 
 ENV GO111MODULE=on
