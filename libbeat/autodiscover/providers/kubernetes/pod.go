@@ -138,7 +138,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 	switch pod.Status.Phase {
 	case kubernetes.PodSucceeded, kubernetes.PodFailed:
 		// If Pod is in a phase where all containers in the have terminated emit a stop event
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		p.logger.Debugf("Watcher Pod update (terminated): %+v", obj)
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 		return
 	case kubernetes.PodPending:
@@ -148,14 +148,18 @@ func (p *pod) OnUpdate(obj interface{}) {
 
 	// here handle the case when a Pod is in `Terminating` phase.
 	// In this case the pod is neither `PodSucceeded` nor `PodFailed` and
-	// hence a stop/start sequence will take place. However we need to
-	// handle this as just a stop event with a cleanup timeout so as to
-	// to give time to any leftover log lines to be collected while the pod is
-	// in `Terminating` phase.
+	// hence requires special handling.
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Pod update (being terminated): %+v", obj)
+		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		// Pod is terminating, don't reload its configuration and ignore the event
+		// if some pod is still running, we will receive more events when containers
+		// terminate.
+		for _, container := range pod.Status.ContainerStatuses {
+			if container.State.Running != nil {
+				return
+			}
+		}
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-		return
 	}
 
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
