@@ -38,6 +38,7 @@ type Config struct {
 	Codec      encoding.Encoding
 	BufferSize int
 	Terminator LineTerminator
+	MaxBytes   int
 }
 
 // New creates a new Encode reader from input reader by applying
