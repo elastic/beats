@@ -91,3 +91,4 @@
 - Add --insecure option to enroll command {pull}19900[19900]
 - Will retry to enroll if the server return a 429. {pull}19918[19811]
 - Add --staging option to enroll command {pull}20026[20026]
+- Add `event.dataset` to all events {pull}20076[20076]
