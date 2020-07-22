@@ -31,7 +31,7 @@ kill -9 PID
 
 Where `PID` is the ID of the `elastic-agent` process.
 
-*Systemd*
+*Systemd:*
 
 The DEB and RPM packages include a service unit for Linux systems with systemd.
 On these systems, you can manage {agent} by using systemd commands. Use
