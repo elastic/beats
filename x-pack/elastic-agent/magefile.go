@@ -326,9 +326,9 @@ func commitID() string {
 	return commitID
 }
 
-// Update is an alias for executing fields, dashboards, config, includes.
+// Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(ControlProto, Config, BuildSpec, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -344,6 +344,11 @@ func CrossBuildGoDaemon() error {
 // Config generates both the short/reference/docker.
 func Config() {
 	mg.Deps(configYML)
+}
+
+// ControlProto generates pkg/agent/control/proto module.
+func ControlProto() error {
+	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
 }
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
