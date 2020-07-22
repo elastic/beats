@@ -132,6 +132,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			for _, event := range events {
+				fmt.Println("************ event = ", event)
+				hostID, _ := event.RootFields.GetValue("host.id")
+				fmt.Println("************ event hostID = ", hostID)
+				hostName, _ := event.RootFields.GetValue("host.name")
+				fmt.Println("************ event hostName = ", hostName)
 				if len(event.MetricSetFields) != 0 {
 					if reported := report.Event(event); !reported {
 						m.Logger().Debug("Fetch interrupted, failed to emit event")
@@ -203,7 +208,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
 					// add cloud.instance.name and host.name into ec2 events
 					if *tag.Key == "Name" {
+						hasHostName, err := events[instanceID].RootFields.HasKey("host.name")
+						if hasHostName && err != nil {
+							continue
+						}
 						events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
+						events[instanceID].RootFields.Put("host.name", *tag.Value)
 					}
 				}
 
@@ -269,6 +279,10 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
+			// add host cpu/network/disk fields and host.id
+			hostFields := addHostFields(resultMetricsetFields, instanceID)
+			events[instanceID].RootFields.Update(hostFields)
+
 			// add rate metrics
 			calculateRate(resultMetricsetFields, monitoringStates[instanceID])
 
@@ -307,6 +321,29 @@ func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) 
 			resultMetricsetFields.Put(metricName+"_per_sec", rateValue)
 		}
 	}
+}
+
+func addHostFields(resultMetricsetFields common.MapStr, instanceID string) common.MapStr {
+	hostRootFields := common.MapStr{}
+	hostRootFields.Put("host.id", instanceID)
+
+	hostFieldTable := map[string]string{
+		"cpu.total.pct":       "host.cpu.pct",
+		"network.in.bytes":    "host.network.in.bytes",
+		"network.out.bytes":   "host.network.out.bytes",
+		"network.in.packets":  "host.network.in.packets",
+		"network.out.packets": "host.network.out.packets",
+		"diskio.read.bytes":   "host.disk.read.bytes",
+		"diskio.write.bytes":  "host.diskio.write.bytes",
+	}
+
+	for ec2MetricName, hostMetricName := range hostFieldTable {
+		metricValue, err := resultMetricsetFields.GetValue(ec2MetricName)
+		if err == nil && metricValue != nil {
+			hostRootFields.Put(hostMetricName, metricValue)
+		}
+	}
+	return hostRootFields
 }
 
 func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
