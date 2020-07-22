@@ -52,11 +52,24 @@ var crowdstrikeFalcon = (function () {
                 from: "crowdstrike.event.ProcessId",
                 to: "process.pid"
             },
+            {
+                from: "crowdstrike.event.ParentImageFileName",
+                to: "process.parent.executable"
+            },
+            {
+                from: "crowdstrike.event.ParentCommandLine",
+                to: "process.parent.command_line"
+            },
             // UserActivityAuditEvent and AuthActivityAuditEvent
             {
                 from: "crowdstrike.event.UserIp",
                 to: "source.ip",
                 type: "ip"
+            },
+            // FirewallRuleIP4Matched
+            {
+                from: "crowdstrike.event.Ipv",
+                to: "network.type",
             },
         ],
         mode: "copy",
@@ -84,6 +97,16 @@ var crowdstrikeFalcon = (function () {
         convertToMSEpoch(evt, "crowdstrike.event.UTCTimestamp")
         convertToMSEpoch(evt, "crowdstrike.metadata.eventCreationTime")
     };
+
+    var normalizeProcess = function (evt) {
+        var command_line = evt.Get("crowdstrike.event.CommandLine")
+        var args = command_line.split(' ')
+        var executable = args[0]
+
+        evt.Put("process.command_line", command_line)
+        evt.Put("process.args", args)
+        evt.Put("process.executable", executable)
+    }
 
     var processEvent = function (evt) {
         var eventType = evt.Get("crowdstrike.metadata.eventType")
@@ -117,13 +140,7 @@ var crowdstrikeFalcon = (function () {
                 evt.Put("message", evt.Get("crowdstrike.event.DetectDescription"))
                 evt.Put("process.name", evt.Get("crowdstrike.event.FileName"))
 
-                var command_line = evt.Get("crowdstrike.event.CommandLine")
-                var args = command_line.split(' ')
-                var executable = args[0]
-
-                evt.Put("process.command_line", command_line)
-                evt.Put("process.args", args)
-                evt.Put("process.executable", executable)
+                normalizeProcess(evt);
 
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
                 evt.Put("user.domain", evt.Get("crowdstrike.event.MachineDomain"))
@@ -162,6 +179,47 @@ var crowdstrikeFalcon = (function () {
                 evt.Put("event.category", ["iam"])
                 evt.Put("event.dataset", "crowdstrike.falcon_audit")
 
+                break;
+
+            case "FirewallMatchEvent":
+                evt.Put("message", "Firewall Rule '" + evt.Get("crowdstrike.event.RuleName") + "' triggered")
+
+                evt.Put("event.category", ["network"])
+                evt.Put("event.type", ["connection", "start"])
+                evt.Put("event.outcome", ["unknown"])
+                evt.Put("event.action", convertUnderscore(eventType))
+                evt.Put("event.code", evt.Get("crowdstrike.event.EventType"))
+                evt.Put("event.dataset", "crowdstrike.falcon_endpoint")
+                evt.Put("process.pid", evt.Get("crowdstrike.event.PID"))
+                evt.Put("process.name", evt.Get("crowdstrike.event.ImageFileName"))
+
+                normalizeProcess(evt);
+
+                evt.Put("rule.id", evt.Get("crowdstrike.event.RuleId"))
+                evt.Put("rule.name", evt.Get("crowdstrike.event.RuleName"))
+                evt.Put("rule.ruleset", evt.Get("crowdstrike.event.RuleGroupName"))
+                evt.Put("rule.description", evt.Get("crowdstrike.event.RuleDescription"))
+                evt.Put("rule.category", evt.Get("crowdstrike.event.RuleFamilyID"))
+
+                evt.Put("host.name", evt.Get("crowdstrike.event.HostName"))
+
+                var localAddress = evt.Get("crowdstrike.event.LocalAddress");
+                var localPort = evt.Get("crowdstrike.event.LocalPort");
+                var remoteAddress = evt.Get("crowdstrike.event.RemoteAddress");
+                var remotePort = evt.Get("crowdstrike.event.RemotePort");
+                if (evt.Get("crowdstrike.event.ConnectionDirection") === "1") {
+                    evt.Put("network.direction", "inbound")
+                    evt.Put("source.ip", remoteAddress)
+                    evt.Put("source.port", remotePort)
+                    evt.Put("destination.ip", localAddress)
+                    evt.Put("destination.port", localPort)
+                } else {
+                    evt.Put("network.direction", "outbound")
+                    evt.Put("destination.ip", remoteAddress)
+                    evt.Put("destination.port", remotePort)
+                    evt.Put("source.ip", localAddress)
+                    evt.Put("source.port", localPort)
+                }
                 break;
 
             case "AuthActivityAuditEvent":

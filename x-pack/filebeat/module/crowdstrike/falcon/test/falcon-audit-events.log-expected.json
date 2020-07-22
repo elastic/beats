@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-02-27T19:12:14.000Z",
         "crowdstrike.event.HostnameField": "hostnameofmachine",
         "crowdstrike.event.SessionId": "6020260b-0398-4d41-999d-5531b55522de",
         "crowdstrike.event.StartTimestamp": "2020-02-27T19:12:14.000Z",
@@ -12,7 +11,6 @@
         "crowdstrike.metadata.version": "1.0",
         "event.action": "remote_response_session_start_event",
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.471760Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -35,7 +33,6 @@
         "user.name": "first.last@company.com"
     },
     {
-        "@timestamp": "2020-02-27T19:12:52.000Z",
         "crowdstrike.event.EndTimestamp": "2020-02-27T19:12:52.000Z",
         "crowdstrike.event.HostnameField": "hostnameofmachine",
         "crowdstrike.event.SessionId": "6020260b-0398-4d41-999d-5531b55522de",
@@ -47,7 +44,6 @@
         "crowdstrike.metadata.version": "1.0",
         "event.action": "remote_response_session_end_event",
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.478195Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -70,7 +66,6 @@
         "user.name": "first.last@company.com"
     },
     {
-        "@timestamp": "2020-02-12T21:29:10.710Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "APIClientID",
@@ -109,7 +104,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.479287Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -131,7 +125,6 @@
         "user.name": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz"
     },
     {
-        "@timestamp": "2020-02-12T21:39:37.147Z",
         "crowdstrike.event.OperationName": "twoFactorAuthenticate",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -148,7 +141,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.480239Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -171,7 +163,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-12T22:14:37.554Z",
         "crowdstrike.event.OperationName": "twoFactorAuthenticate",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -188,7 +179,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.481177Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -211,7 +201,6 @@
         "user.name": "bob@company.com"
     },
     {
-        "@timestamp": "2020-02-12T22:24:08.000Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "group_id",
@@ -237,7 +226,6 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.482193Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -260,7 +248,6 @@
         "user.name": "chris@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:41:52.140Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "target_name",
@@ -283,7 +270,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.483103Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -306,7 +292,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:42:21.730Z",
         "crowdstrike.event.OperationName": "twoFactorAuthenticate",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -323,7 +308,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.484Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -346,7 +330,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:45:20.236Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "target_name",
@@ -369,7 +352,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.489492Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -381,7 +363,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 5003,
+        "log.offset": 4999,
         "message": "CrowdStrike Authentication",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
@@ -392,7 +374,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:46:12.362Z",
         "crowdstrike.event.OperationName": "userAuthenticate",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -409,7 +390,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.493387Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -421,7 +401,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 5657,
+        "log.offset": 5646,
         "message": "CrowdStrike Authentication",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
@@ -432,7 +412,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:50:14.754Z",
         "crowdstrike.event.OperationName": "twoFactorAuthenticate",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -449,7 +428,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.494263Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -461,7 +439,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 6149,
+        "log.offset": 6134,
         "message": "CrowdStrike Authentication",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
@@ -472,7 +450,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T13:50:20.289Z",
         "crowdstrike.event.OperationName": "selfAcceptEula",
         "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
         "crowdstrike.event.Success": true,
@@ -489,7 +466,6 @@
             "authentication"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.495231Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "success",
@@ -501,7 +477,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 6642,
+        "log.offset": 6627,
         "message": "CrowdStrike Authentication",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
@@ -512,7 +488,6 @@
         "user.name": "alice@company.com"
     },
     {
-        "@timestamp": "2020-02-13T14:14:22.000Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "detection_id",
@@ -546,7 +521,6 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:22.496040Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -558,7 +532,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 7128,
+        "log.offset": 7113,
         "message": "detection_update",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",

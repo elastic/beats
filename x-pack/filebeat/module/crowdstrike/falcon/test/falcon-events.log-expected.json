@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-02-19T08:30:00.000Z",
         "crowdstrike.event.CommandLine": "C:\\Windows\\Explorer.EXE",
         "crowdstrike.event.ComputerName": "alice-laptop",
         "crowdstrike.event.DetectDescription": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
@@ -50,7 +49,6 @@
             "malware"
         ],
         "event.dataset": "crowdstrike.falcon_endpoint",
-        "event.ingested": "2020-07-22T16:07:07.997487Z",
         "event.kind": "alert",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -89,7 +87,6 @@
         "user.name": "alice"
     },
     {
-        "@timestamp": "2020-03-04T04:17:56.766Z",
         "crowdstrike.event.FalconHostLink": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
         "crowdstrike.event.FineScore": 1.2,
         "crowdstrike.event.IncidentEndTime": "2020-03-04T04:17:50.000Z",
@@ -105,7 +102,6 @@
             "malware"
         ],
         "event.dataset": "crowdstrike.falcon_endpoint",
-        "event.ingested": "2020-07-22T16:07:08.106544Z",
         "event.kind": "alert",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
@@ -126,7 +122,6 @@
         ]
     },
     {
-        "@timestamp": "2020-06-26T15:55:52.000Z",
         "crowdstrike.event.AuditKeyValues": [
             {
                 "Key": "quarantined_file_id",
@@ -151,7 +146,6 @@
             "iam"
         ],
         "event.dataset": "crowdstrike.falcon_audit",
-        "event.ingested": "2020-07-22T16:07:08.107410Z",
         "event.kind": "event",
         "event.module": "crowdstrike",
         "event.outcome": "unknown",

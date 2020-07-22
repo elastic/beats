@@ -242,6 +242,14 @@ def clean_keys(obj):
         "microsoft.defender_atp",
         "crowdstrike.falcon_endpoint",
         "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
@@ -280,10 +288,6 @@ def clean_keys(obj):
     if obj["event.dataset"] == "aws.vpcflow":
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
-
-    if obj["event.module"] == "gsuite":
-        delete_key(obj, "event.ingested")
-
 
 def delete_key(obj, key):
     if key in obj:
