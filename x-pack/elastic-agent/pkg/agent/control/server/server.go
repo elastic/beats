@@ -6,6 +6,8 @@ package server
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"net"
 
 	"google.golang.org/grpc"
@@ -61,18 +63,37 @@ func (s *Server) Stop() {
 	}
 }
 
-func (s *Server) Version(ctx context.Context, empty *proto.Empty) (*proto.VersionResponse, error) {
-	panic("implement me")
+// Version returns the currently running version.
+func (s *Server) Version(_ context.Context, _ *proto.Empty) (*proto.VersionResponse, error) {
+	return &proto.VersionResponse{
+		Version:   release.Version(),
+		Commit:    release.Commit(),
+		BuildTime: release.BuildTime().Format(control.TimeFormat()),
+		Snapshot:  release.Snapshot(),
+	}, nil
 }
 
-func (s *Server) Status(ctx context.Context, empty *proto.Empty) (*proto.StatusResponse, error) {
-	panic("implement me")
+// Status returns the overall status of the agent.
+func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusResponse, error) {
+	// not implemented
+	return &proto.StatusResponse{
+		Status:       proto.Status_HEALTHY,
+		Message:      "not implemented",
+		Applications: nil,
+	}, nil
 }
 
-func (s *Server) Restart(ctx context.Context, empty *proto.Empty) (*proto.Empty, error) {
-	panic("implement me")
+// Restart performs re-exec.
+func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.Empty, error) {
+	// not implemented
+	return &proto.Empty{}, nil
 }
 
+// Upgrade performs the upgrade operation.
 func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*proto.UpgradeResponse, error) {
-	panic("implement me")
+	// not implemented
+	return &proto.UpgradeResponse{
+		Status:  proto.UpgradeResponse_FAILURE,
+		Version: release.Version(),
+	}, nil
 }
