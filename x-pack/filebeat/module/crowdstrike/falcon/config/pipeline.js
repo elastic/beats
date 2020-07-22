@@ -23,17 +23,9 @@ var crowdstrikeFalcon = (function () {
         max_depth: 8
     });
 
-    var dropIfEmpty = function (evt, field) {
-        var value = evt.Get(field);
-        if (!value || value === "") {
-            evt.Delete(field);
-        }
-    }
-
     var dropFields = function (evt) {
         evt.Delete("message");
         evt.Delete("host.name");
-        dropIfEmpty(evt, "crowdstrike.event.UserIp");
     };
 
     var setFields = function (evt) {
@@ -61,7 +53,7 @@ var crowdstrikeFalcon = (function () {
         ],
         mode: "copy",
         ignore_missing: true,
-        ignore_failure: true
+        fail_on_error: false
     });
 
     var parseTimestamp = new processor.Timestamp({

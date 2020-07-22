@@ -139,6 +139,7 @@
         "crowdstrike.event.ServiceName": "quarantined_files",
         "crowdstrike.event.UTCTimestamp": 1593186952000,
         "crowdstrike.event.UserId": "Crowdstrike",
+        "crowdstrike.event.UserIp": "",
         "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
         "crowdstrike.metadata.eventCreationTime": 1593186952000,
         "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
