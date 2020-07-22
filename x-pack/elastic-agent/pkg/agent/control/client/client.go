@@ -8,9 +8,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 )
@@ -37,25 +38,25 @@ const (
 
 // Version is the current running version of the daemon.
 type Version struct {
-	Version string
-	Commit string
+	Version   string
+	Commit    string
 	BuildTime time.Time
-	Snapshot bool
+	Snapshot  bool
 }
 
 // ApplicationStatus is a status of an application inside of Elastic Agent.
 type ApplicationStatus struct {
-	ID string
-	Name string
-	Status Status
+	ID      string
+	Name    string
+	Status  Status
 	Message string
 	Payload map[string]interface{}
 }
 
 // AgentStatus is the current status of the Elastic Agent.
 type AgentStatus struct {
-	Status Status
-	Message string
+	Status       Status
+	Message      string
 	Applications []*ApplicationStatus
 }
 
@@ -149,9 +150,9 @@ func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
 			}
 		}
 		s.Applications = append(s.Applications, &ApplicationStatus{
-			ID: appRes.Id,
-			Name: appRes.Name,
-			Status: appRes.Status,
+			ID:      appRes.Id,
+			Name:    appRes.Name,
+			Status:  appRes.Status,
 			Message: appRes.Message,
 			Payload: payload,
 		})

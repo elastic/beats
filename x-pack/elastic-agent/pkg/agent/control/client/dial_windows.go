@@ -2,25 +2,25 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !windows
+// +build windows
 
 package client
 
 import (
 	"context"
 	"net"
-	"strings"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 
 	"google.golang.org/grpc"
+
+	"github.com/elastic/beats/v7/libbeat/api/npipe"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 )
 
 func dialContext(ctx context.Context) (*grpc.ClientConn, error) {
-	return grpc.DialContext(ctx, strings.TrimPrefix(control.Address(), "unix://"), grpc.WithInsecure(), grpc.WithContextDialer(dialer))
+	return grpc.DialContext(ctx, control.Address(), grpc.WithInsecure(), grpc.WithContextDialer(dialer))
 }
 
 func dialer(ctx context.Context, addr string) (net.Conn, error) {
-	var d net.Dialer
-	return d.DialContext(ctx, "unix", addr)
+	return npipe.DialContext(arr)(ctx, "", "")
 }

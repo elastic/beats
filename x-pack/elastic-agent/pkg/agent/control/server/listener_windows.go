@@ -7,14 +7,11 @@
 package server
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"net"
 	"os/user"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 )
 

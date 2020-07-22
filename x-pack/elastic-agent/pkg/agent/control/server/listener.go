@@ -8,10 +8,11 @@ package server
 
 import (
 	"net"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 )
 
 func createListener() (net.Listener, error) {
-	return net.Listen("unix", control.Address())
+	return net.Listen("unix", strings.TrimPrefix(control.Address(), "unix://"))
 }

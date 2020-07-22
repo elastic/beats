@@ -6,20 +6,21 @@ package server
 
 import (
 	"context"
+	"net"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-	"net"
 
 	"google.golang.org/grpc"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 type Server struct {
-	logger       *logger.Logger
-	listener     net.Listener
-	server       *grpc.Server
+	logger   *logger.Logger
+	listener net.Listener
+	server   *grpc.Server
 }
 
 func New(log *logger.Logger) *Server {
@@ -84,16 +85,20 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 }
 
 // Restart performs re-exec.
-func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.Empty, error) {
+func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
 	// not implemented
-	return &proto.Empty{}, nil
+	return &proto.RestartResponse{
+		Status: proto.ActionStatus_FAILURE,
+		Error:  "not implemented",
+	}, nil
 }
 
 // Upgrade performs the upgrade operation.
 func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*proto.UpgradeResponse, error) {
 	// not implemented
 	return &proto.UpgradeResponse{
-		Status:  proto.UpgradeResponse_FAILURE,
-		Version: release.Version(),
+		Status:  proto.ActionStatus_FAILURE,
+		Version: "",
+		Error:   "not implemented",
 	}, nil
 }
