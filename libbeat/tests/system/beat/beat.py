@@ -488,6 +488,21 @@ class TestCase(unittest.TestCase, ComposeMixin):
         except IOError:
             return False
 
+    def output_is_empty(self, output_file=None):
+        """
+        Returns true if the output is empty.
+        """
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
+                return len([1 for line in f]) == 0
+        except IOError:
+            return True
+
     def output_has_message(self, message, output_file=None):
         """
         Returns true if the output has the given message field.
