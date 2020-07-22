@@ -58,12 +58,6 @@
         "message": "Firewall Rule 'Inbound SMB Block & Log Private' triggered",
         "network.direction": "inbound",
         "network.type": "ipv4",
-        "process.args": [
-            ""
-        ],
-        "process.command_line": "",
-        "process.executable": "",
-        "process.name": "",
         "process.pid": "206158879910",
         "rule.category": "fec73e96a1bf4481be582c3f89b234fa",
         "rule.description": "",

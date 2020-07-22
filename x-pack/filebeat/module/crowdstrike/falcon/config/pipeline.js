@@ -99,13 +99,15 @@ var crowdstrikeFalcon = (function () {
     };
 
     var normalizeProcess = function (evt) {
-        var command_line = evt.Get("crowdstrike.event.CommandLine")
-        var args = command_line.split(' ')
-        var executable = args[0]
+        var commandLine = evt.Get("crowdstrike.event.CommandLine")
+        if (commandLine && commandLine !== "") {
+            var args = commandLine.split(' ')
+            var executable = args[0]
 
-        evt.Put("process.command_line", command_line)
-        evt.Put("process.args", args)
-        evt.Put("process.executable", executable)
+            evt.Put("process.command_line", commandLine)
+            evt.Put("process.args", args)
+            evt.Put("process.executable", executable)
+        }
     }
 
     var processEvent = function (evt) {
@@ -191,7 +193,6 @@ var crowdstrikeFalcon = (function () {
                 evt.Put("event.code", evt.Get("crowdstrike.event.EventType"))
                 evt.Put("event.dataset", "crowdstrike.falcon_endpoint")
                 evt.Put("process.pid", evt.Get("crowdstrike.event.PID"))
-                evt.Put("process.name", evt.Get("crowdstrike.event.ImageFileName"))
 
                 normalizeProcess(evt);
 
