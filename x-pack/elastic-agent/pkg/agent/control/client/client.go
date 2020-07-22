@@ -7,6 +7,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"sync"
 	"time"
@@ -160,8 +161,14 @@ func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
 
 // Restart triggers restarting the current running daemon.
 func (c *client) Restart(ctx context.Context) error {
-	_, err := c.client.Restart(ctx, &proto.Empty{})
-	return err
+	res, err := c.client.Restart(ctx, &proto.Empty{})
+	if err != nil {
+		return err
+	}
+	if res.Status == proto.ActionStatus_FAILURE {
+		return fmt.Errorf(res.Error)
+	}
+	return nil
 }
 
 // Upgrade triggers upgrade of the current running daemon.
@@ -172,6 +179,9 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string) 
 	})
 	if err != nil {
 		return "", err
+	}
+	if res.Status == proto.ActionStatus_FAILURE {
+		return "", fmt.Errorf(res.Error)
 	}
 	return res.Version, nil
 }
