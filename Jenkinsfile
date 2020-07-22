@@ -729,7 +729,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build goUnitTest")
+                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build unitTest")
               }
             }
           }

@@ -594,6 +594,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
+- Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 
 *Packetbeat*
 
