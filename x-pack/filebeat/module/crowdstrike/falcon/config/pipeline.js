@@ -25,7 +25,7 @@ var crowdstrikeFalcon = (function () {
 
     var dropIfEmpty = function (evt, field) {
         var value = evt.Get(field);
-        if (value && value === "") {
+        if (!value || value === "") {
             evt.Delete(field);
         }
     }

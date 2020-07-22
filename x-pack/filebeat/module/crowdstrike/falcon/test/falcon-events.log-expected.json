@@ -122,5 +122,50 @@
         "tags": [
             "forwarded"
         ]
+    },
+    {
+        "@timestamp": "2020-06-26T15:55:52.000Z",
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "quarantined_file_id",
+                "ValueString": "35b35a53da374816a6b471cf09e12019_a076d3121743755f2d4f8d4d5807f0bc013177f7847d09b48e76de88ace08c78"
+            },
+            {
+                "Key": "action_taken",
+                "ValueString": "quarantined"
+            }
+        ],
+        "crowdstrike.event.OperationName": "quarantined_file_update",
+        "crowdstrike.event.ServiceName": "quarantined_files",
+        "crowdstrike.event.UTCTimestamp": 1593186952000,
+        "crowdstrike.event.UserId": "Crowdstrike",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": 1593186952000,
+        "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
+        "crowdstrike.metadata.offset": 22865,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_activity_audit_event",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2579,
+        "message": "quarantined_file_update",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.name": "Crowdstrike"
     }
 ]
