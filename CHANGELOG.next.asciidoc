@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
 - Ignore missing in Zeek module when dropping unnecessary fields. {pull}19984[19984]
+- Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 
 *Heartbeat*
 
@@ -238,6 +239,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added an input option `publisher_pipeline.disable_host` to disable `host.name`
 from being added to events by default. {pull}18159[18159]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Add event.ingested for CrowdStrike module {pull}20138[20138]
+- Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 
 *Heartbeat*
 
