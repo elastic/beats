@@ -88,7 +88,7 @@ in the cluster. If `kube-state-metrics` is not already running, deploy it now (s
 https://github.com/kubernetes/kube-state-metrics#kubernetes-deployment[Kubernetes
 deployment] docs).
 
-To deploy {} to Kubernetes, run:
+To deploy to Kubernetes, run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
