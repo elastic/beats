@@ -148,9 +148,13 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu": common.MapStr{"pct": 0.25},
+				"id":  "i-123",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -175,6 +179,7 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
@@ -231,9 +236,13 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu": common.MapStr{"pct": 0.25},
+				"id":  "i-123",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -258,6 +267,7 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
