@@ -23,10 +23,6 @@ spec:
       containers:
         - name: agent-ingest-management-nodescope
           image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
-          command: ["/bin/sh", "-c"]
-          args: [
-            "yes | ./elastic-agent enroll $KIBANA_HOST $FLEET_ENROLLMENT_TOKEN && ./elastic-agent run"
-          ]
           env:
             - name: FLEET_ENROLL
               value: "1"
@@ -70,10 +66,6 @@ spec:
       containers:
         - name: agent-ingest-management-clusterscope
           image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
-          command: ["/bin/sh", "-c"]
-          args: [
-            "yes | ./elastic-agent enroll $KIBANA_HOST $FLEET_ENROLLMENT_TOKEN && ./elastic-agent run"
-          ]
           env:
             - name: FLEET_ENROLL
               value: "1"
