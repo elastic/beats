@@ -58,7 +58,7 @@ import (
 
 var (
 	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
-	filesMetrics     = harvesterMetrics.NewRegistry("files")
+	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")

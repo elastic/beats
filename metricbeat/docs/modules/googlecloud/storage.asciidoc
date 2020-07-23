@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-googlecloud-storage]]
+[role="xpack"]
 === Google Cloud Platform storage metricset
 
 beta[]
