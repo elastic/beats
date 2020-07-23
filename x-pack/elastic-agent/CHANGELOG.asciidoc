@@ -52,6 +52,7 @@
 - Remove support for logs type and use logfile {pull}19761[19761]
 - Avoid comparing uncomparable types on enroll {issue}19976[19976]
 - Fix issues with merging of elastic-agent.yml and fleet.yml {pull}20026[20026]
+- Improve GRPC stop to be more relaxed {pull}20118[20118]
 
 ==== New features
 
