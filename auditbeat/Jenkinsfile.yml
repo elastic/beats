@@ -22,6 +22,8 @@ stages:
     macos:
         command:
             - "cd auditbeat && mage build unitTest"
+        platform:
+          - "macos"
         when:           ## Aggregate when with the top-level one.
             comments:
                 - "/test auditbeat for macos"
