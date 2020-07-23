@@ -53,6 +53,7 @@
 - Avoid comparing uncomparable types on enroll {issue}19976[19976]
 - Fix issues with merging of elastic-agent.yml and fleet.yml {pull}20026[20026]
 - Fix failing unit tests on windows {pull}20127[20127]
+- Prevent closing closed reader {pull}20214[20214]
 
 ==== New features
 
