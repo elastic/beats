@@ -6,3 +6,4 @@ var:
       - /var/log/crowdstrike/falconhoseclient/output
 
 input: config/falcon.yml
+ingest_pipeline: ingest/pipeline.yml
