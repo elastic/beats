@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 
 *Heartbeat*
 
