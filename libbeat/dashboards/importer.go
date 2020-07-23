@@ -305,7 +305,9 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 
 	// Loads the internal index pattern
 	if imp.fields != nil {
-		imp.loader.ImportIndex(imp.fields)
+		if err = imp.loader.ImportIndex(imp.fields); err != nil {
+			return errw.Wrap(err, "failed to import Kibana index pattern")
+		}
 	}
 
 	dir = path.Join(dir, versionPath)
