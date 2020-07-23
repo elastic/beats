@@ -54,6 +54,7 @@
 - Unzip failures on Windows 8/Windows server 2012 {pull}20088[20088]
 - Fix failing unit tests on windows {pull}20127[20127]
 - Improve GRPC stop to be more relaxed {pull}20118[20118]
+- Prevent closing closed reader {pull}20214[20214]
 
 ==== New features
 
