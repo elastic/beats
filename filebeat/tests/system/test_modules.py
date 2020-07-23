@@ -227,7 +227,7 @@ def clean_keys(obj):
         "cef.log",
         "cisco.asa",
         "cisco.ios",
-        "f5.firepass",
+        "cylance.protect",
         "fortinet.clientendpoint",
         "haproxy.log",
         "icinga.startup",
