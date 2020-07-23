@@ -25,6 +25,7 @@ package query
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/metricbeat/module/mysql"
 
 	"github.com/pkg/errors"
 
@@ -36,7 +37,7 @@ import (
 
 func init() {
 	mb.Registry.MustAddMetricSet("mysql", "query", New,
-		mb.DefaultMetricSet(),
+		mb.WithHostParser(mysql.ParseDSN),
 	)
 }
 
