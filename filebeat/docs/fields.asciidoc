@@ -32022,7 +32022,7 @@ Meta data fields for each event that include type and timestamp.
 *`crowdstrike.metadata.eventType`*::
 +
 --
-DetectionSummaryEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
+DetectionSummaryEvent, FirewallMatchEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
 
 
 type: keyword
@@ -32200,6 +32200,16 @@ type: keyword
 +
 --
 Executable path with command line arguments.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.SHA1String`*::
++
+--
+SHA1 sum of the executable associated with the detection.
 
 
 type: keyword
@@ -32456,6 +32466,16 @@ type: nested
 
 --
 
+*`crowdstrike.event.ExecutablesWritten`*::
++
+--
+Detected executables written to disk by a process.
+
+
+type: nested
+
+--
+
 *`crowdstrike.event.SessionId`*::
 +
 --
@@ -32493,6 +32513,406 @@ End time for the remote session in UTC UNIX format.
 
 
 type: date
+
+--
+
+*`crowdstrike.event.LateralMovement`*::
++
+--
+Lateral movement field for incident.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.ParentImageFileName`*::
++
+--
+Path to the parent process.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ParentCommandLine`*::
++
+--
+Parent process command line arguments.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.GrandparentImageFileName`*::
++
+--
+Path to the grandparent process.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.GrandparentCommandLine`*::
++
+--
+Grandparent process command line arguments.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.IOCType`*::
++
+--
+CrowdStrike type for indicator of compromise.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.IOCValue`*::
++
+--
+CrowdStrike value for indicator of compromise.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.CustomerId`*::
++
+--
+Customer identifier.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.DeviceId`*::
++
+--
+Device on which the event occurred.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Ipv`*::
++
+--
+Protocol for network request.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ConnectionDirection`*::
++
+--
+Direction for network connection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.EventType`*::
++
+--
+CrowdStrike provided event type.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.HostName`*::
++
+--
+Host name of the local machine.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ICMPCode`*::
++
+--
+RFC2780 ICMP Code field.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ICMPType`*::
++
+--
+RFC2780 ICMP Type field.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ImageFileName`*::
++
+--
+File name of the associated process for the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.PID`*::
++
+--
+Associated process id for the detection.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.LocalAddress`*::
++
+--
+IP address of local machine.
+
+
+type: ip
+
+--
+
+*`crowdstrike.event.LocalPort`*::
++
+--
+Port of local machine.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.RemoteAddress`*::
++
+--
+IP address of remote machine.
+
+
+type: ip
+
+--
+
+*`crowdstrike.event.RemotePort`*::
++
+--
+Port of remote machine.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.RuleAction`*::
++
+--
+Firewall rule action.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.RuleDescription`*::
++
+--
+Firewall rule description.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.RuleFamilyID`*::
++
+--
+Firewall rule family id.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.RuleGroupName`*::
++
+--
+Firewall rule group name.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.RuleName`*::
++
+--
+Firewall rule name.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.RuleId`*::
++
+--
+Firewall rule id.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.MatchCount`*::
++
+--
+Number of firewall rule matches.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.MatchCountSinceLastReport`*::
++
+--
+Number of firewall rule matches since the last report.
+
+
+type: long
+
+--
+
+*`crowdstrike.event.Timestamp`*::
++
+--
+Firewall rule triggered timestamp.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.Flags.Audit`*::
++
+--
+CrowdStrike audit flag.
+
+
+type: boolean
+
+--
+
+*`crowdstrike.event.Flags.Log`*::
++
+--
+CrowdStrike log flag.
+
+
+type: boolean
+
+--
+
+*`crowdstrike.event.Flags.Monitor`*::
++
+--
+CrowdStrike monitor flag.
+
+
+type: boolean
+
+--
+
+*`crowdstrike.event.Protocol`*::
++
+--
+CrowdStrike provided protocol.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.NetworkProfile`*::
++
+--
+CrowdStrike network profile.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.PolicyName`*::
++
+--
+CrowdStrike policy name.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.PolicyID`*::
++
+--
+CrowdStrike policy id.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Status`*::
++
+--
+CrowdStrike status.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.TreeID`*::
++
+--
+CrowdStrike tree id.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Commands`*::
++
+--
+Commands run in a remote session.
+
+
+type: keyword
 
 --
 

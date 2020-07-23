@@ -239,6 +239,17 @@ def clean_keys(obj):
         "redis.log",
         "system.auth",
         "system.syslog",
+        "microsoft.defender_atp",
+        "crowdstrike.falcon_endpoint",
+        "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
@@ -265,6 +276,8 @@ def clean_keys(obj):
             delete_key(obj, "@timestamp")
             # Also remove alternate time field from rsa parsers.
             delete_key(obj, "rsa.time.event_time")
+            # Remove event.ingested from testing, as it will never be the same.
+            delete_key(obj, "event.ingested")
         else:
             # excluded events need to have their filename saved to the expected.json
             # so that the exception mechanism can be triggered when the json is
@@ -275,14 +288,6 @@ def clean_keys(obj):
     if obj["event.dataset"] == "aws.vpcflow":
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
-
-    # Remove event.ingested from testing, as it will never be the same.
-    if obj["event.dataset"] == "microsoft.defender_atp":
-        delete_key(obj, "event.ingested")
-        delete_key(obj, "@timestamp")
-
-    if obj["event.module"] == "gsuite":
-        delete_key(obj, "event.ingested")
 
 
 def delete_key(obj, key):
