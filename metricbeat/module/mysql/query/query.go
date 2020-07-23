@@ -40,7 +40,7 @@ func init() {
 	)
 }
 
-type query struct {
+type Query struct {
 	// Namespace for the mysql event. It effectively names the metricset. For example using `performance` will name
 	// all events `mysql.performance.*`
 	Namespace string `config:"query_namespace"`
@@ -57,7 +57,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	db     *sql.DbClient
 	Config struct {
-		Queries   []query `config:"queries" validate:"nonzero,required"`
+		Queries   []Query `config:"queries" validate:"nonzero,required"`
 		Namespace string  `config:"namespace" validate:"nonzero,required"`
 	}
 }
@@ -95,7 +95,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.ReporterV2) error {
+func (m *MetricSet) fetchQuery(ctx context.Context, query Query, reporter mb.ReporterV2) error {
 	if query.ResponseFormat == "table" {
 		mss, err := m.db.FetchTableMode(ctx, query.Query)
 		if err != nil {
@@ -103,7 +103,7 @@ func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.Rep
 		}
 
 		for _, ms := range mss {
-			event := m.transformMapStrToEvent(query, ms)
+			event := TransformMapStrToEvent(ms, m.Config.Namespace, query.Namespace, query.ReplaceUnderscores)
 			reporter.Event(event)
 		}
 	} else {
@@ -112,25 +112,25 @@ func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.Rep
 			return err
 		}
 
-		event := m.transformMapStrToEvent(query, ms)
+		event := TransformMapStrToEvent(ms, m.Config.Namespace, query.Namespace, query.ReplaceUnderscores)
 		reporter.Event(event)
 	}
 
 	return nil
 }
 
-func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Event {
-	event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
+func TransformMapStrToEvent(ms common.MapStr, namespace, queryNamespace string, replaceUnderscores bool) mb.Event {
+	event := mb.Event{ModuleFields: common.MapStr{namespace: common.MapStr{}}}
 
 	data := ms
-	if query.ReplaceUnderscores {
+	if replaceUnderscores {
 		data = sql.ReplaceUnderscores(ms)
 	}
 
-	if query.Namespace != "" {
-		event.ModuleFields[m.Config.Namespace] = common.MapStr{query.Namespace: data}
+	if queryNamespace != "" {
+		event.ModuleFields[namespace] = common.MapStr{queryNamespace: data}
 	} else {
-		event.ModuleFields[m.Config.Namespace] = data
+		event.ModuleFields[namespace] = data
 	}
 
 	return event
