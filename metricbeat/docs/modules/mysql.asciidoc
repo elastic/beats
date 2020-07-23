@@ -58,8 +58,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: mysql
   metricsets:
-    - "status"
-  # - "galera_status"
+    - status
+  # - galera_status
   # - performance
   # - query
   period: 10s
