@@ -16,7 +16,7 @@ processors:
       target: suricata.eve
   - convert:
       ignore_missing: true
-      ignore_failure: true
+      fail_on_error: false
       mode: rename
       fields:
         - {from: suricata.eve.src_ip, to: source.address}
@@ -26,7 +26,7 @@ processors:
         - {from: suricata.eve.proto, to: network.transport}
   - convert:
       ignore_missing: true
-      ignore_failure: true
+      fail_on_error: false
       mode: copy
       fields:
         - {from: source.address, to: source.ip, type: ip}
@@ -48,7 +48,7 @@ processors:
     then:
       - convert:
           ignore_missing: true
-          ignore_failure: true
+          fail_on_error: false
           mode: copy
           fields:
             - {from: suricata.eve.dns.id, to: dns.id, type: string}
@@ -57,7 +57,7 @@ processors:
       - convert:
           when.equals.dns.type: query
           ignore_missing: true
-          ignore_failure: true
+          fail_on_error: false
           mode: copy
           fields:
             - {from: suricata.eve.dns.rrname, to: dns.question.name}
@@ -69,7 +69,7 @@ processors:
         then:
           - convert:
               ignore_missing: true
-              ignore_failure: true
+              fail_on_error: false
               mode: copy
               fields:
                 - {from: suricata.eve.dns.rrname, to: dns.question.name}
