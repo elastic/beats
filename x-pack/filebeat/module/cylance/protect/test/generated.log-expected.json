@@ -1353,7 +1353,7 @@
         "user.name": "imveni"
     },
     {
-        "@timestamp": "2019-07-25T11:47:41.000Z",
+        "@timestamp": "2020-07-25T11:47:41.000Z",
         "event.action": "DeviceRemove",
         "event.code": "CylancePROTECT",
         "event.dataset": "cylance.protect",
@@ -1384,7 +1384,7 @@
             "ntium4450.www5.localdomain"
         ],
         "rsa.network.eth_host": "01:00:5e:ee:e8:77",
-        "rsa.time.event_time": "2019-07-25T11:47:41.000Z",
+        "rsa.time.event_time": "2020-07-25T11:47:41.000Z",
         "service.type": "cylance",
         "source.ip": [
             "10.22.94.10"
