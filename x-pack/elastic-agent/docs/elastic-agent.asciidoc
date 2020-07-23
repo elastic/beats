@@ -15,6 +15,7 @@ To learn how to install, configure, and run your {agent}s, see:
 
 * <<elastic-agent-installation>>
 * <<run-elastic-agent>>
+* <<stop-elastic-agent>>
 * <<elastic-agent-cmd-options>>
 * <<elastic-agent-configuration>>
 
