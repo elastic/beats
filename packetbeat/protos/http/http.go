@@ -458,7 +458,7 @@ func (http *httpPlugin) flushResponses(conn *httpConnectionData) {
 		resp := conn.responses.pop()
 		debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
 
-		if bytes.Equal(resp.statusPhrase, continueStatePhrase) && resp.statusCode == 100 {
+		if resp.statusCode == 100 {
 			debugf("Drop first 100-continue response")
 			return
 		}
