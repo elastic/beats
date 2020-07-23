@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-app_insights]]
+[role="xpack"]
 === Azure app_insights metricset
 
 beta[]
