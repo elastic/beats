@@ -49,6 +49,7 @@ function enroll(){
       if [ $exitCode -ne 0 ]; then
         exit $exitCode
       fi
+      
       apikey=$(echo $enrollResp | jq -r '.item.api_key')
     fi
     echo $apikey
