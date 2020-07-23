@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-openmetrics-collector]]
+[role="xpack"]
 === Openmetrics collector metricset
 
 beta[]
