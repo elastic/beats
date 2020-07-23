@@ -23,8 +23,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.176.10.114",
-            "10.206.191.17"
+            "10.206.191.17",
+            "10.176.10.114"
         ],
         "related.user": [
             "sumdo"
@@ -182,8 +182,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uptassi",
         "rsa.misc.action": [
-            "Blocked",
-            "giatq"
+            "giatq",
+            "Blocked"
         ],
         "rsa.misc.category": "llu",
         "rsa.misc.filter": "tconsec",
@@ -208,7 +208,7 @@
         ],
         "url.original": "https://example.com/taspe/mvolu.gif?atcup=snos#iquaUte",
         "user.name": "tenima",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -240,8 +240,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.103.246.190",
-            "10.252.125.53"
+            "10.252.125.53",
+            "10.103.246.190"
         ],
         "related.user": [
             "equun"
@@ -255,8 +255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ima",
         "rsa.misc.action": [
-            "Allowed",
-            "llam"
+            "llam",
+            "Allowed"
         ],
         "rsa.misc.category": "aboris",
         "rsa.misc.filter": "atatnonp",
@@ -281,7 +281,7 @@
         ],
         "url.original": "https://api.example.org/doloreeu/pori.jpg?itati=mfu#uid",
         "user.name": "equun",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -313,8 +313,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.61.78.108",
-            "10.136.153.149"
+            "10.136.153.149",
+            "10.61.78.108"
         ],
         "related.user": [
             "ercit"
@@ -328,8 +328,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inim",
         "rsa.misc.action": [
-            "reetdolo",
-            "Blocked"
+            "Blocked",
+            "reetdolo"
         ],
         "rsa.misc.category": "osquir",
         "rsa.misc.filter": "ipit",
@@ -386,8 +386,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.183.16.166",
-            "10.66.250.92"
+            "10.66.250.92",
+            "10.183.16.166"
         ],
         "related.user": [
             "tessec"
@@ -401,8 +401,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "avol",
         "rsa.misc.action": [
-            "ist",
-            "Allowed"
+            "Allowed",
+            "ist"
         ],
         "rsa.misc.category": "lorema",
         "rsa.misc.filter": "sun",
@@ -474,8 +474,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lupt",
         "rsa.misc.action": [
-            "dun",
-            "Blocked"
+            "Blocked",
+            "dun"
         ],
         "rsa.misc.category": "rsitamet",
         "rsa.misc.filter": "usmod",
@@ -532,8 +532,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.74.17.5",
-            "10.119.185.63"
+            "10.119.185.63",
+            "10.74.17.5"
         ],
         "related.user": [
             "erc"
@@ -547,8 +547,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tame",
         "rsa.misc.action": [
-            "nsec",
-            "Blocked"
+            "Blocked",
+            "nsec"
         ],
         "rsa.misc.category": "emaperi",
         "rsa.misc.filter": "rehe",
@@ -605,8 +605,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.78.151.178",
-            "10.25.192.202"
+            "10.25.192.202",
+            "10.78.151.178"
         ],
         "related.user": [
             "quip"
@@ -620,8 +620,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atquovo",
         "rsa.misc.action": [
-            "amvolup",
-            "Allowed"
+            "Allowed",
+            "amvolup"
         ],
         "rsa.misc.category": "hil",
         "rsa.misc.filter": "deFinibu",
@@ -678,8 +678,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.71.170.37",
-            "10.135.225.244"
+            "10.135.225.244",
+            "10.71.170.37"
         ],
         "related.user": [
             "atu"
@@ -693,8 +693,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ihilm",
         "rsa.misc.action": [
-            "psaquae",
-            "Allowed"
+            "Allowed",
+            "psaquae"
         ],
         "rsa.misc.category": "eFinib",
         "rsa.misc.filter": "inesci",
@@ -719,7 +719,7 @@
         ],
         "url.original": "https://mail.example.net/equep/iavolu.gif?aqu=rpo#uipe",
         "user.name": "atu",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -865,7 +865,7 @@
         ],
         "url.original": "https://internal.example.net/oru/temqu.htm?etMalor=ipi#reseos",
         "user.name": "ihilmo",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -897,8 +897,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.31.240.6",
-            "10.167.98.76"
+            "10.167.98.76",
+            "10.31.240.6"
         ],
         "related.user": [
             "ratvolu"
@@ -970,8 +970,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.135.160.125",
-            "10.0.55.9"
+            "10.0.55.9",
+            "10.135.160.125"
         ],
         "related.user": [
             "volupta"
@@ -1058,8 +1058,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nnum",
         "rsa.misc.action": [
-            "ntoccae",
-            "Allowed"
+            "Allowed",
+            "ntoccae"
         ],
         "rsa.misc.category": "tium",
         "rsa.misc.filter": "uteirure",
@@ -1116,8 +1116,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.5.126.127",
-            "10.252.124.150"
+            "10.252.124.150",
+            "10.5.126.127"
         ],
         "related.user": [
             "inibusB"
@@ -1131,8 +1131,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mod",
         "rsa.misc.action": [
-            "xeacomm",
-            "Allowed"
+            "Allowed",
+            "xeacomm"
         ],
         "rsa.misc.category": "sauteiru",
         "rsa.misc.filter": "antiu",
@@ -1277,8 +1277,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quid",
         "rsa.misc.action": [
-            "itecto",
-            "Allowed"
+            "Allowed",
+            "itecto"
         ],
         "rsa.misc.category": "quam",
         "rsa.misc.filter": "adeser",
@@ -1408,8 +1408,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.29.155.171",
-            "10.229.83.165"
+            "10.229.83.165",
+            "10.29.155.171"
         ],
         "related.user": [
             "ulapar"
@@ -1423,8 +1423,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedi",
         "rsa.misc.action": [
-            "llitanim",
-            "Allowed"
+            "Allowed",
+            "llitanim"
         ],
         "rsa.misc.category": "apariat",
         "rsa.misc.filter": "tasnulap",
@@ -1481,8 +1481,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.129.192.145",
-            "10.161.148.64"
+            "10.161.148.64",
+            "10.129.192.145"
         ],
         "related.user": [
             "lor"
@@ -1554,8 +1554,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.7.200.140",
-            "10.203.65.161"
+            "10.203.65.161",
+            "10.7.200.140"
         ],
         "related.user": [
             "snost"
@@ -1569,8 +1569,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdol",
         "rsa.misc.action": [
-            "Allowed",
-            "nte"
+            "nte",
+            "Allowed"
         ],
         "rsa.misc.category": "adeseru",
         "rsa.misc.filter": "mac",
@@ -1642,8 +1642,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iutali",
         "rsa.misc.action": [
-            "Blocked",
-            "atcupi"
+            "atcupi",
+            "Blocked"
         ],
         "rsa.misc.category": "isetq",
         "rsa.misc.filter": "equinesc",
@@ -1700,8 +1700,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.24.111.229",
-            "10.39.31.115"
+            "10.39.31.115",
+            "10.24.111.229"
         ],
         "related.user": [
             "fugi"
@@ -1741,7 +1741,7 @@
         ],
         "url.original": "https://example.com/luptatem/uaeratv.gif?dat=periam#dqu",
         "user.name": "fugi",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1788,8 +1788,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "riss",
         "rsa.misc.action": [
-            "Blocked",
-            "risnis"
+            "risnis",
+            "Blocked"
         ],
         "rsa.misc.category": "emqu",
         "rsa.misc.filter": "oluptas",
@@ -1846,8 +1846,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.128.173.19",
-            "10.88.172.34"
+            "10.88.172.34",
+            "10.128.173.19"
         ],
         "related.user": [
             "agnaaliq"
@@ -1919,8 +1919,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.130.241.232",
-            "10.238.224.49"
+            "10.238.224.49",
+            "10.130.241.232"
         ],
         "related.user": [
             "onse"
@@ -1960,7 +1960,7 @@
         ],
         "url.original": "https://api.example.org/rure/asiarchi.txt?loremeu=aturve#utfug",
         "user.name": "onse",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2033,7 +2033,7 @@
         ],
         "url.original": "https://example.com/emUte/molestia.htm?orroqu=elitsed#labore",
         "user.name": "Cic",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2106,7 +2106,7 @@
         ],
         "url.original": "https://mail.example.net/repreh/plic.jpg?utlabo=tetur#tionula",
         "user.name": "ueipsa",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2138,8 +2138,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.18.226.72",
-            "10.101.85.169"
+            "10.101.85.169",
+            "10.18.226.72"
         ],
         "related.user": [
             "rroqu"
@@ -2153,8 +2153,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "moles",
         "rsa.misc.action": [
-            "Allowed",
-            "vitaed"
+            "vitaed",
+            "Allowed"
         ],
         "rsa.misc.category": "billoi",
         "rsa.misc.filter": "suntex",
@@ -2179,7 +2179,7 @@
         ],
         "url.original": "https://api.example.com/tcu/iatqu.jpg?quovo=urExcep#ema",
         "user.name": "rroqu",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2211,8 +2211,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.87.100.240",
-            "10.242.182.193"
+            "10.242.182.193",
+            "10.87.100.240"
         ],
         "related.user": [
             "stenatus"
@@ -2284,8 +2284,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.80.57.247",
-            "10.229.242.223"
+            "10.229.242.223",
+            "10.80.57.247"
         ],
         "related.user": [
             "itasp"
@@ -2357,8 +2357,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.106.77.138",
-            "10.193.66.155"
+            "10.193.66.155",
+            "10.106.77.138"
         ],
         "related.user": [
             "iusmodt"
@@ -2372,8 +2372,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uteir",
         "rsa.misc.action": [
-            "Allowed",
-            "Section"
+            "Section",
+            "Allowed"
         ],
         "rsa.misc.category": "cididu",
         "rsa.misc.filter": "Utenima",
@@ -2430,8 +2430,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.236.230.136",
-            "10.54.159.1"
+            "10.54.159.1",
+            "10.236.230.136"
         ],
         "related.user": [
             "mUteni"
@@ -2518,8 +2518,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tvolup",
         "rsa.misc.action": [
-            "utemvel",
-            "Allowed"
+            "Allowed",
+            "utemvel"
         ],
         "rsa.misc.category": "untutlab",
         "rsa.misc.filter": "dol",
@@ -2649,8 +2649,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.128.184.241",
-            "10.138.188.201"
+            "10.138.188.201",
+            "10.128.184.241"
         ],
         "related.user": [
             "etur"
@@ -2810,8 +2810,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "idolores",
         "rsa.misc.action": [
-            "lestia",
-            "Blocked"
+            "Blocked",
+            "lestia"
         ],
         "rsa.misc.category": "risni",
         "rsa.misc.filter": "emacc",
@@ -2868,8 +2868,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.33.144.10",
-            "10.202.224.79"
+            "10.202.224.79",
+            "10.33.144.10"
         ],
         "related.user": [
             "rios"
@@ -2883,8 +2883,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lit",
         "rsa.misc.action": [
-            "Blocked",
-            "quu"
+            "quu",
+            "Blocked"
         ],
         "rsa.misc.category": "oluptate",
         "rsa.misc.filter": "exercita",
@@ -2982,7 +2982,7 @@
         ],
         "url.original": "https://mail.example.com/qui/equeporr.jpg?itsedd=texpli#liquipex",
         "user.name": "CSe",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3029,8 +3029,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "voluptas",
         "rsa.misc.action": [
-            "olor",
-            "Allowed"
+            "Allowed",
+            "olor"
         ],
         "rsa.misc.category": "ataevita",
         "rsa.misc.filter": "nderi",
@@ -3160,8 +3160,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.137.164.122",
-            "10.143.0.78"
+            "10.143.0.78",
+            "10.137.164.122"
         ],
         "related.user": [
             "orissus"
@@ -3233,8 +3233,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.30.87.51",
-            "10.156.177.53"
+            "10.156.177.53",
+            "10.30.87.51"
         ],
         "related.user": [
             "psaquaea"
@@ -3321,8 +3321,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "upta",
-            "Blocked"
+            "Blocked",
+            "upta"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3379,8 +3379,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.141.195.13",
-            "10.180.150.47"
+            "10.180.150.47",
+            "10.141.195.13"
         ],
         "related.user": [
             "taliq"
@@ -3394,8 +3394,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itesse",
         "rsa.misc.action": [
-            "Allowed",
-            "uip"
+            "uip",
+            "Allowed"
         ],
         "rsa.misc.category": "teturad",
         "rsa.misc.filter": "roquisqu",
@@ -3452,8 +3452,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.255.40.12",
-            "10.166.195.20"
+            "10.166.195.20",
+            "10.255.40.12"
         ],
         "related.user": [
             "lamcolab"
@@ -3467,8 +3467,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mipsumq",
         "rsa.misc.action": [
-            "Allowed",
-            "citation"
+            "citation",
+            "Allowed"
         ],
         "rsa.misc.category": "usant",
         "rsa.misc.filter": "Nem",
@@ -3523,8 +3523,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.100.143.226",
-            "10.22.122.43"
+            "10.22.122.43",
+            "10.100.143.226"
         ],
         "related.user": [
             "ute"
@@ -3538,8 +3538,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ento",
         "rsa.misc.action": [
-            "Blocked",
-            "Bonoru"
+            "Bonoru",
+            "Blocked"
         ],
         "rsa.misc.category": "luptasnu",
         "rsa.misc.filter": "quamni",
@@ -3564,7 +3564,7 @@
         ],
         "url.original": "https://example.org/tvolu/dutper.html?nbyCicer=scipit#equuntu",
         "user.name": "ute",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -3596,8 +3596,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.121.9.5",
-            "10.119.53.68"
+            "10.119.53.68",
+            "10.121.9.5"
         ],
         "related.user": [
             "ssec"
@@ -3611,8 +3611,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dexea",
         "rsa.misc.action": [
-            "tinvolup",
-            "Blocked"
+            "Blocked",
+            "tinvolup"
         ],
         "rsa.misc.category": "ende",
         "rsa.misc.filter": "onse",
@@ -3755,8 +3755,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "epor",
         "rsa.misc.action": [
-            "etquasia",
-            "Allowed"
+            "Allowed",
+            "etquasia"
         ],
         "rsa.misc.category": "iaturE",
         "rsa.misc.filter": "rep",
@@ -3809,8 +3809,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.39.46.155",
-            "10.120.138.109"
+            "10.120.138.109",
+            "10.39.46.155"
         ],
         "related.user": [
             "picia"
@@ -3824,8 +3824,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "adipisc",
         "rsa.misc.action": [
-            "exer",
-            "Blocked"
+            "Blocked",
+            "exer"
         ],
         "rsa.misc.category": "remagna",
         "rsa.misc.filter": "emvel",
@@ -3850,7 +3850,7 @@
         ],
         "url.original": "https://example.com/itsedqu/paq.jpg?hilmol=oluptate#todi",
         "user.name": "picia",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3897,8 +3897,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ecillum",
         "rsa.misc.action": [
-            "emp",
-            "Blocked"
+            "Blocked",
+            "emp"
         ],
         "rsa.misc.category": "ciati",
         "rsa.misc.filter": "elit",
@@ -4333,8 +4333,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tDuisaut",
         "rsa.misc.action": [
-            "upidatat",
-            "Allowed"
+            "Allowed",
+            "upidatat"
         ],
         "rsa.misc.category": "aliquide",
         "rsa.misc.filter": "deriti",
@@ -4359,7 +4359,7 @@
         ],
         "url.original": "https://api.example.com/lits/tvolu.jpg?squir=gnaaliq#quam",
         "user.name": "tsedquia",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -4406,8 +4406,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rroq",
         "rsa.misc.action": [
-            "fdeFin",
-            "Blocked"
+            "Blocked",
+            "fdeFin"
         ],
         "rsa.misc.category": "diduntut",
         "rsa.misc.filter": "ano",
@@ -4533,8 +4533,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.248.108.55",
-            "10.120.215.174"
+            "10.120.215.174",
+            "10.248.108.55"
         ],
         "related.user": [
             "prehend"
@@ -4548,8 +4548,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rema",
         "rsa.misc.action": [
-            "uatDu",
-            "Allowed"
+            "Allowed",
+            "uatDu"
         ],
         "rsa.misc.category": "ent",
         "rsa.misc.filter": "iscivel",
@@ -4604,8 +4604,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.51.161.245",
-            "10.15.254.181"
+            "10.15.254.181",
+            "10.51.161.245"
         ],
         "related.user": [
             "abo"
@@ -4645,7 +4645,7 @@
         ],
         "url.original": "https://www5.example.net/yCice/uinesci.htm?taevitae=dminimv#quam",
         "user.name": "abo",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4677,8 +4677,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.7.152.238",
-            "10.129.66.196"
+            "10.129.66.196",
+            "10.7.152.238"
         ],
         "related.user": [
             "equamn"
@@ -4750,8 +4750,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.185.107.27",
-            "10.29.162.157"
+            "10.29.162.157",
+            "10.185.107.27"
         ],
         "related.user": [
             "evelite"
@@ -4765,8 +4765,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "orinrep",
         "rsa.misc.action": [
-            "squirat",
-            "Blocked"
+            "Blocked",
+            "squirat"
         ],
         "rsa.misc.category": "sequa",
         "rsa.misc.filter": "orainci",
@@ -4823,8 +4823,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.215.63.248",
-            "10.138.0.214"
+            "10.138.0.214",
+            "10.215.63.248"
         ],
         "related.user": [
             "eavolupt"
@@ -4838,8 +4838,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "dqu",
-            "Blocked"
+            "Blocked",
+            "dqu"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -4864,7 +4864,7 @@
         ],
         "url.original": "https://mail.example.org/umdolo/nimv.htm?equunt=tutla#usmod",
         "user.name": "eavolupt",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -5115,8 +5115,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.249.1.143",
-            "10.124.177.226"
+            "10.124.177.226",
+            "10.249.1.143"
         ],
         "related.user": [
             "isciveli"
@@ -5156,7 +5156,7 @@
         ],
         "url.original": "https://internal.example.org/olorin/orisnisi.gif?eritquii=atevelit#dese",
         "user.name": "isciveli",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -5188,8 +5188,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.146.228.249",
-            "10.167.176.220"
+            "10.167.176.220",
+            "10.146.228.249"
         ],
         "related.user": [
             "estla"
@@ -5261,8 +5261,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.203.47.23",
-            "10.200.74.101"
+            "10.200.74.101",
+            "10.203.47.23"
         ],
         "related.user": [
             "litesse"
@@ -5276,8 +5276,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nde",
         "rsa.misc.action": [
-            "iqu",
-            "Allowed"
+            "Allowed",
+            "iqu"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "ntincul",
@@ -5334,8 +5334,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.24.23.209",
-            "10.162.78.48"
+            "10.162.78.48",
+            "10.24.23.209"
         ],
         "related.user": [
             "ntore"
@@ -5375,7 +5375,7 @@
         ],
         "url.original": "https://example.com/sedqui/iuntNe.gif?epteu=nvent#uepor",
         "user.name": "ntore",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5407,8 +5407,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.55.151.53",
-            "10.211.66.68"
+            "10.211.66.68",
+            "10.55.151.53"
         ],
         "related.user": [
             "squir"
@@ -5422,8 +5422,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "diconseq",
         "rsa.misc.action": [
-            "umet",
-            "Allowed"
+            "Allowed",
+            "umet"
         ],
         "rsa.misc.category": "ciad",
         "rsa.misc.filter": "oeiusmod",
@@ -5448,7 +5448,7 @@
         ],
         "url.original": "https://www5.example.net/lits/Nemoen.txt?elillu=seruntmo#imidest",
         "user.name": "squir",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5521,7 +5521,7 @@
         ],
         "url.original": "https://example.org/eius/evo.jpg?iarchit=volupt#ipis",
         "user.name": "mes",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5626,8 +5626,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.124.119.48",
-            "10.26.222.144"
+            "10.26.222.144",
+            "10.124.119.48"
         ],
         "related.user": [
             "nre"
@@ -5641,8 +5641,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lloin",
         "rsa.misc.action": [
-            "Blocked",
-            "ici"
+            "ici",
+            "Blocked"
         ],
         "rsa.misc.category": "quidolor",
         "rsa.misc.filter": "nonproi",
@@ -5714,8 +5714,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "Allowed",
-            "antium"
+            "antium",
+            "Allowed"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -5740,7 +5740,7 @@
         ],
         "url.original": "https://mail.example.org/ntutlabo/leumiure.htm?eacommo=amqua#tionevol",
         "user.name": "ten",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -5959,7 +5959,7 @@
         ],
         "url.original": "https://mail.example.net/enbyCic/aturau.gif?orroqui=sci#psamvolu",
         "user.name": "tectobe",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -6105,7 +6105,7 @@
         ],
         "url.original": "https://api.example.net/mnisiut/eabil.jpg?psumqui=trude#ccusa",
         "user.name": "redolo",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -6137,8 +6137,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.13.125.101",
-            "10.97.202.149"
+            "10.97.202.149",
+            "10.13.125.101"
         ],
         "related.user": [
             "colab"
@@ -6152,8 +6152,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atcupi",
         "rsa.misc.action": [
-            "Blocked",
-            "uaUten"
+            "uaUten",
+            "Blocked"
         ],
         "rsa.misc.category": "modt",
         "rsa.misc.filter": "magnidol",
@@ -6225,8 +6225,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itautf",
         "rsa.misc.action": [
-            "Blocked",
-            "mini"
+            "mini",
+            "Blocked"
         ],
         "rsa.misc.category": "gna",
         "rsa.misc.filter": "usmo",
@@ -6283,8 +6283,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.10.25.145",
-            "10.224.249.228"
+            "10.224.249.228",
+            "10.10.25.145"
         ],
         "related.user": [
             "mnisiuta"
@@ -6298,8 +6298,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issuscip",
         "rsa.misc.action": [
-            "Blocked",
-            "remap"
+            "remap",
+            "Blocked"
         ],
         "rsa.misc.category": "eetdolo",
         "rsa.misc.filter": "rsitam",
@@ -6324,7 +6324,7 @@
         ],
         "url.original": "https://www.example.org/iat/acom.html?umdolo=oluptass#umqu",
         "user.name": "mnisiuta",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -6371,8 +6371,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "neavolu",
         "rsa.misc.action": [
-            "nofdeF",
-            "Blocked"
+            "Blocked",
+            "nofdeF"
         ],
         "rsa.misc.category": "remagnam",
         "rsa.misc.filter": "maveniam",
@@ -6397,7 +6397,7 @@
         ],
         "url.original": "https://www.example.com/onorum/umiure.gif?lites=admini#trumexer",
         "user.name": "aeabillo",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -6444,8 +6444,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ilmoles",
         "rsa.misc.action": [
-            "Blocked",
-            "tatisetq"
+            "tatisetq",
+            "Blocked"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "liquide",
@@ -6502,8 +6502,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.154.188.132",
-            "10.166.205.159"
+            "10.166.205.159",
+            "10.154.188.132"
         ],
         "related.user": [
             "uptat"
@@ -6640,8 +6640,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.172.159.251",
-            "10.254.119.31"
+            "10.254.119.31",
+            "10.172.159.251"
         ],
         "related.user": [
             "usm"
@@ -6655,8 +6655,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "imadmi",
         "rsa.misc.action": [
-            "tatemacc",
-            "Blocked"
+            "Blocked",
+            "tatemacc"
         ],
         "rsa.misc.category": "tutlabor",
         "rsa.misc.filter": "eturad",
@@ -6728,8 +6728,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "isnost",
         "rsa.misc.action": [
-            "Allowed",
-            "oriosa"
+            "oriosa",
+            "Allowed"
         ],
         "rsa.misc.category": "uis",
         "rsa.misc.filter": "nemul",
@@ -6801,8 +6801,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntut",
         "rsa.misc.action": [
-            "nima",
-            "Blocked"
+            "Blocked",
+            "nima"
         ],
         "rsa.misc.category": "boru",
         "rsa.misc.filter": "umquia",
@@ -6827,7 +6827,7 @@
         ],
         "url.original": "https://www5.example.org/oriosa/ssusc.htm?atemacc=rsitvolu#isi",
         "user.name": "eroi",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -6874,8 +6874,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tquovo",
         "rsa.misc.action": [
-            "qua",
-            "Allowed"
+            "Allowed",
+            "qua"
         ],
         "rsa.misc.category": "ectet",
         "rsa.misc.filter": "lites",
@@ -6932,8 +6932,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.131.81.172",
-            "10.139.90.218"
+            "10.139.90.218",
+            "10.131.81.172"
         ],
         "related.user": [
             "hende"
@@ -7005,8 +7005,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.152.217.174",
-            "10.128.43.71"
+            "10.128.43.71",
+            "10.152.217.174"
         ],
         "related.user": [
             "mquiado"
@@ -7020,8 +7020,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.action": [
-            "Blocked",
-            "temvele"
+            "temvele",
+            "Blocked"
         ],
         "rsa.misc.category": "natuser",
         "rsa.misc.filter": "amnihil",
@@ -7046,7 +7046,7 @@
         ],
         "url.original": "https://www.example.org/erit/asiarch.gif?tdolor=oremagna#siuta",
         "user.name": "mquiado",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -7078,8 +7078,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.217.193.148",
-            "10.26.149.221"
+            "10.26.149.221",
+            "10.217.193.148"
         ],
         "related.user": [
             "uisa"
@@ -7224,8 +7224,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.ip": [
-            "10.119.106.108",
-            "10.135.38.213"
+            "10.135.38.213",
+            "10.119.106.108"
         ],
         "related.user": [
             "ore"
@@ -7265,7 +7265,7 @@
         ],
         "url.original": "https://mail.example.com/ostr/liqu.txt?niam=mullamc#umtota",
         "user.name": "ore",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
