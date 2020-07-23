@@ -113,7 +113,6 @@ var (
 	constClose          = []byte("close")
 	constKeepAlive      = []byte("keep-alive")
 	constHTTPVersion    = []byte("HTTP/")
-	continueStatePhrase = []byte("Continue")
 
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
