@@ -57,6 +57,8 @@ var crowdstrikeFalconProcessor = (function () {
             evt.Put("source.ip", localAddress)
             evt.Put("source.port", localPort)
         }
+        evt.AppendTo("related.ip", remoteAddress)
+        evt.AppendTo("related.ip", localAddress)
     }
 
     function convertEventAction(evt) {
@@ -73,6 +75,7 @@ var crowdstrikeFalconProcessor = (function () {
             if (username.split('@').length == 2) {
                 evt.Put("user.email", username)
             }
+            evt.AppendTo("related.user", username)
         }
     }
 
@@ -93,6 +96,10 @@ var crowdstrikeFalconProcessor = (function () {
                 fields: [{
                         from: "crowdstrike.event.LocalIP",
                         to: "source.ip",
+                        type: "ip"
+                    }, {
+                        from: "crowdstrike.event.LocalIP",
+                        to: "related.ip",
                         type: "ip"
                     }, {
                         from: "crowdstrike.event.ProcessId",
@@ -213,6 +220,10 @@ var crowdstrikeFalconProcessor = (function () {
                     from: "crowdstrike.event.UserIp",
                     to: "source.ip",
                     type: "ip"
+                }, {
+                    from: "crowdstrike.event.UserIp",
+                    to: "related.ip",
+                    type: "ip"
                 }],
                 mode: "copy",
                 ignore_missing: true,
@@ -239,6 +250,10 @@ var crowdstrikeFalconProcessor = (function () {
                 }, {
                     from: "crowdstrike.event.UserIp",
                     to: "source.ip",
+                    type: "ip"
+                }, {
+                    from: "crowdstrike.event.UserIp",
+                    to: "related.ip",
                     type: "ip"
                 }],
                 mode: "copy",

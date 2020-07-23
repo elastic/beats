@@ -59,6 +59,10 @@
         "network.direction": "inbound",
         "network.type": "ipv4",
         "process.pid": "206158879910",
+        "related.ip": [
+            "10.37.60.21",
+            "10.37.60.194"
+        ],
         "rule.category": "fec73e96a1bf4481be582c3f89b234fa",
         "rule.description": "",
         "rule.id": "4877172638743447345",
@@ -159,6 +163,8 @@
         ],
         "log.offset": 2041,
         "message": "Crowdstrike Authentication",
+        "related.ip": "165.225.220.184",
+        "related.user": "first.last@company.com",
         "service.type": "crowdstrike",
         "source.ip": "165.225.220.184",
         "tags": [
@@ -205,6 +211,7 @@
         ],
         "log.offset": 3219,
         "message": "quarantined_file_update",
+        "related.user": "Crowdstrike",
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -237,6 +244,7 @@
         ],
         "log.offset": 4017,
         "message": "Remote response session started",
+        "related.user": "first.last@company.com",
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -281,6 +289,7 @@
         ],
         "log.offset": 4466,
         "message": "Remote response session ended",
+        "related.user": "first.last@company.com",
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -399,6 +408,7 @@
         "process.parent.command_line": "C:\\Windows\\Explorer.EXE",
         "process.parent.executable": "\\Device\\HarddiskVolume2\\Windows\\explorer.exe",
         "process.pid": 663790158277,
+        "related.ip": "10.1.190.117",
         "rule.description": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
         "rule.name": "NGAV",
         "service.type": "crowdstrike",

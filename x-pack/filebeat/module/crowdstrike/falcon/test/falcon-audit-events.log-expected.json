@@ -25,6 +25,7 @@
         ],
         "log.offset": 0,
         "message": "Remote response session started",
+        "related.user": "first.last@company.com",
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -58,6 +59,7 @@
         ],
         "log.offset": 457,
         "message": "Remote response session ended",
+        "related.user": "first.last@company.com",
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"
@@ -117,6 +119,8 @@
         ],
         "log.offset": 910,
         "message": "Crowdstrike Streaming API",
+        "related.ip": "10.10.0.8",
+        "related.user": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz",
         "service.type": "crowdstrike",
         "source.ip": "10.10.0.8",
         "tags": [
@@ -154,6 +158,8 @@
         ],
         "log.offset": 2152,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -192,6 +198,8 @@
         ],
         "log.offset": 2645,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.3",
+        "related.user": "bob@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.3",
         "tags": [
@@ -239,6 +247,8 @@
         ],
         "log.offset": 3136,
         "message": "update_group",
+        "related.ip": "192.168.6.13",
+        "related.user": "chris@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.13",
         "tags": [
@@ -283,6 +293,8 @@
         ],
         "log.offset": 3858,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -321,6 +333,8 @@
         ],
         "log.offset": 4506,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -365,6 +379,8 @@
         ],
         "log.offset": 4999,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -403,6 +419,8 @@
         ],
         "log.offset": 5646,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -441,6 +459,8 @@
         ],
         "log.offset": 6134,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -479,6 +499,8 @@
         ],
         "log.offset": 6627,
         "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
@@ -534,6 +556,8 @@
         ],
         "log.offset": 7113,
         "message": "detection_update",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
         "service.type": "crowdstrike",
         "source.ip": "192.168.6.8",
         "tags": [
