@@ -475,7 +475,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental dataset cisco/nexus for Cisco Nexus logs {pull}19713[19713]
 - Add experimental dataset citrix/virtualapps for Citrix Virtual Apps logs {pull}19713[19713]
 - Add experimental dataset cylance/protect for Cylance Protect logs {pull}19713[19713]
-- Add experimental dataset f5/firepass for F5 FirePass SSL VPN logs {pull}19713[19713]
 - Add experimental dataset fortinet/clientendpoint for Fortinet FortiClient Endpoint Protection logs {pull}19713[19713]
 - Add experimental dataset imperva/securesphere for Imperva Secure Sphere logs {pull}19713[19713]
 - Add experimental dataset infoblox/nios for Infoblox Network Identity Operating System logs {pull}19713[19713]
