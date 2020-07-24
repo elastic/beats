@@ -20,8 +20,10 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
@@ -68,6 +70,10 @@ type TLSConfig struct {
 	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
 	// the server certificate.
 	CASha256 []string
+
+	// Time returns the current time as the number of seconds since the epoch.
+	// If Time is nil, TLS uses time.Now.
+	Time func() time.Time
 }
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
@@ -80,15 +86,13 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 	insecure := c.Verification != VerifyFull
 	if insecure {
-		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
+		// TODO: set this to debug? it is not super useful seeing a thousand of these
+		logp.NewLogger("tls").Warn("Some SSL/TLS verifications disabled.")
 	}
 
-	// When we are usign the CAsha256 pin to validate the CA used to validate the chain
-	// we add a custom callback.
-	var verifyPeerCertFn verifyPeerCertFunc
-	if len(c.CASha256) > 0 {
-		verifyPeerCertFn = MakeCAPinCallback(c.CASha256)
-	}
+	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
+	// or when we are using 'certificate' TLS verification mode, we add a custom callback
+	verifyPeerCertFn := MakeVerifyPeerCertificate(c)
 
 	return &tls.Config{
 		MinVersion:            minVersion,
@@ -115,4 +119,83 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	config := c.ToConfig()
 	config.ServerName = host
 	return config
+}
+
+// MakeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
+func MakeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
+	pin := len(cfg.CASha256) > 0
+	skipHostName := cfg.Verification == VerifyCertificate
+
+	if pin && !skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			return VerifyCAPin(cfg.CASha256, verifiedChains)
+		}
+	}
+
+	if pin && skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			_, _, err := VerifyCertificateExceptServerName(rawCerts, cfg)
+			if err != nil {
+				return err
+			}
+			return VerifyCAPin(cfg.CASha256, verifiedChains)
+		}
+	}
+
+	if !pin && skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			_, _, err := VerifyCertificateExceptServerName(rawCerts, cfg)
+			return err
+		}
+	}
+
+	return nil
+}
+
+// VerifyCertificateExceptServerName is a TLS Certificate verification utility method that verifies that the provided
+// certificate chain is valid and is signed by one of the root CAs in the provided tls.Config. It is intended to be
+// as similar as possible to the default verify (go/src/crypto/tls/handshake_client.go:259), but does not verify
+// that the provided certificate matches the ServerName in the tls.Config.
+func VerifyCertificateExceptServerName(
+	rawCerts [][]byte,
+	c *TLSConfig,
+) ([]*x509.Certificate, [][]*x509.Certificate, error) {
+	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
+	// during the handshake.
+	// the verification code here is taken from crypto/tls/handshake_client.go:259
+	certs := make([]*x509.Certificate, len(rawCerts))
+	for i, asn1Data := range rawCerts {
+		cert, err := x509.ParseCertificate(asn1Data)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "tls: failed to parse certificate from server")
+		}
+		certs[i] = cert
+	}
+
+	var t time.Time
+	if c.Time != nil {
+		t = c.Time()
+	} else {
+		t = time.Now()
+	}
+
+	// DNSName omitted in VerifyOptions in order to skip ServerName verification
+	opts := x509.VerifyOptions{
+		Roots:         c.RootCAs,
+		CurrentTime:   t,
+		Intermediates: x509.NewCertPool(),
+	}
+
+	for i, cert := range certs {
+		if i == 0 {
+			continue
+		}
+		opts.Intermediates.AddCert(cert)
+	}
+
+	headCert := certs[0]
+
+	// defer to the default verification performed
+	chains, err := headCert.Verify(opts)
+	return certs, chains, errors.WithStack(err)
 }
