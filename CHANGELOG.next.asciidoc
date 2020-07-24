@@ -197,6 +197,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
+- Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
+- Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
+- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
+- Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
+- Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
+- Add data type conversion in `dissect` processor for converting string values to other basic data types. {pull}18683[18683]
+- Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
+- Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
+- Add support to trim captured values in the dissect processor. {pull}19464[19464]
+- Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
+- Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
+- Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 
 *Auditbeat*
 
