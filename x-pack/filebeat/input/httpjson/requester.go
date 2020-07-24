@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package httpjson
 
 import (
@@ -13,11 +17,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
+
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
 )
 
 type requestInfo struct {

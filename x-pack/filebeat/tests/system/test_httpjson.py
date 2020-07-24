@@ -282,8 +282,8 @@ class Test(BaseTest):
         message = {"hello": "world"}
 
         def handler():
-            if request.get_json() != {"test":"abc"}:
-                resp = jsonify({"error":"got {}".format(request.get_data())})
+            if request.get_json() != {"test": "abc"}:
+                resp = jsonify({"error": "got {}".format(request.get_data())})
                 resp.status_code = 400
                 return resp
             return jsonify(message)
@@ -319,8 +319,8 @@ class Test(BaseTest):
         message = {"hello": "world"}
 
         def handler():
-            if request.get_json() != {"test":"abc"}:
-                resp = jsonify({"error":"got {}".format(request.get_data())})
+            if request.get_json() != {"test": "abc"}:
+                resp = jsonify({"error": "got {}".format(request.get_data())})
                 resp.status_code = 400
                 return resp
             return jsonify(message)
@@ -357,31 +357,32 @@ class Test(BaseTest):
 
         message = {"hello": "world"}
         is_oauth2_token_request = True
+
         def handler():
             nonlocal is_oauth2_token_request
             if is_oauth2_token_request:
                 if request.method != "POST":
-                    resp = jsonify({"error":"expected POST request"})
+                    resp = jsonify({"error": "expected POST request"})
                     resp.status_code = 400
                     return resp
                 if request.values["grant_type"] != "client_credentials":
-                    resp = jsonify({"error":"expected grant_type was client_credentials"})
+                    resp = jsonify({"error": "expected grant_type was client_credentials"})
                     resp.status_code = 400
                     return resp
                 if request.values["client_id"] != "a_client_id" or request.values["client_secret"] != "a_client_secret":
-                    resp = jsonify({"error":"expected client credentials a_client_id:a_client_secret"})
+                    resp = jsonify({"error": "expected client credentials a_client_id:a_client_secret"})
                     resp.status_code = 400
                     return resp
                 if request.values["scope"] != "scope1 scope2":
-                    resp = jsonify({"error":"expected scope was scope1+scope2"})
+                    resp = jsonify({"error": "expected scope was scope1+scope2"})
                     resp.status_code = 400
                     return resp
                 if request.values["param1"] != "v1":
-                    resp = jsonify({"error":"expected param1 was v1"})
+                    resp = jsonify({"error": "expected param1 was v1"})
                     resp.status_code = 400
                     return resp
                 is_oauth2_token_request = False
-                return jsonify({"token_type":"Bearer", "expires_in":"60", "access_token":"abcd"})
+                return jsonify({"token_type": "Bearer", "expires_in": "60", "access_token": "abcd"})
             return jsonify(message)
 
         shutdown_func = self.start_server("POST", handler)
@@ -564,16 +565,17 @@ class Test(BaseTest):
         """
 
         message = [
-            {"@timestamp":"2002-10-02T15:00:00Z", "foo": "bar"},
-            {"@timestamp":"2002-10-02T15:00:01Z", "foo": "bar"}
+            {"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+            {"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"}
         ]
 
         times = 0
+
         def handler():
             nonlocal times
             if times == 1:
                 if request.values["$filter"] != "alertCreationTime ge 2002-10-02T15:00:01Z":
-                    resp = jsonify({"error":"wrong filter"})
+                    resp = jsonify({"error": "wrong filter"})
                     resp.status_code = 400
                     return resp
             times += 1
