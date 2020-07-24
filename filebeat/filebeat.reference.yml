@@ -514,7 +514,6 @@ filebeat.inputs:
   # By default it is set to false
   #json.ignore_decoding_error: false
   
-
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
