@@ -25,9 +25,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -39,7 +40,7 @@ import (
 // to a Worker.
 type Sniffer struct {
 	config config.InterfacesConfig
-	dumper *pcap.Dumper
+	writer *pcapgo.Writer
 
 	state atomic.Int32 // store snifferState
 
@@ -143,7 +144,7 @@ func New(
 func (s *Sniffer) Run() error {
 	var (
 		counter = 0
-		dumper  *pcap.Dumper
+		writer  *pcapgo.Writer
 	)
 
 	handle, err := s.open()
@@ -153,12 +154,10 @@ func (s *Sniffer) Run() error {
 	defer handle.Close()
 
 	if s.config.Dumpfile != "" {
-		dumper, err = openDumper(s.config.Dumpfile, handle.LinkType())
+		writer, err = openWriter(s.config.Dumpfile, handle.LinkType())
 		if err != nil {
 			return err
 		}
-
-		defer dumper.Close()
 	}
 
 	worker, err := s.factory(handle.LinkType())
@@ -201,8 +200,8 @@ func (s *Sniffer) Run() error {
 			continue
 		}
 
-		if dumper != nil {
-			dumper.WritePacketData(data, ci)
+		if writer != nil {
+			_ = writer.WritePacket(ci, data)
 		}
 
 		counter++
@@ -266,15 +265,7 @@ func validatePcapFilter(expr string) error {
 		return nil
 	}
 
-	// Open a dummy pcap handle to compile the filter
-	p, err := pcap.OpenDead(layers.LinkTypeEthernet, 65535)
-	if err != nil {
-		return fmt.Errorf("OpenDead: %s", err)
-	}
-
-	defer p.Close()
-
-	_, err = p.NewBPF(expr)
+	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
 	if err != nil {
 		return fmt.Errorf("invalid filter '%s': %v", expr, err)
 	}
@@ -319,11 +310,12 @@ func openAFPacket(filter string, cfg *config.InterfacesConfig) (snifferHandle, e
 	return h, nil
 }
 
-func openDumper(file string, linkType layers.LinkType) (*pcap.Dumper, error) {
-	p, err := pcap.OpenDead(linkType, 65535)
+func openWriter(file string, linkType layers.LinkType) (*pcapgo.Writer, error) {
+	f, err := os.Create(file)
 	if err != nil {
 		return nil, err
 	}
-
-	return p.NewDumper(file)
+	w := pcapgo.NewWriter(f)
+	err = w.WriteFileHeader(65535, linkType)
+	return w, err
 }

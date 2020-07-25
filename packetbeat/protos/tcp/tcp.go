@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 )
 
 const TCPMaxDataInStream = 10 * (1 << 20)

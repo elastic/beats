@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"

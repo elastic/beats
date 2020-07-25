@@ -21,7 +21,7 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

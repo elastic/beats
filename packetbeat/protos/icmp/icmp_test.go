@@ -30,8 +30,8 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 
 	"github.com/stretchr/testify/assert"
 )

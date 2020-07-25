@@ -22,7 +22,7 @@ package icmp
 import (
 	"testing"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -112,5 +112,5 @@ func TestIcmpMessageHumanReadableICMPv6(t *testing.T) {
 	tuple := &icmpTuple{icmpVersion: 6}
 	msg := &icmpMessage{Type: layers.ICMPv6TypeDestinationUnreachable, code: 3}
 
-	assert.Equal(t, "DestinationUnreachable(Address)", humanReadable(tuple, msg))
+	assert.Equal(t, "DestinationUnreachable(AddressUnreachable)", humanReadable(tuple, msg))
 }

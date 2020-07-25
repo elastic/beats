@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 )
 
 type icmpPlugin struct {
