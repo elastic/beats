@@ -1,9 +1,6 @@
 %%{
   machine common;
   action tok {
-    fmt.Println(tok)
-    fmt.Println(p)
-    fmt.Println("---")
     tok = p
   }
 

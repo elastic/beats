@@ -35,9 +35,10 @@ import (
 )
 
 // Parser is generated from a ragel state machine using the following command:
-//go:generate ragel -Z -G2 parser.rl -o parser.go
-//go:generate ragel -Z -G2 rfc5424_parser.rl -o rfc5424_parser.go
-//go:generate goimports -l -w parser.go
+//go:generate ragel -Z -G2 parser/rfc3164_parser.rl -o rfc3164_parser.go
+//go:generate ragel -Z -G2 parser/rfc5424_parser.rl -o rfc5424_parser.go
+//go:generate goimports -l -w rfc3164_parser.go
+//go:generate goimports -l -w rfc5424_parser.go
 
 // Severity and Facility are derived from the priority, theses are the human readable terms
 // defined in https://tools.ietf.org/html/rfc3164#section-4.1.1.
@@ -235,7 +236,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 
 func parseAndCreateEvent(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	ev := newEvent()
-	Parse(data, ev)
+	ParserRFC3164(data, ev)
 	if !ev.IsValid() {
 		log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
 		return newBeatEvent(time.Now(), metadata, common.MapStr{

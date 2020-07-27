@@ -2,7 +2,7 @@
 package syslog
 
 %%{
-    machine syslog;
+    machine syslog_rfc3154;
     write data;
     variable p p;
     variable pe pe;
@@ -13,7 +13,7 @@ var (
 )
 
 // Parse parses Syslog events.
-func Parse(data []byte, event *event) {
+func ParserRFC3164(data []byte, event *event) {
     var p, cs int
     pe := len(data)
     tok := 0
@@ -26,4 +26,7 @@ func Parse(data []byte, event *event) {
       write init;
       write exec;
     }%%
+
 }
+
+
