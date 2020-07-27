@@ -74,6 +74,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Admin support. {pull}19769[19769]
 - Adds Gsuite Drive support. {pull}19704[19704]
 - Adds Gsuite Groups support. {pull}19725[19725]
+- Move file metrics to dataset endpoint {pull}19977[19977]
 
 *Heartbeat*
 
@@ -169,7 +170,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
+- Fix terminating pod autodiscover issue. {pull}20084[20084]
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
+- Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 
 *Auditbeat*
 
@@ -247,7 +250,11 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
+- Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
+- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
+- Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
+- Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 
 *Heartbeat*
 
@@ -548,7 +555,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset cisco/nexus for Cisco Nexus logs {pull}19713[19713]
 - Add experimental dataset citrix/virtualapps for Citrix Virtual Apps logs {pull}19713[19713]
 - Add experimental dataset cylance/protect for Cylance Protect logs {pull}19713[19713]
-- Add experimental dataset f5/firepass for F5 FirePass SSL VPN logs {pull}19713[19713]
 - Add experimental dataset fortinet/clientendpoint for Fortinet FortiClient Endpoint Protection logs {pull}19713[19713]
 - Add experimental dataset imperva/securesphere for Imperva Secure Sphere logs {pull}19713[19713]
 - Add experimental dataset infoblox/nios for Infoblox Network Identity Operating System logs {pull}19713[19713]
@@ -561,6 +567,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
+- Add event.ingested for CrowdStrike module {pull}20138[20138]
+- Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 
 *Heartbeat*
 
