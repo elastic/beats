@@ -27,6 +27,8 @@ https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
 
 *Filebeat*
 
+- Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
+- Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
 - Fix date and timestamp formats for fortigate module {pull}19316[19316]
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
@@ -34,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
 
 *Metricbeat*
 
+- Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
 - Set tags correctly if the dimension value is ARN {issue}19111[19111] {pull}19433[19433]
 - Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
