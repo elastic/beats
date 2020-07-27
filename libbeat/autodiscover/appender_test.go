@@ -53,16 +53,16 @@ func TestAppenderRegistry(t *testing.T) {
 	cfg, err := common.NewConfigFrom(&config)
 
 	// Make sure that config building doesn't fail
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	appender, err := reg.BuildAppender(cfg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, appender)
 
 	// Attempt to build using an array of configs
 	Registry.AddAppender("fake", newFakeAppender)
 	cfgs := []*common.Config{cfg}
 	appenders, err := NewAppenders(cfgs)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, len(appenders), 1)
 
 	// Attempt to build using an incorrect config
@@ -70,10 +70,10 @@ func TestAppenderRegistry(t *testing.T) {
 		Type: "wrong",
 	}
 	icfg, err := common.NewConfigFrom(&incorrectConfig)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	cfgs = append(cfgs, icfg)
 	appenders, err = NewAppenders(cfgs)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Nil(t, appenders)
 
 	// Try to append onto an event using fakeAppender and the result should have one item

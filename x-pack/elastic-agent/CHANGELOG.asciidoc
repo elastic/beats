@@ -51,6 +51,10 @@
 - Remove support for logs type and use logfile {pull}19761[19761]
 - Avoid comparing uncomparable types on enroll {issue}19976[19976]
 - Fix issues with merging of elastic-agent.yml and fleet.yml {pull}20026[20026]
+- Unzip failures on Windows 8/Windows server 2012 {pull}20088[20088]
+- Fix failing unit tests on windows {pull}20127[20127]
+- Improve GRPC stop to be more relaxed {pull}20118[20118]
+- Prevent closing closed reader {pull}20214[20214]
 
 ==== New features
 
@@ -91,3 +95,4 @@
 - Will retry to enroll if the server return a 429. {pull}19918[19811]
 - Allow to specify what artifacts to embed at build times {pull}20019[20019]
 - Add --staging option to enroll command {pull}20026[20026]
+- Add `event.dataset` to all events {pull}20076[20076]
