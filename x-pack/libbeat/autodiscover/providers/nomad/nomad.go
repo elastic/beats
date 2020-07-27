@@ -172,8 +172,8 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 		}
 
 		// avoid emitting events when the associated task is in a TaskStatePending state
-		if state, ok := obj.TaskStates[fmt.Sprintf("%v", taskName)]; ok {
-			if state.State == nomad.TaskStatePending {
+		if taskState, ok := obj.TaskStates[fmt.Sprintf("%v", taskName)]; ok {
+			if flag != "stop" && taskState.State == nomad.TaskStatePending {
 				logp.Debug("nomad", "Skipping pending allocation: %s", fmt.Sprintf("%s-%s", obj.ID, task["name"]))
 				continue
 			}
