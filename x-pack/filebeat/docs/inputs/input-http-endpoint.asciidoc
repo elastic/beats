@@ -41,6 +41,17 @@ Custom response example:
   prefix: "json"
 ----
 
+Disable Content-Type checks
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  content_type: ""
+  prefix: "json"
+----
+
 Basic auth and SSL example:
 ["source","yaml",subs="attributes"]
 ----
@@ -79,6 +90,12 @@ If `basic_auth` is enabled, this is the username used for authentication against
 ==== `password`
 
 If `basic_auth` is eanbled, this is the password used for authentication against the HTTP listener. Requires `username` to also be set.
+
+[float]
+==== `content_type`
+
+By default the input expects the incoming POST to include a Content-Type of `application/json` to try to enforce the incoming data to be valid JSON.
+In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null
 
 [float]
 ==== `response_code`
