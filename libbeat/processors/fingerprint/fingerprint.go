@@ -19,7 +19,6 @@ package fingerprint
 
 import (
 	"fmt"
-	"hash"
 	"io"
 	"time"
 
@@ -39,7 +38,7 @@ const processorName = "fingerprint"
 type fingerprint struct {
 	config Config
 	fields []string
-	hash   hash.Hash
+	hash   hashMethod
 }
 
 // New constructs a new fingerprint processor.
@@ -49,12 +48,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, makeErrConfigUnpack(err)
 	}
 
-	fields := common.MakeStringSet(config.Fields...)
+	// The fields array must be sorted, to guarantee that we always
+	// get the same hash for a similar set of configured keys.
+	// The call `ToSlice` always returns a sorted slice.
+	fields := common.MakeStringSet(config.Fields...).ToSlice()
 
 	p := &fingerprint{
 		config: config,
-		hash:   config.Method(),
-		fields: fields.ToSlice(),
+		hash:   config.Method,
+		fields: fields,
 	}
 
 	return p, nil
@@ -62,8 +64,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
-	hashFn := p.hash
-	hashFn.Reset()
+	hashFn := p.hash()
 
 	err := p.writeFields(hashFn, event.Fields)
 	if err != nil {

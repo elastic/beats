@@ -22899,6 +22899,80 @@ type: keyword
 
 --
 
+[float]
+=== response
+
+The operation response.
+
+
+
+*`googlecloud.audit.response.proto_name`*::
++
+--
+Type property of the response.
+
+
+type: keyword
+
+--
+
+[float]
+=== details
+
+The details of the response.
+
+
+
+*`googlecloud.audit.response.details.group`*::
++
+--
+The name of the group.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.kind`*::
++
+--
+The kind of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.name`*::
++
+--
+The name of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.uid`*::
++
+--
+The uid of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.status`*::
++
+--
+Status of the response. 
+
+
+type: keyword
+
+--
+
 *`googlecloud.audit.resource_name`*::
 +
 --
@@ -24677,6 +24751,16 @@ type: keyword
 +
 --
 Java class the log is coming from.
+
+
+type: keyword
+
+--
+
+*`kafka.log.thread`*::
++
+--
+Thread name the log is coming from.
 
 
 type: keyword
@@ -34462,6 +34546,36 @@ type: date
 --
 
 *`suricata.eve.tls.subject`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.tls.ja3s.string`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.ja3s.hash`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.tls.ja3.string`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.ja3.hash`*::
 +
 --
 type: keyword

@@ -77,6 +77,26 @@ so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multipl
 This metricset will collect metrics from the storage accounts, these metrics will have a timegrain every 5 minutes,
 so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
 
+[float]
+=== `container_instance`
+This metricset will collect metrics from specified container groups, these metrics will have a timegrain every 5 minutes,
+so the `period` for `container_instance` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `container_registry`
+This metricset will collect metrics from the container registries, these metrics will have a timegrain every 5 minutes,
+so the `period` for `container_registry` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `container_service`
+This metricset will collect metrics from the container services, these metrics will have a timegrain every 5 minutes,
+so the `period` for `container_service` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `database_account`
+This metricset will collect relevant metrics from specified database accounts, these metrics will have a timegrain every 5 minutes,
+so the `period` for `database_account` metricset  should be `300s` or multiples of `300s`.
+
 
 [float]
 == Additional notes about metrics and costs

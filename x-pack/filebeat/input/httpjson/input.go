@@ -201,7 +201,10 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 	return "", nil
 }
 
-// getRateLimit get the rate limit value if specified in the HTTP Header of the response
+// getRateLimit get the rate limit value if specified in the HTTP Header of the response,
+// and returns an init64 value in seconds since unix epoch for rate limit reset time.
+// When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
+// returns 0 for the epoch value.
 func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 	if rateLimit != nil {
 		if rateLimit.Remaining != "" {
@@ -222,6 +225,9 @@ func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 				if err != nil {
 					return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
 				}
+				if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+					return 0, nil
+				}
 				return epoch, nil
 			}
 		}
@@ -235,12 +241,14 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 	if err != nil {
 		return err
 	}
-	if epoch == 0 {
+	t := time.Unix(epoch, 0)
+	w := time.Until(t)
+	if epoch == 0 || w <= 0 {
+		in.log.Debugf("Rate Limit: No need to apply rate limit.")
 		return nil
 	}
-	t := time.Unix(epoch, 0)
 	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
-	ticker := time.NewTicker(time.Until(t))
+	ticker := time.NewTicker(w)
 	defer ticker.Stop()
 	select {
 	case <-ctx.Done():

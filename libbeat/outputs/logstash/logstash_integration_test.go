@@ -94,7 +94,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	host := getElasticsearchHost()
 	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
-	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "")
+	indexFmtExpr, _ := outil.FmtSelectorExpr(indexFmt, "", outil.SelectorLowerCase)
 	indexSel := outil.MakeSelector(indexFmtExpr)
 	index, _ = indexSel.Select(&beat.Event{
 		Timestamp: ts,

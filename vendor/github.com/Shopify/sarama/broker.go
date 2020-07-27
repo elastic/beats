@@ -162,29 +162,11 @@ func (b *Broker) Open(conf *Config) error {
 			atomic.StoreInt32(&b.opened, 0)
 			return
 		}
-
 		if conf.Net.TLS.Enable {
-			Logger.Printf("Using tls")
-			cfg := conf.Net.TLS.Config
-			if cfg == nil {
-				cfg = &tls.Config{}
-			}
-			// If no ServerName is set, infer the ServerName
-			// from the hostname we're connecting to.
-			// Gets the hostname as tls.DialWithDialer does it.
-			if cfg.ServerName == "" {
-				colonPos := strings.LastIndex(b.addr, ":")
-				if colonPos == -1 {
-					colonPos = len(b.addr)
-				}
-				hostname := b.addr[:colonPos]
-				cfg.ServerName = hostname
-			}
-			b.conn = tls.Client(b.conn, cfg)
+			b.conn = tls.Client(b.conn, validServerNameTLS(b.addr, conf.Net.TLS.Config))
 		}
 
 		b.conn = newBufConn(b.conn)
-
 		b.conf = conf
 
 		// Create or reuse the global metrics shared between brokers
@@ -398,23 +380,6 @@ func (b *Broker) FetchOffset(request *OffsetFetchRequest) (*OffsetFetchResponse,
 	err := b.sendAndReceive(request, response)
 	if err != nil {
 		return nil, err
-	}
-
-	// In new consumer group / partition pairs, Microsoft's Azure Event Hubs
-	// communicates the "no error / new offset" state by omitting the requested
-	// entries from the OffsetFetchResponse (in contrast to other implementations
-	// which indicate this by returning an explicit offset of -1). To handle this
-	// case, we check all entries in the request and add an offset to the response
-	// table for any that are missing.
-	for topic, partitions := range request.partitions {
-		if response.Blocks[topic] == nil {
-			response.Blocks[topic] = make(map[int32]*OffsetFetchResponseBlock)
-		}
-		for _, p := range partitions {
-			if response.Blocks[topic][p] == nil {
-				response.Blocks[topic][p] = &OffsetFetchResponseBlock{Offset: -1}
-			}
-		}
 	}
 
 	return response, nil
@@ -1456,4 +1421,21 @@ func (b *Broker) registerCounter(name string) metrics.Counter {
 	nameForBroker := getMetricNameForBroker(name, b)
 	b.registeredMetrics = append(b.registeredMetrics, nameForBroker)
 	return metrics.GetOrRegisterCounter(nameForBroker, b.conf.MetricRegistry)
+}
+
+func validServerNameTLS(addr string, cfg *tls.Config) *tls.Config {
+	if cfg == nil {
+		cfg = &tls.Config{}
+	}
+	if cfg.ServerName != "" {
+		return cfg
+	}
+
+	c := cfg.Clone()
+	sn, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		Logger.Println(fmt.Errorf("failed to get ServerName from addr %w", err))
+	}
+	c.ServerName = sn
+	return c
 }
