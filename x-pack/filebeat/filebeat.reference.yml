@@ -600,25 +600,6 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-  firepass:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9509
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:
@@ -718,7 +699,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   user_accounts:
     enabled: true
     # var.jwt_file: credentials.json
@@ -726,7 +707,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   login:
     enabled: true
     # var.jwt_file: credentials.json
@@ -734,7 +715,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   admin:
     enabled: true
     # var.jwt_file: credentials.json
@@ -742,7 +723,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   drive:
     enabled: true
     # var.jwt_file: credentials.json
@@ -750,7 +731,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   groups:
     enabled: true
     # var.jwt_file: credentials.json
@@ -758,7 +739,7 @@ filebeat.modules:
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
 
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy

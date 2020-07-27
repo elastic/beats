@@ -416,6 +416,57 @@ func TestServer_Stop(t *testing.T) {
 	assert.NoError(t, stopErr)
 }
 
+func TestServer_StopJustDisconnect(t *testing.T) {
+	initConfig := "initial_config"
+	app := &StubApp{}
+	srv := createAndStartServer(t, &StubHandler{})
+	defer srv.Stop()
+	as, err := srv.Register(app, initConfig)
+	require.NoError(t, err)
+	cImpl := &StubClientImpl{}
+	c := newClientFromApplicationState(t, as, cImpl)
+	require.NoError(t, c.Start(context.Background()))
+	defer c.Stop()
+
+	// clients should get initial check-ins then set as healthy
+	require.NoError(t, waitFor(func() error {
+		if cImpl.Config() != initConfig {
+			return fmt.Errorf("client never got intial config")
+		}
+		return nil
+	}))
+	c.Status(proto.StateObserved_HEALTHY, "Running", nil)
+	assert.NoError(t, waitFor(func() error {
+		if app.Status() != proto.StateObserved_HEALTHY {
+			return fmt.Errorf("server never updated currect application state")
+		}
+		return nil
+	}))
+
+	// send stop to the client
+	done := make(chan bool)
+	var stopErr error
+	go func() {
+		stopErr = as.Stop(time.Second * 5)
+		close(done)
+	}()
+
+	// process of testing the flow
+	//   1. server sends stop
+	//   2. client disconnects
+	require.NoError(t, waitFor(func() error {
+		if cImpl.Stop() == 0 {
+			return fmt.Errorf("client never got expected stop")
+		}
+		return nil
+	}))
+	c.Stop()
+	<-done
+
+	// no error on stop
+	assert.NoError(t, stopErr)
+}
+
 func TestServer_StopTimeout(t *testing.T) {
 	initConfig := "initial_config"
 	app := &StubApp{}
