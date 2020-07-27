@@ -144,7 +144,7 @@ metricbeat.modules:
 -------------------------------------------------------------------------------------
 
 The configuration above will consider metrics with names that match `_my_counter_suffix` as Counters
-and those that match match `_my_histogram_suffix` (and have `le` in their labels) as Histograms.
+and those that match `_my_histogram_suffix` (and have `le` in their labels) as Histograms.
 
 
 To match only specific metrics, anchor the start and the end of the regexp of each metric:
@@ -160,5 +160,5 @@ metricbeat.modules:
   host: "localhost"
   port: "9201"
   types_patterns:
-    histogram_patterns: ["^my_histogram_metirc$"]
+    histogram_patterns: ["^my_histogram_metric$"]
 -------------------------------------------------------------------------------------

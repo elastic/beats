@@ -39,19 +39,19 @@ func init() {
 	)
 }
 
-// RemoteWriteEventsGenerator converts a Prometheus metric Samples mb.Event map
+// RemoteWriteEventsGenerator converts Prometheus Samples to a map of mb.Event
 type RemoteWriteEventsGenerator interface {
 	// Start must be called before using the generator
 	Start()
 
-	// converts a Prometheus metric family into a list of PromEvents
+	// converts Prometheus Samples to a map of mb.Event
 	GenerateEvents(metrics model.Samples) map[string]mb.Event
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
 }
 
-// RemoteWriteEventsGeneratorFactory creates a PromEventsGenerator when instanciating a metricset
+// RemoteWriteEventsGeneratorFactory creates a RemoteWriteEventsGenerator when instanciating a metricset
 type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error)
 
 type MetricSet struct {
@@ -89,7 +89,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
-// MetricSetBuilder returns a builder function for a new Prometheus metricset using
+// MetricSetBuilder returns a builder function for a new Prometheus remote_write metricset using
 // the given namespace and event generator
 func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {

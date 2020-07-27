@@ -118,13 +118,13 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		promType := g.findMetricType(name, labels)
 		val := float64(metric.Value)
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
-			// join metrics with same labels in a single event
 			labelsHash := labels.String()
 			labelsClone := labels.Clone()
 			labelsClone.Delete("le")
 			if promType == histogramType {
 				labelsHash = labelsClone.String()
 			}
+			// join metrics with same labels in a single event
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = mb.Event{
 					ModuleFields: common.MapStr{},
