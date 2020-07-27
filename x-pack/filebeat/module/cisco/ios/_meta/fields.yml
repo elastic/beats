@@ -1,4 +1,4 @@
-- name: ios
+- name: cisco.ios
   type: group
   description: >
     Fields for Cisco IOS logs.
