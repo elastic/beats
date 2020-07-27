@@ -457,6 +457,12 @@ func (http *httpPlugin) flushResponses(conn *httpConnectionData) {
 		unmatchedResponses.Add(1)
 		resp := conn.responses.pop()
 		debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
+
+		if resp.statusCode == 100 {
+			debugf("Drop first 100-continue response")
+			return
+		}
+
 		event := http.newTransaction(nil, resp)
 		http.publishTransaction(event)
 	}

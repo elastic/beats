@@ -271,7 +271,7 @@ func (w *clientCloseWaiter) signalClose() {
 		return
 	}
 
-	w.closing.Store(false)
+	w.closing.Store(true)
 	if w.events.Load() == 0 {
 		w.finishClose()
 		return
