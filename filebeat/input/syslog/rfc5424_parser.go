@@ -4,7 +4,7 @@ package syslog
 
 //line rfc5424_parser.go:8
 const syslog_rfc5424_start int = 1
-const syslog_rfc5424_first_final int = 12
+const syslog_rfc5424_first_final int = 50
 const syslog_rfc5424_error int = 0
 
 const syslog_rfc5424_en_main int = 1
@@ -42,18 +42,94 @@ func Parse5424(data []byte, event *event) {
 			goto st_case_5
 		case 6:
 			goto st_case_6
-		case 12:
-			goto st_case_12
 		case 7:
 			goto st_case_7
 		case 8:
 			goto st_case_8
+		case 50:
+			goto st_case_50
 		case 9:
 			goto st_case_9
 		case 10:
 			goto st_case_10
 		case 11:
 			goto st_case_11
+		case 12:
+			goto st_case_12
+		case 13:
+			goto st_case_13
+		case 14:
+			goto st_case_14
+		case 15:
+			goto st_case_15
+		case 16:
+			goto st_case_16
+		case 17:
+			goto st_case_17
+		case 18:
+			goto st_case_18
+		case 19:
+			goto st_case_19
+		case 20:
+			goto st_case_20
+		case 21:
+			goto st_case_21
+		case 22:
+			goto st_case_22
+		case 23:
+			goto st_case_23
+		case 24:
+			goto st_case_24
+		case 25:
+			goto st_case_25
+		case 26:
+			goto st_case_26
+		case 27:
+			goto st_case_27
+		case 28:
+			goto st_case_28
+		case 29:
+			goto st_case_29
+		case 30:
+			goto st_case_30
+		case 31:
+			goto st_case_31
+		case 32:
+			goto st_case_32
+		case 33:
+			goto st_case_33
+		case 34:
+			goto st_case_34
+		case 35:
+			goto st_case_35
+		case 36:
+			goto st_case_36
+		case 37:
+			goto st_case_37
+		case 38:
+			goto st_case_38
+		case 39:
+			goto st_case_39
+		case 40:
+			goto st_case_40
+		case 41:
+			goto st_case_41
+		case 42:
+			goto st_case_42
+		case 43:
+			goto st_case_43
+		case 44:
+			goto st_case_44
+		case 45:
+			goto st_case_45
+		case 46:
+			goto st_case_46
+		case 47:
+			goto st_case_47
+		case 48:
+			goto st_case_48
+		case 49:
+			goto st_case_49
 		}
 		goto st_out
 	st_case_1:
@@ -91,7 +167,7 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line rfc5424_parser.go:99
+//line rfc5424_parser.go:175
 		if data[(p)] == 62 {
 			goto tr5
 		}
@@ -107,7 +183,7 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line rfc5424_parser.go:115
+//line rfc5424_parser.go:191
 		if 49 <= data[(p)] && data[(p)] <= 57 {
 			goto tr6
 		}
@@ -123,12 +199,12 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line rfc5424_parser.go:131
+//line rfc5424_parser.go:207
 		if data[(p)] == 32 {
 			goto tr7
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto st7
+			goto st45
 		}
 		goto st0
 	tr7:
@@ -142,43 +218,67 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof6
 		}
 	st_case_6:
-//line rfc5424_parser.go:150
-		goto tr9
-	tr9:
-//line parser/common.rl:3
-
-		tok = p
-
-		goto st12
-	st12:
-		if (p)++; (p) == (pe) {
-			goto _test_eof12
+//line rfc5424_parser.go:226
+		if data[(p)] == 45 {
+			goto st7
 		}
-	st_case_12:
-//line rfc5424_parser.go:163
-		goto st12
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto tr10
+		}
+		goto st0
+	tr36:
+//line parser/common.rl:39
+
+		event.SetSecond(data[tok:p])
+
+		goto st7
+	tr47:
+//line parser/common.rl:43
+
+		event.SetNanosecond(data[tok:p])
+
+		goto st7
 	st7:
 		if (p)++; (p) == (pe) {
 			goto _test_eof7
 		}
 	st_case_7:
-		if data[(p)] == 32 {
-			goto tr7
-		}
-		if 48 <= data[(p)] && data[(p)] <= 57 {
+//line rfc5424_parser.go:251
+		if data[(p)] == 84 {
 			goto st8
 		}
 		goto st0
+	tr43:
+//line parser/common.rl:35
+
+		event.SetMinute(data[tok:p])
+
+//line parser/common.rl:74
+
+		event.SetTimeZone(data[tok:p])
+
+		goto st8
 	st8:
 		if (p)++; (p) == (pe) {
 			goto _test_eof8
 		}
 	st_case_8:
-		if data[(p)] == 32 {
-			goto tr7
+//line rfc5424_parser.go:271
+		goto tr12
+	tr12:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st50
+	st50:
+		if (p)++; (p) == (pe) {
+			goto _test_eof50
 		}
-		goto st0
-	tr3:
+	st_case_50:
+//line rfc5424_parser.go:284
+		goto st50
+	tr10:
 //line parser/common.rl:3
 
 		tok = p
@@ -189,34 +289,18 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof9
 		}
 	st_case_9:
-//line rfc5424_parser.go:197
-		switch data[(p)] {
-		case 57:
-			goto st11
-		case 62:
-			goto tr5
-		}
-		if 48 <= data[(p)] && data[(p)] <= 56 {
+//line rfc5424_parser.go:297
+		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st10
 		}
 		goto st0
-	tr4:
-//line parser/common.rl:3
-
-		tok = p
-
-		goto st10
 	st10:
 		if (p)++; (p) == (pe) {
 			goto _test_eof10
 		}
 	st_case_10:
-//line rfc5424_parser.go:219
-		if data[(p)] == 62 {
-			goto tr5
-		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto st3
+			goto st11
 		}
 		goto st0
 	st11:
@@ -224,6 +308,592 @@ func Parse5424(data []byte, event *event) {
 			goto _test_eof11
 		}
 	st_case_11:
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st12
+		}
+		goto st0
+	st12:
+		if (p)++; (p) == (pe) {
+			goto _test_eof12
+		}
+	st_case_12:
+		if data[(p)] == 45 {
+			goto tr16
+		}
+		goto st0
+	tr16:
+//line parser/common.rl:19
+
+		event.SetYear(data[tok:p])
+
+		goto st13
+	st13:
+		if (p)++; (p) == (pe) {
+			goto _test_eof13
+		}
+	st_case_13:
+//line rfc5424_parser.go:340
+		switch data[(p)] {
+		case 48:
+			goto tr17
+		case 49:
+			goto tr18
+		}
+		goto st0
+	tr17:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st14
+	st14:
+		if (p)++; (p) == (pe) {
+			goto _test_eof14
+		}
+	st_case_14:
+//line rfc5424_parser.go:359
+		if 49 <= data[(p)] && data[(p)] <= 57 {
+			goto st15
+		}
+		goto st0
+	st15:
+		if (p)++; (p) == (pe) {
+			goto _test_eof15
+		}
+	st_case_15:
+		if data[(p)] == 45 {
+			goto tr20
+		}
+		goto st0
+	tr20:
+//line parser/common.rl:23
+
+		event.SetMonthNumeric(data[tok:p])
+
+		goto st16
+	st16:
+		if (p)++; (p) == (pe) {
+			goto _test_eof16
+		}
+	st_case_16:
+//line rfc5424_parser.go:384
+		if data[(p)] == 51 {
+			goto tr22
+		}
+		if 49 <= data[(p)] && data[(p)] <= 50 {
+			goto tr21
+		}
+		goto st0
+	tr21:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st17
+	st17:
+		if (p)++; (p) == (pe) {
+			goto _test_eof17
+		}
+	st_case_17:
+//line rfc5424_parser.go:403
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st18
+		}
+		goto st0
+	st18:
+		if (p)++; (p) == (pe) {
+			goto _test_eof18
+		}
+	st_case_18:
+		if data[(p)] == 84 {
+			goto tr24
+		}
+		goto st0
+	tr24:
+//line parser/common.rl:27
+
+		event.SetDay(data[tok:p])
+
+		goto st19
+	st19:
+		if (p)++; (p) == (pe) {
+			goto _test_eof19
+		}
+	st_case_19:
+//line rfc5424_parser.go:428
+		if data[(p)] == 50 {
+			goto tr26
+		}
+		if 48 <= data[(p)] && data[(p)] <= 49 {
+			goto tr25
+		}
+		goto st0
+	tr25:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st20
+	st20:
+		if (p)++; (p) == (pe) {
+			goto _test_eof20
+		}
+	st_case_20:
+//line rfc5424_parser.go:447
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st21
+		}
+		goto st0
+	st21:
+		if (p)++; (p) == (pe) {
+			goto _test_eof21
+		}
+	st_case_21:
+		if data[(p)] == 58 {
+			goto tr28
+		}
+		goto st0
+	tr28:
+//line parser/common.rl:31
+
+		event.SetHour(data[tok:p])
+
+		goto st22
+	st22:
+		if (p)++; (p) == (pe) {
+			goto _test_eof22
+		}
+	st_case_22:
+//line rfc5424_parser.go:472
+		if 48 <= data[(p)] && data[(p)] <= 53 {
+			goto tr29
+		}
+		goto st0
+	tr29:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st23
+	st23:
+		if (p)++; (p) == (pe) {
+			goto _test_eof23
+		}
+	st_case_23:
+//line rfc5424_parser.go:488
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st24
+		}
+		goto st0
+	st24:
+		if (p)++; (p) == (pe) {
+			goto _test_eof24
+		}
+	st_case_24:
+		if data[(p)] == 58 {
+			goto tr31
+		}
+		goto st0
+	tr31:
+//line parser/common.rl:35
+
+		event.SetMinute(data[tok:p])
+
+		goto st25
+	st25:
+		if (p)++; (p) == (pe) {
+			goto _test_eof25
+		}
+	st_case_25:
+//line rfc5424_parser.go:513
+		if 48 <= data[(p)] && data[(p)] <= 53 {
+			goto tr32
+		}
+		goto st0
+	tr32:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st26
+	st26:
+		if (p)++; (p) == (pe) {
+			goto _test_eof26
+		}
+	st_case_26:
+//line rfc5424_parser.go:529
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st27
+		}
+		goto st0
+	st27:
+		if (p)++; (p) == (pe) {
+			goto _test_eof27
+		}
+	st_case_27:
+		switch data[(p)] {
+		case 43:
+			goto tr34
+		case 45:
+			goto tr34
+		case 46:
+			goto tr35
+		case 90:
+			goto tr36
+		}
+		goto st0
+	tr34:
+//line parser/common.rl:39
+
+		event.SetSecond(data[tok:p])
+
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st28
+	tr45:
+//line parser/common.rl:43
+
+		event.SetNanosecond(data[tok:p])
+
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st28
+	st28:
+		if (p)++; (p) == (pe) {
+			goto _test_eof28
+		}
+	st_case_28:
+//line rfc5424_parser.go:575
+		if data[(p)] == 50 {
+			goto tr38
+		}
+		if 48 <= data[(p)] && data[(p)] <= 49 {
+			goto tr37
+		}
+		goto st0
+	tr37:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st29
+	st29:
+		if (p)++; (p) == (pe) {
+			goto _test_eof29
+		}
+	st_case_29:
+//line rfc5424_parser.go:594
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st30
+		}
+		goto st0
+	st30:
+		if (p)++; (p) == (pe) {
+			goto _test_eof30
+		}
+	st_case_30:
+		if data[(p)] == 58 {
+			goto tr40
+		}
+		goto st0
+	tr40:
+//line parser/common.rl:31
+
+		event.SetHour(data[tok:p])
+
+		goto st31
+	st31:
+		if (p)++; (p) == (pe) {
+			goto _test_eof31
+		}
+	st_case_31:
+//line rfc5424_parser.go:619
+		if 48 <= data[(p)] && data[(p)] <= 53 {
+			goto tr41
+		}
+		goto st0
+	tr41:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st32
+	st32:
+		if (p)++; (p) == (pe) {
+			goto _test_eof32
+		}
+	st_case_32:
+//line rfc5424_parser.go:635
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st33
+		}
+		goto st0
+	st33:
+		if (p)++; (p) == (pe) {
+			goto _test_eof33
+		}
+	st_case_33:
+		if data[(p)] == 84 {
+			goto tr43
+		}
+		goto st0
+	tr38:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st34
+	st34:
+		if (p)++; (p) == (pe) {
+			goto _test_eof34
+		}
+	st_case_34:
+//line rfc5424_parser.go:660
+		if 48 <= data[(p)] && data[(p)] <= 51 {
+			goto st30
+		}
+		goto st0
+	tr35:
+//line parser/common.rl:39
+
+		event.SetSecond(data[tok:p])
+
+		goto st35
+	st35:
+		if (p)++; (p) == (pe) {
+			goto _test_eof35
+		}
+	st_case_35:
+//line rfc5424_parser.go:676
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto tr44
+		}
+		goto st0
+	tr44:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st36
+	st36:
+		if (p)++; (p) == (pe) {
+			goto _test_eof36
+		}
+	st_case_36:
+//line rfc5424_parser.go:692
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st37
+		}
+		goto st0
+	st37:
+		if (p)++; (p) == (pe) {
+			goto _test_eof37
+		}
+	st_case_37:
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st38
+		}
+		goto st0
+	st38:
+		if (p)++; (p) == (pe) {
+			goto _test_eof38
+		}
+	st_case_38:
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st39
+		}
+		goto st0
+	st39:
+		if (p)++; (p) == (pe) {
+			goto _test_eof39
+		}
+	st_case_39:
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st40
+		}
+		goto st0
+	st40:
+		if (p)++; (p) == (pe) {
+			goto _test_eof40
+		}
+	st_case_40:
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st41
+		}
+		goto st0
+	st41:
+		if (p)++; (p) == (pe) {
+			goto _test_eof41
+		}
+	st_case_41:
+		switch data[(p)] {
+		case 43:
+			goto tr45
+		case 45:
+			goto tr45
+		case 90:
+			goto tr47
+		}
+		goto st0
+	tr26:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st42
+	st42:
+		if (p)++; (p) == (pe) {
+			goto _test_eof42
+		}
+	st_case_42:
+//line rfc5424_parser.go:798
+		if 48 <= data[(p)] && data[(p)] <= 51 {
+			goto st21
+		}
+		goto st0
+	tr22:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st43
+	st43:
+		if (p)++; (p) == (pe) {
+			goto _test_eof43
+		}
+	st_case_43:
+//line rfc5424_parser.go:814
+		if 48 <= data[(p)] && data[(p)] <= 49 {
+			goto st18
+		}
+		goto st0
+	tr18:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st44
+	st44:
+		if (p)++; (p) == (pe) {
+			goto _test_eof44
+		}
+	st_case_44:
+//line rfc5424_parser.go:830
+		if 48 <= data[(p)] && data[(p)] <= 50 {
+			goto st15
+		}
+		goto st0
+	st45:
+		if (p)++; (p) == (pe) {
+			goto _test_eof45
+		}
+	st_case_45:
+		if data[(p)] == 32 {
+			goto tr7
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st46
+		}
+		goto st0
+	st46:
+		if (p)++; (p) == (pe) {
+			goto _test_eof46
+		}
+	st_case_46:
+		if data[(p)] == 32 {
+			goto tr7
+		}
+		goto st0
+	tr3:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st47
+	st47:
+		if (p)++; (p) == (pe) {
+			goto _test_eof47
+		}
+	st_case_47:
+//line rfc5424_parser.go:867
+		switch data[(p)] {
+		case 57:
+			goto st49
+		case 62:
+			goto tr5
+		}
+		if 48 <= data[(p)] && data[(p)] <= 56 {
+			goto st48
+		}
+		goto st0
+	tr4:
+//line parser/common.rl:3
+
+		tok = p
+
+		goto st48
+	st48:
+		if (p)++; (p) == (pe) {
+			goto _test_eof48
+		}
+	st_case_48:
+//line rfc5424_parser.go:889
+		if data[(p)] == 62 {
+			goto tr5
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st3
+		}
+		goto st0
+	st49:
+		if (p)++; (p) == (pe) {
+			goto _test_eof49
+		}
+	st_case_49:
 		if data[(p)] == 62 {
 			goto tr5
 		}
@@ -247,14 +917,14 @@ func Parse5424(data []byte, event *event) {
 	_test_eof6:
 		cs = 6
 		goto _test_eof
-	_test_eof12:
-		cs = 12
-		goto _test_eof
 	_test_eof7:
 		cs = 7
 		goto _test_eof
 	_test_eof8:
 		cs = 8
+		goto _test_eof
+	_test_eof50:
+		cs = 50
 		goto _test_eof
 	_test_eof9:
 		cs = 9
@@ -265,18 +935,132 @@ func Parse5424(data []byte, event *event) {
 	_test_eof11:
 		cs = 11
 		goto _test_eof
+	_test_eof12:
+		cs = 12
+		goto _test_eof
+	_test_eof13:
+		cs = 13
+		goto _test_eof
+	_test_eof14:
+		cs = 14
+		goto _test_eof
+	_test_eof15:
+		cs = 15
+		goto _test_eof
+	_test_eof16:
+		cs = 16
+		goto _test_eof
+	_test_eof17:
+		cs = 17
+		goto _test_eof
+	_test_eof18:
+		cs = 18
+		goto _test_eof
+	_test_eof19:
+		cs = 19
+		goto _test_eof
+	_test_eof20:
+		cs = 20
+		goto _test_eof
+	_test_eof21:
+		cs = 21
+		goto _test_eof
+	_test_eof22:
+		cs = 22
+		goto _test_eof
+	_test_eof23:
+		cs = 23
+		goto _test_eof
+	_test_eof24:
+		cs = 24
+		goto _test_eof
+	_test_eof25:
+		cs = 25
+		goto _test_eof
+	_test_eof26:
+		cs = 26
+		goto _test_eof
+	_test_eof27:
+		cs = 27
+		goto _test_eof
+	_test_eof28:
+		cs = 28
+		goto _test_eof
+	_test_eof29:
+		cs = 29
+		goto _test_eof
+	_test_eof30:
+		cs = 30
+		goto _test_eof
+	_test_eof31:
+		cs = 31
+		goto _test_eof
+	_test_eof32:
+		cs = 32
+		goto _test_eof
+	_test_eof33:
+		cs = 33
+		goto _test_eof
+	_test_eof34:
+		cs = 34
+		goto _test_eof
+	_test_eof35:
+		cs = 35
+		goto _test_eof
+	_test_eof36:
+		cs = 36
+		goto _test_eof
+	_test_eof37:
+		cs = 37
+		goto _test_eof
+	_test_eof38:
+		cs = 38
+		goto _test_eof
+	_test_eof39:
+		cs = 39
+		goto _test_eof
+	_test_eof40:
+		cs = 40
+		goto _test_eof
+	_test_eof41:
+		cs = 41
+		goto _test_eof
+	_test_eof42:
+		cs = 42
+		goto _test_eof
+	_test_eof43:
+		cs = 43
+		goto _test_eof
+	_test_eof44:
+		cs = 44
+		goto _test_eof
+	_test_eof45:
+		cs = 45
+		goto _test_eof
+	_test_eof46:
+		cs = 46
+		goto _test_eof
+	_test_eof47:
+		cs = 47
+		goto _test_eof
+	_test_eof48:
+		cs = 48
+		goto _test_eof
+	_test_eof49:
+		cs = 49
+		goto _test_eof
 
 	_test_eof:
 		{
 		}
 		if (p) == eof {
 			switch cs {
-			case 12:
+			case 50:
 //line parser/common.rl:11
 
 				event.SetMessage(data[tok:p])
 
-//line rfc5424_parser.go:260
+//line rfc5424_parser.go:968
 			}
 		}
 

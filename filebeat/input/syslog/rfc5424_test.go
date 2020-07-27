@@ -25,6 +25,7 @@ import (
 
 const VersionTestTemplate = `<34>%d 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - BOM'su root' failed for lonvick on /dev/pts/8`
 const PriorityTestTemplate = `<%d>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - BOM'su root' failed for lonvick on /dev/pts/8`
+const TimeTestTemplate = `<22>11 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - BOM'su root' failed for lonvick on /dev/pts/8`
 
 type testRule struct {
 	title  string
@@ -32,38 +33,61 @@ type testRule struct {
 	syslog event
 }
 
+func setRightTime(e *event) {
+	e.year = 2003
+	e.month = 10
+	e.day = 11
+	e.hour = 22
+	e.minute = 14
+	e.second = 15
+	e.second = 15
+	e.nanosecond = 3000000
+}
+
 func createVersionTestRule(v int, success bool) testRule {
-	var except = -1
-	if success {
-		except = v
+
+	var rule = testRule{
+		title:  fmt.Sprintf("versionTest v:%d", v),
+		log:    []byte(fmt.Sprintf(VersionTestTemplate, v)),
+		syslog: *newEvent(),
+	}
+	rule.syslog.SetPriority([]byte("34"))
+
+	if !success {
+		return rule
 	}
 
-	return testRule{
-		title: fmt.Sprintf("versionTest v:%d", v),
-		log:   []byte(fmt.Sprintf(VersionTestTemplate, v)),
-		syslog: event{
-			version:  except,
-			priority: 34,
-		},
-	}
+	setRightTime(&rule.syslog)
+	rule.syslog.version = v
+	return rule
 }
 
 func createPriorityTestRule(v int, success bool) testRule {
 	var rule = testRule{
-		title: fmt.Sprintf("priorityTest v:%d", v),
-		log:   []byte(fmt.Sprintf(PriorityTestTemplate, v)),
-		syslog: event{
-			version:  1,
-			priority: v,
-		},
+		title:  fmt.Sprintf("priorityTest v:%d", v),
+		log:    []byte(fmt.Sprintf(PriorityTestTemplate, v)),
+		syslog: *newEvent(),
 	}
 	if !success {
-		rule.syslog = event{
-			priority: -1,
-			version: -1,
-		}
+		return rule
 	}
 
+	setRightTime(&rule.syslog)
+	rule.syslog.priority = v
+	rule.syslog.SetVersion([]byte("1"))
+	return rule
+}
+
+func createTimeTestRule() testRule {
+	var rule = testRule{
+		title: fmt.Sprintf("TimestampTest v"),
+		log:   []byte(fmt.Sprintf(TimeTestTemplate)),
+		syslog: event{
+			version:  11,
+			priority: 22,
+		},
+	}
+	setRightTime(&rule.syslog)
 	return rule
 }
 
@@ -86,23 +110,25 @@ func TestParseRfc5424Syslog(t *testing.T) {
 	tests = append(tests, createVersionTestRule(100, true))
 	tests = append(tests, createVersionTestRule(1000, false))
 
+	tests = append(tests, createTimeTestRule())
+
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
 			l := newEvent()
 			Parse5424(test.log, l)
-			//assert.Equal(t, test.syslog.Message(), l.Message())
-			//assert.Equal(t, test.syslog.Hostname(), l.Hostname())
-			assert.Equal(t, test.syslog.Priority(), l.Priority())
-			assert.Equal(t, test.syslog.Version(), l.Version())
-			//assert.Equal(t, test.syslog.Pid(), l.Pid())
-			//assert.Equal(t, test.syslog.Program(), l.Program())
-			//assert.Equal(t, test.syslog.Month(), l.Month())
-			//assert.Equal(t, test.syslog.Day(), l.Day())
-			//assert.Equal(t, test.syslog.Hour(), l.Hour())
-			//assert.Equal(t, test.syslog.Minute(), l.Minute())
-			//assert.Equal(t, test.syslog.Second(), l.Second())
-			//assert.Equal(t, test.syslog.Nanosecond(), l.Nanosecond())
-			//assert.Equal(t, test.syslog.loc, l.loc)
+			AssertEvent(t, test.syslog, l)
 		})
 	}
+}
+
+func AssertEvent(t *testing.T, except event, actual *event) {
+	assert.Equal(t, except.Priority(), actual.Priority())
+	assert.Equal(t, except.Version(), actual.Version())
+	assert.Equal(t, except.Year(), actual.Year())
+	assert.Equal(t, except.Month(), actual.Month())
+	assert.Equal(t, except.Day(), actual.Day())
+	assert.Equal(t, except.Hour(), actual.Hour())
+	assert.Equal(t, except.Minute(), actual.Minute())
+	assert.Equal(t, except.Second(), actual.Second())
+	assert.Equal(t, except.Nanosecond(), actual.Nanosecond())
 }
