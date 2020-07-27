@@ -56,6 +56,7 @@
 - Fix failing unit tests on windows {pull}20127[20127]
 - Prevent closing closed reader {pull}20214[20214]
 - Improve GRPC stop to be more relaxed {pull}20118[20118]
+- Fix Windows service installation script {pull}20203[20203]
 
 ==== New features
 
