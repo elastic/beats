@@ -87,7 +87,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		username:    e.config.Username,
 		password:    e.config.Password,
 		method:      http.MethodPost,
-		contentType: "application/json",
+		contentType: e.config.ContentType,
 	}
 
 	handler := &httpHandler{

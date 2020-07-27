@@ -98,15 +98,16 @@ type PackageSpec struct {
 
 // PackageFile represents a file or directory within a package.
 type PackageFile struct {
-	Source   string                  `yaml:"source,omitempty"`    // Regular source file or directory.
-	Content  string                  `yaml:"content,omitempty"`   // Inline template string.
-	Template string                  `yaml:"template,omitempty"`  // Input template file.
-	Target   string                  `yaml:"target,omitempty"`    // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
-	Mode     os.FileMode             `yaml:"mode,omitempty"`      // Target mode for file. Does not apply when source is a directory.
-	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
-	Modules  bool                    `yaml:"modules"`             // Mark directory as directory with modules.
-	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
-	Owner    string                  `yaml:"owner,omitempty"`     // File Owner, for user and group name (rpm only).
+	Source        string                  `yaml:"source,omitempty"`          // Regular source file or directory.
+	Content       string                  `yaml:"content,omitempty"`         // Inline template string.
+	Template      string                  `yaml:"template,omitempty"`        // Input template file.
+	Target        string                  `yaml:"target,omitempty"`          // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
+	Mode          os.FileMode             `yaml:"mode,omitempty"`            // Target mode for file. Does not apply when source is a directory.
+	Config        bool                    `yaml:"config"`                    // Mark file as config in the package (deb and rpm only).
+	Modules       bool                    `yaml:"modules"`                   // Mark directory as directory with modules.
+	Dep           func(PackageSpec) error `yaml:"-" hash:"-" json:"-"`       // Dependency to invoke during Evaluate.
+	Owner         string                  `yaml:"owner,omitempty"`           // File Owner, for user and group name (rpm only).
+	SkipOnMissing bool                    `yaml:"skip_on_missing,omitempty"` // Prevents build failure if the file is missing.
 }
 
 // OSArchNames defines the names of architectures for use in packages.
@@ -758,6 +759,10 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
 	return filepath.Walk(pkgFile.Source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
+				return nil
+			}
+
 			return err
 		}
 
@@ -819,6 +824,10 @@ func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
 func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 	return filepath.Walk(pkgFile.Source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
+				return nil
+			}
+
 			return err
 		}
 

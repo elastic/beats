@@ -111,6 +111,9 @@ func (b *dmgBuilder) buildBeatPkg() error {
 	for _, f := range b.Files {
 		target := filepath.Join(beatPkgRoot, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				return nil
+			}
 			return err
 		}
 
