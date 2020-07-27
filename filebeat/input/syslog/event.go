@@ -72,6 +72,7 @@ type event struct {
 	year       int
 	loc        *time.Location
 	sequence   int
+	version int
 }
 
 // newEvent() return a new event.
@@ -86,6 +87,7 @@ func newEvent() *event {
 		second:   -1,
 		year:     time.Now().Year(),
 		sequence: -1,
+		version:  -1,
 	}
 }
 
@@ -297,6 +299,16 @@ func (s *event) SetNanosecond(b []byte) {
 func (s *event) Nanosecond() int {
 	return s.nanosecond
 }
+
+// SetVersion sets the version.
+func (s *event) SetVersion(version []byte) {
+	s.version = bytesToInt(version)
+}
+
+func (s *event) Version() int {
+	return s.version
+}
+
 
 // Timestamp return the timestamp in UTC.
 func (s *event) Timestamp(timezone *time.Location) time.Time {

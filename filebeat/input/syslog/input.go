@@ -36,6 +36,7 @@ import (
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G2 parser.rl -o parser.go
+//go:generate ragel -Z -G2 rfc5424_parser.rl -o rfc5424_parser.go
 //go:generate goimports -l -w parser.go
 
 // Severity and Facility are derived from the priority, theses are the human readable terms
