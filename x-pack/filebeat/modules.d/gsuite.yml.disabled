@@ -9,7 +9,7 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   user_accounts:
     enabled: true
     # var.jwt_file: credentials.json
@@ -17,7 +17,7 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   login:
     enabled: true
     # var.jwt_file: credentials.json
@@ -25,7 +25,7 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   admin:
     enabled: true
     # var.jwt_file: credentials.json
@@ -33,7 +33,7 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   drive:
     enabled: true
     # var.jwt_file: credentials.json
@@ -41,7 +41,7 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
   groups:
     enabled: true
     # var.jwt_file: credentials.json
@@ -49,4 +49,4 @@
     # var.initial_interval: 24h
     # var.http_client_timeout: 60s
     # var.user_key: all
-    # var.interval: 5s
+    # var.interval: 2h
