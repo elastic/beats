@@ -1,0 +1,12 @@
+- name: zoom
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing Zoom API Webhooks.
+  fields:
+    - name: confidence_level
+      type: integer
+      overwrite: true
+      description: >
+        Confidence level determined by ThreatCloud.

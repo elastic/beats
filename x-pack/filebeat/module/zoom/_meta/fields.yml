@@ -1,0 +1,5 @@
+- key: zoom
+  title: Zoom
+  description: >
+    Some Zoom module
+  fields:
