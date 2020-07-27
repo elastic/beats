@@ -20,7 +20,14 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8s "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -49,13 +56,15 @@ type Eventer interface {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config    *Config
-	bus       bus.Bus
-	templates template.Mapper
-	builders  autodiscover.Builders
-	appenders autodiscover.Appenders
-	logger    *logp.Logger
-	eventer   Eventer
+	config         *Config
+	bus            bus.Bus
+	templates      template.Mapper
+	builders       autodiscover.Builders
+	appenders      autodiscover.Appenders
+	logger         *logp.Logger
+	eventer        Eventer
+	leaderElection leaderelection.LeaderElectionConfig
+	cancel         context.CancelFunc
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -118,6 +127,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
+	p.leaderElection = p.newLeaderElectionConfig(client, "some")
 	return p, nil
 }
 
@@ -126,11 +136,15 @@ func (p *Provider) Start() {
 	if err := p.eventer.Start(); err != nil {
 		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
+	ctx, cancel := context.WithCancel(context.Background())
+	p.cancel = cancel
+	leaderelection.RunOrDie(ctx, p.leaderElection)
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
 	p.eventer.Stop()
+	p.cancel()
 }
 
 // String returns a description of kubernetes autodiscover provider.
@@ -153,4 +167,64 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 	p.bus.Publish(event)
+}
+
+func (p *Provider) startLeading(uuid string, eventID string) {
+	event := bus.Event{
+		"start":    true,
+		"provider": uuid,
+		"id":       eventID,
+		"unique":   "true",
+	}
+	if config := p.templates.GetConfig(event); config != nil {
+		event["config"] = config
+	}
+	p.bus.Publish(event)
+}
+
+func (p *Provider) stopLeading(uuid string, eventID string) {
+	event := bus.Event{
+		"stop":     true,
+		"provider": uuid,
+		"id":       eventID,
+		"unique":   "true",
+	}
+	if config := p.templates.GetConfig(event); config != nil {
+		event["config"] = config
+	}
+	p.bus.Publish(event)
+}
+
+func (p *Provider) newLeaderElectionConfig(client k8s.Interface, uuid string) leaderelection.LeaderElectionConfig {
+	id := "beats-leader-" + uuid
+	lease := metav1.ObjectMeta{
+		Name:      "beats-cluster-leader",
+		Namespace: "default",
+	}
+	metaUID := lease.GetObjectMeta().GetUID()
+	return leaderelection.LeaderElectionConfig{
+		Lock: &resourcelock.LeaseLock{
+			LeaseMeta: lease,
+			Client:    client.CoordinationV1(),
+			LockConfig: resourcelock.ResourceLockConfig{
+				Identity: id,
+			},
+		},
+		ReleaseOnCancel: true,
+		LeaseDuration:   15 * time.Second,
+		RenewDeadline:   10 * time.Second,
+		RetryPeriod:     5 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: func(ctx context.Context) {
+				p.logger.Debugf("leader election lock GAINED, id %v", id)
+				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				p.startLeading(uuid, eventID)
+			},
+			OnStoppedLeading: func() {
+				p.logger.Debugf("leader election lock LOST, id %v", id)
+				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				p.stopLeading(uuid, eventID)
+			},
+		},
+	}
 }

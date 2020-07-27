@@ -44,6 +44,8 @@ type Config struct {
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
+	// Unique identifies if this provider enables it's templates only when it is elected as leader in a k8s cluster
+	Unique bool `config:"unique"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
@@ -97,6 +99,9 @@ func (c *Config) Validate() error {
 
 	if c.Scope != "node" && c.Scope != "cluster" {
 		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
+	}
+	if c.Unique && c.Scope != "cluster" {
+		logp.L().Warnf("can only set `unique` when scope is `cluster`")
 	}
 
 	return nil
