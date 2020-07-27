@@ -1,0 +1,31 @@
+description: Ingest pipeline for normalizing CrowdStrike Falcon logs
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - script:
+      lang: painless
+      if: ctx?.crowdstrike?.event != null
+      params:
+        values:
+          - null
+          - ''
+          - '-'
+          - 'N/A'
+      source: |
+        ctx.crowdstrike.event.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+  - script:
+      lang: painless
+      if: ctx?.crowdstrike?.metadata != null
+      params:
+        values:
+          - null
+          - ''
+          - '-'
+          - 'N/A'
+      source: |
+        ctx.crowdstrike.metadata.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-oracle-performance]]
+[role="xpack"]
 === Oracle performance metricset
 
 include::../../../../x-pack/metricbeat/module/oracle/performance/_meta/docs.asciidoc[]

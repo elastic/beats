@@ -729,7 +729,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build goUnitTest")
+                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build unitTest")
               }
             }
           }
@@ -945,9 +945,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
       } finally {
         if (archive) {
           archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
-        }
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          sh(label: 'Report to Codecov', script: '.ci/scripts/report-codecov.sh auditbeat filebeat heartbeat journalbeat libbeat metricbeat packetbeat winlogbeat')
         }
       }
     }
@@ -1343,7 +1340,7 @@ def loadConfigEnvVars(){
   env.BUILD_ON_MACOS = (params.macosTest                  // UI Input parameter is set to true
                         || !isPR()                        // For branches and tags
                         || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
-                        || (env.GITHUB_COMMENT?.toLowerCase().contains('/test macos'))) // If `/test macos` in the GH comment (Case-Insensitive)
+                        || (env.GITHUB_COMMENT?.toLowerCase()?.contains('/test macos'))) // If `/test macos` in the GH comment (Case-Insensitive)
 }
 
 /**
