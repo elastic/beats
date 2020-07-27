@@ -5,12 +5,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -57,11 +60,19 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
+	// Windows: Mark service as stopped.
+	// After this is run, the service is considered by the OS to be stopped.
+	// This must be the first deferred cleanup task (last to execute).
+	defer service.NotifyTermination()
+
 	locker := application.NewAppLocker(paths.Data())
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
 	defer locker.Unlock()
+
+	service.BeforeRun()
+	defer service.Cleanup()
 
 	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
@@ -72,11 +83,24 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
+	// register as a service
+	stop := make(chan bool)
+	_, cancel := context.WithCancel(context.Background())
+	var stopBeat = func() {
+		close(stop)
+	}
+	service.HandleSignals(stopBeat, cancel)
+
 	// listen for kill signal
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT)
 
-	<-signals
+	select {
+	case <-stop:
+		break
+	case <-signals:
+		break
+	}
 
 	return app.Stop()
 }
