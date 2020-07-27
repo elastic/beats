@@ -154,6 +154,8 @@ func (w *watcher) sync() error {
 			alloc.DesiredStatus, alloc.ClientStatus)
 
 		switch alloc.ClientStatus {
+		case AllocClientStatusPending:
+			continue
 		case AllocClientStatusComplete, AllocClientStatusFailed, AllocClientStatusLost:
 			// the allocation is in a terminal state
 			w.handler.OnDelete(*alloc)

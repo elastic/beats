@@ -24,23 +24,14 @@ const (
 	DefaultWaitIndex = 1
 )
 
-func TestWatcherAddAllocation(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	alloc := api.Allocation{}
-	alloc.ModifyIndex = 20
-	alloc.CreateIndex = 20
-	alloc.AllocModifyIndex = 20
-	alloc.TaskGroup = "group1"
-	alloc.ClientStatus = AllocClientStatusRunning
-
+func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
 		payload, err := json.Marshal([]interface{}{node})
 		if err != nil {
-			t.Error(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 		}
 
 		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
@@ -48,599 +39,247 @@ func TestWatcherAddAllocation(t *testing.T) {
 	})
 
 	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
+		payload, err := json.Marshal(allocs)
 		if err != nil {
-			t.Error(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 		}
 
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
+		w.Header().Add(NomadIndexHeader, fmt.Sprint(waitIndex))
 		w.Write(payload)
 	})
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
-	}
-
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 20,
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
-		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
-		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
-		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 1)
-	assert.Len(t, updated, 0)
-	assert.Len(t, deleted, 0)
+	return mux
 }
 
-func TestWatcherUnchangedIndex(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	alloc := api.Allocation{}
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(DefaultWaitIndex))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
-	}
-
-	options := WatchOptions{
-		RefreshInterval: 1 * time.Second,
-		Node:            node.Name,
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
-		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
-		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
-		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 0)
-	assert.Len(t, updated, 0)
-	assert.Len(t, deleted, 0)
+type watcherEvents struct {
+	added   []api.Allocation
+	updated []api.Allocation
+	deleted []api.Allocation
 }
 
-func TestWatcherIgnoreOldAllocations(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	// The Watcher is initialized with an initial WaitIndex of 1
-	// this allocation should be ignored
-	alloc := api.Allocation{}
-	alloc.ID = "9820bd24-6c67-013a-e0c3-6ce1129dc0d2"
-	alloc.ModifyIndex = 0
-	alloc.AllocModifyIndex = 0
-	alloc.ClientStatus = AllocClientStatusRunning
-
-	alloc1 := api.Allocation{}
-	alloc1.ID = "5678ad24-6c67-013a-e0c3-6ce1129dc0d2"
-	alloc1.ModifyIndex = 1
-	alloc1.AllocModifyIndex = 1
-	alloc1.ClientStatus = AllocClientStatusRunning
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc, alloc1})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
+func (w *watcherEvents) testResourceEventHandler() ResourceEventHandlerFuncs {
+	return ResourceEventHandlerFuncs{
+		AddFunc:    func(alloc api.Allocation) { w.added = append(w.added, alloc) },
+		UpdateFunc: func(alloc api.Allocation) { w.updated = append(w.updated, alloc) },
+		DeleteFunc: func(alloc api.Allocation) { w.deleted = append(w.deleted, alloc) },
 	}
-
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 1,
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
-		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
-		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
-		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 0)
-	assert.Len(t, updated, 1)
-	assert.Len(t, deleted, 0)
-
-	assert.NotEqual(t, updated[0].ID, alloc.ID)
 }
 
-func TestWatcherAddAllocationOnFirstRun(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	alloc := api.Allocation{}
-	alloc.ModifyIndex = 72975148
-	alloc.CreateIndex = 72636274
-	alloc.AllocModifyIndex = 72975148
-	alloc.ClientStatus = AllocClientStatusRunning
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
-	}
-
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 0,
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
+func TestAllocationWatcher(t *testing.T) {
+	tests := []struct {
+		name             string
+		node             api.Node
+		allocs           []api.Allocation
+		waitIndex        uint64
+		initialWaitIndex uint64
+		expected         watcherEvents
+	}{
+		{
+			name: "allocation added",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 20, CreateIndex: 20,
+					AllocModifyIndex: 20, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        400,
+			initialWaitIndex: 20,
+			expected: watcherEvents{
+				added: []api.Allocation{
+					{
+						ModifyIndex: 20, CreateIndex: 20,
+						AllocModifyIndex: 20, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				updated: nil,
+				deleted: nil,
+			},
 		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
+		{
+			name: "ignore events due to unchanged WaitIndex",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 20, CreateIndex: 20,
+					AllocModifyIndex: 20, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        DefaultWaitIndex,
+			initialWaitIndex: DefaultWaitIndex,
+			expected: watcherEvents{
+				added:   nil,
+				updated: nil,
+				deleted: nil,
+			},
 		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
+		{
+			name: "ignore old allocations",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ID: "9820bd24-6c67-013a-e0c3-6ce1129dc0d2", ModifyIndex: 0,
+					CreateIndex: 0, AllocModifyIndex: 0, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+				{
+					ID: "5678ad24-6c67-013a-e0c3-6ce1129dc0d2", ModifyIndex: 1,
+					CreateIndex: 0, AllocModifyIndex: 1, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        400,
+			initialWaitIndex: 1,
+			expected: watcherEvents{
+				added: nil,
+				updated: []api.Allocation{
+					{
+						ID: "5678ad24-6c67-013a-e0c3-6ce1129dc0d2", ModifyIndex: 1,
+						CreateIndex: 0, AllocModifyIndex: 1, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				deleted: nil,
+			},
 		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 1)
-	assert.Len(t, updated, 0)
-	assert.Len(t, deleted, 0)
-}
-
-func TestWatcherUpdateAllocation(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	alloc := api.Allocation{}
-	alloc.ModifyIndex = 20
-	alloc.CreateIndex = 10
-	alloc.AllocModifyIndex = 20
-	alloc.ClientStatus = AllocClientStatusRunning
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
-	}
-
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 18, // not the initial run
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
+		{
+			name: "on initial run all allocations are added",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 200, CreateIndex: 100,
+					AllocModifyIndex: 200, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        400,
+			initialWaitIndex: 0,
+			expected: watcherEvents{
+				added: []api.Allocation{
+					{
+						ModifyIndex: 200, CreateIndex: 100,
+						AllocModifyIndex: 200, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				updated: nil,
+				deleted: nil,
+			},
 		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
+		{
+			name: "allocation updated",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 20, CreateIndex: 10,
+					AllocModifyIndex: 20, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        25,
+			initialWaitIndex: 18,
+			expected: watcherEvents{
+				added: nil,
+				updated: []api.Allocation{
+					{
+						ModifyIndex: 20, CreateIndex: 10,
+						AllocModifyIndex: 20, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				deleted: nil,
+			},
 		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
+		{
+			name: "allocation created in the same index as the watcher check",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 97, CreateIndex: 85,
+					AllocModifyIndex: 97, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        100,
+			initialWaitIndex: 85,
+			expected: watcherEvents{
+				added: []api.Allocation{
+					{
+						ModifyIndex: 97, CreateIndex: 85,
+						AllocModifyIndex: 97, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				updated: nil,
+				deleted: nil,
+			},
 		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 0)
-	assert.Len(t, updated, 1)
-	assert.Len(t, deleted, 0)
-}
-
-func TestWatcherAllocationCreatedWhenChecked(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	// The Watcher is initialized with an initial WaitIndex of 1
-	// this allocation should be ignored
-	alloc := api.Allocation{}
-	alloc.ID = "9820bd24-6c67-013a-e0c3-6ce1129dc0d2"
-	alloc.ModifyIndex = 97
-	alloc.AllocModifyIndex = 97
-	alloc.CreateIndex = 85
-	alloc.ClientStatus = api.AllocClientStatusRunning
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
-	}
-
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 85,
-	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
+		{
+			name: "allocation updated in the same index as the watcher check",
+			node: api.Node{Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 509, CreateIndex: 479,
+					AllocModifyIndex: 509, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        600,
+			initialWaitIndex: 509,
+			expected: watcherEvents{
+				added: nil,
+				updated: []api.Allocation{
+					{
+						ModifyIndex: 509, CreateIndex: 479,
+						AllocModifyIndex: 509, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				deleted: nil,
+			},
 		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
-		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
-		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 1)
-	assert.Len(t, updated, 0)
-	assert.Len(t, deleted, 0)
-}
-
-func TestWatcherAllocationUpdatedWhenChecked(t *testing.T) {
-	node := api.Node{}
-	node.Name = "nomad1"
-
-	// The Watcher is initialized with an initial WaitIndex of 1
-	// this allocation should be ignored
-	alloc := api.Allocation{}
-	alloc.ID = "9820bd24-6c67-013a-e0c3-6ce1129dc0d2"
-	alloc.ModifyIndex = 22286509
-	alloc.AllocModifyIndex = 22286509
-	alloc.CreateIndex = 22286479
-	alloc.ClientStatus = api.AllocClientStatusRunning
-
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/v1/node/", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{alloc})
-		if err != nil {
-			t.Error(err)
-		}
-
-		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
-		w.Write(payload)
-	})
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Error("Unexpected requested detected")
-	})
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	config := &api.Config{
-		Address:    server.URL,
-		HttpClient: server.Client(),
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mux := nomadRoutes(tt.node, tt.allocs, tt.waitIndex)
+			server := httptest.NewServer(mux)
+			defer server.Close()
 
-	options := WatchOptions{
-		RefreshInterval:  1 * time.Second,
-		Node:             node.Name,
-		InitialWaitIndex: 22286509,
+			config := &api.Config{
+				Address:    server.URL,
+				HttpClient: server.Client(),
+			}
+
+			options := WatchOptions{
+				RefreshInterval:  1 * time.Second,
+				Node:             tt.node.Name,
+				InitialWaitIndex: tt.initialWaitIndex,
+			}
+
+			client, err := api.NewClient(config)
+			if err != nil {
+				t.Error(err)
+			}
+
+			watcher, err := NewWatcher(client, options)
+			if err != nil {
+				t.Error(err)
+			}
+
+			events := watcherEvents{}
+			watcher.AddEventHandler(events.testResourceEventHandler())
+
+			goroutines := resources.NewGoroutinesChecker()
+			defer goroutines.Check(t)
+
+			watcher.Start()
+			defer watcher.Stop()
+
+			assert.Equal(t, tt.expected, events)
+		})
 	}
-
-	client, err := api.NewClient(config)
-	if err != nil {
-		t.Error(err)
-	}
-
-	watcher, err := NewWatcher(client, options)
-	if err != nil {
-		t.Error(err)
-	}
-
-	added := []api.Allocation{}
-	updated := []api.Allocation{}
-	deleted := []api.Allocation{}
-
-	watcher.AddEventHandler(ResourceEventHandlerFuncs{
-		AddFunc: func(alloc api.Allocation) {
-			added = append(added, alloc)
-		},
-		UpdateFunc: func(alloc api.Allocation) {
-			updated = append(updated, alloc)
-		},
-		DeleteFunc: func(alloc api.Allocation) {
-			deleted = append(deleted, alloc)
-		},
-	})
-
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	watcher.Start()
-	defer watcher.Stop()
-
-	assert.Len(t, added, 0)
-	assert.Len(t, updated, 1)
-	assert.Len(t, deleted, 0)
 }
