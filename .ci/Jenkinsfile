@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@feature/2.0-beats') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
@@ -112,10 +112,10 @@ def generateSteps(Map args = [:]) {
   def content = readYaml(file: masterFile)
   def defaultNode = content['platform']
 
-  if (whenValidation(project: name, content: content, changeset: changeset)) {
+  if (beatsWhen(project: name, content: content, changeset: changeset)) {
     content['stages'].each { stageName ->
       if (stageName['when']) {
-        if (whenValidation(project: "stageName", content: stageName['when'], changeset: changeset)) {
+        if (beatsWhen(project: "stageName", content: stageName['when'], changeset: changeset)) {
           generateStages(defaultNode: defaultNode, content: stageName).each { k,v ->
             mapParallelStages["${k}"] = v
           }
@@ -148,55 +148,4 @@ def generateStage(Map args = [:]) {
       sh "${content['command']}"
     }
   }
-}
-
-/**
-* Given the YAML definition and the changeset global macros
-* then it verifies if the project or stage should be enabled.
-*
-* It will generate a 
-*/
-def whenValidation(Map args = [:]) {
-  def project = args.project
-  def content = args.content
-  def patterns = args.changeset
-  def ret = false
-  if (content['comments']?.trim() && env.GITHUB_COMMENT?.trim()) {
-    if (content['comments']?.any { env.GITHUB_COMMENT?.toLowerCase()?.contains(it?.toLowerCase()) }) {
-      ret = true
-      markdownReason(project: project, reason: 'Comment is enabled and matches with the pattern.')
-    } else {
-      markdownReason(project: project, reason: 'Comment is enabled and does not match with the pattern.')
-    }
-  }
-  if (content['labels']) {
-    if (content['labels']?.any { matchesPrLabel(label: it) }) {
-      ret = true
-      markdownReason(project: project, reason: 'Label is enabled and matches with the pattern.')
-    } else {
-      markdownReason(project: project, reason: 'Label is enabled and does not match with the pattern.')
-    }
-  }
-  if (content['parameters']) {
-    if (content['parameters']?.any { params.[it] }) {
-      ret = true
-      markdownReason(project: project, reason: 'Parameter is enabled and matches with the pattern.')
-    } else {
-      markdownReason(project: project, reason: 'Parameter is enabled and does not match with the pattern.')
-    }
-  }
-  if (content['branches'] && env.BRANCH_NAME?.trim()) {
-    ret = true
-    markdownReason(project: project, reason: 'Branch is enabled and matches with the pattern.')
-  }
-  if (content['tags'] && env.TAG_NAME?.trim()) {
-    ret = true
-    markdownReason(project: project, reason: 'Tag is enabled and matches with the pattern.')
-  }
-  return ret
-}
-
-def markdownReason(Map args = [:]) {
-  echo "${args.project} - ${args.reason}"
-  // TODO create markdown
 }
