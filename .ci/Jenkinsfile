@@ -172,8 +172,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def goRoot, path, magefile, pythonEnv, testResults, artifacts
 
   if(isUnix()) {
-    def os = goos()
-    goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+    goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
     path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
