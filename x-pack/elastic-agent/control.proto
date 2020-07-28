@@ -18,6 +18,7 @@ enum Status {
   FAILED = 4;
   STOPPING = 5;
   UPGRADING = 6;
+  ROLLBACK = 7;
 }
 
 // Action status codes for restart and upgrade response.
