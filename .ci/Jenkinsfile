@@ -119,7 +119,7 @@ def generateStages(Map args = [:]) {
   if (fileExists(fileName)) {
     def content = readYaml(file: fileName)
     if (beatsWhen(project: projectName, content: content?.when, changeset: changeset)) {
-      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: runCommand())
+      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: this.&runCommand)
     }
   } else {
     log(level: 'WARN', text: "${fileName} file does not exist. Please review the top-level Jenkinsfile.yml")
