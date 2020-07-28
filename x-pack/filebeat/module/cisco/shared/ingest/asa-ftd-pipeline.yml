@@ -253,7 +253,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106100'"
       field: "message"
-      pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port}) -> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port}) %{}"
+      pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port})%{}-> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106102'"
       field: "message"
