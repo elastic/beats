@@ -54,6 +54,9 @@ shared:
       /etc/init.d/{{.BeatServiceName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
         mode: 0755
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0644
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
