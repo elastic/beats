@@ -60,7 +60,7 @@ endif::[]
 ifeval::["{release-state}"!="unreleased"]
 
 . Download the {agent} Windows zip file from the
-https://www.elastic.co/downloads/beats/elastic-agent[downloads page].
+https://www.elastic.co/downloads/elastic-agent[downloads page].
 
 . Extract the contents of the zip file into `C:\Program Files`.
 
