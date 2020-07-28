@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu && immutable' }
+  agent { label 'ubuntu-18 && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
@@ -57,7 +57,7 @@ pipeline {
       failFast false
       parallel {
         stage('Filebeat oss'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -70,7 +70,7 @@ pipeline {
           }
         }
         stage('Filebeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -109,7 +109,7 @@ pipeline {
           }
         }
         stage('Heartbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -152,7 +152,7 @@ pipeline {
           }
         }
         stage('Auditbeat oss'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -200,7 +200,7 @@ pipeline {
           }
         }
         stage('Auditbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -213,7 +213,7 @@ pipeline {
           }
         }
         stage('Libbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -240,7 +240,7 @@ pipeline {
           }
         }
         stage('Libbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -253,7 +253,7 @@ pipeline {
           }
         }
         stage('Metricbeat Unit tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -266,7 +266,7 @@ pipeline {
           }
         }
         stage('Metricbeat Integration tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -279,7 +279,7 @@ pipeline {
           }
         }
         stage('Metricbeat System tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -292,7 +292,7 @@ pipeline {
           }
         }
         stage('Metricbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -305,7 +305,7 @@ pipeline {
           }
         }
         stage('Metricbeat crosscompile'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -344,7 +344,7 @@ pipeline {
           }
         }
         stage('Packetbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -361,7 +361,7 @@ pipeline {
           }
         }
         stage('dockerlogbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -378,7 +378,7 @@ pipeline {
           }
         }
         stage('Winlogbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -421,7 +421,7 @@ pipeline {
           }
         }
         stage('Functionbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -467,7 +467,7 @@ pipeline {
           }
         }
         stage('Journalbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -484,7 +484,7 @@ pipeline {
           }
         }
         stage('Generators'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -534,7 +534,7 @@ pipeline {
           }
         }
         stage('Kubernetes'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
