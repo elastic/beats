@@ -72,7 +72,10 @@ type event struct {
 	year       int
 	loc        *time.Location
 	sequence   int
-	version int
+	version    int
+	appName    string
+	msgID      string
+	processID  string
 }
 
 // newEvent() return a new event.
@@ -309,6 +312,30 @@ func (s *event) Version() int {
 	return s.version
 }
 
+
+func (s *event) SetAppName(appname []byte) {
+	s.appName = string(appname)
+}
+
+func (s *event) AppName() string {
+	return s.appName
+}
+
+func (s *event) SetMsgID(msgID []byte) {
+	s.msgID = string(msgID)
+}
+
+func (s *event) MsgID() string {
+	return s.msgID
+}
+
+func (s *event) SetProcID(processID []byte) {
+	s.processID = string(processID)
+}
+
+func (s *event) ProcID() string {
+	return s.processID
+}
 
 // Timestamp return the timestamp in UTC.
 func (s *event) Timestamp(timezone *time.Location) time.Time {

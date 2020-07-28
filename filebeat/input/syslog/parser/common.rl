@@ -83,6 +83,18 @@
     event.SetVersion(data[tok:p])
   }
 
+  action app_name{
+    event.SetAppName(data[tok:p])
+  }
+
+  action proc_id {
+    event.SetProcID(data[tok:p])
+  }
+
+  action msg_id {
+    event.SetMsgID(data[tok:p])
+  }
+
   SP = ' ';
 
 }%%
