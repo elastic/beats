@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
@@ -74,6 +75,13 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	service.BeforeRun()
 	defer service.Cleanup()
 
+	execPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	rexLogger := logger.Named("reexec")
+	rex := reexec.Manager(rexLogger, execPath)
+
 	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
 		return err
@@ -91,16 +99,35 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	// listen for kill signal
+	// listen for signals
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT)
-
-	select {
-	case <-stop:
-		break
-	case <-signals:
-		break
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	reexecing := false
+	for {
+		breakout := false
+		select {
+		case <-stop:
+			breakout = true
+		case <-rex.ShutdownChan():
+			reexecing = true
+			breakout = true
+		case sig := <-signals:
+			if sig == syscall.SIGHUP {
+				rexLogger.Infof("SIGHUP triggered re-exec")
+				rex.ReExec()
+			} else {
+				breakout = true
+			}
+		}
+		if breakout {
+			break
+		}
 	}
 
-	return app.Stop()
+	err = app.Stop()
+	if !reexecing {
+		return err
+	}
+	rex.ShutdownComplete()
+	return err
 }
