@@ -167,12 +167,15 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
-	binaryName := "configurable"
+	configurableName := "configurable"
+	serviceableName := "serviceable"
 	if runtime.GOOS == "windows" {
-		binaryName += ".exe"
+		configurableName += ".exe"
+		serviceableName += ".exe"
 	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
