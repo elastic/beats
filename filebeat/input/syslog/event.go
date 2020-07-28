@@ -79,6 +79,7 @@ type event struct {
 	data       map[string]map[string]string
 }
 
+
 // newEvent() return a new event.
 func newEvent() *event {
 	return &event{
@@ -204,7 +205,12 @@ func (s *event) Year() int {
 
 // SetMessage sets the message.
 func (s *event) SetMessage(b []byte) {
-	s.message = string(b)
+	// remove BOM
+	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
+		s.message = string(b[3:])
+	}else {
+		s.message = string(b)
+	}
 }
 
 // Message returns the message.

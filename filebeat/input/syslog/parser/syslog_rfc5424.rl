@@ -70,16 +70,15 @@
   param_value_escapes   = (BS escapes_char);
   SD_NAME               = (PRINT_US_ASCII - ('=' | SP | ']' | '"')){1,32};
 
-  SD_ID                 = SD_NAME                                                   >tok %set_sd_id;
-  PARAM_NAME            = SD_NAME                                                   >tok %set_sd_param_name;
-  PARAM_VALUE           =  ((utf8char -  escapes_char)* param_value_escapes*)+      >tok %set_sd_param_value;
-  SD_PARAM              = PARAM_NAME "=" '"' PARAM_VALUE '"'                        >init_sd_param;
+  SD_ID                 = SD_NAME                                                       >tok %set_sd_id;
+  PARAM_NAME            = SD_NAME                                                       >tok %set_sd_param_name;
+  PARAM_VALUE           =  ((OCTET -  escapes_char) | param_value_escapes)+             >tok %set_sd_param_value;
+  SD_PARAM              = PARAM_NAME "=" '"' PARAM_VALUE '"'                            >init_sd_param;
   SD_ELEMENT            = "[" SD_ID (SP SD_PARAM+)* "]";
-  STRUCTURED_DATA       = NIL_VALUE | SD_ELEMENT+                                   >init_data;
+  STRUCTURED_DATA       = NIL_VALUE | SD_ELEMENT+                                       >init_data;
 
+  MSG                   = OCTET* >tok %message;
 
-  message        = any+>tok %message;
-
-  main := HEADER SP STRUCTURED_DATA (SP message)?;
+  main := HEADER SP STRUCTURED_DATA (SP MSG)?;
 
 }%%
