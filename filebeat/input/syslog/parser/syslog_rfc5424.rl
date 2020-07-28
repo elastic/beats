@@ -42,8 +42,9 @@
 
 
   #
+
   escapes_char          =  ('"' | "]" | BS);
-  param_value_escapes   = (BS escapes_char);
+  param_value_escapes   = (BS>set_bs escapes_char);
   SD_NAME               = (PRINT_US_ASCII - ('=' | SP | ']' | '"')){1,32};
 
   SD_ID                 = SD_NAME                                                       >tok %set_sd_id;
@@ -54,6 +55,9 @@
   STRUCTURED_DATA       = NIL_VALUE | SD_ELEMENT+                                       >init_data;
 
   MSG                   = OCTET* >tok %message;
+
+
+
 
 
 }%%

@@ -191,7 +191,7 @@ func TestRfc5424ParseStructuredData(t *testing.T) {
 		},
 	}, {
 		title: fmt.Sprintf("TestHeader RfcDoc65Example4"),
-		log:   []byte(fmt.Sprintf(RfcDoc65Example4)),
+		log:   []byte(RfcDoc65Example4),
 		syslog: event{
 			priority:   165,
 			version:    1,
@@ -219,6 +219,46 @@ func TestRfc5424ParseStructuredData(t *testing.T) {
 		},
 	},
 	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
+			l := newEvent()
+			ParserRFC5424(test.log, l)
+			AssertEvent(t, test.syslog, l)
+		})
+	}
+}
+
+
+
+func TestRfc5424ParseStructuredDataEscape(t *testing.T) {
+	var tests = []testRule{{
+		title: fmt.Sprintf("TestHeader RfcDoc65Example3"),
+		log:   []byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="\]3" eventSource="\"Application\"" eventID="1011"] ` + BOM + `An application event log entry...`),
+		syslog: event{
+			priority:   165,
+			version:    1,
+			hostname:   "mymachine.example.com",
+			appName:    "evntslog",
+			processID:  "-",
+			msgID:      "ID47",
+			year:       2003,
+			month:      10,
+			day:        11,
+			hour:       22,
+			minute:     14,
+			second:     15,
+			nanosecond: 3000000,
+			message:    "An application event log entry...",
+			data: map[string]map[string]string{
+				"exampleSDID@32473": {
+					"iut":         "]3",
+					"eventID":     "1011",
+					"eventSource": "\"Application\"",
+				},
+			},
+		},
+	}}
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {

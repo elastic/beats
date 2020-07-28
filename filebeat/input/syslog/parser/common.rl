@@ -58,7 +58,7 @@
   }
 
   action set_sd_param_value{
-    event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
+    event.SetData(state.sd_id, state.sd_param_name, data, tok, p, state.sd_value_bs)
  }
 
   action set_sd_id{
@@ -70,6 +70,9 @@
 	}
   }
 
+  action set_bs{
+    state.sd_value_bs = append(state.sd_value_bs, p)
+  }
   # NOTES: This allow to bail out of obvious non valid
   # hostname, this might not be ideal in all situation, but
   # when this happen we just go to the catch all case and at least

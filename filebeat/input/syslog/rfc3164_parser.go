@@ -310,7 +310,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st2
 	tr75:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -623,7 +623,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st22
 	tr61:
-//line parser/common.rl:100
+//line parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
@@ -669,7 +669,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		tok = p
 
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -684,7 +684,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st23
 	tr42:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -733,7 +733,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		tok = p
 
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -748,7 +748,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st24
 	tr43:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -800,7 +800,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr45:
-//line parser/common.rl:88
+//line parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -850,7 +850,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st26
 	tr49:
-//line parser/common.rl:92
+//line parser/common.rl:95
 
 		event.SetProgram(data[tok:p])
 
@@ -882,7 +882,7 @@ func ParserRFC3164(data []byte, event *event) {
 	st_case_28:
 		goto tr0
 	tr50:
-//line parser/common.rl:92
+//line parser/common.rl:95
 
 		event.SetProgram(data[tok:p])
 
@@ -917,7 +917,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr54:
-//line parser/common.rl:96
+//line parser/common.rl:99
 
 		event.SetPid(data[tok:p])
 
@@ -945,7 +945,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr46:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -958,7 +958,7 @@ func ParserRFC3164(data []byte, event *event) {
 			}
 		}
 
-//line parser/common.rl:88
+//line parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -1001,7 +1001,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr57:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1016,7 +1016,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st34
 	tr58:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1029,7 +1029,7 @@ func ParserRFC3164(data []byte, event *event) {
 			}
 		}
 
-//line parser/common.rl:88
+//line parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -1076,7 +1076,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		tok = p
 
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1091,7 +1091,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st35
 	tr44:
-//line parser/common.rl:77
+//line parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1225,7 +1225,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st41
 	tr65:
-//line parser/common.rl:100
+//line parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
@@ -1250,7 +1250,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr63:
-//line parser/common.rl:100
+//line parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
@@ -1439,7 +1439,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto tr75
 	tr76:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -1492,7 +1492,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st54
 	tr77:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -1908,7 +1908,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st80
 	tr78:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -1994,7 +1994,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st87
 	tr79:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -2080,7 +2080,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st94
 	tr80:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -2175,7 +2175,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st100
 	tr81:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -2242,7 +2242,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st104
 	tr82:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -2277,7 +2277,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st106
 	tr83:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
@@ -2327,7 +2327,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st109
 	tr84:
-//line parser/common.rl:104
+//line parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 

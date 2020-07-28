@@ -1297,7 +1297,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr7:
-//line parser/common.rl:108
+//line parser/common.rl:111
 
 		event.SetVersion(data[tok:p])
 
@@ -1338,7 +1338,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr585:
-//line parser/common.rl:100
+//line parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
@@ -1373,7 +1373,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr13:
-//line parser/common.rl:88
+//line parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -1408,7 +1408,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr16:
-//line parser/common.rl:112
+//line parser/common.rl:115
 
 		event.SetAppName(data[tok:p])
 
@@ -1443,7 +1443,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr19:
-//line parser/common.rl:116
+//line parser/common.rl:119
 
 		event.SetProcID(data[tok:p])
 
@@ -1478,7 +1478,7 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 		goto st0
 	tr22:
-//line parser/common.rl:120
+//line parser/common.rl:123
 
 		event.SetMsgID(data[tok:p])
 
@@ -2297,7 +2297,7 @@ func ParserRFC5424(data []byte, event *event) {
 		case 34:
 			goto tr67
 		case 92:
-			goto st56
+			goto tr68
 		case 93:
 			goto st0
 		}
@@ -2305,7 +2305,7 @@ func ParserRFC5424(data []byte, event *event) {
 	tr67:
 //line parser/common.rl:60
 
-		event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
+		event.SetData(state.sd_id, state.sd_param_name, data, tok, p, state.sd_value_bs)
 
 //line parser/common.rl:52
 
@@ -2365,13 +2365,23 @@ func ParserRFC5424(data []byte, event *event) {
 
 		tok = p
 
+//line parser/common.rl:73
+
+		state.sd_value_bs = append(state.sd_value_bs, p)
+
+		goto st56
+	tr68:
+//line parser/common.rl:73
+
+		state.sd_value_bs = append(state.sd_value_bs, p)
+
 		goto st56
 	st56:
 		if (p)++; (p) == (pe) {
 			goto _test_eof56
 		}
 	st_case_56:
-//line rfc5424_parser.go:2379
+//line rfc5424_parser.go:2389
 		if data[(p)] == 34 {
 			goto st54
 		}
@@ -8558,7 +8568,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof547
 		}
 	st_case_547:
-//line rfc5424_parser.go:8566
+//line rfc5424_parser.go:8576
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st548
 		}
@@ -8601,7 +8611,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof551
 		}
 	st_case_551:
-//line rfc5424_parser.go:8609
+//line rfc5424_parser.go:8619
 		switch data[(p)] {
 		case 48:
 			goto tr560
@@ -8620,7 +8630,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof552
 		}
 	st_case_552:
-//line rfc5424_parser.go:8628
+//line rfc5424_parser.go:8638
 		if 49 <= data[(p)] && data[(p)] <= 57 {
 			goto st553
 		}
@@ -8645,7 +8655,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof554
 		}
 	st_case_554:
-//line rfc5424_parser.go:8653
+//line rfc5424_parser.go:8663
 		if data[(p)] == 51 {
 			goto tr565
 		}
@@ -8664,7 +8674,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof555
 		}
 	st_case_555:
-//line rfc5424_parser.go:8672
+//line rfc5424_parser.go:8682
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st556
 		}
@@ -8689,7 +8699,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof557
 		}
 	st_case_557:
-//line rfc5424_parser.go:8697
+//line rfc5424_parser.go:8707
 		if data[(p)] == 50 {
 			goto tr569
 		}
@@ -8708,7 +8718,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof558
 		}
 	st_case_558:
-//line rfc5424_parser.go:8716
+//line rfc5424_parser.go:8726
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st559
 		}
@@ -8733,7 +8743,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof560
 		}
 	st_case_560:
-//line rfc5424_parser.go:8741
+//line rfc5424_parser.go:8751
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr572
 		}
@@ -8749,7 +8759,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof561
 		}
 	st_case_561:
-//line rfc5424_parser.go:8757
+//line rfc5424_parser.go:8767
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st562
 		}
@@ -8774,7 +8784,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof563
 		}
 	st_case_563:
-//line rfc5424_parser.go:8782
+//line rfc5424_parser.go:8792
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr575
 		}
@@ -8790,7 +8800,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof564
 		}
 	st_case_564:
-//line rfc5424_parser.go:8798
+//line rfc5424_parser.go:8808
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st565
 		}
@@ -8836,7 +8846,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof566
 		}
 	st_case_566:
-//line rfc5424_parser.go:8844
+//line rfc5424_parser.go:8854
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto st567
 		}
@@ -8897,7 +8907,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof572
 		}
 	st_case_572:
-//line rfc5424_parser.go:8905
+//line rfc5424_parser.go:8915
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr586
 		}
@@ -8913,7 +8923,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof573
 		}
 	st_case_573:
-//line rfc5424_parser.go:8921
+//line rfc5424_parser.go:8931
 		switch data[(p)] {
 		case 43:
 			goto tr587
@@ -9019,7 +9029,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof579
 		}
 	st_case_579:
-//line rfc5424_parser.go:9027
+//line rfc5424_parser.go:9037
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto st559
 		}
@@ -9035,7 +9045,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof580
 		}
 	st_case_580:
-//line rfc5424_parser.go:9043
+//line rfc5424_parser.go:9053
 		if 48 <= data[(p)] && data[(p)] <= 49 {
 			goto st556
 		}
@@ -9051,7 +9061,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof581
 		}
 	st_case_581:
-//line rfc5424_parser.go:9059
+//line rfc5424_parser.go:9069
 		if 48 <= data[(p)] && data[(p)] <= 50 {
 			goto st553
 		}
@@ -9088,7 +9098,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof584
 		}
 	st_case_584:
-//line rfc5424_parser.go:9096
+//line rfc5424_parser.go:9106
 		switch data[(p)] {
 		case 57:
 			goto st586
@@ -9110,7 +9120,7 @@ func ParserRFC5424(data []byte, event *event) {
 			goto _test_eof585
 		}
 	st_case_585:
-//line rfc5424_parser.go:9118
+//line rfc5424_parser.go:9128
 		if data[(p)] == 62 {
 			goto tr5
 		}
@@ -10918,7 +10928,7 @@ func ParserRFC5424(data []byte, event *event) {
 
 				event.SetMessage(data[tok:p])
 
-//line rfc5424_parser.go:9746
+//line rfc5424_parser.go:9756
 			}
 		}
 
@@ -10927,6 +10937,6 @@ func ParserRFC5424(data []byte, event *event) {
 		}
 	}
 
-//line parser/rfc5424_parser.rl:36
+//line parser/rfc5424_parser.rl:35
 
 }

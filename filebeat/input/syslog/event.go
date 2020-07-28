@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"bytes"
 	"math"
 	"time"
 )
@@ -78,7 +79,6 @@ type event struct {
 	processID  string
 	data       map[string]map[string]string
 }
-
 
 // newEvent() return a new event.
 func newEvent() *event {
@@ -208,7 +208,7 @@ func (s *event) SetMessage(b []byte) {
 	// remove BOM
 	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
 		s.message = string(b[3:])
-	}else {
+	} else {
 		s.message = string(b)
 	}
 }
@@ -369,9 +369,26 @@ func (s *event) IsValid() bool {
 	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && s.message != ""
 }
 
-func (s *event) SetData(id string, key string, value []byte, bs []int) {
+func (s *event) SetData(id string, key string, data []byte, start int, end int, bs []int) {
+	var v string
+
+	// param value escape
+	// https://tools.ietf.org/html/rfc5424#section-6.3.3
+	if len(bs) > 0 {
+		buf := bytes.NewBufferString("")
+		for _, i := range bs {
+			buf.Write(data[start : i])
+			start = i+1
+		}
+		if start<=end {
+			buf.Write(data[start:end])
+		}
+		v = buf.String()
+	} else {
+		v = string(data[start:end])
+	}
 	if element, ok := s.data[id]; ok {
-		element[key] = string(value)
+		element[key] = v
 	}
 }
 

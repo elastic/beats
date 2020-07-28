@@ -17,21 +17,20 @@ type machineState struct {
 func ParserRFC5424(data []byte, event *event) {
     var p, cs int
     state := machineState{
-      sd_value_bs : []int{},
+        sd_value_bs : []int{},
     }
     pe := len(data)
     tok := 0
     eof := len(data)
     %%{
 
-      include common "common.rl";
 
-      include syslog_rfc5424 "syslog_rfc5424.rl";
+        include common "common.rl";
+        include syslog_rfc5424 "syslog_rfc5424.rl";
 
-      main := HEADER SP STRUCTURED_DATA (SP MSG)?;
+        main := HEADER SP STRUCTURED_DATA (SP MSG)?;
 
-
-      write init;
-      write exec;
+        write init;
+        write exec;
     }%%
 }
