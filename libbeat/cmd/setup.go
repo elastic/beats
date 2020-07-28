@@ -114,6 +114,13 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 				}
 			}
 
+			// XXX this is a workaround for installing index template patterns
+			// before enabling ML for modules
+			if s.MachineLearning && !s.Dashboard {
+				fmt.Fprintf(os.Stderr, "--dashboards must be specified when choosing --machine-learning\n")
+				os.Exit(1)
+			}
+
 			if err = beat.Setup(settings, beatCreator, s); err != nil {
 				os.Exit(1)
 			}
