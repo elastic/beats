@@ -208,12 +208,6 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					}
 				}
 
-				// if there is no instance name, use instance ID as the host.name
-				hasHostName, _ := events[instanceID].RootFields.HasKey("host.name")
-				if !hasHostName {
-					events[instanceID].RootFields.Put("host.name", instanceID)
-				}
-
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
 					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
@@ -277,7 +271,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 			}
 
 			// add host cpu/network/disk fields and host.id
-			hostFields := addHostFields(resultMetricsetFields, instanceID)
+			hostFields := addHostFields(resultMetricsetFields, events[instanceID].RootFields, instanceID)
 			events[instanceID].RootFields.Update(hostFields)
 
 			// add rate metrics
@@ -320,9 +314,17 @@ func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) 
 	}
 }
 
-func addHostFields(resultMetricsetFields common.MapStr, instanceID string) common.MapStr {
+func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr, instanceID string) common.MapStr {
 	hostRootFields := common.MapStr{}
 	hostRootFields.Put("host.id", instanceID)
+
+	// If there is no instance name, use instance ID as the host.name
+	hostName, err := rootFields.GetValue("host.name")
+	if err == nil && hostName != nil {
+		hostRootFields.Put("host.name", hostName)
+	} else {
+		hostRootFields.Put("host.name", instanceID)
+	}
 
 	hostFieldTable := map[string]string{
 		"cpu.total.pct":       "host.cpu.pct",
