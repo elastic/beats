@@ -129,35 +129,39 @@ def generateStages(Map args = [:]) {
 
 def runCommand(Map args = [:]) {
   if(args?.containsKey('make')) {
-    makeTarget(args)
+    makeTarget(context: args.label, command: args.make, directory: args.project, label: args.label)
   } else {
-    mageTarget(args)
+    mageTarget(context: args.label, command: args.mage, directory: args.project, label: args.label)
   }
 }
 
 def makeTarget(Map args = [:]) {
   def context = args.context
-  def target = args.target
+  def command = args.command
   def directory = args.get('directory', '')
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
   def directoryFlag = directory.trim() ? "-C ${directory}" : ''
-  withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
-      sh(label: "Make ${target}", script: "make ${directoryFlag} ${target}")
+  node(args.label) {
+    withGithubNotify(context: "${context}") {
+      withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
+        sh(label: "${command}", script: "${command}")
+      }
     }
   }
 }
 
 def mageTarget(Map args = [:]) {
   def context = args.context
+  def command = args.command
   def directory = args.directory
-  def target = args.target
   def withModule = args.get('withModule', false)
-  withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
-      dir(directory) {
-        cmd(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+  node(args.label) {
+    withGithubNotify(context: "${context}") {
+      withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
+        dir(directory) {
+          cmd(label: "${command}", script: "${command}")
+        }
       }
     }
   }
@@ -233,11 +237,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
 }
 
 def installTools() {
-  def i = 2 // Number of retries
   if(isUnix()) {
-    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
   } else {
-    retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 2, seconds: 5){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
