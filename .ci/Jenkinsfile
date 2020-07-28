@@ -207,12 +207,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "DOCKER_PULL=0",
     "MODULE=${module}"
   ]) {
-    if(isDockerInstalled()){
+    if(isInstalled(tool: 'docker', flag: '--version')) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
       installTools()
-
       if(isUnix()) {
         // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
         // See https://github.com/elastic/beats/issues/17787.
