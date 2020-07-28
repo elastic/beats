@@ -167,12 +167,15 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
-	binaryName := "configurable"
+	configurableName := "configurable"
+	serviceableName := "serviceable"
 	if runtime.GOOS == "windows" {
-		binaryName += ".exe"
+		configurableName += ".exe"
+		serviceableName += ".exe"
 	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -326,7 +329,7 @@ func commitID() string {
 	return commitID
 }
 
-// Update is an alias for executing fields, dashboards, config, includes.
+// Update is an alias for executing control protocol, configs, and specs.
 func Update() {
 	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
 }
@@ -344,6 +347,11 @@ func CrossBuildGoDaemon() error {
 // Config generates both the short/reference/docker.
 func Config() {
 	mg.Deps(configYML)
+}
+
+// ControlProto generates pkg/agent/control/proto module.
+func ControlProto() error {
+	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
 }
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
