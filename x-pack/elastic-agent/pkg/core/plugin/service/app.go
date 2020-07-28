@@ -220,21 +220,25 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()
-	defer a.appLock.Unlock()
+	srvState := a.srvState
+	a.appLock.Unlock()
 
-	if a.srvState == nil {
+	if srvState == nil {
 		return
 	}
 
-	if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+	if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
+		a.appLock.Lock()
 		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error(), nil)
 	} else {
+		a.appLock.Lock()
 		a.setState(state.Stopped, "Stopped", nil)
 	}
 	a.srvState = nil
 
 	a.cleanUp()
 	a.stopCredsListener()
+	a.appLock.Unlock()
 }
 
 // Shutdown disconnects the service, but doesn't signal it to stop.
