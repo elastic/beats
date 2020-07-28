@@ -175,10 +175,10 @@ shared:
       content: >
         {{ commit }}
       mode: 0644
-    elastic-agent.reference.yml:
+    'elastic-agent.reference.yml':
       source: 'elastic-agent.reference.yml'
       mode: 0644
-    elastic-agent.yml:
+    'elastic-agent.yml':
       source: 'elastic-agent.yml'
       mode: 0600
       config: true
