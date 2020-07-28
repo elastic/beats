@@ -286,6 +286,7 @@ func getLabels(metric *dto.Metric) common.MapStr {
 	return labels
 }
 
+// CompilePatternList compiles a patter list and returns the list of the compiled patterns
 func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 	var compiledPatterns []*regexp.Regexp
 	compiledPatterns = []*regexp.Regexp{}
@@ -302,6 +303,8 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 	return []*regexp.Regexp{}, nil
 }
 
+
+// MatchMetricFamily checks if the given family/metric name matches any of the given patterns
 func MatchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
 	for _, checkMetric := range matchMetrics {
 		matched := checkMetric.MatchString(family)

@@ -253,7 +253,7 @@ func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels com
 	if strings.HasSuffix(metricName, "_total") || strings.HasSuffix(metricName, "_sum") ||
 		strings.HasSuffix(metricName, "_count") {
 		return counterType
-	} else if strings.Contains(metricName, "_bucket") && leLabel {
+	} else if strings.HasSuffix(metricName, "_bucket") && leLabel {
 		return histogramType
 	}
 
