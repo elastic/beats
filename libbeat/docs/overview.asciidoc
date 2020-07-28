@@ -1,5 +1,5 @@
 [[beats-reference]]
-== Beats overview
+== What are {beats}?
 
 {beats} are open source data shippers that you install as agents on your
 servers to send operational data to
