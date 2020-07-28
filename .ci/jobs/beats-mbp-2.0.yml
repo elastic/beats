@@ -26,11 +26,7 @@
         credentials-id: github-app-beats-ci
         ssh-checkout:
           credentials: f6c7695a-671e-4f4f-a331-acdce44ff9ba
-        property-strategies:
-          all-branches:
-          - suppress-scm-triggering: true
         build-strategies:
-        - skip-initial-build: true
         - tags:
             ignore-tags-older-than: -1
             ignore-tags-newer-than: 365
