@@ -199,17 +199,17 @@ def withBeatsEnv(Map args = [:], Closure body) {
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(modulePattern, directory) : ''
   withEnv([
-    "HOME=${env.WORKSPACE}",
+    "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
-    "PATH=${path}",
+    "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
-    "TEST_COVERAGE=true",
-    "RACE_DETECTOR=true",
+    "MODULE=${module}",
+    "PATH=${path}",
     "PYTHON_ENV=${pythonEnv}",
-    "TEST_TAGS=${env.TEST_TAGS},oracle",
-    "DOCKER_PULL=0",
-    "MODULE=${module}"
+    "RACE_DETECTOR=true",
+    "TEST_COVERAGE=true",
+    "TEST_TAGS=${env.TEST_TAGS},oracle"
   ]) {
     if(isInstalled(tool: 'docker', flag: '--version')) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
