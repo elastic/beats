@@ -303,7 +303,6 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 	return []*regexp.Regexp{}, nil
 }
 
-
 // MatchMetricFamily checks if the given family/metric name matches any of the given patterns
 func MatchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
 	for _, checkMetric := range matchMetrics {
