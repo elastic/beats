@@ -35,7 +35,7 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/logs && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
     chmod 0750 {{ $beatBinary }} && \
-    chmod 0750 {{ $beatBinary }}/data/elastic-agent-*/elastic-agent && \
+    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
