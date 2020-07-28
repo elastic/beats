@@ -80,18 +80,23 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        unstash "source"
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           script {
             def masterFile = 'Jenkinsfile.yml'
             def changeset = readYaml(file: masterFile)['changeset']
-            readYaml(file: masterFile)['projects'].each { project ->
-              generateSteps(name: project, changeset: changeset).each { k,v ->
+            readYaml(file: masterFile)['projects'].each { projectName ->
+              generateStages(project: projectName, changeset: changeset).each { k,v ->
                 mapParallelTasks["${k}"] = v
               }
             }
             parallel(mapParallelTasks)
           }
+        }
+      }
+      post {
+        always {
+          echo 'TODO: save markdown files for the record'
         }
       }
     }
@@ -100,52 +105,6 @@ pipeline {
     // TODO: Support runbld
     cleanup {
       notifyBuildResult(prComment: true)
-    }
-  }
-}
-
-def generateSteps(Map args = [:]) {
-  def name = args.project
-  def changeset = args.changeset
-  def mapParallelStages = [:]
-  def masterFile = "${name}/Jenkinsfile.yml"
-  def content = readYaml(file: masterFile)
-  def defaultNode = content['platform']
-
-  if (beatsWhen(project: name, content: content, changeset: changeset)) {
-    content['stages'].each { stageName ->
-      if (stageName['when']) {
-        if (beatsWhen(project: "stageName", content: stageName['when'], changeset: changeset)) {
-          generateStages(defaultNode: defaultNode, content: stageName).each { k,v ->
-            mapParallelStages["${k}"] = v
-          }
-        }
-      } else {
-        generateStages(defaultNode: defaultNode, content: stageName).each { k,v ->
-          mapParallelStages["${k}"] = v
-        }
-      }
-  }
-  return mapParallelStages
-}
-
-def generateStages(Map args = [:]) {
-  def defaultNode = args.defaultNode
-  def mapParallelStages = [:]
-  if (content['platform']) {
-    content['platform']?.each {
-      mapParallelStages["${k}-${it}"] = generateStage(platform: it, content: stageName)
-    }
-  } else {
-    mapParallelStages["${k}"] = generateStage(platform: defaultNode, content: stageName)
-  }
-  return mapParallelStages
-}
-
-def generateStage(Map args = [:]) {
-  return {
-    node(it) {
-      sh "${content['command']}"
     }
   }
 }
