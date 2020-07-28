@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
 * CoreDNS {pull}19134[19134] (`forwarded` tag is not included by default)
 * Envoy Proxy {pull}19134[19134] (`forwarded` tag is not included by default)
+- Disable the option of running --machine-learning on its own. {pull}20241[20241]
 
 *Heartbeat*
 
