@@ -56,6 +56,7 @@
 - Improve GRPC stop to be more relaxed {pull}20118[20118]
 - Prevent closing closed reader {pull}20214[20214]
 - Fix Windows service installation script {pull}20203[20203]
+- Fix timeout issue stopping service applications {pull}20256[20256]
 
 ==== New features
 
