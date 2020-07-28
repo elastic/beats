@@ -1,0 +1,26 @@
+[[whats-new]]
+== What's new in {beats} {minor-version}
+++++
+<titleabbrev>What's new in {minor-version}</titleabbrev>
+++++
+
+Here are the highlights of what's new and improved in {minor-version}.
+//Uncomment when release notes are available.
+//For detailed information about this release, check out the
+//<<release-notes-7.10.0,release notes>> and
+//<<breaking-changes-7.10,breaking changes>>.
+
+coming[7.10.0]
+
+//Starting with n.1, uncomment this list and add links to previous releases
+//with most recent listed first:
+//Other versions: {beats-ref-all}/7.10/release-highlights-7.10.0.html[7.10] |
+//{beats-ref-all}/n.n/release-highlights-n.n.n.html[n.n] |
+//{beats-ref-all}/n.n/release-highlights-n.n.n.html[n.n]
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+//
+// end::notable-highlights[]
