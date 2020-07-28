@@ -86,7 +86,6 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 	insecure := c.Verification != VerifyFull
 	if insecure {
-		// TODO: set this to debug? it is not super useful seeing a thousand of these
 		logp.NewLogger("tls").Warn("Some SSL/TLS verifications disabled.")
 	}
 
@@ -106,6 +105,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:         c.Renegotiation,
 		ClientAuth:            c.ClientAuth,
 		VerifyPeerCertificate: verifyPeerCertFn,
+		Time:                  c.Time,
 	}
 }
 
