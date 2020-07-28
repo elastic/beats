@@ -27,6 +27,9 @@ processors:
 - set:
     field: event.dataset
     value: fortinet.firewall
+- remove:
+    field: event.timezone
+    ignore_missing: true
 - set:
     field: event.timezone
     value: "{{fortinet.firewall.tz}}"
