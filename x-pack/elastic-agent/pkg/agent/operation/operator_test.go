@@ -35,9 +35,9 @@ func TestMain(m *testing.M) {
 	}
 	serviceSpec := program.Spec{
 		ServicePort: port,
-		Name: "serviceable",
-		Cmd:  "serviceable",
-		Args: []string{fmt.Sprintf("%d", port)},
+		Name:        "serviceable",
+		Cmd:         "serviceable",
+		Args:        []string{fmt.Sprintf("%d", port)},
 	}
 
 	program.Supported = append(program.Supported, configurableSpec, serviceSpec)
@@ -389,7 +389,7 @@ func TestConfigurableService(t *testing.T) {
 
 	// emulating a service, so we need to start the binary here in the test
 	spec := p.Spec()
-	cmd := exec.Command(spec.BinaryPath, spec.Args...)
+	cmd := exec.Command(spec.BinaryPath, fmt.Sprintf("%d", p.ServicePort()))
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	cmd.Dir = filepath.Dir(spec.BinaryPath)
 	cmd.Stdout = os.Stdout
@@ -435,15 +435,6 @@ func TestConfigurableService(t *testing.T) {
 	if err := operator.stop(p); err != nil {
 		t.Fatalf("Failed to stop service: %v", err)
 	}
-
-	waitFor(t, func() error {
-		items := operator.State()
-		_, ok := items[p.ID()]
-		if ok {
-			return fmt.Errorf("state for process, should be removed")
-		}
-		return nil
-	})
 
 	if err := cmd.Wait(); err != nil {
 		t.Fatalf("Process failed: %v", err)

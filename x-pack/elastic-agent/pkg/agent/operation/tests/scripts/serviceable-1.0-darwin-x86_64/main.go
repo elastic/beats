@@ -9,14 +9,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	protobuf "github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"net"
 	"os"
 	"path/filepath"
 	"strconv"
 
+	protobuf "github.com/golang/protobuf/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -82,21 +82,10 @@ func (s *configServer) OnConfig(cfgString string) {
 		}
 	}
 
-	if testCfg.Crash {
-		os.Exit(2)
-	}
-
-	if testCfg.Status != nil {
-		s.client.Status(*testCfg.Status, "Custom status", map[string]interface{}{
-			"status":  *testCfg.Status,
-			"message": "Custom status",
-		})
-	} else {
-		s.client.Status(proto.StateObserved_HEALTHY, "Running", map[string]interface{}{
-			"status":  proto.StateObserved_HEALTHY,
-			"message": "Running",
-		})
-	}
+	s.client.Status(proto.StateObserved_HEALTHY, "Running", map[string]interface{}{
+		"status":  proto.StateObserved_HEALTHY,
+		"message": "Running",
+	})
 }
 
 func (s *configServer) OnStop() {
@@ -110,23 +99,20 @@ func (s *configServer) OnError(err error) {
 
 // TestConfig is a configuration for testing Config calls
 type TestConfig struct {
-	TestFile string                      `config:"TestFile" yaml:"TestFile"`
-	Status   *proto.StateObserved_Status `config:"Status" yaml:"Status"`
-	Crash    bool                        `config:"Crash" yaml:"Crash"`
+	TestFile string `config:"TestFile" yaml:"TestFile"`
 }
 
 func getCreds(port int) (*proto.ConnInfo, error) {
-	c, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", port))
+	c, err := net.Dial("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
 		return nil, err
 	}
 	defer c.Close()
-	buf := make([]byte, 0, 8192)
+	buf := make([]byte, 1024*1024)
 	n, err := c.Read(buf)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Fprintf(os.Stdout, "reading: %d\n", n)
 	var connInfo proto.ConnInfo
 	err = protobuf.Unmarshal(buf[:n], &connInfo)
 	if err != nil {
