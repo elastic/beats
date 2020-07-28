@@ -1,16 +1,17 @@
 when:
-    branches: true             ## for all the branches
-    changeset:                 ## when PR contains any of those entries in the changeset
+    branches: true      ## for all the branches
+    tags: true          ## for all the tags
+    changeset:          ## when PR contains any of those entries in the changeset
         - "auditbeat"
-        - '@oss'               ## special token regarding the changeset for the oss 
-    comments:                  ## when PR comment contains any of those entries
+        - '@oss'         ## special token regarding the changeset for the oss 
+    comments:
         - "/test auditbeat"
-    labels:                    ## when PR labels matche any of those entries
+    labels:
         - "auditbeat"
-    parameters:                ## when parameter was selected in the UI.
+    parameters:
         - "auditbeat"
-    tags: true                 ## for all the tags
-platform: "linux && ubuntu-16" ## default label for all the stages
+platform:               ## default platform where the stages will use
+    - "linux && ubuntu-16"
 stages:
     build:
         command:
@@ -21,9 +22,9 @@ stages:
     macos:
         command:
             - "cd auditbeat && mage build unitTest"
-        platforms:             ## override default label in this specific stage.
+        platform:
           - "macos"
-        when:                  ## Aggregate when with the top-level one.
+        when:           ## Aggregate when with the top-level one.
             comments:
                 - "/test auditbeat for macos"
             labels:
@@ -33,11 +34,11 @@ stages:
     windows:
         command:
             - "cd auditbeat && mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
+        platform:
             - "windows-2019"
             - "windows-2016"
         when:
             comments:
                 - "/test auditbeat for windows"
             parameters:
-                - "windows"
+                - "macos"
