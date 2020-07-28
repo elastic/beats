@@ -76,6 +76,7 @@ type event struct {
 	appName    string
 	msgID      string
 	processID  string
+	data       map[string]map[string]string
 }
 
 // newEvent() return a new event.
@@ -312,7 +313,6 @@ func (s *event) Version() int {
 	return s.version
 }
 
-
 func (s *event) SetAppName(appname []byte) {
 	s.appName = string(appname)
 }
@@ -361,6 +361,12 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 // IsValid returns true if the date and the message are present.
 func (s *event) IsValid() bool {
 	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && s.message != ""
+}
+
+func (s *event) SetData(id string, key string, value []byte, bs []int) {
+	if element, ok := s.data[id]; ok {
+		element[key] = string(value)
+	}
 }
 
 // BytesToInt takes a variable length of bytes and assume ascii chars and convert it to int, this is

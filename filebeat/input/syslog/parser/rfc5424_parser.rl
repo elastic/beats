@@ -8,8 +8,17 @@ package syslog
     variable pe pe;
 }%%
 
+type machineState struct {
+	sd_id         string
+	sd_param_name string
+	sd_value_bs   []int
+}
+
 func Parse5424(data []byte, event *event) {
     var p, cs int
+    state := machineState{
+      sd_value_bs : []int{},
+    }
     pe := len(data)
     tok := 0
     eof := len(data)

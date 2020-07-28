@@ -1,14 +1,34 @@
 %%{
   machine syslog_rfc5424;
 
-  NONZERO_DIGIT = '1'..'9';
+  action init_data{
+    event.data = map[string]map[string]string{}
+  }
+
+  action init_sd_param{
+    state.sd_value_bs = []int{}
+  }
+
+  action set_sd_param_name{
+    state.sd_param_name = string(data[tok:p])
+  }
+
+  action set_sd_param_value{
+    event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
+ }
+
+  action set_sd_id{
+    state.sd_id = string(data[tok:p])
+    if _, ok := event.data[ state.sd_id ]; ok {
+		fhold;
+	} else {
+		event.data[state.sd_id] = map[string]string{}
+	}
+  }
+
 
   # Syslog Message Format
   # https://tools.ietf.org/html/rfc5424#section-6
-
-  # comment
-  NIL_VALUE = "-";
-  PRINT_US_ASCII =  0x21..0x7E;
 
   # PRI:  range 0 .. 191
   PRIVAL  = (('1' ('9' ('0' | '1'){,1}
@@ -41,11 +61,25 @@
   PROCID        = NIL_VALUE | PRINT_US_ASCII{1,128}     >tok %proc_id;
   MSGID         = NIL_VALUE | PRINT_US_ASCII{1,32}      >tok %msg_id;
 
-
-
-  message = any+>tok %message;
   HEADER          = PRI VERSION SP TIMESTAMP SP HOSTNAME
                     SP APP_NAME SP PROCID SP MSGID;
-  main := HEADER SP message;
+
+
+  #
+  escapes_char          =  ('"' | "]" | BS);
+  param_value_escapes   = (BS escapes_char);
+  SD_NAME               = (PRINT_US_ASCII - ('=' | SP | ']' | '"')){1,32};
+
+  SD_ID                 = SD_NAME                                                   >tok %set_sd_id;
+  PARAM_NAME            = SD_NAME                                                   >tok %set_sd_param_name;
+  PARAM_VALUE           =  ((utf8char -  escapes_char)* param_value_escapes*)+      >tok %set_sd_param_value;
+  SD_PARAM              = PARAM_NAME "=" '"' PARAM_VALUE '"'                        >init_sd_param;
+  SD_ELEMENT            = "[" SD_ID (SP SD_PARAM+)* "]";
+  STRUCTURED_DATA       = NIL_VALUE | SD_ELEMENT+                                   >init_data;
+
+
+  message        = any+>tok %message;
+
+  main := HEADER SP STRUCTURED_DATA (SP message)?;
 
 }%%
