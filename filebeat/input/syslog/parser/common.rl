@@ -44,6 +44,32 @@
     event.SetNanosecond(data[tok:p])
   }
 
+
+  action init_data{
+    event.data = map[string]map[string]string{}
+  }
+
+  action init_sd_param{
+    state.sd_value_bs = []int{}
+  }
+
+  action set_sd_param_name{
+    state.sd_param_name = string(data[tok:p])
+  }
+
+  action set_sd_param_value{
+    event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
+ }
+
+  action set_sd_id{
+    state.sd_id = string(data[tok:p])
+    if _, ok := event.data[ state.sd_id ]; ok {
+		fhold;
+	} else {
+		event.data[state.sd_id] = map[string]string{}
+	}
+  }
+
   # NOTES: This allow to bail out of obvious non valid
   # hostname, this might not be ideal in all situation, but
   # when this happen we just go to the catch all case and at least

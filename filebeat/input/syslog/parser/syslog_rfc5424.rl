@@ -1,43 +1,19 @@
 %%{
   machine syslog_rfc5424;
 
-  action init_data{
-    event.data = map[string]map[string]string{}
-  }
-
-  action init_sd_param{
-    state.sd_value_bs = []int{}
-  }
-
-  action set_sd_param_name{
-    state.sd_param_name = string(data[tok:p])
-  }
-
-  action set_sd_param_value{
-    event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
- }
-
-  action set_sd_id{
-    state.sd_id = string(data[tok:p])
-    if _, ok := event.data[ state.sd_id ]; ok {
-		fhold;
-	} else {
-		event.data[state.sd_id] = map[string]string{}
-	}
-  }
-
-
   # Syslog Message Format
   # https://tools.ietf.org/html/rfc5424#section-6
 
   # PRI:  range 0 .. 191
-  PRIVAL  = (('1' ('9' ('0' | '1'){,1}
-             | '0'..'8' ('0'..'9'){,1}){,1})
-             | ('2'..'9' ('0'..'9'){,1})
-             | ('0'))   >tok %priority;
-  PRI     =  "<" PRIVAL ">";
+  PRIVAL_RANGE              = (('1' ('9' ('0' | '1'){,1}
+                                | '0'..'8' ('0'..'9'){,1}){,1})
+                                | ('2'..'9' ('0'..'9'){,1})
+                                | ('0'));
+  PRIVAL                    = PRIVAL_RANGE >tok %priority;
+  PRI                       =  "<" PRIVAL ">";
 
-  VERSION = (NONZERO_DIGIT digit{0,2})>tok %version;
+  VERSION_RANGE             = (NONZERO_DIGIT digit{0,2});
+  VERSION                   = VERSION_RANGE>tok %version;
 
   # timestamp
   DATE_FULLYEAR   = digit{4}>tok %year;
@@ -79,6 +55,5 @@
 
   MSG                   = OCTET* >tok %message;
 
-  main := HEADER SP STRUCTURED_DATA (SP MSG)?;
 
 }%%

@@ -28,7 +28,6 @@ const BOM = "\xEF\xBB\xBF"
 
 const VersionTestTemplate = `<34>%d 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - ` + BOM + `'su root' failed for lonvick on /dev/pts/8`
 const PriorityTestTemplate = `<%d>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - ` + BOM + `'su root' failed for lonvick on /dev/pts/8`
-const TimeTestTemplate = `<22>11 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - ` + BOM + `'su root' failed for lonvick on /dev/pts/8`
 
 const RfcDoc65Example1 = `<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - ` + BOM + `'su root' failed for lonvick on /dev/pts/8`
 const RfcDoc65Example2 = `<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts.`
@@ -114,25 +113,25 @@ func createPriorityTestRule(v int, success bool) testRule {
 
 func TestRfc5424ParseHeader(t *testing.T) {
 	var tests = []testRule{{
-	//	title: fmt.Sprintf("TestHeader RfcDoc65Example1"),
-	//	log:   []byte(fmt.Sprintf(RfcDoc65Example1)),
-	//	syslog: event{
-	//		priority:   34,
-	//		version:    1,
-	//		hostname:   "mymachine.example.com",
-	//		appName:    "su",
-	//		processID:  "-",
-	//		msgID:      "ID47",
-	//		year:       2003,
-	//		month:      10,
-	//		day:        11,
-	//		hour:       22,
-	//		minute:     14,
-	//		second:     15,
-	//		nanosecond: 3000000,
-	//		message:    "'su root' failed for lonvick on /dev/pts/8",
-	//	},
-	//}, {
+		title: fmt.Sprintf("TestHeader RfcDoc65Example1"),
+		log:   []byte(fmt.Sprintf(RfcDoc65Example1)),
+		syslog: event{
+			priority:   34,
+			version:    1,
+			hostname:   "mymachine.example.com",
+			appName:    "su",
+			processID:  "-",
+			msgID:      "ID47",
+			year:       2003,
+			month:      10,
+			day:        11,
+			hour:       22,
+			minute:     14,
+			second:     15,
+			nanosecond: 3000000,
+			message:    "'su root' failed for lonvick on /dev/pts/8",
+		},
+	}, {
 		title: fmt.Sprintf("TestHeader RfcDoc65Example2"),
 		log:   []byte(RfcDoc65Example2),
 		syslog: event{
@@ -157,7 +156,7 @@ func TestRfc5424ParseHeader(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
 			l := newEvent()
-			Parse5424(test.log, l)
+			ParserRFC5424(test.log, l)
 			AssertEvent(t, test.syslog, l)
 		})
 	}
@@ -224,7 +223,7 @@ func TestRfc5424ParseStructuredData(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
 			l := newEvent()
-			Parse5424(test.log, l)
+			ParserRFC5424(test.log, l)
 			AssertEvent(t, test.syslog, l)
 		})
 	}
@@ -252,7 +251,7 @@ func TestParseRfc5424Syslog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s:%s", test.title, string(test.log)), func(t *testing.T) {
 			l := newEvent()
-			Parse5424(test.log, l)
+			ParserRFC5424(test.log, l)
 			AssertEvent(t, test.syslog, l)
 		})
 	}

@@ -14,7 +14,7 @@ type machineState struct {
 	sd_value_bs   []int
 }
 
-func Parse5424(data []byte, event *event) {
+func ParserRFC5424(data []byte, event *event) {
     var p, cs int
     state := machineState{
       sd_value_bs : []int{},
@@ -27,6 +27,9 @@ func Parse5424(data []byte, event *event) {
       include common "common.rl";
 
       include syslog_rfc5424 "syslog_rfc5424.rl";
+
+      main := HEADER SP STRUCTURED_DATA (SP MSG)?;
+
 
       write init;
       write exec;

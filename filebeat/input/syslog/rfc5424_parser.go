@@ -17,7 +17,7 @@ type machineState struct {
 	sd_value_bs   []int
 }
 
-func Parse5424(data []byte, event *event) {
+func ParserRFC5424(data []byte, event *event) {
 	var p, cs int
 	state := machineState{
 		sd_value_bs: []int{},
@@ -1297,7 +1297,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr7:
-//line parser/common.rl:82
+//line parser/common.rl:108
 
 		event.SetVersion(data[tok:p])
 
@@ -1338,7 +1338,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr585:
-//line parser/common.rl:74
+//line parser/common.rl:100
 
 		event.SetTimeZone(data[tok:p])
 
@@ -1373,7 +1373,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr13:
-//line parser/common.rl:62
+//line parser/common.rl:88
 
 		event.SetHostname(data[tok:p])
 
@@ -1408,7 +1408,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr16:
-//line parser/common.rl:86
+//line parser/common.rl:112
 
 		event.SetAppName(data[tok:p])
 
@@ -1443,7 +1443,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr19:
-//line parser/common.rl:90
+//line parser/common.rl:116
 
 		event.SetProcID(data[tok:p])
 
@@ -1478,7 +1478,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr22:
-//line parser/common.rl:94
+//line parser/common.rl:120
 
 		event.SetMsgID(data[tok:p])
 
@@ -1525,7 +1525,7 @@ func Parse5424(data []byte, event *event) {
 //line rfc5424_parser.go:1530
 		goto st589
 	tr25:
-//line parser/syslog_rfc5424.rl:4
+//line parser/common.rl:48
 
 		event.data = map[string]map[string]string{}
 
@@ -1582,7 +1582,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr27:
-//line parser/syslog_rfc5424.rl:20
+//line parser/common.rl:64
 
 		state.sd_id = string(data[tok:p])
 		if _, ok := event.data[state.sd_id]; ok {
@@ -2252,7 +2252,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr32:
-//line parser/syslog_rfc5424.rl:12
+//line parser/common.rl:56
 
 		state.sd_param_name = string(data[tok:p])
 
@@ -2303,11 +2303,11 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st54
 	tr67:
-//line parser/syslog_rfc5424.rl:16
+//line parser/common.rl:60
 
 		event.SetData(state.sd_id, state.sd_param_name, data[tok:p], state.sd_value_bs)
 
-//line parser/syslog_rfc5424.rl:8
+//line parser/common.rl:52
 
 		state.sd_value_bs = []int{}
 
@@ -2336,7 +2336,7 @@ func Parse5424(data []byte, event *event) {
 		}
 		goto st0
 	tr29:
-//line parser/syslog_rfc5424.rl:20
+//line parser/common.rl:64
 
 		state.sd_id = string(data[tok:p])
 		if _, ok := event.data[state.sd_id]; ok {
@@ -10927,6 +10927,6 @@ func Parse5424(data []byte, event *event) {
 		}
 	}
 
-//line parser/rfc5424_parser.rl:33
+//line parser/rfc5424_parser.rl:36
 
 }
