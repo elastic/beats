@@ -203,13 +203,15 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
 					// add cloud.instance.name and host.name into ec2 events
 					if *tag.Key == "Name" {
-						hasHostName, err := events[instanceID].RootFields.HasKey("host.name")
-						if hasHostName && err != nil {
-							continue
-						}
 						events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
 						events[instanceID].RootFields.Put("host.name", *tag.Value)
 					}
+				}
+
+				// if there is no instance name, use instance ID as the host.name
+				hasHostName, _ := events[instanceID].RootFields.HasKey("host.name")
+				if !hasHostName {
+					events[instanceID].RootFields.Put("host.name", instanceID)
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
