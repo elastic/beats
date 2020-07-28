@@ -20,10 +20,17 @@ projects:
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:
-    oss:
+    ci:
         - "^Jenkinsfile"
+        - "^\\.ci/scripts/.*"
+    oss:
         - "^go.mod"
         - "^libbeat/.*"
-        - "^testing/.*"
         - "^dev-tools/.*"
-        - "^\\.ci/scripts/.*"
+        - "^testing/.*"
+    xpack:
+        - "^go.mod"
+        - "^libbeat/.*"
+        - "^dev-tools/.*"
+        - "^testing/.*"
+        - "^x-pack/libbeat/.*"

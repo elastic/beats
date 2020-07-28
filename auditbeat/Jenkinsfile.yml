@@ -2,6 +2,7 @@ when:
     branches: true             ## for all the branches
     changeset:                 ## when PR contains any of those entries in the changeset
         - "auditbeat"
+        - '@ci'                ## special token regarding the changeset for the ci 
         - '@oss'               ## special token regarding the changeset for the oss 
     comments:                  ## when PR comment contains any of those entries
         - "/test auditbeat"
@@ -13,14 +14,14 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        command:
-            - "cd auditbeat && mage build test"
+        mage:
+            - "mage build test"
     crosscompile: 
-        command:
+        make:
             - "make -C auditbeat crosscompile"
     macos:
-        command:
-            - "cd auditbeat && mage build unitTest"
+        mage:
+            - "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "macos"
         when:                  ## Aggregate when with the top-level one.
@@ -31,8 +32,8 @@ stages:
             parameters:
                 - "macos"
     windows:
-        command:
-            - "cd auditbeat && mage build unitTest"
+        mage:
+            - "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             - "windows-2016"
