@@ -12,6 +12,7 @@ json.keys_under_root: false
 processors:
   - drop_fields:
       fields: ["json.orig_bytes","json.resp_bytes","json.tunnel_parents"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"

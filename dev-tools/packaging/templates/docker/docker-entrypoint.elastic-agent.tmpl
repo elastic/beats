@@ -49,8 +49,9 @@ function enroll(){
       if [ $exitCode -ne 0 ]; then
         exit $exitCode
       fi
+      
+      apikey=$(echo $enrollResp | jq -r '.item.api_key')
     fi
-    apikey=$(echo $enrollResp | jq -r '.item.api_key')
     echo $apikey
 
     ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
