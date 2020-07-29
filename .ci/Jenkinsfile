@@ -98,7 +98,8 @@ pipeline {
       }
       post {
         always {
-          echo 'TODO: save markdown files for the record'
+          // Archive the markdown files that contain the reason for the build to be triggered
+          archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/*reasons.md")
         }
       }
     }
