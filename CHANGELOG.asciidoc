@@ -93,7 +93,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 - Fix `netflow` module to support 7 bytepad for IPFIX template. {issue}18098[18098]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
-- Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Fix Cisco ASA 3020** and 106023 messages. {pull}17964[17964]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
@@ -114,7 +114,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix mapping of service start type in the service metricset, windows module. {pull}19551[19551]
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
-- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
+- Fix SQL module mapping NULL values as string. {pull}18955[18955] {issue}18898[18898]
 
 *Packetbeat*
 
@@ -232,7 +232,8 @@ field. You can revert this change by configuring tags for the module and omittin
 
 
 *Elastic Log Driver*
-- Add support for `docker logs` command {pull}19531[19531]
+
+- Add support for `docker logs` command. {pull}19531[19531]
 
 ==== Deprecated
 
