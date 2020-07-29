@@ -72,9 +72,9 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
-	// Time returns the current time as the number of seconds since the epoch.
-	// If Time is nil, TLS uses time.Now.
-	Time func() time.Time
+	// time returns the current time as the number of seconds since the epoch.
+	// If time is nil, TLS uses time.Now.
+	time func() time.Time
 }
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
@@ -85,14 +85,15 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	}
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
-	insecure := c.Verification != VerifyFull
-	if insecure {
-		logp.NewLogger("tls").Warn("Some SSL/TLS verifications disabled.")
-	}
 
 	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
 	// or when we are using 'certificate' TLS verification mode, we add a custom callback
-	verifyPeerCertFn := MakeVerifyPeerCertificate(c)
+	verifyPeerCertFn := makeVerifyPeerCertificate(c)
+
+	insecure := c.Verification != VerifyFull
+	if c.Verification == VerifyNone {
+		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
+	}
 
 	return &tls.Config{
 		MinVersion:            minVersion,
@@ -106,7 +107,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:         c.Renegotiation,
 		ClientAuth:            c.ClientAuth,
 		VerifyPeerCertificate: verifyPeerCertFn,
-		Time:                  c.Time,
+		Time:                  c.time,
 	}
 }
 
@@ -122,30 +123,30 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	return config
 }
 
-// MakeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
-func MakeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
+// makeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
+func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	pin := len(cfg.CASha256) > 0
 	skipHostName := cfg.Verification == VerifyCertificate
 
 	if pin && !skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			return VerifyCAPin(cfg.CASha256, verifiedChains)
+			return verifyCAPin(cfg.CASha256, verifiedChains)
 		}
 	}
 
 	if pin && skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := VerifyCertificateExceptServerName(rawCerts, cfg)
+			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
 			if err != nil {
 				return err
 			}
-			return VerifyCAPin(cfg.CASha256, verifiedChains)
+			return verifyCAPin(cfg.CASha256, verifiedChains)
 		}
 	}
 
 	if !pin && skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := VerifyCertificateExceptServerName(rawCerts, cfg)
+			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
 			return err
 		}
 	}
@@ -153,17 +154,17 @@ func MakeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	return nil
 }
 
-// VerifyCertificateExceptServerName is a TLS Certificate verification utility method that verifies that the provided
+// verifyCertificateExceptServerName is a TLS Certificate verification utility method that verifies that the provided
 // certificate chain is valid and is signed by one of the root CAs in the provided tls.Config. It is intended to be
-// as similar as possible to the default verify (go/src/crypto/tls/handshake_client.go:259), but does not verify
-// that the provided certificate matches the ServerName in the tls.Config.
-func VerifyCertificateExceptServerName(
+// as similar as possible to the default verify, but does not verify that the provided certificate matches the
+// ServerName in the tls.Config.
+func verifyCertificateExceptServerName(
 	rawCerts [][]byte,
 	c *TLSConfig,
 ) ([]*x509.Certificate, [][]*x509.Certificate, error) {
 	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
 	// during the handshake.
-	// the verification code here is taken from crypto/tls/handshake_client.go:259
+	// the verification code here is taken from verifyServerCertificate in crypto/tls/handshake_client.go:824
 	certs := make([]*x509.Certificate, len(rawCerts))
 	for i, asn1Data := range rawCerts {
 		cert, err := x509.ParseCertificate(asn1Data)
@@ -174,8 +175,8 @@ func VerifyCertificateExceptServerName(
 	}
 
 	var t time.Time
-	if c.Time != nil {
-		t = c.Time()
+	if c.time != nil {
+		t = c.time()
 	} else {
 		t = time.Now()
 	}
@@ -187,10 +188,7 @@ func VerifyCertificateExceptServerName(
 		Intermediates: x509.NewCertPool(),
 	}
 
-	for i, cert := range certs {
-		if i == 0 {
-			continue
-		}
+	for _, cert := range certs[1:] {
 		opts.Intermediates.AddCert(cert)
 	}
 
@@ -198,5 +196,5 @@ func VerifyCertificateExceptServerName(
 
 	// defer to the default verification performed
 	chains, err := headCert.Verify(opts)
-	return certs, chains, errors.WithStack(err)
+	return certs, chains, err
 }

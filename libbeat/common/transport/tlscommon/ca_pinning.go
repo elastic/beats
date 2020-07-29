@@ -32,12 +32,12 @@ var ErrCAPinMissmatch = errors.New("provided CA certificate pins doesn't match a
 // TLS connection is used.
 type verifyPeerCertFunc func([][]byte, [][]*x509.Certificate) error
 
-// VerifyCAPin loops through the verified chains and will try to match the certificates pin.
+// verifyCAPin loops through the verified chains and will try to match the certificates pin.
 //
 // NOTE: Defining a PIN to check certificates is not a replacement for the normal TLS validations it's
 // an additional validation. In fact if you set `InsecureSkipVerify` to true and a PIN, the
 // verifiedChains variable will be empty and the added validation will fail.
-func VerifyCAPin(hashes []string, verifiedChains [][]*x509.Certificate) error {
+func verifyCAPin(hashes []string, verifiedChains [][]*x509.Certificate) error {
 	for _, chain := range verifiedChains {
 		for _, certificate := range chain {
 			h := Fingerprint(certificate)

@@ -29,7 +29,7 @@ import (
 )
 
 // This does not actually test that it ignores the server name because no part of the func even consumes the server name
-func TestVerifyCertificateExceptServerName(t *testing.T) {
+func Test_verifyCertificateExceptServerName(t *testing.T) {
 
 	tests := []struct {
 		name    string
@@ -74,7 +74,7 @@ func TestVerifyCertificateExceptServerName(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := &TLSConfig{Time: tc.time}
+			cfg := &TLSConfig{time: tc.time}
 			// load the CA
 			if tc.ca != "" {
 				ca := loadFileBytes(tc.ca)
@@ -91,7 +91,7 @@ func TestVerifyCertificateExceptServerName(t *testing.T) {
 				rawCerts = append(rawCerts, block.Bytes)
 			}
 
-			_, _, got := VerifyCertificateExceptServerName(rawCerts, cfg)
+			_, _, got := verifyCertificateExceptServerName(rawCerts, cfg)
 			if tc.wantErr {
 				assert.Error(t, got)
 			} else {
