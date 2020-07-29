@@ -109,7 +109,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			continue
 		}
 		val := float64(metric.Value)
-		if !math.IsNaN(val) && !math.IsInf(val, 0) {
+		if math.IsNaN(val) || math.IsInf(val, 0) {
 			continue
 		}
 
