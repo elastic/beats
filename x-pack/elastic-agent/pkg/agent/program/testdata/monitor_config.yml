@@ -1,4 +1,4 @@
-streams:
+inputs:
 - type: monitor/icmp
   name: icmp
   schedule: '*/5 * * * * * *'

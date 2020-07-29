@@ -5,6 +5,7 @@
 package program
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -400,10 +401,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
-		// "monitor_config": {
-		// 	programs: []string{"heartbeat"},
-		// 	expected: 1,
-		// },
+		"monitor_config": {
+		 	programs: []string{"heartbeat"},
+		 	expected: 1,
+		},
 		"enabled_true": {
 			programs: []string{"filebeat"},
 			expected: 1,
@@ -455,6 +456,7 @@ func TestConfiguration(t *testing.T) {
 			require.Equal(t, 1, len(programs))
 
 			defPrograms, ok := programs["default"]
+			fmt.Printf("AST %v\n", ast)
 			require.True(t, ok)
 			require.Equal(t, test.expected, len(defPrograms))
 
