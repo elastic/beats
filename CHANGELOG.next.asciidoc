@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
+- Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
 
 *Heartbeat*
 
