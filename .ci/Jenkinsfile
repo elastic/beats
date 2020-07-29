@@ -127,12 +127,22 @@ def generateStages(Map args = [:]) {
   return mapParallelStages
 }
 
+/**
+* This method is the one used for running the parallel stages, therefore
+* its arguments are passed by the beatsStages step.
+*
+*  What parameters/arguments are supported:
+*    - label -> the worker labels
+*    - project -> the name of the project that should match with the folder name.
+*    - content -> the specific stage data in the <project>/Jenkinsfile.yml
+*/
 def runCommand(Map args = [:]) {
   echo "[INFO] ${args?.toString()}"
-  if(args?.containsKey('make')) {
-    makeTarget(context: args.label, command: args.make, directory: args.project, label: args.label)
-  } else {
-    mageTarget(context: args.label, command: args.mage, directory: args.project, label: args.label)
+  if(args?.content?.containsKey('make')) {
+    makeTarget(context: args.label, command: args.content.make, directory: args.project, label: args.label)
+  }
+  if(args?.content?.containsKey('mage')) {
+    mageTarget(context: args.label, command: args.content.mage, directory: args.project, label: args.label)
   }
 }
 
