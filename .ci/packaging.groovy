@@ -189,14 +189,14 @@ def tagAndPush(name){
     libbetaVer += "-SNAPSHOT"
   }
 
-  def imageName = "${name}"
+  def tagName = "${libbetaVer}"
   if (env.CHANGE_ID?.trim()) {
-    imageName = "${name}/pr-${env.CHANGE_ID}"
+    tagName = "pr-${env.CHANGE_ID}"
   }
 
   def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${imageName}:${libbetaVer}"
-  def commitName = "${DOCKER_REGISTRY}/observability-ci/${imageName}:${env.GIT_BASE_COMMIT}"
+  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
+  def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
   retry(3){
     sh(label:'Change tag and push', script: """
