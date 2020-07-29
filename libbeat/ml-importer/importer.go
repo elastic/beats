@@ -209,7 +209,7 @@ func SetupModule(kibanaClient MLSetupper, module, prefix string) error {
 	prefixPayload := fmt.Sprintf("{\"prefix\": \"%s\"}", prefix)
 	status, response, err := kibanaClient.Request("POST", setupURL, nil, nil, strings.NewReader(prefixPayload))
 	if status != 200 {
-		return errors.Errorf("cannot set up ML with prefix: %s", prefix)
+		return errors.Errorf("cannot set up ML with prefix: %s, response: %s", prefix, string(response))
 	}
 	if err != nil {
 		return err
