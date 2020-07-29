@@ -394,6 +394,7 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         for evt in output:
             process = evt["system"]["process"]
+            found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             process.pop("env", None)
@@ -402,11 +403,8 @@ class Test(metricbeat.BaseTest):
             # Remove optional keys.
             process.pop("cgroup", None)
             process.pop("fd", None)
-            process.pop("cwd", None)
-
-            cmdline = process.pop("cmdline", None)
-            if cmdline is not None:
-                found_cmdline = True
+            process.pop("working_directory", None)
+            process.pop("cmdline", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
@@ -452,23 +450,19 @@ class Test(metricbeat.BaseTest):
         found_cwd = not sys.platform.startswith("linux")
         for evt in output:
             process = evt["system"]["process"]
+            found_fd |= "fd" in process
+            found_env |= "env" in process
+            found_cwd |= "working_directory" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             env = process.pop("env", None)
-            if env is not None:
-                found_env = True
-
             self.assert_fields_are_documented(evt)
 
             # Remove optional keys.
             process.pop("cgroup", None)
             process.pop("cmdline", None)
-            cwd = process.pop("cwd", None)
-            if cwd is not None:
-                found_cwd = True
-            fd = process.pop("fd", None)
-            if fd is not None:
-                found_fd = True
+            process.pop("working_directory", None)
+            process.pop("fd", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
