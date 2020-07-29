@@ -78,10 +78,10 @@ metricbeat.modules:
   port: "9201"
 -------------------------------------------------------------------------------------
 
-`use_types` paramater (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
+`use_types` parameter (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
 types, including https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html[histograms].
 
-`rate_counters` paramater (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
+`rate_counters` parameter (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
 the counter increment since the last collection. This metric should make some aggregations easier and with better
 performance. This parameter can only be enabled in combination with `use_types`.
 
@@ -117,7 +117,7 @@ When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 [float]
 ==== Types' patterns
 
-Unline `collector` metricset, `remote_write` receives metrics in raw form from the prometheus server.
+Unlike `collector` metricset, `remote_write` receives metrics in raw format from the prometheus server.
 In this, the module has to internally use a heuristic in order to identify efficiently the type of each raw metric.
 For these purpose some name patterns are used in order to identify the type of each metric.
 The default patterns are the following:
@@ -149,8 +149,8 @@ and those that match `_my_histogram_suffix` (and have `le` in their labels) as H
 
 To match only specific metrics, anchor the start and the end of the regexp of each metric:
 
-- the caret ^ matches the beginning of a text or line,
-- the dollar sign $ matches the end of a text.
+- the caret `^` matches the beginning of a text or line,
+- the dollar sign `$` matches the end of a text.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -162,3 +162,7 @@ metricbeat.modules:
   types_patterns:
     histogram_patterns: ["^my_histogram_metric$"]
 -------------------------------------------------------------------------------------
+
+Note that when using `types_patterns`, the provided patterns have higher priority than the default patterns.
+For instance if `_histogram_total` is a defined histogram pattern, then a metric like `network_bytes_histogram_total`
+will be handled as a histogram even of it has the suffix `_total` which is a default pattern for counters.

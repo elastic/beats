@@ -286,7 +286,7 @@ func getLabels(metric *dto.Metric) common.MapStr {
 	return labels
 }
 
-// CompilePatternList compiles a patter list and returns the list of the compiled patterns
+// CompilePatternList compiles a pattern list and returns the list of the compiled patterns
 func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 	var compiledPatterns []*regexp.Regexp
 	compiledPatterns = []*regexp.Regexp{}

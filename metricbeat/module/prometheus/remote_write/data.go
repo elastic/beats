@@ -45,6 +45,11 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		if metric == nil {
 			continue
 		}
+		val := float64(metric.Value)
+		if math.IsNaN(val) || math.IsInf(val, 0) {
+			continue
+		}
+
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 
@@ -52,31 +57,28 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 			labels[string(k)] = v
 		}
 
-		val := float64(metric.Value)
-		if !math.IsNaN(val) && !math.IsInf(val, 0) {
-			// join metrics with same labels in a single event
-			labelsHash := labels.String()
-			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = mb.Event{
-					ModuleFields: common.MapStr{
-						"metrics": common.MapStr{},
-					},
-				}
-
-				// Add labels
-				if len(labels) > 0 {
-					eventList[labelsHash].ModuleFields["labels"] = labels
-				}
+		// join metrics with same labels in a single event
+		labelsHash := labels.String()
+		if _, ok := eventList[labelsHash]; !ok {
+			eventList[labelsHash] = mb.Event{
+				ModuleFields: common.MapStr{
+					"metrics": common.MapStr{},
+				},
 			}
 
-			// Not checking anything here because we create these maps some lines before
-			e := eventList[labelsHash]
-			e.Timestamp = metric.Timestamp.Time()
-			data := common.MapStr{
-				name: val,
+			// Add labels
+			if len(labels) > 0 {
+				eventList[labelsHash].ModuleFields["labels"] = labels
 			}
-			e.ModuleFields["metrics"].(common.MapStr).Update(data)
 		}
+
+		// Not checking anything here because we create these maps some lines before
+		e := eventList[labelsHash]
+		e.Timestamp = metric.Timestamp.Time()
+		data := common.MapStr{
+			name: val,
+		}
+		e.ModuleFields["metrics"].(common.MapStr).Update(data)
 	}
 
 	return eventList

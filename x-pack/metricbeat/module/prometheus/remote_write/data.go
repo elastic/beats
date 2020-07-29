@@ -27,7 +27,7 @@ import (
 
 const (
 	counterType   = "counter_type"
-	histogramType = "histgram_type"
+	histogramType = "histogram_type"
 	otherType     = "other_type"
 )
 
@@ -108,6 +108,11 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		if metric == nil {
 			continue
 		}
+		val := float64(metric.Value)
+		if !math.IsNaN(val) && !math.IsInf(val, 0) {
+			continue
+		}
+
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 
@@ -116,71 +121,70 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 
 		promType := g.findMetricType(name, labels)
-		val := float64(metric.Value)
-		if !math.IsNaN(val) && !math.IsInf(val, 0) {
-			labelsHash := labels.String()
-			labelsClone := labels.Clone()
-			labelsClone.Delete("le")
-			if promType == histogramType {
-				labelsHash = labelsClone.String()
-			}
-			// join metrics with same labels in a single event
-			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = mb.Event{
-					ModuleFields: common.MapStr{},
-				}
 
-				// Add labels
-				if len(labels) > 0 {
-					if promType == histogramType {
-						eventList[labelsHash].ModuleFields["labels"] = labelsClone
-					} else {
-						eventList[labelsHash].ModuleFields["labels"] = labels
-					}
-				}
+		labelsHash := labels.String()
+		labelsClone := labels.Clone()
+		labelsClone.Delete("le")
+		if promType == histogramType {
+			labelsHash = labelsClone.String()
+		}
+		// join metrics with same labels in a single event
+		if _, ok := eventList[labelsHash]; !ok {
+			eventList[labelsHash] = mb.Event{
+				ModuleFields: common.MapStr{},
 			}
 
-			e := eventList[labelsHash]
-			e.Timestamp = metric.Timestamp.Time()
-			switch promType {
-			case counterType:
-				data = common.MapStr{
-					name: g.rateCounterFloat64(name, labels, val),
+			// Add labels
+			if len(labels) > 0 {
+				if promType == histogramType {
+					eventList[labelsHash].ModuleFields["labels"] = labelsClone
+				} else {
+					eventList[labelsHash].ModuleFields["labels"] = labels
 				}
-			case otherType:
-				data = common.MapStr{
-					name: common.MapStr{
-						"value": val,
-					},
-				}
-			case histogramType:
-				histKey := name + labelsClone.String()
+			}
+		}
 
-				le, _ := labels.GetValue("le")
-				upperBound := string(le.(model.LabelValue))
+		e := eventList[labelsHash]
+		e.Timestamp = metric.Timestamp.Time()
+		switch promType {
+		case counterType:
+			data = common.MapStr{
+				name: g.rateCounterFloat64(name, labels, val),
+			}
+		case otherType:
+			data = common.MapStr{
+				name: common.MapStr{
+					"value": val,
+				},
+			}
+		case histogramType:
+			histKey := name + labelsClone.String()
 
-				bucket, err := strconv.ParseFloat(upperBound, 64)
-				if err != nil {
-					continue
-				}
-				v := uint64(val)
-				b := &dto.Bucket{
-					CumulativeCount: &v,
-					UpperBound:      &bucket,
-				}
-				hist, ok := histograms[histKey]
-				if !ok {
-					hist = histogram{}
-				}
-				hist.buckets = append(hist.buckets, b)
-				hist.timestamp = metric.Timestamp.Time()
-				hist.labels = labelsClone
-				hist.metricName = name
-				histograms[histKey] = hist
+			le, _ := labels.GetValue("le")
+			upperBound := string(le.(model.LabelValue))
+
+			bucket, err := strconv.ParseFloat(upperBound, 64)
+			if err != nil {
 				continue
 			}
-			e.ModuleFields.Update(data)
+			v := uint64(val)
+			b := &dto.Bucket{
+				CumulativeCount: &v,
+				UpperBound:      &bucket,
+			}
+			hist, ok := histograms[histKey]
+			if !ok {
+				hist = histogram{}
+			}
+			hist.buckets = append(hist.buckets, b)
+			hist.timestamp = metric.Timestamp.Time()
+			hist.labels = labelsClone
+			hist.metricName = name
+			histograms[histKey] = hist
+			continue
 		}
+		e.ModuleFields.Update(data)
+
 	}
 
 	// process histograms together
@@ -250,12 +254,6 @@ func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels com
 	if _, ok := labels["le"]; ok {
 		leLabel = true
 	}
-	if strings.HasSuffix(metricName, "_total") || strings.HasSuffix(metricName, "_sum") ||
-		strings.HasSuffix(metricName, "_count") {
-		return counterType
-	} else if strings.HasSuffix(metricName, "_bucket") && leLabel {
-		return histogramType
-	}
 
 	// handle user provided patterns
 	if len(g.counterPatterns) > 0 {
@@ -268,5 +266,14 @@ func (g *remoteWriteTypedGenerator) findMetricType(metricName string, labels com
 			return histogramType
 		}
 	}
+
+	// handle defaults
+	if strings.HasSuffix(metricName, "_total") || strings.HasSuffix(metricName, "_sum") ||
+		strings.HasSuffix(metricName, "_count") {
+		return counterType
+	} else if strings.HasSuffix(metricName, "_bucket") && leLabel {
+		return histogramType
+	}
+
 	return otherType
 }
