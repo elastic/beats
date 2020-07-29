@@ -33,8 +33,3 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             - "windows-2016"
-        when:
-            comments:
-                - "/test auditbeat for windows"
-            parameters:
-                - "windows"
