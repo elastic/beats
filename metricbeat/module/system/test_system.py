@@ -403,7 +403,6 @@ class Test(metricbeat.BaseTest):
             # Remove optional keys.
             process.pop("cgroup", None)
             process.pop("fd", None)
-            process.pop("working_directory", None)
             process.pop("cmdline", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
@@ -449,10 +448,11 @@ class Test(metricbeat.BaseTest):
         found_env = False
         found_cwd = not sys.platform.startswith("linux")
         for evt in output:
+            found_cwd |= "working_directory" in evt["process"]
+
             process = evt["system"]["process"]
             found_fd |= "fd" in process
             found_env |= "env" in process
-            found_cwd |= "working_directory" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             env = process.pop("env", None)
@@ -461,13 +461,13 @@ class Test(metricbeat.BaseTest):
             # Remove optional keys.
             process.pop("cgroup", None)
             process.pop("cmdline", None)
-            process.pop("working_directory", None)
             process.pop("fd", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
         self.assertTrue(found_fd, "fd not found in any process events")
         self.assertTrue(found_env, "env not found in any process events")
+        self.assertTrue(found_cwd, "working_directory not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
