@@ -14,14 +14,11 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        mage:
-            - "mage build test"
+        mage: "mage build test"
     crosscompile: 
-        make:
-            - "make -C auditbeat crosscompile"
+        make: "make -C auditbeat crosscompile"
     macos:
-        mage:
-            - "mage build unitTest"
+        mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "macosx"
         when:                  ## Aggregate when with the top-level one.
@@ -32,8 +29,7 @@ stages:
             parameters:
                 - "macosTest"
     windows:
-        mage:
-            - "mage build unitTest"
+        mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             - "windows-2016"
