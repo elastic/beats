@@ -466,7 +466,9 @@ class Test(metricbeat.BaseTest):
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
-        self.assertTrue(found_fd, "fd not found in any process events")
+        if not sys.platform.startswith("darwin"):
+            self.assertTrue(found_fd, "fd not found in any process events")
+
         self.assertTrue(found_env, "env not found in any process events")
         self.assertTrue(found_cwd, "working_directory not found in any process events")
 
