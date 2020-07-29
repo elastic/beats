@@ -137,7 +137,6 @@ def generateStages(Map args = [:]) {
 *    - content -> the specific stage data in the <project>/Jenkinsfile.yml
 */
 def runCommand(Map args = [:]) {
-  echo "[INFO] ${args?.toString()}"
   if(args?.content?.containsKey('make')) {
     makeTarget(context: args.label, command: args.content.make, directory: args.project, label: args.label)
   }
@@ -152,7 +151,6 @@ def makeTarget(Map args = [:]) {
   def directory = args.get('directory', '')
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
-  def directoryFlag = directory.trim() ? "-C ${directory}" : ''
   node(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
