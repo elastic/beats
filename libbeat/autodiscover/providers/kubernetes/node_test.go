@@ -278,3 +278,178 @@ func TestEmitEvent_Node(t *testing.T) {
 		})
 	}
 }
+
+func TestNode_isUpdated(t *testing.T) {
+	tests := []struct {
+		old     *kubernetes.Node
+		new     *kubernetes.Node
+		updated bool
+		test    string
+	}{
+		{
+			test:    "one of the objects is nil then its updated",
+			old:     nil,
+			new:     &kubernetes.Node{},
+			updated: true,
+		},
+		{
+			test:    "both empty nodes should return not updated",
+			old:     &kubernetes.Node{},
+			new:     &kubernetes.Node{},
+			updated: false,
+		},
+		{
+			test: "resource version is the same should return not updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+				},
+			},
+		},
+		{
+			test: "if meta changes then it should return updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations:     map[string]string{},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+			},
+			updated: true,
+		},
+		{
+			test: "if spec changes then it should return updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: false,
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+			},
+			updated: true,
+		},
+		{
+			test: "if overall status doesn't change then its not an update",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			updated: false,
+		},
+		{
+			test: "if node status changes then its an update",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionFalse,
+						},
+					},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			updated: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.test, func(t *testing.T) {
+			assert.Equal(t, test.updated, isUpdated(test.old, test.new))
+		})
+	}
+}
