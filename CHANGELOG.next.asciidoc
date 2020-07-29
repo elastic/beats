@@ -263,6 +263,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Add support for new `service_name` option to all monitors. {pull}19932[19932].
 
 *Journalbeat*
 
