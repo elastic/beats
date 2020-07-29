@@ -150,8 +150,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
 - Fix terminating pod autodiscover issue. {pull}20084[20084]
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
+- Remove unnecessary restarts of metricsets while using Node autodiscover {pull}19974[19974]
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
+- Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 
 *Auditbeat*
 
@@ -600,6 +602,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `performance` and `query` metricsets to `mysql` module. {pull}18955[18955]
 - The `elasticsearch-xpack/index` metricset now reports hidden indices as such. {issue}18639[18639] {pull}18706[18706]
 - Adds support for app insights metrics in the azure module. {issue}18570[18570] {pull}18940[18940]
+- Infer types in Prometheus remote_write. {pull}19944[19944]
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
