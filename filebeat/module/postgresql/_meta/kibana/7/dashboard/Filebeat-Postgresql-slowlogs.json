@@ -229,7 +229,7 @@
                         "highlightAll": true, 
                         "query": {
                             "language": "kuery",
-                            "query": "postgresql.log.query:*"
+                            "query": ""
                         }, 
                         "version": true
                     }
