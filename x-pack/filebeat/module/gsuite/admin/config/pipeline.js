@@ -447,9 +447,15 @@ var login = (function () {
         evt.Delete("gsuite.admin.WHITELISTED_GROUPS");
     };
 
-    var parseDate = function(field, targetField) {
+    var deleteField = function(field) {
         return function(evt) {
-            new processor.Timestamp({
+            evt.Delete(field);
+        };
+    };
+
+    var parseDate = function(field, targetField) {
+        return new processor.Chain()
+            .Add(new processor.Timestamp({
                 field: field,
                 target_field: targetField,
                 timezone: "UTC",
@@ -464,10 +470,9 @@ var login = (function () {
                     "2020/07/28 04:59:59 UTC",
                 ],
                 ignore_missing: true,
-            }).Run(evt);
-
-            evt.Delete(field);
-        };
+            }))
+            .Add(deleteField(field))
+            .Build()
     };
 
     var pipeline = new processor.Chain()
