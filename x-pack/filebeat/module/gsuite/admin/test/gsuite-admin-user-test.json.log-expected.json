@@ -1389,12 +1389,12 @@
         ],
         "event.dataset": "gsuite.admin",
         "event.duration": 3600000000000,
-        "event.end": "2002-10-02T16:00:00Z",
+        "event.end": "2002-10-02T16:00:00.000Z",
         "event.id": "1",
         "event.module": "gsuite",
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_EMAIL_MONITOR\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_MONITOR_DEST_EMAIL\",\"value\":\"dest@example.com\"},{\"name\":\"EMAIL_MONITOR_LEVEL_CHAT\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_DRAFT_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_INCOMING_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_OUTGOING_EMAIL\",\"value\":\"info\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
         "event.provider": "admin",
-        "event.start": "2002-10-02T15:00:00Z",
+        "event.start": "2002-10-02T15:00:00.000Z",
         "event.type": [
             "user",
             "creation"
@@ -2361,12 +2361,12 @@
         ],
         "event.dataset": "gsuite.admin",
         "event.duration": 3600000000000,
-        "event.end": "2002-10-02T16:00:00Z",
+        "event.end": "2002-10-02T16:00:00.000Z",
         "event.id": "1",
         "event.module": "gsuite",
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REQUEST_MAILBOX_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_EXPORT_INCLUDE_DELETED\",\"value\":\"true\"},{\"name\":\"EMAIL_EXPORT_PACKAGE_CONTENT\",\"value\":\"contents\"},{\"name\":\"SEARCH_QUERY_FOR_DUMP\",\"value\":\"foo bar\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
         "event.provider": "admin",
-        "event.start": "2002-10-02T15:00:00Z",
+        "event.start": "2002-10-02T15:00:00.000Z",
         "event.type": [
             "user",
             "info"
@@ -2929,7 +2929,7 @@
         ],
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
-        "gsuite.admin.user.birthdate": "2002-10-02T15:00:00Z",
+        "gsuite.admin.user.birthdate": "2002-10-02T15:00:00.000Z",
         "gsuite.admin.user.email": "user@example.com",
         "gsuite.event.type": "USER_SETTINGS",
         "gsuite.kind": "admin#reports#activity",

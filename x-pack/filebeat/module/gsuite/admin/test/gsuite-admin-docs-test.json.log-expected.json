@@ -58,12 +58,12 @@
         ],
         "event.dataset": "gsuite.admin",
         "event.duration": 10800000000000,
-        "event.end": "2002-10-02T15:00:00Z",
+        "event.end": "2002-10-02T15:00:00.000Z",
         "event.id": "1",
         "event.module": "gsuite",
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"DRIVE_DATA_RESTORE\",\"parameters\":[{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
-        "event.start": "2002-10-02T12:00:00Z",
+        "event.start": "2002-10-02T12:00:00.000Z",
         "event.type": [
             "info"
         ],
