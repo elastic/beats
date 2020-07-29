@@ -2216,6 +2216,132 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 
 - Prospector reloading only works properly with new files. {pull}3546[3546]
 
+
+[[release-notes-5.6.14]]
+=== Beats version 5.6.14
+https://github.com/elastic/beats/compare/v5.6.13...v5.6.14[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.13]]
+=== Beats version 5.6.13
+https://github.com/elastic/beats/compare/v5.6.12...v5.6.13[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.12]]
+=== Beats version 5.6.12
+https://github.com/elastic/beats/compare/v5.6.11...v5.6.12[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.11]]
+=== Beats version 5.6.11
+https://github.com/elastic/beats/compare/v5.6.10...v5.6.11[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.10]]
+=== Beats version 5.6.10
+https://github.com/elastic/beats/compare/v5.6.9...v5.6.10[View commits]
+
+==== Bugfixes
+
+*Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+
+[[release-notes-5.6.9]]
+=== Beats version 5.6.9
+https://github.com/elastic/beats/compare/v5.6.8...v5.6.9[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix a type issue when specifying certicate authority when using the `import_dashboards` command. {pull}6678[6678]
+
+*Packetbeat*
+
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
+- Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
+- Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
+- Fix panic when parsing partial AMQP messages. {pull}6384[6384]
+- Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
+- Fix sniffer hanging on exit under Linux. {pull}6535[6535]
+- Fix bounds check error in http parser causing a panic. {pull}6750[6750]
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
+
+
+[[release-notes-5.6.8]]
+=== Beats version 5.6.8
+https://github.com/elastic/beats/compare/v5.6.7...v5.6.8[View commits]
+
+==== Bugfixes
+
+*Winlogbeat*
+
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
+
+
+[[release-notes-5.6.7]]
+=== Beats version 5.6.7
+https://github.com/elastic/beats/compare/v5.6.6...v5.6.7[View commits]
+
+No changes in this release.
+
+
+[[release-notes-5.6.6]]
+=== Beats version 5.6.6
+https://github.com/elastic/beats/compare/v5.6.5...v5.6.6[View commits]
+
+No changes in this release.
+
+
+[[release-notes-5.6.5]]
+=== Beats version 5.6.5
+https://github.com/elastic/beats/compare/v5.6.4...v5.6.5[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix duplicate batches of events in retry queue. {pull}5520[5520]
+
+*Metricbeat*
+
+- Clarify meaning of percentages reported by system core metricset. {pull}5565[5565]
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
+
+[[release-notes-5.6.4]]
+=== Beats version 5.6.4
+https://github.com/elastic/beats/compare/v5.6.3...v5.6.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+
+*Packetbeat*
+
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add setting to enable/disable the slow start in logstash output. {pull}5400[5400]
+
+[[release-notes-5.6.3]]
+=== Beats version 5.6.3
+https://github.com/elastic/beats/compare/v5.6.2...v5.6.3[View commits]
+
+No changes in this release.
+
 [[release-notes-5.6.2]]
 === Beats version 5.6.2
 https://github.com/elastic/beats/compare/v5.6.1...v5.6.2[View commits]
