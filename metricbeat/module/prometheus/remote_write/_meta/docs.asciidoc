@@ -127,7 +127,8 @@ The default patterns are the following:
 . `_count` suffix: the metric is of Counter type
 . `_bucket` suffix and `le` in labels: the metric is of Histogram type
 
-Everything else is handled as a Gauge.
+Everything else is handled as a Gauge. In addition there is no special handling for Summaries so it is expected that
+Summary's quantiles are handled as Gauges and Summary's sum and count as Counters.
 
 Users have the flexibility to add their own patterns using the following configuration:
 
