@@ -150,7 +150,6 @@ def makeTarget(Map args = [:]) {
   def context = args.context
   def command = args.command
   def directory = args.get('directory', '')
-  def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
   node(args.label) {
     withGithubNotify(context: "${context}") {
@@ -241,8 +240,22 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           //archiveTestOutput(testResults: testResults, artifacts: artifacts)
         }
+        // Tear down the setup for the permamnent workers.
+        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+          fixPermissions("${WORKSPACE}")
+          deleteDir()
+        }
       }
     }
+  }
+}
+
+def fixPermissions(location) {
+  if(isUnix()) {
+    sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+      source ./dev-tools/common.bash
+      docker_setup
+      script/fix_permissions.sh ${location}""", returnStatus: true)
   }
 }
 
