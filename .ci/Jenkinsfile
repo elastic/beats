@@ -138,11 +138,12 @@ def generateStages(Map args = [:]) {
 *    - content -> the specific stage data in the <project>/Jenkinsfile.yml
 */
 def runCommand(Map args = [:]) {
+  def withModule = args.content.get('withModule', false)
   if(args?.content?.containsKey('make')) {
-    makeTarget(context: args.label, command: args.content.make, directory: args.project, label: args.label)
+    makeTarget(context: args.label, command: args.content.make, directory: args.project, label: args.label, withModule: withModule)
   }
   if(args?.content?.containsKey('mage')) {
-    mageTarget(context: args.label, command: args.content.mage, directory: args.project, label: args.label)
+    mageTarget(context: args.label, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule)
   }
 }
 

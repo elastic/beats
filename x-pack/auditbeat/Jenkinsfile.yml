@@ -15,6 +15,7 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     build:
         mage: "mage update build test"
+        withModule: true       ## run the ITs only if the changeset affects a specific module.
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
