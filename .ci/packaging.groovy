@@ -26,7 +26,7 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
-    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
