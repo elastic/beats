@@ -25,12 +25,12 @@ changeset:
         - "^\\.ci/scripts/.*"
     oss:
         - "^go.mod"
-        - "^libbeat/.*"
         - "^dev-tools/.*"
+        - "^libbeat/.*"
         - "^testing/.*"
     xpack:
         - "^go.mod"
-        - "^libbeat/.*"
         - "^dev-tools/.*"
+        - "^libbeat/.*"
         - "^testing/.*"
         - "^x-pack/libbeat/.*"
