@@ -2,6 +2,207 @@
   "objects": [
     {
       "attributes": {
+        "description": "Overview of the Surcata events dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "2",
+              "w": 9,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "3",
+              "w": 11,
+              "x": 19,
+              "y": 20
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "4",
+              "w": 48,
+              "x": 0,
+              "y": 10
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
+              "i": "5",
+              "w": 48,
+              "x": 0,
+              "y": 34
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_4",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "6",
+              "w": 9,
+              "x": 30,
+              "y": 20
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "7",
+              "w": 9,
+              "x": 39,
+              "y": 20
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_6",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "8",
+              "w": 10,
+              "x": 9,
+              "y": 20
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_7",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "9",
+              "w": 48,
+              "x": 0,
+              "y": 53
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_8",
+            "version": "7.3.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Suricata] Events Overview ECS",
+        "version": 1
+      },
+      "id": "78289c40-86da-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_4",
+          "type": "search"
+        },
+        {
+          "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
+          "name": "panel_8",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY3MCwxXQ=="
+    },
+    {
+      "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -12,7 +213,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Activity Types over Time [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -29,7 +230,6 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "customInterval": "2h",
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
@@ -128,9 +328,22 @@
         }
       },
       "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2MSwxXQ=="
     },
     {
       "attributes": {
@@ -144,7 +357,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Event Types [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -192,9 +405,22 @@
         }
       },
       "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2MiwxXQ=="
     },
     {
       "attributes": {
@@ -208,7 +434,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Top Application Protocols [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -256,9 +482,22 @@
         }
       },
       "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2MywxXQ=="
     },
     {
       "attributes": {
@@ -272,7 +511,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Top Hosts Generating Events [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -289,7 +528,6 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "customInterval": "2h",
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
@@ -388,9 +626,22 @@
         }
       },
       "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2NCwxXQ=="
     },
     {
       "attributes": {
@@ -418,7 +669,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "filebeat-*",
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
                   "key": "suricata.eve.event_type",
                   "negate": true,
                   "params": {
@@ -444,7 +695,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "filebeat-*",
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
                   "key": "event.module",
                   "negate": false,
                   "params": {
@@ -465,7 +716,7 @@
               }
             ],
             "highlightAll": true,
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -474,16 +725,41 @@
           }
         },
         "sort": [
-          "@timestamp",
-          "desc"
+          [
+            "@timestamp",
+            "desc"
+          ]
         ],
         "title": "Events [Filebeat Suricata] ECS",
         "version": 1
       },
       "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "search",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2NSwxXQ=="
     },
     {
       "attributes": {
@@ -497,7 +773,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Top Connection Source Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -540,9 +816,22 @@
         }
       },
       "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2NiwxXQ=="
     },
     {
       "attributes": {
@@ -556,7 +845,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Top Connection Destination Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -599,9 +888,22 @@
         }
       },
       "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2NywxXQ=="
     },
     {
       "attributes": {
@@ -615,7 +917,7 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "savedSearchRefName": "search_0",
         "title": "Top Network Protocols [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
@@ -663,9 +965,22 @@
         }
       },
       "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2OCwxXQ=="
     },
     {
       "attributes": {
@@ -690,7 +1005,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "filebeat-*",
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
                   "key": "suricata.eve.event_type",
                   "negate": false,
                   "params": {
@@ -716,7 +1031,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "filebeat-*",
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
                   "key": "event.module",
                   "negate": false,
                   "params": {
@@ -737,7 +1052,7 @@
               }
             ],
             "highlightAll": true,
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -746,174 +1061,42 @@
           }
         },
         "sort": [
-          "@timestamp",
-          "desc"
+          [
+            "@timestamp",
+            "desc"
+          ]
         ],
         "title": "Host Stats [Filebeat Suricata] ECS",
         "version": 1
       },
       "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
-      "type": "search",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "Overview of the Surcata events dashboard.",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "highlightAll": true,
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 10,
-              "i": "1",
-              "w": 48,
-              "x": 0,
-              "y": 0
-            },
-            "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 14,
-              "i": "2",
-              "w": 9,
-              "x": 0,
-              "y": 20
-            },
-            "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 14,
-              "i": "3",
-              "w": 11,
-              "x": 19,
-              "y": 20
-            },
-            "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 10,
-              "i": "4",
-              "w": 48,
-              "x": 0,
-              "y": 10
-            },
-            "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 19,
-              "i": "5",
-              "w": 48,
-              "x": 0,
-              "y": 34
-            },
-            "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "5",
-            "type": "search",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 14,
-              "i": "6",
-              "w": 9,
-              "x": 30,
-              "y": 20
-            },
-            "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 14,
-              "i": "7",
-              "w": 9,
-              "x": 39,
-              "y": 20
-            },
-            "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 14,
-              "i": "8",
-              "w": 10,
-              "x": 9,
-              "y": 20
-            },
-            "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 16,
-              "i": "9",
-              "w": 48,
-              "x": 0,
-              "y": 53
-            },
-            "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
-            "panelIndex": "9",
-            "type": "search",
-            "version": "6.3.0"
-          }
-        ],
-        "timeRestore": false,
-        "title": "[Filebeat Suricata] Events Overview ECS",
-        "version": 1
+      "migrationVersion": {
+        "search": "7.4.0"
       },
-      "id": "78289c40-86da-11e8-b59d-21efb914e65c-ecs",
-      "type": "dashboard",
-      "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2020-07-23T17:51:13.671Z",
+      "version": "WzY2OSwxXQ=="
     }
   ],
-  "version": "6.4.3"
+  "version": "7.9.0-SNAPSHOT"
 }
