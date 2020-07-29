@@ -222,7 +222,12 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+  if (env.CHANGE_ID?.trim()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+  }
+
+  googleStorageUpload(bucket: "${bucketUri}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",
