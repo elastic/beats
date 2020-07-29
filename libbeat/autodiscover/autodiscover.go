@@ -306,24 +306,26 @@ func (a *Autodiscover) checkConfig(config *common.Config) error {
 		if err == nil {
 			return nil
 		} else {
-			if err, ok := err.(*common.ErrInputNotFinished); !ok {
+			if _, ok := err.(*common.ErrInputNotFinished); !ok {
 				// error not related to stopping input, raise it now
+				a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+					"Auto discover config check failed for config '%s', won't start runner",
+					common.DebugString(config, true))))
+				return err
+			}
+
+			if checkConfigAttempts > maxCheckConfigAttempts {
 				a.logger.Error(errors.Wrap(err, fmt.Sprintf(
 					"Auto discover config check failed for config '%s' after max attempts, won't start runner",
 					common.DebugString(config, true))))
 				return err
+			} else {
+				a.logger.Debug(errors.Wrap(err, fmt.Sprintf(
+					"Auto discover config check failed for config '%s'[attempt %v], won't start runner",
+					common.DebugString(config, true), checkConfigAttempts+1)))
+				time.Sleep(3 * time.Second)
+				checkConfigAttempts += 1
 			}
-			a.logger.Debug(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s'[attempt %v], won't start runner",
-				common.DebugString(config, true), checkConfigAttempts+1)))
 		}
-		if checkConfigAttempts > maxCheckConfigAttempts {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s' after max attempts, won't start runner",
-				common.DebugString(config, true))))
-			return err
-		}
-		time.Sleep(3 * time.Second)
-		checkConfigAttempts += 1
 	}
 }
