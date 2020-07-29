@@ -416,17 +416,18 @@ class Test(metricbeat.BaseTest):
         """
         import getpass
 
-        self.render_config_template(modules=[{
-            "name": "system",
-            "metricsets": ["process"],
-            "period": "5s",
-            "extras": {
-                "process.env.whitelist": ["PATH"],
-                "process.include_cpu_ticks": True,
+        self.render_config_template(
+            modules=[{
+                "name": "system",
+                "metricsets": ["process"],
+                "period": "5s",
+                "extras": {
+                    "process.env.whitelist": ["PATH"],
+                    "process.include_cpu_ticks": True,
 
-                # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
-                "process.include_per_cpu": False,
-            },
+                    # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+                    "process.include_per_cpu": False,
+                },
             }],
             # Some info is only guaranteed in processes with permissions, check
             # only on own processes.
