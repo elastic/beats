@@ -152,6 +152,6 @@ func injectLogLevel(logLevel string, args []string) []string {
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
+	dataPath := filepath.Join(paths.Home(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }

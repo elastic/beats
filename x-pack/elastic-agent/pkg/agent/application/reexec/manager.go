@@ -19,7 +19,7 @@ var (
 type ExecManager interface {
 	// ReExec asynchronously re-executes command in the same PID and memory address
 	// as the currently running application.
-	ReExec()
+	ReExec(argOverrides ...string)
 
 	// ShutdownChan returns the shutdown channel the main function should use to
 	// handle shutdown of the current running application.
@@ -56,12 +56,12 @@ func newManager(log *logger.Logger, exec string) *manager {
 	}
 }
 
-func (m *manager) ReExec() {
+func (m *manager) ReExec(argOverrides ...string) {
 	go func() {
 		close(m.trigger)
 		<-m.shutdown
 
-		if err := reexec(m.logger, m.exec); err != nil {
+		if err := reexec(m.logger, m.exec, argOverrides...); err != nil {
 			// panic; because there is no going back, everything is shutdown
 			panic(err)
 		}
