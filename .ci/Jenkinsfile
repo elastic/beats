@@ -128,6 +128,7 @@ def generateStages(Map args = [:]) {
 }
 
 def runCommand(Map args = [:]) {
+  echo "[INFO] ${args?.toString()}"
   if(args?.containsKey('make')) {
     makeTarget(context: args.label, command: args.make, directory: args.project, label: args.label)
   } else {
@@ -242,5 +243,29 @@ def installTools() {
   } else {
     retryWithSleep(retries: 2, seconds: 5){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
+}
+
+def getModulePattern(String toCompare) {
+  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
+  return (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
+}
+
+/**
+  This method gathers the module name, if required, in order to run the ITs only if
+  the changeset affects a specific module.
+
+  For such, it's required to look for changes under the module folder and exclude anything else
+  such as ascidoc and png files.
+*/
+def getCommonModuleInTheChangeSet(String pattern, String directory) {
+  def module = ''
+  // Transform folder structure in regex format since path separator is required to be escaped
+  def transformedDirectory = directory.replaceAll('/', '\\/')
+  def directoryExclussion = "((?!^${transformedDirectory}\\/).)*\$"
+  def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
+  dir("${env.BASE_DIR}") {
+    module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
+  }
+  return module
 }
 
