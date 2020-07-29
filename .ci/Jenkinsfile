@@ -156,7 +156,7 @@ def makeTarget(Map args = [:]) {
   node(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
-        sh(label: "${command}", script: "${command} ${directoryFlag}")
+        sh(label: "${command}", script: "${command}")
       }
     }
   }
