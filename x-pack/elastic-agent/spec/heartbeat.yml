@@ -13,7 +13,7 @@ rules:
     type: logs
 
 - map:
-    path: inputs
+    path: monitors
     rules:
     - copy_all_to_list:
         to: streams
@@ -23,15 +23,6 @@ rules:
         item: processors
         to: streams
         on_conflict: insert_before
-
-- rename:
-    from: inputs
-    to: inputsstreams
-
-- extract_list_items:
-    path: inputsstreams
-    item: streams
-    to: inputs
 
 - map:
     path: inputs
@@ -52,7 +43,7 @@ rules:
         key: dataset.name
 
 - filter_values:
-    selector: inputs
+    selector: monitors
     key: type
     values:
     - http
@@ -60,7 +51,7 @@ rules:
     - icmp
 
 - filter_values:
-    selector: inputs
+    selector: monitors
     key: enabled
     values:
     - true
