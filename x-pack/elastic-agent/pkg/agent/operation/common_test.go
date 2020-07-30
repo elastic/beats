@@ -94,15 +94,13 @@ func getLogger() *logger.Logger {
 }
 
 func getProgram(binary, version string) *app.Descriptor {
+	spec := program.SupportedMap[binary]
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
 		Architecture:    "32",
 	}
-	return app.NewDescriptor(program.Spec{
-		Name: binary,
-		Cmd:  binary,
-	}, version, downloadCfg, nil)
+	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }
 
 func getAbsPath(path string) string {

@@ -1,7 +1,6 @@
-[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/)
 [![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
-[![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 # Beats - The Lightweight Shippers of the Elastic Stack
@@ -102,9 +101,8 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
   * `/test <beat-name> for macos` will kick off a default build with also the `macos` stage for the `<beat-name>`.
 * [apm-beats-update][]
   * `/run apm-beats-update`
-
-[beats]: https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/
-[apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
+* [apm-beats-packaging][]
+  * `/package` or `/packaging` will kick of a build to generate the packages for beats.
 
 ### PR Labels
 
@@ -112,3 +110,7 @@ It's possible to configure the build on a GitHub PR by labelling the PR with the
 
 * `<beat-name>` to force the following builds to run the stages for the `<beat-name>`
 * `macOS` to force the following builds to run the `macos` stages.
+
+[beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
+[apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
+[apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/
