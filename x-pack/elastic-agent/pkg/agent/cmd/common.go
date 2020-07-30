@@ -123,7 +123,7 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 			return err
 		}
 
-		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), os.Args[0])
+		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(os.Args[0]))
 		rexLogger := logger.Named("reexec")
 		argsOverrides := []string{
 			"--path.data", paths.Data(),
