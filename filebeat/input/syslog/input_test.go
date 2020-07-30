@@ -278,6 +278,7 @@ func TestParseAndCreateEvent5424(t *testing.T) {
 					"priority":       34,
 					"severity_label": "Critical",
 					"msgid":          "ID47",
+					"version":        1,
 				},
 			},
 		},
@@ -302,11 +303,13 @@ func TestParseAndCreateEvent5424(t *testing.T) {
 					"priority":       165,
 					"severity_label": "Notice",
 					"msgid":          "ID47",
-					"data": map[string]map[string]string{
+					"version":        1,
+					"data": EventData{
 						"exampleSDID@32473": {
 							"eventID":     "1011",
 							"eventSource": "Application",
-							"iut":         "3"},
+							"iut":         "3",
+						},
 					},
 				},
 			},

@@ -251,14 +251,20 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	if ev.AppName() != "" {
 		process["name"] = ev.AppName()
 	}
+
 	if ev.ProcID() != "" {
 		process["entity_id"] = ev.ProcID()
 	}
+
 	if ev.MsgID() != "" {
 		syslog["msgid"] = ev.MsgID()
 	}
 
-	if ev.data != nil && len(ev.data)>0 {
+	if ev.Version() != -1 {
+		syslog["version"] = ev.Version()
+	}
+
+	if ev.data != nil && len(ev.data) > 0 {
 		syslog["data"] = ev.data
 	}
 

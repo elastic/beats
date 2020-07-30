@@ -46,7 +46,7 @@
 
 
   action init_data{
-    event.data = map[string]map[string]string{}
+    event.data = EventData{}
   }
 
   action init_sd_param{

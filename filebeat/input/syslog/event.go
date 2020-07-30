@@ -73,12 +73,16 @@ type event struct {
 	year       int
 	loc        *time.Location
 	sequence   int
-	version    int
-	appName    string
-	msgID      string
-	processID  string
-	data       map[string]map[string]string
+
+	// RFC 5424
+	version   int
+	appName   string
+	msgID     string
+	processID string
+	data      EventData
 }
+
+type EventData map[string]map[string]string
 
 // newEvent() return a new event.
 func newEvent() *event {
@@ -364,9 +368,16 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 	).UTC()
 }
 
+func (s *event) IsDataEmpty() bool {
+	if s.data == nil {
+		return true
+	}
+	return len(s.data) == 0
+}
+
 // IsValid returns true if the date and the message are present.
 func (s *event) IsValid() bool {
-	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && s.message != ""
+	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && (s.message != "" || !s.IsDataEmpty())
 }
 
 func (s *event) SetData(id string, key string, data []byte, start int, end int, bs []int) {
@@ -377,10 +388,10 @@ func (s *event) SetData(id string, key string, data []byte, start int, end int, 
 	if len(bs) > 0 {
 		buf := bytes.NewBufferString("")
 		for _, i := range bs {
-			buf.Write(data[start : i])
-			start = i+1
+			buf.Write(data[start:i])
+			start = i + 1
 		}
-		if start<=end {
+		if start <= end {
 			buf.Write(data[start:end])
 		}
 		v = buf.String()
