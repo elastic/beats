@@ -19,7 +19,7 @@ pipeline {
     GOX_FLAGS = "-arch amd64"
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
-    PIPELINE_LOG_LEVEL = 'DEBUG'
+    PIPELINE_LOG_LEVEL = 'INFO'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     TERRAFORM_VERSION = "0.12.24"
