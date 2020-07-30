@@ -164,6 +164,22 @@ def runCommand(Map args = [:]) {
   if(args?.content?.containsKey('k8sTest')) {
     k8sTest(versions: args.content.k8sTest.split('-'), label: args.label)
   }
+  if(args?.content?.containsKey('cloud')) {
+    cloud(context: args.label, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule)
+  }
+}
+
+def cloud(map args = [:]) {
+  node(args.label) {
+    stage("${args.contex}-prepare-cloud-env"){
+      startCloudTestEnv(args.context, dirs: ['x-pack/metricbeat/module/aws'])
+    }
+    stage("${args.contex}-prepare-cloud-env"){
+      withCloudTestEnv() {
+        mageTarget(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule)
+      }
+    }
+  }
 }
 
 def k8sTest(map args = [:]) {
@@ -404,6 +420,86 @@ def runbld() {
           EOF
           /usr/local/bin/runbld ./runbld-script
           '''.stripIndent())  // stripIdent() requires '''/
+      }
+    }
+  }
+}
+
+/**
+* This method executes a closure with credentials for cloud test
+* environments.
+*/
+def withCloudTestEnv(Closure body) {
+  def maskedVars = []
+  def testTags = "${env.TEST_TAGS}"
+
+  // AWS
+  if (params.allCloudTests || params.awsCloudTests) {
+    testTags = "${testTags},aws"
+    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
+    if (!aws.containsKey('access_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
+    }
+    if (!aws.containsKey('secret_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
+    }
+    maskedVars.addAll([
+      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
+      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
+    ])
+  }
+
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
+    withEnvMask(vars: maskedVars) {
+      body()
+    }
+  }
+}
+
+/**
+* Start testing environment on cloud using terraform. Terraform files are
+* stashed so they can be used by other stages. They are also archived in
+* case manual cleanup is needed.
+*
+* Example:
+*   startCloudTestEnv('x-pack-metricbeat', dir: ['x-pack/metricbeat/module/aws'])
+*   ...
+*   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+*/
+def startCloudTestEnv(String name, dirs = []) {
+  withCloudTestEnv() {
+    withBeatsEnv(archive: false, withModule: false) {
+      try {
+        for (folder in dirs) {
+          retryWithSleep(retries: 2, seconds: 5, backoff: true){
+            terraformApply(folder)
+          }
+        }
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+      }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+    }
+  }
+}
+
+/**
+* Tear down the terraform environments, by looking for all terraform states in directory 
+* then it runs terraform destroy for each one.
+* it uses terraform states previously stashed by startCloudTestEnv.
+*/
+def terraformCleanup(String stashName, String directory) {
+  stage("Remove cloud scenarios in ${directory}"){
+    withCloudTestEnv() {
+      withBeatsEnv(archive: false, withModule: false) {
+        unstash("terraform-${stashName}")
+        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        }
       }
     }
   }

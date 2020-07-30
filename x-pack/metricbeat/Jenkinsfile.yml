@@ -16,6 +16,10 @@ stages:
     build:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
+        when:                  ## Aggregate when with the top-level one.
+            parameters:
+                - "awsCloudTests"
+                - "runAllCloudTests"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
