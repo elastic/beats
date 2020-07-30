@@ -18,8 +18,8 @@ import (
 
 // Output returns the output when `--yaml` is used.
 type Output struct {
-	Binary *release.VersionInfo `yaml:"binary`
-	Daemon *release.VersionInfo `yaml:"daemon,omitempty""`
+	Binary *release.VersionInfo `yaml:"binary"`
+	Daemon *release.VersionInfo `yaml:"daemon,omitempty"`
 }
 
 // NewCommandWithArgs returns a new version command.
