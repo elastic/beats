@@ -219,7 +219,7 @@ func subheader(title string) string {
 	return makeHeading(title, "-")
 }
 
-var nonWhitespaceRegex = regexp.MustCompile(`(?m)(^.*\S+.*$)`)
+var nonWhitespaceRegex = regexp.MustCompile(`(?m)(^.*\S.*$)`)
 
 // indent pads all non-whitespace lines with the number of spaces specified.
 func indent(spaces int, content string) string {
