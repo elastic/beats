@@ -10,9 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -22,13 +20,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 const (
@@ -143,69 +136,4 @@ func hashedDirName(filecontent []byte) string {
 	}
 
 	return fmt.Sprintf("elastic-agent-%s", s)
-}
-
-func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}) error {
-	reexecPath := filepath.Join(paths.Data(), hashedDirName(hasFileContent), filepath.Base(os.Args[0]))
-	argsOverrides := []string{
-		"--path.data", paths.Data(),
-		"--path.home", filepath.Dir(reexecPath),
-		"--path.config", paths.Config(),
-	}
-
-	if runtime.GOOS == "windows" {
-		args := append([]string{reexecPath}, os.Args[1:]...)
-		args = append(args, argsOverrides...)
-		// no support for exec just spin a new child
-		cmd := exec.Cmd{
-			Path:   reexecPath,
-			Args:   args,
-			Stdin:  os.Stdin,
-			Stdout: os.Stdout,
-			Stderr: os.Stderr,
-		}
-
-		go func() {
-			<-stopChan
-			cmd.Process.Kill()
-		}()
-
-		if err := cmd.Start(); err != nil {
-			return err
-		}
-
-		// Wait so agent wont exit and service wont start another instance
-		return cmd.Wait()
-	}
-
-	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadYAML(pathConfigFile)
-	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
-	}
-
-	cfg, err := configuration.NewFromConfig(rawConfig)
-	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
-	}
-
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
-	if err != nil {
-		return err
-	}
-
-	rexLogger := logger.Named("reexec")
-	rm := reexec.Manager(rexLogger, reexecPath)
-	rm.ReExec(argsOverrides...)
-
-	// trigger reexec
-	rm.ShutdownComplete()
-
-	return nil
 }
