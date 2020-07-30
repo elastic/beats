@@ -170,7 +170,7 @@ func (p *Input) loadStates(states []file.State) error {
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
 			if !state.Finished {
-				return fmt.Errorf("Can only start an input when all related states are finished: %+v", state)
+				return &input.ErrInputNotFinished{State: state.String()}
 			}
 
 			// Update input states and send new states to registry

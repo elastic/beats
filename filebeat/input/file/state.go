@@ -18,6 +18,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -96,4 +97,20 @@ func (s *State) IsEmpty() bool {
 		s.Source == "" &&
 		len(s.Meta) == 0 &&
 		s.Timestamp.IsZero()
+}
+
+// String returns string representation of the struct
+func (s *State) String() string {
+	return fmt.Sprintf(
+		"{Id: %v, Finished: %v, Fileinfo: %v, Source: %v, Offset: %v, Timestamp: %v, TTL: %v, Type: %v, Meta: %v, FileStateOS: %v}",
+		s.Id,
+		s.Finished,
+		s.Fileinfo,
+		s.Source,
+		s.Offset,
+		s.Timestamp,
+		s.TTL,
+		s.Type,
+		s.Meta,
+		s.FileStateOS)
 }
