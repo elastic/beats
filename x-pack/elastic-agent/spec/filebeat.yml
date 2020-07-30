@@ -38,7 +38,6 @@ rules:
     - translate:
         path: type
         mapper:
-          logs: log
           logfile: log
           event/file: log
           event/stdin: stdin

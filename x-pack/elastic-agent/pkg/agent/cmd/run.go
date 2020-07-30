@@ -5,6 +5,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,8 +13,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/service"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -35,7 +40,7 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 
 func run(flags *globalFlags, streams *cli.IOStreams) error {
 	pathConfigFile := flags.Config()
-	config, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
@@ -43,16 +48,39 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", config)
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
 	}
+
+	// Windows: Mark service as stopped.
+	// After this is run, the service is considered by the OS to be stopped.
+	// This must be the first deferred cleanup task (last to execute).
+	defer service.NotifyTermination()
 
 	locker := application.NewAppLocker(paths.Data())
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
 	defer locker.Unlock()
+
+	service.BeforeRun()
+	defer service.Cleanup()
+
+	execPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	rexLogger := logger.Named("reexec")
+	rex := reexec.Manager(rexLogger, execPath)
 
 	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
@@ -63,11 +91,43 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
-	// listen for kill signal
+	// register as a service
+	stop := make(chan bool)
+	_, cancel := context.WithCancel(context.Background())
+	var stopBeat = func() {
+		close(stop)
+	}
+	service.HandleSignals(stopBeat, cancel)
+
+	// listen for signals
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	reexecing := false
+	for {
+		breakout := false
+		select {
+		case <-stop:
+			breakout = true
+		case <-rex.ShutdownChan():
+			reexecing = true
+			breakout = true
+		case sig := <-signals:
+			if sig == syscall.SIGHUP {
+				rexLogger.Infof("SIGHUP triggered re-exec")
+				rex.ReExec()
+			} else {
+				breakout = true
+			}
+		}
+		if breakout {
+			break
+		}
+	}
 
-	<-signals
-
-	return app.Stop()
+	err = app.Stop()
+	if !reexecing {
+		return err
+	}
+	rex.ShutdownComplete()
+	return err
 }

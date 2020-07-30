@@ -1,4 +1,5 @@
 name: Endpoint Host
+revision: 5
 fleet:
   agent:
     id: fleet-agent-id

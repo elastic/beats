@@ -87,6 +87,7 @@ func (a *ActionConfigChange) ID() string {
 type ActionUnenroll struct {
 	ActionID   string
 	ActionType string
+	IsDetected bool
 }
 
 func (a *ActionUnenroll) String() string {

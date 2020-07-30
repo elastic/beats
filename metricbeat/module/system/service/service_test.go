@@ -31,10 +31,12 @@ import (
 
 var exampleUnits = []dbus.UnitStatus{
 	dbus.UnitStatus{
-		Name: "sshd.service",
+		Name:      "sshd.service",
+		LoadState: "active",
 	},
 	dbus.UnitStatus{
-		Name: "metricbeat.service",
+		Name:      "metricbeat.service",
+		LoadState: "active",
 	},
 	dbus.UnitStatus{
 		Name: "filebeat.service",
@@ -103,4 +105,24 @@ func TestFilterMatches(t *testing.T) {
 	shouldMatch, err := matchUnitPatterns(filtersMatch, exampleUnits)
 	assert.NoError(t, err)
 	assert.Len(t, shouldMatch, 1)
+}
+
+func TestNoFilter(t *testing.T) {
+	shouldReturnResults, err := matchUnitPatterns([]string{}, exampleUnits)
+	assert.NoError(t, err)
+	assert.Len(t, shouldReturnResults, 3)
+}
+
+func TestUnitStateFilter(t *testing.T) {
+	stateFilter := []string{
+		"active",
+	}
+	shouldReturnResults := matchUnitState(stateFilter, exampleUnits)
+	assert.Len(t, shouldReturnResults, 2)
+
+}
+
+func TestUnitStateNoFilter(t *testing.T) {
+	shouldReturnResults := matchUnitState([]string{}, exampleUnits)
+	assert.Len(t, shouldReturnResults, 3)
 }

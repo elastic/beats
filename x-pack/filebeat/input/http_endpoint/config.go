@@ -23,6 +23,7 @@ type config struct {
 	ListenPort    string                  `config:"listen_port"`
 	URL           string                  `config:"url"`
 	Prefix        string                  `config:"prefix"`
+	ContentType   string                  `config:"content_type"`
 }
 
 func defaultConfig() config {
@@ -36,12 +37,19 @@ func defaultConfig() config {
 		ListenPort:    "8000",
 		URL:           "/",
 		Prefix:        "json",
+		ContentType:   "application/json",
 	}
 }
 
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
 		return errors.New("response_body must be valid JSON")
+	}
+
+	if c.BasicAuth {
+		if c.Username == "" || c.Password == "" {
+			return errors.New("Username and password required when basicauth is enabled")
+		}
 	}
 
 	return nil

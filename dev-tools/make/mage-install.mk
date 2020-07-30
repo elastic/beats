@@ -1,4 +1,4 @@
-MAGE_VERSION     ?= v1.9.0
+MAGE_VERSION     ?= v1.10.0
 MAGE_PRESENT     := $(shell mage --version 2> /dev/null | grep $(MAGE_VERSION))
 MAGE_IMPORT_PATH ?= github.com/magefile/mage
 export MAGE_IMPORT_PATH

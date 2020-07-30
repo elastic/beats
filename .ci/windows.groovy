@@ -16,7 +16,7 @@ import groovy.transform.Field
    - 'windows-2012-r2', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit' are disabled
       since we are working on releasing each windows version incrementally.
 */
-@Field def windowsVersions = ['windows-2019', 'windows-2016']
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012-r2']
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -349,9 +349,10 @@ def mageTargetWin(String context, String directory, String target, String label)
     log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
     def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
 
-    // NOTE: skip filebeat with windows-2016 since there are some test failures.
-    if (directory.equals('filebeat') && label.equals('windows-2016')) {
-      log(level: 'WARN', text: "Skipped stage for the 'filebeat' with 'windows-2016' as long as there are test failures to be analysed.")
+    // NOTE: skip filebeat with windows-2016/2012-r2 since there are some test failures.
+    //       See https://github.com/elastic/beats/issues/19787 https://github.com/elastic/beats/issues/19641
+    if (directory.equals('filebeat') && (label.equals('windows-2016') || label.equals('windows-2012-r2'))) {
+      log(level: 'WARN', text: "Skipped stage for the 'filebeat' with '${label}' as long as there are test failures to be analysed.")
     } else {
       node("${immutable} && ${label}"){
         withBeatsEnvWin() {
@@ -594,7 +595,7 @@ def isChanged(patterns){
 def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -607,7 +608,7 @@ def isChangedOSSCode(patterns) {
 def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",
@@ -817,9 +818,10 @@ def getVendorPatterns(beatName){
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
   ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
-        |awk '{print \$1"/.*"}'\
-        |sed -e "s#github.com/elastic/beats/v7/##g"
+      go list -deps ./${beatName} \
+        | grep 'elastic/beats' \
+        | sed -e "s#github.com/elastic/beats/v7/##g" \
+        | awk '{print "^" \$1 "/.*"}'
     """)
   }
   return output?.split('\n').collect{ item -> item as String }

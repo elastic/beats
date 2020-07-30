@@ -75,14 +75,6 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
-        body = {
-            "transient": {
-                "script.max_compilations_rate": "2000/1m"
-            }
-        }
-
-        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
-
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -222,14 +214,43 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
-    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
-                        "system.auth", "system.syslog", "cef.log", "activemq.audit", "iptables.log", "cisco.asa", "cisco.ios"}
+    remove_timestamp = {
+        "activemq.audit",
+        "barracuda.waf",
+        "bluecoat.director",
+        "cef.log",
+        "cisco.asa",
+        "cisco.ios",
+        "cylance.protect",
+        "fortinet.clientendpoint",
+        "haproxy.log",
+        "icinga.startup",
+        "imperva.securesphere",
+        "infoblox.nios",
+        "iptables.log",
+        "netscout.sightline",
+        "rapid7.nexpose",
+        "redis.log",
+        "system.auth",
+        "system.syslog",
+        "microsoft.defender_atp",
+        "crowdstrike.falcon_endpoint",
+        "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
+    }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),
@@ -253,6 +274,8 @@ def clean_keys(obj):
     if obj["event.dataset"] in remove_timestamp:
         if not (obj['event.dataset'], filename) in remove_timestamp_exception:
             delete_key(obj, "@timestamp")
+            # Also remove alternate time field from rsa parsers.
+            delete_key(obj, "rsa.time.event_time")
         else:
             # excluded events need to have their filename saved to the expected.json
             # so that the exception mechanism can be triggered when the json is

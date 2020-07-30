@@ -22,16 +22,30 @@ import (
 
 	"github.com/spf13/pflag"
 
-	// import protocol modules
-	_ "github.com/elastic/beats/v7/packetbeat/include"
-
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/packetbeat/beater"
+
+	// Register fields and protocol modules.
+	_ "github.com/elastic/beats/v7/packetbeat/include"
 )
 
-// Name of this beat
-var Name = "packetbeat"
+const (
+	// Name of this beat.
+	Name = "packetbeat"
+
+	// ecsVersion specifies the version of ECS that Packetbeat is implementing.
+	ecsVersion = "1.5.0"
+)
+
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
 
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
@@ -48,6 +62,7 @@ func init() {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
 	RootCmd.AddCommand(genDevicesCommand())

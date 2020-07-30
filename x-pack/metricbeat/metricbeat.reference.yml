@@ -313,7 +313,6 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
-
 - module: azure
   metricsets:
   - database_account
@@ -323,6 +322,24 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - billing
+  enabled: true
+  period: 24h
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - app_insights
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
 
 
 #--------------------------------- Beat Module ---------------------------------
@@ -526,7 +543,7 @@ metricbeat.modules:
 
 - module: googlecloud
   metricsets:
-    - stackdriver
+    - metrics
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
@@ -952,8 +969,10 @@ metricbeat.modules:
 #-------------------------------- MySQL Module --------------------------------
 - module: mysql
   metricsets:
-    - "status"
-  #  - "galera_status"
+    - status
+  #  - galera_status
+  #  - performance
+  #  - query
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -1077,6 +1096,19 @@ metricbeat.modules:
 
   # Store counter rates instead of original cumulative counters (experimental, default: false)
   #rate_counters: true
+
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  #use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  #rate_counters: true
+
+  # Define patterns for counter and histogram types so as to identify metrics' types according to these patterns
+  #types_patterns:
+  #  counter_patterns: []
+  #  histogram_patterns: []
+
 
 # Metrics sent by a Prometheus server using remote_write option
 #- module: prometheus

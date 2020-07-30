@@ -3,6 +3,9 @@ description: Pipeline for parsing Suricata EVE logs
 
 processors:
   - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
       value: "{{suricata.eve.http.http_method}}"
       field: http.request.method
       if: "ctx?.suricata?.eve?.http?.http_method != null"
