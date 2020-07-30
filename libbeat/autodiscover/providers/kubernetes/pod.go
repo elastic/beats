@@ -160,6 +160,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 			}
 		}
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+		return
 	}
 
 	p.logger.Debugf("Watcher Pod update: %+v", obj)

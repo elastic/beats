@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
 - Remove unnecessary restarts of metricsets while using Node autodiscover {pull}19974[19974]
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
+- Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 
 *Auditbeat*
