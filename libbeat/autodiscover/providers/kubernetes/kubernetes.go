@@ -31,7 +31,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -149,8 +149,21 @@ func (p *Provider) Start() {
 	if p.config.Unique {
 		ctx, cancel := context.WithCancel(context.Background())
 		p.cancel = cancel
-		leaderelection.RunOrDie(ctx, p.leaderElection)
+		p.StartLeaderElector(ctx, p.leaderElection)
 	}
+}
+
+// StartLeaderElector starts a Leader Elector in the background with the provided config
+func (p *Provider) StartLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
+	le, err := leaderelection.NewLeaderElector(lec)
+	if err != nil {
+		p.logger.Errorf("leader election lock GAINED, id %v", err)
+	}
+	if lec.WatchDog != nil {
+		lec.WatchDog.SetLeaderElection(le)
+	}
+	p.logger.Debugf("Starting Leader Elector")
+	go le.Run(ctx)
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.
