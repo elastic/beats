@@ -162,7 +162,32 @@ def runCommand(Map args = [:]) {
     mageTarget(context: args.label, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule)
   }
   if(args?.content?.containsKey('k8sTest')) {
-    log(level: 'WARN', text: "TBD: k8sTest")
+    k8sTest(versions: args.content.k8sTest.split('-'), label: args.label)
+  }
+}
+
+def k8sTest(map args = [:]) {
+  def versions = args.versions
+  node(args.label) {
+    versions.each{ v ->
+      stage("k8s ${v}"){
+        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+          withGithubNotify(context: "K8s ${v}") {
+            withBeatsEnv(archive: false, withModule: false) {
+              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+              try {
+                sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+                sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
+              } finally {
+                sh(label: 'Delete cluster', script: 'kind delete cluster')
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -291,9 +316,9 @@ def fixPermissions(location) {
 */
 def installTools() {
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
   } else {
-    retryWithSleep(retries: 2, seconds: 5){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
