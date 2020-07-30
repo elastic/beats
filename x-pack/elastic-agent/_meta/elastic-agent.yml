@@ -9,26 +9,6 @@ outputs:
     password: changeme
 
 inputs:
-  - type: synthetics/monitors
-    streams:
-      - type: http
-        name: MyHTTPMonitor
-        id: my-id
-        target: "https://elastic.co"
-        schedule: "@every 10s"
-        http: # example HTTP specific option
-          user: blah
-          password: something else
-      - type: icmp
-        name: MyICMPMonitor
-        id: my-icmp-id
-        target: "elastic.co"
-        schedule: "@every 10s"
-      - type: tcp
-        name: MyTCPMonitor
-        id: my-tcp-id
-        target: "elastic.co:80"
-        schedule: "@every 10s"
   - type: system/metrics
 
     # The only two requirement are that it has only characters allowed in an Elasticsearch index name
