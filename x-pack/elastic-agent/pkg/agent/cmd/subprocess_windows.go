@@ -10,11 +10,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
-func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}) error {
+func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}, wg *sync.WaitGroup) error {
 	reexecPath := filepath.Join(paths.Data(), hashedDirName(hasFileContent), filepath.Base(os.Args[0]))
 	argsOverrides := []string{
 		"--path.data", paths.Data(),
@@ -33,9 +34,11 @@ func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan 
 		Stderr: os.Stderr,
 	}
 
+	wg.Add(1)
 	go func() {
 		<-stopChan
 		cmd.Process.Kill()
+		wg.Done()
 	}()
 
 	if err := cmd.Start(); err != nil {

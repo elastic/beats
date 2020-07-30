@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -19,7 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}) error {
+func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}, _ *sync.WaitGroup) error {
 	reexecPath := filepath.Join(paths.Data(), hashedDirName(hasFileContent), filepath.Base(os.Args[0]))
 	argsOverrides := []string{
 		"--path.data", paths.Data(),

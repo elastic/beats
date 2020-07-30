@@ -10,8 +10,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
+	"syscall"
 
 	"github.com/spf13/cobra"
 
@@ -98,25 +101,47 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 			return err
 		}
 
-		// Windows: Mark service as stopped.
-		// After this is run, the service is considered by the OS to be stopped.
-		// This must be the first deferred cleanup task (last to execute).
-		defer service.NotifyTermination()
-
+		// prepare cancellation handling
+		var wg sync.WaitGroup
 		stop := make(chan struct{})
-		stopFn := func() {
-			close(stop)
-			os.Exit(0)
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
+		// wrapped so service cancellation is communicated in case of os.Exit
+		serviceHandler := func() error {
+			// Windows: Mark service as stopped.
+			// After this is run, the service is considered by the OS to be stopped.
+			// This must be the first deferred cleanup task (last to execute).
+			defer service.NotifyTermination()
+
+			stopFn := func() {
+				close(stop)
+			}
+			_, cancel := context.WithCancel(context.Background())
+
+			service.BeforeRun()
+			service.HandleSignals(stopFn, cancel)
+			defer service.Cleanup()
+
+			if err := startSubprocess(flags, content, stop, &wg); err != nil {
+				return err
+			}
+			return nil
 		}
-		_, cancel := context.WithCancel(context.Background())
 
-		service.BeforeRun()
-		service.HandleSignals(stopFn, cancel)
-		defer service.Cleanup()
-
-		if err := startSubprocess(flags, content, stop); err != nil {
+		if err := serviceHandler(); err != nil {
 			return err
 		}
+
+		select {
+		case <-stop:
+			break
+		case <-signals:
+			close(stop)
+			break
+		}
+
+		wg.Wait()
 
 		// prevent running Run function
 		os.Exit(0)
