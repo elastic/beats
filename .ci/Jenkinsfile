@@ -133,7 +133,8 @@ def generateStages(Map args = [:]) {
   def fileName = "${projectName}/Jenkinsfile.yml"
   if (fileExists(fileName)) {
     def content = readYaml(file: fileName)
-    if (beatsWhen(project: projectName, content: content?.when, changeset: changeset)) {
+    // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
+    if (beatsWhen(project: projectName, content: content?.when, changeset: changeset, changesetFunction: this.&getProjectDependencies)) {
       mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: this.&runCommand)
     }
   } else {
@@ -495,6 +496,31 @@ def terraformCleanup(String stashName, String directory) {
       }
     }
   }
+}
+
+/**
+* This method fetchs the dependencies of a Go module for such it transforms them in a
+* regex pattern.
+*/
+def getProjectDependencies(Map args = [:]) {
+  def beatName = args.project
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
+  def output = ""
+
+  dir("${env.BASE_DIR}") {
+    withEnv([
+      "HOME=${env.WORKSPACE}/${env.BASE_DIR}",
+      "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+    ]) {
+      output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
+        go list -deps ./${beatName} \
+          | grep 'elastic/beats' \
+          | sed -e "s#github.com/elastic/beats/v7/##g" \
+          | awk '{print "^" \$1 "/.*"}'
+      """)
+    }
+  }
+  return output?.split('\n').collect{ item -> item as String }
 }
 
 /**
