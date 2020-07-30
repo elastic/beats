@@ -174,11 +174,9 @@ def cloud(Map args = [:]) {
     stage("${args.contex}-prepare-cloud-env"){
       startCloudTestEnv(args.context, dirs: ['x-pack/metricbeat/module/aws'])
     }
-    stage("${args.contex}-prepare-cloud-env"){
-      withCloudTestEnv() {
-        mageTarget(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule)
-      }
-    }
+  }
+  withCloudTestEnv() {
+    mageTarget(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule)
   }
 }
 
