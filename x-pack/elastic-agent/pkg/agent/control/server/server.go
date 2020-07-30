@@ -8,6 +8,8 @@ import (
 	"context"
 	"net"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
+
 	"google.golang.org/grpc"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
@@ -88,10 +90,10 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 
 // Restart performs re-exec.
 func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
-	// not implemented
+	rex := reexec.Manager()
+	rex.ReExec()
 	return &proto.RestartResponse{
-		Status: proto.ActionStatus_FAILURE,
-		Error:  "not implemented",
+		Status: proto.ActionStatus_SUCCESS,
 	}, nil
 }
 

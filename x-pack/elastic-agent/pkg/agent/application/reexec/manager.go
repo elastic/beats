@@ -30,11 +30,16 @@ type ExecManager interface {
 	ShutdownComplete()
 }
 
-// Manager returns the global reexec manager.
-func Manager(log *logger.Logger, exec string) ExecManager {
+// NewManager returns the global reexec manager.
+func NewManager(log *logger.Logger, exec string) ExecManager {
 	execSingletonOnce.Do(func() {
 		execSingleton = newManager(log, exec)
 	})
+	return execSingleton
+}
+
+// Manager returns the global reexec manager.
+func Manager() ExecManager {
 	return execSingleton
 }
 

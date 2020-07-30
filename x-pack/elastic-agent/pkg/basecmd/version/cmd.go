@@ -37,6 +37,8 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 				c := client.New()
 				daemonError = c.Start(context.Background())
 				if daemonError == nil {
+					defer c.Stop()
+
 					var version client.Version
 					version, daemonError = c.Version(context.Background())
 					if daemonError == nil {
