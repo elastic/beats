@@ -139,9 +139,9 @@ func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
 	s := &AgentStatus{
 		Status:       res.Status,
 		Message:      res.Message,
-		Applications: make([]*ApplicationStatus, 0),
+		Applications: make([]*ApplicationStatus, len(res.Applications)),
 	}
-	for _, appRes := range res.Applications {
+	for i, appRes := range res.Applications {
 		var payload map[string]interface{}
 		if appRes.Payload != "" {
 			err := json.Unmarshal([]byte(appRes.Payload), &payload)
@@ -149,13 +149,13 @@ func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
 				return nil, err
 			}
 		}
-		s.Applications = append(s.Applications, &ApplicationStatus{
+		s.Applications[i] = &ApplicationStatus{
 			ID:      appRes.Id,
 			Name:    appRes.Name,
 			Status:  appRes.Status,
 			Message: appRes.Message,
 			Payload: payload,
-		})
+		}
 	}
 	return s, nil
 }
