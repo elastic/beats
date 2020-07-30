@@ -50,7 +50,10 @@ type queueSegment struct {
 
 	// The length in bytes of the segment file on disk. This is updated when
 	// the segment is written to, and should always correspond to the end of
-	// a complete data frame.
+	// a complete data frame. If a write fails after writing part of a frame,
+	// size does not change, even though the on-disk size increases, because
+	// the later bytes will be overwritten by the next write and should not
+	// be counted against the number of writable bytes.
 	size uint64
 
 	// The number of frames read from this segment, or zero if it has not

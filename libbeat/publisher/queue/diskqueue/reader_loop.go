@@ -24,18 +24,19 @@ import (
 
 func (dq *diskQueue) readerLoop() {
 	curFrameID := frameID(0)
+	logger := dq.settings.Logger.Named("readerLoop")
 	for {
 		dq.frameWrittenCond.Wait()
 		reader, errs := dq.nextSegmentReader()
 		for _, err := range errs {
 			// Errors encountered while reading should be logged.
-			dq.settings.Logger.Error(err)
+			logger.Error(err)
 		}
 		if reader == nil {
 			// We couldn't find a readable segment, wait for a new
 			// data frame to be written.
 			dq.frameWrittenCond.Wait()
-			if dq.closed.Load() {
+			if dq.closedForRead.Load() {
 				// The queue has been closed, shut down.
 				// TODO: cleanup (write the final read position)
 				return

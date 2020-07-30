@@ -107,7 +107,7 @@ type diskQueue struct {
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
 	// to the queue.
-	bytesOnDisk uint64
+	//bytesOnDisk uint64
 
 	// The memory queue of data blobs waiting to be written to disk.
 	// To add something to the queue internally, send it to this channel.
@@ -153,7 +153,7 @@ type diskQueue struct {
 	// This will usually be less than ackedUpTo, since oldestFrame can't
 	// advance until the entire segment file has been acknowledged and
 	// deleted.
-	oldestFrame frameID
+	//oldestFrame frameID
 
 	// This lock must be held to read and write acked and ackedUpTo.
 	ackLock sync.Mutex
@@ -165,10 +165,27 @@ type diskQueue struct {
 	// can't yet be acknowledged as a continuous block).
 	acked map[frameID]bool
 
-	// Whether the queue has been closed. Code that can't check the done
-	// channel (e.g. code that must wait on a condition variable) should
-	// always check this value when waking up.
-	closed atomic.Bool
+	// Whether the queue has been closed for write. When this is true, data that
+	// has already been added to the queue intake should continue being written
+	// to disk, but no new data should be accepted and the writerLoop routine
+	// should terminate when all data has been written.
+	closedForWrite atomic.Bool
+
+	// Whether the queue has been closed for read. When this is true, no more
+	// frames can be read from the queue, and the readerLoop routine should
+	// terminate. The queue will continue to accept acks for already-read
+	// frames and update the on-disk state accordingly.
+	closedForRead atomic.Bool
+
+	// If true, goroutines should return as soon as possible without waiting for
+	// data updates to complete. The queue will no longer write buffered frames
+	// to disk or update the on-disk state to reflect incoming acks.
+	// If abort is true, then closedForRead and closedForWrite must be true.
+	abort atomic.Bool
+
+	// Wait group for shutdown of the goroutines associated with this queue:
+	// reader loop, writer loop.
+	waitGroup *sync.WaitGroup
 
 	// The channel to signal our goroutines to shut down.
 	done chan struct{}
@@ -184,25 +201,28 @@ type diskQueueSegments struct {
 
 	//writer *segmentWriter
 	//reader *segmentReader
+	segmentDeletedCond *sync.Cond
+	frameWrittenCond   *sync.Cond
 
 	// A list of the segments that have been completely written but have
 	// not yet been completely processed by the reader loop, sorted by increasing
 	// segment ID. Segments are always read in order. When a segment has
 	// been read completely, it is removed from the front of this list and
-	// appended to waiting.
+	// appended to read.
 	reading []*queueSegment
 
 	// A list of the segments that have been read but have not yet been
 	// completely acknowledged, sorted by increasing segment ID. When the
 	// first entry of this list is completely acknowledged, it is removed
-	// from this list and added to finished.
-	waiting []*queueSegment
+	// from this list and added to acked.
+	acking []*queueSegment
 
 	// A list of the segments that have been completely processed and are
 	// ready to be deleted. The writer loop always tries to delete segments
 	// in this list before writing new data. When a segment is successfully
-	// deleted, it is removed from this list.
-	finished []*queueSegment
+	// deleted, it is removed from this list and the queue's
+	// segmentDeletedCond is signalled.
+	acked []*queueSegment
 
 	// The next sequential unused segment ID. This is what will be assigned
 	// to the next queueSegment we create.
@@ -259,19 +279,26 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	segments, err := queueSegmentsForPath(
+	initialSegments, err := queueSegmentsForPath(
 		settings.directoryPath(), settings.Logger)
 	if err != nil {
 		return nil, err
 	}
 
+	// segments needs to be created separately so its condition variables can
+	// point at its sync.Mutex.
+	segments := &diskQueueSegments{
+		reading: initialSegments,
+	}
+	segments.segmentDeletedCond = sync.NewCond(segments)
+	segments.frameWrittenCond = sync.NewCond(segments)
+
 	return &diskQueue{
-		settings: settings,
-		segments: &diskQueueSegments{
-			reading: segments,
-		},
-		closed: atomic.MakeBool(false),
-		done:   make(chan struct{}),
+		settings:       settings,
+		segments:       segments,
+		closedForRead:  atomic.MakeBool(false),
+		closedForWrite: atomic.MakeBool(false),
+		done:           make(chan struct{}),
 	}, nil
 }
 
@@ -296,7 +323,7 @@ func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
 		// Remove the segment from the active list and move it to
 		// completedSegments until all its data has been acknowledged.
 		dq.segments.reading = dq.segments.reading[1:]
-		dq.segments.waiting = append(dq.segments.waiting, segment)
+		dq.segments.acking = append(dq.segments.acking, segment)
 		return reader, errors
 	}
 	// TODO: if segments.reading is empty we may still be able to
@@ -393,7 +420,9 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 //
 
 func (dq *diskQueue) Close() error {
-	if dq.closed.Swap(true) {
+	closedForRead := dq.closedForRead.Swap(true)
+	closedForWrite := dq.closedForWrite.Swap(true)
+	if closedForRead && closedForWrite {
 		return fmt.Errorf("Can't close disk queue: queue already closed")
 	}
 	// TODO: wait for worker threads?
