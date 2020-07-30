@@ -96,7 +96,6 @@
         "event.module": "fortinet",
         "event.outcome": "success",
         "event.start": "2020-06-24T01:16:08.000Z",
-        "event.timezone": "-02:00",
         "event.type": [
             "connection",
             "end"

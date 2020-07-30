@@ -260,6 +260,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
+- Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
 
 *Heartbeat*
 
