@@ -150,6 +150,7 @@ def generateStages(Map args = [:]) {
 *    - label -> the worker labels
 *    - project -> the name of the project that should match with the folder name.
 *    - content -> the specific stage data in the <project>/Jenkinsfile.yml
+*    - context -> the name of the stage, normally <project>-<stage>(-<platform>)?
 */
 def runCommand(Map args = [:]) {
   def withModule = args.content.get('withModule', false)
@@ -169,7 +170,7 @@ def runCommand(Map args = [:]) {
 
 def cloud(Map args = [:]) {
   node(args.label) {
-    stage("${args.contex}-prepare-cloud-env"){
+    stage("${args.context}-prepare-cloud-env"){
       startCloudTestEnv(args.context, dirs: ['x-pack/metricbeat/module/aws'])
     }
   }
