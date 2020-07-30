@@ -554,6 +554,22 @@ func (p *s3Input) jsonFieldsType(jsonFields interface{}, offset int, objectHash 
 			return offset, nil
 		}
 	case map[string]interface{}:
+		if p.config.ExpandEventListFromField != "" {
+			textValue, ok := f[p.config.ExpandEventListFromField]
+			if !ok {
+				err := errors.Errorf("key '%s' not found", p.config.ExpandEventListFromField)
+				p.logger.Error(err)
+				return offset, err
+			}
+			offset, err := p.convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx)
+			if err != nil {
+				err = errors.Wrapf(err, "convertJSONToEvent failed for '%s' from S3 bucket '%s'", s3Info.key, s3Info.name)
+				p.logger.Error(err)
+				return offset, err
+			}
+			return offset, nil
+		}
+
 		offset, err := p.convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx)
 		if err != nil {
 			err = errors.Wrapf(err, "convertJSONToEvent failed for '%s' from S3 bucket '%s'", s3Info.key, s3Info.name)
