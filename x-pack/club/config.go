@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -23,18 +22,10 @@ type settings struct {
 	Inputs   []*common.Config
 	Path     pathSettings
 	Logging  logp.Config
-	Registry registrySettings // XXX: copied from filebeat
+	Registry kvStoreSettings // XXX: copied from filebeat
 	Limits   limitsSettings
 	Location string       // time zone info
 	Output   outputConfig `config:",inline"`
-}
-
-type registrySettings struct {
-	Path          string        `config:"path"`
-	Permissions   os.FileMode   `config:"file_permissions"`
-	FlushTimeout  time.Duration `config:"flush"`
-	CleanInterval time.Duration `config:"cleanup_interval"`
-	MigrateFile   string        `config:"migrate_file"`
 }
 
 // configure global resource limits to be shared with input managers

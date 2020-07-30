@@ -1,33 +1,29 @@
 package main
 
 import (
+	"os"
 	"time"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
 
-type filebeatStore struct {
+type kvStore struct {
 	registry      *statestore.Registry
 	storeName     string
 	cleanInterval time.Duration
 }
 
-func makeFilebeatRegistry(info beat.Info, log *logp.Logger, store *filebeatStore) v2.Registry {
-	inputLogger := log.Named("input")
-	v2Inputs, err := v2.PluginRegistry(inputs.Init(info, inputLogger, store))
-	if err != nil {
-		panic(err)
-	}
-	return v2Inputs
+type kvStoreSettings struct {
+	Path          string        `config:"path"`
+	Permissions   os.FileMode   `config:"file_permissions"`
+	CleanInterval time.Duration `config:"cleanup_interval"`
 }
 
-func openStateStore(info beat.Info, logger *logp.Logger, cfg registrySettings) (*filebeatStore, error) {
+func newKVStore(info beat.Info, logger *logp.Logger, cfg kvStoreSettings) (*kvStore, error) {
 	memlog, err := memlog.New(logger, memlog.Settings{
 		Root:     paths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
@@ -36,21 +32,21 @@ func openStateStore(info beat.Info, logger *logp.Logger, cfg registrySettings) (
 		return nil, err
 	}
 
-	return &filebeatStore{
+	return &kvStore{
 		registry:      statestore.NewRegistry(memlog),
 		storeName:     info.Beat,
 		cleanInterval: cfg.CleanInterval,
 	}, nil
 }
 
-func (s *filebeatStore) Close() {
+func (s *kvStore) Close() {
 	s.registry.Close()
 }
 
-func (s *filebeatStore) Access() (*statestore.Store, error) {
+func (s *kvStore) Access() (*statestore.Store, error) {
 	return s.registry.Get(s.storeName)
 }
 
-func (s *filebeatStore) CleanupInterval() time.Duration {
+func (s *kvStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
 }

@@ -16,6 +16,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
+	"github.com/elastic/beats/v7/x-pack/club/internal/registries"
+	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
 
 type app struct {
@@ -28,7 +31,7 @@ type app struct {
 	rawConfig *common.Config // required for index managemnt setup... should be removed
 
 	// configured subsystems
-	statestore  *filebeatStore
+	statestore  *kvStore
 	scheduler   *scheduler.Scheduler
 	inputLoader *v2.Loader
 
@@ -155,7 +158,7 @@ func (app *app) configure() error {
 	// configure filebeat store
 	ok := false
 	fmt.Printf("%#v\n", app.Settings.Registry)
-	store, err := openStateStore(app.info, app.log.Named("store"), app.Settings.Registry)
+	store, err := newKVStore(app.info, app.log.Named("store"), app.Settings.Registry)
 	if err != nil {
 		return err
 	}
@@ -173,13 +176,7 @@ func (app *app) configure() error {
 	}
 	app.scheduler = scheduler.NewWithLocation(app.Settings.Limits.Monitors, nil, location)
 
-	inputsCollection := registryList{
-		withTypePrefix("logs", makeFilebeatRegistry(app.info, app.log, app.statestore)),
-		withTypePrefix("monitor", makeHeartbeatRegistry(app.scheduler)),
-		withTypePrefix("metrics", makeMetricbeatRegistry(app.info, nil)),
-		withTypePrefix("audit", makeAuditbeatRegistry(app.info, nil)),
-		withTypePrefix("net", makePacketbeatRegistry()),
-	}
+	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
 	app.inputLoader = v2.NewLoader(app.log, inputsCollection, "type", "")
 
 	// Let's configure inputs. Inputs won't do any processing, yet.
@@ -199,6 +196,20 @@ func (app *app) configure() error {
 
 	ok = true
 	return nil
+}
+
+func makeInputRegistry(info beat.Info, log *logp.Logger, sched *scheduler.Scheduler, store *kvStore) v2.Registry {
+	return registries.Combine(
+		// filebeat v2 inputs
+		registries.Prefixed("logs", v2.MustPluginRegistry(inputs.Init(info, log.Named("input"), store))),
+		// packetbeat as v2 input
+		registries.Prefixed("net", v2.MustPluginRegistry([]v2.Plugin{pb.Plugin()})),
+
+		// metricbeat,`auditbeat, heartbeat based on legacy runner factories
+		registries.Prefixed("monitor", makeHeartbeatRegistry(sched)),
+		registries.Prefixed("metrics", makeMetricbeatRegistry(info, nil)),
+		registries.Prefixed("audit", makeAuditbeatRegistry(info, nil)),
+	)
 }
 
 func (app *app) Run(sigContext context.Context) error {

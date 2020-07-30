@@ -1,7 +1,7 @@
-package main
+// pb wraps packetbeat so the sniffer and analyzers can be used as inputs.
+package pb
 
 import (
-	// import protocol modules
 	"context"
 	"errors"
 	"fmt"
@@ -9,10 +9,15 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/tsg/gopacket/layers"
+
+	// import protocol modules
+
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/decoder"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	_ "github.com/elastic/beats/v7/packetbeat/include"
@@ -22,8 +27,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/tsg/gopacket/layers"
 
 	pbconfig "github.com/elastic/beats/v7/packetbeat/config"
 )
@@ -68,6 +71,14 @@ type interfaceConfig struct {
 	EnableAutoPromiscMode bool   `config:"auto_promisc_mode"`
 }
 
+func Plugin() v2.Plugin {
+	return v2.Plugin{
+		Name:      "sniffer",
+		Stability: feature.Experimental,
+		Manager:   v2.ConfigureWith(configurePacketbeatInput),
+	}
+}
+
 func (cfg *packetbeatConfig) Validate() error {
 	if len(cfg.Interface.Devices) == 0 {
 		return errors.New("no device configured")
@@ -77,17 +88,6 @@ func (cfg *packetbeatConfig) Validate() error {
 	}
 
 	return nil
-}
-
-func makePacketbeatRegistry() v2.Registry {
-	reg, _ := v2.PluginRegistry([]v2.Plugin{
-		{
-			Name:      "sniffer",
-			Stability: feature.Experimental,
-			Manager:   v2.ConfigureWith(configurePacketbeatInput),
-		},
-	})
-	return reg
 }
 
 func configurePacketbeatInput(cfg *common.Config) (v2.Input, error) {

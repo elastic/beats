@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
+	"github.com/elastic/beats/v7/x-pack/club/internal/registries"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 )
 
@@ -27,10 +28,10 @@ type metricbeatInput struct {
 
 func makeMetricbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
 	factory := module.NewFactory(info, nil, opts...)
-	return &runnerFactoryRegistry{
-		typeField: "module",
-		factory:   factory,
-		has: func(name string) bool {
+	return &registries.RunnerFactoryRegistry{
+		TypeField: "module",
+		Factory:   factory,
+		Has: func(name string) bool {
 			if isAuditModule(name) {
 				return false
 			}
@@ -47,10 +48,10 @@ func makeMetricbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
 
 func makeAuditbeatRegistry(info beat.Info, opts []module.Option) v2.Registry {
 	factory := module.NewFactory(info, nil, opts...)
-	return &runnerFactoryRegistry{
-		typeField: "module",
-		factory:   factory,
-		has: func(name string) bool {
+	return &registries.RunnerFactoryRegistry{
+		TypeField: "module",
+		Factory:   factory,
+		Has: func(name string) bool {
 			if !isAuditModule(name) {
 				return false
 			}

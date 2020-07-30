@@ -56,6 +56,14 @@ func PluginRegistry(plugins []Plugin) (Registry, error) {
 	return registry, nil
 }
 
+func MustPluginRegistry(plugins []Plugin) Registry {
+	reg, err := PluginRegistry(plugins)
+	if err != nil {
+		panic(err)
+	}
+	return reg
+}
+
 func (t tableRegistry) Init(group unison.Group, mode Mode) error {
 	for _, p := range t {
 		if err := p.Manager.Init(group, mode); err != nil {
