@@ -77,9 +77,9 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 				},
 			}
 
-			if stdMonFields.ServiceName != "" {
+			if stdMonFields.Service.Name != "" {
 				fieldsToMerge["service"] = common.MapStr{
-					"name": stdMonFields.ServiceName,
+					"name": stdMonFields.Service.Name,
 				}
 			}
 

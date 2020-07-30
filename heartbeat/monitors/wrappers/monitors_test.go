@@ -105,7 +105,7 @@ func TestSimpleJob(t *testing.T) {
 
 func TestJobWithServiceName(t *testing.T) {
 	fields := testMonFields
-	fields.ServiceName = "testServiceName"
+	fields.Service.Name = "testServiceName"
 	testCommonWrap(t, testDef{
 		"simple",
 		fields,
@@ -123,7 +123,7 @@ func TestJobWithServiceName(t *testing.T) {
 						"check_group": isdef.IsString,
 					},
 					"service": map[string]interface{}{
-						"name": fields.ServiceName,
+						"name": fields.Service.Name,
 					},
 				}),
 				hbtestllext.MonitorTimespanValidator,
