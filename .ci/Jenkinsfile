@@ -211,6 +211,7 @@ def makeTarget(Map args = [:]) {
   node(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
+        dumpVariables()
         cmd(label: "${command}", script: "${command}")
       }
     }
@@ -225,6 +226,7 @@ def mageTarget(Map args = [:]) {
   node(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
+        dumpVariables()
         dir(directory) {
           cmd(label: "${command}", script: "${command}")
         }
@@ -499,4 +501,66 @@ def terraformCleanup(String stashName, String directory) {
       }
     }
   }
+}
+
+/**
+* For debugging purposes.
+*/
+def dumpVariables(){
+  echo "### MAGE DUMP ###"
+  cmd(label: 'Dump mage variables', script: 'mage dumpVariables')
+  echo "### END MAGE DUMP ###"
+  echo """
+  ### ENV DUMP ###
+  BEAT_VERSION: ${env.BEAT_VERSION}
+  BEATS: ${env.BEATS}
+  BUILD_DIR: ${env.BUILD_DIR}
+  COMMIT_ID: ${env.COMMIT_ID}
+  COVERAGE_DIR: ${env.COVERAGE_DIR}
+  COVERAGE_TOOL: ${env.COVERAGE_TOOL}
+  COVERAGE_TOOL_REPO: ${env.COVERAGE_TOOL_REPO}
+  DOCKER_CACHE: ${env.DOCKER_CACHE}
+  DOCKER_COMPOSE_PROJECT_NAME: ${env.DOCKER_COMPOSE_PROJECT_NAME}
+  DOCKER_COMPOSE: ${env.DOCKER_COMPOSE}
+  FIND: ${env.FIND}
+  GOBUILD_FLAGS: ${env.GOBUILD_FLAGS}
+  GOIMPORTS: ${env.GOIMPORTS}
+  GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}
+  GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}
+  GOLINT: ${env.GOLINT}
+  GOLINT_REPO: ${env.GOLINT_REPO}
+  GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}
+  GOX_FLAGS: ${env.GOX_FLAGS}
+  GOX_OS: ${env.GOX_OS}
+  GOX_OSARCH: ${env.GOX_OSARCH}
+  HOME: ${env.HOME}
+  NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}
+  NOW: ${env.NOW}
+  PATH: ${env.PATH}
+  PKG_BUILD_DIR: ${env.PKG_BUILD_DIR}
+  PKG_UPLOAD_DIR: ${env.PKG_UPLOAD_DIR}
+  PIP_INSTALL_PARAMS: ${env.PIP_INSTALL_PARAMS}
+  PROJECTS: ${env.PROJECTS}
+  PROJECTS_ENV: ${env.PROJECTS_ENV}
+  PYTHON_ENV: ${env.PYTHON_ENV}
+  PYTHON_ENV_EXE: ${env.PYTHON_ENV_EXE}
+  PYTHON_EXE: ${env.PYTHON_EXE}
+  PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}
+  PROCESSES: ${env.PROCESSES}
+  REVIEWDOG: ${env.REVIEWDOG}
+  REVIEWDOG_OPTIONS: ${env.REVIEWDOG_OPTIONS}
+  REVIEWDOG_REPO: ${env.REVIEWDOG_REPO}
+  STRESS_TESTS: ${env.STRESS_TESTS}
+  STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}
+  SYSTEM_TESTS: ${env.SYSTEM_TESTS}
+  TESTIFY_TOOL_REPO: ${env.TESTIFY_TOOL_REPO}
+  TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}
+  TEST_TAGS: ${env.TEST_TAGS}
+  TESTING_ENVIRONMENT: ${env.TESTING_ENVIRONMENT}
+  TIMEOUT: ${env.TIMEOUT}
+  USERPROFILE: ${env.USERPROFILE}
+  VENV_PARAMS: ${env.VENV_PARAMS}
+  XPACK_SUFFIX: ${env.XPACK_SUFFIX}
+  ### END ENV DUMP ###
+  """
 }
