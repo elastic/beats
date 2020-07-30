@@ -169,7 +169,7 @@ def runCommand(Map args = [:]) {
   }
 }
 
-def cloud(map args = [:]) {
+def cloud(Map args = [:]) {
   node(args.label) {
     stage("${args.contex}-prepare-cloud-env"){
       startCloudTestEnv(args.context, dirs: ['x-pack/metricbeat/module/aws'])
@@ -182,7 +182,7 @@ def cloud(map args = [:]) {
   }
 }
 
-def k8sTest(map args = [:]) {
+def k8sTest(Map args = [:]) {
   def versions = args.versions
   node(args.label) {
     versions.each{ v ->
