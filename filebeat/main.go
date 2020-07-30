@@ -18,11 +18,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
-	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 )
+
+//"github.com/elastic/beats/v7/filebeat/cmd"
+//inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
 
 // The basic model of execution:
 // - input: finds files in paths/globs to harvest, starts harvesters
@@ -33,7 +36,15 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
-	if err := cmd.Filebeat(inputs.Init).Execute(); err != nil {
+	//if err := cmd.Filebeat(inputs.Init).Execute(); err != nil {
+	//	os.Exit(1)
+	//}
+	settings := diskqueue.Settings{}
+	queue, err := diskqueue.NewQueue(settings)
+	if err != nil {
+		fmt.Printf("queue creation error: %v", err)
 		os.Exit(1)
 	}
+	queue.Close()
+	fmt.Printf("Hello")
 }
