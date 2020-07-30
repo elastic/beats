@@ -81,7 +81,9 @@ pipeline {
         }
       }
       steps {
-        echo 'linting'
+        whenFalse(true) { // TODO: disable for the time being.
+          makeTarget(context: "Lint", target: "check")
+        }
       }
     }
     stage('Build&Test') {
