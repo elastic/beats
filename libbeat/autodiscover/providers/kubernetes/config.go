@@ -62,6 +62,7 @@ func defaultConfig() *Config {
 		Resource:       "pod",
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
+		Unique:         false,
 	}
 }
 

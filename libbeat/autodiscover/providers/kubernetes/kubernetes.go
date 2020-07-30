@@ -31,13 +31,14 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-
+	
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -79,6 +80,11 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errWrap(err)
+	}
+
+	if config.Unique {
+		// enrich the config with Unique templates before building Mapper
+		initUniqueTemplate(config)
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
@@ -127,7 +133,10 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	p.leaderElection = p.newLeaderElectionConfig(client, "some")
+	if p.config.Unique {
+		p.initLeaderElectionConfig(client, "some")
+	}
+
 	return p, nil
 }
 
@@ -136,15 +145,20 @@ func (p *Provider) Start() {
 	if err := p.eventer.Start(); err != nil {
 		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-	p.cancel = cancel
-	leaderelection.RunOrDie(ctx, p.leaderElection)
+
+	if p.config.Unique {
+		ctx, cancel := context.WithCancel(context.Background())
+		p.cancel = cancel
+		leaderelection.RunOrDie(ctx, p.leaderElection)
+	}
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
 	p.eventer.Stop()
-	p.cancel()
+	if p.cancel != nil {
+		p.cancel()
+	}
 }
 
 // String returns a description of kubernetes autodiscover provider.
@@ -195,14 +209,14 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 	p.bus.Publish(event)
 }
 
-func (p *Provider) newLeaderElectionConfig(client k8s.Interface, uuid string) leaderelection.LeaderElectionConfig {
+func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
 	id := "beats-leader-" + uuid
 	lease := metav1.ObjectMeta{
 		Name:      "beats-cluster-leader",
 		Namespace: "default",
 	}
 	metaUID := lease.GetObjectMeta().GetUID()
-	return leaderelection.LeaderElectionConfig{
+	p.leaderElection = leaderelection.LeaderElectionConfig{
 		Lock: &resourcelock.LeaseLock{
 			LeaseMeta: lease,
 			Client:    client.CoordinationV1(),
@@ -226,5 +240,17 @@ func (p *Provider) newLeaderElectionConfig(client k8s.Interface, uuid string) le
 				p.stopLeading(uuid, eventID)
 			},
 		},
+	}
+}
+
+func initUniqueTemplate(config *Config) {
+	m := make(map[string]interface{})
+	m["unique"] = "true"
+	fields := &conditions.Fields{}
+	fields.Unpack(m)
+	for _, template := range config.Templates {
+		template.ConditionConfig = &conditions.Config{
+			Contains: fields,
+		}
 	}
 }
