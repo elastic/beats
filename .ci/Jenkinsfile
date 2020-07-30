@@ -172,11 +172,15 @@ def runCommand(Map args = [:]) {
 def cloud(Map args = [:]) {
   node(args.label) {
     stage("${args.context}-prepare-cloud-env"){
-      startCloudTestEnv(args.context, dirs: ['x-pack/metricbeat/module/aws'])
+      startCloudTestEnv(name: args.directory, dirs: ['x-pack/metricbeat/module/aws'])
     }
   }
   withCloudTestEnv() {
-    target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true)
+    try {
+      target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true)
+    } finally {
+      terraformCleanup(name: args.directory, dir: args.directory)
+    }
   }
 }
 
@@ -458,11 +462,13 @@ def withCloudTestEnv(Closure body) {
 * case manual cleanup is needed.
 *
 * Example:
-*   startCloudTestEnv('x-pack-metricbeat', dir: ['x-pack/metricbeat/module/aws'])
+*   startCloudTestEnv(name: 'x-pack-metricbeat', dirs: ['x-pack/metricbeat/module/aws'])
 *   ...
-*   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+*   terraformCleanup(name: 'x-pack-metricbeat', dir: 'x-pack/metricbeat')
 */
-def startCloudTestEnv(String name, dirs = []) {
+def startCloudTestEnv(Map args = [:]) {
+  String name = normalise(args.name)
+  def dirs = args.get('dirs',[])
   withCloudTestEnv() {
     withBeatsEnv(archive: false, withModule: false) {
       try {
@@ -485,17 +491,45 @@ def startCloudTestEnv(String name, dirs = []) {
 * then it runs terraform destroy for each one.
 * it uses terraform states previously stashed by startCloudTestEnv.
 */
-def terraformCleanup(String stashName, String directory) {
+def terraformCleanup(Map args = [:]) {
+  String name = normalise(args.name)
+  String directory = args.dir
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
-        unstash("terraform-${stashName}")
+        unstash("terraform-${name}")
         retryWithSleep(retries: 2, seconds: 5, backoff: true) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
       }
     }
   }
+}
+
+/**
+* Prepare the terraform context in the given directory
+*/
+def terraformInit(String directory) {
+  dir(directory) {
+    sh(label: "Terraform Init on ${directory}", script: "terraform init")
+  }
+}
+
+/**
+* Run terraform in the given directory
+*/
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+/**
+* Replace the slashes in the directory in case there are nested folders.
+*/
+def normalise(String directory) {
+  return directory.replaceAll("[\\W]|_",'-')
 }
 
 /**
