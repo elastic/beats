@@ -33,6 +33,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		Long:  "This will enroll the Agent into Fleet.",
 		Args:  cobra.ExactArgs(2),
 		Run: func(c *cobra.Command, args []string) {
+			fmt.Println("RUNNING ENROLL")
 			if err := enroll(streams, c, flags, args); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)

@@ -5,17 +5,21 @@
 package cmd
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
+	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -101,6 +105,22 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 			return err
 		}
 
+		// Windows: Mark service as stopped.
+		// After this is run, the service is considered by the OS to be stopped.
+		// This must be the first deferred cleanup task (last to execute).
+		defer service.NotifyTermination()
+
+		service.BeforeRun()
+
+		stop := make(chan struct{})
+		stopFn := func() {
+			close(stop)
+			os.Exit(0)
+		}
+		_, cancel := context.WithCancel(context.Background())
+		service.HandleSignals(stopFn, cancel)
+		defer service.Cleanup()
+
 		pathConfigFile := flags.Config()
 		rawConfig, err := config.LoadYAML(pathConfigFile)
 		if err != nil {
@@ -118,23 +138,9 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 				errors.M(errors.MetaKeyPath, pathConfigFile))
 		}
 
-		logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
-		if err != nil {
+		if err := startSubprocess(content, cfg.Settings.LoggingConfig, stop); err != nil {
 			return err
 		}
-
-		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(os.Args[0]))
-		rexLogger := logger.Named("reexec")
-		argsOverrides := []string{
-			"--path.data", paths.Data(),
-			"--path.home", filepath.Dir(reexecPath),
-			"--path.config", paths.Config(),
-		}
-		rm := reexec.Manager(rexLogger, reexecPath)
-		rm.ReExec(argsOverrides...)
-
-		// trigger reexec
-		rm.ShutdownComplete()
 
 		// prevent running Run function
 		os.Exit(0)
@@ -154,4 +160,52 @@ func hashedDirName(filecontent []byte) string {
 	}
 
 	return fmt.Sprintf("elastic-agent-%s", s)
+}
+
+func startSubprocess(hasFileContent []byte, loggingConfig *logger.Config, stopChan <-chan struct{}) error {
+	reexecPath := filepath.Join(paths.Data(), hashedDirName(hasFileContent), filepath.Base(os.Args[0]))
+	argsOverrides := []string{
+		"--path.data", paths.Data(),
+		"--path.home", filepath.Dir(reexecPath),
+		"--path.config", paths.Config(),
+	}
+
+	if runtime.GOOS == "windows" {
+		args := append([]string{reexecPath}, os.Args[1:]...)
+		args = append(args, argsOverrides...)
+		// no support for exec just spin a new child
+		cmd := exec.Cmd{
+			Path:   reexecPath,
+			Args:   args,
+			Stdin:  os.Stdin,
+			Stdout: os.Stdout,
+			Stderr: os.Stderr,
+		}
+
+		go func() {
+			<-stopChan
+			cmd.Process.Kill()
+		}()
+
+		if err := cmd.Start(); err != nil {
+			return err
+		}
+
+		// Wait so agent wont exit and service wont start another instance
+		return cmd.Wait()
+	}
+
+	logger, err := logger.NewFromConfig("", loggingConfig)
+	if err != nil {
+		return err
+	}
+
+	rexLogger := logger.Named("reexec")
+	rm := reexec.Manager(rexLogger, reexecPath)
+	rm.ReExec(argsOverrides...)
+
+	// trigger reexec
+	rm.ShutdownComplete()
+
+	return nil
 }
