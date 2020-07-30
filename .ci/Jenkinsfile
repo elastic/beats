@@ -191,10 +191,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
-  def modulePattern
-  if (withModule) {
-    modulePattern = getModulePattern(directory)
-  }
+
   def goRoot, path, magefile, pythonEnv, testResults, artifacts
 
   if(isUnix()) {
@@ -217,7 +214,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
-  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern, directory) : ''
+  def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
   withEnv([
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
@@ -278,11 +275,6 @@ def installTools() {
   }
 }
 
-def getModulePattern(String toCompare) {
-  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
-  return (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
-}
-
 /**
   This method gathers the module name, if required, in order to run the ITs only if
   the changeset affects a specific module.
@@ -290,8 +282,11 @@ def getModulePattern(String toCompare) {
   For such, it's required to look for changes under the module folder and exclude anything else
   such as ascidoc and png files.
 */
-def getCommonModuleInTheChangeSet(String pattern, String directory) {
+def getCommonModuleInTheChangeSet(String directory) {
+  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
+  def pattern = (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
   def module = ''
+
   // Transform folder structure in regex format since path separator is required to be escaped
   def transformedDirectory = directory.replaceAll('/', '\\/')
   def directoryExclussion = "((?!^${transformedDirectory}\\/).)*\$"
