@@ -8,11 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 )
 
@@ -81,7 +81,7 @@ type client struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
-	client  proto.ElasticAgentClient
+	client  proto.ElasticAgentControlClient
 	cfgLock sync.RWMutex
 	obsLock sync.RWMutex
 }
@@ -98,7 +98,7 @@ func (c *client) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	c.client = proto.NewElasticAgentClient(conn)
+	c.client = proto.NewElasticAgentControlClient(conn)
 	return nil
 }
 

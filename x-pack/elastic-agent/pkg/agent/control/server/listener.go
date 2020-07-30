@@ -17,6 +17,9 @@ import (
 
 func createListener() (net.Listener, error) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		os.Remove(path)
+	}
 	dir := filepath.Dir(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err = os.MkdirAll(dir, 0755)
@@ -35,4 +38,9 @@ func createListener() (net.Listener, error) {
 		return nil, err
 	}
 	return lis, err
+}
+
+func cleanupListener() {
+	path := strings.TrimPrefix(control.Address(), "unix://")
+	os.Remove(path)
 }

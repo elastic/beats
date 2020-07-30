@@ -8,13 +8,12 @@ import (
 	"context"
 	"net"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-
 	"google.golang.org/grpc"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // Server is the daemon side of the control protocol.
@@ -44,7 +43,7 @@ func (s *Server) Start() error {
 	}
 	s.listener = lis
 	s.server = grpc.NewServer()
-	proto.RegisterElasticAgentServer(s.server, s)
+	proto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
 	go func() {
@@ -63,6 +62,7 @@ func (s *Server) Stop() {
 		s.server.Stop()
 		s.server = nil
 		s.listener = nil
+		cleanupListener()
 	}
 }
 

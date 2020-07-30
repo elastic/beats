@@ -27,3 +27,7 @@ func createListener() (net.Listener, error) {
 	}
 	return npipe.NewListener(control.Address(), sd)
 }
+
+func cleanupListener() {
+	// nothing to do on windows
+}
