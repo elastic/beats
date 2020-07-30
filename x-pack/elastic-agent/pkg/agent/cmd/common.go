@@ -110,35 +110,18 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 		// This must be the first deferred cleanup task (last to execute).
 		defer service.NotifyTermination()
 
-		service.BeforeRun()
-
 		stop := make(chan struct{})
 		stopFn := func() {
 			close(stop)
 			os.Exit(0)
 		}
 		_, cancel := context.WithCancel(context.Background())
+
+		service.BeforeRun()
 		service.HandleSignals(stopFn, cancel)
 		defer service.Cleanup()
 
-		pathConfigFile := flags.Config()
-		rawConfig, err := config.LoadYAML(pathConfigFile)
-		if err != nil {
-			return errors.New(err,
-				fmt.Sprintf("could not read configuration file %s", pathConfigFile),
-				errors.TypeFilesystem,
-				errors.M(errors.MetaKeyPath, pathConfigFile))
-		}
-
-		cfg, err := configuration.NewFromConfig(rawConfig)
-		if err != nil {
-			return errors.New(err,
-				fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
-				errors.TypeFilesystem,
-				errors.M(errors.MetaKeyPath, pathConfigFile))
-		}
-
-		if err := startSubprocess(content, cfg.Settings.LoggingConfig, stop); err != nil {
+		if err := startSubprocess(flags, content, stop); err != nil {
 			return err
 		}
 
@@ -162,7 +145,7 @@ func hashedDirName(filecontent []byte) string {
 	return fmt.Sprintf("elastic-agent-%s", s)
 }
 
-func startSubprocess(hasFileContent []byte, loggingConfig *logger.Config, stopChan <-chan struct{}) error {
+func startSubprocess(flags *globalFlags, hasFileContent []byte, stopChan <-chan struct{}) error {
 	reexecPath := filepath.Join(paths.Data(), hashedDirName(hasFileContent), filepath.Base(os.Args[0]))
 	argsOverrides := []string{
 		"--path.data", paths.Data(),
@@ -195,7 +178,24 @@ func startSubprocess(hasFileContent []byte, loggingConfig *logger.Config, stopCh
 		return cmd.Wait()
 	}
 
-	logger, err := logger.NewFromConfig("", loggingConfig)
+	pathConfigFile := flags.Config()
+	rawConfig, err := config.LoadYAML(pathConfigFile)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
 	}

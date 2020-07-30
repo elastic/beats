@@ -30,7 +30,6 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 		Use:   "run",
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
-			fmt.Println("RUNNING RUN")
 			if err := run(flags, streams); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)

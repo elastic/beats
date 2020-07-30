@@ -28,7 +28,6 @@ func newReExecWindowsCommand(flags *globalFlags, _ []string, streams *cli.IOStre
 		Long:   "This waits for the windows service to stop then restarts it to allow self-upgrading.",
 		Args:   cobra.ExactArgs(2),
 		Run: func(c *cobra.Command, args []string) {
-			fmt.Println("RUNNING REEXEC")
 			serviceName := args[0]
 			servicePid, err := strconv.Atoi(args[1])
 			if err != nil {
