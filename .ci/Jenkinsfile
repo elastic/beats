@@ -156,16 +156,16 @@ def generateStages(Map args = [:]) {
 def runCommand(Map args = [:]) {
   def withModule = args.content.get('withModule', false)
   if(args?.content?.containsKey('make')) {
-    makeTarget(context: args.label, command: args.content.make, directory: args.project, label: args.label, withModule: withModule)
+    makeTarget(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule)
   }
   if(args?.content?.containsKey('mage')) {
-    mageTarget(context: args.label, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule)
+    mageTarget(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule)
   }
   if(args?.content?.containsKey('k8sTest')) {
-    k8sTest(versions: args.content.k8sTest.split('-'), label: args.label)
+    k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label)
   }
   if(args?.content?.containsKey('cloud')) {
-    cloud(context: args.label, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule)
+    cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule)
   }
 }
 
@@ -184,9 +184,9 @@ def k8sTest(Map args = [:]) {
   def versions = args.versions
   node(args.label) {
     versions.each{ v ->
-      stage("k8s ${v}"){
+      stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
-          withGithubNotify(context: "K8s ${v}") {
+          withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
