@@ -1,6 +1,8 @@
 projects:
     - "auditbeat"
+    - "deploy/kubernetes"
     - "filebeat"
+    - "generator"
     - "heartbeat"
     - "journalbeat"
     - "libbeat"
@@ -9,14 +11,15 @@ projects:
     - "winlogbeat"
     - "x-pack/auditbeat"
     - "x-pack/dockerlogbeat"
+    - "x-pack/elastic-agent"
     - "x-pack/filebeat"
     - "x-pack/functionbeat"
-    - "x-pack/heartbeat"
-    - "x-pack/journalbeat"
     - "x-pack/libbeat"
     - "x-pack/metricbeat"
-    - "x-pack/packetbeat"
     - "x-pack/winlogbeat"
+    ##- "x-pack/heartbeat"    It's not yet in the 1.0 pipeline.
+    ##- "x-pack/journalbeat"  It's not yet in the 1.0 pipeline.
+    ##- "x-pack/packetbeat"   It's not yet in the 1.0 pipeline.
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:
