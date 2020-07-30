@@ -175,6 +175,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
 - Remove unnecessary restarts of metricsets while using Node autodiscover {pull}19974[19974]
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
+- Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 
 *Auditbeat*
 
