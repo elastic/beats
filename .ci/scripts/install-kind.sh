@@ -18,7 +18,7 @@ then
     fi
 fi
 
-echo "Installing Kind"
+echo "UNMET DEP: Installing Kind"
 
 mkdir -p "${HOME}/bin"
 

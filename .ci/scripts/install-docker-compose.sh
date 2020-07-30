@@ -17,7 +17,7 @@ then
     fi
 fi
 
-echo "Installing docker-compose"
+echo "UNMET DEP: Installing docker-compose"
 
 DC_CMD="${HOME}/bin/docker-compose"
 

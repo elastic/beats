@@ -19,7 +19,7 @@ then
     fi
 fi
 
-echo "Installing Go"
+echo "UNMET DEP: Installing Go"
 mkdir -p "${HOME}/bin"
 
 curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-${ARCH}-amd64"

@@ -20,7 +20,7 @@ then
     fi
 fi
 
-echo "Installing Terraform"
+echo "UNMET DEP: Installing Terraform"
 
 mkdir -p "${HOME}/bin"
 
