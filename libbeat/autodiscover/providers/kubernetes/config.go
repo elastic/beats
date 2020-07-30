@@ -45,7 +45,8 @@ type Config struct {
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
 	// Unique identifies if this provider enables it's templates only when it is elected as leader in a k8s cluster
-	Unique bool `config:"unique"`
+	Unique     bool   `config:"unique"`
+	Identifier string `config:"identifier"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`

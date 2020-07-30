@@ -77,6 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	config := defaultConfig()
+	config.Identifier = uuid.String()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errWrap(err)
@@ -134,7 +135,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	if p.config.Unique {
-		p.initLeaderElectionConfig(client, "some")
+		p.initLeaderElectionConfig(client, p.config.Identifier)
 	}
 
 	return p, nil
