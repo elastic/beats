@@ -122,6 +122,10 @@ pipeline {
   }
 }
 
+/**
+* This method is the one used for running the parallel stages, therefore
+* its arguments are passed by the beatsStages step.
+*/
 def generateStages(Map args = [:]) {
   def projectName = args.project
   def changeset = args.changeset
@@ -190,6 +194,9 @@ def mageTarget(Map args = [:]) {
   }
 }
 
+/**
+* This method wraps all the environment setup and pre-requirements to run any commands.
+*/
 def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
@@ -261,15 +268,25 @@ def withBeatsEnv(Map args = [:], Closure body) {
   }
 }
 
+/**
+* This method fixes the filesystem permissions after the build has happenend. The reason is to
+* ensure any non-ephemeral workers don't have any leftovers that could cause some environmental
+* issues.
+*/
 def fixPermissions(location) {
   if(isUnix()) {
     sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+      set +x
       source ./dev-tools/common.bash
       docker_setup
       script/fix_permissions.sh ${location}""", returnStatus: true)
   }
 }
 
+/**
+* This method installs the required dependencies that are for some reason not available in the
+* CI Workers.
+*/
 def installTools() {
   if(isUnix()) {
     retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
@@ -279,15 +296,15 @@ def installTools() {
 }
 
 /**
-  This method gathers the module name, if required, in order to run the ITs only if
-  the changeset affects a specific module.
-
-  For such, it's required to look for changes under the module folder and exclude anything else
-  such as ascidoc and png files.
+* This method gathers the module name, if required, in order to run the ITs only if
+* the changeset affects a specific module.
+*
+* For such, it's required to look for changes under the module folder and exclude anything else
+* such as ascidoc and png files.
 */
 def getCommonModuleInTheChangeSet(String directory) {
   // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
-  def pattern = (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
+  def pattern = (directory.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
   def module = ''
 
   // Transform folder structure in regex format since path separator is required to be escaped
@@ -301,8 +318,8 @@ def getCommonModuleInTheChangeSet(String directory) {
 }
 
 /**
-  This method archives and report the tests output, for such, it searches in certain folders
-  to bypass some issues when working with big repositories.
+* This method archives and report the tests output, for such, it searches in certain folders
+* to bypass some issues when working with big repositories.
 */
 def archiveTestOutput(Map args = [:]) {
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -325,6 +342,10 @@ def archiveTestOutput(Map args = [:]) {
   }
 }
 
+/**
+* This method wraps the junit built-in step to archive the test reports that gonna be populated later on
+* with the runbld post build step.
+*/
 def junitAndStore(Map args = [:]){
   junit(args)
   // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
@@ -333,6 +354,10 @@ def junitAndStore(Map args = [:]){
   stashedTestReports[stageName] = stageName
 }
 
+/**
+* This method populates the test output using the runbld approach. For such it requires the
+* global variable stashedTestReports. 
+*/
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
