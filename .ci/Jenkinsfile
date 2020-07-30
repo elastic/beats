@@ -80,7 +80,7 @@ pipeline {
       }
       steps {
         whenFalse(true) { // TODO: disable for the time being.
-          makeTarget(context: "Lint", target: 'make check')
+          target(context: "Lint", target: 'make check')
         }
       }
     }
@@ -154,10 +154,10 @@ def generateStages(Map args = [:]) {
 def runCommand(Map args = [:]) {
   def withModule = args.content.get('withModule', false)
   if(args?.content?.containsKey('make')) {
-    makeTarget(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule)
+    target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false)
   }
   if(args?.content?.containsKey('mage')) {
-    mageTarget(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule)
+    target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true)
   }
   if(args?.content?.containsKey('k8sTest')) {
     k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label)
@@ -174,7 +174,7 @@ def cloud(Map args = [:]) {
     }
   }
   withCloudTestEnv() {
-    mageTarget(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule)
+    target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true)
   }
 }
 
@@ -203,31 +203,24 @@ def k8sTest(Map args = [:]) {
   }
 }
 
-def makeTarget(Map args = [:]) {
+/**
+* This method runs the given command supporting two kind of scenarios:
+*  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
+*  - mage then the dir(location) is required, aka by enabling isMage: true.
+*/
+def target(Map args = [:]) {
   def context = args.context
   def command = args.command
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
+  def isMage = args.get('isMage', false)
   node(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
         dumpVariables()
-        cmd(label: "${command}", script: "${command}")
-      }
-    }
-  }
-}
-
-def mageTarget(Map args = [:]) {
-  def context = args.context
-  def command = args.command
-  def directory = args.directory
-  def withModule = args.get('withModule', false)
-  node(args.label) {
-    withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory) {
-        dumpVariables()
-        dir(directory) {
+        // make commands use -C <folder> while mage commands require the dir(folder)
+        // let's support this scenario with the location variable.
+        dir(isMage ? directory : '') {
           cmd(label: "${command}", script: "${command}")
         }
       }
@@ -344,7 +337,7 @@ def installTools() {
 * such as ascidoc and png files.
 */
 def getCommonModuleInTheChangeSet(String directory) {
-  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
+  // Use contains to support the target(target: 'make -C <folder>') while target(directory: '<folder>', target: '...')
   def pattern = (directory.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
   def module = ''
 
