@@ -337,7 +337,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 
 	c := newConfig(t, moduleConf)
 
-	baseModule, err := newBaseModuleFromConfig(c)
+	baseModule, err := NewBaseModuleFromConfig(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, moduleName, baseModule.Name())

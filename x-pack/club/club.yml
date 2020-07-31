@@ -7,8 +7,8 @@ inputs:
   # - syslog.identifier=test
 
 # collect system metrics
-- type: metrics/system
-  enabled: false
+- type: metrics/system/process
+  enabled: true
   period: 60
 
 - type: audit/file_integrity
@@ -23,13 +23,13 @@ inputs:
 
 # monitor local NAS
 - type: monitor/icmp
-  enabled: true
+  enabled: false
   hosts: ["festplatte"]
   schedule: "@every 5s"
 
 # monitor and analyzer DNS, HTTP and HTTPS traffic
 - type: net/sniffer
-  enabled: true
+  enabled: false
   interface.device: [lo, enp39s0, wlo1]
   protocols:
   - type: icmp

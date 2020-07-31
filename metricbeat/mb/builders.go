@@ -52,7 +52,7 @@ func NewModule(config *common.Config, r *Register) (Module, []MetricSet, error) 
 		return nil, nil, ErrModuleDisabled
 	}
 
-	bm, err := newBaseModuleFromConfig(config)
+	bm, err := NewBaseModuleFromConfig(config)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -70,9 +70,9 @@ func NewModule(config *common.Config, r *Register) (Module, []MetricSet, error) 
 	return module, metricsets, nil
 }
 
-// newBaseModuleFromConfig creates a new BaseModule from config. The returned
+// NewBaseModuleFromConfig creates a new BaseModule from config. The returned
 // BaseModule's name will always be lower case.
-func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
+func NewBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
@@ -180,26 +180,30 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to generate ID for metricset")
 			}
-			msID := id.String()
-			metrics := monitoring.NewRegistry()
-			monitoring.NewString(metrics, "module").Set(m.Name())
-			monitoring.NewString(metrics, "metricset").Set(name)
-			if host != "" {
-				monitoring.NewString(metrics, "host").Set(host)
-			}
-			monitoring.NewString(metrics, "id").Set(msID)
-
-			metricsets = append(metricsets, BaseMetricSet{
-				id:      msID,
-				name:    name,
-				module:  m,
-				host:    host,
-				metrics: metrics,
-				logger:  logp.NewLogger(m.Name() + "." + name),
-			})
+			metricsets = append(metricsets, NewBaseMetricSet(m, id.String(), name, host, HostData{URI: host}))
 		}
 	}
 	return metricsets, nil
+}
+
+func NewBaseMetricSet(module Module, id, name, host string, hostData HostData) BaseMetricSet {
+	metrics := monitoring.NewRegistry()
+	monitoring.NewString(metrics, "module").Set(module.Name())
+	monitoring.NewString(metrics, "metricset").Set(name)
+	if host != "" {
+		monitoring.NewString(metrics, "host").Set(host)
+	}
+	monitoring.NewString(metrics, "id").Set(id)
+
+	return BaseMetricSet{
+		id:       id,
+		name:     name,
+		module:   module,
+		host:     host,
+		hostData: hostData,
+		metrics:  metrics,
+		logger:   logp.NewLogger(module.Name() + "." + name),
+	}
 }
 
 // mustHaveModule returns an error if the given MetricSet's Module() method

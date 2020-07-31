@@ -207,8 +207,7 @@ func makeInputRegistry(info beat.Info, log *logp.Logger, sched *scheduler.Schedu
 
 		// metricbeat,`auditbeat, heartbeat based on legacy runner factories
 		registries.Prefixed("monitor", makeHeartbeatRegistry(sched)),
-		registries.Prefixed("metrics", makeMetricbeatRegistry(info, nil)),
-		registries.Prefixed("audit", makeAuditbeatRegistry(info, nil)),
+		registries.Prefixed("metrics", makeMetricbeatRegistry()),
 	)
 }
 
