@@ -537,18 +537,10 @@ def normalise(String directory) {
 * regex pattern.
 */
 def getProjectDependencies(Map args = [:]) {
-  def beatName = args.project
   def output = ""
-
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """#!/usr/bin/env bash
-      set +x
-      eval \$(gvm "${GO_VERSION}")
-      go list -deps ./${beatName} \
-        | grep 'elastic/beats' \
-        | sed -e "s#github.com/elastic/beats/v7/##g" \
-        | awk '{print "^" \$1 "/.*"}'
-    """)
+    output = sh(label: 'Get vendor dependency patterns', returnStdout: true,
+                script: ".ci/scripts/get-vendor-dependencies.sh ${args.project}")
   }
   return output?.split('\n').collect{ item -> item as String }
 }
