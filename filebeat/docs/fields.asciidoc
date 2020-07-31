@@ -45379,7 +45379,7 @@ Roles to which the principal belongs
 
 type: keyword
 
-example: ['kibana_user', 'beats_admin']
+example: ['kibana_admin', 'beats_admin']
 
 --
 
