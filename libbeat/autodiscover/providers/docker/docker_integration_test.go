@@ -36,6 +36,8 @@ import (
 
 // Test docker start emits an autodiscover event
 func TestDockerStart(t *testing.T) {
+	t.Skip("#20360 Flaky TestDockerStart skipped")
+
 	log := logp.NewLogger("docker")
 
 	d, err := dk.NewClient()
