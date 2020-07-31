@@ -14,7 +14,7 @@ inputs:
       - type: http
         name: MyHTTPMonitor
         id: my-id
-        target: "https://elastic.co"
+        url: "https://elastic.co"
         schedule: "@every 10s"
         http: # example HTTP specific option
           user: blah
@@ -22,12 +22,13 @@ inputs:
       - type: icmp
         name: MyICMPMonitor
         id: my-icmp-id
-        target: "elastic.co"
+        host: "elastic.co"
         schedule: "@every 10s"
       - type: tcp
         name: MyTCPMonitor
         id: my-tcp-id
-        target: "elastic.co:80"
+        host: "elastic.co"
+        port: 80
         schedule: "@every 10s"
   - type: system/metrics
 
