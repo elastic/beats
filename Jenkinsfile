@@ -1089,6 +1089,7 @@ def dumpFilteredEnvironment(){
   echo "TIMEOUT: ${env.TIMEOUT}"
   echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
   echo "PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}"
+  echo "PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}"
   echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
