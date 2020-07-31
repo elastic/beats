@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,9 +13,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -35,48 +37,75 @@ var (
 	timeNow = time.Now
 )
 
-// httpJSONInput struct has the HttpJsonInput configuration and other userful info.
-type httpJSONInput struct{}
+type retryLogger struct {
+	log *logp.Logger
+}
 
-// Plugin create a stateful input Plugin collecting logs from HTTPJSONInput.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
-	return input.Plugin{
-		Name:       inputName,
-		Stability:  feature.Beta,
-		Deprecated: false,
-		Info:       "HTTP JSON Input",
-		Manager: &cursor.InputManager{
-			Logger:     log.Named(inputName),
-			StateStore: store,
-			Type:       inputName,
-			Configure:  configure,
-		},
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
 	}
 }
 
-func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, err
+func (log *retryLogger) Error(format string, args ...interface{}) {
+	log.log.Errorf(format, args...)
+}
+
+func (log *retryLogger) Info(format string, args ...interface{}) {
+	log.log.Infof(format, args...)
+}
+
+func (log *retryLogger) Debug(format string, args ...interface{}) {
+	log.log.Debugf(format, args...)
+}
+
+func (log *retryLogger) Warn(format string, args ...interface{}) {
+	log.log.Warnf(format, args...)
+}
+
+type httpJSONInput struct {
+	config    config
+	tlsConfig *tlscommon.TLSConfig
+}
+
+func Plugin() v2.Plugin {
+	return v2.Plugin{
+		Name:       inputName,
+		Stability:  feature.Beta,
+		Deprecated: false,
+		Manager:    stateless.NewInputManager(configure),
+	}
+}
+
+func configure(cfg *common.Config) (stateless.Input, error) {
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err != nil {
+		return nil, err
 	}
 
-	httpClient, err := newHTTPClient(config)
+	return newHTTPJSONInput(conf)
+}
+
+func newHTTPJSONInput(config config) (*httpJSONInput, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	r := &requester{config: config, client: httpClient}
-
-	in := &httpJSONInput{}
-
-	return []cursor.Source{r}, in, nil
+	return &httpJSONInput{
+		config:    config,
+		tlsConfig: tlsConfig,
+	}, nil
 }
 
 func (*httpJSONInput) Name() string { return inputName }
 
-func (*httpJSONInput) Test(source cursor.Source, ctx input.TestContext) error {
-	requester := source.(*requester)
-	url, err := url.Parse(requester.config.URL)
+func (in *httpJSONInput) Test(v2.TestContext) error {
+	url, err := url.Parse(in.config.URL)
 	if err != nil {
 		return err
 	}
@@ -92,9 +121,9 @@ func (*httpJSONInput) Test(source cursor.Source, ctx input.TestContext) error {
 		return "80"
 	}()
 
-	_, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%s", url.Hostname(), port), time.Second)
+	_, err = net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
 	if err != nil {
-		return fmt.Errorf("url %q is unreachable", requester.config.URL)
+		return fmt.Errorf("url %q is unreachable", in.config.URL)
 	}
 
 	return nil
@@ -102,34 +131,34 @@ func (*httpJSONInput) Test(source cursor.Source, ctx input.TestContext) error {
 
 // Run starts the input worker then returns. Only the first invocation
 // will ever start the worker.
-func (in *httpJSONInput) Run(
-	ctx input.Context,
-	source cursor.Source,
-	cursor cursor.Cursor,
-	publisher cursor.Publisher,
-) error {
-	requester := source.(*requester)
-
-	log := ctx.Logger.With("url", requester.config.URL)
-	requester.log = log
-
-	requester.loadCheckpoint(cursor)
+func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
+	log := ctx.Logger.With("url", in.config.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	ri := &requestInfo{
-		contentMap: common.MapStr{},
-		headers:    requester.config.HTTPHeaders,
+	httpClient, err := in.newHTTPClient(stdCtx)
+	if err != nil {
+		return err
 	}
 
-	if requester.config.HTTPMethod == "POST" &&
-		requester.config.HTTPRequestBody != nil {
-		ri.contentMap.Update(common.MapStr(requester.config.HTTPRequestBody))
-	}
+	dateCursor := newDateCursorFromConfig(in.config, log)
 
-	err := requester.processHTTPRequest(stdCtx, publisher, ri)
-	if err == nil && requester.config.Interval > 0 {
-		ticker := time.NewTicker(requester.config.Interval)
+	rateLimiter := newRateLimiterFromConfig(in.config, log)
+
+	pagination := newPaginationFromConfig(in.config)
+
+	requester := newRequester(
+		in.config,
+		rateLimiter,
+		dateCursor,
+		pagination,
+		httpClient,
+		log,
+	)
+
+	err = requester.processHTTPRequest(stdCtx, publisher)
+	if err == nil && in.config.Interval > 0 {
+		ticker := time.NewTicker(in.config.Interval)
 		defer ticker.Stop()
 		for {
 			select {
@@ -138,7 +167,7 @@ func (in *httpJSONInput) Run(
 				return nil
 			case <-ticker.C:
 				log.Info("Process another repeated request.")
-				err = requester.processHTTPRequest(stdCtx, publisher, ri)
+				err = requester.processHTTPRequest(stdCtx, publisher)
 				if err != nil {
 					return err
 				}
@@ -149,34 +178,29 @@ func (in *httpJSONInput) Run(
 	return err
 }
 
-func newHTTPClient(config config) (*http.Client, error) {
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
+func (in *httpJSONInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
 	// Make retryable HTTP client
-	var client *retryablehttp.Client = &retryablehttp.Client{
+	client := &retryablehttp.Client{
 		HTTPClient: &http.Client{
 			Transport: &http.Transport{
 				DialContext: (&net.Dialer{
-					Timeout: config.HTTPClientTimeout,
+					Timeout: in.config.HTTPClientTimeout,
 				}).DialContext,
-				TLSClientConfig:   tlsConfig.ToConfig(),
+				TLSClientConfig:   in.tlsConfig.ToConfig(),
 				DisableKeepAlives: true,
 			},
-			Timeout: config.HTTPClientTimeout,
+			Timeout: in.config.HTTPClientTimeout,
 		},
 		Logger:       newRetryLogger(),
-		RetryWaitMin: config.RetryWaitMin,
-		RetryWaitMax: config.RetryWaitMax,
-		RetryMax:     config.RetryMax,
+		RetryWaitMin: in.config.RetryWaitMin,
+		RetryWaitMax: in.config.RetryWaitMax,
+		RetryMax:     in.config.RetryMax,
 		CheckRetry:   retryablehttp.DefaultRetryPolicy,
 		Backoff:      retryablehttp.DefaultBackoff,
 	}
 
-	if config.OAuth2.IsEnabled() {
-		return config.OAuth2.Client(client.StandardClient())
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client.StandardClient())
 	}
 
 	return client.StandardClient(), nil

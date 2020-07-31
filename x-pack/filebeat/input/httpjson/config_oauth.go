@@ -66,8 +66,8 @@ func (o *OAuth2) IsEnabled() bool {
 }
 
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
-func (o *OAuth2) Client(client *http.Client) (*http.Client, error) {
-	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, client)
+func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client, error) {
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.GetProvider() {
 	case OAuth2ProviderAzure, OAuth2ProviderDefault:

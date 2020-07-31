@@ -609,3 +609,51 @@ class Test(BaseTest):
         assert json.loads(output[1]["message"]) == message[1]
         assert json.loads(output[2]["message"]) == message[0]
         assert json.loads(output[3]["message"]) == message[1]
+
+    def test_pagination(self):
+        """
+        Test httpjson input works correctly with pagination
+        """
+
+        message = [
+            {"@timestamp": "2002-10-02T15:00:00Z", "nextPageToken": "bar", "items": [{"foo": "bar"}]},
+            {"@timestamp": "2002-10-02T15:00:01Z", "items": [{"bar": "bazz"}]}
+        ]
+
+        times = 0
+
+        def handler():
+            nonlocal times
+            if times == 1:
+                if request.values["page"] != "bar":
+                    resp = jsonify({"error": "wrong page token"})
+                    resp.status_code = 400
+                    return resp
+            resp = jsonify(message[times])
+            times += 1
+            return resp
+
+        shutdown_func = self.start_server("GET", handler)
+
+        options = [
+            "http_method: GET",
+            "interval: 300ms",
+            "url: http://localhost:5000",
+            "pagination.id_field: nextPageToken",
+            "pagination.url_field: page",
+            "json_objects_array: items"
+        ]
+        self.set_config(options)
+
+        filebeat = self.start_beat()
+
+        self.wait_until(lambda: self.output_count(lambda x: x == 2))
+
+        filebeat.check_kill_and_wait()
+        shutdown_func()
+
+        output = self.read_output()
+
+        assert output[0]["input.type"] == "httpjson"
+        assert json.loads(output[0]["message"]) == {"foo": "bar"}
+        assert json.loads(output[1]["message"]) == {"bar": "bazz"}

@@ -7,9 +7,7 @@ package httpjson
 import (
 	"net/http"
 	"regexp"
-	"strconv"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -33,21 +31,21 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		"id": 100,
 	}
 	extraBodyContent := common.MapStr{"extra_body": "abc"}
-	config := &Pagination{
-		IDField:          "id",
-		RequestField:     "pagination_id",
-		ExtraBodyContent: extraBodyContent,
-		URL:              "https://test-123",
+	pagination := &pagination{
+		idField:          "id",
+		requestField:     "pagination_id",
+		extraBodyContent: extraBodyContent,
+		url:              "https://test-123",
 	}
-	ri, err := createRequestInfoFromBody(
-		config,
+	ri := &requestInfo{
+		url:        "",
+		contentMap: common.MapStr{},
+		headers:    common.MapStr{},
+	}
+	err := pagination.setRequestInfoFromBody(
 		common.MapStr(m),
 		common.MapStr(m),
-		&requestInfo{
-			url:        "",
-			contentMap: common.MapStr{},
-			headers:    common.MapStr{},
-		},
+		ri,
 	)
 	if ri.url != "https://test-123" {
 		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
@@ -75,57 +73,5 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		}
 	default:
 		t.Fatalf("Failed to test createRequestInfoFromBody. extra_body type %T should be string.", bt)
-	}
-}
-
-// Test getRateLimit function with a remaining quota, expect to receive 0, nil.
-func TestGetRateLimitCase1(t *testing.T) {
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "120")
-	header.Add("X-Rate-Limit-Remaining", "118")
-	header.Add("X-Rate-Limit-Reset", "1581658643")
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
-	}
-	epoch, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch != 0 {
-		t.Fatal("Failed to test getRateLimit.")
-	}
-}
-
-// Test getRateLimit function with a past time, expect to receive 0, nil.
-func TestGetRateLimitCase2(t *testing.T) {
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "10")
-	header.Add("X-Rate-Limit-Remaining", "0")
-	header.Add("X-Rate-Limit-Reset", "1581658643")
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
-	}
-	epoch, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch != 0 {
-		t.Fatal("Failed to test getRateLimit.")
-	}
-}
-
-// Test getRateLimit function with a time yet to come, expect to receive <reset-value>, nil.
-func TestGetRateLimitCase3(t *testing.T) {
-	epoch := time.Now().Unix() + 100
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "10")
-	header.Add("X-Rate-Limit-Remaining", "0")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(epoch, 10))
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
-	}
-	epoch2, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch2 != epoch {
-		t.Fatal("Failed to test getRateLimit.")
 	}
 }
