@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
@@ -113,12 +114,12 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 
 		// create symlink to elastic-agent-{hash}
 		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(os.Args[0]))
-		argsOverrides := []string{
-			"--path.data", paths.Data(),
-			"--path.home", filepath.Dir(reexecPath),
-			"--path.config", paths.Config(),
+		if err := os.Symlink(reexecPath, origExecPath); err != nil {
+			return err
 		}
-		if err := createSymlink(origExecPath, reexecPath, argsOverrides...); err != nil {
+
+		// generate paths
+		if err := generatePaths(filepath.Dir(reexecPath)); err != nil {
 			return err
 		}
 
@@ -147,6 +148,12 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 
 		rexLogger := logger.Named("reexec")
 		rm := reexec.Manager(rexLogger, reexecPath)
+
+		argsOverrides := []string{
+			"--path.data", paths.Data(),
+			"--path.home", filepath.Dir(reexecPath),
+			"--path.config", paths.Config(),
+		}
 		rm.ReExec(argsOverrides...)
 
 		// trigger reexec
@@ -169,4 +176,18 @@ func hashedDirName(filecontent []byte) string {
 	}
 
 	return fmt.Sprintf("elastic-agent-%s", s)
+}
+func generatePaths(dir string) error {
+	pathsCfg := map[string]interface{}{
+		"--path.data":   paths.Data(),
+		"--path.home":   dir,
+		"--path.config": paths.Config(),
+	}
+	pathsCfgPath := filepath.Join(dir, "paths.yml")
+	pathsContent, err := yaml.Marshal(pathsCfg)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(pathsCfgPath, pathsContent, 0740)
 }

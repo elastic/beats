@@ -8,6 +8,8 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 var (
@@ -17,14 +19,37 @@ var (
 	logsPath   string
 )
 
+type paths struct {
+	HomePath   string `yaml:"path.home"`
+	ConfigPath string `yaml:"path.config"`
+	DataPath   string `yaml:"path.data"`
+	LogsPath   string `yaml:"path.logs"`
+}
+
 func init() {
-	exePath := retrieveExecutablePath()
+	defaults := getDefaultValues()
 
 	fs := flag.CommandLine
-	fs.StringVar(&homePath, "path.home", exePath, "Agent root path")
-	fs.StringVar(&configPath, "path.config", exePath, "Config path is the directory Agent looks for its config file")
-	fs.StringVar(&dataPath, "path.data", filepath.Join(exePath, "data"), "Data path contains Agent managed binaries")
-	fs.StringVar(&logsPath, "path.logs", exePath, "Logs path contains Agent log output")
+	fs.StringVar(&homePath, "path.home", defaults.HomePath, "Agent root path")
+	fs.StringVar(&configPath, "path.config", defaults.ConfigPath, "Config path is the directory Agent looks for its config file")
+	fs.StringVar(&dataPath, "path.data", defaults.DataPath, "Data path contains Agent managed binaries")
+	fs.StringVar(&logsPath, "path.logs", defaults.LogsPath, "Logs path contains Agent log output")
+}
+
+func getDefaultValues() paths {
+	exePath := retrieveExecutablePath()
+	defaults := paths{
+		HomePath:   exePath,
+		ConfigPath: exePath,
+		DataPath:   filepath.Join(exePath, "data"),
+		LogsPath:   exePath,
+	}
+
+	if rawConfig, err := config.LoadYAML("paths.yml"); err == nil {
+		rawConfig.Unpack(&defaults)
+	}
+
+	return defaults
 }
 
 // Home returns a directory where binary lives
