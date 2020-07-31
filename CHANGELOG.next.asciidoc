@@ -189,6 +189,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - auditd: Fix spelling of anomaly in `event.category`.
 - auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
 - auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
+- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
 
 *Filebeat*
 
