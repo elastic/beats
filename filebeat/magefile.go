@@ -218,7 +218,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "NOSE_"), "GENERATE")...)
+	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {
 		return err
 	}
