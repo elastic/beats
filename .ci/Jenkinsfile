@@ -410,6 +410,8 @@ def runbld() {
         }
         sh(label: 'Process JUnit reports with runbld',
           script: '''\
+          ## for debugging purposes
+          find . -name "TEST-*.xml"
           cat >./runbld-script <<EOF
           echo "Processing JUnit reports with runbld..."
           EOF
