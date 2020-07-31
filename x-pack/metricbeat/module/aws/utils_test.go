@@ -377,7 +377,7 @@ func TestFindIdentifierFromARN(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		identifier, err := FindIdentifierFromARN(c.resourceARN)
+		identifier, err := FindShortIdentifierFromARN(c.resourceARN)
 		assert.NoError(t, err)
 		assert.Equal(t, c.expectedIdentifier, identifier)
 	}
@@ -388,7 +388,7 @@ func TestGetResourcesTags(t *testing.T) {
 	mockSvc := &MockResourceGroupsTaggingClient{}
 	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(resourceTagMap))
+	assert.Equal(t, 4, len(resourceTagMap))
 
 	expectedResourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapi.Tag{
@@ -402,6 +402,26 @@ func TestGetResourcesTags(t *testing.T) {
 		},
 	}
 	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("finance"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("boo"),
+		},
+	}
+	expectedResourceTagMap["db:mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("engineering"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("foo"),
+		},
+	}
+	expectedResourceTagMap["db:mysql-db-2"] = []resourcegroupstaggingapi.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("finance"),
