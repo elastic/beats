@@ -14,7 +14,7 @@ if __name__ == "__main__":
                 with open(os.path.join(root, file), 'r') as f:
                     doc = yaml.load(f, Loader=yaml.FullLoader)
                 module = root.replace(".{}".format(os.sep), '')
-                platforms = [ doc["platform"] ]
+                platforms = [doc["platform"]]
                 when = ""
                 if "branches" in doc["when"]:
                     when = f"{when}/:palm_tree:"
@@ -40,7 +40,8 @@ if __name__ == "__main__":
                         withModule = doc["stages"][stage]["withModule"]
                     if "when" in doc["stages"][stage]:
                         when = f"{when}/:star:"
-                    print("| {} | {} | `{}` | {} | `{}` | {} |".format(module, stage, command, withModule, platforms, when))
+                    print("| {} | {} | `{}` | {} | `{}` | {} |".format(
+                        module, stage, command, withModule, platforms, when))
 
 print("> :palm_tree: -> Git Branch based")
 print("> :label: -> GitHub Pull Request Label based")
