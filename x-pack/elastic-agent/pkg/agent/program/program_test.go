@@ -401,8 +401,8 @@ func TestConfiguration(t *testing.T) {
 		// 	expected: 1,
 		// },
 		"synthetics_config": {
-		 	programs: []string{"heartbeat"},
-		 	expected: 1,
+			programs: []string{"heartbeat"},
+			expected: 1,
 		},
 		"enabled_true": {
 			programs: []string{"filebeat"},
