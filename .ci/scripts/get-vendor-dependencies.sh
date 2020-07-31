@@ -4,7 +4,7 @@
 # used by the CI to enable/disable specific stages as long as the changeset
 # matches any of those patterns.
 #
-set -euo pipefail
+
 GO_VERSION=${GO_VERSION:?"GO_VERSION environment variable is not set"}
 BEATS=${1:?"parameter missing."}
 eval "$(gvm "${GO_VERSION}")"
