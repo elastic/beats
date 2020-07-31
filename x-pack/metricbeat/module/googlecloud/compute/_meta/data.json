@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "17557085450298074",
+            "name": "gke-chrismark-leaderelec-default-pool-896893cb-t17x"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "e2-medium"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,31 +23,31 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 171
+                    "value": 432
                 },
                 "dropped_packets_count": {
-                    "value": 4
+                    "value": 6
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 2
+                        "value": 1
                     },
                     "usage_time": {
-                        "value": 0.1803964574089818
+                        "value": 9.515682164234931
                     },
                     "utilization": {
-                        "value": 0.001503303811741515
+                        "value": 0.15859470273724885
                     }
                 },
                 "memory": {
                     "balloon": {
                         "ram_size": {
-                            "value": 7896264704
+                            "value": 4140863488
                         },
                         "ram_used": {
-                            "value": 416518144
+                            "value": 2765357056
                         },
                         "swap_in_bytes_count": {
                             "value": 0
@@ -58,15 +58,22 @@
                     }
                 },
                 "uptime": {
-                    "value": 60.000000000000455
+                    "value": 60.000000000007276
                 }
             }
         },
         "labels": {
             "user": {
-                "created-by": "ks"
+                "goog-gke-node": ""
             }
         }
+    },
+    "host": {
+        "cpu": {
+            "pct": 15.859470273724884
+        },
+        "id": "17557085450298074",
+        "name": "gke-chrismark-leaderelec-default-pool-896893cb-t17x"
     },
     "metricset": {
         "name": "compute",

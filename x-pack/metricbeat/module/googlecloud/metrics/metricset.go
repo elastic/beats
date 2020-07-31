@@ -169,8 +169,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 	events := make([]mb.Event, 0)
 	for _, groupedEvents := range tsGrouped {
 		event := mb.Event{
-			Timestamp:  groupedEvents[0].Timestamp,
-			RootFields: groupedEvents[0].ECS,
+			Timestamp: groupedEvents[0].Timestamp,
 			ModuleFields: common.MapStr{
 				"labels": groupedEvents[0].Labels,
 			},
@@ -179,6 +178,12 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 
 		for _, singleEvent := range groupedEvents {
 			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
+		}
+
+		if serviceName == "compute" {
+			event.RootFields = addHostFields(groupedEvents)
+		} else {
+			event.RootFields = groupedEvents[0].ECS
 		}
 
 		events = append(events, event)
@@ -265,4 +270,37 @@ func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta ma
 
 	metricsWithMeta[out.Type] = meta
 	return metricsWithMeta
+}
+
+func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
+	hostRootFields := groupedEvents[0].ECS
+	// add host.id and host.name
+	if hostID, err := groupedEvents[0].ECS.GetValue("cloud.instance.id"); err == nil {
+		hostRootFields.Put("host.id", hostID)
+	}
+
+	if hostName, err := groupedEvents[0].ECS.GetValue("cloud.instance.name"); err == nil {
+		hostRootFields.Put("host.name", hostName)
+	}
+
+	hostFieldTable := map[string]string{
+		"instance.cpu.utilization.value":                "host.cpu.pct",
+		"instance.network.sent_bytes_count.value":       "host.network.in.bytes",
+		"instance.network.received_bytes_count.value":   "host.network.out.bytes",
+		"instance.network.sent_packets_count.value":     "host.network.in.packets",
+		"instance.network.received_packets_count.value": "host.network.out.packets",
+		"instance.disk.read_bytes_count.value":          "host.disk.read.bytes",
+		"instance.disk.write_bytes_count.value":         "host.disk.write.bytes",
+	}
+
+	for _, singleEvent := range groupedEvents {
+		if hostMetricName, ok := hostFieldTable[singleEvent.Key]; ok {
+			if hostMetricName == "host.cpu.pct" {
+				hostRootFields.Put(hostMetricName, singleEvent.Value.(float64)*100)
+			} else {
+				hostRootFields.Put(hostMetricName, singleEvent.Value)
+			}
+		}
+	}
+	return hostRootFields
 }

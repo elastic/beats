@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "8825965883407652424",
+            "name": "heartbeat-los-angeles"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "n1-standard-8"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-west2-a",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,50 +23,37 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 171
+                    "value": 586
                 },
                 "dropped_packets_count": {
-                    "value": 4
+                    "value": 6
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 2
+                        "value": 0.2
                     },
                     "usage_time": {
-                        "value": 0.1803964574089818
+                        "value": 1.0218381873273756
                     },
                     "utilization": {
-                        "value": 0.001503303811741515
-                    }
-                },
-                "memory": {
-                    "balloon": {
-                        "ram_size": {
-                            "value": 7896264704
-                        },
-                        "ram_used": {
-                            "value": 416518144
-                        },
-                        "swap_in_bytes_count": {
-                            "value": 0
-                        },
-                        "swap_out_bytes_count": {
-                            "value": 0
-                        }
+                        "value": 0.0851531822772813
                     }
                 },
                 "uptime": {
-                    "value": 60.000000000000455
+                    "value": 60
                 }
             }
         },
-        "labels": {
-            "user": {
-                "created-by": "ks"
-            }
-        }
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "pct": 8.51531822772813
+        },
+        "id": "8825965883407652424",
+        "name": "heartbeat-los-angeles"
     },
     "metricset": {
         "name": "compute",

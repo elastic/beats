@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "8825965883407652424",
+            "name": "heartbeat-los-angeles"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "n1-standard-8"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-west2-a",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -24,16 +24,16 @@
             "instance": {
                 "network": {
                     "received_bytes_count": {
-                        "value": 13073
+                        "value": 2817591
                     },
                     "received_packets_count": {
-                        "value": 95
+                        "value": 2528
                     },
                     "sent_bytes_count": {
-                        "value": 0
+                        "value": 121736
                     },
                     "sent_packets_count": {
-                        "value": 0
+                        "value": 754
                     }
                 }
             }
@@ -41,9 +41,20 @@
         "labels": {
             "metrics": {
                 "loadbalanced": "false"
+            }
+        }
+    },
+    "host": {
+        "id": "8825965883407652424",
+        "name": "heartbeat-los-angeles",
+        "network": {
+            "in": {
+                "bytes": 121736,
+                "packets": 754
             },
-            "user": {
-                "created-by": "ks"
+            "out": {
+                "bytes": 2817591,
+                "packets": 2528
             }
         }
     },

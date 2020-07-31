@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "7920542032463815386",
+            "name": "gke-chrismark-leaderelec-default-pool-896893cb-nm8x"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "e2-medium"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,31 +23,31 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 277
+                    "value": 211
                 },
                 "dropped_packets_count": {
-                    "value": 5
+                    "value": 3
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 2
+                        "value": 1
                     },
                     "usage_time": {
-                        "value": 0.18404532833979204
+                        "value": 8.026239710991831
                     },
                     "utilization": {
-                        "value": 0.001533711069498267
+                        "value": 0.13377066184986386
                     }
                 },
                 "memory": {
                     "balloon": {
                         "ram_size": {
-                            "value": 7896264704
+                            "value": 4140863488
                         },
                         "ram_used": {
-                            "value": 416260096
+                            "value": 2498785280
                         },
                         "swap_in_bytes_count": {
                             "value": 0
@@ -64,9 +64,16 @@
         },
         "labels": {
             "user": {
-                "created-by": "ks"
+                "goog-gke-node": ""
             }
         }
+    },
+    "host": {
+        "cpu": {
+            "pct": 13.377066184986386
+        },
+        "id": "7920542032463815386",
+        "name": "gke-chrismark-leaderelec-default-pool-896893cb-nm8x"
     },
     "metricset": {
         "name": "compute",
