@@ -276,7 +276,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "TEST_COVERAGE=true",
     "TEST_TAGS=${env.TEST_TAGS},oracle"
   ]) {
-    if(isInstalled(tool: 'docker', flag: '--version')) {
+    if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
@@ -607,4 +607,13 @@ def dumpVariables(){
   XPACK_SUFFIX: ${env.XPACK_SUFFIX}
   ### END ENV DUMP ###
   """
+}
+
+def isDockerInstalled(){
+  if (isUnix()) {
+    // TODO: some issues with macosx if(isInstalled(tool: 'docker', flag: '--version')) {
+    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+  } else {
+    return false
+  }
 }
