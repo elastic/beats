@@ -5,26 +5,26 @@
 package cmd
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"sync"
-	"syscall"
 
 	"github.com/spf13/cobra"
 
 	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
-	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 const (
@@ -101,51 +101,59 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 			return err
 		}
 
-		// prepare cancellation handling
-		var wg sync.WaitGroup
-		stop := make(chan struct{})
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
-
-		// wrapped so service cancellation is communicated in case of os.Exit
-		serviceHandler := func() error {
-			// Windows: Mark service as stopped.
-			// After this is run, the service is considered by the OS to be stopped.
-			// This must be the first deferred cleanup task (last to execute).
-			defer service.NotifyTermination()
-
-			stopFn := func() {
-				close(stop)
-			}
-			_, cancel := context.WithCancel(context.Background())
-
-			service.BeforeRun()
-			service.HandleSignals(stopFn, cancel)
-			defer service.Cleanup()
-
-			if err := startSubprocess(flags, content, stop, &wg); err != nil {
-				return err
-			}
-			return nil
-		}
-
-		if err := serviceHandler(); err != nil {
+		// rename itself
+		origExecPath, err := os.Executable()
+		if err != nil {
 			return err
 		}
 
-		select {
-		case <-stop:
-			break
-		case <-signals:
-			close(stop)
-			break
+		if err := os.Rename(origExecPath, origExecPath+".bak"); err != nil {
+			return err
 		}
 
-		wg.Wait()
+		// create symlink to elastic-agent-{hash}
+		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(os.Args[0]))
+		argsOverrides := []string{
+			"--path.data", paths.Data(),
+			"--path.home", filepath.Dir(reexecPath),
+			"--path.config", paths.Config(),
+		}
+		if err := createSymlink(origExecPath, reexecPath, argsOverrides...); err != nil {
+			return err
+		}
 
-		// prevent running Run function
+		// reexec
+		pathConfigFile := flags.Config()
+		rawConfig, err := config.LoadYAML(pathConfigFile)
+		if err != nil {
+			return errors.New(err,
+				fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+				errors.TypeFilesystem,
+				errors.M(errors.MetaKeyPath, pathConfigFile))
+		}
+
+		cfg, err := configuration.NewFromConfig(rawConfig)
+		if err != nil {
+			return errors.New(err,
+				fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+				errors.TypeFilesystem,
+				errors.M(errors.MetaKeyPath, pathConfigFile))
+		}
+
+		logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		if err != nil {
+			return err
+		}
+
+		rexLogger := logger.Named("reexec")
+		rm := reexec.Manager(rexLogger, reexecPath)
+		rm.ReExec(argsOverrides...)
+
+		// trigger reexec
+		rm.ShutdownComplete()
+
+		// return without running Run method
 		os.Exit(0)
-
 		return nil
 	}
 }
