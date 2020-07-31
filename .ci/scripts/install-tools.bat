@@ -29,7 +29,7 @@ mage -version
 where mage
 
 IF NOT EXIST C:\Python38\python.exe (
-    REM Install python 3.8.
+    REM Install python 3.8
     choco install python -y -r --no-progress --version 3.8.5
     IF NOT ERRORLEVEL 0 (
         exit /b 1
