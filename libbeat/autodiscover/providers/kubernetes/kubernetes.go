@@ -57,15 +57,15 @@ type Eventer interface {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config         *Config
-	bus            bus.Bus
-	templates      template.Mapper
-	builders       autodiscover.Builders
-	appenders      autodiscover.Appenders
-	logger         *logp.Logger
-	eventer        Eventer
-	leaderElection leaderelection.LeaderElectionConfig
-	cancel         context.CancelFunc
+	config               *Config
+	bus                  bus.Bus
+	templates            template.Mapper
+	builders             autodiscover.Builders
+	appenders            autodiscover.Appenders
+	logger               *logp.Logger
+	eventer              Eventer
+	leaderElection       leaderelection.LeaderElectionConfig
+	cancelLeaderElection context.CancelFunc
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -135,7 +135,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	if p.config.Unique {
-		p.initLeaderElectionConfig(client, p.config.Identifier)
+		p.initLeaderElectionConfig(client, uuid.String())
 	}
 
 	return p, nil
@@ -149,7 +149,7 @@ func (p *Provider) Start() {
 
 	if p.config.Unique {
 		ctx, cancel := context.WithCancel(context.Background())
-		p.cancel = cancel
+		p.cancelLeaderElection = cancel
 		p.StartLeaderElector(ctx, p.leaderElection)
 	}
 }
@@ -170,8 +170,8 @@ func (p *Provider) StartLeaderElector(ctx context.Context, lec leaderelection.Le
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
 	p.eventer.Stop()
-	if p.cancel != nil {
-		p.cancel()
+	if p.cancelLeaderElection != nil {
+		p.cancelLeaderElection()
 	}
 }
 
@@ -224,7 +224,10 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 }
 
 func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
-	id := "beats-leader-" + uuid
+	id := "beats-leader-" + p.config.Node
+	if p.config.Identifier != "" {
+		id = id + "-" + p.config.Identifier
+	}
 	lease := metav1.ObjectMeta{
 		Name:      "beats-cluster-leader",
 		Namespace: "default",
@@ -241,7 +244,7 @@ func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
 		ReleaseOnCancel: true,
 		LeaseDuration:   15 * time.Second,
 		RenewDeadline:   10 * time.Second,
-		RetryPeriod:     5 * time.Second,
+		RetryPeriod:     2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
 				p.logger.Debugf("leader election lock GAINED, id %v", id)

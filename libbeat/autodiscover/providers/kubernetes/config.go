@@ -64,6 +64,7 @@ func defaultConfig() *Config {
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
 		Unique:         false,
+		Identifier:     "",
 	}
 }
 
