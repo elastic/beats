@@ -13,7 +13,7 @@ when:
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     build:
-        mage: "mage build"     ## TODO test goal has been disabled since there are broken tests.
+        mage: "mage build test"
     crosscompile:
         make: "make -C libbeat crosscompile"
     stress-tests:

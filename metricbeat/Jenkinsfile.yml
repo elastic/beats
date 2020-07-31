@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     unitTest:
-        mage: "mage build"     ## Disable unitTest since there are broken tests
+        mage: "mage build unitTest"
     goIntegTest:
         mage: "mage goIntegTest"
         withModule: true
