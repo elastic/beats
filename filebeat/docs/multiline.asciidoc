@@ -23,7 +23,7 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 
 You can specify the following options in the +{beatname_lc}.inputs+ section of
 the +{beatname_lc}.yml+ config file to control how {beatname_uc} deals with messages
-that span multiple lines. 
+that span multiple lines.
 
 The following example shows how to configure {beatname_uc} to handle a multiline message where the first line of the message begins with a bracket (`[`).
 
@@ -47,8 +47,8 @@ multiline.match: after
     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
 -------------------------------------------------------------------------------------
 
-*`multiline.type`*:: Defines which aggregation method to use. The default is `pattern`. The other option
-is `count` which lets you aggregate constant number of lines.
+*`multiline.type`*:: Defines which aggregation method to use. The default is `pattern`. The other options
+are `count` which lets you aggregate constant number of lines and `while_pattern` which aggregate lines by pattern without match option.
 
 *`multiline.pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by {beatname_uc}
 differ somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
@@ -71,7 +71,7 @@ the pattern.
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message.
+*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message. Work only with `pattern` type.
 
 *`multiline.max_lines`*:: The maximum number of lines that can be combined into one event. If
 the multiline message contains more than `max_lines`, any additional
