@@ -27,24 +27,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-// Feature exposes a memory queue.
-var Feature = queue.Feature("mem",
-	create,
-	feature.MakeDetails(
-		"Memory queue",
-		"Buffer events in memory before sending to the output.",
-		feature.Stable),
-)
-
 type broker struct {
 	done chan struct{}
 
 	logger logger
 
 	bufSize int
-	// buf         brokerBuffer
-	// minEvents   int
-	// idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
@@ -84,7 +72,13 @@ type chanList struct {
 }
 
 func init() {
-	queue.RegisterType("mem", create)
+	queue.RegisterQueueType(
+		"mem",
+		create,
+		feature.MakeDetails(
+			"Memory queue",
+			"Buffer events in memory before sending to the output.",
+			feature.Stable))
 }
 
 func create(
@@ -194,7 +188,7 @@ func (b *broker) Close() error {
 
 func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		Events: b.bufSize,
+		MaxEvents: b.bufSize,
 	}
 }
 

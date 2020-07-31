@@ -20,33 +20,13 @@
 package perfmon
 
 import (
-	"strings"
-
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-// CounterConfig for perfmon counters.
-type CounterConfig struct {
-	InstanceLabel    string `config:"instance_label"`
-	InstanceName     string `config:"instance_name"`
-	MeasurementLabel string `config:"measurement_label" validate:"required"`
-	Query            string `config:"query"             validate:"required"`
-	Format           string `config:"format"`
-}
-
-// Config for the windows perfmon metricset.
-type Config struct {
-	IgnoreNECounters   bool            `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements  bool            `config:"perfmon.group_measurements_by_instance"`
-	CounterConfig      []CounterConfig `config:"perfmon.counters" validate:"required"`
-	GroupAllCountersTo string          `config:"perfmon.group_all_counter"`
-}
 
 const metricsetName = "perfmon"
 
@@ -62,24 +42,9 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The perfmon metricset is beta")
-
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-	for _, value := range config.CounterConfig {
-		form := strings.ToLower(value.Format)
-		switch form {
-		case "", "float":
-			value.Format = "float"
-		case "long", "large":
-		default:
-			return nil, errors.Errorf("initialization failed: format '%s' "+
-				"for counter '%s' is invalid (must be float, large or long)",
-				value.Format, value.InstanceLabel)
-		}
-
 	}
 	reader, err := NewReader(config)
 	if err != nil {

@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package sqs
 
@@ -17,10 +18,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("sqs", "300s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -49,10 +47,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("sqs", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {

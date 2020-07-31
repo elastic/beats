@@ -51,10 +51,12 @@ func Format() {
 }
 
 // GoImports executes goimports against all .go files in and below the CWD. It
-// ignores vendor/ directories.
+// ignores vendor/ and generator/_templates/ directories.
 func GoImports() error {
 	goFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return filepath.Ext(path) == ".go" && !strings.Contains(path, "vendor/")
+		return filepath.Ext(path) == ".go" &&
+			!strings.Contains(path, "vendor/") &&
+			!strings.Contains(path, "generator/_templates/")
 	})
 	if err != nil {
 		return err
@@ -64,19 +66,10 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if UseVendor {
-		if err := gotool.Install(
-			gotool.Install.Vendored(),
-			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
-		); err != nil {
-			return err
-		}
-	} else {
-		if err := gotool.Get(
-			gotool.Get.Package(filepath.Join(GoImportsImportPath)),
-		); err != nil {
-			return err
-		}
+	if err := gotool.Install(
+		gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+	); err != nil {
+		return err
 	}
 
 	args := append(

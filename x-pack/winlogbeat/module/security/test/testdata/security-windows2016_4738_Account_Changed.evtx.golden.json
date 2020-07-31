@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:36:17.5667652Z",
     "event": {
       "action": "modified-user-account",
+      "category": "iam",
       "code": 4738,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -38,7 +44,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "LOCKOUT",
           "NORMAL_ACCOUNT"
         ],
@@ -89,10 +95,16 @@
     "@timestamp": "2019-09-06T13:36:36.3634107Z",
     "event": {
       "action": "modified-user-account",
+      "category": "iam",
       "code": 4738,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -124,7 +136,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "LOCKOUT",
           "NORMAL_ACCOUNT"
         ],

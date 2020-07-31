@@ -2,6 +2,10 @@
 [role="xpack"]
 == Configure index lifecycle management
 
+++++
+<titleabbrev>Index lifecycle management (ILM)</titleabbrev>
+++++
+
 Use the {ref}/getting-started-index-lifecycle-management.html[index lifecycle
 management] (ILM) feature in {es} to manage your {beatname_uc} indices as they age.
 For example, instead of creating daily indices where index size can vary based

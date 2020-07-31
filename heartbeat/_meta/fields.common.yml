@@ -17,11 +17,19 @@
           type: keyword
           description: >
             The monitors configured name
+          multi_fields:
+            - name: text
+              type: text
+              analyzer: simple
 
         - name: id
           type: keyword
           description: >
             The monitors full job ID as used by heartbeat.
+          multi_fields:
+            - name: text
+              type: text
+              analyzer: simple
 
         - name: duration
           type: group

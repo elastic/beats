@@ -112,11 +112,7 @@ func NewInput(
 
 	log := logp.NewLogger("syslog")
 
-	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: context.DynamicFields,
-		},
-	})
+	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +252,9 @@ func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fie
 		},
 		Fields: fields,
 	}
-	event.Fields.Put("log.source.address", metadata.RemoteAddr.String())
+	if metadata.RemoteAddr != nil {
+		event.Fields.Put("log.source.address", metadata.RemoteAddr.String())
+	}
 	return event
 }
 

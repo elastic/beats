@@ -20,6 +20,7 @@
 package server
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,6 +52,12 @@ func TestData(t *testing.T) {
 }
 
 func getConfig(host string) map[string]interface{} {
+	h := os.Getenv("COUCHDB_HOST")
+
+	if h != "" {
+		host = h
+	}
+
 	return map[string]interface{}{
 		"module":     "couchdb",
 		"metricsets": []string{"server"},

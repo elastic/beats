@@ -46,6 +46,8 @@ const (
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
+
+	elasticBeatsModulePath = "github.com/elastic/beats/v7"
 )
 
 // Common settings with defaults derived from files, CWD, and environment.
@@ -58,7 +60,10 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
-	UseVendor    = true
+
+	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only.
+	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
@@ -103,10 +108,6 @@ func init() {
 	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
-	}
-	UseVendor, err = strconv.ParseBool(EnvOr("USE_VENDOR", "true"))
-	if err != nil {
-		panic(errors.Wrap(err, "failed to parse USE_VENDOR env value"))
 	}
 
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
@@ -280,8 +281,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-
-	return gotool.ListModulePath("github.com/elastic/beats/v7")
+	return gotool.ListModuleCacheDir(elasticBeatsModulePath)
 }
 
 var (
@@ -599,13 +599,13 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 
 		if isRoot {
 			rootDir = possibleRoot
+			subDir, err = filepath.Rel(rootDir, cwd)
+			if err != nil {
+				errs = append(errs, err.Error())
+			}
 			break
 		}
 
-		subDir, err = filepath.Rel(possibleRoot, cwd)
-		if err != nil {
-			errs = append(errs, err.Error())
-		}
 		possibleRoot = filepath.Dir(possibleRoot)
 	}
 

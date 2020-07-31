@@ -184,12 +184,12 @@ func TestFetchTimeout(t *testing.T) {
 	elapsed := time.Since(start)
 	var found bool
 	for _, err := range errs {
-		if strings.Contains(err.Error(), "request canceled (Client.Timeout exceeded") {
+		if strings.Contains(err.Error(), "context deadline exceeded (Client.Timeout exceeded") {
 			found = true
 		}
 	}
 	if !found {
-		assert.Failf(t, "", "expected an error containing 'request canceled (Client.Timeout exceeded'. Got %v", errs)
+		assert.Failf(t, "", "expected an error containing 'context deadline exceeded (Client.Timeout exceeded'. Got %v", errs)
 	}
 
 	assert.True(t, elapsed < 5*time.Second, "elapsed time: %s", elapsed.String())

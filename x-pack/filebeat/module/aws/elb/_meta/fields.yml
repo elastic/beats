@@ -1,6 +1,7 @@
 - name: elb
   type: group
   release: ga
+  default_field: false
   description: >
     Fields for AWS ELB logs.
   fields:
@@ -98,5 +99,5 @@
         The URL used if a redirection action was executed.
     - name: error.reason
       type: keyword
-      description:
+      description: >
         The error reason if the executed action failed.

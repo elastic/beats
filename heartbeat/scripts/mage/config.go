@@ -22,24 +22,13 @@ import (
 )
 
 // ConfigFileParams returns the default ConfigFileParams for generating
-// packetbeat*.yml files.
+// heartbeat*.yml files.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/beat.yml"),
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/beat.reference.yml"),
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		DockerParts: []string{
-			devtools.OSSBeatDir("_meta/beat.docker.yml"),
-			devtools.LibbeatDir("_meta/config.docker.yml"),
-		},
-		ExtraVars: map[string]interface{}{
-			"UseObserverProcessor": true,
-			"ExcludeDashboards":    true,
-		},
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	p.ExtraVars = map[string]interface{}{
+		"UseObserverProcessor": true,
+		"ExcludeDashboards":    true,
 	}
+	return p
 }

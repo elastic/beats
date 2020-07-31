@@ -14,6 +14,7 @@ For more information, https://www.freedesktop.org/software/systemd/man/systemd.r
 === Configuration
 
 *`service.state_filter`* - A list of service states to filter by. This can be any of the states or sub-states known to systemd.
+*`service.pattern_filter`* - A list of glob patterns to filter service names by. This is an "or" filter, and will report any systemd unit that matches at least one filter pattern.
 
 [float]
 === Dashboard

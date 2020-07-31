@@ -1,0 +1,53 @@
+{{header "Template"}}
+
+# A template is used to set the mapping in Elasticsearch
+# By default template loading is enabled and the template is loaded.
+# These settings can be adjusted to load your own template or overwrite existing ones.
+
+# Set to false to disable template loading.
+#setup.template.enabled: true
+
+# Template name. By default the template name is "{{.BeatIndexPrefix}}-%{[agent.version]}"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.name: "{{.BeatIndexPrefix}}-%{[agent.version]}"
+
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indices.
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.pattern: "{{.BeatIndexPrefix}}-%{[agent.version]}-*"
+
+# Path to fields.yml file to generate the template
+#setup.template.fields: "${path.config}/fields.yml"
+
+# A list of fields to be added to the template and Kibana index pattern. Also
+# specify setup.template.overwrite: true to overwrite the existing template.
+#setup.template.append_fields:
+#- name: field_name
+#  type: field_type
+
+# Enable JSON template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the JSON template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
+
+# Overwrite existing template
+#setup.template.overwrite: false
+
+# Elasticsearch template settings
+setup.template.settings:
+
+  # A dictionary of settings to place into the settings.index dictionary
+  # of the Elasticsearch template. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  #index:
+    #number_of_shards: 1
+    #codec: best_compression
+
+  # A dictionary of settings for the _source field. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
+  #_source:
+    #enabled: false

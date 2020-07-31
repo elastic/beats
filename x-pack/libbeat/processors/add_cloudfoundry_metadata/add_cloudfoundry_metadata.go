@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build linux darwin windows
-
 package add_cloudfoundry_metadata
 
 import (
@@ -62,7 +60,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
-		// doesn't have the required cf.app.id value to add more information
+		// doesn't have the required cloudfoundry.app.id value to add more information
 		return event, nil
 	}
 	val, _ := valI.(string)
@@ -72,7 +70,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	app, err := d.client.GetAppByGuid(val)
 	if err != nil {
-		d.log.Warnf("failed to get application info for GUID(%s): %v", val, err)
+		d.log.Debugf("failed to get application info for GUID(%s): %v", val, err)
 		return event, nil
 	}
 	event.Fields.DeepUpdate(common.MapStr{

@@ -424,3 +424,46 @@ func TestDataTypes(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkTestConvertRun(b *testing.B) {
+	c := defaultConfig()
+	c.IgnoreMissing = true
+	c.Fields = append(c.Fields,
+		field{From: "source.address", To: "source.ip", Type: IP},
+		field{From: "destination.address", To: "destination.ip", Type: IP},
+		field{From: "a", To: "b"},
+		field{From: "c", To: "d"},
+		field{From: "e", To: "f"},
+		field{From: "g", To: "h"},
+		field{From: "i", To: "j"},
+		field{From: "k", To: "l"},
+		field{From: "m", To: "n"},
+		field{From: "o", To: "p"},
+	)
+
+	p, err := newConvert(c)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			event := &beat.Event{
+				Fields: common.MapStr{
+					"source": common.MapStr{
+						"address": "192.51.100.1",
+					},
+					"destination": common.MapStr{
+						"address": "192.0.2.51",
+					},
+				},
+			}
+
+			_, err := p.Run(event)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}

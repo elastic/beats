@@ -6,4 +6,4 @@ input:
     metrics_path: /
     metrics_filters:
       include: ["node_*"]
-      exclude: ["up"]
+      exclude: ["^up$"]

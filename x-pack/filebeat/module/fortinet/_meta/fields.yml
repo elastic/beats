@@ -1,0 +1,5 @@
+- key: fortinet
+  title: Fortinet
+  description: >
+    fortinet Module
+  fields:

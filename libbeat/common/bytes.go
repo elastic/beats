@@ -20,8 +20,22 @@ package common
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
+	"unicode/utf16"
+	"unicode/utf8"
+)
+
+const (
+	// 0xd800-0xdc00 encodes the high 10 bits of a pair.
+	// 0xdc00-0xe000 encodes the low 10 bits of a pair.
+	// the value is those 20 bits plus 0x10000.
+	surr1           = 0xd800
+	surr2           = 0xdc00
+	surr3           = 0xe000
+	replacementChar = '\uFFFD' // Unicode replacement character
 )
 
 // Byte order utilities
@@ -75,4 +89,47 @@ func RandomBytes(length int) ([]byte, error) {
 	}
 
 	return r, nil
+}
+
+func UTF16ToUTF8Bytes(in []byte, out io.Writer) error {
+	if len(in)%2 != 0 {
+		return fmt.Errorf("input buffer must have an even length (length=%d)", len(in))
+	}
+
+	var runeBuf [4]byte
+	var v1, v2 uint16
+	for i := 0; i < len(in); i += 2 {
+		v1 = uint16(in[i]) | uint16(in[i+1])<<8
+		// Stop at null-terminator.
+		if v1 == 0 {
+			return nil
+		}
+
+		switch {
+		case v1 < surr1, surr3 <= v1:
+			n := utf8.EncodeRune(runeBuf[:], rune(v1))
+			out.Write(runeBuf[:n])
+		case surr1 <= v1 && v1 < surr2 && len(in) > i+2:
+			v2 = uint16(in[i+2]) | uint16(in[i+3])<<8
+			if surr2 <= v2 && v2 < surr3 {
+				// valid surrogate sequence
+				r := utf16.DecodeRune(rune(v1), rune(v2))
+				n := utf8.EncodeRune(runeBuf[:], r)
+				out.Write(runeBuf[:n])
+			}
+			i += 2
+		default:
+			// invalid surrogate sequence
+			n := utf8.EncodeRune(runeBuf[:], replacementChar)
+			out.Write(runeBuf[:n])
+		}
+	}
+	return nil
+}
+
+func StringToUTF16Bytes(in string) []byte {
+	var u16 []uint16 = utf16.Encode([]rune(in))
+	buf := &bytes.Buffer{}
+	binary.Write(buf, binary.LittleEndian, u16)
+	return buf.Bytes()
 }

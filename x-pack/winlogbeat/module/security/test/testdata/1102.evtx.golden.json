@@ -2,11 +2,17 @@
   {
     "@timestamp": "2019-11-07T10:34:29.0559196Z",
     "event": {
-      "action": "changed-audit-config",
+      "action": "audit-log-cleared",
+      "category": "iam",
       "code": 1102,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Eventlog"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Eventlog",
+      "type": [
+        "admin",
+        "change"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"

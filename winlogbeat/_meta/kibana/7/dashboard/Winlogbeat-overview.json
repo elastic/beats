@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of all Windows Event Logs.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -89,7 +89,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Winlogbeat Dashboard ECS",
+        "title": "[Winlogbeat] Overview",
         "version": 1
       },
       "id": "Winlogbeat-Dashboard-ecs",
@@ -140,7 +140,7 @@
             }
           }
         },
-        "title": "Number of Events Over Time By Channel ECS",
+        "title": "Number of Events Over Time By Channel [Winlogbeat Overview]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -311,7 +311,7 @@
             ],
             "yAxis": {}
           },
-          "title": "Number of Events Over Time By Channel ECS",
+          "title": "Number of Events Over Time By Channel [Winlogbeat Overview]",
           "type": "histogram"
         }
       },
@@ -343,7 +343,7 @@
             }
           }
         },
-        "title": "Number of Events ECS",
+        "title": "Number of Events [Winlogbeat Overview]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -390,7 +390,7 @@
             }
           }
         },
-        "title": "Top Event IDs ECS",
+        "title": "Top Event IDs [Winlogbeat Overview]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -467,7 +467,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Event IDs ECS",
+          "title": "Top Event IDs [Winlogbeat Overview]",
           "type": "table"
         }
       },
@@ -499,7 +499,7 @@
             }
           }
         },
-        "title": "Event Levels ECS",
+        "title": "Event Levels [Winlogbeat Overview]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -576,7 +576,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Event Levels ECS",
+          "title": "Event Levels [Winlogbeat Overview]",
           "type": "table"
         }
       },
@@ -608,7 +608,7 @@
             }
           }
         },
-        "title": "Sources (Provider Names) ECS",
+        "title": "Sources (Provider Names) [Winlogbeat Overview]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -651,7 +651,7 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "Sources (Provider Names) ECS",
+          "title": "Sources (Provider Names) [Winlogbeat Overview]",
           "type": "pie"
         }
       },

@@ -108,7 +108,3 @@ func TestChannels(t *testing.T) {
 		}
 	}
 }
-
-func TestExtension(t *testing.T) {
-	filepath.Ext("sysmon")
-}

@@ -121,6 +121,16 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 		return
 	}
 
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", errors.Wrap(err, "error determining xpack features")
+	}
+
+	if !xpack.Features.CCR.Enabled {
+		message = "the CCR feature is not enabled on your Elasticsearch cluster."
+		return
+	}
+
 	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.CCRStatsAPIAvailableVersion)
 
 	if !isAvailable {

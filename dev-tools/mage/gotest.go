@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -67,6 +68,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		Packages:        []string{"./..."},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
+		Tags:            testTagsFromEnv(),
 	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
@@ -83,11 +85,18 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
+		Tags:            testTagsFromEnv(),
 	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
 	}
 	return params
+}
+
+// testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
+// environment variables, e.g: TEST_TAGS=aws,azure.
+func testTagsFromEnv() []string {
+	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
@@ -127,28 +136,51 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // This method executes integration tests for a single module at a time.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	return RunIntegTest("goIntegTest", func() error {
-		modulesFileInfo, err := ioutil.ReadDir("./module")
-		if err != nil {
-			return err
-		}
+	module := EnvOr("MODULE", "")
+	modulesFileInfo, err := ioutil.ReadDir("./module")
+	if err != nil {
+		return err
+	}
 
-		var failed bool
-		for _, fi := range modulesFileInfo {
-			if !fi.IsDir() {
-				continue
-			}
+	foundModule := false
+	failedModules := []string{}
+	for _, fi := range modulesFileInfo {
+		if !fi.IsDir() {
+			continue
+		}
+		if module != "" && module != fi.Name() {
+			continue
+		}
+		foundModule = true
+
+		// Set MODULE because only want that modules tests to run inside the testing environment.
+		env := map[string]string{"MODULE": fi.Name()}
+		passThroughEnvs(env, IntegrationTestEnvVars()...)
+		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), env)
+		if err != nil {
+			return errors.Wrapf(err, "test setup failed for module %s", fi.Name())
+		}
+		err = runners.Test("goIntegTest", func() error {
 			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
 			if err != nil {
-				failed = true
+				return err
 			}
+			return nil
+		})
+		if err != nil {
+			// err will already be report to stdout, collect failed module to report at end
+			failedModules = append(failedModules, fi.Name())
 		}
-		if failed {
-			return errors.New("integration tests failed")
-		}
-		return nil
-	})
+	}
+	if module != "" && !foundModule {
+		return fmt.Errorf("no module %s", module)
+	}
+	if len(failedModules) > 0 {
+		return fmt.Errorf("failed modules: %s", strings.Join(failedModules, ", "))
+	}
+	return nil
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an
@@ -161,8 +193,11 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	args := []string{"test"}
 	args = append(args, "-v")
 
-	if params.Race {
-		args = append(args, "-race")
+	// -race is only supported on */amd64
+	if os.Getenv("DEV_ARCH") == "amd64" {
+		if params.Race {
+			args = append(args, "-race")
+		}
 	}
 	if len(params.Tags) > 0 {
 		args = append(args, "-tags", strings.Join(params.Tags, " "))
@@ -192,8 +227,13 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = io.MultiWriter(output, os.Stdout)
-	goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	goTest.Stdout = output
+	goTest.Stderr = output
+
+	if mg.Verbose() {
+		goTest.Stdout = io.MultiWriter(output, os.Stdout)
+		goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	}
 
 	// Execute 'go test' and measure duration.
 	start := time.Now()
@@ -419,5 +459,10 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}
+
+	start := time.Now()
+	defer func() {
+		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
+	}()
 	return sh.RunV("go", args...)
 }

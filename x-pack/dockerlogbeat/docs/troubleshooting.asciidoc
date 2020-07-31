@@ -1,6 +1,6 @@
 [[log-driver-troubleshooting]]
 [role="xpack"]
-== Troubleshooting
+== Troubleshoot
 
 experimental[]
 

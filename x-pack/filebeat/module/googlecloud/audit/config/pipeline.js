@@ -63,35 +63,43 @@ function Audit(keep_original_message) {
     // contains the structured audit log fields.
     var convertProtoPayload = new processor.Convert({
         fields: [
-            {from: "json.@type", to: "json.type"},
+            {from: "json.@type", to: "googlecloud.audit.type"},
 
             {from: "json.authenticationInfo.principalEmail", to: "json.authenticationInfo.principal_email"},
             {from: "json.authenticationInfo.authoritySelector", to: "json.authenticationInfo.authority_selector"},
-            {from: "json.authenticationInfo", to: "json.authentication_info"},
+            {from: "json.authenticationInfo", to: "googlecloud.audit.authentication_info"},
 
-            {from: "json.authorizationInfo", to: "json.authorization_info"},
+            {from: "json.authorizationInfo", to: "googlecloud.audit.authorization_info"},
 
-            {from: "json.methodName", to: "json.method_name"},
+            {from: "json.methodName", to: "googlecloud.audit.method_name"},
 
-            {from: "json.numResponseItems", to: "json.num_response_items", type: "long"},
+            {from: "json.numResponseItems", to: "googlecloud.audit.num_response_items", type: "long"},
 
-            {from: "json.request.@type", to: "json.request.proto_name"},
-            {from: "json.request.filter", to: "json.request.filter"},
-            {from: "json.request.name", to: "json.request.name"},
-            {from: "json.request.resourceName", to: "json.request.resource_name"},
+            {from: "json.request.@type", to: "googlecloud.audit.request.proto_name"},
+            {from: "json.request.filter", to: "googlecloud.audit.request.filter"},
+            {from: "json.request.name", to: "googlecloud.audit.request.name"},
+            {from: "json.request.resourceName", to: "googlecloud.audit.request.resource_name"},
 
             {from: "json.requestMetadata.callerIp", to: "json.requestMetadata.caller_ip", type: "ip"},
             {from: "json.requestMetadata.callerSuppliedUserAgent", to: "json.requestMetadata.caller_supplied_user_agent"},
-            {from: "json.requestMetadata", to: "json.request_metadata"},
+            {from: "json.requestMetadata", to: "googlecloud.audit.request_metadata"},
 
-            {from: "json.resourceName", to: "json.resource_name"},
+            {from: "json.response.@type", to: "googlecloud.audit.response.proto_name"},
+            {from: "json.response.status", to: "googlecloud.audit.response.status"},
+            {from: "json.response.details.group", to: "googlecloud.audit.response.details.group"},
+            {from: "json.response.details.kind", to: "googlecloud.audit.response.details.kind"},
+            {from: "json.response.details.name", to: "googlecloud.audit.response.details.name"},
+            {from: "json.response.details.uid", to: "googlecloud.audit.response.details.uid"},
+
+            {from: "json.resourceName", to: "googlecloud.audit.resource_name"},
 
             {from: "json.resourceLocation.currentLocations", to: "json.resourceLocation.current_locations"},
-            {from: "json.resourceLocation", to: "json.resource_location"},
+            {from: "json.resourceLocation", to: "googlecloud.audit.resource_location"},
 
-            {from: "json.serviceName", to: "json.service_name"},
+            {from: "json.serviceName", to: "googlecloud.audit.service_name"},
 
-            {from: "json", to: "googlecloud.audit"},
+            {from: "json.status", to: "googlecloud.audit.status"},
+
         ],
         mode: "rename",
         ignore_missing: true,

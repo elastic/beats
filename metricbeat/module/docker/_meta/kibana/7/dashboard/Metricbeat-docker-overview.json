@@ -249,7 +249,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "agent.hostname", 
+                                "field": "agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5

@@ -6,9 +6,10 @@ import shutil
 from metricbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
@@ -106,4 +107,4 @@ class Test(BaseTest):
         return "http://" + self.compose_host("kibana")
 
     def kibana_dir(self):
-        return os.path.join(self.beat_path, "_meta", "kibana.generated")
+        return os.path.join(self.beat_path, "build", "kibana")

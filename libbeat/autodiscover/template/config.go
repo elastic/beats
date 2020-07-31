@@ -18,16 +18,24 @@
 package template
 
 import (
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-ucfg"
 )
 
-// Mapper maps config templates with conditions, if a match happens on a discover event
-// the given template will be used as config
-type Mapper []*ConditionMap
+// Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event
+// the given template will be used as config.
+// Mapper also includes the global Keystore object at `keystore` and `keystoreProvider`, which
+// has access to a keystores registry
+type Mapper struct {
+	ConditionMaps    []*ConditionMap
+	keystore         keystore.Keystore
+	keystoreProvider keystore.Provider
+}
 
 // ConditionMap maps a condition to the configs to use when it's triggered
 type ConditionMap struct {
@@ -42,19 +50,24 @@ type MapperSettings []*struct {
 }
 
 // NewConfigMapper builds a template Mapper from given settings
-func NewConfigMapper(configs MapperSettings) (mapper Mapper, err error) {
+func NewConfigMapper(
+	configs MapperSettings,
+	keystore keystore.Keystore,
+	keystoreProvider keystore.Provider,
+) (mapper Mapper, err error) {
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
 		if c.ConditionConfig != nil {
 			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig)
 			if err != nil {
-				return nil, err
+				return Mapper{}, err
 			}
 		}
-
-		mapper = append(mapper, condMap)
+		mapper.ConditionMaps = append(mapper.ConditionMaps, condMap)
 	}
 
+	mapper.keystore = keystore
+	mapper.keystoreProvider = keystoreProvider
 	return mapper, nil
 }
 
@@ -73,15 +86,26 @@ func (e Event) GetValue(key string) (interface{}, error) {
 // GetConfig returns a matching Config if any, nil otherwise
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
-
-	for _, mapping := range c {
+	opts := []ucfg.Option{}
+	// add k8s keystore in options list with higher priority
+	if c.keystoreProvider != nil {
+		k8sKeystore := c.keystoreProvider.GetKeystore(event)
+		if k8sKeystore != nil {
+			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)))
+		}
+	}
+	// add local keystore in options list with lower priority
+	if c.keystore != nil {
+		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(c.keystore)))
+	}
+	for _, mapping := range c.ConditionMaps {
 		// An empty condition matches everything
 		conditionOk := mapping.Condition == nil || mapping.Condition.Check(Event(event))
 		if mapping.Configs != nil && !conditionOk {
 			continue
 		}
 
-		configs := ApplyConfigTemplate(event, mapping.Configs)
+		configs := ApplyConfigTemplate(event, mapping.Configs, opts...)
 		if configs != nil {
 			result = append(result, configs...)
 		}
@@ -90,7 +114,7 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 }
 
 // ApplyConfigTemplate takes a set of templated configs and applys information in an event map
-func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Config {
+func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...ucfg.Option) []*common.Config {
 	var result []*common.Config
 	// unpack input
 	vars, err := ucfg.NewFrom(map[string]interface{}{
@@ -105,6 +129,8 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
 	}
+	opts = append(opts, options...)
+
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
 		if err != nil {

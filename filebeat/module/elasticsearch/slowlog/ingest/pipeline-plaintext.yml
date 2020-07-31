@@ -1,0 +1,41 @@
+description: Pipeline for parsing elasticsearch slow logs in plaintext format.
+processors:
+- grok:
+    field: message
+    pattern_definitions:
+      GREEDYMULTILINE: |-
+        (.|
+        )*
+      INDEXNAME: '[a-zA-Z0-9_.-]*'
+    patterns:
+    - \[%{TIMESTAMP_ISO8601:elasticsearch.slowlog.timestamp}\]\[%{WORD:log.level}(%{SPACE})\]\[%{DATA:elasticsearch.slowlog.logger}\]%{SPACE}\[%{DATA:elasticsearch.node.name}\](%{SPACE})?(\[%{INDEXNAME:elasticsearch.index.name}\]\[%{NUMBER:elasticsearch.shard.id}\])?(%{SPACE})?(\[%{INDEXNAME:elasticsearch.index.name}\/%{DATA:elasticsearch.index.id}\])?(%{SPACE})?%{SPACE}(took\[%{DATA:elasticsearch.slowlog.took}\],)?%{SPACE}(took_millis\[%{NUMBER:elasticsearch.slowlog.duration:long}\],)?%{SPACE}(type\[%{DATA:elasticsearch.slowlog.type}\],)?%{SPACE}(id\[%{DATA:elasticsearch.slowlog.id}\],)?%{SPACE}(routing\[%{DATA:elasticsearch.slowlog.routing}\],)?%{SPACE}(total_hits\[%{NUMBER:elasticsearch.slowlog.total_hits:int}\],)?%{SPACE}(types\[%{DATA:elasticsearch.slowlog.types}\],)?%{SPACE}(stats\[%{DATA:elasticsearch.slowlog.stats}\],)?%{SPACE}(search_type\[%{DATA:elasticsearch.slowlog.search_type}\],)?%{SPACE}(total_shards\[%{NUMBER:elasticsearch.slowlog.total_shards:int}\],)?%{SPACE}(source\[%{GREEDYMULTILINE:elasticsearch.slowlog.source_query}\])?,?%{SPACE}(extra_source\[%{DATA:elasticsearch.slowlog.extra_source}\])?,?
+- split:
+    if: ctx.elasticsearch.slowlog?.stats != ''
+    field: elasticsearch.slowlog.stats
+    separator: ','
+    ignore_missing: true
+- date:
+    if: ctx.event.timezone == null
+    field: elasticsearch.slowlog.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd'T'HH:mm:ss,SSS
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- date:
+    if: ctx.event.timezone != null
+    field: elasticsearch.slowlog.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd'T'HH:mm:ss,SSS
+    timezone: '{{ event.timezone }}'
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

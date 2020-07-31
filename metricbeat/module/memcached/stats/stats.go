@@ -52,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	network, address, err := m.getNetworkAndAddress()
+	network, address, err := getNetworkAndAddress(m.HostData())
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")
 	}
@@ -92,14 +92,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) getNetworkAndAddress() (network string, address string, err error) {
-	hostData := m.HostData()
+func getNetworkAndAddress(hostData mb.HostData) (network string, address string, err error) {
 	u, err := url.Parse(hostData.URI)
 	if err != nil {
 		err = errors.Wrap(err, "invalid URL")
 		return
 	}
+
 	network = u.Scheme
-	address = u.Host
+	if network == "unix" {
+		address = u.Path
+	} else {
+		address = u.Host
+	}
 	return
 }

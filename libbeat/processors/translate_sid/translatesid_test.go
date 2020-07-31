@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -79,6 +80,41 @@ func TestTranslateSID(t *testing.T) {
 			if tc.AccountType > 0 {
 				assert.Equal(t, tc.AccountType.String(), evt.Fields["type"])
 			}
+		})
+	}
+}
+
+func TestTranslateSIDEmptyTarget(t *testing.T) {
+	c := defaultConfig()
+	c.Field = "sid"
+
+	evt := &beat.Event{Fields: map[string]interface{}{
+		"sid": "S-1-5-32-544",
+	}}
+
+	tests := []struct {
+		Name   string
+		Config config
+	}{
+		{"account_name", config{Field: "sid", AccountNameTarget: "account_name"}},
+		{"account_type", config{Field: "sid", AccountTypeTarget: "account_type"}},
+		{"domain", config{Field: "sid", DomainTarget: "domain"}},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.Name, func(t *testing.T) {
+			p, err := newFromConfig(tc.Config)
+			require.NoError(t, err)
+
+			evt, err := p.Run(&beat.Event{Fields: evt.Fields.Clone()})
+			require.NoError(t, err)
+
+			// Verify that only the configured target field is set.
+			// And ensure that no empty string keys are used.
+			assert.Len(t, evt.Fields, 2)
+			assert.Contains(t, evt.Fields, tc.Name)
+			assert.NotContains(t, evt.Fields, "")
 		})
 	}
 }

@@ -1,0 +1,461 @@
+{
+  "test_name": "netflow9_e10s_4_7byte_pad",
+  "events": [
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.36.236.100",
+          "locality": "private",
+          "port": 54594
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "6mUV1nPVG80",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.36.236.100",
+          "destination_transport_port": 54594,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.963Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:48.96Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 1855,
+          "packet_delta_count": 5,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.127.32.11",
+          "source_transport_port": 53,
+          "tcp_control_bits": 27,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 1855,
+          "community_id": "1:+/kh1SKruHHnZ5JGSMfWk9nZx8o=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 5,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "10.127.32.11",
+            "10.36.236.100"
+          ]
+        },
+        "source": {
+          "bytes": 1855,
+          "ip": "10.127.32.11",
+          "locality": "private",
+          "packets": 5,
+          "port": 53
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.36.237.22",
+          "locality": "private",
+          "port": 52058
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "3BTOVt9gp8I",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.36.237.22",
+          "destination_transport_port": 52058,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.901Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:48.9Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 217,
+          "packet_delta_count": 3,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.36.228.103",
+          "source_transport_port": 8000,
+          "tcp_control_bits": 25,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 217,
+          "community_id": "1:FAOWMcPTJlyjuohaFfnr9oyvnIo=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 3,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "10.36.228.103",
+            "10.36.237.22"
+          ]
+        },
+        "source": {
+          "bytes": 217,
+          "ip": "10.36.228.103",
+          "locality": "private",
+          "packets": 3,
+          "port": 8000
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.127.32.11",
+          "locality": "private",
+          "port": 53
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "6mUV1nPVG80",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.127.32.11",
+          "destination_transport_port": 53,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.963Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:48.96Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 547,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.36.236.100",
+          "source_transport_port": 54594,
+          "tcp_control_bits": 27,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 547,
+          "community_id": "1:+/kh1SKruHHnZ5JGSMfWk9nZx8o=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 7,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "10.36.236.100",
+            "10.127.32.11"
+          ]
+        },
+        "source": {
+          "bytes": 547,
+          "ip": "10.36.236.100",
+          "locality": "private",
+          "packets": 7,
+          "port": 54594
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.36.236.100",
+          "locality": "private",
+          "port": 49180
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "HVg4SttTufc",
+          "locality": "public"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.36.236.100",
+          "destination_transport_port": 49180,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.404Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:47.995Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 7158,
+          "packet_delta_count": 10,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "52.206.251.4",
+          "source_transport_port": 443,
+          "tcp_control_bits": 27,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 7158,
+          "community_id": "1:Zyly7BCJ6D7luuRJJazRxZ/mFZM=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 10,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "52.206.251.4",
+            "10.36.236.100"
+          ]
+        },
+        "source": {
+          "bytes": 7158,
+          "ip": "52.206.251.4",
+          "locality": "public",
+          "packets": 10,
+          "port": 443
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "52.206.251.4",
+          "locality": "public",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "HVg4SttTufc",
+          "locality": "public"
+        },
+        "netflow": {
+          "destination_ipv4_address": "52.206.251.4",
+          "destination_transport_port": 443,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.404Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:47.92Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 1538,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.36.236.100",
+          "source_transport_port": 49180,
+          "tcp_control_bits": 27,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 1538,
+          "community_id": "1:Zyly7BCJ6D7luuRJJazRxZ/mFZM=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 11,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "10.36.236.100",
+            "52.206.251.4"
+          ]
+        },
+        "source": {
+          "bytes": 1538,
+          "ip": "10.36.236.100",
+          "locality": "private",
+          "packets": 11,
+          "port": 49180
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2020-04-16T23:22:51Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.36.228.103",
+          "locality": "private",
+          "port": 8000
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
+          "created": "2020-04-16T23:22:51Z",
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
+        },
+        "flow": {
+          "id": "3BTOVt9gp8I",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.36.228.103",
+          "destination_transport_port": 8000,
+          "egress_interface": 1,
+          "exporter": {
+            "address": "109.180.55.123:10000",
+            "source_id": 1,
+            "timestamp": "2020-04-16T23:22:51Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_milliseconds": "2020-04-16T23:22:48.901Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2020-04-16T23:22:48.9Z",
+          "ingress_interface": 1,
+          "octet_delta_count": 217,
+          "packet_delta_count": 3,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.36.237.22",
+          "source_transport_port": 52058,
+          "tcp_control_bits": 25,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 217,
+          "community_id": "1:FAOWMcPTJlyjuohaFfnr9oyvnIo=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 3,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "109.180.55.123"
+        },
+        "related": {
+          "ip": [
+            "10.36.237.22",
+            "10.36.228.103"
+          ]
+        },
+        "source": {
+          "bytes": 217,
+          "ip": "10.36.237.22",
+          "locality": "private",
+          "packets": 3,
+          "port": 52058
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

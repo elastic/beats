@@ -61,9 +61,9 @@ func TestNode_Generate(t *testing.T) {
 				"node": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -106,9 +106,9 @@ func TestNode_GenerateFromName(t *testing.T) {
 				"node": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
+				},
+				"labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -121,7 +121,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 		metagen := NewNodeMetadataGenerator(cfg, nodes)
 
 		accessor, err := meta.Accessor(test.input)
-		require.Nil(t, err)
+		require.NoError(t, err)
 
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.GenerateFromName(fmt.Sprint(accessor.GetName())))

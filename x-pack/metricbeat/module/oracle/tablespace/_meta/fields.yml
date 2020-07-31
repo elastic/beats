@@ -1,7 +1,7 @@
 - name: tablespace
   type: group
   description: tablespace
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword

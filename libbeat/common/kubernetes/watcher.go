@@ -66,11 +66,15 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
+	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
+	// vs what does not.
+	IsUpdated func(old, new interface{}) bool
 }
 
 type item struct {
-	object interface{}
-	state  string
+	object    interface{}
+	objectRaw interface{}
+	state     string
 }
 
 type watcher struct {
@@ -99,6 +103,19 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	if opts.IsUpdated == nil {
+		opts.IsUpdated = func(o, n interface{}) bool {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				return true
+			}
+			return false
+		}
+	}
+
 	w := &watcher{
 		client:   client,
 		informer: informer,
@@ -118,11 +135,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 			w.enqueue(o, delete)
 		},
 		UpdateFunc: func(o, n interface{}) {
-			old, _ := accessor.ResourceVersion(o.(runtime.Object))
-			new, _ := accessor.ResourceVersion(n.(runtime.Object))
-
-			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
-			if old != new {
+			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
 			}
 		},
@@ -175,8 +188,7 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	if err != nil {
 		return
 	}
-
-	w.queue.Add(&item{key, state})
+	w.queue.Add(&item{key, obj, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -204,6 +216,11 @@ func (w *watcher) process(ctx context.Context) bool {
 			return nil
 		}
 		if !exists {
+			if entry.state == delete {
+				w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
+				// delete anyway in order to clean states
+				w.handler.OnDelete(entry.objectRaw)
+			}
 			return nil
 		}
 

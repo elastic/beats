@@ -67,6 +67,23 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionHost:
+		return "info"
+	case eventActionIDChanged:
+		return "change"
+	case eventActionReboot:
+		return "start"
+	case eventActionHostnameChanged:
+		return "change"
+	case eventActionHostChanged:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 // Host represents information about a host.
 type Host struct {
 	Info types.HostInfo
@@ -322,8 +339,10 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"host"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"message": hostMessage(host, action),
 		},

@@ -23,8 +23,7 @@ This input doesn't perform any transformation on the incoming messages, notably
 no {ecs-ref}/ecs-reference.html[Elastic Common Schema fields] are populated, and
 some data is encoded as arrays of objects, which are difficult to query in
 Elasticsearch. You probably want to use the
-{filebeat-ref}/filebeat-module-o365.html[o365 module] instead.
-// TODO: link to O365 module docs.
+{filebeat-ref}/filebeat-module-o365.html[Office 365 module] instead.
 
 Example configuration:
 
@@ -116,7 +115,7 @@ endpoints.
 
 ===== `api.max_retention`
 
-The maximum data retention period to support. `178h` by default. {beatname_uc}
+The maximum data retention period to support. `168h` by default. {beatname_uc}
 will fetch all retained data for a tenant when run for the first time.
 
 ===== `api.poll_interval`
@@ -132,3 +131,8 @@ default is `2000`, as this is the server-side limit per tenant.
 
 The maximum time window that API allows in a single query. Defaults to `24h`
 to match Microsoft's documented limit.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

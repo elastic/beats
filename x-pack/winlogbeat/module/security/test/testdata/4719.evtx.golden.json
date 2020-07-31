@@ -3,10 +3,16 @@
     "@timestamp": "2019-11-07T15:22:57.6553291Z",
     "event": {
       "action": "changed-audit-config",
+      "category": "iam",
       "code": 4719,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"

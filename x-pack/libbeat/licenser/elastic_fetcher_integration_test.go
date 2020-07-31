@@ -13,8 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 const (
@@ -22,16 +21,15 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *elasticsearch.Client {
+func getTestClient() *eslegclient.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
-		Index:            outil.MakeSelector(),
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}, nil)
+		Timeout:          60 * time.Second,
+	})
 
 	if err != nil {
 		panic(err)

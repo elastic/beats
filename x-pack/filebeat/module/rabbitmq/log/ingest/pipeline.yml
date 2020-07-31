@@ -26,6 +26,9 @@ processors:
 - remove:
     field:
     - timestamp
+- set:
+    field: event.kind
+    value: event
 on_failure:
 - set:
     field: error.message

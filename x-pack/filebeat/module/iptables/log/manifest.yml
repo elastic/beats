@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/iptables.log
   - name: tags
-    default: [iptables]
+    default: [iptables, forwarded]
   - name: syslog_host
     default: localhost
   - name: syslog_port
@@ -15,7 +15,7 @@ var:
   - name: community_id
     default: true
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
 
 requires.processors:

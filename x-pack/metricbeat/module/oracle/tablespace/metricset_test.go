@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build oracle
 
 package tablespace
 
@@ -17,7 +18,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	r := compose.EnsureUp(t, "oracle")
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))

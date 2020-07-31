@@ -28,7 +28,7 @@ The simple configuration below enables the processor.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_cloud_metadata: ~
+  - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
 The `add_cloud_metadata` processor has three optional configuration settings.

@@ -58,8 +58,9 @@ func (c *config) Unpack(from *common.Config) error {
 				return nil
 			}
 		} else {
-			// full config provided, discard default
-			c.DefaultConfig = config
+			// full config provided, discard default. It must be a clone of the
+			// given config otherwise it could be updated across multiple inputs.
+			c.DefaultConfig = common.MustNewConfigFrom(config)
 		}
 	}
 

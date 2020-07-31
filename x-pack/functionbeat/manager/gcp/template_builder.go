@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	runtime          = "go111"                            // Golang 1.11
+	runtime          = "go113"                            // Golang 1.13
 	archiveURL       = "gs://%s/%s"                       // path to the function archive
 	locationTemplate = "projects/%s/locations/%s"         // full name of the location
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions
@@ -190,6 +190,5 @@ func zipResources() map[string][]bundle.Resource {
 
 func zipResourcesOfFunc(typeName string) []bundle.Resource {
 	root := filepath.Join("pkg", typeName)
-	vendor := bundle.Folder(filepath.Join("pkg", typeName, "vendor"), filepath.Join("pkg", typeName), 0644)
-	return append(vendor, &bundle.LocalFile{Path: filepath.Join(root, typeName+".go"), FileMode: 0755})
+	return []bundle.Resource{&bundle.LocalFile{Path: filepath.Join(root, typeName+".go"), FileMode: 0755}}
 }

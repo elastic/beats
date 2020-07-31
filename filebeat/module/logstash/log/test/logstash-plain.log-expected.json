@@ -2,8 +2,10 @@
     {
         "@timestamp": "2017-10-23T14:20:12.046-02:00",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
         "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
@@ -15,8 +17,10 @@
     {
         "@timestamp": "2017-11-20T03:55:00.318-02:00",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
         "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -25,7 +29,25 @@
         "log.level": "INFO",
         "log.offset": 175,
         "logstash.log.module": "logstash.inputs.jdbc",
-        "message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n",
+        "message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people",
+        "service.type": "logstash"
+    },
+    {
+        "@timestamp": "2020-05-13T11:00:26.431-02:00",
+        "event.dataset": "logstash.log",
+        "event.kind": "event",
+        "event.module": "logstash",
+        "event.timezone": "-02:00",
+        "event.type": "info",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.offset": 318,
+        "logstash.log.module": "logstash.inputs.json",
+        "message": "(0.158950s) {\n\"foo\": [\n{\n  \"bar\": \"baz\"\n}\n]\n}",
         "service.type": "logstash"
     }
 ]

@@ -14,8 +14,34 @@ data:
       # Reload module configs as they change:
       reload.enabled: false
 
+    # When using containerd as runtime, a configuration like the following one
+    # can be used to monitor files in containers using autodiscover.
+    #auditbeat.autodiscover:
+    #  providers:
+    #  - type: kubernetes
+    #    host: ${NODE_NAME}
+    #    templates:
+    #      - config:
+    #        - module: 'file_integrity'
+    #          paths:
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/bin'
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/etc'
+    #          scan_at_start: false
+    #          recursive: true
+
     processors:
       - add_cloud_metadata:
+      - add_process_metadata:
+          match_pids: ['process.pid']
+          include_fields: ['container.id']
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          default_indexers.enabled: false
+          default_matchers.enabled: false
+          indexers:
+            - container:
+          matchers:
+            - fields.lookup_fields: ['container.id']
 
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
@@ -50,3 +76,11 @@ data:
       max_file_size: 100 MiB
       hash_types: [sha1]
       recursive: true
+    - module: auditd
+      audit_rules: |
+        # Executions
+        -a always,exit -F arch=b64 -S execve,execveat -k exec
+
+        # Unauthorized access attempts
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access

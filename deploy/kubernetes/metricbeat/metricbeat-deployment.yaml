@@ -61,9 +61,9 @@ spec:
       volumes:
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-deployment-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-deployment-modules

@@ -132,7 +132,7 @@ func ExampleRunner() {
 		return
 	}
 
-	connector, err := module.NewConnector(b.Info, b.Publisher, config, nil)
+	connector, err := module.NewConnector(b.Info, b.Publisher, config)
 	if err != nil {
 		return
 	}

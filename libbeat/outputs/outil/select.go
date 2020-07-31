@@ -19,7 +19,6 @@ package outil
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,22 +30,6 @@ import (
 // A selector supports multiple rules that need to be configured.
 type Selector struct {
 	sel SelectorExpr
-}
-
-// Settings configures how BuildSelectorFromConfig creates a Selector from
-// a given configuration object.
-type Settings struct {
-	// single selector key and default option keyword
-	Key string
-
-	// multi-selector key in config
-	MultiKey string
-
-	// if enabled a selector `key` in config will be generated, if `key` is present
-	EnableSingleOnly bool
-
-	// Fail building selector if `key` and `multiKey` are missing
-	FailEmpty bool
 }
 
 // SelectorExpr represents an expression object that can be composed with other
@@ -73,6 +56,7 @@ type constSelector struct {
 type fmtSelector struct {
 	f         fmtstr.EventFormatString
 	otherwise string
+	selCase   SelectorCase
 }
 
 type mapSelector struct {
@@ -142,7 +126,7 @@ func BuildSelectorFromConfig(
 		}
 
 		for _, config := range table {
-			action, err := buildSingle(config, key)
+			action, err := buildSingle(config, key, settings.Case)
 			if err != nil {
 				return Selector{}, err
 			}
@@ -167,7 +151,7 @@ func BuildSelectorFromConfig(
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
 
-		fmtsel, err := FmtSelectorExpr(fmtstr, "")
+		fmtsel, err := FmtSelectorExpr(fmtstr, "", settings.Case)
 		if err != nil {
 			return Selector{}, fmt.Errorf("%v in %v", err, cfg.PathOf(key))
 		}
@@ -196,16 +180,16 @@ func EmptySelectorExpr() SelectorExpr {
 }
 
 // ConstSelectorExpr creates a selector expression that always returns the configured string.
-func ConstSelectorExpr(s string) SelectorExpr {
+func ConstSelectorExpr(s string, selCase SelectorCase) SelectorExpr {
 	if s == "" {
 		return EmptySelectorExpr()
 	}
-	return &constSelector{strings.ToLower(s)}
+	return &constSelector{selCase.apply(s)}
 }
 
 // FmtSelectorExpr creates a selector expression using a format string. If the
 // event can not be applied the default fallback constant string will be returned.
-func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (SelectorExpr, error) {
+func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string, selCase SelectorCase) (SelectorExpr, error) {
 	if fmt.IsConst() {
 		str, err := fmt.Run(nil)
 		if err != nil {
@@ -214,10 +198,10 @@ func FmtSelectorExpr(fmt *fmtstr.EventFormatString, fallback string) (SelectorEx
 		if str == "" {
 			str = fallback
 		}
-		return ConstSelectorExpr(str), nil
+		return ConstSelectorExpr(str, selCase), nil
 	}
 
-	return &fmtSelector{*fmt, strings.ToLower(fallback)}, nil
+	return &fmtSelector{*fmt, selCase.apply(fallback), selCase}, nil
 }
 
 // ConcatSelectorExpr combines multiple expressions that are run one after the other.
@@ -241,6 +225,7 @@ func LookupSelectorExpr(
 	evtfmt *fmtstr.EventFormatString,
 	table map[string]string,
 	fallback string,
+	selCase SelectorCase,
 ) (SelectorExpr, error) {
 	if evtfmt.IsConst() {
 		str, err := evtfmt.Run(nil)
@@ -248,11 +233,11 @@ func LookupSelectorExpr(
 			return nil, err
 		}
 
-		str = table[strings.ToLower(str)]
+		str = table[selCase.apply(str)]
 		if str == "" {
 			str = fallback
 		}
-		return ConstSelectorExpr(str), nil
+		return ConstSelectorExpr(str, selCase), nil
 	}
 
 	return &mapSelector{
@@ -262,15 +247,15 @@ func LookupSelectorExpr(
 	}, nil
 }
 
-func lowercaseTable(table map[string]string) map[string]string {
+func copyTable(selCase SelectorCase, table map[string]string) map[string]string {
 	tmp := make(map[string]string, len(table))
 	for k, v := range table {
-		tmp[strings.ToLower(k)] = strings.ToLower(v)
+		tmp[selCase.apply(k)] = selCase.apply(v)
 	}
 	return tmp
 }
 
-func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
+func buildSingle(cfg *common.Config, key string, selCase SelectorCase) (SelectorExpr, error) {
 	// TODO: check for unknown fields
 
 	// 1. extract required key-word handler
@@ -295,7 +280,7 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 		if err != nil {
 			return nil, err
 		}
-		otherwise = strings.ToLower(tmp)
+		otherwise = selCase.apply(tmp)
 	}
 
 	// 3. extract optional `mapping`
@@ -332,9 +317,9 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	// 5. build selector from available fields
 	var sel SelectorExpr
 	if len(mapping.Table) > 0 {
-		sel, err = LookupSelectorExpr(evtfmt, lowercaseTable(mapping.Table), otherwise)
+		sel, err = LookupSelectorExpr(evtfmt, copyTable(selCase, mapping.Table), otherwise, selCase)
 	} else {
-		sel, err = FmtSelectorExpr(evtfmt, otherwise)
+		sel, err = FmtSelectorExpr(evtfmt, otherwise, selCase)
 	}
 	if err != nil {
 		return nil, err
@@ -388,7 +373,7 @@ func (s *fmtSelector) sel(evt *beat.Event) (string, error) {
 	if n == "" {
 		return s.otherwise, nil
 	}
-	return strings.ToLower(n), nil
+	return s.selCase.apply(n), nil
 }
 
 func (s *mapSelector) sel(evt *beat.Event) (string, error) {

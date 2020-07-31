@@ -43,8 +43,6 @@
     enabled: true
   rfb:
     enabled: true
-  signatures:
-    enabled: true
   sip:
     enabled: true
   smb_cmd:

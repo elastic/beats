@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2019-03-24T14:01:45.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.slowlog",
         "event.duration": 2475469000,
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [
@@ -23,11 +30,18 @@
     },
     {
         "@timestamp": "2019-03-24T14:04:51.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.slowlog",
         "event.duration": 2631844000,
         "event.end": "2019-03-24T14:04:53.713951Z",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.start": "2019-03-24T14:04:51.082107Z",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [

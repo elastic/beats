@@ -23,9 +23,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -74,7 +76,7 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
 	if err != nil {
@@ -96,7 +98,7 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 
 	inputs := make([]cfgfile.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		inputs[i], err = f.inputFactory.Create(p, pConfig, meta)
+		inputs[i], err = f.inputFactory.Create(p, pConfig)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err
@@ -111,6 +113,11 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
 	}, nil
+}
+
+func (f *Factory) CheckConfig(c *common.Config) error {
+	_, err := f.Create(pubpipeline.NewNilPipeline(), c)
+	return err
 }
 
 func (p *inputsRunner) Start() {
@@ -134,7 +141,7 @@ func (p *inputsRunner) Start() {
 		}
 
 		// Register callback to try to load pipelines when connecting to ES.
-		callback := func(esClient *elasticsearch.Client) error {
+		callback := func(esClient *eslegclient.Connection) error {
 			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)
@@ -152,6 +159,7 @@ func (p *inputsRunner) Start() {
 		moduleList.Add(m)
 	}
 }
+
 func (p *inputsRunner) Stop() {
 	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)

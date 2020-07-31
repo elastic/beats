@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-22T11:33:57.271141Z",
     "event": {
       "action": "type-changed-group-account",
+      "category": "iam",
       "code": 4764,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "group"
+      ]
     },
     "group": {
       "domain": "WLBEAT",

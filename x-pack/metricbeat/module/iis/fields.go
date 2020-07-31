@@ -19,5 +19,5 @@ func init() {
 // AssetIis returns asset data.
 // This is the base64 encoded gzipped contents of module/iis.
 func AssetIis() string {
-	return "eJy0kbGOgzAQRHt/xYgSKfkAF/cryMAm2ovBlu1cxN+ffAYOiEE02YJidzTzzFzwoEGC2QsgcNAkUTD7QgAt+caxDWx6iS8BIOrQmfapSQCONClPEjUFJQRwY9Ktl3/KC3rV0eQcJwyWJO7OPO24yQSsTZZGylrNjYriyhqjZ0HOOc4a73+fTU1zkLHFWqLF7+owIT1oeBnXbm4HABsIRIi1/ZT5otqT+yF3La/liVcnIFN/UxMW67So0vWmjdo5Vp2ylvv7qCzK4twfnTHnbfYlHOgTfb5bv9e4W+J+hYcFjpnJ7zcAAP//navhqA=="
+	return "eJzMkrFuhDAQRHt/xYgS6e4DXKS/Oh+ADOydNmewZfty4u8jx0AAgUUZFxSzo5m3aC940iDB7AUQOGiSKG63z0IALfnGsQ1seokPASD60Jn2pUkAjjQpTxI1BSUEcGfSrZe/zgt61dGUHF8YLEk8nHnZUdkpWIcsg5S1mhsVzZU1Rs+GveT41nh/+m5repmOLdYSLX5XgwnpScPbuHYzywBsIBAh1vFT55tqT+6b3LW8lie2TkCm/qImLOQkVGl610YdDKtOWcv9Y3QWZXHuj86Ys7q7CQf6/3twoOxBHJ7D8TFkT2HsTHk/AQAA//+gjPaq"
 }

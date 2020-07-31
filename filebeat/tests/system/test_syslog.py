@@ -1,5 +1,8 @@
 from filebeat import BaseTest
 import socket
+import os
+import tempfile
+import unittest
 
 
 class Test(BaseTest):
@@ -129,7 +132,100 @@ class Test(BaseTest):
         assert len(output) == 2
         self.assert_syslog(output[0])
 
-    def assert_syslog(self, syslog):
+    # AF_UNIX support in python isn't available until
+    # Python 3.9, see https://bugs.python.org/issue33408
+    @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
+    def test_syslog_with_unix(self):
+        """
+        Test syslog input with events from UNIX.
+        """
+        # we create the socket in a temporary directory because
+        # go will fail to create a unix socket if the path length
+        # is longer than 108 characters. See https://github.com/golang/go/issues/6895
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "filebeat.sock")
+            input_raw = """
+- type: syslog
+  protocol:
+    unix:
+        path: {}
+"""
+
+            input_raw = input_raw.format(path)
+            self.render_config_template(
+                input_raw=input_raw,
+                inputs=False,
+            )
+
+            filebeat = self.start_beat()
+
+            self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
+
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # UNIX
+
+            sock.connect(path)
+
+            for n in range(0, 2):
+                m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
+                    " 'su root' failed for lonvick on /dev/pts/8 {}\n"
+                m = m.format(n)
+                sock.send(m.encode("utf-8"))
+
+            self.wait_until(lambda: self.output_count(lambda x: x >= 2))
+
+            filebeat.check_kill_and_wait()
+
+            output = self.read_output()
+
+            assert len(output) == 2
+            self.assert_syslog(output[0], False)
+
+    # AF_UNIX support in python isn't available until
+    # Python 3.9, see https://bugs.python.org/issue33408
+    @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
+    def test_syslog_with_unix_invalid_message(self):
+        """
+        Test syslog input with invalid events from UNIX.
+        """
+        # we create the socket in a temporary directory because
+        # go will fail to create a unix socket if the path length
+        # is longer than 108 characters. See https://github.com/golang/go/issues/6895
+        with tempfile.TemporaryDirectory() as tempdir:
+            path = os.path.join(tempdir, "filebeat.sock")
+            input_raw = """
+- type: syslog
+  protocol:
+    unix:
+        path: {}
+"""
+
+            input_raw = input_raw.format(path)
+            self.render_config_template(
+                input_raw=input_raw,
+                inputs=False,
+            )
+
+            filebeat = self.start_beat()
+
+            self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
+
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # UNIX
+
+            sock.connect(path)
+            for n in range(0, 2):
+                sock.send("invalid\n".encode("utf-8"))
+
+            self.wait_until(lambda: self.output_count(lambda x: x >= 2))
+
+            filebeat.check_kill_and_wait()
+
+            output = self.read_output()
+
+            assert len(output) == 2
+            assert output[0]["message"] == "invalid"
+            sock.close()
+
+    def assert_syslog(self, syslog, has_address=True):
         assert syslog["event.severity"] == 5
         assert syslog["hostname"] == "wopr.mymachine.co"
         assert syslog["input.type"] == "syslog"
@@ -140,4 +236,5 @@ class Test(BaseTest):
         assert syslog["syslog.priority"] == 13
         assert syslog["syslog.severity_label"] == "Notice"
         assert syslog["syslog.facility_label"] == "user-level"
-        assert len(syslog["log.source.address"]) > 0
+        if has_address:
+            assert len(syslog["log.source.address"]) > 0

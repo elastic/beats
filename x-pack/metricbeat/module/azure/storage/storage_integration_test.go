@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build azure
 
 package storage
 
@@ -17,23 +18,18 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("storage")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "storage")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("storage")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "storage")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

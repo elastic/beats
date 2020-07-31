@@ -9,6 +9,12 @@ The `process` object contains System/Process counters like the the overall serve
 The `net_clr` object which returns ASP.NET error rate counter values.
 Users can specify the application pools they would like to monitor using the configuration option `application_pool.name`, else, all application pools are considered.
 
+[float]
+==== Dashboard
+
+image::./images/metricbeat-iis-application-pool-overview.png[]
+
+
 
 
 

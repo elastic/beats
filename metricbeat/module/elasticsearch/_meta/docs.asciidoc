@@ -1,14 +1,14 @@
-There are two modules that collect metrics about {es}: 
-
-* The Elasticsearch module contains a minimal set of metrics to enable
-monitoring of Elasticsearch across multiple versions. The default metricsets in
-this module are `node` and `node_stats`.
-* The Elasticsearch X-Pack module enables you to monitor more Elasticsearch
-metrics with our {stack} {monitor-features}. The default metricsets in this
-module are `ccr`, `cluster_stats`, `enrich`, ``index`, `index_recovery`,
-`index_summary`, `ml_job`, `node_stats`, and `shard`.
+The `elasticsearch` module collects metrics about {es}.
 
 [float]
 === Compatibility
 
-The Elasticsearch module works with Elasticsearch 6.7.0 and later.
+The `elasticsearch` module works with {es} 6.7.0 and later.
+
+[float]
+=== Usage for Stack Monitoring
+
+The `elasticsearch` module can be used to collect metrics shown in our {stack} {monitor-features}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
+`metricbeat modules enable elasticsearch-xpack`.

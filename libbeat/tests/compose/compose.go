@@ -72,23 +72,41 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		option(&upOptions)
 	}
 
-	// Start container
-	err = compose.Start(service, upOptions)
-	if err != nil {
-		t.Fatal("failed to start service", service, err)
-	}
-
-	// Wait for health
-	err = compose.Wait(upOptions.Timeout, service)
-	if err != nil {
-		inspected, inspectErr := compose.Inspect(service)
-		if inspectErr != nil {
-			t.Logf("inspection error: %v", err)
-		} else {
-			t.Logf("Container state (service: '%s'): %s", service, inspected)
+	start := func() error {
+		// Start container
+		err := compose.Start(service, upOptions)
+		if err != nil {
+			return fmt.Errorf("failed to start service '%s: %v", service, err)
 		}
 
-		t.Fatal(err)
+		// Wait for health
+		err = compose.Wait(upOptions.Timeout, service)
+		if err != nil {
+			inspected, inspectErr := compose.Inspect(service)
+			if inspectErr != nil {
+				t.Logf("inspection error: %v", err)
+			} else {
+				t.Logf("Container state (service: '%s'): %s", service, inspected)
+			}
+
+			return err
+		}
+
+		return nil
+	}
+
+	err = nil
+	for retries := 0; retries < 3; retries++ {
+		err := start()
+		if err == nil {
+			break
+		}
+		t.Log(err)
+		// Ignore errors here
+		compose.Kill(service)
+	}
+	if err != nil {
+		t.FailNow()
 	}
 
 	// Get host information

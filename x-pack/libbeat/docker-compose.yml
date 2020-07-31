@@ -4,8 +4,11 @@ services:
     build: ${PWD}/.
     depends_on:
       - proxy_dep
-    env_file:
-      - ${PWD}/build/test.env
+    environment:
+      - ES_BEATS=/go/src/github.com/elastic/beats
+      - BEAT_STRICT_PERMS=false
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
     working_dir: /go/src/github.com/elastic/beats/x-pack/libbeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/

@@ -6,6 +6,7 @@ package tools
 
 import (
 	_ "github.com/pierrre/gotestcover"
+	_ "github.com/tsg/go-daemon"
 	_ "golang.org/x/tools/cmd/goimports"
 
 	_ "github.com/mitchellh/gox"

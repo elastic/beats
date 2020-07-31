@@ -7,6 +7,8 @@
 
 The Console output writes events in JSON format to stdout.
 
+WARNING: The Console output should be used only for debugging issues as it can produce a large amount of logging data. 
+
 To use this output, edit the {beatname_uc} configuration file to disable the {es}
 output by commenting it out, and enable the console output by adding `output.console`.
 
