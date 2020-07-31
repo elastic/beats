@@ -526,10 +526,11 @@ func (p *s3Input) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3
 			return nil
 		}
 
-		offset, err = p.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx)
+		offsetNew, err := p.jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx)
 		if err != nil {
 			return err
 		}
+		offset = offsetNew
 	}
 }
 
@@ -554,6 +555,27 @@ func (p *s3Input) jsonFieldsType(jsonFields interface{}, offset int, objectHash 
 			return offset, nil
 		}
 	case map[string]interface{}:
+		if p.config.ExpandEventListFromField != "" {
+			textValues, ok := f[p.config.ExpandEventListFromField]
+			if !ok {
+				err := errors.Errorf("key '%s' not found", p.config.ExpandEventListFromField)
+				p.logger.Error(err)
+				return offset, err
+			}
+
+			valuesConverted := textValues.([]interface{})
+			for _, textValue := range valuesConverted {
+				offsetNew, err := p.convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx)
+				if err != nil {
+					err = errors.Wrapf(err, "convertJSONToEvent failed for '%s' from S3 bucket '%s'", s3Info.key, s3Info.name)
+					p.logger.Error(err)
+					return offset, err
+				}
+				offset = offsetNew
+			}
+			return offset, nil
+		}
+
 		offset, err := p.convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx)
 		if err != nil {
 			err = errors.Wrapf(err, "convertJSONToEvent failed for '%s' from S3 bucket '%s'", s3Info.key, s3Info.name)
