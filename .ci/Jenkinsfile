@@ -541,15 +541,14 @@ def getProjectDependencies(Map args = [:]) {
   def output = ""
 
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    dir("${env.BASE_DIR}") {
-      output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-        eval \$(gvm "${GO_VERSION}")
-        go list -deps ./${beatName} \
-          | grep 'elastic/beats' \
-          | sed -e "s#github.com/elastic/beats/v7/##g" \
-          | awk '{print "^" \$1 "/.*"}'
-      """)
-    }
+    output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """#!/usr/bin/env bash
+      set +x
+      eval \$(gvm "${GO_VERSION}")
+      go list -deps ./${beatName} \
+        | grep 'elastic/beats' \
+        | sed -e "s#github.com/elastic/beats/v7/##g" \
+        | awk '{print "^" \$1 "/.*"}'
+    """)
   }
   return output?.split('\n').collect{ item -> item as String }
 }
