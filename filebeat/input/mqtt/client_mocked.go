@@ -22,10 +22,10 @@ import (
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 type mockedMessage struct {
@@ -190,8 +190,8 @@ type mockedConnector struct {
 
 var _ channel.Connector = new(mockedConnector)
 
-func (m *mockedConnector) Connect(*common.Config) (channel.Outleter, error) {
-	panic("implement me")
+func (m *mockedConnector) Connect(c *common.Config) (channel.Outleter, error) {
+	return m.ConnectWith(c, beat.ClientConfig{})
 }
 
 func (m *mockedConnector) ConnectWith(*common.Config, beat.ClientConfig) (channel.Outleter, error) {

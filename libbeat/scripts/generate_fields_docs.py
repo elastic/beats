@@ -6,6 +6,8 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
+    if "skipdocs" in section:
+        return
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
 
@@ -119,9 +121,8 @@ grouped in the following categories:
         for field in section["fields"]:
             name = field["name"]
             if name in fields:
-                assert field["type"] == (fields[name]["type"],
-                                         'field "{}" redefined with different type "{}"'.format(
-                    name, field["type"]))
+                assert field["type"] == fields[name]["type"], 'field "{}" redefined with different type "{}"'.format(
+                    name, field["type"])
                 fields[name].update(field)
             else:
                 fields[name] = field
@@ -136,7 +137,8 @@ grouped in the following categories:
         if "anchor" not in section:
             section["anchor"] = section["key"]
 
-        output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
+        if "skipdocs" not in section:
+            output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 
     # Sort alphabetically by key
@@ -165,10 +167,10 @@ if __name__ == "__main__":
     es_beats = args.es_beats
 
     # Read fields.yml
-    with open(fields_yml) as f:
+    with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
+    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

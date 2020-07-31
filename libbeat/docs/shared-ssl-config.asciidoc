@@ -1,6 +1,10 @@
 [[configuration-ssl]]
 ifndef::apm-server[]
-== Specify SSL settings
+== Configure SSL
+
+++++
+<titleabbrev>SSL</titleabbrev>
+++++
 endif::apm-server[]
 ifdef::apm-server[]
 == SSL output settings
@@ -12,7 +16,9 @@ ifndef::apm-server[]
 You can specify SSL options when you configure:
 
 * <<configuring-output,outputs>> that support SSL
+ifndef::no_dashboards[]
 * the <<setup-kibana-endpoint,Kibana endpoint>>
+endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
 * <<configuration-heartbeat-options,{beatname_uc} monitors>> that support SSL
 endif::[]
@@ -233,12 +239,11 @@ are `never`, `once`, and `freely`. The default value is never.
 [float]
 ==== `ca_sha256`
 
-This configure a certificate pin can that ca be used to ensure that a specific certificate is used
-to as part of the verified chain.
+This configures a certificate pin that you can use to ensure that a specific certificate is part of the verified chain.
 
 The pin is a base64 encoded string of the SHA-256 of the certificate.
 
-NOTE: This check is not a replacement for the normal SSL validation but it add additional validation.
+NOTE: This check is not a replacement for the normal SSL validation, but it adds additional validation.
 If this option is used with  `verification_mode` set to `none`, the check will always fail because
 it will not receive any verified chains.
 

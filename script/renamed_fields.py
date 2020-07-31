@@ -27,7 +27,7 @@ def get_table(migration_fields):
 
 def read_migration_fields(beat):
     migration_fields = {}
-    migration_yml = "../dev-tools/ecs-migration.yml"
+    migration_yml = "ecs-migration-8x.yml"
     with open(migration_yml, 'r') as f:
         migration = yaml.safe_load(f)
         for k in migration:

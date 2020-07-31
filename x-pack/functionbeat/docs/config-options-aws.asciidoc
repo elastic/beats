@@ -3,7 +3,7 @@
 == Configure AWS functions
 
 ++++
-<titleabbrev>Configure AWS functions</titleabbrev>
+<titleabbrev>AWS functions</titleabbrev>
 ++++
 
 {beatname_uc} runs as a function in your serverless environment.

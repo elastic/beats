@@ -40,6 +40,9 @@
             "79a59df900b949e55d96a1e698fbacedfd6e09d98eacf8f8d5218e7cd47ef2be"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
@@ -88,6 +91,9 @@
             "79a59df900b949e55d96a1e698fbacedfd6e09d98eacf8f8d5218e7cd47ef2be"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
@@ -138,6 +144,9 @@
             "79a59df900b949e55d96a1e698fbacedfd6e09d98eacf8f8d5218e7cd47ef2be"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
@@ -186,6 +195,9 @@
             "79a59df900b949e55d96a1e698fbacedfd6e09d98eacf8f8d5218e7cd47ef2be"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",
@@ -236,6 +248,9 @@
             "79a59df900b949e55d96a1e698fbacedfd6e09d98eacf8f8d5218e7cd47ef2be"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.1",
         "tls.version_protocol": "tls",

@@ -6,6 +6,7 @@ WARNING: This metricset collects a large number of metrics, what can
 significantly impact disk usage. Processors can be used to drop unused metrics
 before they are stored. For example the following configuration will drop all
 histogram buckets:
+
 [source,yaml]
 ------------------------------------------------------------------------------
 - module: cockroachdb

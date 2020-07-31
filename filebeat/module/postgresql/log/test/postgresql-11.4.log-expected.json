@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2019-07-23T12:06:24.406Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -16,9 +23,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.406Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -30,9 +44,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.478Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -45,9 +66,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.478Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -59,9 +87,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -74,9 +109,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -88,9 +130,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -103,9 +152,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -117,9 +173,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -132,9 +195,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.485Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -146,9 +216,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.507Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -161,9 +238,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:24.507Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -175,9 +259,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:30.536Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -190,9 +281,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:30.536Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -204,9 +302,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:30.537Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -219,9 +324,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:30.537Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -233,9 +345,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:33.732Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -248,9 +367,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:33.732Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -262,9 +388,17 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:33.732Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info",
+            "error"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "ERROR",
@@ -277,9 +411,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:33.732Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -291,9 +432,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:33.732Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "STATEMENT",
@@ -305,9 +453,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:34.877Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -320,9 +475,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:34.877Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -334,9 +496,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:34.878Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -349,9 +518,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:34.878Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -363,9 +539,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:09:57.563Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -378,9 +561,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:09:57.563Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",
@@ -392,9 +582,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:09:57.565Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -407,9 +604,16 @@
     },
     {
         "@timestamp": "2019-07-23T12:09:57.565Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOCATION",

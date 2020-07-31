@@ -3,10 +3,16 @@
     "@timestamp": "2019-12-19T08:34:23.1623432Z",
     "event": {
       "action": "deleted-distribution-group-account",
+      "category": "iam",
       "code": 4763,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "deletion",
+        "group"
+      ]
     },
     "group": {
       "domain": "TEST",

@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Daily Storage Bucket Size in Bytes"
+            },
             "gridData": {
               "h": 7,
               "i": "1",
@@ -29,10 +31,13 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "version": "7.3.0"
+            "title": "S3 Daily Storage Bucket Size in Bytes",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Daily Storage Number of Objects"
+            },
             "gridData": {
               "h": 7,
               "i": "2",
@@ -42,10 +47,13 @@
             },
             "panelIndex": "2",
             "panelRefName": "panel_1",
-            "version": "7.3.0"
+            "title": "S3 Daily Storage Number of Objects",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Request Latency Total Request in ms"
+            },
             "gridData": {
               "h": 7,
               "i": "3",
@@ -55,10 +63,13 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_2",
-            "version": "7.3.0"
+            "title": "S3 Request Latency Total Request in ms",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Total Error 4xx"
+            },
             "gridData": {
               "h": 6,
               "i": "4",
@@ -68,10 +79,13 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
-            "version": "7.3.0"
+            "title": "S3 Total Error 4xx",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Total Error 5xx"
+            },
             "gridData": {
               "h": 6,
               "i": "5",
@@ -81,10 +95,13 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_4",
-            "version": "7.3.0"
+            "title": "S3 Total Error 5xx",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Filters"
+            },
             "gridData": {
               "h": 6,
               "i": "6",
@@ -94,10 +111,13 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_5",
-            "version": "7.3.0"
+            "title": "S3 Filters",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "S3 Total Requests"
+            },
             "gridData": {
               "h": 7,
               "i": "7",
@@ -107,10 +127,17 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_6",
-            "version": "7.3.0"
+            "title": "S3 Total Requests",
+            "version": "7.7.0"
           }
         ],
-        "timeRestore": false,
+        "refreshInterval": {
+          "pause": true,
+          "value": 0
+        },
+        "timeFrom": "now-1d",
+        "timeRestore": true,
+        "timeTo": "now",
         "title": "[Metricbeat AWS] S3 Overview",
         "version": 1
       },
@@ -156,8 +183,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-09-12T21:18:24.987Z",
-      "version": "Wzc3NjAsN10="
+      "updated_at": "2020-04-06T16:29:50.517Z",
+      "version": "WzkxOSwyXQ=="
     },
     {
       "attributes": {
@@ -190,6 +217,8 @@
                 "id": "f703aff0-475f-11e9-a9de-e776805ecfc9"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "gauge_color_rules": [
               {
@@ -202,6 +231,7 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "1d",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -222,7 +252,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.s3_daily_storage.bucket.name",
+                "terms_field": "aws.s3.bucket.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -232,18 +262,18 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "AWS S3 Daily Storage Bucket Size in Bytes",
+          "title": "S3 Daily Storage Bucket Size in Bytes [Metricbeat AWS]",
           "type": "metrics"
         }
       },
       "id": "2dbb8f90-4760-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0MzQsN10="
+      "updated_at": "2020-04-06T16:01:45.966Z",
+      "version": "Wzg2NCwyXQ=="
     },
     {
       "attributes": {
@@ -276,10 +306,13 @@
                 "id": "01dad830-4761-11e9-bf81-69a4e579cab5"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "1d",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -300,7 +333,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.s3_daily_storage.bucket.name",
+                "terms_field": "aws.s3.bucket.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -310,18 +343,18 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "AWS S3 Daily Storage Number of Objects",
+          "title": "S3 Daily Storage Number of Objects [Metricbeat AWS]",
           "type": "metrics"
         }
       },
       "id": "3a3914d0-4761-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0MzUsN10="
+      "updated_at": "2020-04-06T16:15:51.106Z",
+      "version": "WzkwMywyXQ=="
     },
     {
       "attributes": {
@@ -354,6 +387,8 @@
                 "id": "67cb0930-4761-11e9-bf81-69a4e579cab5"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "gauge_color_rules": [
               {
@@ -366,7 +401,8 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "1d",
-            "pivot_id": "aws.s3_request.bucket.name",
+            "isModelInvalid": false,
+            "pivot_id": "aws.s3.bucket.name",
             "series": [
               {
                 "axis_position": "right",
@@ -393,7 +429,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.s3_request.bucket.name",
+                "terms_field": "aws.s3.bucket.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -403,18 +439,18 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "AWS S3 Request Latency Total Request in ms",
+          "title": "S3 Request Latency Total Request in ms [Metricbeat AWS]",
           "type": "metrics"
         }
       },
       "id": "2b2d58b0-4762-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0MzYsN10="
+      "updated_at": "2020-04-06T16:24:42.835Z",
+      "version": "WzkxMiwyXQ=="
     },
     {
       "attributes": {
@@ -484,12 +520,12 @@
       },
       "id": "81d83c70-4762-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0MzcsN10="
+      "updated_at": "2020-04-03T21:29:11.214Z",
+      "version": "WzIwOCwyXQ=="
     },
     {
       "attributes": {
@@ -559,12 +595,12 @@
       },
       "id": "8b34a100-4762-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0MzgsN10="
+      "updated_at": "2020-04-03T21:29:11.214Z",
+      "version": "WzIwOSwyXQ=="
     },
     {
       "attributes": {
@@ -626,12 +662,12 @@
       },
       "id": "6e3285d0-4763-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:18:08.498Z",
-      "version": "Wzc3NTgsN10="
+      "updated_at": "2020-04-03T21:29:11.214Z",
+      "version": "WzIxMCwyXQ=="
     },
     {
       "attributes": {
@@ -664,10 +700,13 @@
                 "id": "c7b9fca0-4763-11e9-b811-fd5d24a641d7"
               }
             ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "1d",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -689,7 +728,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.s3_request.bucket.name",
+                "terms_field": "aws.s3.bucket.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "terms_size": "5"
               }
@@ -699,19 +738,19 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "AWS S3 Total Requests",
+          "title": "S3 Total Requests [Metricbeat AWS]",
           "type": "metrics"
         }
       },
       "id": "d186fd50-4763-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.4.2"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-12T21:13:42.937Z",
-      "version": "Wzc0NDAsN10="
+      "updated_at": "2020-04-06T16:25:02.532Z",
+      "version": "WzkxMywyXQ=="
     }
   ],
-  "version": "7.3.0"
+  "version": "7.7.0"
 }

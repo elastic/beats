@@ -13,6 +13,7 @@ var threat = (function () {
     var categorizeEvent = new processor.AddFields({
         target: "event",
         fields: {
+            kind: "event",
             category: "threat-intel",
             type: "indicator",
         },
@@ -24,8 +25,13 @@ var threat = (function () {
 
     var convertFields = new processor.Convert({
         fields: [
+            { from: "json.Event.id", to: "rule.id" },
             { from: "json.Event.info", to: "misp.threat_indicator.description" },
+            { from: "json.Event.info", to: "rule.description" },
             { from: "json.Event.uuid", to: "misp.threat_indicator.id" },
+            { from: "json.Event.uuid", to: "rule.uuid" },
+            { from: "json.category", to: "rule.category" },
+            { from: "json.uuid", to: "event.id" },
         ],
         mode: "rename",
         ignore_missing: true,
@@ -116,6 +122,7 @@ var threat = (function () {
             case 'github-username':
                 attackPattern = '[' + 'user:name = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'user.name: ' + '"' + v + '"';
+                evt.Put("user.name", v);
                 break;
             case "hostname":
                 attackPattern = '[' + 'source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
@@ -155,6 +162,7 @@ var threat = (function () {
             case 'regkey':
                 attackPattern = '[' + 'regkey = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'regkey: ' + '"' + v + '"';
+                evt.Put("registry.key", v);
                 break;
             case "sha1":
                 attackPattern = '[' + 'file:hash:sha1 = ' + '\'' + v + '\'' + ']';

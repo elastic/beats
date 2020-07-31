@@ -18,10 +18,12 @@
 package hbtest
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -29,13 +31,17 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
-	"github.com/elastic/beats/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v7/libbeat/common"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -107,13 +113,25 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"tls": map[string]interface{}{
-			"rtt.handshake.us":             isdef.IsDuration,
-			"certificate_not_valid_before": certificate.NotBefore,
-			"certificate_not_valid_after":  certificate.NotAfter,
-		},
-	})
+	expected := common.MapStr{}
+	// This function is well tested independently, so we just test that things match up here.
+	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
+		Version:           tls.VersionTLS13,
+		HandshakeComplete: true,
+		CipherSuite:       tls.TLS_AES_128_GCM_SHA256,
+		ServerName:        certificate.Subject.CommonName,
+		PeerCertificates:  []*x509.Certificate{certificate},
+	}, time.Duration(1))
+
+	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	return lookslike.MustCompile(expected)
+}
+
+func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
+	expected := common.MapStr{}
+	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
+	return lookslike.MustCompile(expected)
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
@@ -153,10 +171,19 @@ func SummaryChecks(up int, down int) validator.Validator {
 	})
 }
 
+// ResolveChecks returns a lookslike matcher for the 'resolve' fields.
+func ResolveChecks(ip string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"resolve": map[string]interface{}{
+			"ip":     ip,
+			"rtt.us": isdef.IsDuration,
+		},
+	})
+}
+
 // SimpleURLChecks returns a check for a simple URL
 // with only a scheme, host, and port
 func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {
-
 	hostPort := host
 	if port != 0 {
 		hostPort = fmt.Sprintf("%s:%d", host, port)
@@ -165,6 +192,11 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
 	require.NoError(t, err)
 
+	return URLChecks(t, u)
+}
+
+// URLChecks returns a validator for the given URL's fields
+func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
 	})
@@ -180,6 +212,14 @@ func ErrorChecks(msgSubstr string, errType string) validator.Validator {
 			"type":    errType,
 		},
 	})
+}
+
+func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
+	msg := x509.CertificateInvalidError{Cert: cert, Reason: x509.Expired}.Error()
+	return lookslike.Compose(
+		ErrorChecks(msg, "io"),
+		TLSCertChecks(cert),
+	)
 }
 
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
@@ -200,4 +240,24 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	require.NoError(t, err)
 	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
+}
+
+func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port string, cert *x509.Certificate, doClose func() error) {
+	cert, err := x509.ParseCertificate(tlsCert.Certificate[0])
+	require.NoError(t, err)
+
+	// No need to start a real server, since this is invalid, we just
+	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	})
+	require.NoError(t, err)
+
+	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	go func() {
+		srv.Serve(l)
+	}()
+
+	host, port, err = net.SplitHostPort(l.Addr().String())
+	require.NoError(t, err)
+	return host, port, cert, srv.Close
 }

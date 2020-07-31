@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-istio-mesh]]
-=== istio mesh metricset
+[role="xpack"]
+=== Istio mesh metricset
 
 beta[]
 

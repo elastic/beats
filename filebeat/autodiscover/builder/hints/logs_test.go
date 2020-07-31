@@ -23,9 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -54,7 +54,7 @@ func TestGenerateHints(t *testing.T) {
 		config *common.Config
 		event  bus.Event
 		len    int
-		result common.MapStr
+		result []common.MapStr
 	}{
 		{
 			msg:    "Default config is correct",
@@ -73,9 +73,11 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-				"type":  "container",
+			result: []common.MapStr{
+				{
+					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+					"type":  "container",
+				},
 			},
 		},
 		{
@@ -94,7 +96,8 @@ func TestGenerateHints(t *testing.T) {
 					"id":   "abc",
 				},
 			},
-			len: 0,
+			len:    0,
+			result: []common.MapStr{},
 		},
 		{
 			msg:    "Hint to enable when disabled by default works",
@@ -119,10 +122,12 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type":          "container",
-				"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-				"exclude_lines": []interface{}{"^test2", "^test3"},
+			result: []common.MapStr{
+				{
+					"type":          "container",
+					"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+					"exclude_lines": []interface{}{"^test2", "^test3"},
+				},
 			},
 		},
 		{
@@ -136,7 +141,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: common.MapStr{},
+			result: []common.MapStr{},
 		},
 		{
 			msg:    "Hints with logs.disable should return nothing",
@@ -149,7 +154,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: common.MapStr{},
+			result: []common.MapStr{},
 		},
 		{
 			msg:    "Empty event hints should return default config",
@@ -168,12 +173,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"close_timeout": "true",
 				},
-				"close_timeout": "true",
 			},
 		},
 		{
@@ -199,14 +206,62 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"include_lines": []interface{}{"^test", "^test1"},
+					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"close_timeout": "true",
 				},
-				"include_lines": []interface{}{"^test", "^test1"},
-				"exclude_lines": []interface{}{"^test2", "^test3"},
-				"close_timeout": "true",
+			},
+		},
+		{
+			msg:    "Hints with  two sets of include|exclude_lines must be part of the input config",
+			config: customCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"1": common.MapStr{
+							"exclude_lines": "^test1, ^test2",
+						},
+						"2": common.MapStr{
+							"include_lines": "^test1, ^test2",
+						},
+					},
+				},
+			},
+			len: 2,
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"exclude_lines": []interface{}{"^test1", "^test2"},
+					"close_timeout": "true",
+				},
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"include_lines": []interface{}{"^test1", "^test2"},
+					"close_timeout": "true",
+				},
 			},
 		},
 		{
@@ -234,16 +289,18 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"multiline": map[string]interface{}{
+						"pattern": "^test",
+						"negate":  "true",
+					},
+					"close_timeout": "true",
 				},
-				"multiline": map[string]interface{}{
-					"pattern": "^test",
-					"negate":  "true",
-				},
-				"close_timeout": "true",
 			},
 		},
 		{
@@ -268,14 +325,16 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
-				},
-				"multiline": map[string]interface{}{
-					"pattern": "^test",
-					"negate":  "true",
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
+					},
+					"multiline": map[string]interface{}{
+						"pattern": "^test",
+						"negate":  "true",
+					},
 				},
 			},
 		},
@@ -308,20 +367,22 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
-				},
-				"close_timeout": "true",
-				"processors": []interface{}{
-					map[string]interface{}{
-						"dissect": map[string]interface{}{
-							"tokenizer": "%{key1} %{key2}",
-						},
+			result: []common.MapStr{
+				{
+					"type": "docker",
+					"containers": map[string]interface{}{
+						"ids": []interface{}{"abc"},
 					},
-					map[string]interface{}{
-						"drop_event": nil,
+					"close_timeout": "true",
+					"processors": []interface{}{
+						map[string]interface{}{
+							"dissect": map[string]interface{}{
+								"tokenizer": "%{key1} %{key2}",
+							},
+						},
+						map[string]interface{}{
+							"drop_event": nil,
+						},
 					},
 				},
 			},
@@ -348,28 +409,30 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"error": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
-							"stream": "all",
-							"ids":    []interface{}{"abc"},
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"error": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "all",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
 						},
-						"close_timeout": "true",
 					},
-				},
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
-							"stream": "all",
-							"ids":    []interface{}{"abc"},
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "all",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
 						},
-						"close_timeout": "true",
 					},
 				},
 			},
@@ -397,28 +460,30 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
-							"stream": "all",
-							"ids":    []interface{}{"abc"},
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "all",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
 						},
-						"close_timeout": "true",
 					},
-				},
-				"error": map[string]interface{}{
-					"enabled": false,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
-							"stream": "all",
-							"ids":    []interface{}{"abc"},
+					"error": map[string]interface{}{
+						"enabled": false,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "all",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
 						},
-						"close_timeout": "true",
 					},
 				},
 			},
@@ -447,168 +512,176 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "stdout",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
+						},
+					},
+					"error": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type": "docker",
+							"containers": map[string]interface{}{
+								"stream": "stderr",
+								"ids":    []interface{}{"abc"},
+							},
+							"close_timeout": "true",
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should attach input to its filesets",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module": "apache2",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"error": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type":   "container",
+							"stream": "all",
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+						},
+					},
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type":   "container",
+							"stream": "all",
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should honor defined filesets",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":  "apache2",
+						"fileset": "access",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type":   "container",
+							"stream": "all",
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+						},
+					},
+					"error": map[string]interface{}{
+						"enabled": false,
+						"input": map[string]interface{}{
+							"type":   "container",
+							"stream": "all",
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should honor defined filesets with streams",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":         "apache2",
+						"fileset.stdout": "access",
+						"fileset.stderr": "error",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module": "apache2",
+					"access": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type":   "container",
 							"stream": "stdout",
-							"ids":    []interface{}{"abc"},
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
 						},
-						"close_timeout": "true",
 					},
-				},
-				"error": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type": "docker",
-						"containers": map[string]interface{}{
+					"error": map[string]interface{}{
+						"enabled": true,
+						"input": map[string]interface{}{
+							"type":   "container",
 							"stream": "stderr",
-							"ids":    []interface{}{"abc"},
-						},
-						"close_timeout": "true",
-					},
-				},
-			},
-		},
-		{
-			msg:    "Hint with module should attach input to its filesets",
-			config: defaultCfg,
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
-				},
-				"container": common.MapStr{
-					"name": "foobar",
-					"id":   "abc",
-				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"module": "apache2",
-					},
-				},
-			},
-			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"error": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "all",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
-						},
-					},
-				},
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "all",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
-						},
-					},
-				},
-			},
-		},
-		{
-			msg:    "Hint with module should honor defined filesets",
-			config: defaultCfg,
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
-				},
-				"container": common.MapStr{
-					"name": "foobar",
-					"id":   "abc",
-				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"module":  "apache2",
-						"fileset": "access",
-					},
-				},
-			},
-			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "all",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
-						},
-					},
-				},
-				"error": map[string]interface{}{
-					"enabled": false,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "all",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
-						},
-					},
-				},
-			},
-		},
-		{
-			msg:    "Hint with module should honor defined filesets with streams",
-			config: defaultCfg,
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
-				},
-				"container": common.MapStr{
-					"name": "foobar",
-					"id":   "abc",
-				},
-				"hints": common.MapStr{
-					"logs": common.MapStr{
-						"module":         "apache2",
-						"fileset.stdout": "access",
-						"fileset.stderr": "error",
-					},
-				},
-			},
-			len: 1,
-			result: common.MapStr{
-				"module": "apache2",
-				"access": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "stdout",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
-						},
-					},
-				},
-				"error": map[string]interface{}{
-					"enabled": true,
-					"input": map[string]interface{}{
-						"type":   "container",
-						"stream": "stderr",
-						"paths": []interface{}{
-							"/var/lib/docker/containers/abc/*-json.log",
+							"paths": []interface{}{
+								"/var/lib/docker/containers/abc/*-json.log",
+							},
 						},
 					},
 				},
@@ -629,15 +702,18 @@ func TestGenerateHints(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len, test.msg)
-		if test.len != 0 {
+		assert.Equal(t, test.len, len(cfgs), test.msg)
+		configs := make([]common.MapStr, 0)
+		for _, cfg := range cfgs {
 			config := common.MapStr{}
-			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.msg)
-
-			assert.Equal(t, test.result, config, test.msg)
+			err := cfg.Unpack(&config)
+			ok := assert.Nil(t, err, test.msg)
+			if !ok {
+				break
+			}
+			configs = append(configs, config)
 		}
-
+		assert.Equal(t, test.result, configs, test.msg)
 	}
 }
 
@@ -861,7 +937,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len, test.msg)
+		assert.Equal(t, test.len, len(cfgs), test.msg)
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)

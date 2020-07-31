@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-08T10:20:34.0535453Z",
     "event": {
       "action": "group-membership-enumerated",
+      "category": "iam",
       "code": 4798,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "info",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"

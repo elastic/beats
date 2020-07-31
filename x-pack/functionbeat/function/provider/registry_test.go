@@ -12,11 +12,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 type mockProvider struct {

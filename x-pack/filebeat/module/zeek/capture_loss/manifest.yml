@@ -11,5 +11,5 @@ var:
   - name: tags
     default: [zeek.capture_loss]
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/capture_loss.yml

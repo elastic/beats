@@ -1,0 +1,40 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: httpjson
+  - name: api_key
+  - name: authentication_scheme
+    default: "SSWS"
+  - name: http_client_timeout
+  - name: http_method
+  - name: http_headers
+  - name: http_request_body
+  - name: interval
+    default: 60s
+  - name: json_objects_array
+  - name: keep_original_message
+    default: true
+  - name: no_http_body
+    default: true
+  - name: pagination
+    default:
+      header:
+        field_name: Link
+        regex_pattern: '<([^>]+)>; *rel="next"(?:,|$)'
+  - name: rate_limit
+    default:
+      limit: X-Rate-Limit-Limit
+      remaining: X-Rate-Limit-Remaining
+      reset: X-Rate-Limit-Reset
+  - name: ssl
+  - name: tags
+    default: [forwarded]
+  - name: url
+
+input: config/input.yml
+ingest_pipeline: ingest/pipeline.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

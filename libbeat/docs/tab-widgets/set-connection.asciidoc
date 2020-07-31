@@ -1,0 +1,65 @@
+// tag::cloud[]
+
+:beatname_url: {beats-ref-root}/{beatname_lc}/{branch}
+
+Specify the {beatname_url}/configure-cloud-id.html[cloud.id] of your {ess}, and set
+{beatname_url}/configure-cloud-id.html[cloud.auth] to a user who is authorized to
+set up {beatname_uc}. For example:
+
+["source","yaml",subs="attributes"]
+----------------------------------------------------------------------
+cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
+cloud.auth: "{beatname_lc}_setup:{pwd}" <1>
+----------------------------------------------------------------------
+<1> This examples shows a hard-coded password, but you should store sensitive
+values
+ifndef::serverless[]
+in the {beatname_url}/keystore.html[secrets keystore].
+endif::[]
+ifdef::serverless[]
+in environment variables.
+endif::[]
+// end::cloud[]
+
+// tag::self-managed[]
+. Set the host and port where {beatname_uc} can find the {es} installation, and
+set the username and password of a user who is authorized to set up
+{beatname_uc}. For example:
++
+["source","yaml",subs="attributes"]
+----
+output.elasticsearch:
+  hosts: ["myEShost:9200"]
+  username: "{beatname_lc}_internal"
+  password: "{pwd}" <1>
+----
+<1> This examples shows a hard-coded password, but you should store sensitive
+values
+ifndef::serverless[]
+in the {beatname_url}/keystore.html[secrets keystore].
+endif::[]
+ifdef::serverless[]
+in environment variables.
+endif::[]
+
+. If you plan to use our pre-built {kib} dashboards, configure the {kib}
+endpoint. Skip this step if {kib} is running on the same host as {es}.
++
+[source,yaml]
+----------------------------------------------------------------------
+  setup.kibana:
+    host: "mykibanahost:5601" <1>
+    username: "my_kibana_user" <2> <3>
+    password: "{pwd}"
+----------------------------------------------------------------------
+<1> The hostname and port of the machine where {kib} is running,
+for example, `mykibanahost:5601`. If you specify a path after the port number,
+include the scheme and port: `http://mykibanahost:5601/path`.
+<2> The `username` and `password` settings for {kib} are optional. If you don't
+specify credentials for {kib}, {beatname_uc} uses the `username` and `password`
+specified for the {es} output.
+<3> To use the pre-built {kib} dashboards, this user must be authorized to
+view dashboards or have the
+`kibana_admin` {ref}/built-in-roles.html[built-in role].
+// end::self-managed[]
+

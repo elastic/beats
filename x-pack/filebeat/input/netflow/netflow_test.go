@@ -21,11 +21,11 @@ import (
 	"github.com/tsg/gopacket/pcap"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/protocol"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
 var (

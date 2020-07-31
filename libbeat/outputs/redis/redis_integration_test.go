@@ -20,6 +20,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -30,12 +31,12 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
-	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
-	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 )
 
 const (
@@ -348,7 +349,7 @@ func sendTestEvents(out outputs.Client, batches, N int) error {
 		}
 
 		batch := outest.NewBatch(events...)
-		err := out.Publish(batch)
+		err := out.Publish(context.Background(), batch)
 		if err != nil {
 			return err
 		}

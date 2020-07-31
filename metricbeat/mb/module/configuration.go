@@ -20,9 +20,9 @@ package module
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
@@ -30,7 +30,7 @@ func ConfiguredModules(modulesData []*common.Config, configModulesData *common.C
 	var modules []*Wrapper
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, mb.Registry, nil)
+		module, err := NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}

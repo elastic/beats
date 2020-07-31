@@ -24,7 +24,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Config defines the configuration options for the DNS processor.
@@ -36,6 +36,7 @@ type Config struct {
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
 	Fields       common.MapStr `config:"fields"`                   // Mapping of source fields to target fields.
+	Transport    string        `config:"transport"`                // Can be tls or udp.
 	reverseFlat  map[string]string
 }
 
@@ -117,6 +118,14 @@ func (c *Config) Validate() error {
 		c.reverseFlat[k] = target
 	}
 
+	c.Transport = strings.ToLower(c.Transport)
+	switch c.Transport {
+	case "tls":
+	case "udp":
+	default:
+		return errors.Errorf("invalid transport method type '%v' specified in "+
+			"config (valid value is: tls or udp)", c.Transport)
+	}
 	return nil
 }
 
@@ -155,5 +164,6 @@ var defaultConfig = Config{
 			MaxCapacity:     10000,
 		},
 	},
-	Timeout: 500 * time.Millisecond,
+	Transport: "udp",
+	Timeout:   500 * time.Millisecond,
 }

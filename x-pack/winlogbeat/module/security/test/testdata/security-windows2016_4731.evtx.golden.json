@@ -2,11 +2,17 @@
   {
     "@timestamp": "2019-10-22T11:29:49.3586766Z",
     "event": {
-      "action": "added-member-to-group",
+      "action": "added-group-account",
+      "category": "iam",
       "code": 4731,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "group"
+      ]
     },
     "group": {
       "domain": "WLBEAT",

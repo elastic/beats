@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "event": {
       "action": "added-user-account",
+      "category": "iam",
       "code": 4720,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -37,7 +43,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "SCRIPT",
           "LOCKOUT"
         ],
@@ -90,10 +96,16 @@
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "event": {
       "action": "added-user-account",
+      "category": "iam",
       "code": 4720,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -124,7 +136,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "SCRIPT",
           "LOCKOUT"
         ],

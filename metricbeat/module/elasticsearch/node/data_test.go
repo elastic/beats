@@ -25,9 +25,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var info = elasticsearch.Info{

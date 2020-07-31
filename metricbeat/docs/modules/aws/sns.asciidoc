@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-sns]]
-=== aws sns metricset
+[role="xpack"]
+=== AWS sns metricset
 
 beta[]
 

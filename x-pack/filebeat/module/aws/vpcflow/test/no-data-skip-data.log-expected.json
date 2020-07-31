@@ -19,7 +19,10 @@
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 0,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2015-05-10T18:02:14.000Z",
@@ -41,6 +44,9 @@
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 82,
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

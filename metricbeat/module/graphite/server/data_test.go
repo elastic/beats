@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func GetMetricProcessor() *metricProcessor {
@@ -84,7 +84,7 @@ func TestMetricProcessorDeleteTemplate(t *testing.T) {
 func TestMetricProcessorProcess(t *testing.T) {
 	processor := GetMetricProcessor()
 	event, err := processor.Process("test.localhost.bash.stats 42 1500934723")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, event)
 
 	tag := event["tag"].(common.MapStr)
@@ -101,7 +101,7 @@ func TestMetricProcessorProcess(t *testing.T) {
 	assert.Equal(t, event["@timestamp"], timestamp)
 
 	event, err = processor.Process("test.localhost.bash.stats 42")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, event)
 
 	assert.NotNil(t, event["stats"])

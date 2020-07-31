@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -25,11 +26,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
@@ -126,7 +127,7 @@ func testConnectionType(
 		batch.OnSignal = func(_ outest.BatchSignal) {
 			close(sig)
 		}
-		err = output.Publish(batch)
+		err = output.Publish(context.Background(), batch)
 
 		t.Log("wait signal")
 		<-sig

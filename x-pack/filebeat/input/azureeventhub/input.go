@@ -11,15 +11,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
@@ -42,6 +40,7 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
+	ackChannel   chan int
 }
 
 const (
@@ -61,18 +60,9 @@ func NewInput(
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
-	cfgwarn.Beta("The %s input is beta", inputName)
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "reading %s input config", inputName)
-	}
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
-	if err != nil {
-		return nil, err
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -88,17 +78,20 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	input := &azureInput{
+	in := &azureInput{
 		config:       config,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
-		outlet:       out,
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
-
-	input.log.Infof("Initialized %s input.", inputName)
-	return input, nil
+	out, err := connector.Connect(cfg)
+	if err != nil {
+		return nil, err
+	}
+	in.outlet = out
+	in.log.Infof("Initialized %s input.", inputName)
+	return in, nil
 }
 
 // Run starts the input worker then returns. Only the first invocation
@@ -176,7 +169,7 @@ func (a *azureInput) Wait() {
 	a.Stop()
 }
 
-func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) error {
+func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
 	timestamp := time.Now()
 	azure := common.MapStr{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
@@ -195,25 +188,43 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) er
 				"message": msg,
 				"azure":   azure,
 			},
+			Private: event.Data,
 		})
 		if !ok {
-			return errors.New("event has not been sent")
+			return ok
 		}
 	}
-	return nil
+	return true
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
-	if err != nil {
-		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-		return []string{string(bMessage)}
-	}
+	var mapObject map[string][]interface{}
 	var messages []string
-	if len(obj[expandEventListFromField]) > 0 {
-		for _, ms := range obj[expandEventListFromField] {
+	// check if the message is a "records" object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		if len(mapObject[expandEventListFromField]) > 0 {
+			for _, ms := range mapObject[expandEventListFromField] {
+				js, err := json.Marshal(ms)
+				if err == nil {
+					messages = append(messages, string(js))
+				} else {
+					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				}
+			}
+		}
+	} else {
+		a.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
+		// in some cases the message is an array
+		var arrayObject []interface{}
+		err = json.Unmarshal(bMessage, &arrayObject)
+		if err != nil {
+			// return entire message
+			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			return []string{string(bMessage)}
+		}
+		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))

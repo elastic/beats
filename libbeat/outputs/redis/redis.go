@@ -24,22 +24,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 type redisOut struct {
 	beat beat.Info
 }
-
-var debugf = logp.MakeDebug("redis")
 
 const (
 	defaultWaitRetry    = 1 * time.Second
@@ -95,12 +92,7 @@ func makeRedis(
 		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
 
-	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "key",
-		MultiKey:         "keys",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
+	key, err := buildKeySelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -136,7 +128,7 @@ func makeRedis(
 			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
 		}
 
-		transp := &transport.Config{
+		transp := transport.Config{
 			Timeout: config.Timeout,
 			Proxy:   &config.Proxy,
 			TLS:     tls,
@@ -150,7 +142,7 @@ func makeRedis(
 			}
 		case tlsRedisScheme:
 			if transp.TLS == nil {
-				transp.TLS = &transport.TLSConfig{} // enable with system default if TLS was not configured
+				transp.TLS = &tlscommon.TLSConfig{} // enable with system default if TLS was not configured
 			}
 		}
 
@@ -176,4 +168,14 @@ func makeRedis(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildKeySelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
+	})
 }

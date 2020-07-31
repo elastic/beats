@@ -5,7 +5,7 @@
   release: ga
   fields:
     - name: cmd_get
-      type: long
+      type: double
       description: >
         Number of get commands
     - name: couch.docs.disk_size.bytes

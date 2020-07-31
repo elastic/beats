@@ -1,85 +1,43 @@
 {
-    "_index" : "metricbeat-8.0.0-2020.01.09-000001",
-    "_type" : "_doc",
-    "_id" : "XxYjjG8BQe78yNOEwING",
-    "_score" : null,
-    "_source" : {
-        "@timestamp" : "2020-01-09T21:04:00.000Z",
-        "event" : {
-            "duration" : 122304420600,
-            "dataset" : "azure.storage",
-            "module" : "azure"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "namespace": "Microsoft.Storage/storageAccounts/queueServices",
+        "resource": {
+            "group": "obs-infrastructure",
+            "type": "Microsoft.Storage/storageAccounts"
         },
-        "metricset" : {
-            "name" : "storage",
-            "period" : 300000
-        },
-        "azure" : {
-            "timegrain" : "PT5M",
-            "namespace" : "Microsoft.Storage/storageAccounts/blobServices",
-            "dimensions" : {
-                "apiname" : "DeleteBlob"
+        "storage": {
+            "queue_capacity": {
+                "avg": 0
             },
-            "storage" : {
-                "successe2elatency" : {
-                    "avg" : 9.1
-                },
-                "availability" : {
-                    "avg" : 100
-                },
-                "transactions" : {
-                    "total" : 10
-                },
-                "ingress" : {
-                    "total" : 5330
-                },
-                "egress" : {
-                    "total" : 1010
-                },
-                "successserverlatency" : {
-                    "avg" : 9.1
-                }
+            "queue_count": {
+                "avg": 0
             },
-            "resource" : {
-                "name" : "obsdiaglinux",
-                "type" : "Microsoft.Storage/storageAccounts",
-                "group" : "obs-infrastructure"
-            },
-            "subscription_id" : "12345678-qwer-1234-5678-12345678"
+            "queue_message_count": {
+                "avg": 0
+            }
         },
-        "service" : {
-            "type" : "azure"
-        },
-        "ecs" : {
-            "version" : "1.2.0"
-        },
-        "host" : {
-            "architecture" : "x86_64",
-            "name" : "DESKTOP-RFOOE09",
-            "os" : {
-                "kernel" : "10.0.18362.535 (WinBuild.160101.0800)",
-                "build" : "18362.535",
-                "platform" : "windows",
-                "version" : "10.0",
-                "family" : "windows",
-                "name" : "Windows 10 Pro"
-            },
-            "id" : "12345678-qwer-1234-5678-12345678",
-            "hostname" : "DESKTOP-RFOOE09"
-        },
-        "agent" : {
-            "hostname" : "DESKTOP-RFOOE09",
-            "id" : "12345678-qwer-1234-5678-12345678",
-            "version" : "8.0.0",
-            "type" : "metricbeat",
-            "ephemeral_id" : "12345678-qwer-1234-5678-12345678"
-        },
-        "cloud" : {
-            "provider" : "azure",
-            "region" : "westeurope"
-        }
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "timegrain": "PT1H"
     },
-    "sort" : [
-        1578603840000
-    ]
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Storage/storageAccounts/urcbyscmrkbygsawinvm/queueServices/default",
+            "name": "urcbyscmrkbygsawinvm"
+        },
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.storage",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "storage",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
 }

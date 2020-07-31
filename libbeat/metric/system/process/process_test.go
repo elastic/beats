@@ -29,7 +29,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/gosigar"
 )
 
@@ -37,7 +37,7 @@ func TestPids(t *testing.T) {
 	pids, err := Pids()
 
 	assert.NotNil(t, pids)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Assuming at least 2 processes are running
 	assert.True(t, (len(pids) > 1))

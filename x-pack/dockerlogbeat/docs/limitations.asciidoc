@@ -8,6 +8,5 @@ This release of the {log-driver} has the following known problems and
 limitations:
 
 * Spool to disk (beta) is not supported.
-* Complex config options can't be easily represented via `--log-opts`.
 * Mapping templates and other assets that are normally installed by the
 {beats} setup are not available.

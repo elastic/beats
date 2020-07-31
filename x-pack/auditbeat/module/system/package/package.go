@@ -19,18 +19,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
 const (
@@ -76,6 +76,21 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingPackage:
+		return "info"
+	case eventActionPackageInstalled:
+		return "installation"
+	case eventActionPackageRemoved:
+		return "deletion"
+	case eventActionPackageUpdated:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -106,7 +121,9 @@ type Package struct {
 	Size        uint64
 	Summary     string
 	URL         string
-	Error       error
+	Type        string
+
+	error error
 }
 
 // Hash creates a hash for Package.
@@ -119,8 +136,12 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() common.MapStr {
+func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
 	mapstr := common.MapStr{
+		"name":    pkg.Name,
+		"version": pkg.Version,
+	}
+	ecsMapstr := common.MapStr{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
@@ -131,29 +152,39 @@ func (pkg Package) toMapStr() common.MapStr {
 
 	if pkg.Arch != "" {
 		mapstr.Put("arch", pkg.Arch)
+		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
 		mapstr.Put("license", pkg.License)
+		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
 		mapstr.Put("installtime", pkg.InstallTime)
+		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
 		mapstr.Put("size", pkg.Size)
+		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
 		mapstr.Put("summary", pkg.Summary)
+		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
 		mapstr.Put("url", pkg.URL)
+		ecsMapstr.Put("reference", pkg.URL)
 	}
 
-	return mapstr
+	if pkg.Type != "" {
+		ecsMapstr.Put("type", pkg.Type)
+	}
+
+	return mapstr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -340,23 +371,27 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 }
 
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"package"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
+			"package": ecsPkgFields,
 			"message": packageMessage(pkg, action),
 		},
-		MetricSetFields: pkg.toMapStr(),
+		MetricSetFields: pkgFields,
 	}
 
 	if ms.HostID() != "" {
 		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
 	}
 
-	if pkg.Error != nil {
-		event.RootFields.Put("error.message", pkg.Error.Error())
+	if pkg.error != nil {
+		event.RootFields.Put("error.message", pkg.error.Error())
 	}
 
 	return event
@@ -462,7 +497,7 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 	if err == nil {
 		foundPackageManager = true
 
-		dpkgPackages, err := listDebPackages()
+		dpkgPackages, err := ms.listDebPackages()
 		if err != nil {
 			return nil, errors.Wrap(err, "error getting DEB packages")
 		}
@@ -499,7 +534,7 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 	return packages, nil
 }
 
-func listDebPackages() ([]*Package, error) {
+func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 	dpkgStatusFile := filepath.Join(dpkgPath, "status")
 
 	file, err := os.Open(dpkgStatusFile)
@@ -538,7 +573,9 @@ func listDebPackages() ([]*Package, error) {
 		value := strings.TrimSpace(words[1])
 
 		if pkg == nil {
-			pkg = &Package{}
+			pkg = &Package{
+				Type: "dpkg",
+			}
 		}
 
 		switch strings.ToLower(words[0]) {
@@ -556,9 +593,14 @@ func listDebPackages() ([]*Package, error) {
 		case "description":
 			pkg.Summary = value
 		case "installed-size":
-			pkg.Size, err = strconv.ParseUint(value, 10, 64)
+			pkg.Size, err = parseDpkgInstalledSize(value)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error converting %s to int", value)
+				// If installed size is invalid, log a warning but still
+				// report the package with size=0.
+				ms.log.Warnw("Failed parsing installed size",
+					"package", pkg.Name,
+					"Installed-Size", value,
+					"Error", err)
 			}
 		case "homepage":
 			pkg.URL = value
@@ -577,4 +619,34 @@ func listDebPackages() ([]*Package, error) {
 	}
 
 	return packages, nil
+}
+
+func parseDpkgInstalledSize(value string) (size uint64, err error) {
+	// Installed-Size is an integer (KiB).
+	if size, err = strconv.ParseUint(value, 10, 64); err == nil {
+		return size, err
+	}
+
+	// Some rare third-party packages contain a unit at the end. This is ignored
+	// by dpkg tools. Try to parse to return a value as close as possible
+	// to what the package maintainer meant.
+	end := len(value)
+	for idx, chr := range value {
+		if chr < '0' || chr > '9' {
+			end = idx
+			break
+		}
+	}
+	multiplier := uint64(1)
+	if end < len(value) {
+		switch value[end] {
+		case 'm', 'M':
+			multiplier = 1024
+		case 'g', 'G':
+			multiplier = 1024 * 1024
+		}
+	}
+
+	size, err = strconv.ParseUint(value[:end], 10, 64)
+	return size * multiplier, err
 }

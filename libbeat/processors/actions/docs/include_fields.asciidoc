@@ -1,6 +1,10 @@
 [[include-fields]]
 === Keep fields from events
 
+++++
+<titleabbrev>include_fields</titleabbrev>
+++++
+
 The `include_fields` processor specifies which fields to export if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
 specified fields are always exported. The `@timestamp` and `type` fields are
@@ -9,10 +13,10 @@ always exported, even if they are not defined in the `include_fields` list.
 [source,yaml]
 -------
 processors:
- - include_fields:
-     when:
+  - include_fields:
+      when:
         condition
-     fields: ["field1", "field2", ...]
+      fields: ["field1", "field2", ...]
 -------
 
 See <<conditions>> for a list of supported conditions.

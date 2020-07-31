@@ -22,13 +22,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/go-ucfg"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 type fakeBuilder struct{}
 
-func (f *fakeBuilder) CreateConfig(event bus.Event) []*common.Config {
+func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	return []*common.Config{common.NewConfig()}
 }
 
@@ -53,10 +55,10 @@ func TestBuilderRegistry(t *testing.T) {
 	cfg, err := common.NewConfigFrom(&config)
 
 	// Make sure that config building doesn't fail
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	builder, err := reg.BuildBuilder(cfg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, builder)
 
 	// Try to create a config with fake builder and assert length
@@ -65,7 +67,7 @@ func TestBuilderRegistry(t *testing.T) {
 	assert.Equal(t, len(res), 1)
 
 	builders := Builders{}
-	builders = append(builders, builder)
+	builders.builders = append(builders.builders, builder)
 
 	// Try using builders object for the same as above and expect
 	// the same result

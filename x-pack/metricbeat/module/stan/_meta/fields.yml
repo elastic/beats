@@ -2,7 +2,7 @@
   title: "Stan"
   description: >
     stan Module
-  release: beta
+  release: ga
   fields:
     - name: stan
       type: group

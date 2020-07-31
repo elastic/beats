@@ -9,14 +9,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/mssql"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
 )
 
 type performanceCounter struct {
@@ -49,8 +48,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The mssql performance metricset is beta.")
-
 	logger := logp.NewLogger("mssql.performance").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
@@ -71,40 +68,40 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	var err error
 	var rows *sql.Rows
-	rows, err = m.db.Query(`SELECT object_name, 
-       counter_name, 
-       instance_name, 
-       cntr_value 
-FROM   sys.dm_os_performance_counters 
-WHERE  counter_name = 'SQL Compilations/sec' 
-        OR counter_name = 'SQL Re-Compilations/sec' 
-        OR counter_name = 'User Connections' 
-        OR counter_name = 'Page splits/sec' 
-        OR ( counter_name = 'Lock Waits/sec' 
-             AND instance_name = '_Total' ) 
-        OR counter_name = 'Page splits/sec' 
-        OR ( object_name = 'SQLServer:Buffer Manager' 
-             AND counter_name = 'Page life expectancy' ) 
-        OR counter_name = 'Batch Requests/sec' 
-        OR ( counter_name = 'Buffer cache hit ratio' 
-             AND object_name = 'SQLServer:Buffer Manager' ) 
-        OR ( counter_name = 'Target pages' 
-             AND object_name = 'SQLServer:Buffer Manager' ) 
-        OR ( counter_name = 'Database pages' 
-             AND object_name = 'SQLServer:Buffer Manager' ) 
-        OR ( counter_name = 'Checkpoint pages/sec' 
-             AND object_name = 'SQLServer:Buffer Manager' ) 
-        OR ( counter_name = 'Lock Waits/sec' 
-             AND instance_name = '_Total' ) 
-        OR ( counter_name = 'Transactions' 
-             AND object_name = 'SQLServer:General Statistics' ) 
-        OR ( counter_name = 'Logins/sec' 
-             AND object_name = 'SQLServer:General Statistics' ) 
-        OR ( counter_name = 'Logouts/sec' 
-             AND object_name = 'SQLServer:General Statistics' ) 
-        OR ( counter_name = 'Connection Reset/sec' 
-             AND object_name = 'SQLServer:General Statistics' ) 
-        OR ( counter_name = 'Active Temp Tables' 
+	rows, err = m.db.Query(`SELECT object_name,
+       counter_name,
+       instance_name,
+       cntr_value
+FROM   sys.dm_os_performance_counters
+WHERE  counter_name = 'SQL Compilations/sec'
+        OR counter_name = 'SQL Re-Compilations/sec'
+        OR counter_name = 'User Connections'
+        OR counter_name = 'Page splits/sec'
+        OR ( counter_name = 'Lock Waits/sec'
+             AND instance_name = '_Total' )
+        OR counter_name = 'Page splits/sec'
+        OR ( object_name = 'SQLServer:Buffer Manager'
+             AND counter_name = 'Page life expectancy' )
+        OR counter_name = 'Batch Requests/sec'
+        OR ( counter_name = 'Buffer cache hit ratio'
+             AND object_name = 'SQLServer:Buffer Manager' )
+        OR ( counter_name = 'Target pages'
+             AND object_name = 'SQLServer:Buffer Manager' )
+        OR ( counter_name = 'Database pages'
+             AND object_name = 'SQLServer:Buffer Manager' )
+        OR ( counter_name = 'Checkpoint pages/sec'
+             AND object_name = 'SQLServer:Buffer Manager' )
+        OR ( counter_name = 'Lock Waits/sec'
+             AND instance_name = '_Total' )
+        OR ( counter_name = 'Transactions'
+             AND object_name = 'SQLServer:General Statistics' )
+        OR ( counter_name = 'Logins/sec'
+             AND object_name = 'SQLServer:General Statistics' )
+        OR ( counter_name = 'Logouts/sec'
+             AND object_name = 'SQLServer:General Statistics' )
+        OR ( counter_name = 'Connection Reset/sec'
+             AND object_name = 'SQLServer:General Statistics' )
+        OR ( counter_name = 'Active Temp Tables'
              AND object_name = 'SQLServer:General Statistics' )`)
 	if err != nil {
 		reporter.Error(errors.Wrapf(err, "error closing rows"))

@@ -11,5 +11,5 @@ var:
   - name: tags
     default: [zeek.stats]
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/stats.yml

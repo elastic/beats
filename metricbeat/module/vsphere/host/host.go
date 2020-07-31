@@ -25,9 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -52,8 +51,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere host metricset is beta")
-
 	config := struct {
 		Username string `config:"username"`
 		Password string `config:"password"`

@@ -282,24 +282,22 @@ func TestData(t *testing.T) {
 ===== Running the Tests
 
 To run all the tests, run `make testsuite`. To only run unit tests, run
-`make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
-a running Docker environment is needed for integration and system tests.
+`mage unitTest`, or for integration tests `mage integTest`.
+Be aware that a running Docker environment is needed for integration and system
+tests.
 
 To run `TestData` and generate the `data.json` file, run
 `go test -tags=integration -data -run TestData` in the directory where your test is located.
 
-Sometimes you may want to run a single integration test, for example, to test a
-module such as the `apache` module. To do this, you can:
+To run the integration tests for a single module, set the `MODULE` environment
+variable to the name of the directory of the module. For example you can run the
+following command to run integration tests for `apache` module:
 
-. Start the Docker service by running
-`docker-compose run -p port:port apache`. You can skip this step if, like the
-`golang` module, your module doesn't need a Docker service.
+[source,shell]
+----
+MODULE=apache mage integTest
+----
 
-. Run `cd tests/system` to change to the folder that contains the integration
-tests.
-
-. Run `INTEGRATION_TESTS=true nosetests test_apache.py`,
-remembering to replace `test_apache.py` with your own test file.
 
 [float]
 === Documentation

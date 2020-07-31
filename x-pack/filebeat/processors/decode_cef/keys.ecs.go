@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/x-pack/filebeat/processors/decode_cef/cef"
+	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
 type mappedField struct {
@@ -45,7 +45,7 @@ var ecsExtensionMapping = map[string]mappedField{
 	"destinationTranslatedPort":    {Target: "destination.nat.port"},
 	"destinationUserId":            {Target: "destination.user.id"},
 	"destinationUserName":          {Target: "destination.user.name"},
-	"destinationUserPrivileges":    {Target: "destination.user.group"},
+	"destinationUserPrivileges":    {Target: "destination.user.group.name"},
 	"deviceAction":                 {Target: "event.action"},
 	"deviceAddress":                {Target: "observer.ip"},
 	"deviceDirection": {
@@ -108,7 +108,7 @@ var ecsExtensionMapping = map[string]mappedField{
 	"sourceTranslatedPort":    {Target: "source.nat.port"},
 	"sourceUserId":            {Target: "source.user.id"},
 	"sourceUserName":          {Target: "source.user.name"},
-	"sourceUserPrivileges":    {Target: "source.user.group"},
+	"sourceUserPrivileges":    {Target: "source.user.group.name"},
 	"startTime":               {Target: "event.start"},
 	"transportProtocol": {
 		Target: "network.transport",

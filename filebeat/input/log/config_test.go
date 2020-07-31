@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/harvester"
 )
 
 func TestCleanOlderError(t *testing.T) {
@@ -59,7 +59,7 @@ func TestCleanOlderIgnoreOlderErrorEqual(t *testing.T) {
 
 func TestCleanOlderIgnoreOlder(t *testing.T) {
 	config := config{
-		CleanInactive: 10*time.Hour + defaultConfig.ScanFrequency + 1*time.Second,
+		CleanInactive: 10*time.Hour + defaultConfig().ScanFrequency + 1*time.Second,
 		IgnoreOlder:   10 * time.Hour,
 		Paths:         []string{"hello"},
 		ForwarderConfig: harvester.ForwarderConfig{

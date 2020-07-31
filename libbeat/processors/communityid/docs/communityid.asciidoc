@@ -1,6 +1,10 @@
 [[community-id]]
 === Community ID Network Flow Hash
 
+++++
+<titleabbrev>community_id</titleabbrev>
+++++
+
 The `community_id` processor computes a network flow hash according to the
 https://github.com/corelight/community-id-spec[Community ID Flow Hash
 specification].

@@ -37,4 +37,4 @@ class Test(XPackTest):
 
             # Verify if processors are correctly setup.
             for metric in evt["prometheus"]["metrics"].keys():
-                assert metric.startswith("ibmmq_")
+                assert metric.startswith("ibmmq_") or metric == "up"

@@ -7,14 +7,25 @@
         "destination.domain": "play.google.com",
         "destination.ip": "216.58.201.174",
         "destination.port": 443,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network_traffic",
+            "network"
+        ],
         "event.dataset": "tls",
         "event.duration": 12280000,
         "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "network.community_id": "1:hfsK5r0tJm7av4j7BtSxA6oH9xA=",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.1.36",
+            "216.58.201.174"
+        ],
         "server.domain": "play.google.com",
         "server.ip": "216.58.201.174",
         "server.port": 443,

@@ -18,10 +18,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/auditbeat/core"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
@@ -84,10 +84,10 @@ func TestWtmp(t *testing.T) {
 
 	// utmpdump: [7] [14962] [ts/2] [vagrant ] [pts/2       ] [10.0.2.2            ] [10.0.2.2       ] [2019-01-24T09:51:51,367964+00:00]
 	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_success"})
 	checkFieldValue(t, events[0].RootFields, "event.action", "user_login")
 	checkFieldValue(t, events[0].RootFields, "event.outcome", "success")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_success")
 	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
 	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
 	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
@@ -123,10 +123,14 @@ func TestWtmp(t *testing.T) {
 	}
 
 	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"end"})
 	checkFieldValue(t, events[0].RootFields, "event.action", "user_logout")
 	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
 	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
+	checkFieldValue(t, events[0].RootFields, "related.ip", []string{"10.0.2.2"})
 	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
+	checkFieldValue(t, events[0].RootFields, "related.user", []string{"vagrant"})
 	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
 }
 
@@ -156,10 +160,10 @@ func TestBtmp(t *testing.T) {
 
 	// utmpdump: [6] [03307] [    ] [root    ] [ssh:notty   ] [10.0.2.2            ] [10.0.2.2       ] [2019-02-20T17:42:26,000000+0000]
 	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_failure"})
 	checkFieldValue(t, events[0].RootFields, "event.action", "user_login")
 	checkFieldValue(t, events[0].RootFields, "event.outcome", "failure")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_failure")
 	checkFieldValue(t, events[0].RootFields, "process.pid", 3307)
 	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
 	checkFieldValue(t, events[0].RootFields, "user.id", 0)
@@ -171,10 +175,10 @@ func TestBtmp(t *testing.T) {
 	// The second UTMP entry in the btmp test file is a duplicate of the first, this is what Ubuntu 18.04 generates.
 	// utmpdump: [6] [03307] [    ] [root    ] [ssh:notty   ] [10.0.2.2            ] [10.0.2.2       ] [2019-02-20T17:42:26,000000+0000]
 	checkFieldValue(t, events[1].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_failure"})
 	checkFieldValue(t, events[1].RootFields, "event.action", "user_login")
 	checkFieldValue(t, events[1].RootFields, "event.outcome", "failure")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_failure")
 	checkFieldValue(t, events[1].RootFields, "process.pid", 3307)
 	checkFieldValue(t, events[1].RootFields, "source.ip", "10.0.2.2")
 	checkFieldValue(t, events[1].RootFields, "user.id", 0)
@@ -185,10 +189,10 @@ func TestBtmp(t *testing.T) {
 
 	// utmpdump: [7] [03788] [/0  ] [elastic ] [pts/0       ] [                    ] [0.0.0.0        ] [2019-02-20T17:45:08,447344+0000]
 	checkFieldValue(t, events[2].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_failure"})
 	checkFieldValue(t, events[2].RootFields, "event.action", "user_login")
 	checkFieldValue(t, events[2].RootFields, "event.outcome", "failure")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_failure")
 	checkFieldValue(t, events[2].RootFields, "process.pid", 3788)
 	checkFieldValue(t, events[2].RootFields, "source.ip", "0.0.0.0")
 	checkFieldValue(t, events[2].RootFields, "user.name", "elastic")
@@ -198,10 +202,10 @@ func TestBtmp(t *testing.T) {
 
 	// utmpdump: [7] [03788] [/0  ] [UNKNOWN ] [pts/0       ] [                    ] [0.0.0.0        ] [2019-02-20T17:45:15,765318+0000]
 	checkFieldValue(t, events[3].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
+	checkFieldValue(t, events[0].RootFields, "event.category", []string{"authentication"})
+	checkFieldValue(t, events[0].RootFields, "event.type", []string{"start", "authentication_failure"})
 	checkFieldValue(t, events[3].RootFields, "event.action", "user_login")
 	checkFieldValue(t, events[3].RootFields, "event.outcome", "failure")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_failure")
 	checkFieldValue(t, events[3].RootFields, "process.pid", 3788)
 	checkFieldValue(t, events[3].RootFields, "source.ip", "0.0.0.0")
 	contains, err := events[3].RootFields.HasKey("user.id")

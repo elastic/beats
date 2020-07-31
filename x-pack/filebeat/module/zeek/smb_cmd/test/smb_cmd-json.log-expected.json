@@ -4,15 +4,29 @@
         "destination.address": "172.16.128.202",
         "destination.ip": "172.16.128.202",
         "destination.port": 445,
+        "event.action": "NT_CREATE_ANDX",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.smb_cmd",
         "event.id": "CbT8mpAXseu6Pt4R7",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "smb_cmd",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:SJNAD5vtzZuhQjGtfaI8svTnyuw=",
         "network.protocol": "smb",
         "network.transport": "tcp",
+        "related.ip": [
+            "172.16.133.6",
+            "172.16.128.202"
+        ],
         "service.type": "zeek",
         "source.address": "172.16.133.6",
         "source.ip": "172.16.133.6",

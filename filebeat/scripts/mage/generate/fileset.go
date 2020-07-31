@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	genfileset "github.com/elastic/beats/filebeat/generator/fileset"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	genfileset "github.com/elastic/beats/v7/filebeat/generator/fileset"
 )
 
 // Fileset creates a new fileset for an existing Filebeat module.

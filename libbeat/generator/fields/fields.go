@@ -123,24 +123,32 @@ func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output io.Writer) error {
 func GenerateFieldsYml(fieldFiles []*YmlFile) ([]byte, error) {
 	buf := bytes.NewBufferString("")
 	for _, p := range fieldFiles {
-		file, err := os.Open(p.Path)
+		err := generateFieldsYmlForFile(buf, p)
 		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-
-		fs := bufio.NewScanner(file)
-		for fs.Scan() {
-			err = writeIndentedLine(buf, fs.Text()+"\n", p.Indent)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if err := fs.Err(); err != nil {
 			return nil, err
 		}
 	}
 	return buf.Bytes(), nil
+}
+
+func generateFieldsYmlForFile(buf *bytes.Buffer, p *YmlFile) error {
+	file, err := os.Open(p.Path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	fs := bufio.NewScanner(file)
+	for fs.Scan() {
+		err = writeIndentedLine(buf, fs.Text()+"\n", p.Indent)
+		if err != nil {
+			return err
+		}
+	}
+	if err := fs.Err(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {

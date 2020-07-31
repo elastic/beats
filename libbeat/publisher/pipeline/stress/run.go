@@ -22,12 +22,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 )
 
 type config struct {
@@ -84,9 +84,9 @@ func RunTests(
 		return fmt.Errorf("loading pipeline failed: %+v", err)
 	}
 	defer func() {
-		logp.Info("Stop pipeline")
+		log.Info("Stop pipeline")
 		pipeline.Close()
-		logp.Info("pipeline closed")
+		log.Info("pipeline closed")
 	}()
 
 	cs := newCloseSignaler()
@@ -100,7 +100,7 @@ func RunTests(
 		withWG(&genWG, func() {
 			err := generate(cs, pipeline, config.Generate, i, errors)
 			if err != nil {
-				logp.Err("Generator failed with: %v", err)
+				log.Errorf("Generator failed with: %v", err)
 			}
 		})
 	}

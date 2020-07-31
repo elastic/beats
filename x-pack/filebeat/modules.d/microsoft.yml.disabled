@@ -1,0 +1,36 @@
+# Module: microsoft
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-microsoft.html
+
+- module: microsoft
+  # ATP configuration
+  defender_atp:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+   
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  dhcp:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9515
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local

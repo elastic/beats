@@ -24,17 +24,18 @@ import (
 
 	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 var (
 	// Defaults used in the template
-	defaultDateDetection         = false
-	defaultTotalFieldsLimit      = 10000
-	defaultNumberOfRoutingShards = 30
+	defaultDateDetection           = false
+	defaultTotalFieldsLimit        = 10000
+	defaultNumberOfRoutingShards   = 30
+	defaultMaxDocvalueFieldsSearch = 200
 
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
@@ -323,6 +324,10 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		fields = append(fields, "fields.*")
 
 		indexSettings.Put("query.default_field", fields)
+	}
+
+	if ver.Major >= 6 {
+		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
 	}
 
 	indexSettings.DeepUpdate(userSettings)

@@ -4,25 +4,25 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-istio]]
 [role="xpack"]
-== istio module
+== Istio module
 
 beta[]
 
 This is the Istio module. The Istio module collects metrics from the
-Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
+Istio https://istio.io/v1.4/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
 The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
 
 [float]
 === Compatibility
 
-The Istio module is tested with Istio 1.4
+The Istio module is tested with Istio `1.4`.
 
 
 [float]
 === Example configuration
 
-The istio module supports the standard configuration options that are described
+The Istio module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

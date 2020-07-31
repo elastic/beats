@@ -18,13 +18,14 @@
 package stress
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 type testOutput struct {
@@ -70,7 +71,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 
 func (*testOutput) Close() error { return nil }
 
-func (t *testOutput) Publish(batch publisher.Batch) error {
+func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	config := &t.config
 
 	n := len(batch.Events())

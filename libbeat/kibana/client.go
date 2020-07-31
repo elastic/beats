@@ -31,10 +31,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type Connection struct {
@@ -48,6 +48,7 @@ type Connection struct {
 
 type Client struct {
 	Connection
+	log *logp.Logger
 }
 
 func addToURL(_url, _path string, params url.Values) string {
@@ -115,7 +116,8 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		kibanaURL = u.String()
 	}
 
-	logp.Info("Kibana url: %s", kibanaURL)
+	log := logp.NewLogger("kibana")
+	log.Info("Kibana url: %s", kibanaURL)
 
 	var dialer, tlsDialer transport.Dialer
 
@@ -144,6 +146,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 				Timeout: config.Timeout,
 			},
 		},
+		log: log,
 	}
 
 	if !config.IgnoreVersion {
@@ -271,7 +274,7 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 
 	body, err := json.Marshal(jsonBody)
 	if err != nil {
-		logp.Err("Failed to json encode body (%v): %#v", err, jsonBody)
+		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
 		return fmt.Errorf("fail to marshal the json content: %v", err)
 	}
 

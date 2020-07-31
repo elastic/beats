@@ -213,6 +213,11 @@ func (l *Logger) Recover(msg string) {
 	}
 }
 
+// Sync syncs the logger.
+func (l *Logger) Sync() error {
+	return l.logger.Sync()
+}
+
 // L returns an unnamed global logger.
 func L() *Logger {
 	return loadLogger().logger

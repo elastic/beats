@@ -29,7 +29,8 @@
         "observer.version": "6.6.1",
         "service.type": "cef",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -62,7 +63,8 @@
         "observer.version": "6.6.1",
         "service.type": "cef",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -106,11 +108,16 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "6.6.1",
+        "related.ip": [
+            "10.1.1.40",
+            "10.37.205.252"
+        ],
         "rule.id": "2097157.1",
         "service.type": "cef",
         "source.ip": "10.37.205.252",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -154,12 +161,17 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.ip": [
+            "255.255.255.255",
+            "172.16.1.1"
+        ],
         "rule.id": "605.0",
         "service.type": "cef",
         "source.ip": "172.16.1.1",
         "source.port": 68,
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -202,11 +214,16 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.ip": [
+            "192.168.1.1",
+            "172.16.1.1"
+        ],
         "rule.id": "601.0",
         "service.type": "cef",
         "source.ip": "172.16.1.1",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -247,11 +264,15 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.user": [
+            "alice"
+        ],
         "service.type": "cef",
         "source.bytes": 32526,
         "source.user.name": "alice",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -283,11 +304,18 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.ip": [
+            "192.168.1.1"
+        ],
+        "related.user": [
+            "bob"
+        ],
         "service.type": "cef",
         "source.ip": "192.168.1.1",
         "source.user.name": "bob",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -319,11 +347,18 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.ip": [
+            "192.168.1.1"
+        ],
+        "related.user": [
+            "bob"
+        ],
         "service.type": "cef",
         "source.ip": "192.168.1.1",
         "source.user.name": "bob",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -355,11 +390,18 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.ip": [
+            "172.16.2.1"
+        ],
+        "related.user": [
+            "alice"
+        ],
         "service.type": "cef",
         "source.ip": "172.16.2.1",
         "source.user.name": "alice",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -392,7 +434,8 @@
         "observer.version": "6.6.1",
         "service.type": "cef",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     }
 ]

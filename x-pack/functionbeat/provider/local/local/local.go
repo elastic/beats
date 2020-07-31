@@ -10,12 +10,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 const stdinName = "stdin"

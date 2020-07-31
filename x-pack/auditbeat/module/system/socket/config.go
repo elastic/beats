@@ -32,6 +32,10 @@ type Config struct {
 	// considered closed.
 	FlowInactiveTimeout time.Duration `config:"socket.flow_inactive_timeout"`
 
+	// SocketInactiveTimeout determines how long a socket has to be inactive to be
+	// considered terminated or closed.
+	SocketInactiveTimeout time.Duration `config:"socket.socket_inactive_timeout"`
+
 	// FlowTerminationTimeout determines how long to wait after a flow has been
 	// closed for out of order packets. With TCP, some packets can be received
 	// shortly after a socket is closed. If set too low, additional flows will
@@ -71,6 +75,7 @@ var defaultConfig = Config{
 	ErrQueueSize:           1,
 	RingSizeExp:            7,
 	FlowInactiveTimeout:    30 * time.Second,
+	SocketInactiveTimeout:  60 * time.Second,
 	FlowTerminationTimeout: 5 * time.Second,
 	ClockMaxDrift:          100 * time.Millisecond,
 	ClockSyncPeriod:        10 * time.Second,

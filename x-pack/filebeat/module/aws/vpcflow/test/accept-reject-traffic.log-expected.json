@@ -53,7 +53,10 @@
         "source.geo.region_name": "Moscow",
         "source.ip": "78.24.182.42",
         "source.packets": 20,
-        "source.port": 20641
+        "source.port": 20641,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2014-12-14T04:07:50.000Z",
@@ -109,7 +112,10 @@
         "source.geo.region_name": "Moscow",
         "source.ip": "78.24.182.42",
         "source.packets": 20,
-        "source.port": 49761
+        "source.port": 49761,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2015-05-29T16:32:22.000Z",
@@ -149,7 +155,10 @@
         "source.bytes": 336,
         "source.ip": "203.0.113.12",
         "source.packets": 4,
-        "source.port": 0
+        "source.port": 0,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2015-05-29T16:32:22.000Z",
@@ -189,6 +198,9 @@
         "source.bytes": 336,
         "source.ip": "172.31.16.139",
         "source.packets": 4,
-        "source.port": 0
+        "source.port": 0,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

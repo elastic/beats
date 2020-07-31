@@ -14,9 +14,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (
@@ -137,7 +137,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 func ReadTemplateFlowSet(d Decoder, buf *bytes.Buffer) (templates []*template.Template, err error) {
 	var row [4]byte
 	for {
-		if buf.Len() < 4 {
+		if buf.Len() < 8 {
 			return templates, nil
 		}
 		if n, err := buf.Read(row[:]); err != nil || n != len(row) {

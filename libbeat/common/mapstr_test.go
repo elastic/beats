@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -86,6 +86,11 @@ func TestMapStrDeepUpdate(t *testing.T) {
 			MapStr{"a": 1},
 			MapStr{"a.b": 1},
 			MapStr{"a": 1, "a.b": 1},
+		},
+		{
+			MapStr{"a": (MapStr)(nil)},
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": MapStr{"b": 1}},
 		},
 	}
 

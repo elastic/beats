@@ -31,13 +31,13 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::{libbeat-dir}/repositories.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
+
+include::{docdir}/howto/howto.asciidoc[]
 
 include::./modules.asciidoc[]
 
@@ -53,3 +53,4 @@ include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
 
+include::{libbeat-dir}/shared/redirects.asciidoc[]

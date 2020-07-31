@@ -1,0 +1,17 @@
+default: false
+input:
+  module: googlecloud
+  metricset: metrics
+  defaults:
+    metrics:
+      - service: storage
+        metric_types:
+          - "api/request_count"
+          - "authz/acl_based_object_access_count"
+          - "authz/acl_operations_count"
+          - "authz/object_specific_acl_mutation_count"
+          - "network/received_bytes_count"
+          - "network/sent_bytes_count"
+          - "storage/object_count"
+          - "storage/total_byte_seconds"
+          - "storage/total_bytes"

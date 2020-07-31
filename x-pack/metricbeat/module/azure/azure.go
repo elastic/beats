@@ -8,19 +8,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Config options
 type Config struct {
-	ClientID            string           `config:"client_id"    validate:"required"`
-	ClientSecret        string           `config:"client_secret" validate:"required"`
-	TenantID            string           `config:"tenant_id" validate:"required"`
-	SubscriptionID      string           `config:"subscription_id" validate:"required"`
+	ClientId            string           `config:"client_id"`
+	ClientSecret        string           `config:"client_secret"`
+	TenantId            string           `config:"tenant_id"`
+	SubscriptionId      string           `config:"subscription_id"`
 	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
@@ -29,7 +27,7 @@ type Config struct {
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID          []string       `config:"resource_id"`
+	Id          []string       `config:"resource_id"`
 	Group       []string       `config:"resource_group"`
 	Metrics     []MetricConfig `config:"metrics"`
 	Type        string         `config:"resource_type"`
@@ -62,10 +60,6 @@ func init() {
 // newModule adds validation that hosts is non-empty, a requirement to use the
 // azure module.
 func newModule(base mb.BaseModule) (mb.Module, error) {
-	var config Config
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
-	}
 	return &base, nil
 }
 
@@ -82,7 +76,6 @@ type MetricSet struct {
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	cfgwarn.Beta("The azure %s metricset is beta.", metricsetName)
 	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
@@ -106,14 +99,16 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
 		var resources []ResourceConfig
 		for _, resource := range config.Resources {
-			if len(resource.Group) != 0 || len(resource.ID) != 0 {
+			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.Id) {
 				resources = append(resources, resource)
 			}
 		}
+		// check if this is a light metricset or not and no resources have been configured
 		if len(resources) == 0 && len(config.Resources) != 0 {
-			res := config.Resources[0]
-			res.Query = fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType)
-			resources = append(resources, res)
+			resources = append(resources, ResourceConfig{
+				Query:   fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType),
+				Metrics: config.Resources[0].Metrics,
+			})
 		}
 		config.Resources = resources
 	}
@@ -149,6 +144,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if err != nil {
 			return errors.Wrap(err, "error running EventsMapping")
 		}
+	}
+	return nil
+}
+
+// hasConfigOptions func will check if any resource id or resource group options have been entered in the light metricsets
+func hasConfigOptions(config []string) bool {
+	if config == nil {
+		return false
+	}
+	for _, group := range config {
+		if group == "" {
+			return false
+		}
+	}
+	return true
+}
+
+func (conf *Config) Validate() error {
+	if conf.SubscriptionId == "" {
+		return errors.New("no subscription ID has been configured")
+	}
+	if conf.ClientSecret == "" {
+		return errors.New("no client secret has been configured")
+	}
+	if conf.ClientId == "" {
+		return errors.New("no client ID has been configured")
+	}
+	if conf.TenantId == "" {
+		return errors.New("no tenant ID has been configured")
 	}
 	return nil
 }

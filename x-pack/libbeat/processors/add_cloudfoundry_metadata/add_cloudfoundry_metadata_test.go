@@ -2,12 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build linux darwin windows
-
 package add_cloudfoundry_metadata
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -15,9 +12,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestNoClient(t *testing.T) {
@@ -150,7 +147,7 @@ type fakeClient struct {
 
 func (c *fakeClient) GetAppByGuid(guid string) (*cfclient.App, error) {
 	if c.app.Guid != guid {
-		return nil, fmt.Errorf("unknown app")
+		return nil, cfclient.CloudFoundryError{Code: 100004}
 	}
 	return &c.app, nil
 }

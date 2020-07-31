@@ -43,6 +43,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
       connection_string: ""
       storage_account: ""
       storage_account_key: ""
+      resource_manager_endpoint: ""
 
    auditlogs:
      enabled: false
@@ -52,6 +53,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
        connection_string: ""
        storage_account: ""
        storage_account_key: ""
+       resource_manager_endpoint: ""
 
    signinlogs:
      enabled: false
@@ -61,6 +63,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
        connection_string: ""
        storage_account: ""
        storage_account_key: ""
+       resource_manager_endpoint: ""
 
 ```
 
@@ -89,6 +92,16 @@ The name of the storage account the state/offsets will be stored and updated.
 `storage_account_key` ::
 _string_
 The storage account key, this key will be used to authorize access to data in your storage account.
+
+`resource_manager_endpoint` ::
+_string_
+Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment.
+Ex:
+https://management.chinacloudapi.cn/ for azure ChinaCloud
+https://management.microsoftazure.de/ for azure GermanCloud
+https://management.azure.com/ for azure PublicCloud
+https://management.usgovcloudapi.net/ for azure USGovernmentCloud
+Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
 include::../include/what-happens.asciidoc[]
 

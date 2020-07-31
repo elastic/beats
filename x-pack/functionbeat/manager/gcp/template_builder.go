@@ -12,16 +12,16 @@ import (
 	cloudfunctions "google.golang.org/api/cloudfunctions/v1"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
-	fngcp "github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
+	fngcp "github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/gcp"
 )
 
 const (
-	runtime          = "go111"                            // Golang 1.11
+	runtime          = "go113"                            // Golang 1.13
 	archiveURL       = "gs://%s/%s"                       // path to the function archive
 	locationTemplate = "projects/%s/locations/%s"         // full name of the location
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions
@@ -190,6 +190,5 @@ func zipResources() map[string][]bundle.Resource {
 
 func zipResourcesOfFunc(typeName string) []bundle.Resource {
 	root := filepath.Join("pkg", typeName)
-	vendor := bundle.Folder(filepath.Join("pkg", typeName, "vendor"), filepath.Join("pkg", typeName), 0644)
-	return append(vendor, &bundle.LocalFile{Path: filepath.Join(root, typeName+".go"), FileMode: 0755})
+	return []bundle.Resource{&bundle.LocalFile{Path: filepath.Join(root, typeName+".go"), FileMode: 0755}}
 }

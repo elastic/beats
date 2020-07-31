@@ -14,19 +14,19 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -151,11 +151,6 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // BuildPkgForFunctions creates a folder named pkg and adds functions to it.
 // This makes testing the manager more comfortable.
 func BuildPkgForFunctions() error {
@@ -164,11 +159,9 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
-		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
-		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
-		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
-		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
+		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{
@@ -178,6 +171,29 @@ func BuildPkgForFunctions() error {
 		err = c.Execute()
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+// TestGCPFunctions are used by the CI to test if the GCP functions can be built with
+// the selected Go version.
+// The version is 1.13.1 (Ref: https://cloud.google.com/functions/docs/concepts/go-runtime)
+func TestGCPFunctions() error {
+	for _, f := range []string{"pubsub", "storage"} {
+		params := devtools.DefaultBuildArgs()
+		inputFiles := filepath.Join("provider", "gcp", f, f+".go")
+		params.InputFiles = []string{inputFiles}
+		params.Name = f
+		params.CGO = false
+		params.Env = map[string]string{
+			"GOOS":   "linux",
+			"GOARCH": "amd64",
+		}
+
+		err := devtools.Build(params)
+		if err != nil {
+			return fmt.Errorf("error while building %s for GCP: %+v", f, err)
 		}
 	}
 	return nil

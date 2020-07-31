@@ -11,7 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 const resourceIDExtension = "/default"
@@ -61,7 +61,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 					if dimension != azure.NoDimension {
 						dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 					}
-					metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, mets, resource, resourceID, namespace, dimensions, time)...)
+					metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resource, resourceID, "", namespace, dimensions, time)...)
 				}
 			}
 		}

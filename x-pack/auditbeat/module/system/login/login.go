@@ -13,11 +13,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 const (
@@ -178,7 +178,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	if loginRecord.Username != "" {
 		event.RootFields.Put("user.name", loginRecord.Username)
-
+		event.RootFields.Put("related.user", []string{loginRecord.Username})
 		if loginRecord.UID != -1 {
 			event.RootFields.Put("user.id", loginRecord.UID)
 		}
@@ -194,6 +194,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	if loginRecord.IP != nil {
 		event.RootFields.Put("source.ip", loginRecord.IP)
+		event.RootFields.Put("related.ip", []string{loginRecord.IP.String()})
 	}
 
 	if loginRecord.Hostname != "" && loginRecord.Hostname != loginRecord.IP.String() {
@@ -202,13 +203,22 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	switch loginRecord.Type {
 	case userLoginRecord:
-		event.RootFields.Put("event.category", "authentication")
+		event.RootFields.Put("event.category", []string{"authentication"})
 		event.RootFields.Put("event.outcome", "success")
-		event.RootFields.Put("event.type", "authentication_success")
+		event.RootFields.Put("event.type", []string{"start", "authentication_success"})
 	case userLoginFailedRecord:
-		event.RootFields.Put("event.category", "authentication")
+		event.RootFields.Put("event.category", []string{"authentication"})
 		event.RootFields.Put("event.outcome", "failure")
-		event.RootFields.Put("event.type", "authentication_failure")
+		event.RootFields.Put("event.type", []string{"start", "authentication_failure"})
+	case userLogoutRecord:
+		event.RootFields.Put("event.category", []string{"authentication"})
+		event.RootFields.Put("event.type", []string{"end"})
+	case bootRecord:
+		event.RootFields.Put("event.category", []string{"host"})
+		event.RootFields.Put("event.type", []string{"start"})
+	case shutdownRecord:
+		event.RootFields.Put("event.category", []string{"host"})
+		event.RootFields.Put("event.type", []string{"end"})
 	}
 
 	return event

@@ -1,0 +1,112 @@
+[float]
+[[kubernetes-indexers-and-matchers]]
+=== Indexers and matchers
+
+==== Indexers
+
+Indexers use pods metadata to create unique identifiers for each one of the
+pods.
+
+Available indexers are:
+
+`container`:: Identifies the pod metadata using the IDs of its containers.
+`ip_port`:: Identifies the pod metadata using combinations of its IP and its exposed ports.
+When using this indexer metadata is identified using the IP of the pods, and the
+combination if `ip:port` for each one of the ports exposed by its containers.
+`pod_name`:: Identifies the pod metadata using its namespace and its name as
+`namespace/pod_name`.
+`pod_uid`:: Identifies the pod metadata using the UID of the pod.
+
+==== Matchers
+
+Matchers are used to construct the lookup keys that match with the identifiers
+created by indexes.
+
+===== `field_format`
+
+Looks up pod metadata using a key created with a string format that can include
+event fields.
+
+This matcher has an option `format` to define the string format. This string
+format can contain placeholders for any field in the event.
+
+For example, the following configuration uses the `ip_port` indexer to identify
+the pod metadata by combinations of the pod IP and its exposed ports, and uses
+the destination IP and port in events as match keys:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+    ...
+    default_indexers.enabled: false
+    default_matchers.enabled: false
+    indexers:
+      - ip_port:
+    matchers:
+      - field_format:
+          format: '%{[destination.ip]}:%{[destination.port]}'
+-------------------------------------------------------------------------------
+
+===== `fields`
+
+Looks up pod metadata using as key the value of some specific fields. When
+multiple fields are defined, the first one included in the event is used.
+
+This matcher has an option `lookup_fields` to define the files whose value will
+be used for lookup.
+
+For example, the following configuration uses the `ip_port` indexer to identify
+pods, and defines a matcher that uses the destination IP or the server IP for the
+lookup, the first it finds in the event:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+    ...
+    default_indexers.enabled: false
+    default_matchers.enabled: false
+    indexers:
+      - ip_port:
+    matchers:
+      - fields:
+          lookup_fields: ['destination.ip', 'server.ip']
+-------------------------------------------------------------------------------
+
+ifdef::has_kubernetes_logs_path_matcher[]
+===== `logs_path`
+
+Looks up pod metadata using identifiers extracted from the log path stored in
+the `log.file.path` field.
+
+This matcher has the following configuration settings:
+
+`logs_path`:: (Optional) Base path of container logs. If not specified, it uses
+the default logs path of the platform where {beatname_uc} is running.
+`resource_type`:: (Optional) Type of the resource to obtain the ID of. It can be
+`pod`, to make the lookup based on the pod UID, or `container`, to make the
+lookup based on the container ID. It defaults to `container`.
+
+The default configuration is able to lookup the metadata using the container ID
+when the logs are collected from the default docker logs path
+(`/var/lib/docker/containers/<container ID>/...` on Linux).
+
+For example the following configuration would use the pod UID when the logs are
+collected from `/var/lib/kubelet/pods/<pod UID>/...`.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+    ...
+    default_indexers.enabled: false
+    default_matchers.enabled: false
+    indexers:
+      - pod_uid:
+    matchers:
+      - logs_path:
+          logs_path: '/var/lib/kubelet/pods'
+          resource_type: 'pod'
+-------------------------------------------------------------------------------
+endif::has_kubernetes_logs_path_matcher[]

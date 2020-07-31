@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func MockResource() resources.GenericResource {
@@ -67,7 +67,7 @@ func TestMapMetric(t *testing.T) {
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
@@ -78,8 +78,8 @@ func TestMapMetric(t *testing.T) {
 		metricConfig.Name = []string{"*"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.Nil(t, err)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.NoError(t, err)
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
@@ -97,10 +97,10 @@ func TestMapMetric(t *testing.T) {
 		metricConfig.Aggregations = []string{"Average"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		assert.True(t, len(metrics) > 0)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")

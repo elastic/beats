@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.conntrack",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "conntrack": {
+            "summary": {
+                "drop": 0,
+                "early_drop": 0,
+                "entries": 16,
+                "found": 0,
+                "ignore": 3271028,
+                "insert_failed": 0,
+                "invalid": 122,
+                "search_restart": 3
+            }
+        }
+    },
+    "metricset": {
+        "name": "conntrack",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
+}

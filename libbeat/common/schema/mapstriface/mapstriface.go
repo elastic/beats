@@ -77,9 +77,9 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/schema"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ConvMap struct {
@@ -98,23 +98,23 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		err.Required = convMap.Required
 		return multierror.Errors{err}
 	}
-	subData, ok := d.(map[string]interface{})
-	if !ok {
+	switch subData := d.(type) {
+	case map[string]interface{}, common.MapStr:
+		subEvent := common.MapStr{}
+		_, errors := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
+		for _, err := range errors {
+			if err, ok := err.(schema.KeyError); ok {
+				err.SetKey(convMap.Key + "." + err.Key())
+			}
+		}
+		event[key] = subEvent
+		return errors
+	default:
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
 		logp.Err(err.Error())
 		return multierror.Errors{err}
 	}
-
-	subEvent := common.MapStr{}
-	_, errors := convMap.Schema.ApplyTo(subEvent, subData)
-	for _, err := range errors {
-		if err, ok := err.(schema.KeyError); ok {
-			err.SetKey(convMap.Key + "." + err.Key())
-		}
-	}
-	event[key] = subEvent
-	return errors
 }
 
 func (convMap ConvMap) HasKey(key string) bool {

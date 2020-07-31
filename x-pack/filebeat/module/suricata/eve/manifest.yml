@@ -13,8 +13,6 @@ var:
   - name: community_id
     default: true
 
-  # - name: nested_ecs
-  #   default: false
 ingest_pipeline: ingest/pipeline.yml
 input: config/eve.yml
 

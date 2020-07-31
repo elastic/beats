@@ -1,3 +1,6 @@
 name: azure
 metricsets:
-  - database_account
+ - container_registry
+ - container_instance
+ - container_service
+ - database_account

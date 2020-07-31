@@ -22,10 +22,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
-	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 )
 
 type checker func(*testing.T, outputs.Group)
@@ -114,6 +114,67 @@ func TestMakeRedis(t *testing.T) {
 			}
 			if test.checks != nil {
 				test.checks(t, groups)
+			}
+		})
+	}
+}
+
+func TestKeySelection(t *testing.T) {
+	cases := map[string]struct {
+		cfg   map[string]interface{}
+		event beat.Event
+		want  string
+	}{
+		"key configured": {
+			cfg:  map[string]interface{}{"key": "test"},
+			want: "test",
+		},
+		"key must keep case": {
+			cfg:  map[string]interface{}{"key": "Test"},
+			want: "Test",
+		},
+		"key setting": {
+			cfg: map[string]interface{}{
+				"keys": []map[string]interface{}{{"key": "test"}},
+			},
+			want: "test",
+		},
+		"keys setting must keep case": {
+			cfg: map[string]interface{}{
+				"keys": []map[string]interface{}{{"key": "Test"}},
+			},
+			want: "Test",
+		},
+		"use event field": {
+			cfg: map[string]interface{}{"key": "test-%{[field]}"},
+			event: beat.Event{
+				Fields: common.MapStr{"field": "from-event"},
+			},
+			want: "test-from-event",
+		},
+		"use event field must keep case": {
+			cfg: map[string]interface{}{"key": "Test-%{[field]}"},
+			event: beat.Event{
+				Fields: common.MapStr{"field": "From-Event"},
+			},
+			want: "Test-From-Event",
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			selector, err := buildKeySelector(common.MustNewConfigFrom(test.cfg))
+			if err != nil {
+				t.Fatalf("Failed to parse configuration: %v", err)
+			}
+
+			got, err := selector.Select(&test.event)
+			if err != nil {
+				t.Fatalf("Failed to create key name: %v", err)
+			}
+
+			if test.want != got {
+				t.Errorf("Pipeline name missmatch (want: %v, got: %v)", test.want, got)
 			}
 		})
 	}

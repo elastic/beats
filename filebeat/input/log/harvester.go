@@ -39,26 +39,26 @@ import (
 	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	file_helper "github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/debug"
-	"github.com/elastic/beats/libbeat/reader/multiline"
-	"github.com/elastic/beats/libbeat/reader/readfile"
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
-	"github.com/elastic/beats/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 )
 
 var (
 	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
-	filesMetrics     = harvesterMetrics.NewRegistry("files")
+	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
@@ -132,7 +132,7 @@ func NewHarvester(
 	}
 
 	h := &Harvester{
-		config:        defaultConfig,
+		config:        defaultConfig(),
 		state:         state,
 		states:        states,
 		publishState:  publishState,
@@ -631,6 +631,8 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
+	logp.Debug("harvester", "newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
+
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
@@ -644,10 +646,17 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	// Configure MaxBytes limit for EncodeReader as multiplied by 4
+	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
+	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
+	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
+	encReaderMaxBytes := h.config.MaxBytes * 4
+
 	r, err = readfile.NewEncodeReader(reader, readfile.Config{
 		Codec:      h.encoding,
 		BufferSize: h.config.BufferSize,
 		Terminator: h.config.LineTerminator,
+		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
 		return nil, err

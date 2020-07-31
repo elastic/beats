@@ -25,12 +25,12 @@ import (
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -79,11 +79,7 @@ func newInput(
 		return nil, errors.Wrap(err, "reading mqtt input config")
 	}
 
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

@@ -3,12 +3,19 @@
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1772 to outside:100.66.98.44/8256",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -18,19 +25,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11757 for outside:100.66.205.104/80 (100.66.205.104/80) to inside:172.31.98.44/1772 (172.31.98.44/1772)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -40,7 +55,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -53,15 +69,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1758,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11749 for outside:100.66.211.242/80 to inside:172.31.98.44/1758 duration 0:01:07 bytes 38110 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -72,12 +96,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.211.242",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.211.242",
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -90,15 +119,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1757,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11748 for outside:100.66.211.242/80 to inside:172.31.98.44/1757 duration 0:01:07 bytes 44010 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -109,12 +146,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.211.242",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.211.242",
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -127,15 +169,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1755,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11745 for outside:100.66.185.90/80 to inside:172.31.98.44/1755 duration 0:01:07 bytes 7652 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -146,12 +196,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.185.90",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.185.90",
         "source.ip": "100.66.185.90",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -164,15 +219,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1754,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11744 for outside:100.66.185.90/80 to inside:172.31.98.44/1754 duration 0:01:07 bytes 7062 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -183,12 +246,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.185.90",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.185.90",
         "source.ip": "100.66.185.90",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -201,15 +269,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1752,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11742 for outside:100.66.160.197/80 to inside:172.31.98.44/1752 duration 0:01:08 bytes 5738 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -220,12 +296,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.160.197",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.160.197",
         "source.ip": "100.66.160.197",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -238,15 +319,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1749,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11738 for outside:100.66.205.14/80 to inside:172.31.98.44/1749 duration 0:01:08 bytes 4176 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -257,12 +346,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.205.14",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.205.14",
         "source.ip": "100.66.205.14",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -275,15 +369,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1750,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11739 for outside:100.66.124.33/80 to inside:172.31.98.44/1750 duration 0:01:08 bytes 1715 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -294,12 +396,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.124.33",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.124.33",
         "source.ip": "100.66.124.33",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -312,15 +419,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1747,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11731 for outside:100.66.35.9/80 to inside:172.31.98.44/1747 duration 0:01:09 bytes 45595 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -331,12 +446,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.35.9",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.35.9",
         "source.ip": "100.66.35.9",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -349,15 +469,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1742,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11723 for outside:100.66.211.242/80 to inside:172.31.98.44/1742 duration 0:01:09 bytes 27359 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -368,12 +496,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.211.242",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.211.242",
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -386,15 +519,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1741,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11715 for outside:100.66.218.21/80 to inside:172.31.98.44/1741 duration 0:01:09 bytes 4457 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -405,12 +546,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.218.21",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.218.21",
         "source.ip": "100.66.218.21",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -423,15 +569,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1739,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11711 for outside:100.66.198.27/80 to inside:172.31.98.44/1739 duration 0:01:09 bytes 26709 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -442,12 +596,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.198.27",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.198.27",
         "source.ip": "100.66.198.27",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -460,15 +619,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1740,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11712 for outside:100.66.198.27/80 to inside:172.31.98.44/1740 duration 0:01:09 bytes 22097 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -479,12 +646,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.198.27",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.198.27",
         "source.ip": "100.66.198.27",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -497,15 +669,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1738,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 70000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11708 for outside:100.66.202.211/80 to inside:172.31.98.44/1738 duration 0:01:10 bytes 2209 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -516,12 +696,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.202.211",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.202.211",
         "source.ip": "100.66.202.211",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -534,15 +719,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1756,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11746 for outside:100.66.124.15/80 to inside:172.31.98.44/1756 duration 0:01:07 bytes 10404 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -553,12 +746,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.124.15",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.124.15",
         "source.ip": "100.66.124.15",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -571,15 +769,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1737,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 70000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11706 for outside:100.66.124.15/80 to inside:172.31.98.44/1737 duration 0:01:10 bytes 123694 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -590,12 +796,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.124.15",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.124.15",
         "source.ip": "100.66.124.15",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -608,15 +819,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1736,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 71000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11702 for outside:100.66.209.247/80 to inside:172.31.98.44/1736 duration 0:01:11 bytes 35835 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:33:45.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -627,12 +846,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.209.247",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.209.247",
         "source.ip": "100.66.209.247",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -645,15 +869,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1765,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 30000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11753 for outside:100.66.35.162/80 to inside:172.31.98.44/1765 duration 0:00:30 bytes 0 SYN Timeout",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -664,24 +896,36 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.35.162",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.35.162",
         "source.ip": "100.66.35.162",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic UDP translation from inside:172.31.98.44/56132 to outside:100.66.98.44/1188",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -691,19 +935,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11758 for outside:100.66.80.32/53 (100.66.80.32/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -713,7 +965,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -726,15 +979,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11758 for outside:100.66.80.32/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 148",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -745,24 +1006,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.80.32",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.80.32",
         "source.ip": "100.66.80.32",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11759 for outside:100.66.252.6/53 (100.66.252.6/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -772,7 +1045,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -785,15 +1059,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11759 for outside:100.66.252.6/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 164",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -804,24 +1086,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.252.6",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.252.6",
         "source.ip": "100.66.252.6",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1773 to outside:100.66.98.44/8257",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -831,19 +1125,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11760 for outside:100.66.252.226/80 (100.66.252.226/80) to inside:172.31.98.44/1773 (172.31.98.44/1773)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -853,19 +1155,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1774 to outside:100.66.98.44/8258",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -875,19 +1185,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11761 for outside:100.66.252.226/80 (100.66.252.226/80) to inside:172.31.98.44/1774 (172.31.98.44/1774)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -897,19 +1215,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11762 for outside:100.66.238.126/53 (100.66.238.126/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -919,19 +1245,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11763 for outside:100.66.93.51/53 (100.66.93.51/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -941,7 +1275,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -954,15 +1289,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11762 for outside:100.66.238.126/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 111",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -973,12 +1316,17 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.238.126",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.238.126",
         "source.ip": "100.66.238.126",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -991,15 +1339,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11763 for outside:100.66.93.51/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 237",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1010,24 +1366,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.93.51",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.93.51",
         "source.ip": "100.66.93.51",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1775 to outside:100.66.98.44/8259",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1037,19 +1405,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11764 for outside:100.66.225.103/443 (100.66.225.103/443) to inside:172.31.98.44/1775 (172.31.98.44/1775)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1059,19 +1435,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic UDP translation from inside:172.31.98.44/56132 to outside:100.66.98.44/1189",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1081,19 +1465,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11772 for outside:100.66.240.126/53 (100.66.240.126/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1103,19 +1495,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11773 for outside:100.66.44.45/53 (100.66.44.45/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1125,7 +1525,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1138,15 +1539,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11772 for outside:100.66.240.126/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 87",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1157,12 +1566,17 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.240.126",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.240.126",
         "source.ip": "100.66.240.126",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1175,15 +1589,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11773 for outside:100.66.44.45/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 221",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1194,24 +1616,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.44.45",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.44.45",
         "source.ip": "100.66.44.45",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1452 to outside:100.66.98.44/8265",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1221,19 +1655,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11774 for outside:100.66.179.219/80 (100.66.179.219/80) to inside:172.31.98.44/1452 (172.31.98.44/1452)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1243,19 +1685,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11775 for outside:100.66.157.232/53 (100.66.157.232/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1265,19 +1715,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11776 for outside:100.66.178.133/53 (100.66.178.133/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1287,7 +1745,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1300,15 +1759,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11775 for outside:100.66.157.232/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 101",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1319,12 +1786,17 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.157.232",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.157.232",
         "source.ip": "100.66.157.232",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1337,15 +1809,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11776 for outside:100.66.178.133/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 126",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1356,24 +1836,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.178.133",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.178.133",
         "source.ip": "100.66.178.133",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1453 to outside:100.66.98.44/8266",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1383,19 +1875,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11777 for outside:100.66.133.112/80 (100.66.133.112/80) to inside:172.31.98.44/1453 (172.31.98.44/1453)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1405,7 +1905,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1418,15 +1919,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1453,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11777 for outside:100.66.133.112/80 to inside:172.31.98.44/1453 duration 0:00:00 bytes 862 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1437,24 +1946,36 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.133.112",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.133.112",
         "source.ip": "100.66.133.112",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11779 for outside:100.66.204.197/53 (100.66.204.197/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1464,7 +1985,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1477,15 +1999,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11778 for outside:100.66.157.232/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 104",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1496,12 +2026,17 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.157.232",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.157.232",
         "source.ip": "100.66.157.232",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1514,15 +2049,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11779 for outside:100.66.204.197/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 176",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1533,24 +2076,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.204.197",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.204.197",
         "source.ip": "100.66.204.197",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1454 to outside:100.66.98.44/8267",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1560,19 +2115,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11780 for outside:100.66.128.3/80 (100.66.128.3/80) to inside:172.31.98.44/1454 (172.31.98.44/1454)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1582,19 +2145,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1455 to outside:100.66.98.44/8268",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1604,19 +2175,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11781 for outside:100.66.128.3/80 (100.66.128.3/80) to inside:172.31.98.44/1455 (172.31.98.44/1455)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1626,19 +2205,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1456 to outside:100.66.98.44/8269",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1648,19 +2235,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11782 for outside:100.66.128.3/80 (100.66.128.3/80) to inside:172.31.98.44/1456 (172.31.98.44/1456)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1670,19 +2265,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11783 for outside:100.66.100.4/53 (100.66.100.4/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1692,7 +2295,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1705,15 +2309,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11783 for outside:100.66.100.4/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 104",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1724,24 +2336,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.100.4",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.100.4",
         "source.ip": "100.66.100.4",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1457 to outside:100.66.98.44/8270",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1751,19 +2375,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11784 for outside:100.66.198.40/80 (100.66.198.40/80) to inside:172.31.98.44/1457 (172.31.98.44/1457)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1773,19 +2405,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1458 to outside:100.66.98.44/8271",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1795,19 +2435,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11785 for outside:100.66.198.40/80 (100.66.198.40/80) to inside:172.31.98.44/1458 (172.31.98.44/1458)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1817,19 +2465,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11786 for outside:100.66.1.107/53 (100.66.1.107/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1839,7 +2495,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1852,15 +2509,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 1457,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11784 for outside:100.66.198.40/80 to inside:172.31.98.44/1457 duration 0:00:00 bytes 593 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1871,24 +2536,36 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.198.40",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.198.40",
         "source.ip": "100.66.198.40",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1459 to outside:100.66.98.44/8272",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1898,19 +2575,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11787 for outside:100.66.198.40/80 (100.66.198.40/80) to inside:172.31.98.44/1459 (172.31.98.44/1459)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1920,7 +2605,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1933,15 +2619,23 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 56132,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11786 for outside:100.66.1.107/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 375",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1952,24 +2646,36 @@
         "network.transport": "udp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.1.107",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.1.107",
         "source.ip": "100.66.1.107",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1460 to outside:100.66.98.44/8273",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -1979,19 +2685,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11788 for outside:100.66.192.44/80 (100.66.192.44/80) to inside:172.31.98.44/1460 (172.31.98.44/1460)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2001,19 +2715,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1454 to outside:100.66.98.44/8267 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2023,19 +2745,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.156.80/1385 to outside:100.66.98.44/8277",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2045,19 +2775,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11797 for outside:100.66.19.254/80 (100.66.19.254/80) to inside:172.31.156.80/1385 (172.31.156.80/1385)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2067,19 +2805,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1455 to outside:100.66.98.44/8268 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2089,19 +2835,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1456 to outside:100.66.98.44/8269 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2111,19 +2865,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1457 to outside:100.66.98.44/8270 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2133,19 +2895,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1458 to outside:100.66.98.44/8271 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2155,19 +2925,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1459 to outside:100.66.98.44/8272 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2177,19 +2955,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1460 to outside:100.66.98.44/8273 duration 0:00:30",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2199,7 +2985,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2212,15 +2999,23 @@
         "destination.ip": "172.31.156.80",
         "destination.port": 1382,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 325000000000,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11564 for outside:100.66.115.46/80 to inside:172.31.156.80/1382 duration 0:05:25 bytes 575 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-10-10T14:29:31.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2231,12 +3026,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.115.46",
+            "172.31.156.80"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.115.46",
         "source.ip": "100.66.115.46",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2249,15 +3049,23 @@
         "destination.ip": "172.31.156.80",
         "destination.port": 1385,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-10-10T12:34:56.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11797 for outside:100.66.19.254/80 to inside:172.31.156.80/1385 duration 0:00:00 bytes 5391 TCP Reset-I",
         "event.severity": 6,
         "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2268,24 +3076,36 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.156.80"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.156.80/1386 to outside:100.66.98.44/8278",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2295,19 +3115,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11798 for outside:100.66.115.46/80 (100.66.115.46/80) to inside:172.31.156.80/1386 (172.31.156.80/1386)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2317,7 +3145,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2330,13 +3159,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2346,12 +3183,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2364,13 +3206,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2380,12 +3230,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2398,13 +3253,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2414,12 +3277,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2432,13 +3300,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2448,12 +3324,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2466,13 +3347,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2482,12 +3371,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2500,13 +3394,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2516,12 +3418,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2534,13 +3441,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2550,12 +3465,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2568,13 +3488,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2584,12 +3512,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2602,13 +3535,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2618,12 +3559,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2636,13 +3582,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2652,12 +3606,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2670,13 +3629,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2686,12 +3653,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2704,13 +3676,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2720,12 +3700,17 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -2738,13 +3723,21 @@
         "destination.ip": "172.31.98.44",
         "destination.port": 8277,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2754,24 +3747,36 @@
         "network.transport": "tcp",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.ip": [
+            "100.66.19.254",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
         "source.address": "100.66.19.254",
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic TCP translation from inside:172.31.98.44/1275 to outside:100.66.98.44/8279",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2781,19 +3786,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302013: Built outbound TCP connection 11799 for outside:100.66.205.99/80 (100.66.205.99/80) to inside:172.31.98.44/1275 (172.31.98.44/1275)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2803,19 +3816,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305011: Built dynamic UDP translation from inside:172.31.98.44/56132 to outside:100.66.98.44/1190",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2825,19 +3846,27 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302015: Built outbound UDP connection 11800 for outside:100.66.14.30/53 (100.66.14.30/53) to inside:172.31.98.44/56132 (172.31.98.44/56132)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -2847,7 +3876,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

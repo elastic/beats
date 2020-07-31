@@ -39,6 +39,20 @@ func UseCommunityBeatPackaging() {
 	MustUsePackaging("community_beat", packageSpecFile)
 }
 
+// UseElasticAgentPackaging configures the package target to build packages for
+// an Elastic Agent.
+func UseElasticAgentPackaging() {
+	// Prepare binaries so they can be packed into agent
+	MustUsePackaging("elastic_beat_agent_binaries", packageSpecFile)
+}
+
+// UseElasticAgentDemoPackaging configures the package target to build packages for
+// an Elastic Agent demo purposes.
+func UseElasticAgentDemoPackaging() {
+	// Prepare binaries so they can be packed into agent
+	MustUsePackaging("elastic_beat_agent_demo_binaries", packageSpecFile)
+}
+
 // UseElasticBeatPackaging configures the package target to build packages for
 // an Elastic Beat. This means it will generate two sets of packages -- one
 // that is purely OSS under Apache 2.0 and one that is licensed under the
@@ -58,6 +72,12 @@ func UseElasticBeatOSSPackaging() {
 // licensed (X-Pack) packages.
 func UseElasticBeatXPackPackaging() {
 	MustUsePackaging("elastic_beat_xpack", packageSpecFile)
+}
+
+// UseElasticBeatXPackReducedPackaging configures the package target to build Elastic
+// licensed (X-Pack) packages for agent use.
+func UseElasticBeatXPackReducedPackaging() {
+	MustUsePackaging("elastic_beat_xpack_reduced", packageSpecFile)
 }
 
 // UseElasticBeatWithoutXPackPackaging configures the package target to build

@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-sqs]]
-=== aws sqs metricset
+[role="xpack"]
+=== AWS sqs metricset
 
 include::../../../../x-pack/metricbeat/module/aws/sqs/_meta/docs.asciidoc[]
 

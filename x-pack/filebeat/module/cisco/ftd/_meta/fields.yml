@@ -1,4 +1,4 @@
-- name: ftd
+- name: cisco.ftd
   type: group
   description: >
     Fields for Cisco Firepower Threat Defense Firewall.
@@ -44,6 +44,12 @@
     description: >
       The translated source IP address. Use ECS source.nat.ip.
 
+  - name: mapped_source_host
+    type: keyword
+    default_field: false
+    description: >
+      The translated source host.
+
   - name: mapped_source_port
     type: long
     description: >
@@ -53,6 +59,12 @@
     type: ip
     description: >
       The translated destination IP address. Use ECS destination.nat.ip.
+
+  - name: mapped_destination_host
+    type: keyword
+    default_field: false
+    description: >
+      The translated destination host.
 
   - name: mapped_destination_port
     type: long
@@ -90,3 +102,15 @@
     type: object
     description:
       Raw fields for Security Events.
+
+  - name: connection_type
+    type: keyword
+    default_field: false
+    description: >
+      The VPN connection type
+
+  - name: dap_records
+    type: keyword
+    default_field: false
+    description: >
+      The assigned DAP records

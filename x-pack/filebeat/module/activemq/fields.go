@@ -7,7 +7,7 @@
 package activemq
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetActivemq returns asset data.
 // This is the base64 encoded gzipped contents of module/activemq.
 func AssetActivemq() string {
-	return "eJyskrFu20AQRHt+xUBVUkgfwCJAmnQKECCpg81xSB105FG7SwX6e4O0ZJOWDAGWtyKGe2/mbneNPU8lJHg8sj0UgEdPLLG6SKsCUCaKscQ/uhRARQsae4+5K/GtAIBtroZE1FnRi1rsGnyfCNtfSLlBHRNtUwB1ZKqsnA6t0UnLhf1YfupZotE89GflhuGSNKcFSYn6Il94e57+Z61m+k3qc/2Ulsg1fMczD9FsGK81Sik3zfitPAw0x5eQxAxZobQ8aODXzVUu3ymleizX74kB34mjYUcVZ7WIxCM7vzYf7NEn+WPUDxjLUEW/cp4P947vj2nMqDW3rys1UUdr28ya39uIlJvPT9D3KQYZ++/mmGcxl7D/6yqBi/9vZ/IUAAD//5OoA7o="
+	return "eJysksFO80AMhO95ilFP/39oHyAHJC7cioQEZ2RtnO2qm2xqe4v69mhDCwktqkTxKZrY801iL7HlQw1yFvbc7SrAgkWusbgfpfXTogKEI5NyDU8V0LA6CYOF1Ne4qwBgnZocGW0SDCQaeo/TPGLyaENkXVVAGzg2Wo9DS/TU8Qxeyg5DIUnKw1G5AJw7Td0cxcjyKZ/8tnx4S9JM9IuuH/VIHSO1sA0f/RBUc/msIsXkfXkW3mVWwz8XSRVJIKwpi+P/q7NcthGm5rZcz6MHbEMGzz0LGTezSLzn3s7hWW/9JS/K8gsw5SbYGXm63Cvch3HNaCV1Xyc1uha0ribNP11ETP7vEwxDDI5K/9Uc0yxq5LavJuR49v77Tt4DAAD//1NHAoY="
 }

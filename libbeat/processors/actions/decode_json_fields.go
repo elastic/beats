@@ -25,13 +25,14 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/jsontransform"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 type decodeJSONFields struct {
@@ -42,6 +43,7 @@ type decodeJSONFields struct {
 	processArray  bool
 	documentID    string
 	target        *string
+	logger        *logp.Logger
 }
 
 type config struct {
@@ -62,8 +64,6 @@ var (
 	errProcessingSkipped = errors.New("processing skipped")
 )
 
-var debug = logp.MakeDebug("filters")
-
 func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		checks.ConfigChecked(NewDecodeJSONFields,
@@ -76,10 +76,11 @@ func init() {
 // NewDecodeJSONFields construct a new decode_json_fields processor.
 func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
+	logger := logp.NewLogger("truncate_fields")
 
 	err := c.Unpack(&config)
 	if err != nil {
-		logp.Warn("Error unpacking config for decode_json_fields")
+		logger.Warn("Error unpacking config for decode_json_fields")
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
@@ -91,6 +92,7 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 		processArray:  config.ProcessArray,
 		documentID:    config.DocumentID,
 		target:        config.Target,
+		logger:        logger,
 	}
 	return f, nil
 }
@@ -101,7 +103,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.fields {
 		data, err := event.GetValue(field)
 		if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
-			debug("Error trying to GetValue for field : %s in event : %v", field, event)
+			f.logger.Debugf("Error trying to GetValue for field : %s in event : %v", field, event)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -115,7 +117,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		var output interface{}
 		err = unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
-			debug("Error trying to unmarshal %s", text)
+			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -149,7 +151,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if err != nil {
-			debug("Error trying to Put value %v for field : %s", output, field)
+			f.logger.Debugf("Error trying to Put value %v for field : %s", output, field)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -158,7 +160,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			if event.Meta == nil {
 				event.Meta = common.MapStr{}
 			}
-			event.Meta["_id"] = id
+			event.Meta[events.FieldMetaID] = id
 		}
 	}
 

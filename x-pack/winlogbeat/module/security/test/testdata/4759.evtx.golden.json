@@ -3,10 +3,16 @@
     "@timestamp": "2019-12-19T08:26:26.1432582Z",
     "event": {
       "action": "added-distribution-group-account",
+      "category": "iam",
       "code": 4759,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "group"
+      ]
     },
     "group": {
       "domain": "TEST",

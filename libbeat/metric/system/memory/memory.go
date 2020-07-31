@@ -22,8 +22,8 @@ package memory
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 	sigar "github.com/elastic/gosigar"
@@ -78,7 +78,8 @@ func GetSwap() (*SwapStat, error) {
 	// this can provoke too big values for used swap.
 	// Workaround this by assuming that all swap is free in that case.
 	if swap.Free > swap.Total || swap.Used > swap.Total {
-		logp.Debug("memory",
+		logger := logp.NewLogger("memory")
+		logger.Debugf("memory",
 			"Unexpected values for swap memory - total: %v free: %v used: %v.  Setting swap used to 0.",
 			swap.Total, swap.Free, swap.Used)
 		swap.Free = swap.Total

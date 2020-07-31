@@ -19,18 +19,19 @@ package redis
 
 import (
 	"bytes"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
 type stream struct {
@@ -324,6 +325,11 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 	}
 	if redis.sendResponse {
 		fields["response"] = resp.message
+	}
+
+	pbf.Event.Action = "redis." + strings.ToLower(string(requ.method))
+	if resp.isError {
+		pbf.Event.Outcome = "failure"
 	}
 
 	return evt

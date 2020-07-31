@@ -24,15 +24,15 @@ import (
 
 	"github.com/elastic/ecs/code/go/ecs"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/x509util"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
 type stream struct {
@@ -443,6 +443,12 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	pb.MarshalStruct(fields, "tls", tls)
 	if plugin.includeDetailedFields {
 		fields.Put("tls.detailed", detailed)
+		if cert, ok := detailed["client_certificate"]; ok {
+			fields.Put("tls.client.x509", cert)
+		}
+		if cert, ok := detailed["server_certificate"]; ok {
+			fields.Put("tls.server.x509", cert)
+		}
 	}
 
 	// Fixes for non-array datatypes

@@ -3,7 +3,7 @@
 == Configure Google Functions
 
 ++++
-<titleabbrev>Configure Google functions</titleabbrev>
+<titleabbrev>Google functions</titleabbrev>
 ++++
 
 beta[]

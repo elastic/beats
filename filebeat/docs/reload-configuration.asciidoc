@@ -1,6 +1,10 @@
 [[filebeat-configuration-reloading]]
 == Load external configuration files
 
+++++
+<titleabbrev>Config file loading</titleabbrev>
+++++
+
 {beatname_uc} can load external configuration files for inputs and modules,
 allowing you to separate your configuration into multiple smaller
 configuration files. See the <<load-input-config>> and the
@@ -58,7 +62,7 @@ same time, it can lead to unexpected behavior.
 For module configurations, you specify the `path` option in the
 +{beatname_lc}.config.modules+ section of the +{beatname_lc}.yml+ file. By default,
 {beatname_uc} loads the module configurations enabled in the
-<<enable-modules-d-configs,`modules.d`>> directory. For example:
+<<configure-modules-d-configs,`modules.d`>> directory. For example:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------

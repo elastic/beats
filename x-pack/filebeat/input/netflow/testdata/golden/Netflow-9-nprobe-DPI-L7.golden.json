@@ -12,9 +12,15 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "1970-01-01T00:08:22Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "oFN7CMNpOLQ",
@@ -51,6 +57,12 @@
         },
         "observer": {
           "ip": "192.0.2.1"
+        },
+        "related": {
+          "ip": [
+            "0.0.0.0",
+            "0.0.0.0"
+          ]
         },
         "source": {
           "bytes": 82,

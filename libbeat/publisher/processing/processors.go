@@ -22,11 +22,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 type group struct {
@@ -41,6 +41,7 @@ type processorFn struct {
 }
 
 func newGeneralizeProcessor(keepNull bool) *processorFn {
+	logger := logp.NewLogger("publisher_processing")
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {
@@ -50,7 +51,7 @@ func newGeneralizeProcessor(keepNull bool) *processorFn {
 		g := common.NewGenericEventConverter(keepNull)
 		fields := g.Convert(event.Fields)
 		if fields == nil {
-			logp.Err("fail to convert to generic event")
+			logger.Error("fail to convert to generic event")
 			return nil, nil
 		}
 

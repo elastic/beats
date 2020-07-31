@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-08T10:20:44.4724208Z",
     "event": {
       "action": "user-member-enumerated",
+      "category": "iam",
       "code": 4799,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "info",
+        "group"
+      ]
     },
     "group": {
       "domain": "Builtin",

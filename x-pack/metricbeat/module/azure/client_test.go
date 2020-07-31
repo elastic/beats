@@ -17,7 +17,7 @@ import (
 var (
 	resourceIDConfig = Config{
 		Resources: []ResourceConfig{
-			{ID: []string{"123"},
+			{Id: []string{"123"},
 				Metrics: []MetricConfig{
 					{
 						Name: []string{"hello", "test"},

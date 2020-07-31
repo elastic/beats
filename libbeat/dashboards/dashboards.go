@@ -25,8 +25,8 @@ import (
 
 	errw "github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // ImportDashboards tries to import the kibana dashboards.
@@ -51,7 +51,7 @@ func ImportDashboards(
 	}
 
 	if !kibanaConfig.Enabled() {
-		return errors.New("kibana configuration missing for loading dashboards.")
+		return errors.New("kibana configuration missing for loading dashboards")
 	}
 
 	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, kibanaConfig, &dashConfig, msgOutputter, pattern)

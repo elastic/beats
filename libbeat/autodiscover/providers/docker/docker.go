@@ -26,15 +26,15 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -59,10 +59,8 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
-
-	cfgwarn.Beta("The docker autodiscover is beta")
 
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up docker autodiscover provider")
@@ -79,15 +77,15 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 && !config.Hints.Enabled() {
+	if len(mapper.ConditionMaps) == 0 && !config.Hints.Enabled() {
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}

@@ -20,6 +20,7 @@ package mage
 import (
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 	"strconv"
 
@@ -60,17 +61,32 @@ func Package() error {
 					continue
 				}
 
+				agentPackageType := TarGz
+				if pkg.OS == "windows" {
+					agentPackageType = Zip
+				}
+
+				agentPackageArch, err := getOSArchName(target, agentPackageType)
+				if err != nil {
+					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
+					continue
+				}
+
+				agentPackageDrop, _ := os.LookupEnv("AGENT_DROP_PATH")
+
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = Snapshot
 				spec.evalContext = map[string]interface{}{
-					"GOOS":        target.GOOS(),
-					"GOARCH":      target.GOARCH(),
-					"GOARM":       target.GOARM(),
-					"Platform":    target,
-					"PackageType": pkgType.String(),
-					"BinaryExt":   binaryExtension(target.GOOS()),
+					"GOOS":          target.GOOS(),
+					"GOARCH":        target.GOARCH(),
+					"GOARM":         target.GOARM(),
+					"Platform":      target,
+					"AgentArchName": agentPackageArch,
+					"PackageType":   pkgType.String(),
+					"BinaryExt":     binaryExtension(target.GOOS()),
+					"AgentDropPath": agentPackageDrop,
 				}
 
 				spec.packageDir, err = pkgType.PackagingDir(packageStagingDir, target, spec)

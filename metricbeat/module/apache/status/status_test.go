@@ -31,12 +31,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 
-	_ "github.com/elastic/beats/metricbeat/module/apache"
+	_ "github.com/elastic/beats/v7/metricbeat/module/apache"
 )
 
 // response is a raw response copied from an Apache web server.
@@ -178,12 +178,12 @@ func TestFetchTimeout(t *testing.T) {
 	elapsed := time.Since(start)
 	var found bool
 	for _, err := range errs {
-		if strings.Contains(err.Error(), "request canceled (Client.Timeout exceeded") {
+		if strings.Contains(err.Error(), "context deadline exceeded (Client.Timeout exceeded") {
 			found = true
 		}
 	}
 	if !found {
-		assert.Failf(t, "", "expected an error containing 'request canceled (Client.Timeout exceeded'. Got %v", errs)
+		assert.Failf(t, "", "expected an error containing 'context deadline exceeded (Client.Timeout exceeded'. Got %v", errs)
 	}
 
 	// Elapsed should be ~50ms, sometimes it can be up to 1s

@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func dummyNode(response string) *Node {
@@ -39,7 +39,7 @@ func TestList(t *testing.T) {
 
 	list, err := n.List()
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expected := []string{"cpu", "df", "uptime"}
 	assert.ElementsMatch(t, expected, list)

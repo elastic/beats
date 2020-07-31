@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-envoyproxy]]
-== envoyproxy module
+== Envoyproxy module
 
 This is the envoyproxy module.
 
@@ -18,7 +18,7 @@ The envoyproxy module is tested with Envoy 1.7.0 and 1.12.0.
 [float]
 === Example configuration
 
-The envoyproxy module supports the standard configuration options that are described
+The Envoyproxy module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

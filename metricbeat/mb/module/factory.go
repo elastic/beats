@@ -18,10 +18,10 @@
 package module
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Factory creates new Runner instances from configuration objects.
@@ -40,7 +40,7 @@ func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
-func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (r *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	module, metricSets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 			return nil, err
 		}
 
-		connector, err := NewConnector(r.beatInfo, p, c, meta)
+		connector, err := NewConnector(r.beatInfo, p, c)
 		if err != nil {
 			return nil, err
 		}

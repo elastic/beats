@@ -21,13 +21,16 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestRenameRun(t *testing.T) {
+	log := logp.NewLogger("rename_test")
 	var tests = []struct {
 		description   string
 		Fields        []fromTo
@@ -234,6 +237,7 @@ func TestRenameRun(t *testing.T) {
 					IgnoreMissing: test.IgnoreMissing,
 					FailOnError:   test.FailOnError,
 				},
+				logger: log,
 			}
 			event := &beat.Event{
 				Fields: test.Input,
@@ -241,9 +245,9 @@ func TestRenameRun(t *testing.T) {
 
 			newEvent, err := f.Run(event)
 			if !test.error {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			} else {
-				assert.NotNil(t, err)
+				assert.Error(t, err)
 			}
 
 			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))

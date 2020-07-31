@@ -9,8 +9,8 @@ import (
 
 	"github.com/godror/godror"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )
@@ -48,10 +48,6 @@ func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
 
 	if params.Password == "" {
 		params.Password = c.Password
-	}
-
-	if params.IsSysDBA == false {
-		return nil, errors.New("a user with DBA permissions are required, check your connection details on field `hosts`")
 	}
 
 	db, err := sql.Open("godror", params.StringWithPassword())

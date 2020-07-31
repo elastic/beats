@@ -25,12 +25,12 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -49,6 +49,7 @@ var (
 				"index_time_in_millis":    c.Int("index_time_in_millis"),
 				"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
 			}),
+			"bulk": elasticsearch.BulkStatsDict,
 			"search": c.Dict("search", s.Schema{
 				"query_total":          c.Int("query_total"),
 				"query_time_in_millis": c.Int("query_time_in_millis"),

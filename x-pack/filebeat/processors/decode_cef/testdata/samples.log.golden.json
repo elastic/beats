@@ -89,7 +89,6 @@
         "version": "1.2.3"
       },
       "extensions": {
-        "DeviceCustomNumber2": 205,
         "TrendMicroDsDetectionConfidence": "95",
         "TrendMicroDsFileMD5": "44D88612FEA8A8F36DE82E1278ABB02F",
         "TrendMicroDsFileSHA1": "3395856CE81F2B7382DEE72602F798B642F14140",
@@ -100,6 +99,7 @@
         "deviceAction": "Delete",
         "deviceCustomNumber1": 1,
         "deviceCustomNumber1Label": "Host ID",
+        "deviceCustomNumber2": 205,
         "deviceCustomNumber2Label": "Quarantine File Size",
         "deviceCustomString6": "ContainerImageName | ContainerName | ContainerID",
         "deviceCustomString6Label": "Container",
@@ -450,9 +450,9 @@
         "version": "NS10.0"
       },
       "extensions": {
-        "DeviceCustomNumber2": 205,
         "deviceAction": "blocked",
         "deviceCustomNumber1": 233,
+        "deviceCustomNumber2": 205,
         "deviceCustomString1": "profile1",
         "deviceCustomString2": "PPE0",
         "deviceCustomString3": "AjSZM26h2M+xL809pON6C8joebUA000",
@@ -497,9 +497,9 @@
         "version": "NS10.0"
       },
       "extensions": {
-        "DeviceCustomNumber2": 535,
         "deviceAction": "not blocked",
         "deviceCustomNumber1": 465,
+        "deviceCustomNumber2": 535,
         "deviceCustomString1": "profile1",
         "deviceCustomString2": "PPE0",
         "deviceCustomString3": "IliG4Dxp1SjOhKVRDVBXmqvAaIcA000",
@@ -544,9 +544,9 @@
         "version": "NS10.0"
       },
       "extensions": {
-        "DeviceCustomNumber2": 610,
         "deviceAction": "transformed",
         "deviceCustomNumber1": 652,
+        "deviceCustomNumber2": 610,
         "deviceCustomString1": "pr_ffc",
         "deviceCustomString2": "PPE0",
         "deviceCustomString3": "li8MdGfW49uG8tGdSV85ech41a0A000",
@@ -591,9 +591,9 @@
         "version": "NS10.0"
       },
       "extensions": {
-        "DeviceCustomNumber2": 610,
         "deviceAction": "transformed",
         "deviceCustomNumber1": 653,
+        "deviceCustomNumber2": 610,
         "deviceCustomString1": "pr_ffc",
         "deviceCustomString2": "PPE0",
         "deviceCustomString3": "li8MdGfW49uG8tGdSV85ech41a0A000",
@@ -638,9 +638,9 @@
         "version": "NS10.0"
       },
       "extensions": {
-        "DeviceCustomNumber2": 205,
         "deviceAction": "not blocked",
         "deviceCustomNumber1": 224,
+        "deviceCustomNumber2": 205,
         "deviceCustomString1": "pr_ffc",
         "deviceCustomString2": "PPE0",
         "deviceCustomString3": "POousP7CIMW5nwZ5Rs4nq5DND0sA000",
@@ -948,7 +948,6 @@
         "agentType": "agent_ac",
         "agentVersion": "7.1.7.7602.0",
         "assetCriticality": "0",
-        "c6a4Label": "Agent IPv6 Address",
         "categoryBehavior": "/Access/Stop",
         "categoryDeviceGroup": "/Firewall",
         "categoryDeviceType": "Firewall",
@@ -958,6 +957,7 @@
         "deviceAddress": "111.111.111.99",
         "deviceAssetId": "5Wa8hHVSDFBCc-t56wI7mTw==",
         "deviceCustomIPv6Address4": "ffff:0:0:0:222:5555:ffff:5555",
+        "deviceCustomIPv6Address4Label": "Agent IPv6 Address",
         "deviceCustomNumber1Label": "ICMP Type",
         "deviceCustomNumber2Label": "ICMP Code",
         "deviceCustomNumber3Label": "DurationInSeconds",

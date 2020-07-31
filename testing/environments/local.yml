@@ -16,6 +16,7 @@ services:
     ports:
       - "127.0.0.1:5044:5044"
       - "127.0.0.1:5055:5055"
+      - "127.0.0.1:9600:9600"
     depends_on:
       elasticsearch:
         condition: service_healthy

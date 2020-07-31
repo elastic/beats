@@ -1,0 +1,86 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  defaults:
+    perfmon.group_measurements_by_instance: true
+    perfmon.ignore_non_existent_counters: true
+    perfmon.group_all_counter: "worker_process_count"
+    perfmon.queries:
+    - object:  "Web Service"
+      instance: "_Total"
+      namespace : "network"
+      counters:
+      # network
+      - name: "Total Bytes Received"
+      - name: "Total Bytes Sent"
+      - name: "Bytes Sent/sec"
+      - name: "Bytes Received/sec"
+      - name: "Current Connections"
+      - name: "Maximum Connections"
+      - name: "Total Connection Attempts (all instances)"
+        field: "total_connection_attempts"
+      - name: "Total Get Requests"
+      - name: "Get Requests/sec"
+      - name: "Total Post Requests"
+      - name: "Post Requests/sec"
+      - name: "Total Delete Requests"
+      - name: "Delete Requests/sec"
+      - name: "Service Uptime"
+      - name: "Current Anonymous Users"
+      - name: "Current NonAnonymous Users"
+      - name: "Total Anonymous Users"
+      - name: "Anonymous Users/sec"
+      - name: "Total NonAnonymous Users"
+    #asp.net
+    - object: "ASP.NET"
+      namespace: "asp_net"
+      counters:
+      - name: "Application Restarts"
+      - name: "Request Wait Time"
+
+    #asp_net_application
+    - object: "ASP.NET Applications"
+      instance: "__Total__"
+      namespace: "asp_net_application"
+      counters:
+      - name: "Errors Total/Sec"
+      - name: "Pipeline Instance Count"
+      - name: "Requests Executing"
+      - name: "Requests in Application Queue"
+        format: 'large'
+      - name: "Requests/Sec"
+    #cache
+    - object: "Web Service Cache"
+      namespace: "cache"
+      counters:
+      - name: "Current Files Cached"
+      - name: "Total Files Cached"
+      - name: "File Cache Hits"
+      - name: "File Cache Misses"
+      - name: "Current File Cache Memory Usage"
+      - name: "Maximum File Cache Memory Usage"
+      - name: "Current URIs Cached"
+      - name: "Total URIs Cached"
+      - name: "URI Cache Hits"
+      - name: "URI Cache Misses"
+      - name: "Output Cache Current Memory Usage"
+      - name: "Output Cache Current Items"
+      - name: "Output Cache Total Hits"
+      - name: "Output Cache Total Misses"
+    #process
+    - object: "Process"
+      field: "process"
+      namespace: "process"
+      instance: "w3wp*"
+      counters:
+      - name: "% Processor Time"
+        field: "cpu_usage_perc"
+      - name: "Handle Count"
+      - name: "Thread Count"
+      - name: "Working Set"
+      - name: "Private Bytes"
+      - name: "Virtual Bytes"
+      - name: "Page Faults/sec"
+      - name: "IO Read Operations/sec"
+      - name: "IO Write Operations/sec"

@@ -24,6 +24,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func newEventLog(beatname string, encoder zapcore.Encoder, enab zapcore.LevelEnabler) (zapcore.Core, error) {
+func newEventLog(_ string, _ zapcore.Encoder, _ zapcore.LevelEnabler) (zapcore.Core, error) {
 	return nil, errors.New("eventlog is only supported on Windows")
 }

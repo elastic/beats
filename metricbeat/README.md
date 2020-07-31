@@ -4,7 +4,7 @@ Metricbeat fetches a set of metrics on a predefined interval from the operating 
 
 ## Getting started
 
-Please follow the [getting started](https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-getting-started.html)
+Please follow the [getting started](https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-installation-configuration.html)
 guide from the docs.
 
 ## Documentation

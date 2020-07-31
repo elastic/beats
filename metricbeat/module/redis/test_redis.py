@@ -34,6 +34,7 @@ class Test(metricbeat.BaseTest):
         """
         Test redis info metricset
         """
+
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
@@ -137,6 +138,7 @@ class Test(metricbeat.BaseTest):
         """
         Test local processors for Redis info event.
         """
+
         fields = ["clients", "cpu"]
         eventFields = ['beat', 'metricset', 'service', 'event']
         eventFields += ['redis.info.' + f for f in fields]

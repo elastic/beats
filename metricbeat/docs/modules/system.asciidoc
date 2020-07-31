@@ -232,7 +232,10 @@ metricbeat.modules:
   #diskio.include_devices: []
 
   # Filter systemd services by status or sub-status
-  #service.state_filter: []
+  #service.state_filter: ["active"]
+
+  # Filter systemd services based on a name pattern
+  #service.pattern_filter: ["ssh*", "nfs*"]
 ----
 
 [float]
@@ -274,6 +277,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-uptime,uptime>>
 
+* <<metricbeat-metricset-system-users,users>>
+
 include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
@@ -307,4 +312,6 @@ include::system/socket.asciidoc[]
 include::system/socket_summary.asciidoc[]
 
 include::system/uptime.asciidoc[]
+
+include::system/users.asciidoc[]
 

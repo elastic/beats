@@ -7,8 +7,8 @@ package compute_vm_scaleset
 import (
 	"fmt"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

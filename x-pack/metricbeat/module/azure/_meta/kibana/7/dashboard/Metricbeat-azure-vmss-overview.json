@@ -374,7 +374,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "value_template": "{{value}}"
               }
             ],
@@ -449,7 +449,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "value_template": "{{value}}"
               }
             ],
@@ -524,7 +524,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -600,7 +600,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -676,7 +676,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -752,7 +752,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -828,7 +828,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -904,7 +904,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }

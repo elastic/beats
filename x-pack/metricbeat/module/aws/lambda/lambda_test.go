@@ -7,11 +7,11 @@ package lambda
 import (
 	"os"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws"
-	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/cloudwatch"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 )
 
 func init() {

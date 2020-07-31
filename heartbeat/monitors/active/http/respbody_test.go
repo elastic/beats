@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -246,7 +246,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 			expectedHash := sha256.Sum256([]byte(tt.body))
 			assert.Equal(t, hex.EncodeToString(expectedHash[:]), gotHashStr)
 
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 		})
 	}
 }

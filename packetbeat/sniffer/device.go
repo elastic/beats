@@ -24,7 +24,7 @@ import (
 
 	"github.com/tsg/gopacket/pcap"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var deviceAnySupported = runtime.GOOS == "linux"

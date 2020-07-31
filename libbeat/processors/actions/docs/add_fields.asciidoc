@@ -1,6 +1,10 @@
 [[add-fields]]
 === Add fields
 
+++++
+<titleabbrev>add_fields</titleabbrev>
+++++
+
 The `add_fields` processor adds additional fields to the event.  Fields can be
 scalar values, arrays, dictionaries, or any nested combination of these.  By
 default the fields that you specify will be grouped under the `fields`
@@ -17,11 +21,11 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_fields:
-    target: project
-    fields:
-      name: myproject
-      id: '574734885120952459'
+  - add_fields:
+      target: project
+      fields:
+        name: myproject
+        id: '574734885120952459'
 ------------------------------------------------------------------------------
 
 Adds these fields to any event:

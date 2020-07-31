@@ -24,10 +24,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
+var commonConfigKeys = []string{"type", "api", "name", "fields", "fields_under_root",
 	"tags", "processors", "index"}
 
 // ConfigCommon is the common configuration data used to instantiate a new

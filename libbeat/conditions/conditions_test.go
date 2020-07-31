@@ -23,9 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestCreateNilCondition(t *testing.T) {
@@ -36,7 +36,7 @@ func TestCreateNilCondition(t *testing.T) {
 
 func GetCondition(t *testing.T, config Config) Condition {
 	cond, err := NewCondition(&config)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	return cond
 }
 

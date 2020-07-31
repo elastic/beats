@@ -61,7 +61,10 @@
         "source.address": "10.142.0.10",
         "source.domain": "test-es",
         "source.ip": "10.142.0.10",
-        "source.port": 57794
+        "source.port": 57794,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-11-06T16:41:38.394Z",
@@ -125,6 +128,9 @@
         "source.address": "10.142.0.16",
         "source.domain": "local-adrian-test",
         "source.ip": "10.142.0.16",
-        "source.port": 80
+        "source.port": 80,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

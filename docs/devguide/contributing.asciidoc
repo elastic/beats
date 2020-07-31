@@ -55,10 +55,6 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
-The location where you clone is important. Make a directory structure under
-`GOPATH` that matches the URL used for Elastic repositories, then clone the
-beats repository under the new directory:
-
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
@@ -185,11 +181,9 @@ external tools.
 [float]
 ==== Golang
 
-To manage the `vendor/` folder we use
-https://github.com/kardianos/govendor[govendor]. Please see
-the govendor documentation on how to add or update vendored dependencies.
+To manage the `vendor/` folder we use go modules.
 
-In most cases `govendor fetch your/dependency@version +out` will get the job done.
+To update the contents of `vendor/`, run `mage vendor`.
 
 [float]
 ==== Other dependencies

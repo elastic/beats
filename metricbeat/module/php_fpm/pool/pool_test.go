@@ -22,9 +22,9 @@ package pool
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/metricbeat/module/php_fpm"
+	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm"
 )
 
 func TestData(t *testing.T) {

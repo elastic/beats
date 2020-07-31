@@ -20,7 +20,7 @@ package nfs
 import (
 	"time"
 
-	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/config"
 )
 
 type rpcConfig struct {

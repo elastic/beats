@@ -20,8 +20,8 @@ package cluster
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type StorageTotals_Ram struct {
@@ -48,8 +48,8 @@ type StorageTotals struct {
 
 type Data struct {
 	StorageTotals        StorageTotals `json:"storageTotals"`
-	IndexMemoryQuota     int64         `json:"indexMemoryQuota"`
-	MemoryQuota          int64         `json:"memoryQuota"`
+	IndexMemoryQuota     float64       `json:"indexMemoryQuota"`
+	MemoryQuota          float64       `json:"memoryQuota"`
 	RebalanceStatus      string        `json:"rebalanceStatus"`
 	RebalanceProgressURI string        `json:"rebalanceProgressUri"`
 	StopRebalanceURI     string        `json:"stopRebalanceUri"`

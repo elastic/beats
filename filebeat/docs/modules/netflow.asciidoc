@@ -72,6 +72,12 @@ details.
 monitor sequence numbers in the Netflow packets to detect an Exporting Process
 reset. See <<filebeat-input-netflow,netflow input>> for details.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[forwarded]`.
+
 :has-dashboards!:
 
 :fileset_ex!:

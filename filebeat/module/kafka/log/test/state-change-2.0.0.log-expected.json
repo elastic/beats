@@ -2,8 +2,10 @@
     {
         "@timestamp": "2018-10-31T15:09:30.451-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
         "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "state.change.logger",

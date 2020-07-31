@@ -83,3 +83,33 @@ func EncodeURLParams(url string, params url.Values) string {
 
 	return strings.Join([]string{url, "?", params.Encode()}, "")
 }
+
+type ParseHint func(raw string) string
+
+// ParseURL tries to parse a URL and return the parsed result.
+func ParseURL(raw string, hints ...ParseHint) (*url.URL, error) {
+	if raw == "" {
+		return nil, nil
+	}
+
+	if len(hints) == 0 {
+		hints = append(hints, WithDefaultScheme("http"))
+	}
+
+	if strings.Index(raw, "://") == -1 {
+		for _, hint := range hints {
+			raw = hint(raw)
+		}
+	}
+
+	return url.Parse(raw)
+}
+
+func WithDefaultScheme(scheme string) ParseHint {
+	return func(raw string) string {
+		if !strings.Contains(raw, "://") {
+			return scheme + "://" + raw
+		}
+		return raw
+	}
+}
