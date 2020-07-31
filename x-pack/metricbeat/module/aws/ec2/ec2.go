@@ -333,7 +333,7 @@ func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr
 		"network.in.packets":  "host.network.in.packets",
 		"network.out.packets": "host.network.out.packets",
 		"diskio.read.bytes":   "host.disk.read.bytes",
-		"diskio.write.bytes":  "host.diskio.write.bytes",
+		"diskio.write.bytes":  "host.disk.write.bytes",
 	}
 
 	for ec2MetricName, hostMetricName := range hostFieldTable {

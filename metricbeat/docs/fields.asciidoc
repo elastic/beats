@@ -1562,6 +1562,70 @@ type: object
 
 --
 
+
+*`host.cpu.pct`*::
++
+--
+Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 100%.
+
+type: scaled_float
+
+--
+
+*`host.network.in.bytes`*::
++
+--
+The number of bytes received on all network interfaces by the host in a given period of time.
+
+type: scaled_float
+
+--
+
+*`host.network.out.bytes`*::
++
+--
+The number of bytes sent out on all network interfaces by the host in a given period of time.
+
+type: scaled_float
+
+--
+
+*`host.network.in.packets`*::
++
+--
+The number of packets received on all network interfaces by the host in a given period of time.
+
+type: scaled_float
+
+--
+
+*`host.network.out.packets`*::
++
+--
+The number of packets sent out on all network interfaces by the host in a given period of time.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes read successfully in a given period of time.
+
+type: scaled_float
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes write successfully in a given period of time.
+
+type: scaled_float
+
+--
+
 [float]
 === billing
 
@@ -1570,7 +1634,7 @@ type: object
 
 
 
-*`aws.billing.metrics.EstimatedCharges.max`*::
+*`host.billing.metrics.EstimatedCharges.max`*::
 +
 --
 Maximum estimated charges for AWS acccount.
@@ -1586,7 +1650,7 @@ type: long
 
 
 
-*`aws.cloudwatch.namespace`*::
+*`host.cloudwatch.namespace`*::
 +
 --
 The namespace specified when query cloudwatch api.
@@ -1604,7 +1668,7 @@ type: keyword
 
 
 
-*`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`*::
+*`host.dynamodb.metrics.SuccessfulRequestLatency.avg`*::
 +
 --
 The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
@@ -1614,7 +1678,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.SuccessfulRequestLatency.max`*::
+*`host.dynamodb.metrics.SuccessfulRequestLatency.max`*::
 +
 --
 The maximum latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
@@ -1624,7 +1688,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.OnlineIndexPercentageProgress.avg`*::
+*`host.dynamodb.metrics.OnlineIndexPercentageProgress.avg`*::
 +
 --
 The percentage of completion when a new global secondary index is being added to a table.
@@ -1634,7 +1698,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ProvisionedWriteCapacityUnits.avg`*::
+*`host.dynamodb.metrics.ProvisionedWriteCapacityUnits.avg`*::
 +
 --
 The number of provisioned write capacity units for a table or a global secondary index.
@@ -1644,7 +1708,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ProvisionedReadCapacityUnits.avg`*::
+*`host.dynamodb.metrics.ProvisionedReadCapacityUnits.avg`*::
 +
 --
 The number of provisioned read capacity units for a table or a global secondary index.
@@ -1654,7 +1718,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg`*::
+*`host.dynamodb.metrics.ConsumedReadCapacityUnits.avg`*::
 +
 --
 The average number of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
@@ -1664,7 +1728,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum`*::
+*`host.dynamodb.metrics.ConsumedReadCapacityUnits.sum`*::
 +
 --
 The sum of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
@@ -1674,7 +1738,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg`*::
+*`host.dynamodb.metrics.ConsumedWriteCapacityUnits.avg`*::
 +
 --
 The average number of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
@@ -1684,7 +1748,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.sum`*::
+*`host.dynamodb.metrics.ConsumedWriteCapacityUnits.sum`*::
 +
 --
 The sum of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
@@ -1694,7 +1758,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.ReplicationLatency.avg`*::
+*`host.dynamodb.metrics.ReplicationLatency.avg`*::
 +
 --
 The average elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
@@ -1704,7 +1768,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.ReplicationLatency.max`*::
+*`host.dynamodb.metrics.ReplicationLatency.max`*::
 +
 --
 The maximum elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
@@ -1714,7 +1778,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.TransactionConflict.avg`*::
+*`host.dynamodb.metrics.TransactionConflict.avg`*::
 +
 --
 Average rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
@@ -1724,7 +1788,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.TransactionConflict.sum`*::
+*`host.dynamodb.metrics.TransactionConflict.sum`*::
 +
 --
 Total rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
@@ -1734,7 +1798,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg`*::
+*`host.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg`*::
 +
 --
 The average percentage of provisioned read capacity units utilized by the account.
@@ -1744,7 +1808,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.AccountProvisionedWriteCapacityUtilization.avg`*::
+*`host.dynamodb.metrics.AccountProvisionedWriteCapacityUtilization.avg`*::
 +
 --
 The average percentage of provisioned write capacity units utilized by the account.
@@ -1754,7 +1818,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.SystemErrors.sum`*::
+*`host.dynamodb.metrics.SystemErrors.sum`*::
 +
 --
 The requests to DynamoDB or Amazon DynamoDB Streams that generate an HTTP 500 status code during the specified time period.
@@ -1764,7 +1828,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.ConditionalCheckFailedRequests.sum`*::
+*`host.dynamodb.metrics.ConditionalCheckFailedRequests.sum`*::
 +
 --
 The number of failed attempts to perform conditional writes.
@@ -1774,7 +1838,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.PendingReplicationCount.sum`*::
+*`host.dynamodb.metrics.PendingReplicationCount.sum`*::
 +
 --
 The number of item updates that are written to one replica table, but that have not yet been written to another replica in the global table.
@@ -1784,7 +1848,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.ReadThrottleEvents.sum`*::
+*`host.dynamodb.metrics.ReadThrottleEvents.sum`*::
 +
 --
 Requests to DynamoDB that exceed the provisioned read capacity units for a table or a global secondary index.
@@ -1794,7 +1858,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.ThrottledRequests.sum`*::
+*`host.dynamodb.metrics.ThrottledRequests.sum`*::
 +
 --
 Requests to DynamoDB that exceed the provisioned throughput limits on a resource (such as a table or an index).
@@ -1804,7 +1868,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.WriteThrottleEvents.sum`*::
+*`host.dynamodb.metrics.WriteThrottleEvents.sum`*::
 +
 --
 Requests to DynamoDB that exceed the provisioned write capacity units for a table or a global secondary index.
@@ -1814,7 +1878,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.AccountMaxReads.max`*::
+*`host.dynamodb.metrics.AccountMaxReads.max`*::
 +
 --
 The maximum number of read capacity units that can be used by an account. This limit does not apply to on-demand tables or global secondary indexes.
@@ -1824,7 +1888,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.AccountMaxTableLevelReads.max`*::
+*`host.dynamodb.metrics.AccountMaxTableLevelReads.max`*::
 +
 --
 The maximum number of read capacity units that can be used by a table or global secondary index of an account. For on-demand tables this limit caps the maximum read request units a table or a global secondary index can use.
@@ -1834,7 +1898,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.AccountMaxTableLevelWrites.max`*::
+*`host.dynamodb.metrics.AccountMaxTableLevelWrites.max`*::
 +
 --
 The maximum number of write capacity units that can be used by a table or global secondary index of an account. For on-demand tables this limit caps the maximum write request units a table or a global secondary index can use.
@@ -1844,7 +1908,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.AccountMaxWrites.max`*::
+*`host.dynamodb.metrics.AccountMaxWrites.max`*::
 +
 --
 The maximum number of write capacity units that can be used by an account. This limit does not apply to on-demand tables or global secondary indexes.
@@ -1854,7 +1918,7 @@ type: long
 
 --
 
-*`aws.dynamodb.metrics.MaxProvisionedTableReadCapacityUtilization.max`*::
+*`host.dynamodb.metrics.MaxProvisionedTableReadCapacityUtilization.max`*::
 +
 --
 The percentage of provisioned read capacity units utilized by the highest provisioned read table or global secondary index of an account.
@@ -1864,7 +1928,7 @@ type: double
 
 --
 
-*`aws.dynamodb.metrics.MaxProvisionedTableWriteCapacityUtilization.max`*::
+*`host.dynamodb.metrics.MaxProvisionedTableWriteCapacityUtilization.max`*::
 +
 --
 The percentage of provisioned write capacity utilized by the highest provisioned write table or global secondary index of an account.
@@ -1882,7 +1946,7 @@ type: double
 
 
 
-*`aws.ebs.metrics.VolumeReadBytes.avg`*::
+*`host.ebs.metrics.VolumeReadBytes.avg`*::
 +
 --
 Average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
@@ -1891,7 +1955,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeWriteBytes.avg`*::
+*`host.ebs.metrics.VolumeWriteBytes.avg`*::
 +
 --
 Average size of each write operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
@@ -1900,7 +1964,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeReadOps.avg`*::
+*`host.ebs.metrics.VolumeReadOps.avg`*::
 +
 --
 The total number of read operations in a specified period of time.
@@ -1909,7 +1973,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeWriteOps.avg`*::
+*`host.ebs.metrics.VolumeWriteOps.avg`*::
 +
 --
 The total number of write operations in a specified period of time.
@@ -1918,7 +1982,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeQueueLength.avg`*::
+*`host.ebs.metrics.VolumeQueueLength.avg`*::
 +
 --
 The number of read and write operation requests waiting to be completed in a specified period of time.
@@ -1927,7 +1991,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeThroughputPercentage.avg`*::
+*`host.ebs.metrics.VolumeThroughputPercentage.avg`*::
 +
 --
 The percentage of I/O operations per second (IOPS) delivered of the total IOPS provisioned for an Amazon EBS volume. Used with Provisioned IOPS SSD volumes only.
@@ -1936,7 +2000,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeConsumedReadWriteOps.avg`*::
+*`host.ebs.metrics.VolumeConsumedReadWriteOps.avg`*::
 +
 --
 The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time. Used with Provisioned IOPS SSD volumes only.
@@ -1945,7 +2009,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.BurstBalance.avg`*::
+*`host.ebs.metrics.BurstBalance.avg`*::
 +
 --
 Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only. Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.
@@ -1954,7 +2018,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeTotalReadTime.sum`*::
+*`host.ebs.metrics.VolumeTotalReadTime.sum`*::
 +
 --
 The total number of seconds spent by all read operations that completed in a specified period of time.
@@ -1963,7 +2027,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeTotalWriteTime.sum`*::
+*`host.ebs.metrics.VolumeTotalWriteTime.sum`*::
 +
 --
 The total number of seconds spent by all write operations that completed in a specified period of time.
@@ -1972,7 +2036,7 @@ type: double
 
 --
 
-*`aws.ebs.metrics.VolumeIdleTime.sum`*::
+*`host.ebs.metrics.VolumeIdleTime.sum`*::
 +
 --
 The total number of seconds in a specified period of time when no read or write operations were submitted.
@@ -1988,7 +2052,7 @@ type: double
 
 
 
-*`aws.ec2.cpu.total.pct`*::
+*`host.ec2.cpu.total.pct`*::
 +
 --
 The percentage of allocated EC2 compute units that are currently in use on the instance.
@@ -1998,7 +2062,7 @@ type: scaled_float
 
 --
 
-*`aws.ec2.cpu.credit_usage`*::
+*`host.ec2.cpu.credit_usage`*::
 +
 --
 The number of CPU credits spent by the instance for CPU utilization.
@@ -2008,7 +2072,7 @@ type: long
 
 --
 
-*`aws.ec2.cpu.credit_balance`*::
+*`host.ec2.cpu.credit_balance`*::
 +
 --
 The number of earned CPU credits that an instance has accrued since it was launched or started.
@@ -2018,7 +2082,7 @@ type: long
 
 --
 
-*`aws.ec2.cpu.surplus_credit_balance`*::
+*`host.ec2.cpu.surplus_credit_balance`*::
 +
 --
 The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
@@ -2028,7 +2092,7 @@ type: long
 
 --
 
-*`aws.ec2.cpu.surplus_credits_charged`*::
+*`host.ec2.cpu.surplus_credits_charged`*::
 +
 --
 The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
@@ -2038,7 +2102,7 @@ type: long
 
 --
 
-*`aws.ec2.network.in.packets`*::
+*`host.ec2.network.in.packets`*::
 +
 --
 The number of packets received on all network interfaces by the instance.
@@ -2048,7 +2112,7 @@ type: long
 
 --
 
-*`aws.ec2.network.in.packets_per_sec`*::
+*`host.ec2.network.in.packets_per_sec`*::
 +
 --
 The number of packets per second sent out on all network interfaces by the instance.
@@ -2058,7 +2122,7 @@ type: long
 
 --
 
-*`aws.ec2.network.out.packets`*::
+*`host.ec2.network.out.packets`*::
 +
 --
 The number of packets sent out on all network interfaces by the instance.
@@ -2068,7 +2132,7 @@ type: long
 
 --
 
-*`aws.ec2.network.out.packets_per_sec`*::
+*`host.ec2.network.out.packets_per_sec`*::
 +
 --
 The number of packets per second sent out on all network interfaces by the instance.
@@ -2078,7 +2142,7 @@ type: long
 
 --
 
-*`aws.ec2.network.in.bytes`*::
+*`host.ec2.network.in.bytes`*::
 +
 --
 The number of bytes received on all network interfaces by the instance.
@@ -2090,7 +2154,7 @@ format: bytes
 
 --
 
-*`aws.ec2.network.in.bytes_per_sec`*::
+*`host.ec2.network.in.bytes_per_sec`*::
 +
 --
 The number of bytes per second received on all network interfaces by the instance.
@@ -2100,7 +2164,7 @@ type: long
 
 --
 
-*`aws.ec2.network.out.bytes`*::
+*`host.ec2.network.out.bytes`*::
 +
 --
 The number of bytes sent out on all network interfaces by the instance.
@@ -2112,7 +2176,7 @@ format: bytes
 
 --
 
-*`aws.ec2.network.out.bytes_per_sec`*::
+*`host.ec2.network.out.bytes_per_sec`*::
 +
 --
 The number of bytes per second sent out on all network interfaces by the instance.
@@ -2122,7 +2186,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.read.bytes`*::
+*`host.ec2.diskio.read.bytes`*::
 +
 --
 Bytes read from all instance store volumes available to the instance.
@@ -2134,7 +2198,7 @@ format: bytes
 
 --
 
-*`aws.ec2.diskio.read.bytes_per_sec`*::
+*`host.ec2.diskio.read.bytes_per_sec`*::
 +
 --
 Bytes read per second from all instance store volumes available to the instance.
@@ -2144,7 +2208,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.bytes`*::
+*`host.ec2.diskio.write.bytes`*::
 +
 --
 Bytes written to all instance store volumes available to the instance.
@@ -2156,7 +2220,7 @@ format: bytes
 
 --
 
-*`aws.ec2.diskio.write.bytes_per_sec`*::
+*`host.ec2.diskio.write.bytes_per_sec`*::
 +
 --
 Bytes written per second to all instance store volumes available to the instance.
@@ -2166,7 +2230,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.read.ops`*::
+*`host.ec2.diskio.read.ops`*::
 +
 --
 Completed read operations from all instance store volumes available to the instance in a specified period of time.
@@ -2176,7 +2240,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.read.ops_per_sec`*::
+*`host.ec2.diskio.read.ops_per_sec`*::
 +
 --
 Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
@@ -2186,7 +2250,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops`*::
+*`host.ec2.diskio.write.ops`*::
 +
 --
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
@@ -2196,7 +2260,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops_per_sec`*::
+*`host.ec2.diskio.write.ops_per_sec`*::
 +
 --
 Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
@@ -2206,7 +2270,7 @@ type: long
 
 --
 
-*`aws.ec2.status.check_failed`*::
+*`host.ec2.status.check_failed`*::
 +
 --
 Reports whether the instance has passed both the instance status check and the system status check in the last minute.
@@ -2216,7 +2280,7 @@ type: long
 
 --
 
-*`aws.ec2.status.check_failed_system`*::
+*`host.ec2.status.check_failed_system`*::
 +
 --
 Reports whether the instance has passed the system status check in the last minute.
@@ -2226,7 +2290,7 @@ type: long
 
 --
 
-*`aws.ec2.status.check_failed_instance`*::
+*`host.ec2.status.check_failed_instance`*::
 +
 --
 Reports whether the instance has passed the instance status check in the last minute.
@@ -2236,7 +2300,7 @@ type: long
 
 --
 
-*`aws.ec2.instance.core.count`*::
+*`host.ec2.instance.core.count`*::
 +
 --
 The number of CPU cores for the instance.
@@ -2246,7 +2310,7 @@ type: integer
 
 --
 
-*`aws.ec2.instance.image.id`*::
+*`host.ec2.instance.image.id`*::
 +
 --
 The ID of the image used to launch the instance.
@@ -2256,7 +2320,7 @@ type: keyword
 
 --
 
-*`aws.ec2.instance.monitoring.state`*::
+*`host.ec2.instance.monitoring.state`*::
 +
 --
 Indicates whether detailed monitoring is enabled.
@@ -2266,7 +2330,7 @@ type: keyword
 
 --
 
-*`aws.ec2.instance.private.dns_name`*::
+*`host.ec2.instance.private.dns_name`*::
 +
 --
 The private DNS name of the network interface.
@@ -2276,7 +2340,7 @@ type: keyword
 
 --
 
-*`aws.ec2.instance.private.ip`*::
+*`host.ec2.instance.private.ip`*::
 +
 --
 The private IPv4 address associated with the network interface.
@@ -2286,7 +2350,7 @@ type: ip
 
 --
 
-*`aws.ec2.instance.public.dns_name`*::
+*`host.ec2.instance.public.dns_name`*::
 +
 --
 The public DNS name of the instance.
@@ -2296,7 +2360,7 @@ type: keyword
 
 --
 
-*`aws.ec2.instance.public.ip`*::
+*`host.ec2.instance.public.ip`*::
 +
 --
 The address of the Elastic IP address (IPv4) bound to the network interface.
@@ -2306,7 +2370,7 @@ type: ip
 
 --
 
-*`aws.ec2.instance.state.code`*::
+*`host.ec2.instance.state.code`*::
 +
 --
 The state of the instance, as a 16-bit unsigned integer.
@@ -2316,7 +2380,7 @@ type: integer
 
 --
 
-*`aws.ec2.instance.state.name`*::
+*`host.ec2.instance.state.name`*::
 +
 --
 The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
@@ -2326,7 +2390,7 @@ type: keyword
 
 --
 
-*`aws.ec2.instance.threads_per_core`*::
+*`host.ec2.instance.threads_per_core`*::
 +
 --
 The number of threads per CPU core.
@@ -2344,7 +2408,7 @@ type: integer
 
 
 
-*`aws.elb.metrics.BackendConnectionErrors.sum`*::
+*`host.elb.metrics.BackendConnectionErrors.sum`*::
 +
 --
 The number of connections that were not successfully established between the load balancer and the registered instances.
@@ -2353,7 +2417,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_Backend_2XX.sum`*::
+*`host.elb.metrics.HTTPCode_Backend_2XX.sum`*::
 +
 --
 The number of HTTP 2XX response code generated by registered instances.
@@ -2362,7 +2426,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_Backend_3XX.sum`*::
+*`host.elb.metrics.HTTPCode_Backend_3XX.sum`*::
 +
 --
 The number of HTTP 3XX response code generated by registered instances.
@@ -2371,7 +2435,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_Backend_4XX.sum`*::
+*`host.elb.metrics.HTTPCode_Backend_4XX.sum`*::
 +
 --
 The number of HTTP 4XX response code generated by registered instances.
@@ -2380,7 +2444,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_Backend_5XX.sum`*::
+*`host.elb.metrics.HTTPCode_Backend_5XX.sum`*::
 +
 --
 The number of HTTP 5XX response code generated by registered instances.
@@ -2389,7 +2453,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_ELB_4XX.sum`*::
+*`host.elb.metrics.HTTPCode_ELB_4XX.sum`*::
 +
 --
 The number of HTTP 4XX client error codes generated by the load balancer.
@@ -2398,7 +2462,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HTTPCode_ELB_5XX.sum`*::
+*`host.elb.metrics.HTTPCode_ELB_5XX.sum`*::
 +
 --
 The number of HTTP 5XX server error codes generated by the load balancer.
@@ -2407,7 +2471,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.RequestCount.sum`*::
+*`host.elb.metrics.RequestCount.sum`*::
 +
 --
 The number of requests completed or connections made during the specified interval.
@@ -2416,7 +2480,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.SpilloverCount.sum`*::
+*`host.elb.metrics.SpilloverCount.sum`*::
 +
 --
 The total number of requests that were rejected because the surge queue is full.
@@ -2425,7 +2489,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.HealthyHostCount.max`*::
+*`host.elb.metrics.HealthyHostCount.max`*::
 +
 --
 The number of healthy instances registered with your load balancer.
@@ -2434,7 +2498,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.SurgeQueueLength.max`*::
+*`host.elb.metrics.SurgeQueueLength.max`*::
 +
 --
 The total number of requests (HTTP listener) or connections (TCP listener) that are pending routing to a healthy instance.
@@ -2443,7 +2507,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.UnHealthyHostCount.max`*::
+*`host.elb.metrics.UnHealthyHostCount.max`*::
 +
 --
 The number of unhealthy instances registered with your load balancer.
@@ -2452,7 +2516,7 @@ type: long
 
 --
 
-*`aws.elb.metrics.Latency.avg`*::
+*`host.elb.metrics.Latency.avg`*::
 +
 --
 The total time elapsed, in seconds, from the time the load balancer sent the request to a registered instance until the instance started to send the response headers.
@@ -2461,7 +2525,7 @@ type: double
 
 --
 
-*`aws.elb.metrics.EstimatedALBActiveConnectionCount.avg`*::
+*`host.elb.metrics.EstimatedALBActiveConnectionCount.avg`*::
 +
 --
 The estimated number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.
@@ -2470,7 +2534,7 @@ type: double
 
 --
 
-*`aws.elb.metrics.EstimatedALBConsumedLCUs.avg`*::
+*`host.elb.metrics.EstimatedALBConsumedLCUs.avg`*::
 +
 --
 The estimated number of load balancer capacity units (LCU) used by an Application Load Balancer.
@@ -2479,7 +2543,7 @@ type: double
 
 --
 
-*`aws.elb.metrics.EstimatedALBNewConnectionCount.avg`*::
+*`host.elb.metrics.EstimatedALBNewConnectionCount.avg`*::
 +
 --
 The estimated number of new TCP connections established from clients to the load balancer and from the load balancer to targets.
@@ -2488,7 +2552,7 @@ type: double
 
 --
 
-*`aws.elb.metrics.EstimatedProcessedBytes.avg`*::
+*`host.elb.metrics.EstimatedProcessedBytes.avg`*::
 +
 --
 The estimated number of bytes processed by an Application Load Balancer.
@@ -2505,7 +2569,7 @@ type: double
 
 
 
-*`aws.applicationelb.metrics.ActiveConnectionCount.sum`*::
+*`host.applicationelb.metrics.ActiveConnectionCount.sum`*::
 +
 --
 The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.
@@ -2514,7 +2578,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.ClientTLSNegotiationErrorCount.sum`*::
+*`host.applicationelb.metrics.ClientTLSNegotiationErrorCount.sum`*::
 +
 --
 The number of TLS connections initiated by the client that did not establish a session with the load balancer due to a TLS error.
@@ -2523,7 +2587,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTP_Fixed_Response_Count.sum`*::
+*`host.applicationelb.metrics.HTTP_Fixed_Response_Count.sum`*::
 +
 --
 The number of fixed-response actions that were successful.
@@ -2532,7 +2596,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTP_Redirect_Count.sum`*::
+*`host.applicationelb.metrics.HTTP_Redirect_Count.sum`*::
 +
 --
 The number of redirect actions that were successful.
@@ -2541,7 +2605,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTP_Redirect_Url_Limit_Exceeded_Count.sum`*::
+*`host.applicationelb.metrics.HTTP_Redirect_Url_Limit_Exceeded_Count.sum`*::
 +
 --
 The number of redirect actions that couldn't be completed because the URL in the response location header is larger than 8K.
@@ -2550,7 +2614,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_3XX_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_3XX_Count.sum`*::
 +
 --
 The number of HTTP 3XX redirection codes that originate from the load balancer.
@@ -2559,7 +2623,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_4XX_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_4XX_Count.sum`*::
 +
 --
 The number of HTTP 4XX client error codes that originate from the load balancer.
@@ -2568,7 +2632,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_5XX_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_5XX_Count.sum`*::
 +
 --
 The number of HTTP 5XX server error codes that originate from the load balancer.
@@ -2577,7 +2641,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_500_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_500_Count.sum`*::
 +
 --
 The number of HTTP 500 error codes that originate from the load balancer.
@@ -2586,7 +2650,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_502_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_502_Count.sum`*::
 +
 --
 The number of HTTP 502 error codes that originate from the load balancer.
@@ -2595,7 +2659,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_503_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_503_Count.sum`*::
 +
 --
 The number of HTTP 503 error codes that originate from the load balancer.
@@ -2604,7 +2668,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.HTTPCode_ELB_504_Count.sum`*::
+*`host.applicationelb.metrics.HTTPCode_ELB_504_Count.sum`*::
 +
 --
 The number of HTTP 504 error codes that originate from the load balancer.
@@ -2613,7 +2677,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.IPv6ProcessedBytes.sum`*::
+*`host.applicationelb.metrics.IPv6ProcessedBytes.sum`*::
 +
 --
 The total number of bytes processed by the load balancer over IPv6.
@@ -2622,7 +2686,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.IPv6RequestCount.sum`*::
+*`host.applicationelb.metrics.IPv6RequestCount.sum`*::
 +
 --
 The number of IPv6 requests received by the load balancer.
@@ -2631,7 +2695,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.NewConnectionCount.sum`*::
+*`host.applicationelb.metrics.NewConnectionCount.sum`*::
 +
 --
 The total number of new TCP connections established from clients to the load balancer and from the load balancer to targets.
@@ -2640,7 +2704,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.ProcessedBytes.sum`*::
+*`host.applicationelb.metrics.ProcessedBytes.sum`*::
 +
 --
 The total number of bytes processed by the load balancer over IPv4 and IPv6.
@@ -2649,7 +2713,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.RejectedConnectionCount.sum`*::
+*`host.applicationelb.metrics.RejectedConnectionCount.sum`*::
 +
 --
 The number of connections that were rejected because the load balancer had reached its maximum number of connections.
@@ -2658,7 +2722,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.RequestCount.sum`*::
+*`host.applicationelb.metrics.RequestCount.sum`*::
 +
 --
 The number of requests processed over IPv4 and IPv6.
@@ -2667,7 +2731,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.RuleEvaluations.sum`*::
+*`host.applicationelb.metrics.RuleEvaluations.sum`*::
 +
 --
 The number of rules processed by the load balancer given a request rate averaged over an hour.
@@ -2676,7 +2740,7 @@ type: long
 
 --
 
-*`aws.applicationelb.metrics.ConsumedLCUs.avg`*::
+*`host.applicationelb.metrics.ConsumedLCUs.avg`*::
 +
 --
 The number of load balancer capacity units (LCU) used by your load balancer.
@@ -2693,7 +2757,7 @@ type: double
 
 
 
-*`aws.networkelb.metrics.ActiveFlowCount.avg`*::
+*`host.networkelb.metrics.ActiveFlowCount.avg`*::
 +
 --
 The total number of concurrent flows (or connections) from clients to targets.
@@ -2702,7 +2766,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ActiveFlowCount_TCP.avg`*::
+*`host.networkelb.metrics.ActiveFlowCount_TCP.avg`*::
 +
 --
 The total number of concurrent TCP flows (or connections) from clients to targets.
@@ -2711,7 +2775,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ActiveFlowCount_TLS.avg`*::
+*`host.networkelb.metrics.ActiveFlowCount_TLS.avg`*::
 +
 --
 The total number of concurrent TLS flows (or connections) from clients to targets.
@@ -2720,7 +2784,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ActiveFlowCount_UDP.avg`*::
+*`host.networkelb.metrics.ActiveFlowCount_UDP.avg`*::
 +
 --
 The total number of concurrent UDP flows (or connections) from clients to targets.
@@ -2729,7 +2793,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ConsumedLCUs.avg`*::
+*`host.networkelb.metrics.ConsumedLCUs.avg`*::
 +
 --
 The number of load balancer capacity units (LCU) used by your load balancer.
@@ -2738,7 +2802,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ClientTLSNegotiationErrorCount.sum`*::
+*`host.networkelb.metrics.ClientTLSNegotiationErrorCount.sum`*::
 +
 --
 The total number of TLS handshakes that failed during negotiation between a client and a TLS listener.
@@ -2747,7 +2811,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.NewFlowCount.sum`*::
+*`host.networkelb.metrics.NewFlowCount.sum`*::
 +
 --
 The total number of new flows (or connections) established from clients to targets in the time period.
@@ -2756,7 +2820,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.NewFlowCount_TLS.sum`*::
+*`host.networkelb.metrics.NewFlowCount_TLS.sum`*::
 +
 --
 The total number of new TLS flows (or connections) established from clients to targets in the time period.
@@ -2765,7 +2829,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.ProcessedBytes.sum`*::
+*`host.networkelb.metrics.ProcessedBytes.sum`*::
 +
 --
 The total number of bytes processed by the load balancer, including TCP/IP headers.
@@ -2774,7 +2838,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.ProcessedBytes_TLS.sum`*::
+*`host.networkelb.metrics.ProcessedBytes_TLS.sum`*::
 +
 --
 The total number of bytes processed by TLS listeners.
@@ -2783,7 +2847,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.TargetTLSNegotiationErrorCount.sum`*::
+*`host.networkelb.metrics.TargetTLSNegotiationErrorCount.sum`*::
 +
 --
 The total number of TLS handshakes that failed during negotiation between a TLS listener and a target.
@@ -2792,7 +2856,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.TCP_Client_Reset_Count.sum`*::
+*`host.networkelb.metrics.TCP_Client_Reset_Count.sum`*::
 +
 --
 The total number of reset (RST) packets sent from a client to a target.
@@ -2801,7 +2865,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.TCP_ELB_Reset_Count.sum`*::
+*`host.networkelb.metrics.TCP_ELB_Reset_Count.sum`*::
 +
 --
 The total number of reset (RST) packets generated by the load balancer.
@@ -2810,7 +2874,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.TCP_Target_Reset_Count.sum`*::
+*`host.networkelb.metrics.TCP_Target_Reset_Count.sum`*::
 +
 --
 The total number of reset (RST) packets sent from a target to a client.
@@ -2819,7 +2883,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.HealthyHostCount.max`*::
+*`host.networkelb.metrics.HealthyHostCount.max`*::
 +
 --
 The number of targets that are considered healthy.
@@ -2828,7 +2892,7 @@ type: long
 
 --
 
-*`aws.networkelb.metrics.UnHealthyHostCount.max`*::
+*`host.networkelb.metrics.UnHealthyHostCount.max`*::
 +
 --
 The number of targets that are considered unhealthy.
@@ -2845,7 +2909,7 @@ type: long
 
 
 
-*`aws.lambda.metrics.Invocations.avg`*::
+*`host.lambda.metrics.Invocations.avg`*::
 +
 --
 The number of times your function code is executed, including successful executions and executions that result in a function error.
@@ -2854,7 +2918,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.Errors.avg`*::
+*`host.lambda.metrics.Errors.avg`*::
 +
 --
 The number of invocations that result in a function error.
@@ -2863,7 +2927,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.DeadLetterErrors.avg`*::
+*`host.lambda.metrics.DeadLetterErrors.avg`*::
 +
 --
 For asynchronous invocation, the number of times Lambda attempts to send an event to a dead-letter queue but fails.
@@ -2872,7 +2936,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.DestinationDeliveryFailures.avg`*::
+*`host.lambda.metrics.DestinationDeliveryFailures.avg`*::
 +
 --
 For asynchronous invocation, the number of times Lambda attempts to send an event to a destination but fails.
@@ -2881,7 +2945,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.Duration.avg`*::
+*`host.lambda.metrics.Duration.avg`*::
 +
 --
 The amount of time that your function code spends processing an event.
@@ -2890,7 +2954,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.Throttles.avg`*::
+*`host.lambda.metrics.Throttles.avg`*::
 +
 --
 The number of invocation requests that are throttled.
@@ -2899,7 +2963,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.IteratorAge.avg`*::
+*`host.lambda.metrics.IteratorAge.avg`*::
 +
 --
 For event source mappings that read from streams, the age of the last record in the event.
@@ -2908,7 +2972,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.ConcurrentExecutions.avg`*::
+*`host.lambda.metrics.ConcurrentExecutions.avg`*::
 +
 --
 The number of function instances that are processing events.
@@ -2917,7 +2981,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.UnreservedConcurrentExecutions.avg`*::
+*`host.lambda.metrics.UnreservedConcurrentExecutions.avg`*::
 +
 --
 For an AWS Region, the number of events that are being processed by functions that don't have reserved concurrency.
@@ -2926,7 +2990,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.ProvisionedConcurrentExecutions.max`*::
+*`host.lambda.metrics.ProvisionedConcurrentExecutions.max`*::
 +
 --
 The number of function instances that are processing events on provisioned concurrency.
@@ -2935,7 +2999,7 @@ type: long
 
 --
 
-*`aws.lambda.metrics.ProvisionedConcurrencyUtilization.max`*::
+*`host.lambda.metrics.ProvisionedConcurrencyUtilization.max`*::
 +
 --
 For a version or alias, the value of ProvisionedConcurrentExecutions divided by the total amount of provisioned concurrency allocated.
@@ -2944,7 +3008,7 @@ type: long
 
 --
 
-*`aws.lambda.metrics.ProvisionedConcurrencyInvocations.sum`*::
+*`host.lambda.metrics.ProvisionedConcurrencyInvocations.sum`*::
 +
 --
 The number of times your function code is executed on provisioned concurrency.
@@ -2953,7 +3017,7 @@ type: long
 
 --
 
-*`aws.lambda.metrics.ProvisionedConcurrencySpilloverInvocations.sum`*::
+*`host.lambda.metrics.ProvisionedConcurrencySpilloverInvocations.sum`*::
 +
 --
 The number of times your function code is executed on standard concurrency when all provisioned concurrency is in use.
@@ -2970,7 +3034,7 @@ type: long
 
 
 
-*`aws.natgateway.metrics.BytesInFromDestination.sum`*::
+*`host.natgateway.metrics.BytesInFromDestination.sum`*::
 +
 --
 The number of bytes received by the NAT gateway from the destination.
@@ -2979,7 +3043,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.BytesInFromSource.sum`*::
+*`host.natgateway.metrics.BytesInFromSource.sum`*::
 +
 --
 The number of bytes received by the NAT gateway from clients in your VPC.
@@ -2988,7 +3052,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.BytesOutToDestination.sum`*::
+*`host.natgateway.metrics.BytesOutToDestination.sum`*::
 +
 --
 The number of bytes sent out through the NAT gateway to the destination.
@@ -2997,7 +3061,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.BytesOutToSource.sum`*::
+*`host.natgateway.metrics.BytesOutToSource.sum`*::
 +
 --
 The number of bytes sent through the NAT gateway to the clients in your VPC.
@@ -3006,7 +3070,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.ConnectionAttemptCount.sum`*::
+*`host.natgateway.metrics.ConnectionAttemptCount.sum`*::
 +
 --
 The number of connection attempts made through the NAT gateway.
@@ -3015,7 +3079,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.ConnectionEstablishedCount.sum`*::
+*`host.natgateway.metrics.ConnectionEstablishedCount.sum`*::
 +
 --
 The number of connections established through the NAT gateway.
@@ -3024,7 +3088,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.ErrorPortAllocation.sum`*::
+*`host.natgateway.metrics.ErrorPortAllocation.sum`*::
 +
 --
 The number of times the NAT gateway could not allocate a source port.
@@ -3033,7 +3097,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.IdleTimeoutCount.sum`*::
+*`host.natgateway.metrics.IdleTimeoutCount.sum`*::
 +
 --
 The number of connections that transitioned from the active state to the idle state.
@@ -3042,7 +3106,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.PacketsDropCount.sum`*::
+*`host.natgateway.metrics.PacketsDropCount.sum`*::
 +
 --
 The number of packets dropped by the NAT gateway.
@@ -3051,7 +3115,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.PacketsInFromDestination.sum`*::
+*`host.natgateway.metrics.PacketsInFromDestination.sum`*::
 +
 --
 The number of packets received by the NAT gateway from the destination.
@@ -3060,7 +3124,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.PacketsInFromSource.sum`*::
+*`host.natgateway.metrics.PacketsInFromSource.sum`*::
 +
 --
 The number of packets received by the NAT gateway from clients in your VPC.
@@ -3069,7 +3133,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.PacketsOutToDestination.sum`*::
+*`host.natgateway.metrics.PacketsOutToDestination.sum`*::
 +
 --
 The number of packets sent out through the NAT gateway to the destination.
@@ -3078,7 +3142,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.PacketsOutToSource.sum`*::
+*`host.natgateway.metrics.PacketsOutToSource.sum`*::
 +
 --
 The number of packets sent through the NAT gateway to the clients in your VPC.
@@ -3087,7 +3151,7 @@ type: long
 
 --
 
-*`aws.natgateway.metrics.ActiveConnectionCount.max`*::
+*`host.natgateway.metrics.ActiveConnectionCount.max`*::
 +
 --
 The total number of concurrent active TCP connections through the NAT gateway.
@@ -3103,7 +3167,7 @@ type: long
 
 
 
-*`aws.rds.cpu.total.pct`*::
+*`host.rds.cpu.total.pct`*::
 +
 --
 The percentage of CPU utilization.
@@ -3115,7 +3179,7 @@ format: percent
 
 --
 
-*`aws.rds.cpu.credit_usage`*::
+*`host.rds.cpu.credit_usage`*::
 +
 --
 The number of CPU credits spent by the instance for CPU utilization.
@@ -3125,7 +3189,7 @@ type: long
 
 --
 
-*`aws.rds.cpu.credit_balance`*::
+*`host.rds.cpu.credit_balance`*::
 +
 --
 The number of earned CPU credits that an instance has accrued since it was launched or started.
@@ -3135,7 +3199,7 @@ type: long
 
 --
 
-*`aws.rds.database_connections`*::
+*`host.rds.database_connections`*::
 +
 --
 The number of database connections in use.
@@ -3145,7 +3209,7 @@ type: long
 
 --
 
-*`aws.rds.db_instance.arn`*::
+*`host.rds.db_instance.arn`*::
 +
 --
 Amazon Resource Name(ARN) for each rds.
@@ -3155,7 +3219,7 @@ type: keyword
 
 --
 
-*`aws.rds.db_instance.class`*::
+*`host.rds.db_instance.class`*::
 +
 --
 Contains the name of the compute and memory capacity class of the DB instance.
@@ -3165,7 +3229,7 @@ type: keyword
 
 --
 
-*`aws.rds.db_instance.identifier`*::
+*`host.rds.db_instance.identifier`*::
 +
 --
 Contains a user-supplied database identifier. This identifier is the unique key that identifies a DB instance.
@@ -3175,7 +3239,7 @@ type: keyword
 
 --
 
-*`aws.rds.db_instance.status`*::
+*`host.rds.db_instance.status`*::
 +
 --
 Specifies the current state of this database.
@@ -3185,7 +3249,7 @@ type: keyword
 
 --
 
-*`aws.rds.disk_queue_depth`*::
+*`host.rds.disk_queue_depth`*::
 +
 --
 The number of outstanding IOs (read/write requests) waiting to access the disk.
@@ -3195,7 +3259,7 @@ type: float
 
 --
 
-*`aws.rds.failed_sql_server_agent_jobs`*::
+*`host.rds.failed_sql_server_agent_jobs`*::
 +
 --
 The number of failed SQL Server Agent jobs during the last minute.
@@ -3205,7 +3269,7 @@ type: long
 
 --
 
-*`aws.rds.freeable_memory.bytes`*::
+*`host.rds.freeable_memory.bytes`*::
 +
 --
 The amount of available random access memory.
@@ -3217,7 +3281,7 @@ format: bytes
 
 --
 
-*`aws.rds.free_storage.bytes`*::
+*`host.rds.free_storage.bytes`*::
 +
 --
 The amount of available storage space.
@@ -3229,7 +3293,7 @@ format: bytes
 
 --
 
-*`aws.rds.maximum_used_transaction_ids`*::
+*`host.rds.maximum_used_transaction_ids`*::
 +
 --
 The maximum transaction ID that has been used. Applies to PostgreSQL.
@@ -3239,7 +3303,7 @@ type: long
 
 --
 
-*`aws.rds.oldest_replication_slot_lag.mb`*::
+*`host.rds.oldest_replication_slot_lag.mb`*::
 +
 --
 The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
@@ -3249,7 +3313,7 @@ type: long
 
 --
 
-*`aws.rds.read_io.ops_per_sec`*::
+*`host.rds.read_io.ops_per_sec`*::
 +
 --
 The average number of disk read I/O operations per second.
@@ -3259,7 +3323,7 @@ type: float
 
 --
 
-*`aws.rds.replica_lag.sec`*::
+*`host.rds.replica_lag.sec`*::
 +
 --
 The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
@@ -3271,7 +3335,7 @@ format: duration
 
 --
 
-*`aws.rds.swap_usage.bytes`*::
+*`host.rds.swap_usage.bytes`*::
 +
 --
 The amount of swap space used on the DB instance. This metric is not available for SQL Server.
@@ -3283,7 +3347,7 @@ format: bytes
 
 --
 
-*`aws.rds.transaction_logs_generation`*::
+*`host.rds.transaction_logs_generation`*::
 +
 --
 The disk space used by transaction logs. Applies to PostgreSQL.
@@ -3293,7 +3357,7 @@ type: long
 
 --
 
-*`aws.rds.write_io.ops_per_sec`*::
+*`host.rds.write_io.ops_per_sec`*::
 +
 --
 The average number of disk write I/O operations per second.
@@ -3303,7 +3367,7 @@ type: float
 
 --
 
-*`aws.rds.queries`*::
+*`host.rds.queries`*::
 +
 --
 The average number of queries executed per second.
@@ -3313,7 +3377,7 @@ type: long
 
 --
 
-*`aws.rds.deadlocks`*::
+*`host.rds.deadlocks`*::
 +
 --
 The average number of deadlocks in the database per second.
@@ -3323,7 +3387,7 @@ type: long
 
 --
 
-*`aws.rds.volume_used.bytes`*::
+*`host.rds.volume_used.bytes`*::
 +
 --
 The amount of storage used by your Aurora DB instance, in bytes.
@@ -3335,7 +3399,7 @@ format: bytes
 
 --
 
-*`aws.rds.volume.read.iops`*::
+*`host.rds.volume.read.iops`*::
 +
 --
 The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
@@ -3347,7 +3411,7 @@ format: bytes
 
 --
 
-*`aws.rds.volume.write.iops`*::
+*`host.rds.volume.write.iops`*::
 +
 --
 The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.
@@ -3359,7 +3423,7 @@ format: bytes
 
 --
 
-*`aws.rds.free_local_storage.bytes`*::
+*`host.rds.free_local_storage.bytes`*::
 +
 --
 The amount of storage available for temporary tables and logs, in bytes.
@@ -3371,7 +3435,7 @@ format: bytes
 
 --
 
-*`aws.rds.login_failures`*::
+*`host.rds.login_failures`*::
 +
 --
 The average number of failed login attempts per second.
@@ -3381,7 +3445,7 @@ type: long
 
 --
 
-*`aws.rds.throughput.commit`*::
+*`host.rds.throughput.commit`*::
 +
 --
 The average number of commit operations per second.
@@ -3391,7 +3455,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.delete`*::
+*`host.rds.throughput.delete`*::
 +
 --
 The average number of delete queries per second.
@@ -3401,7 +3465,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.ddl`*::
+*`host.rds.throughput.ddl`*::
 +
 --
 The average number of DDL requests per second.
@@ -3411,7 +3475,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.dml`*::
+*`host.rds.throughput.dml`*::
 +
 --
 The average number of inserts, updates, and deletes per second.
@@ -3421,7 +3485,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.insert`*::
+*`host.rds.throughput.insert`*::
 +
 --
 The average number of insert queries per second.
@@ -3431,7 +3495,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.network`*::
+*`host.rds.throughput.network`*::
 +
 --
 The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
@@ -3441,7 +3505,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.network_receive`*::
+*`host.rds.throughput.network_receive`*::
 +
 --
 The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
@@ -3451,7 +3515,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.network_transmit`*::
+*`host.rds.throughput.network_transmit`*::
 +
 --
 The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
@@ -3461,7 +3525,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.read`*::
+*`host.rds.throughput.read`*::
 +
 --
 The average amount of time taken per disk I/O operation.
@@ -3471,7 +3535,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.select`*::
+*`host.rds.throughput.select`*::
 +
 --
 The average number of select queries per second.
@@ -3481,7 +3545,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.update`*::
+*`host.rds.throughput.update`*::
 +
 --
 The average number of update queries per second.
@@ -3491,7 +3555,7 @@ type: float
 
 --
 
-*`aws.rds.throughput.write`*::
+*`host.rds.throughput.write`*::
 +
 --
 The average number of bytes written to disk per second.
@@ -3501,7 +3565,7 @@ type: float
 
 --
 
-*`aws.rds.latency.commit`*::
+*`host.rds.latency.commit`*::
 +
 --
 The amount of latency for commit operations, in milliseconds.
@@ -3513,7 +3577,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.ddl`*::
+*`host.rds.latency.ddl`*::
 +
 --
 The amount of latency for data definition language (DDL) requests, in milliseconds.
@@ -3525,7 +3589,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.dml`*::
+*`host.rds.latency.dml`*::
 +
 --
 The amount of latency for inserts, updates, and deletes, in milliseconds.
@@ -3537,7 +3601,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.insert`*::
+*`host.rds.latency.insert`*::
 +
 --
 The amount of latency for insert queries, in milliseconds.
@@ -3549,7 +3613,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.read`*::
+*`host.rds.latency.read`*::
 +
 --
 The average amount of time taken per disk I/O operation.
@@ -3561,7 +3625,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.select`*::
+*`host.rds.latency.select`*::
 +
 --
 The amount of latency for select queries, in milliseconds.
@@ -3573,7 +3637,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.update`*::
+*`host.rds.latency.update`*::
 +
 --
 The amount of latency for update queries, in milliseconds.
@@ -3585,7 +3649,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.write`*::
+*`host.rds.latency.write`*::
 +
 --
 The average amount of time taken per disk I/O operation.
@@ -3597,7 +3661,7 @@ format: duration
 
 --
 
-*`aws.rds.latency.delete`*::
+*`host.rds.latency.delete`*::
 +
 --
 The amount of latency for delete queries, in milliseconds.
@@ -3609,7 +3673,7 @@ format: duration
 
 --
 
-*`aws.rds.disk_usage.bin_log.bytes`*::
+*`host.rds.disk_usage.bin_log.bytes`*::
 +
 --
 The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
@@ -3621,7 +3685,7 @@ format: bytes
 
 --
 
-*`aws.rds.disk_usage.replication_slot.mb`*::
+*`host.rds.disk_usage.replication_slot.mb`*::
 +
 --
 The disk space used by replication slot files. Applies to PostgreSQL.
@@ -3631,7 +3695,7 @@ type: long
 
 --
 
-*`aws.rds.disk_usage.transaction_logs.mb`*::
+*`host.rds.disk_usage.transaction_logs.mb`*::
 +
 --
 The disk space used by transaction logs. Applies to PostgreSQL.
@@ -3641,7 +3705,7 @@ type: long
 
 --
 
-*`aws.rds.transactions.active`*::
+*`host.rds.transactions.active`*::
 +
 --
 The average number of current transactions executing on an Aurora database instance per second.
@@ -3651,7 +3715,7 @@ type: long
 
 --
 
-*`aws.rds.transactions.blocked`*::
+*`host.rds.transactions.blocked`*::
 +
 --
 The average number of transactions in the database that are blocked per second.
@@ -3661,7 +3725,7 @@ type: long
 
 --
 
-*`aws.rds.db_instance.db_cluster_identifier`*::
+*`host.rds.db_instance.db_cluster_identifier`*::
 +
 --
 This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
@@ -3671,7 +3735,7 @@ type: keyword
 
 --
 
-*`aws.rds.db_instance.role`*::
+*`host.rds.db_instance.role`*::
 +
 --
 DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
@@ -3681,7 +3745,7 @@ type: keyword
 
 --
 
-*`aws.rds.db_instance.engine_name`*::
+*`host.rds.db_instance.engine_name`*::
 +
 --
 Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
@@ -3691,7 +3755,7 @@ type: keyword
 
 --
 
-*`aws.rds.aurora_bin_log_replica_lag`*::
+*`host.rds.aurora_bin_log_replica_lag`*::
 +
 --
 The amount of time a replica DB cluster running on Aurora with MySQL compatibility lags behind the source DB cluster.
@@ -3701,7 +3765,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_global_db.replicated_write_io.bytes`*::
+*`host.rds.aurora_global_db.replicated_write_io.bytes`*::
 +
 --
 In an Aurora Global Database, the number of write I/O operations replicated from the primary AWS Region to the cluster volume in a secondary AWS Region.
@@ -3711,7 +3775,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_global_db.data_transfer.bytes`*::
+*`host.rds.aurora_global_db.data_transfer.bytes`*::
 +
 --
 In an Aurora Global Database, the amount of redo log data transferred from the master AWS Region to a secondary AWS Region.
@@ -3721,7 +3785,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_global_db.replication_lag.ms`*::
+*`host.rds.aurora_global_db.replication_lag.ms`*::
 +
 --
 For an Aurora Global Database, the amount of lag when replicating updates from the primary AWS Region, in milliseconds.
@@ -3731,7 +3795,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_replica.lag.ms`*::
+*`host.rds.aurora_replica.lag.ms`*::
 +
 --
 For an Aurora Replica, the amount of lag when replicating updates from the primary instance, in milliseconds.
@@ -3741,7 +3805,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_replica.lag_max.ms`*::
+*`host.rds.aurora_replica.lag_max.ms`*::
 +
 --
 The maximum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
@@ -3751,7 +3815,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_replica.lag_min.ms`*::
+*`host.rds.aurora_replica.lag_min.ms`*::
 +
 --
 The minimum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
@@ -3761,7 +3825,7 @@ type: long
 
 --
 
-*`aws.rds.backtrack_change_records.creation_rate`*::
+*`host.rds.backtrack_change_records.creation_rate`*::
 +
 --
 The number of backtrack change records created over five minutes for your DB cluster.
@@ -3771,7 +3835,7 @@ type: long
 
 --
 
-*`aws.rds.backtrack_change_records.stored`*::
+*`host.rds.backtrack_change_records.stored`*::
 +
 --
 The actual number of backtrack change records used by your DB cluster.
@@ -3781,7 +3845,7 @@ type: long
 
 --
 
-*`aws.rds.backtrack_window.actual`*::
+*`host.rds.backtrack_window.actual`*::
 +
 --
 The difference between the target backtrack window and the actual backtrack window.
@@ -3791,7 +3855,7 @@ type: long
 
 --
 
-*`aws.rds.backtrack_window.alert`*::
+*`host.rds.backtrack_window.alert`*::
 +
 --
 The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.
@@ -3801,7 +3865,7 @@ type: long
 
 --
 
-*`aws.rds.storage_used.backup_retention_period.bytes`*::
+*`host.rds.storage_used.backup_retention_period.bytes`*::
 +
 --
 The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
@@ -3811,7 +3875,7 @@ type: long
 
 --
 
-*`aws.rds.storage_used.snapshot.bytes`*::
+*`host.rds.storage_used.snapshot.bytes`*::
 +
 --
 The total amount of backup storage in bytes consumed by all Aurora snapshots for an Aurora DB cluster outside its backup retention window.
@@ -3821,7 +3885,7 @@ type: long
 
 --
 
-*`aws.rds.cache_hit_ratio.buffer`*::
+*`host.rds.cache_hit_ratio.buffer`*::
 +
 --
 The percentage of requests that are served by the buffer cache.
@@ -3831,7 +3895,7 @@ type: long
 
 --
 
-*`aws.rds.cache_hit_ratio.result_set`*::
+*`host.rds.cache_hit_ratio.result_set`*::
 +
 --
 The percentage of requests that are served by the Resultset cache.
@@ -3841,7 +3905,7 @@ type: long
 
 --
 
-*`aws.rds.engine_uptime.sec`*::
+*`host.rds.engine_uptime.sec`*::
 +
 --
 The amount of time that the instance has been running, in seconds.
@@ -3851,7 +3915,7 @@ type: long
 
 --
 
-*`aws.rds.rds_to_aurora_postgresql_replica_lag.sec`*::
+*`host.rds.rds_to_aurora_postgresql_replica_lag.sec`*::
 +
 --
 The amount of lag in seconds when replicating updates from the primary RDS PostgreSQL instance to other nodes in the cluster.
@@ -3861,7 +3925,7 @@ type: long
 
 --
 
-*`aws.rds.backup_storage_billed_total.bytes`*::
+*`host.rds.backup_storage_billed_total.bytes`*::
 +
 --
 The total amount of backup storage in bytes for which you are billed for a given Aurora DB cluster.
@@ -3871,7 +3935,7 @@ type: long
 
 --
 
-*`aws.rds.aurora_volume_left_total.bytes`*::
+*`host.rds.aurora_volume_left_total.bytes`*::
 +
 --
 The remaining available space for the cluster volume, measured in bytes.
@@ -3888,7 +3952,7 @@ type: long
 
 
 
-*`aws.s3_daily_storage.bucket.size.bytes`*::
+*`host.s3_daily_storage.bucket.size.bytes`*::
 +
 --
 The amount of data in bytes stored in a bucket.
@@ -3900,7 +3964,7 @@ format: bytes
 
 --
 
-*`aws.s3_daily_storage.number_of_objects`*::
+*`host.s3_daily_storage.number_of_objects`*::
 +
 --
 The total number of objects stored in a bucket for all storage classes.
@@ -3917,7 +3981,7 @@ type: long
 
 
 
-*`aws.s3_request.requests.total`*::
+*`host.s3_request.requests.total`*::
 +
 --
 The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
@@ -3927,7 +3991,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.get`*::
+*`host.s3_request.requests.get`*::
 +
 --
 The number of HTTP GET requests made for objects in an Amazon S3 bucket.
@@ -3937,7 +4001,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.put`*::
+*`host.s3_request.requests.put`*::
 +
 --
 The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
@@ -3947,7 +4011,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.delete`*::
+*`host.s3_request.requests.delete`*::
 +
 --
 The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
@@ -3957,7 +4021,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.head`*::
+*`host.s3_request.requests.head`*::
 +
 --
 The number of HTTP HEAD requests made to an Amazon S3 bucket.
@@ -3967,7 +4031,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.post`*::
+*`host.s3_request.requests.post`*::
 +
 --
 The number of HTTP POST requests made to an Amazon S3 bucket.
@@ -3977,7 +4041,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.select`*::
+*`host.s3_request.requests.select`*::
 +
 --
 The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
@@ -3987,7 +4051,7 @@ type: long
 
 --
 
-*`aws.s3_request.requests.select_scanned.bytes`*::
+*`host.s3_request.requests.select_scanned.bytes`*::
 +
 --
 The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
@@ -3999,7 +4063,7 @@ format: bytes
 
 --
 
-*`aws.s3_request.requests.select_returned.bytes`*::
+*`host.s3_request.requests.select_returned.bytes`*::
 +
 --
 The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
@@ -4011,7 +4075,7 @@ format: bytes
 
 --
 
-*`aws.s3_request.requests.list`*::
+*`host.s3_request.requests.list`*::
 +
 --
 The number of HTTP requests that list the contents of a bucket.
@@ -4021,7 +4085,7 @@ type: long
 
 --
 
-*`aws.s3_request.downloaded.bytes`*::
+*`host.s3_request.downloaded.bytes`*::
 +
 --
 The number bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
@@ -4033,7 +4097,7 @@ format: bytes
 
 --
 
-*`aws.s3_request.uploaded.bytes`*::
+*`host.s3_request.uploaded.bytes`*::
 +
 --
 The number bytes uploaded that contain a request body, made to an Amazon S3 bucket.
@@ -4045,7 +4109,7 @@ format: bytes
 
 --
 
-*`aws.s3_request.errors.4xx`*::
+*`host.s3_request.errors.4xx`*::
 +
 --
 The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
@@ -4055,7 +4119,7 @@ type: long
 
 --
 
-*`aws.s3_request.errors.5xx`*::
+*`host.s3_request.errors.5xx`*::
 +
 --
 The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
@@ -4065,7 +4129,7 @@ type: long
 
 --
 
-*`aws.s3_request.latency.first_byte.ms`*::
+*`host.s3_request.latency.first_byte.ms`*::
 +
 --
 The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
@@ -4077,7 +4141,7 @@ format: duration
 
 --
 
-*`aws.s3_request.latency.total_request.ms`*::
+*`host.s3_request.latency.total_request.ms`*::
 +
 --
 The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
@@ -4097,7 +4161,7 @@ format: duration
 
 
 
-*`aws.sns.metrics.PublishSize.avg`*::
+*`host.sns.metrics.PublishSize.avg`*::
 +
 --
 The size of messages published.
@@ -4106,7 +4170,7 @@ type: double
 
 --
 
-*`aws.sns.metrics.SMSSuccessRate.avg`*::
+*`host.sns.metrics.SMSSuccessRate.avg`*::
 +
 --
 The rate of successful SMS message deliveries.
@@ -4115,7 +4179,7 @@ type: double
 
 --
 
-*`aws.sns.metrics.NumberOfMessagesPublished.sum`*::
+*`host.sns.metrics.NumberOfMessagesPublished.sum`*::
 +
 --
 The number of messages published to your Amazon SNS topics.
@@ -4124,7 +4188,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsDelivered.sum`*::
+*`host.sns.metrics.NumberOfNotificationsDelivered.sum`*::
 +
 --
 The number of messages successfully delivered from your Amazon SNS topics to subscribing endpoints.
@@ -4133,7 +4197,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsFailed.sum`*::
+*`host.sns.metrics.NumberOfNotificationsFailed.sum`*::
 +
 --
 The number of messages that Amazon SNS failed to deliver.
@@ -4142,7 +4206,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsFilteredOut.sum`*::
+*`host.sns.metrics.NumberOfNotificationsFilteredOut.sum`*::
 +
 --
 The number of messages that were rejected by subscription filter policies.
@@ -4151,7 +4215,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum`*::
+*`host.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum`*::
 +
 --
 The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid - for example, because the attribute JSON is incorrectly formatted.
@@ -4160,7 +4224,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum`*::
+*`host.sns.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum`*::
 +
 --
 The number of messages that were rejected by subscription filter policies because the messages have no attributes.
@@ -4169,7 +4233,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsRedrivenToDlq.sum`*::
+*`host.sns.metrics.NumberOfNotificationsRedrivenToDlq.sum`*::
 +
 --
 The number of messages that have been moved to a dead-letter queue.
@@ -4178,7 +4242,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum`*::
+*`host.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum`*::
 +
 --
 The number of messages that couldn't be moved to a dead-letter queue.
@@ -4187,7 +4251,7 @@ type: long
 
 --
 
-*`aws.sns.metrics.SMSMonthToDateSpentUSD.sum`*::
+*`host.sns.metrics.SMSMonthToDateSpentUSD.sum`*::
 +
 --
 The charges you have accrued since the start of the current calendar month for sending SMS messages.
@@ -4203,7 +4267,7 @@ type: long
 
 
 
-*`aws.sqs.oldest_message_age.sec`*::
+*`host.sqs.oldest_message_age.sec`*::
 +
 --
 The approximate age of the oldest non-deleted message in the queue.
@@ -4215,7 +4279,7 @@ format: duration
 
 --
 
-*`aws.sqs.messages.delayed`*::
+*`host.sqs.messages.delayed`*::
 +
 --
 TThe number of messages in the queue that are delayed and not available for reading immediately.
@@ -4225,7 +4289,7 @@ type: long
 
 --
 
-*`aws.sqs.messages.not_visible`*::
+*`host.sqs.messages.not_visible`*::
 +
 --
 The number of messages that are in flight.
@@ -4235,7 +4299,7 @@ type: long
 
 --
 
-*`aws.sqs.messages.visible`*::
+*`host.sqs.messages.visible`*::
 +
 --
 The number of messages available for retrieval from the queue.
@@ -4245,7 +4309,7 @@ type: long
 
 --
 
-*`aws.sqs.messages.deleted`*::
+*`host.sqs.messages.deleted`*::
 +
 --
 The number of messages deleted from the queue.
@@ -4255,7 +4319,7 @@ type: long
 
 --
 
-*`aws.sqs.messages.received`*::
+*`host.sqs.messages.received`*::
 +
 --
 The number of messages returned by calls to the ReceiveMessage action.
@@ -4265,7 +4329,7 @@ type: long
 
 --
 
-*`aws.sqs.messages.sent`*::
+*`host.sqs.messages.sent`*::
 +
 --
 The number of messages added to a queue.
@@ -4275,7 +4339,7 @@ type: long
 
 --
 
-*`aws.sqs.empty_receives`*::
+*`host.sqs.empty_receives`*::
 +
 --
 The number of ReceiveMessage API calls that did not return a message.
@@ -4285,7 +4349,7 @@ type: long
 
 --
 
-*`aws.sqs.sent_message_size.bytes`*::
+*`host.sqs.sent_message_size.bytes`*::
 +
 --
 The size of messages added to a queue.
@@ -4297,7 +4361,7 @@ format: bytes
 
 --
 
-*`aws.sqs.queue.name`*::
+*`host.sqs.queue.name`*::
 +
 --
 SQS queue name
@@ -4315,7 +4379,7 @@ type: keyword
 
 
 
-*`aws.transitgateway.metrics.BytesIn.sum`*::
+*`host.transitgateway.metrics.BytesIn.sum`*::
 +
 --
 The number of bytes received by the transit gateway.
@@ -4324,7 +4388,7 @@ type: long
 
 --
 
-*`aws.transitgateway.metrics.BytesOut.sum`*::
+*`host.transitgateway.metrics.BytesOut.sum`*::
 +
 --
 The number of bytes sent from the transit gateway.
@@ -4333,7 +4397,7 @@ type: long
 
 --
 
-*`aws.transitgateway.metrics.PacketsIn.sum`*::
+*`host.transitgateway.metrics.PacketsIn.sum`*::
 +
 --
 The number of packets received by the transit gateway.
@@ -4342,7 +4406,7 @@ type: long
 
 --
 
-*`aws.transitgateway.metrics.PacketsOut.sum`*::
+*`host.transitgateway.metrics.PacketsOut.sum`*::
 +
 --
 The number of packets sent by the transit gateway.
@@ -4351,7 +4415,7 @@ type: long
 
 --
 
-*`aws.transitgateway.metrics.PacketDropCountBlackhole.sum`*::
+*`host.transitgateway.metrics.PacketDropCountBlackhole.sum`*::
 +
 --
 The number of packets dropped because they matched a blackhole route.
@@ -4360,7 +4424,7 @@ type: long
 
 --
 
-*`aws.transitgateway.metrics.PacketDropCountNoRoute.sum`*::
+*`host.transitgateway.metrics.PacketDropCountNoRoute.sum`*::
 +
 --
 The number of packets dropped because they did not match a route.
@@ -4377,7 +4441,7 @@ type: long
 
 
 
-*`aws.usage.metrics.CallCount.sum`*::
+*`host.usage.metrics.CallCount.sum`*::
 +
 --
 The number of specified API operations performed in your account.
@@ -4386,7 +4450,7 @@ type: long
 
 --
 
-*`aws.usage.metrics.ResourceCount.sum`*::
+*`host.usage.metrics.ResourceCount.sum`*::
 +
 --
 The number of the specified resources running in your account. The resources are defined by the dimensions associated with the metric.
@@ -4403,7 +4467,7 @@ type: long
 
 
 
-*`aws.vpn.metrics.TunnelState.avg`*::
+*`host.vpn.metrics.TunnelState.avg`*::
 +
 --
 The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.
@@ -4412,7 +4476,7 @@ type: double
 
 --
 
-*`aws.vpn.metrics.TunnelDataIn.sum`*::
+*`host.vpn.metrics.TunnelDataIn.sum`*::
 +
 --
 The bytes received through the VPN tunnel.
@@ -4421,7 +4485,7 @@ type: double
 
 --
 
-*`aws.vpn.metrics.TunnelDataOut.sum`*::
+*`host.vpn.metrics.TunnelDataOut.sum`*::
 +
 --
 The bytes sent through the VPN tunnel.

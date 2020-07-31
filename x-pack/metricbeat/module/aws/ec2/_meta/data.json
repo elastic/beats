@@ -4,11 +4,11 @@
         "ec2": {
             "cpu": {
                 "credit_balance": 144,
-                "credit_usage": 0.05477,
+                "credit_usage": 0.066802,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 1.166484417714406
+                    "pct": 1.461748633877874
                 }
             },
             "diskio": {
@@ -51,16 +51,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 6644.4,
-                    "bytes_per_sec": 22.148,
-                    "packets": 44.6,
-                    "packets_per_sec": 0.14866666666666667
+                    "bytes": 1305.2,
+                    "bytes_per_sec": 4.350666666666667,
+                    "packets": 8,
+                    "packets_per_sec": 0.02666666666666667
                 },
                 "out": {
-                    "bytes": 6016.6,
-                    "bytes_per_sec": 20.055333333333333,
-                    "packets": 35.4,
-                    "packets_per_sec": 0.118
+                    "bytes": 3153.4,
+                    "bytes_per_sec": 10.511333333333333,
+                    "packets": 9.6,
+                    "packets_per_sec": 0.032
                 }
             },
             "status": {
@@ -97,14 +97,12 @@
     },
     "host": {
         "cpu": {
-            "pct": 1.166484417714406
+            "pct": 1.461748633877874
         },
         "disk": {
             "read": {
                 "bytes": 0
-            }
-        },
-        "diskio": {
+            },
             "write": {
                 "bytes": 0
             }
@@ -113,12 +111,12 @@
         "name": "mysql-test",
         "network": {
             "in": {
-                "bytes": 6644.4,
-                "packets": 44.6
+                "bytes": 1305.2,
+                "packets": 8
             },
             "out": {
-                "bytes": 6016.6,
-                "packets": 35.4
+                "bytes": 3153.4,
+                "packets": 9.6
             }
         }
     },
