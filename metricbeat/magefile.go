@@ -203,6 +203,6 @@ func PythonIntegTest(ctx context.Context) error {
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTestForModule(devtools.DefaultPythonTestIntegrationArgs())
+		return devtools.PythonTestForModule(devtools.DefaultPythonTestIntegrationArgs())
 	})
 }

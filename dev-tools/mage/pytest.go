@@ -171,10 +171,10 @@ func PythonTest(params PythonTestArgs) error {
 	// and HTML report.
 }
 
-// PythonNoseTestForModule executes python system tests for modules.
+// PythonTestForModule executes python system tests for modules.
 //
 // Use `MODULE=module` to run only tests for `module`.
-func PythonNoseTestForModule(params PythonTestArgs) error {
+func PythonTestForModule(params PythonTestArgs) error {
 	if module := EnvOr("MODULE", ""); module != "" {
 		params.Files = []string{
 			fmt.Sprintf("module/%s/test_*.py", module),
@@ -182,7 +182,7 @@ func PythonNoseTestForModule(params PythonTestArgs) error {
 		}
 		params.TestName += "-" + module
 	}
-	return PythonNoseTest(params)
+	return PythonTest(params)
 }
 
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
