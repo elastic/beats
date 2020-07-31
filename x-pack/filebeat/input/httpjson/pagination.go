@@ -47,6 +47,10 @@ func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj
 		var err error
 		// Pagination control using HTTP Body fields
 		if err = p.setRequestInfoFromBody(response.body, lastObj, ri); err != nil {
+			// if the field is not found, there is no next page
+			if errors.Cause(err) == common.ErrKeyNotFound {
+				return ri, false, nil
+			}
 			return ri, false, err
 		}
 
@@ -88,10 +92,6 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 	v, err := last.GetValue(p.idField)
 	if err == common.ErrKeyNotFound {
 		v, err = response.GetValue(p.idField)
-	}
-
-	if err == common.ErrKeyNotFound {
-		return nil
 	}
 
 	if err != nil {

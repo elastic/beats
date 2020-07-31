@@ -119,7 +119,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 
 		if err = json.Unmarshal(responseData, &m); err != nil {
 			r.log.Debug("failed to unmarshal http.response.body", string(responseData))
-			return errors.Wrapf(err, "failed to unmarshal http.response.body")
+			return errors.Wrapf(err, "failed to unmarshal http.response.body %q", string(responseData))
 		}
 
 		switch obj := m.(type) {
