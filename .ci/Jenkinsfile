@@ -165,15 +165,13 @@ def runCommand(Map args = [:]) {
     k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label)
   }
   if(args?.content?.containsKey('cloud')) {
-    cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule)
+    cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs)
   }
 }
 
 def cloud(Map args = [:]) {
   node(args.label) {
-    stage("${args.context}-prepare-cloud-env"){
-      startCloudTestEnv(name: args.directory, dirs: ['x-pack/metricbeat/module/aws'])
-    }
+    startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
     try {
@@ -469,19 +467,21 @@ def withCloudTestEnv(Closure body) {
 def startCloudTestEnv(Map args = [:]) {
   String name = normalise(args.name)
   def dirs = args.get('dirs',[])
-  withCloudTestEnv() {
-    withBeatsEnv(archive: false, withModule: false) {
-      try {
-        for (folder in dirs) {
-          retryWithSleep(retries: 2, seconds: 5, backoff: true){
-            terraformApply(folder)
+  stage("${name}-prepare-cloud-env"){
+    withCloudTestEnv() {
+      withBeatsEnv(archive: false, withModule: false) {
+        try {
+          for (folder in dirs) {
+            retryWithSleep(retries: 2, seconds: 5, backoff: true){
+              terraformApply(folder)
+            }
           }
+        } finally {
+          // Archive terraform states in case manual cleanup is needed.
+          archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
         }
-      } finally {
-        // Archive terraform states in case manual cleanup is needed.
-        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+        stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
       }
-      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
     }
   }
 }
@@ -489,12 +489,12 @@ def startCloudTestEnv(Map args = [:]) {
 /**
 * Tear down the terraform environments, by looking for all terraform states in directory 
 * then it runs terraform destroy for each one.
-* it uses terraform states previously stashed by startCloudTestEnv.
+* It uses terraform states previously stashed by startCloudTestEnv.
 */
 def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
   String directory = args.dir
-  stage("Remove cloud scenarios in ${directory}"){
+  stage("${name}-tear-down-cloud-env"){
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${name}")
