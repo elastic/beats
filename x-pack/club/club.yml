@@ -1,52 +1,54 @@
 inputs:
 
-# collect linux system and services logs
-- type:  logs/journald
-  enabled: false
-  # include_matches:
-  # - syslog.identifier=test
+## collect linux system and services logs
+#- type:  logs/journald
+#  enabled: false
+#  # include_matches:
+#  # - syslog.identifier=test
 
 # collect system metrics
 - type: metrics/system/process
   enabled: true
-  period: 60
+  streams:
+  - period: 60
 
-- type: audit/file_integrity
-  enabled: false
-  paths:
-  - /bin
-  # - /sbin
-  # - /usr/bin
-  # - /usr/sbin
-  # - /usr/local/bin
-  # - /usr/local/sbin
+- type: metrics/system/cpu
+  enabled: true
+  streams:
+  - period: 10
+
+#- type: audit/file_integrity
+#  streams:
+#  - paths:
+#    - /bin
+#    # - /sbin
+#    # - /usr/bin
+#    # - /usr/sbin
+#    # - /usr/local/bin
+#    # - /usr/local/sbin
 
 # monitor local NAS
 - type: monitor/icmp
-  enabled: false
-  hosts: ["festplatte"]
-  schedule: "@every 5s"
+  streams:
+  - hosts: ["festplatte"]
+    schedule: "@every 5s"
 
-# monitor and analyzer DNS, HTTP and HTTPS traffic
+## monitor and analyzer DNS, HTTP and HTTPS traffic
 - type: net/sniffer
-  enabled: false
-  interface.device: [lo, enp39s0, wlo1]
-  protocols:
-  - type: icmp
-  - type: dns
-    ports: [53]
-  - type: http
-    ports: [80]
-  - type: tls    # https
-    ports: [443]
-
-# collect network flows
-- type: net/sniffer
-  enabled: false
-  interface.device: [lo, enp39s0, wlo1]
-  flows:
-    timeout: 30s
-    period: 10s
+  streams:
+  - interface.device: [lo, enp39s0, wlo1]
+    protocols:
+    - type: icmp
+    - type: dns
+      ports: [53]
+    - type: http
+      ports: [80]
+    - type: tls    # https
+      ports: [443]
+  - interface.device: [lo, enp39s0, wlo1]
+    flows:
+      timeout: 30s
+      period: 10s
 
 limits:
   # configure uptime monitors, concurrent network operations limits

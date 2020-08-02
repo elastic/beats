@@ -19,7 +19,8 @@ type flagsConfig struct {
 }
 
 type settings struct {
-	Inputs   []*common.Config
+	ConfigID string `config:"id"`
+	Inputs   []inputSettings
 	Path     pathSettings
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat

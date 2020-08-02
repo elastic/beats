@@ -33,10 +33,10 @@ type app struct {
 	// configured subsystems
 	statestore  *kvStore
 	scheduler   *scheduler.Scheduler
-	inputLoader *v2.Loader
+	inputLoader *inputLoader
 
 	// statically configured inputs. To be removed in favor of configuring via agent RPC only. Maybe keep here for testing only.
-	inputs []v2.Input
+	inputs []*input
 }
 
 func main() {
@@ -177,15 +177,11 @@ func (app *app) configure() error {
 	app.scheduler = scheduler.NewWithLocation(app.Settings.Limits.Monitors, nil, location)
 
 	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
-	app.inputLoader = v2.NewLoader(app.log, inputsCollection, "type", "")
+	app.inputLoader = newInputLoader(app.log, inputsCollection)
 
 	// Let's configure inputs. Inputs won't do any processing, yet.
-	var inputs []v2.Input
+	var inputs []*input
 	for _, config := range app.Settings.Inputs {
-		if !config.Enabled() {
-			continue
-		}
-
 		input, err := app.inputLoader.Configure(config)
 		if err != nil {
 			return fmt.Errorf("Failed to configure inputs: %w", err)
