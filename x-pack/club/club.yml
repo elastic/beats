@@ -9,6 +9,7 @@ inputs:
 # collect system metrics
 - type: metrics/system/process
   enabled: true
+  use_output: other
   streams:
   - period: 60
 
@@ -27,28 +28,28 @@ inputs:
 #    # - /usr/local/bin
 #    # - /usr/local/sbin
 
-# monitor local NAS
-- type: monitor/icmp
-  streams:
-  - hosts: ["festplatte"]
-    schedule: "@every 5s"
+## monitor local NAS
+#- type: monitor/icmp
+#  streams:
+#  - hosts: ["festplatte"]
+#    schedule: "@every 5s"
 
-## monitor and analyzer DNS, HTTP and HTTPS traffic
-- type: net/sniffer
-  streams:
-  - interface.device: [lo, enp39s0, wlo1]
-    protocols:
-    - type: icmp
-    - type: dns
-      ports: [53]
-    - type: http
-      ports: [80]
-    - type: tls    # https
-      ports: [443]
-  - interface.device: [lo, enp39s0, wlo1]
-    flows:
-      timeout: 30s
-      period: 10s
+### monitor and analyzer DNS, HTTP and HTTPS traffic
+#- type: net/sniffer
+#  streams:
+#  - interface.device: [lo, enp39s0, wlo1]
+#    protocols:
+#    - type: icmp
+#    - type: dns
+#      ports: [53]
+#    - type: http
+#      ports: [80]
+#    - type: tls    # https
+#      ports: [443]
+#  - interface.device: [lo, enp39s0, wlo1]
+#    flows:
+#      timeout: 30s
+#      period: 10s
 
 limits:
   # configure uptime monitors, concurrent network operations limits
@@ -57,4 +58,10 @@ limits:
 logging.level: info
 logging.selectors: ['*']
 
-output.console.pretty: true
+outputs.default:
+  type: console
+  pretty: true
+
+outputs.other:
+  type: console
+  pretty: false

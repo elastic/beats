@@ -137,7 +137,7 @@ func (app *app) initSettings(flags flagsConfig) error {
 	}
 
 	app.Settings = settings
-	return nil
+	return app.Settings.validate()
 }
 
 func (app *app) configure() error {
@@ -217,11 +217,11 @@ func (app *app) Run(sigContext context.Context) error {
 		app.log.Info("Shutdown signal received")
 	}))
 
-	pipeline, pipelineClose, err := configurePublishingPipeline(app.log, app.info, app.Settings.Output, app.rawConfig)
+	outputManager, err := configureOutputs(app.log, app.info, app.Settings.Outputs, app.rawConfig)
 	if err != nil {
 		return err
 	}
-	defer pipelineClose()
+	defer outputManager.Close()
 
 	// setup input lifetime management and shutdown signaling
 	inputTaskGroup := unison.TaskGroup{}
@@ -263,7 +263,7 @@ func (app *app) Run(sigContext context.Context) error {
 				Agent:       app.info,
 				Cancelation: cancel,
 			}
-			return input.Run(inputContext, pipeline)
+			return input.Run(inputContext, outputManager.GetPipeline(input.useOutput))
 		})
 	}
 	app.log.Info("Inputs active...")

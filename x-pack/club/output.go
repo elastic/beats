@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
@@ -17,50 +16,72 @@ type outputConfig struct {
 	Pipeline pipeline.Config        `config:",inline"`
 }
 
-func configurePublishingPipeline(log *logp.Logger, info beat.Info, config outputConfig, rawConfig *common.Config) (beat.Pipeline, func(), error) {
+type outputManager struct {
+	pipelines map[string]*pipeline.Pipeline
+}
+
+func configureOutputs(
+	log *logp.Logger,
+	info beat.Info,
+	outputConfig map[string]*common.Config,
+	rawConfig *common.Config,
+) (*outputManager, error) {
 	// XXX: A little overkill to init all index management, but makes output setup easier for now
 	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, info, rawConfig)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	pipeline, err := pipeline.Load(info,
-		pipeline.Monitors{
-			Metrics:   nil,
-			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-			Logger:    log.Named("publisher"),
-			Tracer:    nil,
-		},
-		config.Pipeline,
-		nil,
-		makeOutputFactory(info, indexManagement, config.Output),
-	)
-	if err != nil {
-		return nil, nil, err
+	pipelines := map[string]*pipeline.Pipeline{}
+	for name, cfg := range outputConfig {
+		typeInfo := struct{ Type string }{}
+		if err := cfg.Unpack(&typeInfo); err != nil {
+			return nil, err
+		}
+
+		var pipeConfig pipeline.Config
+		if err := cfg.Unpack(&pipeConfig); err != nil {
+			return nil, err
+		}
+
+		pipeline, err := pipeline.Load(info,
+			pipeline.Monitors{
+				Metrics:   nil,
+				Telemetry: nil,
+				Logger:    log.Named("publisher"),
+				Tracer:    nil,
+			},
+			pipeConfig,
+			nil,
+			makeOutputFactory(info, indexManagement, typeInfo.Type, cfg),
+		)
+		if err != nil {
+			return nil, err
+		}
+		pipelines[name] = pipeline
 	}
 
-	return pipeline, func() { pipeline.Close() }, nil
+	return &outputManager{pipelines: pipelines}, nil
 }
 
 func makeOutputFactory(
 	info beat.Info,
 	indexManagement idxmgmt.Supporter,
-	cfg common.ConfigNamespace,
+	outputType string,
+	cfg *common.Config,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := createOutput(info, indexManagement, outStats, cfg)
-		return cfg.Name(), out, err
+		out, err := outputs.Load(indexManagement, info, outStats, outputType, cfg)
+		return outputType, out, err
 	}
 }
 
-func createOutput(
-	info beat.Info,
-	indexManagement idxmgmt.Supporter,
-	stats outputs.Observer,
-	cfg common.ConfigNamespace,
-) (outputs.Group, error) {
-	if !cfg.IsSet() {
-		return outputs.Group{}, nil
+func (m *outputManager) Close() {
+	for _, pipeline := range m.pipelines {
+		pipeline.Close()
 	}
-	return outputs.Load(indexManagement, info, stats, cfg.Name(), cfg.Config())
+}
+
+func (m *outputManager) GetPipeline(name string) beat.Pipeline {
+	return m.pipelines[name]
 }

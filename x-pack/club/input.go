@@ -19,8 +19,9 @@ type inputLoader struct {
 }
 
 type input struct {
-	streams []stream
-	meta    inputMeta
+	streams   []stream
+	meta      inputMeta
+	useOutput string
 }
 
 type inputMeta struct {
@@ -46,6 +47,7 @@ type inputSettings struct {
 	Type      string                 `config:"type"`
 	Meta      map[string]interface{} `config:"name"`
 	Namespace string                 `config:"dataset.namespace"`
+	UseOutput string                 `config:"use_output"`
 	Streams   []*common.Config       `config:"streams"`
 }
 
@@ -74,6 +76,11 @@ func (l *inputLoader) Configure(settings inputSettings) (*input, error) {
 		}
 	}
 
+	useOutput := settings.UseOutput
+	if useOutput == "" {
+		useOutput = "default"
+	}
+
 	meta := inputMeta{
 		ID:        settings.ID,
 		Name:      settings.Name,
@@ -93,7 +100,7 @@ func (l *inputLoader) Configure(settings inputSettings) (*input, error) {
 		log.Warnf("DEPRECATED: The %v input is deprecated", settings.Type)
 	}
 
-	return &input{meta: meta, streams: streams}, nil
+	return &input{meta: meta, streams: streams, useOutput: useOutput}, nil
 }
 
 func (inp *input) Test(ctx v2.TestContext) error {

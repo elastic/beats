@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -25,8 +26,8 @@ type settings struct {
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
 	Limits   limitsSettings
-	Location string       // time zone info
-	Output   outputConfig `config:",inline"`
+	Location string // time zone info
+	Outputs  map[string]*common.Config
 }
 
 // configure global resource limits to be shared with input managers
@@ -67,6 +68,23 @@ func (c *flagsConfig) registerFlags(flags *flag.FlagSet) {
 	common.StringArrVarFlag(flags, &c.ConfigFiles, "c", "configuration files")
 	flags.BoolVar(&c.StrictPermissions, "strict.perms", true, "Strict permission checking on config files")
 	c.Path.registerFlags(flags)
+}
+
+func (s *settings) validate() error {
+	if _, exists := s.Outputs["default"]; !exists {
+		return errors.New("no default output configured")
+	}
+
+	for _, inp := range s.Inputs {
+		if inp.UseOutput == "" {
+			continue
+		}
+		if _, exist := s.Outputs[inp.UseOutput]; !exist {
+			return fmt.Errorf("output '%v' not defined", inp.UseOutput)
+		}
+	}
+
+	return nil
 }
 
 func (p *pathSettings) registerFlags(flags *flag.FlagSet) {
