@@ -13,10 +13,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // createListener creates a named pipe listener on Windows
-func createListener() (net.Listener, error) {
+func createListener(_ *logger.Logger) (net.Listener, error) {
 	u, err := user.Current()
 	if err != nil {
 		return nil, err
@@ -26,4 +27,8 @@ func createListener() (net.Listener, error) {
 		return nil, err
 	}
 	return npipe.NewListener(control.Address(), sd)
+}
+
+func cleanupListener(_ *logger.Logger) {
+	// nothing to do on windows
 }
