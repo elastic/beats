@@ -79,6 +79,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "network io counters")
 	}
 
+	var networkInBytes, networkOutBytes, networkInPackets, networkOutPackets uint64
+
 	for _, counters := range stats {
 		if m.interfaces != nil {
 			// Select stats by interface name.
@@ -91,11 +93,25 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		isOpen := r.Event(mb.Event{
 			MetricSetFields: ioCountersToMapStr(counters),
 		})
+
+		networkInBytes += counters.BytesRecv
+		networkOutBytes += counters.BytesSent
+		networkInPackets += counters.PacketsRecv
+		networkOutPackets += counters.PacketsSent
+
 		if !isOpen {
-			return nil
+			continue
 		}
 	}
 
+	r.Event(mb.Event{
+		RootFields: common.MapStr{
+			"host.network.in.bytes":    networkInBytes,
+			"host.network.in.packets":  networkInPackets,
+			"host.network.out.bytes":   networkOutBytes,
+			"host.network.out.packets": networkOutPackets,
+		},
+	})
 	return nil
 }
 

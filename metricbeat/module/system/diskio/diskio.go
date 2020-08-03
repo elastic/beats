@@ -70,6 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Store the last cpu counter when finished
 	defer m.statistics.CloseSampling()
 
+	var diskReadBytes, diskWriteBytes uint64
 	for _, counters := range stats {
 		event := common.MapStr{
 			"name": counters.Name,
@@ -87,6 +88,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				"time": counters.IoTime,
 			},
 		}
+
+		diskReadBytes += counters.ReadBytes
+		diskWriteBytes += counters.WriteBytes
+
 		var extraMetrics DiskIOMetric
 		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
 		if err == nil {
@@ -131,9 +136,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: event,
 		})
 		if !isOpen {
-			return nil
+			continue
 		}
 	}
 
+	r.Event(mb.Event{
+		RootFields: common.MapStr{
+			"host.disk.read.bytes":  diskReadBytes,
+			"host.disk.write.bytes": diskWriteBytes,
+		},
+	})
 	return nil
 }
