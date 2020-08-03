@@ -31,6 +31,7 @@ type manager struct {
 	complete chan bool
 }
 
+// NewManager returns the reexec manager.
 func NewManager(log *logger.Logger, exec string) ExecManager {
 	return &manager{
 		logger:   log,
