@@ -2,10 +2,10 @@ description: Initial pipeline for parsing Zoom webhooks
 processors:
 - set:
     field: observer.vendor
-    target_field: Zoom
+    value: Zoom
 - set:
     field: observer.product
-    target_field: Webhook
+    value: Webhook
 - append:
     field: event.kind
     value: event
@@ -23,6 +23,26 @@ processors:
 - rename:
     field: _temp_.payload
     target_field: zoom
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.operator_idl}}"
+    if: "ctx?.zoom?.operator_id != null"
+# Removing some fields that have complex nested arrays that might impact performance
+- remove:
+    field:
+    - zoom.object.occurences
+    - zoom.old_object.occurences
+    - zoom.object.recurrence
+    - zoom.old_object.recurrence
+    - zoom.object.managed_domains
+    - zoom.old_object.managed_domains
+    - zoom.object.registrant.custom_questions
+    - zoom.old_object.registrant.custom_questions
+    - zoom.object.call_logs
+    - zoom.old_object.call_logs
+    - zoom.object.recording_file
+    - zoom.old_object.recording_file
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "meeting" >}'

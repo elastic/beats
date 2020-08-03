@@ -1,0 +1,41 @@
+description: Pipeline for parsing Zoom user webhooks
+processors:
+- append:
+    field: event.type
+    value: iam
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action != user.created
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'user.deleted'
+- append:
+    field: event.type
+    value: change
+    if: "['user.updated', 'user.settings_updated', 'user.deactivated', 'user.activated', 'user.disassociated', 'user.presence_status_updated', 'user.personal_notes_updated'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: ctx?.event?.action == 'user.signed_in'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.event?.action == 'user.signed_out'
+- rename:
+    field: zoom.object
+    target_field: zoom.user
+    ignore_missing: true
+- rename:
+    field: zoom.old_object
+    target_field: zoom.old_user
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.user.id}}"
+    if: "ctx?.zoom?.user?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

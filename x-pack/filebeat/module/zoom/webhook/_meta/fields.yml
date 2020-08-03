@@ -5,8 +5,1793 @@
   description: >
     Module for parsing Zoom API Webhooks.
   fields:
-    - name: confidence_level
-      type: integer
-      overwrite: true
+    - name: master_account_id
+      type: keyword
       description: >
-        Confidence level determined by ThreatCloud.
+        Master Account related to a specific Sub Account
+    - name: sub_account_id
+      type: keyword
+      description: >
+        Related Sub Account
+    - name: operator_id
+      type: keyword
+      description: >
+        UserID that triggered the event
+    - name: operator
+      type: keyword
+      description: >
+        Username/Email related to the user that triggered the event
+    - name: account_id
+      type: keyword
+      description: >
+        Related accountID to the event
+    - name: timestamp
+      type: date
+      description: >
+        Timestamp related to the event
+    - name: account.owner_id
+      type: keyword
+      description: >
+        UserID of the related user the action was performed on
+    - name: account.email
+      type: keyword
+      description: >
+        Email related to the user the action was performed on
+    - name: account.owner_email
+      type: keyword
+      description: >
+        Email related to the user the action was performed on
+    - name: account.account_name
+      type: keyword
+      description: >
+        Name related to the user the action was performed on
+    - name: account.account_alias
+      type: keyword
+      description: >
+        Alias related to the user the action was performed on
+    - name: account.account_support_name
+      type: keyword
+      description: >
+        Support account related to the user the action was performed on
+    - name: account.account_support_email
+      type: keyword
+      description: >
+        Support account (Email) related to the user the action was performed on
+    - name: account.settings.schedule_meeting.host_video
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.participant_video
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.audio_type
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.join_before_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.enforce_login
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.enforce_login_with_domains
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.enforce_login_domains
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.not_store_meeting_topic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.schedule_meeting.force_pmi_jbh_password
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.e2e_encryption
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.private_chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.auto_saving_chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.file_transfer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.post_meeting_feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.co_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.polling
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.attendee_on_hold
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.show_meeting_control_toolbar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.allow_show_zoom_windows
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.annotation
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.whiteboard
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.webinar_question_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.anonymous_question_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.breakout_room
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.closed_caption
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.far_end_camera_control
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.group_hd
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.virtual_background
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.watermark
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.alert_guest_join
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.auto_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.p2p_connetion
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.p2p_ports
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.ports_range
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.sending_default_email_invites
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.use_html_format_email
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.dscp_marking
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.dscp_audio
+      type: long
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.dscp_video
+      type: long
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.stereo_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.original_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.screen_sharing
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.remote_control
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.in_meeting.attention_tracking
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.email_notification.cloud_recording_avaliable_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.email_notification.jbh_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.email_notification.cancel_meeting_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.email_notification.low_host_count_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.email_notification.alternative_host_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.upcoming_meeting_alert
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.start_airplay_manually
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.weekly_system_restart
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.list_meetings_with_calendar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.zr_post_meeting_feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.ultrasonic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.force_private_meeting
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.hide_host_information
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.cmr_for_instant_meeting
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.zoom_rooms.auto_start_stop_scheduled_meetings
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.security.admin_change_name_pic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.security.import_photos_from_devices
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.security.hide_billing_info
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.local_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.cloud_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.record_speaker_view
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.record_gallery_view
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.record_audio_file
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.save_chat_text
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.show_timestamp
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.recording_audio_transcript
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.auto_recording
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.cloud_recording_download
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.cloud_recording_download_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.account_user_access_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.auto_delete_cmr
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.recording.auto_delete_cmr_days
+      type: long
+      description: >
+        Settings related to the account
+    - name: account.settings.telephony.third_party_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.telephony.audio_conference_info
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.google_calendar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.google_drive
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.dropbox
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.box
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.microsoft_one_drive
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.integration.kubi
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: account.settings.feature.meeting_capacity
+      type: boolean
+      description: >
+        Settings related to the account
+
+    - name: old_account.owner_id
+      type: keyword
+      description: >
+        UserID of the related user the action was performed on
+    - name: old_account.email
+      type: keyword
+      description: >
+        Email related to the user the action was performed on
+    - name: old_account.owner_email
+      type: keyword
+      description: >
+        Email related to the user the action was performed on
+    - name: old_account.account_name
+      type: keyword
+      description: >
+        Name related to the user the action was performed on
+    - name: old_account.account_alias
+      type: keyword
+      description: >
+        Alias related to the user the action was performed on
+    - name: old_account.account_support_name
+      type: keyword
+      description: >
+        Support account related to the user the action was performed on
+    - name: old_account.account_support_email
+      type: keyword
+      description: >
+        Support account (Email) related to the user the action was performed on
+    - name: old_account.settings.schedule_meeting.host_video
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.participant_video
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.audio_type
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.join_before_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.enforce_login
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.enforce_login_with_domains
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.enforce_login_domains
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.not_store_meeting_topic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.schedule_meeting.force_pmi_jbh_password
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.e2e_encryption
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.private_chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.auto_saving_chat
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.file_transfer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.post_meeting_feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.co_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.polling
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.attendee_on_hold
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.show_meeting_control_toolbar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.allow_show_zoom_windows
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.annotation
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.whiteboard
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.webinar_question_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.anonymous_question_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.breakout_room
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.closed_caption
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.far_end_camera_control
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.group_hd
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.virtual_background
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.watermark
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.alert_guest_join
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.auto_answer
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.p2p_connetion
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.p2p_ports
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.ports_range
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.sending_default_email_invites
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.use_html_format_email
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.dscp_marking
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.dscp_audio
+      type: long
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.dscp_video
+      type: long
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.stereo_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.original_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.screen_sharing
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.remote_control
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.in_meeting.attention_tracking
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.email_notification.cloud_recording_avaliable_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.email_notification.jbh_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.email_notification.cancel_meeting_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.email_notification.low_host_count_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.email_notification.alternative_host_reminder
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.upcoming_meeting_alert
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.start_airplay_manually
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.weekly_system_restart
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.list_meetings_with_calendar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.zr_post_meeting_feedback
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.ultrasonic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.force_private_meeting
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.hide_host_information
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.cmr_for_instant_meeting
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.zoom_rooms.auto_start_stop_scheduled_meetings
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.security.admin_change_name_pic
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.security.import_photos_from_devices
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.security.hide_billing_info
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.local_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.cloud_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.record_speaker_view
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.record_gallery_view
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.record_audio_file
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.save_chat_text
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.show_timestamp
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.recording_audio_transcript
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.auto_recording
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.cloud_recording_download
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.cloud_recording_download_host
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.account_user_access_recording
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.auto_delete_cmr
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.recording.auto_delete_cmr_days
+      type: long
+      description: >
+        Settings related to the account
+    - name: old_account.settings.telephony.third_party_audio
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.telephony.audio_conference_info
+      type: keyword
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.google_calendar
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.google_drive
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.dropbox
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.box
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.microsoft_one_drive
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.integration.kubi
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: old_account.settings.feature.meeting_capacity
+      type: boolean
+      description: >
+        Settings related to the account
+    - name: chat_channel.name
+      type: keyword
+      description: >
+        Channel name
+    - name: chat_channel.id
+      type: keyword
+      description: >
+        Channel ID
+    - name: chat_channel.type
+      type: integer
+      description: >
+        Channel type
+    - name: chat_channel.timestamp
+      type: date
+      description: >
+        Time when channel was created/modified/deleted
+    - name: chat_channel.date_time
+      type: date
+      description: >
+        Time when channel was created/modified/deleted
+    - name: chat_messages.id
+      type: keyword
+      description: >
+        Message ID
+    - name: chat_messages.type
+      type: integer
+      description: >
+        Type of message, either private message or channel message
+    - name: chat_messages.date_time
+      type: date
+      description: >
+        Time when message was created/modified/deleted
+    - name: chat_messages.timestamp
+      type: date
+      description: >
+        Time when message was created/modified/deleted
+    - name: chat_messages.session_id
+      type: keyword
+      description: >
+        SessionID for the channel related to the message
+    - name: chat_messages.contact_email
+      type: keyword
+      description: >
+        Email address related to the user sending the message
+    - name: chat_messages.contact_id
+      type: keyword
+      description: >
+        UserID related to the user sending the message
+    - name: chat_messages.channel_id
+      type: keyword
+      description: >
+        ChannelID related to the message
+    - name: chat_messages.channel_name
+      type: keyword
+      description: >
+        Channel name related to the message
+    - name: chat_messages.message
+      type: keyword
+      description: >
+        The message sent
+    - name: meeting.id
+      type: keyword
+      description: >
+        The ID of the meeting
+    - name: meeting.uuid
+      type: keyword
+      description: >
+        The UUID of the meeting
+    - name: meeting.host_id
+      type: keyword
+      description: >
+        The UserID of the meeting host
+    - name: meeting.topic
+      type: keyword
+      description: >
+        Meeting Topic
+    - name: meeting.type
+      type: integer
+      description: >
+        Type of meeting created
+    - name: meeting.start_time
+      type: date
+      description: >
+        Time the meeting started
+    - name: meeting.timezone
+      type: keyword
+      description: >
+        Timezone used for the meeting
+    - name: meeting.duration
+      type: long
+      description: >
+        Seconds the meeting has been active
+    - name: meeting.issues
+      type: long
+      description: >
+        Issue message if an alert is triggered on the meeting
+    - name: meeting.password
+      type: keyword
+      description: >
+        Password related to the meeting
+    - name: meeting.settings.host_video
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.participant_video
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.join_before_host
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.mute_upon_entry
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.audio
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.auto_recording
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.use_pmi
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.auto_recording
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.waiting_room
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.watermark
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.settings.enforce_login
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: meeting.registrant.id
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.email
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.first_name
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.last_name
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.address
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.city
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.country
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.zip
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.state
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.phone
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.industry
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.org
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.job_title
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.purchasing_time_frame
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.role_in_purchase_process
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.no_of_employees
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.comments
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.registrant.join_url
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: meeting.participant.id
+      type: keyword
+      description: >
+        Meeting ID of the related meeting
+    - name: meeting.participant.user_id
+      type: keyword
+      description: >
+        UserID of the participant trigger the sharing event
+    - name: meeting.participant.user_name
+      type: keyword
+      description: >
+        User name of the participant trigger the sharing event
+    - name: meeting.participant.join_time
+      type: date
+      description: >
+        The time the participant joined the related meeting
+    - name: meeting.participant.leave_time
+      type: date
+      description: >
+        The time the participant left the related meeting
+    - name: meeting.participant.sharing_details.link_source
+      type: keyword
+      description: >
+        Method of sharing with dropbox integration
+    - name: meeting.participant.sharing_details.content
+      type: keyword
+      description: >
+        Type of content that was shared
+    - name: meeting.participant.sharing_details.file_link
+      type: keyword
+      description: >
+        The file link that was shared
+    - name: meeting.participant.sharing_details.date_time
+      type: keyword
+      description: >
+        Timestamp the sharing started
+    - name: meeting.participant.sharing_details.source
+      type: keyword
+      description: >
+        The file source that was shared
+    - name: old_meeting.id
+      type: keyword
+      description: >
+        The ID of the meeting
+    - name: old_meeting.uuid
+      type: keyword
+      description: >
+        The UUID of the meeting
+    - name: old_meeting.host_id
+      type: keyword
+      description: >
+        The UserID of the meeting host
+    - name: old_meeting.topic
+      type: keyword
+      description: >
+        Meeting Topic
+    - name: old_meeting.type
+      type: integer
+      description: >
+        Type of meeting created
+    - name: old_meeting.start_time
+      type: date
+      description: >
+        Time the meeting started
+    - name: old_meeting.timezone
+      type: keyword
+      description: >
+        Timezone used for the meeting
+    - name: old_meeting.duration
+      type: long
+      description: >
+        Seconds the meeting has been active
+    - name: old_meeting.issues
+      type: long
+      description: >
+        Issue message if an alert is triggered on the meeting
+    - name: old_meeting.password
+      type: keyword
+      description: >
+        Password related to the meeting
+    - name: old_meeting.settings.host_video
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.participant_video
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.join_before_host
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.mute_upon_entry
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.audio
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.auto_recording
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.use_pmi
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.auto_recording
+      type: keyword
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.waiting_room
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.watermark
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: old_meeting.settings.enforce_login
+      type: boolean
+      description: >
+        Settings related to the meeting
+    - name: phone.ringing_start_time
+      type: date
+      description: >
+        The timestamp when a ringtone was established to the callee
+    - name: phone.connected_start_time
+      type: date
+      description: >
+        The timestamp when a ringtone was established to the callee
+    - name: phone.answer_start_time
+      type: date
+      description: >
+        The timestamp when the call was answered
+    - name: phone.call_end_time
+      type: date
+      description: >
+        The timestamp when the call ended
+    - name: phone.call_id
+      type: keyword
+      description: >
+        Unique ID of the call
+    - name: phone.duration
+      type: long
+      description: >
+        Duration of a voicemail
+    - name: phone.caller_number
+      type: keyword
+      description: >
+        Caller number related to the voicemail
+    - name: phone.caller_name
+      type: keyword
+      description: >
+        Caller name related to the voicemail
+    - name: phone.caller_number_type
+      type: long
+      description: >
+        Caller type related to the voicemail
+    - name: phone.caller_user_id
+      type: keyword
+      description: >
+        UserID of the person related to the voicemail
+    - name: phone.callee_user_id
+      type: keyword
+      description: >
+        UserID of the callee related to the voicemail
+    - name: phone.caller.user_id
+      type: keyword
+      description: >
+        UserID of the person which initiated the call
+    - name: phone.caller.phone_number
+      type: keyword
+      description: >
+        Phone Number of the caller
+    - name: phone.caller.extension_number
+      type: keyword
+      description: >
+        Extension number of the caller
+    - name: phone.caller.timezone
+      type: keyword
+      description: >
+        Timezone of the caller
+    - name: phone.caller.device_type
+      type: keyword
+      description: >
+        Device type used by the caller
+    - name: phone.callee_user_id
+      type: keyword
+      description: >
+        UserID of the person that is called
+    - name: phone.callee.user_id
+      type: keyword
+      description: >
+        UserID of the person that is called
+    - name: phone.callee.phone_number
+      type: keyword
+      description: >
+        Phone Number of the callee
+    - name: phone.callee.extension_number
+      type: keyword
+      description: >
+        Extension number of the callee
+    - name: phone.callee.timezone
+      type: keyword
+      description: >
+        Timezone of the callee
+    - name: phone.callee.device_type
+      type: keyword
+      description: >
+        Device type used by the callee
+    - name: recording.id
+      type: keyword
+      description: >
+        ID of the recording
+    - name: recording.uuid
+      type: keyword
+      description: >
+        UUID of the recording
+    - name: recording.host_id
+      type: keyword
+      description: >
+        UserID of the host related to the meeting recording
+    - name: recording.topic
+      type: keyword
+      description: >
+        Topic of the meeting related to the recording
+    - name: recording.type
+      type: long
+      description: >
+        Type of recording
+    - name: recording.start_time
+      type: date
+      description: >
+        Date of the recording
+    - name: recording.timezone
+      type: keyword
+      description: >
+        The timezone used for the recording date
+    - name: recording.duration
+      type: long
+      description: >
+        Duration of the recording
+    - name: recording.share_url
+      type: keyword
+      description: >
+        The share URL for the recording
+    - name: recording.total_size
+      type: long
+      description: >
+        Total size of the recording in bytes
+    - name: recording.recording_count
+      type: long
+      description: >
+        Amount of recording files related to the recording
+    - name: recording.host_email
+      type: long
+      description: >
+        Email address of the host related to the meeting
+
+    - name: recording.registrant.id
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.email
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.first_name
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.last_name
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.address
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.city
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.country
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.zip
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.state
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.phone
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.industry
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.org
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.job_title
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.purchasing_time_frame
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.role_in_purchase_process
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.no_of_employees
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.comments
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: recording.registrant.join_url
+      type: keyword
+      description: >
+        Information about the person that registers to the meeting
+    - name: user.id
+      type: keyword
+      description: >
+        UserID related to the user event
+    - name: user.first_name
+      type: keyword
+      description: >
+        User first name related to the user event
+    - name: user.last_name
+      type: keyword
+      description: >
+        User last name related to the user event
+    - name: user.email
+      type: keyword
+      description: >
+        User email related to the user event
+    - name: user.type
+      type: keyword
+      description: >
+        User type related to the user event
+    - name: user.phone_number
+      type: keyword
+      description: >
+        Phone number related to the user
+    - name: user.phone_country
+      type: keyword
+      description: >
+        Country code related to the phone number
+    - name: user.company
+      type: keyword
+      description: >
+        User Company
+    - name: user.pmi
+      type: keyword
+      description: >
+        User personal meeting ID
+    - name: user.use_pmi
+      type: boolean
+      description: >
+        If use PMI is enabled
+    - name: user.pic_url
+      type: keyword
+      description: >
+        URL to the profile picture
+    - name: user.vanity_name
+      type: keyword
+      description: >
+        Name of the related users personal meeting room
+    - name: user.timezone
+      type: keyword
+      description: >
+        Timezone configured for the user
+    - name: user.language
+      type: keyword
+      description: >
+        Language settings for the user
+    - name: user.host_key
+      type: keyword
+      description: >
+        Host key set for the user
+    - name: user.role
+      type: keyword
+      description: >
+        The configured role for the user
+    - name: user.dept
+      type: keyword
+      description: >
+        The configured departement for the user
+    - name: user.settings.meeting_capacity
+      type: long
+      description: >
+        Maximum capacity for the user
+    - name: user.settings.large_meeting
+      type: boolean
+      description: >
+        If large meeting plan is enabled for the user
+    - name: user.presence_status
+      type: keyword
+      description: >
+        Current presence status of user
+    - name: user.personal_note
+      type: keyword
+      description: >
+        Personal notes for the User
+    - name: user.date_time
+      type: date
+      description: >
+        Time when user logged in/out
+    - name: old_user.id
+      type: keyword
+      description: >
+        UserID related to the user event
+    - name: old_user.first_name
+      type: keyword
+      description: >
+        User first name related to the user event
+    - name: old_user.last_name
+      type: keyword
+      description: >
+        User last name related to the user event
+    - name: old_user.email
+      type: keyword
+      description: >
+        User email related to the user event
+    - name: old_user.type
+      type: keyword
+      description: >
+        User type related to the user event
+    - name: old_user.phone_number
+      type: keyword
+      description: >
+        Phone number related to the user
+    - name: old_user.phone_country
+      type: keyword
+      description: >
+        Country code related to the phone number
+    - name: old_user.company
+      type: keyword
+      description: >
+        User Company
+    - name: old_user.pmi
+      type: keyword
+      description: >
+        User personal meeting ID
+    - name: old_user.use_pmi
+      type: boolean
+      description: >
+        If use PMI is enabled
+    - name: old_user.pic_url
+      type: keyword
+      description: >
+        URL to the profile picture
+    - name: old_user.vanity_name
+      type: keyword
+      description: >
+        Name of the related users personal meeting room
+    - name: old_user.timezone
+      type: keyword
+      description: >
+        Timezone configured for the user
+    - name: old_user.language
+      type: keyword
+      description: >
+        Language settings for the user
+    - name: old_user.host_key
+      type: keyword
+      description: >
+        Host key set for the user
+    - name: old_user.role
+      type: keyword
+      description: >
+        The configured role for the user
+    - name: old_user.dept
+      type: keyword
+      description: >
+        The configured departement for the user
+    - name: old_user.settings.meeting_capacity
+      type: long
+      description: >
+        Maximum capacity for the user
+    - name: old_user.settings.large_meeting
+      type: boolean
+      description: >
+        If large meeting plan is enabled for the user
+    - name: old_user.presence_status
+      type: keyword
+      description: >
+        Current presence status of user
+    - name: old_user.personal_note
+      type: keyword
+      description: >
+        Personal notes for the User
+    - name: old_user.date_time
+      type: date
+      description: >
+        Time when user logged in/out
+    - name: webinar.id
+      type: keyword
+      description: >
+        Unique ID for the webinar
+    - name: webinar.uuid
+      type: keyword
+      description: >
+        UUID for the webinar
+    - name: webinar.host_id
+      type: keyword
+      description: >
+        UserID of the host of the webinar
+    - name: webinar.topic
+      type: keyword
+      description: >
+        Topic of the webinar
+    - name: webinar.type
+      type: keyword
+      description: >
+        Type of webinar created
+    - name: webinar.start_time
+      type: date
+      description: >
+        Start time of the webinar
+    - name: webinar.timezone
+      type: keyword
+      description: >
+        Timezone of the webinar
+    - name: webinar.duration
+      type: long
+      description: >
+        Duration of the webinar
+    - name: webinar.agenda
+      type: keyword
+      description: >
+        Agenda of the webinar
+    - name: webinar.password
+      type: keyword
+      description: >
+        Password for the webinar
+    - name: webinar.issues
+      type: keyword
+      description: >
+        Related issues to the webinar
+    - name: webinar.settings.host_video
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.panelists_video
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.practice_session
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.approval_type
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.registration_type
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.audio
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.auto_recording
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.settings.enforce_login
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.id
+      type: keyword
+      description: >
+        Unique ID for the webinar
+    - name: old_webinar.uuid
+      type: keyword
+      description: >
+        UUID for the webinar
+    - name: old_webinar.host_id
+      type: keyword
+      description: >
+        UserID of the host of the webinar
+    - name: old_webinar.topic
+      type: keyword
+      description: >
+        Topic of the webinar
+    - name: old_webinar.type
+      type: keyword
+      description: >
+        Type of webinar created
+    - name: old_webinar.start_time
+      type: date
+      description: >
+        Start time of the webinar
+    - name: old_webinar.timezone
+      type: keyword
+      description: >
+        Timezone of the webinar
+    - name: old_webinar.duration
+      type: long
+      description: >
+        Duration of the webinar
+    - name: old_webinar.agenda
+      type: keyword
+      description: >
+        Agenda of the webinar
+    - name: old_webinar.password
+      type: keyword
+      description: >
+        Password for the webinar
+    - name: old_webinar.settings.host_video
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.panelists_video
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.practice_session
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.approval_type
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.registration_type
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.audio
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.auto_recording
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: old_webinar.settings.enforce_login
+      type: keyword
+      description: >
+        Related webinar settings
+    - name: webinar.registrant.id
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.email
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.first_name
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.last_name
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.address
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.city
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.country
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.zip
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.state
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.phone
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.industry
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.org
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.job_title
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.purchasing_time_frame
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.role_in_purchase_process
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.no_of_employees
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.comments
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.registrant.join_url
+      type: keyword
+      description: >
+        Information about the person that registers to the webinar
+    - name: webinar.participant.id
+      type: keyword
+      description: >
+        Webinar ID of the related meeting
+    - name: webinar.participant.user_id
+      type: keyword
+      description: >
+        UserID of the participant trigger the sharing event
+    - name: webinar.participant.user_name
+      type: keyword
+      description: >
+        User name of the participant trigger the sharing event
+    - name: webinar.participant.join_time
+      type: date
+      description: >
+        The time the participant joined the related meeting
+    - name: webinar.participant.leave_time
+      type: date
+      description: >
+        The time the participant left the related meeting
+    - name: zoomroom.id
+      type: keyword
+      description: >
+        ID of the Zoom room
+    - name: zoomroom.room_name
+      type: keyword
+      description: >
+        Name of the Zoom room
+    - name: zoomroom.calendar_name
+      type: keyword
+      description: >
+        Calendar name of the Zoom room
+    - name: zoomroom.calendar_id
+      type: keyword
+      description: >
+        Calendar ID of the Zoom room
+    - name: zoomroom.event_id
+      type: keyword
+      description: >
+        Event ID of the Zoom room
+    - name: zoomroom.change_key
+      type: keyword
+      description: >
+        Change key of the Zoom room
+    - name: zoomroom.resource_email
+      type: keyword
+      description: >
+        Resource email address related to the Zoom room
+    - name: zoomroom.email
+      type: keyword
+      description: >
+        Email related to the Zoom room
+    - name: zoomroom.issue
+      type: keyword
+      description: >
+        Related issue message to the Zoom room
+    - name: zoomroom.alert_type
+      type: keyword
+      description: >
+        Zoom room alert type
+    - name: zoomroom.component
+      type: keyword
+      description: >
+        Zoom room component
+    - name: zoomroom.alert_kind
+      type: keyword
+      description: >
+        Alert kind related to the Zoom room

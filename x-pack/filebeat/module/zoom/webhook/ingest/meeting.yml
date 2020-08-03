@@ -6,6 +6,14 @@ processors:
     if: ctx?.event?.action != meeting.alert
 - append:
     field: event.type
+    value: error
+    if: ctx?.event?.action == meeting.alert
+- append:
+    field: event.type
+    value: allowed
+    if: ctx?.event?.action == meeting.registration_approved
+- append:
+    field: event.type
     value: creation
     if: "['meeting.registration_created', 'meeting.created'].contains(ctx?.event?.action)"
 - append:
@@ -19,19 +27,11 @@ processors:
 - append:
     field: event.type
     value: start
-    if: ctx?.event?.action == 'meeting.started'
+    if: "['meeting.started', 'meeting.sharing_started'].contains(ctx?.event?.action)"
 - append:
     field: event.type
     value: end
-    if: ctx?.event?.action == 'meeting.ended'
-- rename:
-    field: zoom.operator
-    target_field: source.user.email
-    ignore_missing: true
-- rename:
-    field: zoom.operator_id
-    target_field: source.user.id
-    ignore_missing: true
+    if: "['meeting.ended', 'meeting.sharing_ended'].contains(ctx?.event?.action)"
 - rename:
     field: zoom.object
     target_field: zoom.meeting
@@ -42,8 +42,8 @@ processors:
     ignore_missing: true
 - append:
     field: related.user
-    value: "{{source.user.id}}"
-    if: "ctx.source?.user?.id != null"
+    value: "{{zoom.meeting.host_id}}"
+    if: "ctx?.zoom?.meeting?.host_id != null"
 on_failure:
 - set:
     field: error.message

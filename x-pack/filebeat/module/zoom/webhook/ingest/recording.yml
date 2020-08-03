@@ -1,0 +1,53 @@
+description: Pipeline for parsing Zoom recording webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: creation
+    if: "ctx?.event?.action == recording.registration_created"
+- append:
+    field: event.type
+    value: allowed
+    if: "ctx?.event?.action == recording.registration_approved"
+- append:
+    field: event.type
+    value: denied
+    if: "ctx?.event?.action == recording.registration_denied"
+- append:
+    field: event.type
+    value: deletion
+    if: "['recording.deleted', 'recording.trashed'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: change
+    if: "['recording.paused', 'recording.resumed', 'recording.renamed', 'recording.recovered'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: "ctx?.event?.action == recording.started"
+- append:
+    field: event.type
+    value: end
+    if: "['recording.stopped', 'recording.completed', 'recording.transcript_completed'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.object
+    target_field: zoom.recording
+    ignore_missing: true
+- rename:
+    field: zoom.old_object
+    target_field: zoom.old_recording
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.recording.host_id}}"
+    if: "ctx?.zoom?.recording?.host_id != null"
+- append:
+    field: related.user
+    value: "{{zoom.recording.registrant.id}}"
+    if: "ctx?.zoom?.recording?.registrant?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

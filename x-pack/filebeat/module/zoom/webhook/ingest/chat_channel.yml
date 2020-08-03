@@ -17,27 +17,20 @@ processors:
     value: change
     if: ctx?.event?.action == 'chat_channel.deleted'
 - rename:
-    field: zoom.operator
-    target_field: source.user.email
-    ignore_missing: true
-- rename:
-    field: zoom.operator_id
-    target_field: source.user.id
-    ignore_missing: true
-- rename:
     field: zoom.object
-    target_field: zoom.channel
+    target_field: zoom.chat_channel
     ignore_missing: true
 - foreach:
-    field: zoom.channel.members
+    field: zoom.chat_channel.members
     processor:
       append:
         field: related.user
         value: "{{_ingest._value.id}}"
-- append:
-    field: related.user
-    value: "{{source.user.id}}"
-    if: "ctx.source?.user?.id != null"
+# Removing to prevent nested values, added to related.user above
+- remove:
+    field:
+    - zoom.chat_channel.members
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

@@ -3,47 +3,34 @@ processors:
 - append:
     field: event.type
     value: info
-    if: ctx?.event?.action != meeting.alert
 - append:
     field: event.type
     value: creation
-    if: "['meeting.registration_created', 'meeting.created'].contains(ctx?.event?.action)"
-- append:
-    field: event.type
-    value: deletion
-    if: ctx?.event?.action == 'meeting.deleted'
-- append:
-    field: event.type
-    value: change
-    if: ctx?.event?.action == 'meeting.updated'
+    if: "['phone.caller_ringing', 'phone.callee_ringing'].contains(ctx?.event?.action)"
 - append:
     field: event.type
     value: start
-    if: ctx?.event?.action == 'meeting.started'
+    if: "['phone.callee_answered', 'phone.caller_connected'].contains(ctx?.event?.action)"
 - append:
     field: event.type
     value: end
-    if: ctx?.event?.action == 'meeting.ended'
-- rename:
-    field: zoom.operator
-    target_field: source.user.email
-    ignore_missing: true
-- rename:
-    field: zoom.operator_id
-    target_field: source.user.id
-    ignore_missing: true
+    if: "['phone.callee_missed', 'phone.callee_ended', 'phone.caller_ended'].contains(ctx?.event?.action)"
 - rename:
     field: zoom.object
-    target_field: zoom.meeting
-    ignore_missing: true
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_meeting
+    target_field: zoom.phone
     ignore_missing: true
 - append:
     field: related.user
-    value: "{{source.user.id}}"
-    if: "ctx.source?.user?.id != null"
+    value: "{{zoom.phone.callee.user_id}}"
+    if: "ctx?.zoom?.phone?.callee?.user_id != null"
+- append:
+    field: related.user
+    value: "{{zoom.phone.callee_user_id}}"
+    if: "ctx?.zoom?.phone?.callee_user_id != null"
+- append:
+    field: related.user
+    value: "{{zoom.phone.caller.user_id}}"
+    if: "ctx?.zoom?.phone?.caller?.user_id != null"
 on_failure:
 - set:
     field: error.message

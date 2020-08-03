@@ -16,33 +16,13 @@ processors:
     value: change
     if: ctx?.event?.action == 'chat_message.updated'
 - rename:
-    field: zoom.operator
-    target_field: source.user.email
-    ignore_missing: true
-- rename:
-    field: zoom.operator_id
-    target_field: source.user.id
-    ignore_missing: true
-- rename:
     field: zoom.object
-    target_field: zoom.chat
-    ignore_missing: true
-- rename:
-    field: zoom.chat.contact_email
-    target_field: destination.user.email
-    ignore_missing: true
-- rename:
-    field: zoom.chat.contact_id
-    target_field: destination.user.id
+    target_field: zoom.chat_message
     ignore_missing: true
 - append:
     field: related.user
-    value: "{{source.user.id}}"
-    if: "ctx.source?.user?.id != null"
-- append:
-    field: related.user
-    value: "{{destination.user.id}}"
-    if: "ctx.destination?.user?.id != null"
+    value: "{{zoom.chat_message.contact_id}}"
+    if: "ctx?.zoom?.chat_message?.contact_id != null"
 on_failure:
 - set:
     field: error.message

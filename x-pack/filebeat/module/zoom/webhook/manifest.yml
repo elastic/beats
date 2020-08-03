@@ -4,9 +4,11 @@ var:
   - name: listen_address
     default: localhost
   - name: listen_port
-    default: 8080
+    default: 80
   - name: input
     default: http_endpoint
+  - name: content_type
+    default: ""
   - name: response_code
     default: 200
   - name: response_body
@@ -14,7 +16,7 @@ var:
   - name: url
     default: /
   - name: prefix
-    default: json
+    default: zoom
   - name: basic_auth
     default: false
   - name: username
@@ -26,14 +28,15 @@ var:
     default: [zoom-webhook, forwarded]
 
 ingest_pipeline:
-  - ingest/pipeline.yml
   - ingest/account.yml
-  - ingest/chat_message.yml
   - ingest/chat_channel.yml
+  - ingest/chat_message.yml
   - ingest/meeting.yml
   - ingest/phone.yml
+  - ingest/pipeline.yml
   - ingest/recording.yml
   - ingest/user.yml
   - ingest/webinar.yml
   - ingest/zoomroom.yml
+
 input: config/webhook.yml
