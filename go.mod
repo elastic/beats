@@ -76,7 +76,7 @@ require (
 	github.com/fsnotify/fsevents v0.0.0-00010101000000-000000000000
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/garyburd/redigo v1.0.1-0.20160525165706-b8dc90050f24
-	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647
+	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
