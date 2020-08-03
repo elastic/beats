@@ -76,7 +76,7 @@ grouped in the following categories:
 * <<exported-fields-s3>>
 * <<exported-fields-santa>>
 * <<exported-fields-sonicwall>>
-* <<exported-fields-sophosxg>>
+* <<exported-fields-sophos>>
 * <<exported-fields-squid>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
@@ -122135,27 +122135,27 @@ type: keyword
 
 --
 
-[[exported-fields-sophosxg]]
-== sophosxg fields
+[[exported-fields-sophos]]
+== sophos fields
 
-sophosxg Module
-
-
-
-[float]
-=== sophosxg
-
+sophos Module
 
 
 
 [float]
-=== firewall
+=== sophos
+
+
+
+
+[float]
+=== xg
 
 Module for parsing sophosxg syslog.
 
 
 
-*`sophosxg.firewall.device`*::
+*`sophos.xg.device`*::
 +
 --
 device
@@ -122165,7 +122165,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.date`*::
+*`sophos.xg.date`*::
 +
 --
 Date (yyyy-mm-dd) when the event occurred
@@ -122175,7 +122175,7 @@ type: date
 
 --
 
-*`sophosxg.firewall.timezone`*::
+*`sophos.xg.timezone`*::
 +
 --
 Time (hh:mm:ss) when the event occurred
@@ -122185,7 +122185,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.device_name`*::
+*`sophos.xg.device_name`*::
 +
 --
 Model number of the device
@@ -122195,7 +122195,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.device_id`*::
+*`sophos.xg.device_id`*::
 +
 --
 Serial number of the device
@@ -122205,7 +122205,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.log_id`*::
+*`sophos.xg.log_id`*::
 +
 --
 Unique 12 characters code (0101011)
@@ -122215,7 +122215,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.log_type`*::
+*`sophos.xg.log_type`*::
 +
 --
 Type of event e.g. firewall event
@@ -122225,7 +122225,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.log_component`*::
+*`sophos.xg.log_component`*::
 +
 --
 Component responsible for logging e.g. Firewall rule
@@ -122235,7 +122235,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.log_subtype`*::
+*`sophos.xg.log_subtype`*::
 +
 --
 Sub type of event
@@ -122245,7 +122245,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.hb_health`*::
+*`sophos.xg.hb_health`*::
 +
 --
 Heartbeat status
@@ -122255,7 +122255,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.priority`*::
+*`sophos.xg.priority`*::
 +
 --
 Severity level of traffic
@@ -122265,7 +122265,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.status`*::
+*`sophos.xg.status`*::
 +
 --
 Ultimate status of traffic – Allowed or Denied
@@ -122275,7 +122275,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.duration`*::
+*`sophos.xg.duration`*::
 +
 --
 Durability of traffic (seconds)
@@ -122285,7 +122285,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.fw_rule_id`*::
+*`sophos.xg.fw_rule_id`*::
 +
 --
 Firewall Rule ID which is applied on the traffic
@@ -122295,7 +122295,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.user_name`*::
+*`sophos.xg.user_name`*::
 +
 --
 user_name
@@ -122305,7 +122305,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.user_group`*::
+*`sophos.xg.user_group`*::
 +
 --
 Group name to which the user belongs
@@ -122315,7 +122315,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.iap`*::
+*`sophos.xg.iap`*::
 +
 --
 Internet Access policy ID applied on the traffic
@@ -122325,7 +122325,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ips_policy_id`*::
+*`sophos.xg.ips_policy_id`*::
 +
 --
 IPS policy ID applied on the traffic
@@ -122335,7 +122335,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.policy_type`*::
+*`sophos.xg.policy_type`*::
 +
 --
 Policy type applied to the traffic
@@ -122345,7 +122345,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.appfilter_policy_id`*::
+*`sophos.xg.appfilter_policy_id`*::
 +
 --
 Application Filter policy applied on the traffic
@@ -122355,7 +122355,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.application_filter_policy`*::
+*`sophos.xg.application_filter_policy`*::
 +
 --
 Application Filter policy applied on the traffic
@@ -122365,7 +122365,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.application`*::
+*`sophos.xg.application`*::
 +
 --
 Application name
@@ -122375,7 +122375,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.application_name`*::
+*`sophos.xg.application_name`*::
 +
 --
 Application name
@@ -122385,7 +122385,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.application_risk`*::
+*`sophos.xg.application_risk`*::
 +
 --
 Risk level assigned to the application
@@ -122395,7 +122395,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.application_technology`*::
+*`sophos.xg.application_technology`*::
 +
 --
 Technology of the application
@@ -122405,7 +122405,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.application_category`*::
+*`sophos.xg.application_category`*::
 +
 --
 Application is resolved by signature or synchronized application
@@ -122415,7 +122415,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.appresolvedby`*::
+*`sophos.xg.appresolvedby`*::
 +
 --
 Technology of the application
@@ -122425,7 +122425,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.app_is_cloud`*::
+*`sophos.xg.app_is_cloud`*::
 +
 --
 Application is Cloud
@@ -122435,7 +122435,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.in_interface`*::
+*`sophos.xg.in_interface`*::
 +
 --
 Interface for incoming traffic, e.g., Port A
@@ -122445,7 +122445,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.out_interface`*::
+*`sophos.xg.out_interface`*::
 +
 --
 Interface for outgoing traffic, e.g., Port B
@@ -122455,7 +122455,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.src_ip`*::
+*`sophos.xg.src_ip`*::
 +
 --
 Original source IP address of traffic
@@ -122465,7 +122465,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.src_mac`*::
+*`sophos.xg.src_mac`*::
 +
 --
 Original source MAC address of traffic
@@ -122475,7 +122475,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.src_country_code`*::
+*`sophos.xg.src_country_code`*::
 +
 --
 Code of the country to which the source IP belongs
@@ -122485,7 +122485,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dst_ip`*::
+*`sophos.xg.dst_ip`*::
 +
 --
 Original destination IP address of traffic
@@ -122495,7 +122495,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.dst_country_code`*::
+*`sophos.xg.dst_country_code`*::
 +
 --
 Code of the country to which the destination IP belongs
@@ -122505,7 +122505,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.protocol`*::
+*`sophos.xg.protocol`*::
 +
 --
 Protocol number of traffic
@@ -122515,7 +122515,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.src_port`*::
+*`sophos.xg.src_port`*::
 +
 --
 Original source port of TCP and UDP traffic
@@ -122525,7 +122525,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.dst_port`*::
+*`sophos.xg.dst_port`*::
 +
 --
 Original destination port of TCP and UDP traffic
@@ -122535,7 +122535,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.icmp_type`*::
+*`sophos.xg.icmp_type`*::
 +
 --
 ICMP type of ICMP traffic
@@ -122545,7 +122545,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.icmp_code`*::
+*`sophos.xg.icmp_code`*::
 +
 --
 ICMP code of ICMP traffic
@@ -122555,7 +122555,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.sent_pkts`*::
+*`sophos.xg.sent_pkts`*::
 +
 --
 Total number of packets sent
@@ -122565,7 +122565,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.received_pkts`*::
+*`sophos.xg.received_pkts`*::
 +
 --
 Total number of packets received
@@ -122575,7 +122575,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.sent_bytes`*::
+*`sophos.xg.sent_bytes`*::
 +
 --
 Total number of bytes sent
@@ -122585,7 +122585,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.recv_bytes`*::
+*`sophos.xg.recv_bytes`*::
 +
 --
 Total number of bytes received
@@ -122595,7 +122595,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.trans_src_ ip`*::
+*`sophos.xg.trans_src_ ip`*::
 +
 --
 Translated source IP address for outgoing traffic
@@ -122605,7 +122605,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.trans_src_port`*::
+*`sophos.xg.trans_src_port`*::
 +
 --
 Translated source port for outgoing traffic
@@ -122615,7 +122615,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.trans_dst_ip`*::
+*`sophos.xg.trans_dst_ip`*::
 +
 --
 Translated destination IP address for outgoing traffic
@@ -122625,7 +122625,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.trans_dst_port`*::
+*`sophos.xg.trans_dst_port`*::
 +
 --
 Translated destination port for outgoing traffic
@@ -122635,7 +122635,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.srczonetype`*::
+*`sophos.xg.srczonetype`*::
 +
 --
 Type of source zone, e.g., LAN
@@ -122645,7 +122645,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.srczone`*::
+*`sophos.xg.srczone`*::
 +
 --
 Name of source zone
@@ -122655,7 +122655,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dstzonetype`*::
+*`sophos.xg.dstzonetype`*::
 +
 --
 Type of destination zone, e.g., WAN
@@ -122665,7 +122665,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dstzone`*::
+*`sophos.xg.dstzone`*::
 +
 --
 Name of destination zone
@@ -122675,7 +122675,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dir_disp`*::
+*`sophos.xg.dir_disp`*::
 +
 --
 TPacket direction. Possible values:“org”, “reply”, “”
@@ -122685,7 +122685,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.connevent`*::
+*`sophos.xg.connevent`*::
 +
 --
 Event on which this log is generated
@@ -122695,7 +122695,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.conn_id`*::
+*`sophos.xg.conn_id`*::
 +
 --
 Unique identifier of connection
@@ -122705,7 +122705,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.vconn_id`*::
+*`sophos.xg.vconn_id`*::
 +
 --
 Connection ID of the master connection
@@ -122715,7 +122715,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.idp_policy_id`*::
+*`sophos.xg.idp_policy_id`*::
 +
 --
 IPS policy ID which is applied on the traffic
@@ -122725,7 +122725,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.idp_policy_name`*::
+*`sophos.xg.idp_policy_name`*::
 +
 --
 IPS policy name i.e. IPS policy name which is applied on the traffic
@@ -122735,7 +122735,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.signature_id`*::
+*`sophos.xg.signature_id`*::
 +
 --
 Signature ID
@@ -122745,7 +122745,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.signature_msg`*::
+*`sophos.xg.signature_msg`*::
 +
 --
 Signature messsage
@@ -122755,7 +122755,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.classification`*::
+*`sophos.xg.classification`*::
 +
 --
 Signature classification
@@ -122765,7 +122765,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.rule_priority`*::
+*`sophos.xg.rule_priority`*::
 +
 --
 Priority of IPS policy
@@ -122775,7 +122775,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.platform`*::
+*`sophos.xg.platform`*::
 +
 --
 Platform of the traffic.
@@ -122785,7 +122785,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.category`*::
+*`sophos.xg.category`*::
 +
 --
 IPS signature category.
@@ -122795,7 +122795,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.target`*::
+*`sophos.xg.target`*::
 +
 --
 Platform of the traffic.
@@ -122805,7 +122805,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.eventid`*::
+*`sophos.xg.eventid`*::
 +
 --
 ATP Evenet ID
@@ -122815,7 +122815,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ep_uuid`*::
+*`sophos.xg.ep_uuid`*::
 +
 --
 Endpoint UUID
@@ -122825,7 +122825,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.threatname`*::
+*`sophos.xg.threatname`*::
 +
 --
 ATP threatname
@@ -122835,7 +122835,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.sourceip`*::
+*`sophos.xg.sourceip`*::
 +
 --
 Original source IP address of traffic
@@ -122845,7 +122845,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.destinationip`*::
+*`sophos.xg.destinationip`*::
 +
 --
 Original destination IP address of traffic
@@ -122855,7 +122855,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.login_user`*::
+*`sophos.xg.login_user`*::
 +
 --
 ATP login user
@@ -122865,7 +122865,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.eventtype`*::
+*`sophos.xg.eventtype`*::
 +
 --
 ATP event type
@@ -122875,7 +122875,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.execution_path`*::
+*`sophos.xg.execution_path`*::
 +
 --
 ATP execution path
@@ -122885,7 +122885,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.av_policy_name`*::
+*`sophos.xg.av_policy_name`*::
 +
 --
 Malware scanning policy name which is applied on the traffic
@@ -122895,7 +122895,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.from_email_address`*::
+*`sophos.xg.from_email_address`*::
 +
 --
 Sender email address
@@ -122905,7 +122905,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.to_email_address`*::
+*`sophos.xg.to_email_address`*::
 +
 --
 Receipeint email address
@@ -122915,7 +122915,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.subject`*::
+*`sophos.xg.subject`*::
 +
 --
 Email subject
@@ -122925,7 +122925,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.mailsize`*::
+*`sophos.xg.mailsize`*::
 +
 --
 mailsize
@@ -122935,7 +122935,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.virus`*::
+*`sophos.xg.virus`*::
 +
 --
 virus name
@@ -122945,7 +122945,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.FTP_url`*::
+*`sophos.xg.FTP_url`*::
 +
 --
 FTP URL from which virus was downloaded
@@ -122955,7 +122955,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.FTP_direction`*::
+*`sophos.xg.FTP_direction`*::
 +
 --
 Direction of FTP transfer: Upload or Download
@@ -122965,7 +122965,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.filesize`*::
+*`sophos.xg.filesize`*::
 +
 --
 Size of the file that contained virus
@@ -122975,7 +122975,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.filepath`*::
+*`sophos.xg.filepath`*::
 +
 --
 Path of the file containing virus
@@ -122985,7 +122985,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.filename`*::
+*`sophos.xg.filename`*::
 +
 --
 File name associated with the event
@@ -122995,7 +122995,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ftpcommand`*::
+*`sophos.xg.ftpcommand`*::
 +
 --
 FTP command used when virus was found
@@ -123005,7 +123005,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.url`*::
+*`sophos.xg.url`*::
 +
 --
 URL from which virus was downloaded
@@ -123015,7 +123015,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.domainname`*::
+*`sophos.xg.domainname`*::
 +
 --
 Domain from which virus was downloaded
@@ -123025,7 +123025,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.quarantine`*::
+*`sophos.xg.quarantine`*::
 +
 --
 Path and filename of the file quarantined
@@ -123035,7 +123035,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.src_domainname`*::
+*`sophos.xg.src_domainname`*::
 +
 --
 Sender domain name
@@ -123045,7 +123045,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dst_domainname`*::
+*`sophos.xg.dst_domainname`*::
 +
 --
 Receiver domain name
@@ -123055,7 +123055,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.reason`*::
+*`sophos.xg.reason`*::
 +
 --
 Reason why the record was detected as spam/malicious
@@ -123065,7 +123065,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.referer`*::
+*`sophos.xg.referer`*::
 +
 --
 Referer
@@ -123075,7 +123075,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.spamaction`*::
+*`sophos.xg.spamaction`*::
 +
 --
 Spam Action
@@ -123085,7 +123085,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.mailid`*::
+*`sophos.xg.mailid`*::
 +
 --
 mailid
@@ -123095,7 +123095,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.quarantine_reason`*::
+*`sophos.xg.quarantine_reason`*::
 +
 --
 Quarantine reason
@@ -123105,7 +123105,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.status_code`*::
+*`sophos.xg.status_code`*::
 +
 --
 Status code
@@ -123115,7 +123115,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.override_token`*::
+*`sophos.xg.override_token`*::
 +
 --
 Override token
@@ -123125,7 +123125,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.con_id`*::
+*`sophos.xg.con_id`*::
 +
 --
 Unique identifier of connection
@@ -123135,7 +123135,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.override_authorizer`*::
+*`sophos.xg.override_authorizer`*::
 +
 --
 Override authorizer
@@ -123145,7 +123145,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.transactionid`*::
+*`sophos.xg.transactionid`*::
 +
 --
 Transaction ID of the AV scan.
@@ -123155,7 +123155,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.upload_file_type`*::
+*`sophos.xg.upload_file_type`*::
 +
 --
 Upload file type
@@ -123165,7 +123165,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.upload_file_name`*::
+*`sophos.xg.upload_file_name`*::
 +
 --
 Upload file name
@@ -123175,7 +123175,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.httpresponsecode`*::
+*`sophos.xg.httpresponsecode`*::
 +
 --
 code of HTTP response
@@ -123185,7 +123185,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.user_gp`*::
+*`sophos.xg.user_gp`*::
 +
 --
 Group name to which the user belongs.
@@ -123195,7 +123195,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.category_type`*::
+*`sophos.xg.category_type`*::
 +
 --
 Type of category under which website falls
@@ -123205,7 +123205,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.download_file_type`*::
+*`sophos.xg.download_file_type`*::
 +
 --
 Download file type
@@ -123215,7 +123215,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.exceptions`*::
+*`sophos.xg.exceptions`*::
 +
 --
 List of the checks excluded by web exceptions.
@@ -123225,7 +123225,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.contenttype`*::
+*`sophos.xg.contenttype`*::
 +
 --
 Type of the content
@@ -123235,7 +123235,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.override_name`*::
+*`sophos.xg.override_name`*::
 +
 --
 Override name
@@ -123245,7 +123245,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.activityname`*::
+*`sophos.xg.activityname`*::
 +
 --
 Web policy activity that matched and caused the policy result.
@@ -123255,7 +123255,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.download_file_name`*::
+*`sophos.xg.download_file_name`*::
 +
 --
 Download file name
@@ -123265,7 +123265,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.sha1sum`*::
+*`sophos.xg.sha1sum`*::
 +
 --
 SHA1 checksum of the item being analyzed
@@ -123275,7 +123275,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.message_id`*::
+*`sophos.xg.message_id`*::
 +
 --
 Message ID
@@ -123285,7 +123285,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.connid`*::
+*`sophos.xg.connid`*::
 +
 --
 Connection ID
@@ -123295,7 +123295,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.message`*::
+*`sophos.xg.message`*::
 +
 --
 Message
@@ -123305,7 +123305,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.email_subject`*::
+*`sophos.xg.email_subject`*::
 +
 --
 Email Subject
@@ -123315,7 +123315,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.file_path`*::
+*`sophos.xg.file_path`*::
 +
 --
 File path
@@ -123325,7 +123325,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dstdomain`*::
+*`sophos.xg.dstdomain`*::
 +
 --
 Destination Domain
@@ -123335,7 +123335,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.file_size`*::
+*`sophos.xg.file_size`*::
 +
 --
 File Size
@@ -123345,7 +123345,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.transaction_id`*::
+*`sophos.xg.transaction_id`*::
 +
 --
 Transaction ID
@@ -123355,7 +123355,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.website`*::
+*`sophos.xg.website`*::
 +
 --
 Website
@@ -123365,7 +123365,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.file_name`*::
+*`sophos.xg.file_name`*::
 +
 --
 Filename
@@ -123375,7 +123375,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.context_prefix`*::
+*`sophos.xg.context_prefix`*::
 +
 --
 Content Prefix
@@ -123385,7 +123385,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.site_category`*::
+*`sophos.xg.site_category`*::
 +
 --
 Site Category
@@ -123395,7 +123395,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.context_suffix`*::
+*`sophos.xg.context_suffix`*::
 +
 --
 Context Suffix
@@ -123405,7 +123405,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.dictionary_name`*::
+*`sophos.xg.dictionary_name`*::
 +
 --
 Dictionary Name
@@ -123415,7 +123415,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.action`*::
+*`sophos.xg.action`*::
 +
 --
 Event Action
@@ -123425,7 +123425,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.user`*::
+*`sophos.xg.user`*::
 +
 --
 User
@@ -123435,17 +123435,17 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.context_match`*::
+*`sophos.xg.context_match`*::
 +
 --
-Context Match 
+Context Match
 
 
 type: keyword
 
 --
 
-*`sophosxg.firewall.direction`*::
+*`sophos.xg.direction`*::
 +
 --
 Direction
@@ -123455,7 +123455,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.auth_client`*::
+*`sophos.xg.auth_client`*::
 +
 --
 Auth Client
@@ -123465,7 +123465,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.auth_mechanism`*::
+*`sophos.xg.auth_mechanism`*::
 +
 --
 Auth mechanism
@@ -123475,7 +123475,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.connectionname`*::
+*`sophos.xg.connectionname`*::
 +
 --
 Connectionname
@@ -123485,7 +123485,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.remotenetwork`*::
+*`sophos.xg.remotenetwork`*::
 +
 --
 remotenetwork
@@ -123495,7 +123495,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.localgateway`*::
+*`sophos.xg.localgateway`*::
 +
 --
 Localgateway
@@ -123505,7 +123505,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.localnetwork`*::
+*`sophos.xg.localnetwork`*::
 +
 --
 Localnetwork
@@ -123515,7 +123515,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.connectiontype`*::
+*`sophos.xg.connectiontype`*::
 +
 --
 Connectiontype
@@ -123525,7 +123525,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.oldversion`*::
+*`sophos.xg.oldversion`*::
 +
 --
 Oldversion
@@ -123535,7 +123535,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.newversion`*::
+*`sophos.xg.newversion`*::
 +
 --
 Newversion
@@ -123545,7 +123545,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ipaddress`*::
+*`sophos.xg.ipaddress`*::
 +
 --
 Ipaddress
@@ -123555,7 +123555,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.client_physical_address`*::
+*`sophos.xg.client_physical_address`*::
 +
 --
 Client physical address
@@ -123565,7 +123565,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.client_host_name`*::
+*`sophos.xg.client_host_name`*::
 +
 --
 Client host name
@@ -123575,7 +123575,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.raw_data`*::
+*`sophos.xg.raw_data`*::
 +
 --
 Raw data
@@ -123585,7 +123585,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.Mode`*::
+*`sophos.xg.Mode`*::
 +
 --
 Mode
@@ -123595,7 +123595,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.sessionid`*::
+*`sophos.xg.sessionid`*::
 +
 --
 Sessionid
@@ -123605,7 +123605,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.starttime`*::
+*`sophos.xg.starttime`*::
 +
 --
 Starttime
@@ -123615,7 +123615,7 @@ type: date
 
 --
 
-*`sophosxg.firewall.remote_ip`*::
+*`sophos.xg.remote_ip`*::
 +
 --
 Remote IP
@@ -123625,7 +123625,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.timestamp`*::
+*`sophos.xg.timestamp`*::
 +
 --
 timestamp
@@ -123635,7 +123635,7 @@ type: date
 
 --
 
-*`sophosxg.firewall.SysLog_SERVER_NAME`*::
+*`sophos.xg.SysLog_SERVER_NAME`*::
 +
 --
 SysLog SERVER NAME
@@ -123645,7 +123645,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.backup_mode`*::
+*`sophos.xg.backup_mode`*::
 +
 --
 Backup mode
@@ -123655,7 +123655,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.source`*::
+*`sophos.xg.source`*::
 +
 --
 Source
@@ -123665,7 +123665,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.server`*::
+*`sophos.xg.server`*::
 +
 --
 Server
@@ -123675,7 +123675,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.host`*::
+*`sophos.xg.host`*::
 +
 --
 Host
@@ -123685,7 +123685,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.responsetime`*::
+*`sophos.xg.responsetime`*::
 +
 --
 Responsetime
@@ -123695,7 +123695,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.cookie`*::
+*`sophos.xg.cookie`*::
 +
 --
 cookie
@@ -123705,7 +123705,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.querystring`*::
+*`sophos.xg.querystring`*::
 +
 --
 querystring
@@ -123715,7 +123715,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.extra`*::
+*`sophos.xg.extra`*::
 +
 --
 extra
@@ -123725,7 +123725,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.PHPSESSID`*::
+*`sophos.xg.PHPSESSID`*::
 +
 --
 PHPSESSID
@@ -123735,7 +123735,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.start_time`*::
+*`sophos.xg.start_time`*::
 +
 --
 Start time
@@ -123745,7 +123745,7 @@ type: date
 
 --
 
-*`sophosxg.firewall.eventtime`*::
+*`sophos.xg.eventtime`*::
 +
 --
 Event time
@@ -123755,7 +123755,7 @@ type: date
 
 --
 
-*`sophosxg.firewall.red_id`*::
+*`sophos.xg.red_id`*::
 +
 --
 RED ID
@@ -123765,7 +123765,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.branch_name`*::
+*`sophos.xg.branch_name`*::
 +
 --
 Branch Name
@@ -123775,7 +123775,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.updatedip`*::
+*`sophos.xg.updatedip`*::
 +
 --
 updatedip
@@ -123785,7 +123785,7 @@ type: ip
 
 --
 
-*`sophosxg.firewall.idle_cpu`*::
+*`sophos.xg.idle_cpu`*::
 +
 --
 idle ##
@@ -123795,7 +123795,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.system_cpu`*::
+*`sophos.xg.system_cpu`*::
 +
 --
 system
@@ -123805,7 +123805,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.user_cpu`*::
+*`sophos.xg.user_cpu`*::
 +
 --
 system
@@ -123815,7 +123815,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.used`*::
+*`sophos.xg.used`*::
 +
 --
 used
@@ -123825,7 +123825,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.unit`*::
+*`sophos.xg.unit`*::
 +
 --
 unit
@@ -123835,7 +123835,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.total_memory`*::
+*`sophos.xg.total_memory`*::
 +
 --
 Total Memory
@@ -123845,7 +123845,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.free`*::
+*`sophos.xg.free`*::
 +
 --
 free
@@ -123855,7 +123855,7 @@ type: integer
 
 --
 
-*`sophosxg.firewall.transmittederrors`*::
+*`sophos.xg.transmittederrors`*::
 +
 --
 transmitted errors
@@ -123865,7 +123865,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.receivederrors`*::
+*`sophos.xg.receivederrors`*::
 +
 --
 received errors
@@ -123875,7 +123875,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.receivedkbits`*::
+*`sophos.xg.receivedkbits`*::
 +
 --
 received kbits
@@ -123885,7 +123885,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.transmittedkbits`*::
+*`sophos.xg.transmittedkbits`*::
 +
 --
 transmitted kbits
@@ -123895,7 +123895,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.transmitteddrops`*::
+*`sophos.xg.transmitteddrops`*::
 +
 --
 transmitted drops
@@ -123905,7 +123905,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.receiveddrops`*::
+*`sophos.xg.receiveddrops`*::
 +
 --
 received drops
@@ -123915,7 +123915,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.collisions`*::
+*`sophos.xg.collisions`*::
 +
 --
 collisions
@@ -123925,7 +123925,7 @@ type: long
 
 --
 
-*`sophosxg.firewall.interface`*::
+*`sophos.xg.interface`*::
 +
 --
 interface
@@ -123935,7 +123935,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.Configuration`*::
+*`sophos.xg.Configuration`*::
 +
 --
 Configuration
@@ -123945,7 +123945,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.Reports`*::
+*`sophos.xg.Reports`*::
 +
 --
 Reports
@@ -123955,7 +123955,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.Signature`*::
+*`sophos.xg.Signature`*::
 +
 --
 Signature
@@ -123965,7 +123965,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.Temp`*::
+*`sophos.xg.Temp`*::
 +
 --
 Temp
@@ -123975,7 +123975,7 @@ type: float
 
 --
 
-*`sophosxg.firewall.users`*::
+*`sophos.xg.users`*::
 +
 --
 users
@@ -123985,7 +123985,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ssid`*::
+*`sophos.xg.ssid`*::
 +
 --
 ssid
@@ -123995,7 +123995,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.ap`*::
+*`sophos.xg.ap`*::
 +
 --
 ap
@@ -124005,7 +124005,7 @@ type: keyword
 
 --
 
-*`sophosxg.firewall.clients_conn_ssid`*::
+*`sophos.xg.clients_conn_ssid`*::
 +
 --
 clients connection ssid
