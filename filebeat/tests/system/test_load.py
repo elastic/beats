@@ -6,6 +6,8 @@ import time
 import unittest
 import pytest
 
+from filebeat import BaseTest
+
 """
 Test filebeat under different load scenarios
 """
@@ -61,7 +63,7 @@ class Test(BaseTest):
         for i in range(total_lines):
             # Make sure each line has the same length
             line = format(i, str(line_length - 1))
-            logger.debug("%d", i)
+            logger.warning("%d", i)
 
         # wait until all lines are read
         self.wait_until(

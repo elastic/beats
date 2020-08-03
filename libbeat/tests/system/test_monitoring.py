@@ -1,9 +1,10 @@
 import os
-import re
-import unittest
-import requests
+import pytest
 import random
+import re
+import requests
 import string
+import unittest
 
 from base import BaseTest
 from elasticsearch import Elasticsearch

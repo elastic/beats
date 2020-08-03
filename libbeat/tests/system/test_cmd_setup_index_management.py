@@ -2,6 +2,7 @@ import logging
 import os
 import pytest
 import unittest
+
 from base import BaseTest
 from elasticsearch import RequestError
 from idxmgmt import IdxMgmt
@@ -64,7 +65,6 @@ class TestCommandSetupIndexManagement(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
-    @pytest.raises(RequestError)
     def test_setup_default(self):
         """
         Test setup --index-management with default config
@@ -79,7 +79,8 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # try deleting policy needs to raise an error as it is in use
-        self.idxmgmt.delete_policy(self.policy_name)
+        with pytest.raises(RequestError):
+            self.idxmgmt.delete_policy(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

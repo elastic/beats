@@ -1,12 +1,11 @@
 import os
 import os.path
+import pytest
 import re
 import requests
 import semver
 import subprocess
 import unittest
-import requests
-import semver
 
 from base import BaseTest
 from unittest import SkipTest
