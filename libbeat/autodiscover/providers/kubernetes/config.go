@@ -45,8 +45,8 @@ type Config struct {
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
 	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
-	Unique     bool   `config:"unique"`
-	Identifier string `config:"identifier"`
+	Unique      bool   `config:"unique"`
+	LeaderLease string `config:"leader_lease"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
@@ -64,7 +64,7 @@ func defaultConfig() *Config {
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
 		Unique:         false,
-		Identifier:     "",
+		LeaderLease:    "beats-cluster-leader",
 	}
 }
 

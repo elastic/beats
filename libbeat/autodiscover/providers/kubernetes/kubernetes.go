@@ -77,7 +77,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	config := defaultConfig()
-	config.Identifier = uuid.String()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errWrap(err)
@@ -224,12 +223,14 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 }
 
 func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
-	id := "beats-leader-" + p.config.Node
-	if p.config.Identifier != "" {
-		id = id + "-" + p.config.Identifier
+	var id string
+	if p.config.Node != "" {
+		id = "beats-leader-" + p.config.Node
+	} else {
+		id = "beats-leader-" + uuid
 	}
 	lease := metav1.ObjectMeta{
-		Name:      "beats-cluster-leader",
+		Name:      p.config.LeaderLease,
 		Namespace: "default",
 	}
 	metaUID := lease.GetObjectMeta().GetUID()
