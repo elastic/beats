@@ -48,7 +48,7 @@ func getOverrides() {
 		LogsPath:   logsPath,
 	}
 
-	pathsFile := filepath.Join(homePath, "paths.yml")
+	pathsFile := filepath.Join(configPath, "paths.yml")
 	rawConfig, err := config.LoadYAML(pathsFile)
 	if err == nil {
 		rawConfig.Unpack(defaults)

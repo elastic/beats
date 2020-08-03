@@ -93,25 +93,16 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 
 func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		pathsFilePath := filepath.Join(paths.Home(), "paths.yml")
-		_, err := os.Stat(pathsFilePath)
-
-		if runtime.GOOS == "windows" && !filepath.IsAbs(os.Args[0]) {
-			if sn := paths.ServiceName(); sn != "" {
+		if sn := paths.ServiceName(); sn != "" {
+			if runtime.GOOS == "windows" && !filepath.IsAbs(os.Args[0]) {
 				os.Args[0] = sn
 			}
-		}
 
-		// file is not present we are at child
-		if !os.IsNotExist(err) {
-			if err != nil {
-				return err
-			}
-
+			// paths were created we're running as child.
 			return nil
 		}
 
-		commitFilepath := filepath.Join(paths.Home(), commitFile)
+		commitFilepath := filepath.Join(paths.Config(), commitFile)
 		content, err := ioutil.ReadFile(commitFilepath)
 
 		// rename itself
@@ -125,7 +116,7 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 		}
 
 		// create symlink to elastic-agent-{hash}
-		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(os.Args[0]))
+		reexecPath := filepath.Join(paths.Data(), hashedDirName(content), filepath.Base(origExecPath))
 		if err := os.Symlink(reexecPath, origExecPath); err != nil {
 			return err
 		}
@@ -160,7 +151,7 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 			}
 
 			rexLogger := logger.Named("reexec")
-			rm := reexec.Manager(rexLogger, origExecPath)
+			rm := reexec.Manager(rexLogger, reexecPath)
 
 			argsOverrides := []string{
 				"--path.data", paths.Data(),
@@ -199,7 +190,13 @@ func generatePaths(dir, origExec string) error {
 		"path.config":       paths.Config(),
 		"path.service_name": origExec,
 	}
-	pathsCfgPath := filepath.Join("paths.yml")
+
+	destinationDir := dir
+	if runtime.GOOS == "windows" {
+		destinationDir = paths.Config()
+	}
+
+	pathsCfgPath := filepath.Join(destinationDir, "paths.yml")
 	pathsContent, err := yaml.Marshal(pathsCfg)
 	if err != nil {
 		return err
