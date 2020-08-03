@@ -3,6 +3,12 @@
   "processors": [
     {
       "set": {
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "set": {
         "field": "event.created",
         "value": "{{_ingest.timestamp}}"
       }
