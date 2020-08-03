@@ -364,6 +364,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
+- Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 
 *Auditbeat*
 
