@@ -3,6 +3,8 @@
 
 import os
 import json
+import unittest
+
 from filebeat import BaseTest
 
 
