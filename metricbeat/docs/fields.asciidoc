@@ -15830,24 +15830,6 @@ alias to: elasticsearch.node.stats.fs.summary.available.bytes
 
 --
 
-*`node_stats.fs.total.free_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.fs.summary.free.bytes
-
---
-
-*`node_stats.fs.total.total_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.fs.summary.total.bytes
-
---
-
 
 
 *`node_stats.fs.io_stats.total.operations`*::
@@ -15856,15 +15838,6 @@ alias to: elasticsearch.node.stats.fs.summary.total.bytes
 type: alias
 
 alias to: elasticsearch.node.stats.fs.io_stats.total.operations.count
-
---
-
-*`node_stats.fs.io_stats.total.read_kilobytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.fs.io_stats.total.read.kb
 
 --
 
@@ -15877,15 +15850,6 @@ alias to: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
 
 --
 
-*`node_stats.fs.io_stats.total.write_kilobytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.fs.io_stats.total.write.kb
-
---
-
 *`node_stats.fs.io_stats.total.write_operations`*::
 +
 --
@@ -15895,81 +15859,6 @@ alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
 
 --
 
-
-
-*`node_stats.indices.bulk.avg_size_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.bulk.avg_size.bytes
-
---
-
-*`node_stats.indices.bulk.avg_time_in_millis`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.bulk.avg_time.ms
-
---
-
-*`node_stats.indices.bulk.total_operations`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.bulk.operations.total.count
-
---
-
-*`node_stats.indices.bulk.total_size_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.bulk.total_size.bytes
-
---
-
-*`node_stats.indices.bulk.total_time_in_millis`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.bulk.total_time.ms
-
---
-
-
-*`node_stats.indices.docs.count`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.docs.count
-
---
-
-
-*`node_stats.indices.fielddata.evictions`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.fielddata.evictions.count
-
---
-
-*`node_stats.indices.fielddata.memory_size_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
-
---
 
 
 *`node_stats.indices.indexing.index_time_in_millis`*::
@@ -16000,23 +15889,15 @@ alias to: elasticsearch.node.stats.indices.indexing.throttle_time.ms
 --
 
 
-*`node_stats.indices.query_cache.evictions`*::
+*`node_stats.indices.fielddata.memory_size_in_bytes`*::
 +
 --
 type: alias
 
-alias to: elasticsearch.node.stats.indices.query_cache.evictions.count
+alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
 
 --
 
-*`node_stats.indices.query_cache.hit_count`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.query_cache.hits.count
-
---
 
 *`node_stats.indices.query_cache.memory_size_in_bytes`*::
 +
@@ -16027,33 +15908,6 @@ alias to: elasticsearch.node.stats.indices.query_cache.memory.bytes
 
 --
 
-*`node_stats.indices.query_cache.miss_count`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.query_cache.misses.count
-
---
-
-
-*`node_stats.indices.request_cache.evictions`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.request_cache.evictions.count
-
---
-
-*`node_stats.indices.request_cache.hit_count`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.request_cache.hits.count
-
---
 
 *`node_stats.indices.request_cache.memory_size_in_bytes`*::
 +
@@ -16061,15 +15915,6 @@ alias to: elasticsearch.node.stats.indices.request_cache.hits.count
 type: alias
 
 alias to: elasticsearch.node.stats.indices.request_cache.memory.bytes
-
---
-
-*`node_stats.indices.request_cache.miss_count`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.request_cache.misses.count
 
 --
 
@@ -16193,16 +16038,6 @@ alias to: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
 --
 
 
-*`node_stats.indices.store.size_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indices.store.size.bytes
-
---
-
-
 
 
 
@@ -16271,30 +16106,12 @@ alias to: elasticsearch.node.stats.jvm.mem.heap.used.pct
 
 --
 
-*`node_stats.mlockall`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.mlockall
-
---
-
 *`node_stats.node_id`*::
 +
 --
 type: alias
 
 alias to: elasticsearch.node.id
-
---
-
-*`node_stats.node_master`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.master
 
 --
 
@@ -16310,34 +16127,7 @@ alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
 
 --
 
-*`node_stats.os.cpu.load_average.5m`*::
-+
---
-type: alias
 
-alias to: elasticsearch.node.stats.os.cpu.load_avg.5m
-
---
-
-*`node_stats.os.cpu.load_average.15m`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.os.cpu.load_avg.15m
-
---
-
-
-
-*`node_stats.os.cgroup.cpuacct.control_group`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.os.cgroup.cpuacct.control_group
-
---
 
 *`node_stats.os.cgroup.cpuacct.usage_nanos`*::
 +
@@ -16348,24 +16138,6 @@ alias to: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
 
 --
 
-
-*`node_stats.os.cgroup.cpu.control_group`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.os.cgroup.cpu.control_group
-
---
-
-*`node_stats.os.cgroup.cpu.cfs_period_micros`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.os.cgroup.cpu.cfs.period.us
-
---
 
 *`node_stats.os.cgroup.cpu.cfs_quota_micros`*::
 +
@@ -16443,24 +16215,6 @@ alias to: elasticsearch.node.stats.process.cpu.pct
 
 --
 
-*`node_stats.process.max_file_descriptors`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.process.file_descriptors.max.count
-
---
-
-*`node_stats.process.open_file_descriptors`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.process.file_descriptors.open.count
-
---
-
 
 
 *`node_stats.thread_pool.bulk.queue`*::
@@ -16478,43 +16232,6 @@ alias to: elasticsearch.node.stats.thread_pool.bulk.queue.count
 type: alias
 
 alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
-
---
-
-*`node_stats.thread_pool.bulk.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.bulk.threads.count
-
---
-
-
-*`node_stats.thread_pool.generic.queue`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.generic.queue.count
-
---
-
-*`node_stats.thread_pool.generic.rejected`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.generic.rejected.count
-
---
-
-*`node_stats.thread_pool.generic.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.generic.threads.count
 
 --
 
@@ -16537,15 +16254,6 @@ alias to: elasticsearch.node.stats.thread_pool.get.rejected.count
 
 --
 
-*`node_stats.thread_pool.get.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.get.threads.count
-
---
-
 
 *`node_stats.thread_pool.index.queue`*::
 +
@@ -16562,43 +16270,6 @@ alias to: elasticsearch.node.stats.thread_pool.index.queue.count
 type: alias
 
 alias to: elasticsearch.node.stats.thread_pool.index.rejected.count
-
---
-
-*`node_stats.thread_pool.index.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.index.threads.count
-
---
-
-
-*`node_stats.thread_pool.management.queue`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.management.queue.count
-
---
-
-*`node_stats.thread_pool.management.rejected`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.management.rejected.count
-
---
-
-*`node_stats.thread_pool.management.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.management.threads.count
 
 --
 
@@ -16621,43 +16292,6 @@ alias to: elasticsearch.node.stats.thread_pool.search.rejected.count
 
 --
 
-*`node_stats.thread_pool.search.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.search.threads.count
-
---
-
-
-*`node_stats.thread_pool.watcher.queue`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.watcher.queue.count
-
---
-
-*`node_stats.thread_pool.watcher.rejected`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.watcher.rejected.count
-
---
-
-*`node_stats.thread_pool.watcher.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.watcher.threads.count
-
---
-
 
 *`node_stats.thread_pool.write.queue`*::
 +
@@ -16674,15 +16308,6 @@ alias to: elasticsearch.node.stats.thread_pool.write.queue.count
 type: alias
 
 alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
-
---
-
-*`node_stats.thread_pool.write.threads`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.write.threads.count
 
 --
 
@@ -17500,53 +17125,6 @@ type: long
 --
 
 
-*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
-+
---
-type: long
-
-format: bytes
-
---
-
-*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.indices.fielddata.evictions.count`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
 +
 --
@@ -17579,20 +17157,6 @@ type: long
 --
 
 
-*`elasticsearch.node.stats.indices.query_cache.evictions.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.indices.query_cache.hits.count`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
 +
 --
@@ -17602,27 +17166,6 @@ format: bytes
 
 --
 
-*`elasticsearch.node.stats.indices.query_cache.misses.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.indices.request_cache.evictions.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.indices.request_cache.hits.count`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.node.stats.indices.request_cache.memory.bytes`*::
 +
@@ -17630,13 +17173,6 @@ type: long
 type: long
 
 format: bytes
-
---
-
-*`elasticsearch.node.stats.indices.request_cache.misses.count`*::
-+
---
-type: long
 
 --
 
@@ -18033,23 +17569,7 @@ type: long
 
 --
 
-
-*`elasticsearch.node.stats.fs.io_stats.total.read.kb`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.fs.io_stats.total.read.operations.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.fs.io_stats.total.write.kb`*::
 +
 --
 type: long
@@ -18072,28 +17592,6 @@ type: long
 
 --
 
-*`elasticsearch.node.stats.os.cpu.load_avg.5m`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.os.cpu.load_avg.15m`*::
-+
---
-type: long
-
---
-
-
-
-*`elasticsearch.node.stats.os.cgroup.cpuacct.control_group`*::
-+
---
-type: keyword
-
---
 
 *`elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns`*::
 +
@@ -18102,21 +17600,6 @@ type: long
 
 --
 
-
-*`elasticsearch.node.stats.os.cgroup.cpu.control_group`*::
-+
---
-type: keyword
-
---
-
-
-*`elasticsearch.node.stats.os.cgroup.cpu.cfs.period.us`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us`*::
 +
@@ -18173,28 +17656,12 @@ format: bytes
 
 --
 
-
 *`elasticsearch.node.stats.process.cpu.pct`*::
 +
 --
 type: long
 
 format: percent
-
---
-
-
-*`elasticsearch.node.stats.process.file_descriptors.max.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.process.file_descriptors.open.count`*::
-+
---
-type: long
 
 --
 
@@ -18208,35 +17675,6 @@ type: long
 --
 
 *`elasticsearch.node.stats.thread_pool.bulk.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.bulk.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.thread_pool.generic.queue.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.generic.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.generic.threads.count`*::
 +
 --
 type: long
@@ -18258,13 +17696,6 @@ type: long
 
 --
 
-*`elasticsearch.node.stats.thread_pool.get.threads.count`*::
-+
---
-type: long
-
---
-
 
 *`elasticsearch.node.stats.thread_pool.index.queue.count`*::
 +
@@ -18274,35 +17705,6 @@ type: long
 --
 
 *`elasticsearch.node.stats.thread_pool.index.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.index.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.thread_pool.management.queue.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.management.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.management.threads.count`*::
 +
 --
 type: long
@@ -18324,35 +17726,6 @@ type: long
 
 --
 
-*`elasticsearch.node.stats.thread_pool.search.threads.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.node.stats.thread_pool.watcher.queue.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.watcher.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.watcher.threads.count`*::
-+
---
-type: long
-
---
-
 
 *`elasticsearch.node.stats.thread_pool.write.queue.count`*::
 +
@@ -18362,13 +17735,6 @@ type: long
 --
 
 *`elasticsearch.node.stats.thread_pool.write.rejected.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.node.stats.thread_pool.write.threads.count`*::
 +
 --
 type: long
