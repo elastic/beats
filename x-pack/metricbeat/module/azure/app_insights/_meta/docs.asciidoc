@@ -45,17 +45,15 @@ This value is only valid when segment is specified.
 `filter`:: (_string_) An expression used to filter the results.
 This value should be a valid OData filter expression where the keys of each clause should be applicable dimensions for the metric you are retrieving.
 
-Users can select the options to retrieve all metrics from a specific namespace using the following:
+Example configuration:
 
 ["source","yaml"]
 ----
- metrics:
- - id: ["*"]
-   timespan: "Microsoft.Storage/storageAccounts"
+metrics:
+ - id: ["requests/count", "requests/failed"]
+   segment: "request/name"
+   aggregation: ["sum"]
 ----
 
-
-
-A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
 
 

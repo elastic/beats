@@ -526,6 +526,7 @@ func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
 // the application times out during stop and ErrApplication
 func (as *ApplicationState) Stop(timeout time.Duration) error {
 	as.checkinLock.Lock()
+	wasConn := as.checkinDone != nil
 	cfgIdx := as.statusConfigIdx
 	as.expected = proto.StateExpected_STOPPING
 	as.checkinLock.Unlock()
@@ -548,8 +549,10 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 		s := as.status
 		doneChan := as.checkinDone
 		as.checkinLock.RUnlock()
-		if s == proto.StateObserved_STOPPING && doneChan == nil {
-			// sent stopping and now is disconnected (so its stopped)
+		if (wasConn && doneChan == nil) || (!wasConn && s == proto.StateObserved_STOPPING && doneChan == nil) {
+			// either occurred
+			// * client was connected then disconnected on stop
+			// * client was not connected; connected; received stopping; then disconnected
 			as.Destroy()
 			return nil
 		}

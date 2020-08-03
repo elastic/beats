@@ -24,7 +24,6 @@ tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - add_locale: ~
   - add_fields:
       target: ''
       fields:

@@ -132,22 +132,6 @@ This is a list of FortiOS fields that are mapped to ECS.
 
 :fileset_ex!:
 
-[float]
-[[dynamic-script-compilations-sophosxg]]
-=== Dynamic Script Compilations
-
-The `sophosxg` filesets are based on Elasticsearch ingest pipelines and
-make extensive use of script processors and painless conditions. This can cause
-the pipelines to fail loading the first time the module is used, due to exceeding
-the maximum script compilation limits. It is recommended to tune the following
-parameters on your Elasticsearch cluster:
-
-- {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
-  Increase to at least `100/5m`.
-
-- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache.max_size]:
-  Increase to at least `300` if using both filesets or other script-heavy modules.
-
 :modulename!:
 
 
