@@ -24,7 +24,7 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 			c := client.New()
 			err := c.Connect(context.Background())
 			if err != nil {
-				return errors.New(err, "Failed talking to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
+				return errors.New(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
 			}
 			defer c.Disconnect()
 			err = c.Restart(context.Background())
