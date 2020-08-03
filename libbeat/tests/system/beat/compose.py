@@ -238,6 +238,7 @@ class ComposeMixin(object):
                 counter += 1
         return counter > 0
 
+
 @contextmanager
 def disabled_logger(name):
     logger = logging.getLogger(name)
