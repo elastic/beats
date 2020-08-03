@@ -38,6 +38,7 @@ heartbeat.monitors:
 - type: http
   id: service-status
   name: Service Status
+  service_name: my-apm-service-name
   hosts: ["http://localhost:80/service/status"]
   check.response.status: [200]
   schedule: '@every 5s'

@@ -26,7 +26,7 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
-    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
@@ -37,8 +37,18 @@ pipeline {
       agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
-        expression {
-          return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
+        anyOf {
+          triggeredBy cause: "IssueCommentCause"
+          expression {
+            def ret = isUserTrigger() || isUpstreamTrigger()
+            if(!ret){
+              currentBuild.result = 'NOT_BUILT'
+              currentBuild.description = "The build has been skipped"
+              currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+              echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+            }
+            return ret
+          }
         }
       }
       stages {
@@ -178,8 +188,14 @@ def tagAndPush(name){
   if("${env.SNAPSHOT}" == "true"){
     libbetaVer += "-SNAPSHOT"
   }
+
+  def tagName = "${libbetaVer}"
+  if (env.CHANGE_ID?.trim()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
   def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${libbetaVer}"
+  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
   def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
   retry(3){
@@ -212,7 +228,12 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+  if (env.CHANGE_ID?.trim()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+  }
+
+  googleStorageUpload(bucket: "${bucketUri}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",

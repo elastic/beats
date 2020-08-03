@@ -152,7 +152,6 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
-
 		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
 		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
 		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
@@ -300,6 +299,32 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 			t.Fatal("expected value not found")
 		}
 	}
+}
+
+func TestSocketExpirationWithOverwrittenSockets(t *testing.T) {
+	const (
+		sock          uintptr = 0xff1234
+		flowTimeout           = time.Hour
+		socketTimeout         = time.Minute * 3
+		closeTimeout          = time.Minute
+	)
+	st := makeState(nil, (*logWrapper)(t), flowTimeout, socketTimeout, closeTimeout, time.Second)
+	now := time.Now()
+	st.clock = func() time.Time {
+		return now
+	}
+	if err := feedEvents([]event{
+		&inetCreate{Meta: meta(1234, 1236, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1236, 5), Sock: sock},
+		&inetCreate{Meta: meta(1234, 1237, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1237, 5), Sock: sock},
+	}, st, t); err != nil {
+		t.Fatal(err)
+	}
+	now = now.Add(closeTimeout + 1)
+	st.ExpireOlder()
+	now = now.Add(socketTimeout + 1)
+	st.ExpireOlder()
 }
 
 func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {

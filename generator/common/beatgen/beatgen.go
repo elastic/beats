@@ -126,7 +126,6 @@ func Generate() error {
 		return errors.Wrap(err, "error while getting required beats version")
 	}
 
-	mg.Deps(setup.CopyVendor)
 	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {

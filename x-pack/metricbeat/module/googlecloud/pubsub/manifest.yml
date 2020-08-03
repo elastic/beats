@@ -1,7 +1,7 @@
 default: true
 input:
   module: googlecloud
-  metricset: stackdriver
+  metricset: metrics
   defaults:
     metrics:
       - service: pubsub

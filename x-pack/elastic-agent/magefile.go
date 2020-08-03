@@ -40,6 +40,7 @@ const (
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
 	configFile     = "elastic-agent.yml"
+	agentDropPath  = "AGENT_DROP_PATH"
 )
 
 // Aliases for commands required by master makefile
@@ -166,12 +167,15 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
-	binaryName := "configurable"
+	configurableName := "configurable"
+	serviceableName := "serviceable"
 	if runtime.GOOS == "windows" {
-		binaryName += ".exe"
+		configurableName += ".exe"
+		serviceableName += ".exe"
 	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -325,7 +329,7 @@ func commitID() string {
 	return commitID
 }
 
-// Update is an alias for executing fields, dashboards, config, includes.
+// Update is an alias for executing control protocol, configs, and specs.
 func Update() {
 	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
 }
@@ -343,6 +347,11 @@ func CrossBuildGoDaemon() error {
 // Config generates both the short/reference/docker.
 func Config() {
 	mg.Deps(configYML)
+}
+
+// ControlProto generates pkg/agent/control/proto module.
+func ControlProto() error {
+	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
 }
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
@@ -495,26 +504,52 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		version = release.Version()
 	}
 
-	packedBeats := []string{"filebeat", "metricbeat"}
-
-	for _, b := range packedBeats {
-		pwd, err := filepath.Abs(filepath.Join("..", b))
+	// build deps only when drop is not provided
+	if dropPathEnv, found := os.LookupEnv(agentDropPath); !found || len(dropPathEnv) == 0 {
+		// prepare new drop
+		dropPath := filepath.Join("build", "distributions", "elastic-agent-drop")
+		dropPath, err := filepath.Abs(dropPath)
 		if err != nil {
 			panic(err)
 		}
 
-		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
-			continue
+		if err := os.MkdirAll(dropPath, 0755); err != nil {
+			panic(err)
 		}
 
-		cmd := exec.Command("mage", "package")
-		cmd.Dir = pwd
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+		os.Setenv(agentDropPath, dropPath)
 
-		if err := cmd.Run(); err != nil {
-			panic(err)
+		// cleanup after build
+		defer os.RemoveAll(dropPath)
+		defer os.Unsetenv(agentDropPath)
+
+		packedBeats := []string{"filebeat", "metricbeat"}
+
+		for _, b := range packedBeats {
+			pwd, err := filepath.Abs(filepath.Join("..", b))
+			if err != nil {
+				panic(err)
+			}
+
+			if requiredPackagesPresent(pwd, b, version, requiredPackages) {
+				continue
+			}
+
+			cmd := exec.Command("mage", "package")
+			cmd.Dir = pwd
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+			if err := cmd.Run(); err != nil {
+				panic(err)
+			}
+
+			// copy to new drop
+			sourcePath := filepath.Join(pwd, "build", "distributions")
+			if err := copyAll(sourcePath, dropPath); err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -524,6 +559,23 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package)
+}
+
+func copyAll(from, to string) error {
+	return filepath.Walk(from, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		targetFile := filepath.Join(to, info.Name())
+
+		// overwrites with current build
+		return sh.Copy(targetFile, path)
+	})
 }
 
 func dockerTag() string {

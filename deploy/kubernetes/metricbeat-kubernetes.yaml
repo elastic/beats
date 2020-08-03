@@ -234,6 +234,7 @@ data:
         - state_container
         - state_cronjob
         - state_resourcequota
+        - state_statefulset
         # Uncomment this to get k8s events:
         #- event
       period: 10s

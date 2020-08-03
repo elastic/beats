@@ -23,6 +23,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
@@ -66,6 +67,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Node,
+		IsUpdated:   isUpdated,
 	}, nil)
 
 	if err != nil {
@@ -188,6 +190,39 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		},
 	}
 	n.publish(event)
+}
+
+func isUpdated(o, n interface{}) bool {
+	old, _ := o.(*kubernetes.Node)
+	new, _ := n.(*kubernetes.Node)
+
+	// Consider as not update in case one of the two objects is not a Node
+	if old == nil || new == nil {
+		return true
+	}
+
+	// This is a resync. It is not an update
+	if old.ResourceVersion == new.ResourceVersion {
+		return false
+	}
+
+	// If the old object and new object are different
+	oldCopy := old.DeepCopy()
+	oldCopy.ResourceVersion = ""
+
+	newCopy := new.DeepCopy()
+	newCopy.ResourceVersion = ""
+
+	// If the old object and new object are different in either meta or spec then there is a valid change
+	if !equality.Semantic.DeepEqual(oldCopy.Spec, newCopy.Spec) || !equality.Semantic.DeepEqual(oldCopy.ObjectMeta, newCopy.ObjectMeta) {
+		return true
+	}
+
+	// If there is a change in the node status then there is a valid change.
+	if isNodeReady(old) != isNodeReady(new) {
+		return true
+	}
+	return false
 }
 
 func getAddress(node *kubernetes.Node) string {
