@@ -6,8 +6,9 @@ package app_insights
 
 import (
 	"fmt"
-	"github.com/Azure/go-autorest/autorest/date"
 	"strings"
+
+	"github.com/Azure/go-autorest/autorest/date"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 
