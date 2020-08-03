@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -80,7 +81,14 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 	rexLogger := logger.Named("reexec")
-	rex := reexec.Manager(rexLogger, execPath)
+	rex := reexec.NewManager(rexLogger, execPath)
+
+	// start the control listener
+	control := server.New(logger.Named("control"), rex)
+	if err := control.Start(); err != nil {
+		return err
+	}
+	defer control.Stop()
 
 	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
