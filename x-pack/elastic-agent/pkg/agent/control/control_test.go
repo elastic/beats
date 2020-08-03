@@ -20,15 +20,15 @@ import (
 )
 
 func TestServerClient_Version(t *testing.T) {
-	srv := server.New(newErrorLogger(t))
+	srv := server.New(newErrorLogger(t), nil)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
 
 	c := client.New()
-	err = c.Start(context.Background())
+	err = c.Connect(context.Background())
 	require.NoError(t, err)
-	defer c.Stop()
+	defer c.Disconnect()
 
 	ver, err := c.Version(context.Background())
 	require.NoError(t, err)
