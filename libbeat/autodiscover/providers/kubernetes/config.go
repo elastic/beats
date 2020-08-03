@@ -44,7 +44,7 @@ type Config struct {
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
-	// Unique identifies if this provider enables it's templates only when it is elected as leader in a k8s cluster
+	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
 	Unique     bool   `config:"unique"`
 	Identifier string `config:"identifier"`
 
