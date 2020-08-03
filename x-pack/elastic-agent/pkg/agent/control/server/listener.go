@@ -7,18 +7,25 @@
 package server
 
 import (
+	"fmt"
+
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func createListener() (net.Listener, error) {
+func createListener(log *logger.Logger) (net.Listener, error) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		os.Remove(path)
+		err = os.Remove(path)
+		if err != nil {
+			log.Errorf("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
+		}
 	}
 	dir := filepath.Dir(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -40,7 +47,9 @@ func createListener() (net.Listener, error) {
 	return lis, err
 }
 
-func cleanupListener() {
+func cleanupListener(log *logger.Logger) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
-	os.Remove(path)
+	if err := os.Remove(path); err != nil {
+		log.Errorf("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
+	}
 }

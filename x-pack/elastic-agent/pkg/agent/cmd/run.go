@@ -84,7 +84,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	rex := reexec.NewManager(rexLogger, execPath)
 
 	// start the control listener
-	control := server.New(logger.Named("control"))
+	control := server.New(logger.Named("control"), rex)
 	if err := control.Start(); err != nil {
 		return err
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
@@ -21,11 +22,11 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 		Short: "Restart the currently running Elastic Agent daemon",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := client.New()
-			err := c.Start(context.Background())
+			err := c.Connect(context.Background())
 			if err != nil {
-				return errors.New(err, "Failed talking to running daemon")
+				return errors.New(err, "Failed talking to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
 			}
-			defer c.Stop()
+			defer c.Disconnect()
 			err = c.Restart(context.Background())
 			if err != nil {
 				return errors.New(err, "Failed trigger restart of daemon")

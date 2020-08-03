@@ -157,9 +157,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	daemon := client.New()
-	err = daemon.Start(context.Background())
+	err = daemon.Connect(context.Background())
 	if err == nil {
-		defer daemon.Stop()
+		defer daemon.Disconnect()
 		err = daemon.Restart(context.Background())
 		if err == nil {
 			fmt.Fprintln(streams.Out, "Successfully triggered restart on running Elastic Agent.")

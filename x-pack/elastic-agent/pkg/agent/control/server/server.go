@@ -21,14 +21,16 @@ import (
 // Server is the daemon side of the control protocol.
 type Server struct {
 	logger   *logger.Logger
+	rex      reexec.ExecManager
 	listener net.Listener
 	server   *grpc.Server
 }
 
 // New creates a new control protocol server.
-func New(log *logger.Logger) *Server {
+func New(log *logger.Logger, rex reexec.ExecManager) *Server {
 	return &Server{
 		logger: log,
+		rex:    rex,
 	}
 }
 
@@ -39,7 +41,7 @@ func (s *Server) Start() error {
 		return nil
 	}
 
-	lis, err := createListener()
+	lis, err := createListener(s.logger)
 	if err != nil {
 		return err
 	}
@@ -64,7 +66,7 @@ func (s *Server) Stop() {
 		s.server.Stop()
 		s.server = nil
 		s.listener = nil
-		cleanupListener()
+		cleanupListener(s.logger)
 	}
 }
 
@@ -90,8 +92,7 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 
 // Restart performs re-exec.
 func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
-	rex := reexec.Manager()
-	rex.ReExec()
+	s.rex.ReExec()
 	return &proto.RestartResponse{
 		Status: proto.ActionStatus_SUCCESS,
 	}, nil

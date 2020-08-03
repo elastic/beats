@@ -35,9 +35,9 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 			binaryOnly, _ := cmd.Flags().GetBool("binary-only")
 			if !binaryOnly {
 				c := client.New()
-				daemonError = c.Start(context.Background())
+				daemonError = c.Connect(context.Background())
 				if daemonError == nil {
-					defer c.Stop()
+					defer c.Disconnect()
 
 					var version client.Version
 					version, daemonError = c.Version(context.Background())
