@@ -8,7 +8,6 @@ import subprocess
 import unittest
 
 from base import BaseTest
-from unittest import SkipTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -74,7 +73,7 @@ class Test(BaseTest):
         version = self.get_version()
         if semver.compare(version, "6.5.0") == -1:
             # Skip for Kibana versions < 6.5.0 as Kibana Spaces not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template()
         if create_space:
@@ -300,7 +299,7 @@ class Test(BaseTest):
         version = self.get_version()
         if semver.compare(version, "6.5.0") == -1:
             # Skip for Kibana versions < 6.5.0 as Kibana Spaces not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.test_load_dashboard_into_space(False)
 

@@ -1,5 +1,6 @@
 import os
 import unittest
+
 from heartbeat import BaseTest
 from parameterized import parameterized
 
@@ -33,7 +34,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
             # Currently skipped on Windows as fields.yml not generated
-            raise SkipTest
+            raise unittest.SkipTest
         self.assert_fields_are_documented(output[0])
 
     @parameterized.expand([
@@ -63,7 +64,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
             # Currently skipped on Windows as fields.yml not generated
-            raise SkipTest
+            raise unittest.SkipTest
         self.assert_fields_are_documented(output[0])
 
     def test_http_delayed(self):
@@ -200,7 +201,7 @@ class Test(BaseTest):
             self.assert_last_status(status)
             if os.name == "nt":
                 # Currently skipped on Windows as fields.yml not generated
-                raise SkipTest
+                raise unittest.SkipTest
             self.assert_fields_are_documented(output[0])
         finally:
             server.shutdown()
