@@ -49,6 +49,10 @@ func NewConfigFrom(from interface{}) (*Config, error) {
 	}
 
 	if in, ok := from.(io.Reader); ok {
+		if closer, ok := from.(io.Closer); ok {
+			defer closer.Close()
+		}
+
 		content, err := ioutil.ReadAll(in)
 		if err != nil {
 			return nil, err

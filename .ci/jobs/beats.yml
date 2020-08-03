@@ -1,7 +1,7 @@
 ---
 - job:
     name: Beats/beats
-    display-name: 'Beats (replacement)'
+    display-name: 'Beats'
     description: 'Beats Main Pipeline'
     view: Beats
     concurrent: true
