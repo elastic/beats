@@ -1544,7 +1544,7 @@ func ParserRFC5424(data []byte, event *event) {
 	tr25:
 //line parser/common.rl:48
 
-		event.data = map[string]map[string]string{}
+		event.data = EventData{}
 
 		goto st17
 	st17:
