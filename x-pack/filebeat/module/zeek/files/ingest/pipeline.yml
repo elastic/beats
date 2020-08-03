@@ -5,7 +5,7 @@ processors:
     value: '{{_ingest.timestamp}}'
 - set:
     field: event.created
-    value: '{{_ingest.timestamp}}'
+    value: '{{@timestamp}}'
 - date:
     field: zeek.files.ts
     formats:
