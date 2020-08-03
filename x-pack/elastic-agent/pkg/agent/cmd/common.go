@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -92,15 +93,26 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 
 func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		commitFilepath := filepath.Join(paths.Home(), commitFile)
-		content, err := ioutil.ReadFile(commitFilepath)
+		pathsFilePath := filepath.Join(paths.Home(), "paths.yml")
+		_, err := os.Stat(pathsFilePath)
+
+		if runtime.GOOS == "windows" && !filepath.IsAbs(os.Args[0]) {
+			if sn := paths.ServiceName(); sn != "" {
+				os.Args[0] = sn
+			}
+		}
 
 		// file is not present we are at child
-		if os.IsNotExist(err) {
+		if !os.IsNotExist(err) {
+			if err != nil {
+				return err
+			}
+
 			return nil
-		} else if err != nil {
-			return err
 		}
+
+		commitFilepath := filepath.Join(paths.Home(), commitFile)
+		content, err := ioutil.ReadFile(commitFilepath)
 
 		// rename itself
 		origExecPath, err := os.Executable()
@@ -119,48 +131,51 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 		}
 
 		// generate paths
-		if err := generatePaths(filepath.Dir(reexecPath)); err != nil {
+		if err := generatePaths(filepath.Dir(reexecPath), origExecPath); err != nil {
 			return err
 		}
 
-		// reexec
-		pathConfigFile := flags.Config()
-		rawConfig, err := config.LoadYAML(pathConfigFile)
-		if err != nil {
-			return errors.New(err,
-				fmt.Sprintf("could not read configuration file %s", pathConfigFile),
-				errors.TypeFilesystem,
-				errors.M(errors.MetaKeyPath, pathConfigFile))
+		// reexec if running run
+		if cmd.Use == "run" {
+			pathConfigFile := flags.Config()
+			rawConfig, err := config.LoadYAML(pathConfigFile)
+			if err != nil {
+				return errors.New(err,
+					fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+					errors.TypeFilesystem,
+					errors.M(errors.MetaKeyPath, pathConfigFile))
+			}
+
+			cfg, err := configuration.NewFromConfig(rawConfig)
+			if err != nil {
+				return errors.New(err,
+					fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+					errors.TypeFilesystem,
+					errors.M(errors.MetaKeyPath, pathConfigFile))
+			}
+
+			logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+			if err != nil {
+				return err
+			}
+
+			rexLogger := logger.Named("reexec")
+			rm := reexec.Manager(rexLogger, origExecPath)
+
+			argsOverrides := []string{
+				"--path.data", paths.Data(),
+				"--path.home", filepath.Dir(reexecPath),
+				"--path.config", paths.Config(),
+			}
+			rm.ReExec(argsOverrides...)
+
+			// trigger reexec
+			rm.ShutdownComplete()
+
+			// return without running Run method
+			os.Exit(0)
 		}
 
-		cfg, err := configuration.NewFromConfig(rawConfig)
-		if err != nil {
-			return errors.New(err,
-				fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
-				errors.TypeFilesystem,
-				errors.M(errors.MetaKeyPath, pathConfigFile))
-		}
-
-		logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
-		if err != nil {
-			return err
-		}
-
-		rexLogger := logger.Named("reexec")
-		rm := reexec.Manager(rexLogger, reexecPath)
-
-		argsOverrides := []string{
-			"--path.data", paths.Data(),
-			"--path.home", filepath.Dir(reexecPath),
-			"--path.config", paths.Config(),
-		}
-		rm.ReExec(argsOverrides...)
-
-		// trigger reexec
-		rm.ShutdownComplete()
-
-		// return without running Run method
-		os.Exit(0)
 		return nil
 	}
 }
@@ -177,13 +192,14 @@ func hashedDirName(filecontent []byte) string {
 
 	return fmt.Sprintf("elastic-agent-%s", s)
 }
-func generatePaths(dir string) error {
+func generatePaths(dir, origExec string) error {
 	pathsCfg := map[string]interface{}{
-		"--path.data":   paths.Data(),
-		"--path.home":   dir,
-		"--path.config": paths.Config(),
+		"path.data":         paths.Data(),
+		"path.home":         dir,
+		"path.config":       paths.Config(),
+		"path.service_name": origExec,
 	}
-	pathsCfgPath := filepath.Join(dir, "paths.yml")
+	pathsCfgPath := filepath.Join("paths.yml")
 	pathsContent, err := yaml.Marshal(pathsCfg)
 	if err != nil {
 		return err

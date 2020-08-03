@@ -13,43 +13,57 @@ import (
 )
 
 var (
-	homePath   string
-	configPath string
-	dataPath   string
-	logsPath   string
+	homePath    string
+	configPath  string
+	dataPath    string
+	logsPath    string
+	serviceName string
 )
 
-type paths struct {
-	HomePath   string `yaml:"path.home"`
-	ConfigPath string `yaml:"path.config"`
-	DataPath   string `yaml:"path.data"`
-	LogsPath   string `yaml:"path.logs"`
-}
-
 func init() {
-	defaults := getDefaultValues()
+	exePath := retrieveExecutablePath()
 
 	fs := flag.CommandLine
-	fs.StringVar(&homePath, "path.home", defaults.HomePath, "Agent root path")
-	fs.StringVar(&configPath, "path.config", defaults.ConfigPath, "Config path is the directory Agent looks for its config file")
-	fs.StringVar(&dataPath, "path.data", defaults.DataPath, "Data path contains Agent managed binaries")
-	fs.StringVar(&logsPath, "path.logs", defaults.LogsPath, "Logs path contains Agent log output")
+	fs.StringVar(&homePath, "path.home", exePath, "Agent root path")
+	fs.StringVar(&configPath, "path.config", exePath, "Config path is the directory Agent looks for its config file")
+	fs.StringVar(&dataPath, "path.data", filepath.Join(exePath, "data"), "Data path contains Agent managed binaries")
+	fs.StringVar(&logsPath, "path.logs", exePath, "Logs path contains Agent log output")
+
+	getOverrides()
 }
 
-func getDefaultValues() paths {
-	exePath := retrieveExecutablePath()
-	defaults := paths{
-		HomePath:   exePath,
-		ConfigPath: exePath,
-		DataPath:   filepath.Join(exePath, "data"),
-		LogsPath:   exePath,
+func getOverrides() {
+	type paths struct {
+		HomePath    string `config:"path.home" yaml:"path.home"`
+		ConfigPath  string `config:"path.config" yaml:"path.config"`
+		DataPath    string `config:"path.data" yaml:"path.data"`
+		LogsPath    string `config:"path.logs" yaml:"path.logs"`
+		ServiceName string `config:"path.service_name" yaml:"path.service_name"`
 	}
 
-	if rawConfig, err := config.LoadYAML("paths.yml"); err == nil {
-		rawConfig.Unpack(&defaults)
+	defaults := &paths{
+		HomePath:   homePath,
+		ConfigPath: configPath,
+		DataPath:   dataPath,
+		LogsPath:   logsPath,
 	}
 
-	return defaults
+	pathsFile := filepath.Join(homePath, "paths.yml")
+	rawConfig, err := config.LoadYAML(pathsFile)
+	if err == nil {
+		rawConfig.Unpack(defaults)
+	}
+
+	homePath = defaults.HomePath
+	configPath = defaults.ConfigPath
+	dataPath = defaults.DataPath
+	logsPath = defaults.LogsPath
+	serviceName = defaults.ServiceName
+}
+
+// ServiceName return predefined service name if defined by initial call.
+func ServiceName() string {
+	return serviceName
 }
 
 // Home returns a directory where binary lives
