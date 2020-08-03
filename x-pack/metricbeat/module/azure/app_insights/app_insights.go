@@ -22,7 +22,7 @@ type Config struct {
 	ApplicationId string        `config:"application_id"    validate:"required"`
 	ApiKey        string        `config:"api_key" validate:"required"`
 	Period        time.Duration `config:"period" validate:"nonzero,required"`
-	Metrics       []Metric      `config:"metrics"`
+	Metrics       []Metric      `config:"metrics" validate:"required"`
 }
 
 // Metric struct used for configuration options
