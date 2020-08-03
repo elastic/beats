@@ -1,0 +1,60 @@
+description: Pipeline for parsing Zoom account webhooks
+processors:
+- append:
+    field: event.category
+    value: iam
+- append:
+    field: event.type
+    value: user
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'account.created'
+- append:
+    field: event.type
+    value: change
+    if: "['account.updated', 'account.settings_updated', 'account.disassociated'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.operator
+    target_field: source.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.operator_id
+    target_field: source.user.id
+    ignore_missing: true
+- rename:
+    field: zoom.account_id
+    target_field: zoom.master_account_id
+    ignore_missing: true
+- rename:
+    field: zoom.object.id
+    target_field: zoom.sub_account_id
+    ignore_missing: true
+- rename:
+    field: zoom.object.owner_id
+    target_field: destination.user.id
+    ignore_missing: true
+- rename:
+    field: zoom.object.owner_id
+    target_field: destination.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.object
+    target_field: zoom.account
+    if: ctx?.event?.action != 'account.created'
+- rename:
+    field: zoom.old_object
+    target_field: zoom.old_account
+    if: ctx?.event?.action != 'account.created'
+- append:
+    field: related.user
+    value: "{{source.user.idl}}"
+    if: "ctx.source?.user?.id != null"
+- append:
+    field: related.user
+    value: "{{destination.user.id}}"
+    if: "ctx.destination?.user?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

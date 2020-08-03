@@ -1,5 +1,14 @@
-description: Pipeline for parsing checkpoint firewall logs
+description: Initial pipeline for parsing Zoom webhooks
 processors:
+- set:
+    field: observer.vendor
+    target_field: Zoom
+- set:
+    field: observer.product
+    target_field: Webhook
+- append:
+    field: event.kind
+    value: event
 - rename:
     field: zoom.event
     target_field: event.action

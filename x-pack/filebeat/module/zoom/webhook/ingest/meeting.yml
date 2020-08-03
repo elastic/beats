@@ -1,0 +1,50 @@
+description: Pipeline for parsing Zoom meeting webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+    if: ctx?.event?.action != meeting.alert
+- append:
+    field: event.type
+    value: creation
+    if: "['meeting.registration_created', 'meeting.created'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'meeting.deleted'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.event?.action == 'meeting.updated'
+- append:
+    field: event.type
+    value: start
+    if: ctx?.event?.action == 'meeting.started'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.event?.action == 'meeting.ended'
+- rename:
+    field: zoom.operator
+    target_field: source.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.operator_id
+    target_field: source.user.id
+    ignore_missing: true
+- rename:
+    field: zoom.object
+    target_field: zoom.meeting
+    ignore_missing: true
+- rename:
+    field: zoom.old_object
+    target_field: zoom.old_meeting
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{source.user.id}}"
+    if: "ctx.source?.user?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

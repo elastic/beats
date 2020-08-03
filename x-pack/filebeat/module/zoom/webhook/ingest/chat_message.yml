@@ -1,0 +1,49 @@
+description: Pipeline for parsing Zoom chat_message webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'chat_message.sent'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'chat_message.deleted'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.event?.action == 'chat_message.updated'
+- rename:
+    field: zoom.operator
+    target_field: source.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.operator_id
+    target_field: source.user.id
+    ignore_missing: true
+- rename:
+    field: zoom.object
+    target_field: zoom.chat
+    ignore_missing: true
+- rename:
+    field: zoom.chat.contact_email
+    target_field: destination.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.chat.contact_id
+    target_field: destination.user.id
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{source.user.id}}"
+    if: "ctx.source?.user?.id != null"
+- append:
+    field: related.user
+    value: "{{destination.user.id}}"
+    if: "ctx.destination?.user?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

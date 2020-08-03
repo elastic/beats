@@ -1,0 +1,44 @@
+description: Pipeline for parsing Zoom chat_channel webhooks
+processors:
+- append:
+    field: event.type
+    value: user
+    if: "['chat_channel.member_invited', 'chat_channel.member_joined', 'chat_channel.member_left'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'chat_channel.created'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'chat_channel.deleted'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.event?.action == 'chat_channel.deleted'
+- rename:
+    field: zoom.operator
+    target_field: source.user.email
+    ignore_missing: true
+- rename:
+    field: zoom.operator_id
+    target_field: source.user.id
+    ignore_missing: true
+- rename:
+    field: zoom.object
+    target_field: zoom.channel
+    ignore_missing: true
+- foreach:
+    field: zoom.channel.members
+    processor:
+      append:
+        field: related.user
+        value: "{{_ingest._value.id}}"
+- append:
+    field: related.user
+    value: "{{source.user.id}}"
+    if: "ctx.source?.user?.id != null"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
