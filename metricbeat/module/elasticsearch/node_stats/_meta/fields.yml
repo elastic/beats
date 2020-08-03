@@ -30,26 +30,9 @@
           type: long
           description: >
             Total size of the store in bytes.
-        - name: bulk
-          type: group
-          fields:
-            - name: avg_size.bytes
-              type: long
-              format: bytes
-            - name: avg_time.ms
-              type: long
-            - name: operations.total.count
-              type: long
-            - name: total_size.bytes
-              type: long
-              format: bytes
-            - name: total_time.ms
-              type: long
         - name: fielddata
           type: group
           fields:
-            - name: evictions.count
-              type: long
             - name: memory.bytes
               type: long
               format: bytes
@@ -65,27 +48,15 @@
         - name: query_cache
           type: group
           fields:
-            - name: evictions.count
-              type: long
-            - name: hits.count
-              type: long
             - name: memory.bytes
               type: long
               format: bytes
-            - name: misses.count
-              type: long
         - name: request_cache
           type: group
           fields:
-            - name: evictions.count
-              type: long
-            - name: hits.count
-              type: long
             - name: memory.bytes
               type: long
               format: bytes
-            - name: misses.count
-              type: long
         - name: search
           type: group
           fields:
@@ -274,20 +245,10 @@
               fields:
                 - name: operations.count
                   type: long
-                - name: read
-                  type: group
-                  fields:
-                    - name: kb
-                      type: long
-                    - name: operations.count
-                      type: long
-                - name: write
-                  type: group
-                  fields:
-                    - name: kb
-                      type: long
-                    - name: operations.count
-                      type: long
+                - name: read.operations.count
+                  type: long
+                - name: write.operations.count
+                  type: long
     - name: os
       type: group
       fields:
@@ -296,32 +257,16 @@
           fields:
             - name: load_avg.1m
               type: long
-            - name: load_avg.5m
-              type: long
-            - name: load_avg.15m
-              type: long
         - name: cgroup
           type: group
           fields:
-            - name: cpuacct
-              type: group
-              fields:
-                - name: control_group
-                  type: keyword
-                - name: usage.ns
-                  type: long
+            - name: cpuacct.usage.ns
+              type: long
             - name: cpu
               type: group
               fields:
-                - name: control_group
-                  type: keyword
-                - name: cfs
-                  type: group
-                  fields:
-                    - name: period.us
-                      type: long
-                    - name: quota.us
-                      type: long
+                - name: cfs.quota.us
+                  type: long
                 - name: stat
                   type: group
                   fields:
@@ -342,19 +287,9 @@
                 - name: usage.bytes
                   type: long
                   format: bytes
-    - name: process
-      type: group
-      fields:
-        - name: cpu.pct
-          type: long
-          format: percent
-        - name: file_descriptors
-          type: group
-          fields:
-            - name: max.count
-              type: long
-            - name: open.count
-              type: long
+    - name: process.cpu.pct
+      type: long
+      format: percent
     - name: thread_pool
       type: group
       fields:
@@ -365,25 +300,12 @@
               type: long
             - name: rejected.count
               type: long
-            - name: threads.count
-              type: long
-        - name: generic
-          type: group
-          fields:
-            - name: queue.count
-              type: long
-            - name: rejected.count
-              type: long
-            - name: threads.count
-              type: long
         - name: get
           type: group
           fields:
             - name: queue.count
               type: long
             - name: rejected.count
-              type: long
-            - name: threads.count
               type: long
         - name: index
           type: group
@@ -392,17 +314,6 @@
               type: long
             - name: rejected.count
               type: long
-            - name: threads.count
-              type: long
-        - name: management
-          type: group
-          fields:
-            - name: queue.count
-              type: long
-            - name: rejected.count
-              type: long
-            - name: threads.count
-              type: long
         - name: search
           type: group
           fields:
@@ -410,25 +321,12 @@
               type: long
             - name: rejected.count
               type: long
-            - name: threads.count
-              type: long
-        - name: watcher
-          type: group
-          fields:
-            - name: queue.count
-              type: long
-            - name: rejected.count
-              type: long
-            - name: threads.count
-              type: long
         - name: write
           type: group
           fields:
             - name: queue.count
               type: long
             - name: rejected.count
-              type: long
-            - name: threads.count
               type: long
 
 
