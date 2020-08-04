@@ -54,7 +54,7 @@ func TestDataNameFilter(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.Equal(t, 3, len(data))
+	assert.Equal(t, 4, len(data))
 }
 
 func TestDataEmptyFilter(t *testing.T) {
@@ -73,7 +73,7 @@ func TestDataEmptyFilter(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.Equal(t, 10, len(data))
+	assert.Equal(t, 11, len(data))
 }
 
 func TestDiskIOStat_CalIOStatistics(t *testing.T) {
