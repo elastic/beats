@@ -9,8 +9,6 @@ package control
 import (
 	"crypto/sha256"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
@@ -20,6 +18,5 @@ func Address() string {
 	data := paths.Data()
 	// entire string cannot be longer than 107 characters, this forces the
 	// length to always be 88 characters (but unique per data path)
-	path := filepath.Join(os.TempDir(), fmt.Sprintf("elastic-agent-%x.sock", sha256.Sum256([]byte(data))))
-	return fmt.Sprintf(`unix://%s`, path)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent-%x.sock`, sha256.Sum256([]byte(data)))
 }
