@@ -25,11 +25,7 @@ processors:
 - rename:
     field: zoom.object
     target_field: zoom.account
-    if: ctx?.event?.action != 'account.created'
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_account
-    if: ctx?.event?.action != 'account.created'
+    ignore_missing: true
 - append:
     field: related.user
     value: "{{zoom.account.owner_id}}"

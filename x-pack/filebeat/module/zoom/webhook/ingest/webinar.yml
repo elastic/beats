@@ -40,10 +40,6 @@ processors:
     field: zoom.object
     target_field: zoom.webinar
     ignore_missing: true
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_webinar
-    ignore_missing: true
 - append:
     field: related.user
     value: "{{zoom.webinar.host_id}}"

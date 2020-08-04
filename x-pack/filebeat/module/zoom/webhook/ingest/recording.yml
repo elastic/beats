@@ -6,15 +6,15 @@ processors:
 - append:
     field: event.type
     value: creation
-    if: "ctx?.event?.action == recording.registration_created"
+    if: ctx?.event?.action == 'recording.registration_created'
 - append:
     field: event.type
     value: allowed
-    if: "ctx?.event?.action == recording.registration_approved"
+    if: ctx?.event?.action == 'recording.registration_approved'
 - append:
     field: event.type
     value: denied
-    if: "ctx?.event?.action == recording.registration_denied"
+    if: ctx?.event?.action == 'recording.registration_denied'
 - append:
     field: event.type
     value: deletion
@@ -26,7 +26,7 @@ processors:
 - append:
     field: event.type
     value: start
-    if: "ctx?.event?.action == recording.started"
+    if: ctx?.event?.action == 'recording.started'
 - append:
     field: event.type
     value: end
@@ -34,10 +34,6 @@ processors:
 - rename:
     field: zoom.object
     target_field: zoom.recording
-    ignore_missing: true
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_recording
     ignore_missing: true
 - append:
     field: related.user

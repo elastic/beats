@@ -3,15 +3,15 @@ processors:
 - append:
     field: event.type
     value: info
-    if: ctx?.event?.action != meeting.alert
+    if: ctx?.event?.action != 'meeting.alert'
 - append:
     field: event.type
     value: error
-    if: ctx?.event?.action == meeting.alert
+    if: ctx?.event?.action == 'meeting.alert'
 - append:
     field: event.type
     value: allowed
-    if: ctx?.event?.action == meeting.registration_approved
+    if: ctx?.event?.action == 'meeting.registration_approved'
 - append:
     field: event.type
     value: creation
@@ -35,10 +35,6 @@ processors:
 - rename:
     field: zoom.object
     target_field: zoom.meeting
-    ignore_missing: true
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_meeting
     ignore_missing: true
 - append:
     field: related.user

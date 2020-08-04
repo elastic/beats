@@ -6,7 +6,7 @@ processors:
 - append:
     field: event.type
     value: creation
-    if: ctx?.event?.action != user.created
+    if: ctx?.event?.action != 'user.created'
 - append:
     field: event.type
     value: deletion
@@ -26,10 +26,6 @@ processors:
 - rename:
     field: zoom.object
     target_field: zoom.user
-    ignore_missing: true
-- rename:
-    field: zoom.old_object
-    target_field: zoom.old_user
     ignore_missing: true
 - append:
     field: related.user

@@ -10,11 +10,8 @@ var:
   - name: content_type
     default: ""
   - name: response_code
-    default: 200
   - name: response_body
-    default: '{"message": "success"}'
   - name: url
-    default: /
   - name: prefix
     default: zoom
   - name: basic_auth
@@ -28,12 +25,12 @@ var:
     default: [zoom-webhook, forwarded]
 
 ingest_pipeline:
+  - ingest/pipeline.yml
   - ingest/account.yml
   - ingest/chat_channel.yml
   - ingest/chat_message.yml
   - ingest/meeting.yml
   - ingest/phone.yml
-  - ingest/pipeline.yml
   - ingest/recording.yml
   - ingest/user.yml
   - ingest/webinar.yml
