@@ -436,6 +436,28 @@ func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error)
 	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
 }
 
+// GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
+func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
+	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
+	if err != nil {
+		return "", err
+	}
+
+	var response struct {
+		Nodes map[string]interface{} `json:"nodes"`
+	}
+
+	if err := json.Unmarshal(content, &response); err != nil {
+		return "", err
+	}
+
+	for nodeID, _ := range response.Nodes {
+		return nodeID, nil
+	}
+
+	return "", errors.New("could not determine master node ID")
+}
+
 // PassThruField copies the field at the given path from the given source data object into
 // the same path in the given target data object.
 func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
