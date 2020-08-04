@@ -7,7 +7,9 @@ package operation
 import (
 	"fmt"
 	"math/rand"
+	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -27,17 +29,26 @@ func TestMain(m *testing.M) {
 		Cmd:  "configurable",
 		Args: []string{},
 	}
-
-	program.Supported = append(program.Supported, configurableSpec)
-
-	p := getProgram("configurable", "1.0")
-	spec := p.Spec()
-	path := spec.BinaryPath
-	if runtime.GOOS == "windows" {
-		path += ".exe"
+	port, err := getFreePort()
+	if err != nil {
+		panic(err)
 	}
-	if s, err := os.Stat(path); err != nil || s == nil {
-		panic(fmt.Errorf("binary not available %s", spec.BinaryPath))
+	serviceSpec := program.Spec{
+		ServicePort: port,
+		Name:        "serviceable",
+		Cmd:         "serviceable",
+		Args:        []string{fmt.Sprintf("%d", port)},
+	}
+
+	program.Supported = append(program.Supported, configurableSpec, serviceSpec)
+	program.SupportedMap["configurable"] = configurableSpec
+	program.SupportedMap["serviceable"] = serviceSpec
+
+	if err := isAvailable("configurable", "1.0"); err != nil {
+		panic(err)
+	}
+	if err := isAvailable("serviceable", "1.0"); err != nil {
+		panic(err)
 	}
 
 	os.Exit(m.Run())
@@ -365,4 +376,94 @@ func TestConfigurableStartStop(t *testing.T) {
 			return nil
 		})
 	}
+}
+
+func TestConfigurableService(t *testing.T) {
+	p := getProgram("serviceable", "1.0")
+
+	operator := getTestOperator(t, downloadPath, installPath, p)
+	if err := operator.start(p, nil); err != nil {
+		t.Fatal(err)
+	}
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
+
+	// emulating a service, so we need to start the binary here in the test
+	spec := p.Spec()
+	cmd := exec.Command(spec.BinaryPath, fmt.Sprintf("%d", p.ServicePort()))
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd.Dir = filepath.Dir(spec.BinaryPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Running {
+			return fmt.Errorf("process never went to running")
+		}
+		return nil
+	})
+
+	// try to configure
+	cfg := make(map[string]interface{})
+	tstFilePath := filepath.Join(os.TempDir(), fmt.Sprintf("tmp%d", rand.Uint32()))
+	cfg["TestFile"] = tstFilePath
+	if err := operator.pushConfig(p, cfg); err != nil {
+		t.Fatalf("failed to config: %v", err)
+	}
+
+	waitFor(t, func() error {
+		if s, err := os.Stat(tstFilePath); err != nil || s == nil {
+			return fmt.Errorf("failed to create a file using Config call %s", tstFilePath)
+		}
+		return nil
+	})
+
+	items := operator.State()
+	item0, ok := items[p.ID()]
+	if !ok || item0.Status != state.Running {
+		t.Fatalf("Process no longer running after config %#v", items)
+	}
+
+	// stop the process
+	if err := operator.stop(p); err != nil {
+		t.Fatalf("Failed to stop service: %v", err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		t.Fatalf("Process failed: %v", err)
+	}
+}
+
+func isAvailable(name, version string) error {
+	p := getProgram(name, version)
+	spec := p.Spec()
+	path := spec.BinaryPath
+	if runtime.GOOS == "windows" {
+		path += ".exe"
+	}
+	if s, err := os.Stat(path); err != nil || s == nil {
+		return fmt.Errorf("binary not available %s", spec.BinaryPath)
+	}
+	return nil
+}
+
+// getFreePort finds a free port.
+func getFreePort() (int, error) {
+	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	if err != nil {
+		return 0, err
+	}
+	l, err := net.ListenTCP("tcp", addr)
+	if err != nil {
+		return 0, err
+	}
+	defer l.Close()
+	return l.Addr().(*net.TCPAddr).Port, nil
 }

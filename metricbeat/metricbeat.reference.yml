@@ -273,12 +273,9 @@ metricbeat.modules:
   #password: "changeme"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Set to false to fetch all entries
   #index_recovery.active_only: true
-
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
+  #scope: node
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -647,8 +644,10 @@ metricbeat.modules:
 #-------------------------------- MySQL Module --------------------------------
 - module: mysql
   metricsets:
-    - "status"
-  #  - "galera_status"
+    - status
+  #  - galera_status
+  #  - performance
+  #  - query
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"

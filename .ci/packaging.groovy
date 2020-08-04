@@ -26,7 +26,7 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
-    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
@@ -222,7 +222,12 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+  if (env.CHANGE_ID?.trim()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+  }
+
+  googleStorageUpload(bucket: "${bucketUri}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",

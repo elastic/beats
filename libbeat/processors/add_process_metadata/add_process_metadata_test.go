@@ -49,12 +49,42 @@ func TestAddProcessMetadata(t *testing.T) {
 			ppid:      0,
 			startTime: startTime,
 		},
+		3: {
+			name:  "systemd",
+			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:   "/usr/lib/systemd/systemd",
+			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			env: map[string]string{
+				"HOME":       "/",
+				"TERM":       "linux",
+				"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+				"LANG":       "en_US.UTF-8",
+			},
+			pid:       1,
+			ppid:      0,
+			startTime: startTime,
+		},
 	}
 
 	// mock of the cgroup processCgroupPaths
 	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
 		testMap := map[int]map[string]string{
-			1: map[string]string{
+			1: {
+				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+			},
+			2: {
 				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -507,6 +537,60 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "no process metadata available",
+			config: common.MapStr{
+				"match_pids":   []string{"system.process.ppid"},
+				"cgroup_regex": "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "2",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "2",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "no container id available",
+			config: common.MapStr{
+				"match_pids":   []string{"system.process.ppid"},
+				"cgroup_regex": "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "3",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "3",
+					},
+				},
+				"process": common.MapStr{
+					"name":       "systemd",
+					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+					"executable": "/usr/lib/systemd/systemd",
+					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+					"pid":        1,
+					"ppid":       0,
+					"start_time": startTime,
 				},
 			},
 		},

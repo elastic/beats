@@ -60,7 +60,7 @@ require (
 	github.com/elastic/ecs v1.5.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
 	github.com/elastic/go-concert v0.0.3
-	github.com/elastic/go-libaudit/v2 v2.0.0
+	github.com/elastic/go-libaudit/v2 v2.0.1
 	github.com/elastic/go-licenser v0.3.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
@@ -163,13 +163,14 @@ require (
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1
+	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200701041122-1837592efa10
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.29.1
+	google.golang.org/protobuf v1.23.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528

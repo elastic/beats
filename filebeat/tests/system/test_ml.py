@@ -106,7 +106,7 @@ class Test(BaseTest):
 
         # Skipping dashboard loading to speed up tests
         cmd += ["-E", "setup.dashboards.enabled=false"]
-        cmd += ["setup", "--machine-learning"]
+        cmd += ["setup", "--machine-learning", "--dashboards"]
         if modules_flag:
             cmd += ["--modules=nginx"]
 
