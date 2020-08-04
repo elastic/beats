@@ -1,5 +1,5 @@
 - key: zoom
   title: Zoom
   description: >
-    Some Zoom module
+    Module for handling incoming Zoom webhook requests
   fields:

@@ -1,8 +1,9 @@
 [
     {
-        "@timestamp": "2020-08-04T18:53:26.130Z",
+        "@timestamp": "2020-08-04T20:19:16.920Z",
         "event.action": "chat_channel.created",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:18.012505Z",
         "event.kind": [
             "event"
         ],
@@ -36,9 +37,10 @@
         "zoom.operator_id": "z8dfgdfguQrdfgdf"
     },
     {
-        "@timestamp": "2020-08-04T18:53:26.131Z",
+        "@timestamp": "2020-08-04T20:19:16.921Z",
         "event.action": "chat_channel.member_invited",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:18.012902Z",
         "event.kind": [
             "event"
         ],

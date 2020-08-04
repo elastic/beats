@@ -40,7 +40,7 @@
     - name: account.owner_id
       type: keyword
       description: >
-        UserID of the related user the action was performed on
+        UserID of the user whose sub account was created/disassociated
     - name: account.email
       type: keyword
       description: >
@@ -48,7 +48,7 @@
     - name: account.owner_email
       type: keyword
       description: >
-        Email related to a sub account which was disassociated
+        Email of the user whose sub account was created/disassociated
     - name: account.account_name
       type: keyword
       description: >
@@ -416,7 +416,7 @@
     - name: user.date_time
       type: date
       description: >
-        The date and time when user logged inor out
+        The date and time when user logged in or out
     - name: user.client_type
       type: keyword
       description: >
@@ -512,19 +512,19 @@
     - name: zoomroom.alert_type
       type: keyword
       description: >
-        A integer value representing the type of alert. The list of alert types can be found in the Zoom documentation
+        An integer value representing the type of alert. The list of alert types can be found in the Zoom documentation
     - name: zoomroom.component
       type: keyword
       description: >
-        A integer value representing the type of equipment or component, The list of component types can be found in the Zoom documentation
+        An integer value representing the type of equipment or component, The list of component types can be found in the Zoom documentation
     - name: zoomroom.alert_kind
       type: keyword
       description: >
-        A integer value showing if the Zoom room alert has been either 1(Triggered) or 2(Cleared)
+        An integer value showing if the Zoom room alert has been either 1(Triggered) or 2(Cleared)
     - name: registrant.id
       type: keyword
       description: >
-        Unique ID of the user registrating to a meeting or webinar
+        Unique ID of the user registering to a meeting or webinar
     - name: registrant.status
       type: keyword
       description: >
@@ -532,67 +532,67 @@
     - name: registrant.email
       type: keyword
       description: >
-        Email of the user registrating to a meeting or webinar
+        Email of the user registering to a meeting or webinar
     - name: registrant.first_name
       type: keyword
       description: >
-        First name of the user registrating to a meeting or webinar
+        First name of the user registering to a meeting or webinar
     - name: registrant.last_name
       type: keyword
       description: >
-        Last name of the user registrating to a meeting or webinar
+        Last name of the user registering to a meeting or webinar
     - name: registrant.address
       type: keyword
       description: >
-        Address of the user registrating to a meeting or webinar
+        Address of the user registering to a meeting or webinar
     - name: registrant.city
       type: keyword
       description: >
-        City of the user registrating to a meeting or webinar
+        City of the user registering to a meeting or webinar
     - name: registrant.country
       type: keyword
       description: >
-        Country of the user registrating to a meeting or webinar
+        Country of the user registering to a meeting or webinar
     - name: registrant.zip
       type: keyword
       description: >
-        Zip code of the user registrating to a meeting or webinar
+        Zip code of the user registering to a meeting or webinar
     - name: registrant.state
       type: keyword
       description: >
-        State of the user registrating to a meeting or webinar
+        State of the user registering to a meeting or webinar
     - name: registrant.phone
       type: keyword
       description: >
-        Phone number of the user registrating to a meeting or webinar
+        Phone number of the user registering to a meeting or webinar
     - name: registrant.industry
       type: keyword
       description: >
-        Related industry of the user registrating to a meeting or webinar
+        Related industry of the user registering to a meeting or webinar
     - name: registrant.org
       type: keyword
       description: >
-        Organization related to the user registrating to a meeting or webinar
+        Organization related to the user registering to a meeting or webinar
     - name: registrant.job_title
       type: keyword
       description: >
-        Job title of the user registrating to a meeting or webinar
+        Job title of the user registering to a meeting or webinar
     - name: registrant.purchasing_time_frame
       type: keyword
       description: >
-        Choosen purchase timeframe of the user registrating to a meeting or webinar
+        Choosen purchase timeframe of the user registering to a meeting or webinar
     - name: registrant.role_in_purchase_process
       type: keyword
       description: >
-        Choosen role in a purchase process related to the user registrating to a meeting or webinar
+        Choosen role in a purchase process related to the user registering to a meeting or webinar
     - name: registrant.no_of_employees
       type: keyword
       description: >
-        Number of employees choosen by the user registrating to a meeting or webinar
+        Number of employees choosen by the user registering to a meeting or webinar
     - name: registrant.comments
       type: keyword
       description: >
-        Comments left by the user registrating to a meeting or webinar
+        Comments left by the user registering to a meeting or webinar
     - name: registrant.join_url
       type: keyword
       description: >
@@ -640,8 +640,8 @@
     - name: old_values
       type: flattened
       description: >
-        test
+        Includes the old values when updating a object like user, meeting, account or webinar
     - name: settings
       type: flattened
       description: >
-        test
+        The current active settings related to a object like user, meeting, account or webinar

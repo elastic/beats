@@ -3,6 +3,11 @@ processors:
 - append:
     field: event.type
     value: iam
+    if: "!['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: authentication
+    if: "['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
 - append:
     field: event.type
     value: creation

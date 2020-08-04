@@ -1,8 +1,9 @@
 [
     {
-        "@timestamp": "2020-08-04T18:53:30.374Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.created",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.229469Z",
         "event.kind": [
             "event"
         ],
@@ -34,9 +35,10 @@
         "zoom.user.type": "3"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.374Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.invitation_accepted",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.229660Z",
         "event.kind": [
             "event"
         ],
@@ -67,9 +69,10 @@
         "zoom.user.type": 1
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.374Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.229764Z",
         "event.kind": [
             "event"
         ],
@@ -104,9 +107,10 @@
         "zoom.user.id": "uLobbbbbbbb_qQsQ"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.settings_updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.229871Z",
         "event.kind": [
             "event"
         ],
@@ -141,9 +145,10 @@
         "zoom.user.id": "uL34AAbbbbAAAAAAQsQ"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.settings_updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.229982Z",
         "event.kind": [
             "event"
         ],
@@ -178,9 +183,10 @@
         "zoom.user.id": "fdhjfdhsj536274gfd"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.deactivated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230087Z",
         "event.kind": [
             "event"
         ],
@@ -215,9 +221,10 @@
         "zoom.user.type": 1
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.activated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230201Z",
         "event.kind": [
             "event"
         ],
@@ -252,9 +259,10 @@
         "zoom.user.type": 3
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.133Z",
         "event.action": "user.disassociated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230301Z",
         "event.kind": [
             "event"
         ],
@@ -289,9 +297,10 @@
         "zoom.user.type": 3
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.134Z",
         "event.action": "user.deleted",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230406Z",
         "event.kind": [
             "event"
         ],
@@ -326,9 +335,10 @@
         "zoom.user.type": "3"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.134Z",
         "event.action": "user.presence_status_updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230508Z",
         "event.kind": [
             "event"
         ],
@@ -359,9 +369,10 @@
         "zoom.user.presence_status": "Available"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.134Z",
         "event.action": "user.personal_notes_updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230602Z",
         "event.kind": [
             "event"
         ],
@@ -393,16 +404,17 @@
         "zoom.user.personal_notes": "Out of Office until February 31"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.134Z",
         "event.action": "user.signed_in",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230693Z",
         "event.kind": [
             "event"
         ],
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
+            "authentication",
             "creation",
             "start"
         ],
@@ -427,16 +439,17 @@
         "zoom.user.version": "4.5.3308.0902"
     },
     {
-        "@timestamp": "2020-08-04T18:53:30.375Z",
+        "@timestamp": "2020-08-04T20:19:21.134Z",
         "event.action": "user.signed_out",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:22.230781Z",
         "event.kind": [
             "event"
         ],
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
+            "authentication",
             "creation",
             "end"
         ],

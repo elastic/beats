@@ -7,9 +7,9 @@
 == Zoom module
 beta[]
 
-This is a module for Zoom webhook logs. The module creates a HTTP listeners that accepts incoming webhooks from Zoom.
+This is a module for Zoom webhook logs. The module creates an HTTP listener that accepts incoming webhooks from Zoom.
 
-To configure Zoom to send webhooks to the filebeat module, please follow the documentation from Zoom located here: https://marketplace.zoom.us/docs/guides/build/webhook-only-app[Zoom Documentation].
+To configure Zoom to send webhooks to the filebeat module, please follow the https://marketplace.zoom.us/docs/guides/build/webhook-only-app[Zoom Documentation].
 
 include::../include/gs-link.asciidoc[]
 

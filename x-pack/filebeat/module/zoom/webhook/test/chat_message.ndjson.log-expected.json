@@ -1,8 +1,9 @@
 [
     {
-        "@timestamp": "2020-08-04T18:53:08.820Z",
+        "@timestamp": "2020-08-04T20:18:59.994Z",
         "event.action": "chat_message.sent",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:01.089874Z",
         "event.kind": [
             "event"
         ],
@@ -38,9 +39,10 @@
         "zoom.operator_id": "zfdgdfgdfgfp8uQ"
     },
     {
-        "@timestamp": "2020-08-04T18:53:08.820Z",
+        "@timestamp": "2020-08-04T20:18:59.994Z",
         "event.action": "chat_message.updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:01.090058Z",
         "event.kind": [
             "event"
         ],
@@ -76,9 +78,10 @@
         "zoom.operator_id": "zfdgdfgdfgfp8uQ"
     },
     {
-        "@timestamp": "2020-08-04T18:53:08.820Z",
+        "@timestamp": "2020-08-04T20:18:59.995Z",
         "event.action": "chat_message.updated",
         "event.dataset": "zoom.webhook",
+        "event.ingested": "2020-08-04T20:19:01.090156Z",
         "event.kind": [
             "event"
         ],

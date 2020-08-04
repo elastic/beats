@@ -127581,7 +127581,7 @@ type: boolean
 [[exported-fields-zoom]]
 == Zoom fields
 
-Some Zoom module
+Module for handling incoming Zoom webhook requests
 
 
 
@@ -127652,10 +127652,30 @@ type: date
 
 --
 
+*`zoom.time_stamp`*::
++
+--
+Timestamp related to the event
+
+
+type: date
+
+--
+
+*`zoom.creation_type`*::
++
+--
+Creation type
+
+
+type: keyword
+
+--
+
 *`zoom.account.owner_id`*::
 +
 --
-UserID of the related user the action was performed on
+UserID of the user whose sub account was created/disassociated
 
 
 type: keyword
@@ -127675,7 +127695,7 @@ type: keyword
 *`zoom.account.owner_email`*::
 +
 --
-Email related to the user the action was performed on
+Email of the user whose sub account was created/disassociated
 
 
 type: keyword
@@ -127685,7 +127705,7 @@ type: keyword
 *`zoom.account.account_name`*::
 +
 --
-Name related to the user the action was performed on
+When an account name is updated, this is the new value set
 
 
 type: keyword
@@ -127695,7 +127715,7 @@ type: keyword
 *`zoom.account.account_alias`*::
 +
 --
-Alias related to the user the action was performed on
+When an account alias is updated, this is the new value set
 
 
 type: keyword
@@ -127705,7 +127725,7 @@ type: keyword
 *`zoom.account.account_support_name`*::
 +
 --
-Support account related to the user the action was performed on
+When an account support_name is updated, this is the new value set
 
 
 type: keyword
@@ -127715,1827 +127735,17 @@ type: keyword
 *`zoom.account.account_support_email`*::
 +
 --
-Support account (Email) related to the user the action was performed on
+When an account support_email is updated, this is the new value set
 
 
 type: keyword
-
---
-
-*`zoom.account.settings.schedule_meeting.host_video`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.participant_video`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.audio_type`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.account.settings.schedule_meeting.join_before_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.enforce_login`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.enforce_login_with_domains`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.enforce_login_domains`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.account.settings.schedule_meeting.not_store_meeting_topic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.schedule_meeting.force_pmi_jbh_password`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.e2e_encryption`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.private_chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.auto_saving_chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.file_transfer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.post_meeting_feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.co_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.polling`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.attendee_on_hold`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.show_meeting_control_toolbar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.allow_show_zoom_windows`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.annotation`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.whiteboard`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.webinar_question_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.anonymous_question_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.breakout_room`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.closed_caption`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.far_end_camera_control`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.group_hd`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.virtual_background`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.watermark`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.alert_guest_join`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.auto_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.p2p_connetion`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.p2p_ports`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.ports_range`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.account.settings.in_meeting.sending_default_email_invites`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.use_html_format_email`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.dscp_marking`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.dscp_audio`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.account.settings.in_meeting.dscp_video`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.account.settings.in_meeting.stereo_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.original_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.screen_sharing`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.remote_control`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.in_meeting.attention_tracking`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.email_notification.cloud_recording_avaliable_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.email_notification.jbh_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.email_notification.cancel_meeting_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.email_notification.low_host_count_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.email_notification.alternative_host_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.upcoming_meeting_alert`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.start_airplay_manually`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.weekly_system_restart`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.list_meetings_with_calendar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.zr_post_meeting_feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.ultrasonic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.force_private_meeting`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.hide_host_information`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.cmr_for_instant_meeting`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.zoom_rooms.auto_start_stop_scheduled_meetings`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.security.admin_change_name_pic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.security.import_photos_from_devices`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.security.hide_billing_info`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.local_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.cloud_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.record_speaker_view`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.record_gallery_view`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.record_audio_file`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.save_chat_text`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.show_timestamp`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.recording_audio_transcript`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.auto_recording`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.account.settings.recording.cloud_recording_download`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.cloud_recording_download_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.account_user_access_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.auto_delete_cmr`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.recording.auto_delete_cmr_days`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.account.settings.telephony.third_party_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.telephony.audio_conference_info`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.account.settings.integration.google_calendar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.integration.google_drive`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.integration.dropbox`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.integration.box`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.integration.microsoft_one_drive`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.integration.kubi`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.account.settings.feature.meeting_capacity`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.owner_id`*::
-+
---
-UserID of the related user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.email`*::
-+
---
-Email related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.owner_email`*::
-+
---
-Email related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.account_name`*::
-+
---
-Name related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.account_alias`*::
-+
---
-Alias related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.account_support_name`*::
-+
---
-Support account related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.account_support_email`*::
-+
---
-Support account (Email) related to the user the action was performed on
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.schedule_meeting.host_video`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.participant_video`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.audio_type`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.schedule_meeting.join_before_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.enforce_login`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.enforce_login_with_domains`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.enforce_login_domains`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.schedule_meeting.not_store_meeting_topic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.schedule_meeting.force_pmi_jbh_password`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.e2e_encryption`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.private_chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.auto_saving_chat`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.file_transfer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.post_meeting_feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.co_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.polling`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.attendee_on_hold`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.show_meeting_control_toolbar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.allow_show_zoom_windows`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.annotation`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.whiteboard`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.webinar_question_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.anonymous_question_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.breakout_room`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.closed_caption`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.far_end_camera_control`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.group_hd`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.virtual_background`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.watermark`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.alert_guest_join`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.auto_answer`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.p2p_connetion`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.p2p_ports`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.ports_range`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.in_meeting.sending_default_email_invites`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.use_html_format_email`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.dscp_marking`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.dscp_audio`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.old_account.settings.in_meeting.dscp_video`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.old_account.settings.in_meeting.stereo_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.original_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.screen_sharing`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.remote_control`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.in_meeting.attention_tracking`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.email_notification.cloud_recording_avaliable_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.email_notification.jbh_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.email_notification.cancel_meeting_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.email_notification.low_host_count_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.email_notification.alternative_host_reminder`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.upcoming_meeting_alert`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.start_airplay_manually`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.weekly_system_restart`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.list_meetings_with_calendar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.zr_post_meeting_feedback`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.ultrasonic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.force_private_meeting`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.hide_host_information`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.cmr_for_instant_meeting`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.zoom_rooms.auto_start_stop_scheduled_meetings`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.security.admin_change_name_pic`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.security.import_photos_from_devices`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.security.hide_billing_info`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.local_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.cloud_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.record_speaker_view`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.record_gallery_view`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.record_audio_file`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.save_chat_text`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.show_timestamp`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.recording_audio_transcript`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.auto_recording`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.recording.cloud_recording_download`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.cloud_recording_download_host`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.account_user_access_recording`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.auto_delete_cmr`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.recording.auto_delete_cmr_days`*::
-+
---
-Settings related to the account
-
-
-type: long
-
---
-
-*`zoom.old_account.settings.telephony.third_party_audio`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.telephony.audio_conference_info`*::
-+
---
-Settings related to the account
-
-
-type: keyword
-
---
-
-*`zoom.old_account.settings.integration.google_calendar`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.integration.google_drive`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.integration.dropbox`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.integration.box`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.integration.microsoft_one_drive`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.integration.kubi`*::
-+
---
-Settings related to the account
-
-
-type: boolean
-
---
-
-*`zoom.old_account.settings.feature.meeting_capacity`*::
-+
---
-Settings related to the account
-
-
-type: boolean
 
 --
 
 *`zoom.chat_channel.name`*::
 +
 --
-Channel name
+The name of the channel that has been added/modified/deleted
 
 
 type: keyword
@@ -129545,7 +127755,7 @@ type: keyword
 *`zoom.chat_channel.id`*::
 +
 --
-Channel ID
+The ID of the channel that has been added/modified/deleted
 
 
 type: keyword
@@ -129555,17 +127765,17 @@ type: keyword
 *`zoom.chat_channel.type`*::
 +
 --
-Channel type
+Type of channel related to the event. Can be 1(Invite-Only), 2(Private) or 3(Public)
 
 
-type: integer
+type: keyword
 
 --
 
 *`zoom.chat_channel.timestamp`*::
 +
 --
-Time when channel was created/modified/deleted
+Date and time when channel was created/modified/deleted
 
 
 type: date
@@ -129575,54 +127785,54 @@ type: date
 *`zoom.chat_channel.date_time`*::
 +
 --
-Time when channel was created/modified/deleted
+Epoch time when channel was created/modified/deleted
 
 
 type: date
 
 --
 
-*`zoom.chat_messages.id`*::
+*`zoom.chat_message.id`*::
 +
 --
-Message ID
+Unique ID of the related chat message
 
 
 type: keyword
 
 --
 
-*`zoom.chat_messages.type`*::
+*`zoom.chat_message.type`*::
 +
 --
-Type of message, either private message or channel message
+Type of message, can be either "to_contact" or "to_channel"
 
 
-type: integer
+type: keyword
 
 --
 
-*`zoom.chat_messages.date_time`*::
+*`zoom.chat_message.date_time`*::
 +
 --
-Time when message was created/modified/deleted
+Date and time when message was created/modified/deleted
 
 
 type: date
 
 --
 
-*`zoom.chat_messages.timestamp`*::
+*`zoom.chat_message.timestamp`*::
 +
 --
-Time when message was created/modified/deleted
+Epoch when message was created/modified/deleted
 
 
 type: date
 
 --
 
-*`zoom.chat_messages.session_id`*::
+*`zoom.chat_message.session_id`*::
 +
 --
 SessionID for the channel related to the message
@@ -129632,7 +127842,7 @@ type: keyword
 
 --
 
-*`zoom.chat_messages.contact_email`*::
+*`zoom.chat_message.contact_email`*::
 +
 --
 Email address related to the user sending the message
@@ -129642,17 +127852,17 @@ type: keyword
 
 --
 
-*`zoom.chat_messages.contact_id`*::
+*`zoom.chat_message.contact_id`*::
 +
 --
-UserID related to the user sending the message
+UserID belonging to the user receiving a message
 
 
 type: keyword
 
 --
 
-*`zoom.chat_messages.channel_id`*::
+*`zoom.chat_message.channel_id`*::
 +
 --
 ChannelID related to the message
@@ -129662,7 +127872,7 @@ type: keyword
 
 --
 
-*`zoom.chat_messages.channel_name`*::
+*`zoom.chat_message.channel_name`*::
 +
 --
 Channel name related to the message
@@ -129672,10 +127882,10 @@ type: keyword
 
 --
 
-*`zoom.chat_messages.message`*::
+*`zoom.chat_message.message`*::
 +
 --
-The message sent
+A string containing the full message that was sent
 
 
 type: keyword
@@ -129685,7 +127895,17 @@ type: keyword
 *`zoom.meeting.id`*::
 +
 --
-The ID of the meeting
+Unique ID of the related meeting
+
+
+type: keyword
+
+--
+
+*`zoom.meeting.join_url`*::
++
+--
+The URL to join the meeting
 
 
 type: keyword
@@ -129695,7 +127915,7 @@ type: keyword
 *`zoom.meeting.uuid`*::
 +
 --
-The UUID of the meeting
+The UUID of the related meeting
 
 
 type: keyword
@@ -129705,7 +127925,7 @@ type: keyword
 *`zoom.meeting.host_id`*::
 +
 --
-The UserID of the meeting host
+The UserID of the configured meeting host
 
 
 type: keyword
@@ -129715,7 +127935,7 @@ type: keyword
 *`zoom.meeting.topic`*::
 +
 --
-Meeting Topic
+Topic of the related meeting
 
 
 type: keyword
@@ -129735,7 +127955,7 @@ type: integer
 *`zoom.meeting.start_time`*::
 +
 --
-Time the meeting started
+Date and time the meeting started
 
 
 type: date
@@ -129745,7 +127965,7 @@ type: date
 *`zoom.meeting.timezone`*::
 +
 --
-Timezone used for the meeting
+Which timezone is used for the meeting timestamps
 
 
 type: keyword
@@ -129755,7 +127975,7 @@ type: keyword
 *`zoom.meeting.duration`*::
 +
 --
-Seconds the meeting has been active
+The duration of a meeting in minutes
 
 
 type: long
@@ -129765,10 +127985,10 @@ type: long
 *`zoom.meeting.issues`*::
 +
 --
-Issue message if an alert is triggered on the meeting
+When a user reports an issue with the meeting, for example: "Unstable audio quality"
 
 
-type: long
+type: keyword
 
 --
 
@@ -129782,603 +128002,33 @@ type: keyword
 
 --
 
-*`zoom.meeting.settings.host_video`*::
+*`zoom.phone.id`*::
 +
 --
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.participant_video`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.join_before_host`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.mute_upon_entry`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.audio`*::
-+
---
-Settings related to the meeting
+Unique ID for the phone or conversation
 
 
 type: keyword
 
 --
 
-*`zoom.meeting.settings.auto_recording`*::
+*`zoom.phone.user_id`*::
 +
 --
-Settings related to the meeting
+UserID for the phone owner related to a Call Log being completed
 
 
 type: keyword
 
 --
 
-*`zoom.meeting.settings.use_pmi`*::
+*`zoom.phone.download_url`*::
 +
 --
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.auto_recording`*::
-+
---
-Settings related to the meeting
+Download URL for the voicemail
 
 
 type: keyword
-
---
-
-*`zoom.meeting.settings.waiting_room`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.watermark`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.settings.enforce_login`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.meeting.registrant.id`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.email`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.first_name`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.last_name`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.address`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.city`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.country`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.zip`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.state`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.phone`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.industry`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.org`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.job_title`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.purchasing_time_frame`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.role_in_purchase_process`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.no_of_employees`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.comments`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.registrant.join_url`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.id`*::
-+
---
-Meeting ID of the related meeting
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.user_id`*::
-+
---
-UserID of the participant trigger the sharing event
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.user_name`*::
-+
---
-User name of the participant trigger the sharing event
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.join_time`*::
-+
---
-The time the participant joined the related meeting
-
-
-type: date
-
---
-
-*`zoom.meeting.participant.leave_time`*::
-+
---
-The time the participant left the related meeting
-
-
-type: date
-
---
-
-*`zoom.meeting.participant.sharing_details.link_source`*::
-+
---
-Method of sharing with dropbox integration
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.sharing_details.content`*::
-+
---
-Type of content that was shared
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.sharing_details.file_link`*::
-+
---
-The file link that was shared
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.sharing_details.date_time`*::
-+
---
-Timestamp the sharing started
-
-
-type: keyword
-
---
-
-*`zoom.meeting.participant.sharing_details.source`*::
-+
---
-The file source that was shared
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.id`*::
-+
---
-The ID of the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.uuid`*::
-+
---
-The UUID of the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.host_id`*::
-+
---
-The UserID of the meeting host
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.topic`*::
-+
---
-Meeting Topic
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.type`*::
-+
---
-Type of meeting created
-
-
-type: integer
-
---
-
-*`zoom.old_meeting.start_time`*::
-+
---
-Time the meeting started
-
-
-type: date
-
---
-
-*`zoom.old_meeting.timezone`*::
-+
---
-Timezone used for the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.duration`*::
-+
---
-Seconds the meeting has been active
-
-
-type: long
-
---
-
-*`zoom.old_meeting.issues`*::
-+
---
-Issue message if an alert is triggered on the meeting
-
-
-type: long
-
---
-
-*`zoom.old_meeting.password`*::
-+
---
-Password related to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.settings.host_video`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.participant_video`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.join_before_host`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.mute_upon_entry`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.audio`*::
-+
---
-Settings related to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.settings.auto_recording`*::
-+
---
-Settings related to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.settings.use_pmi`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.auto_recording`*::
-+
---
-Settings related to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.old_meeting.settings.waiting_room`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.watermark`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
-
---
-
-*`zoom.old_meeting.settings.enforce_login`*::
-+
---
-Settings related to the meeting
-
-
-type: boolean
 
 --
 
@@ -130395,7 +128045,7 @@ type: date
 *`zoom.phone.connected_start_time`*::
 +
 --
-The timestamp when a ringtone was established to the callee
+The date and time when a ringtone was established to the callee
 
 
 type: date
@@ -130405,7 +128055,7 @@ type: date
 *`zoom.phone.answer_start_time`*::
 +
 --
-The timestamp when the call was answered
+The date and time when the call was answered
 
 
 type: date
@@ -130415,7 +128065,7 @@ type: date
 *`zoom.phone.call_end_time`*::
 +
 --
-The timestamp when the call ended
+The date and time when the call ended
 
 
 type: date
@@ -130425,7 +128075,7 @@ type: date
 *`zoom.phone.call_id`*::
 +
 --
-Unique ID of the call
+Unique ID of the related call
 
 
 type: keyword
@@ -130435,7 +128085,7 @@ type: keyword
 *`zoom.phone.duration`*::
 +
 --
-Duration of a voicemail
+Duration of a voicemail in minutes
 
 
 type: long
@@ -130465,7 +128115,7 @@ type: keyword
 *`zoom.phone.caller_number_type`*::
 +
 --
-Caller type related to the voicemail
+Caller type related to the voicemail, can either be 1(Internal) or 2(External)
 
 
 type: long
@@ -130475,7 +128125,7 @@ type: long
 *`zoom.phone.caller_user_id`*::
 +
 --
-UserID of the person related to the voicemail
+UserID of the caller related to the voicemail
 
 
 type: keyword
@@ -130486,6 +128136,16 @@ type: keyword
 +
 --
 UserID of the callee related to the voicemail
+
+
+type: keyword
+
+--
+
+*`zoom.phone.callee_extension_type`*::
++
+--
+Extension type of the calle related to the voicemail, can be user, callQueue, autoReceptionist or shareLineGroup
 
 
 type: keyword
@@ -130505,7 +128165,7 @@ type: keyword
 *`zoom.phone.caller.phone_number`*::
 +
 --
-Phone Number of the caller
+Phone Number of the caller related to the call
 
 
 type: keyword
@@ -130542,10 +128202,10 @@ type: keyword
 
 --
 
-*`zoom.phone.callee_user_id`*::
+*`zoom.phone.callee_id`*::
 +
 --
-UserID of the person that is called
+UserID of the related callee of the voicemail
 
 
 type: keyword
@@ -130555,7 +128215,17 @@ type: keyword
 *`zoom.phone.callee.user_id`*::
 +
 --
-UserID of the person that is called
+UserID of the related callee of a call
+
+
+type: keyword
+
+--
+
+*`zoom.phone.callee_name`*::
++
+--
+The name of the callee related to the voicemail
 
 
 type: keyword
@@ -130565,7 +128235,27 @@ type: keyword
 *`zoom.phone.callee.phone_number`*::
 +
 --
-Phone Number of the callee
+Phone Number of the callee related to the call
+
+
+type: keyword
+
+--
+
+*`zoom.phone.callee_number`*::
++
+--
+Number of the callee related to the voicemail
+
+
+type: keyword
+
+--
+
+*`zoom.phone.callee_number_type`*::
++
+--
+Type of number related to the callee of the voicemail. Can be 1(Internal) or 2(External)
 
 
 type: keyword
@@ -130575,7 +128265,7 @@ type: keyword
 *`zoom.phone.callee.extension_number`*::
 +
 --
-Extension number of the callee
+Extension number of the callee related to the call
 
 
 type: keyword
@@ -130585,7 +128275,7 @@ type: keyword
 *`zoom.phone.callee.timezone`*::
 +
 --
-Timezone of the callee
+Timezone of the callee related to the call
 
 
 type: keyword
@@ -130595,17 +128285,27 @@ type: keyword
 *`zoom.phone.callee.device_type`*::
 +
 --
-Device type used by the callee
+Device type used by the callee related to the call
 
 
 type: keyword
 
 --
 
+*`zoom.phone.date_time`*::
++
+--
+Date and time of the related phone event
+
+
+type: date
+
+--
+
 *`zoom.recording.id`*::
 +
 --
-ID of the recording
+Unique ID of the related recording
 
 
 type: keyword
@@ -130615,7 +128315,7 @@ type: keyword
 *`zoom.recording.uuid`*::
 +
 --
-UUID of the recording
+UUID of the related recording
 
 
 type: keyword
@@ -130625,7 +128325,7 @@ type: keyword
 *`zoom.recording.host_id`*::
 +
 --
-UserID of the host related to the meeting recording
+UserID of the host of the meeting that was recorded
 
 
 type: keyword
@@ -130645,17 +128345,17 @@ type: keyword
 *`zoom.recording.type`*::
 +
 --
-Type of recording
+Type of recording, can be multiple type of values, please check Zoom documentation
 
 
-type: long
+type: keyword
 
 --
 
 *`zoom.recording.start_time`*::
 +
 --
-Date of the recording
+The date and time when the recording started
 
 
 type: date
@@ -130675,7 +128375,7 @@ type: keyword
 *`zoom.recording.duration`*::
 +
 --
-Duration of the recording
+Duration of the recording in minutes
 
 
 type: long
@@ -130685,7 +128385,7 @@ type: long
 *`zoom.recording.share_url`*::
 +
 --
-The share URL for the recording
+The URL to access the recording
 
 
 type: keyword
@@ -130705,7 +128405,7 @@ type: long
 *`zoom.recording.recording_count`*::
 +
 --
-Amount of recording files related to the recording
+Number of recording files related to the recording
 
 
 type: long
@@ -130715,187 +128415,7 @@ type: long
 *`zoom.recording.host_email`*::
 +
 --
-Email address of the host related to the meeting
-
-
-type: long
-
---
-
-*`zoom.recording.registrant.id`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.email`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.first_name`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.last_name`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.address`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.city`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.country`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.zip`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.state`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.phone`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.industry`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.org`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.job_title`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.purchasing_time_frame`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.role_in_purchase_process`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.no_of_employees`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.comments`*::
-+
---
-Information about the person that registers to the meeting
-
-
-type: keyword
-
---
-
-*`zoom.recording.registrant.join_url`*::
-+
---
-Information about the person that registers to the meeting
+Email address of the host related to the meeting that was recorded
 
 
 type: keyword
@@ -130955,7 +128475,7 @@ type: keyword
 *`zoom.user.phone_number`*::
 +
 --
-Phone number related to the user
+User phone number related to the user event
 
 
 type: keyword
@@ -130965,7 +128485,7 @@ type: keyword
 *`zoom.user.phone_country`*::
 +
 --
-Country code related to the phone number
+User country code related to the user event
 
 
 type: keyword
@@ -130975,7 +128495,7 @@ type: keyword
 *`zoom.user.company`*::
 +
 --
-User Company
+User company related to the user event
 
 
 type: keyword
@@ -130985,7 +128505,7 @@ type: keyword
 *`zoom.user.pmi`*::
 +
 --
-User personal meeting ID
+User personal meeting ID related to the user event
 
 
 type: keyword
@@ -130995,7 +128515,7 @@ type: keyword
 *`zoom.user.use_pmi`*::
 +
 --
-If use PMI is enabled
+If a user has PMI enabled
 
 
 type: boolean
@@ -131005,7 +128525,7 @@ type: boolean
 *`zoom.user.pic_url`*::
 +
 --
-URL to the profile picture
+Full URL to the profile picture used by the user
 
 
 type: keyword
@@ -131015,7 +128535,7 @@ type: keyword
 *`zoom.user.vanity_name`*::
 +
 --
-Name of the related users personal meeting room
+Name of the personal meeting room related to the user event
 
 
 type: keyword
@@ -131035,7 +128555,7 @@ type: keyword
 *`zoom.user.language`*::
 +
 --
-Language settings for the user
+Language configured for the user
 
 
 type: keyword
@@ -131072,26 +128592,6 @@ type: keyword
 
 --
 
-*`zoom.user.settings.meeting_capacity`*::
-+
---
-Maximum capacity for the user
-
-
-type: long
-
---
-
-*`zoom.user.settings.large_meeting`*::
-+
---
-If large meeting plan is enabled for the user
-
-
-type: boolean
-
---
-
 *`zoom.user.presence_status`*::
 +
 --
@@ -131102,7 +128602,7 @@ type: keyword
 
 --
 
-*`zoom.user.personal_note`*::
+*`zoom.user.personal_notes`*::
 +
 --
 Personal notes for the User
@@ -131115,237 +128615,47 @@ type: keyword
 *`zoom.user.date_time`*::
 +
 --
-Time when user logged in/out
+The date and time when user logged in or out
 
 
 type: date
 
 --
 
-*`zoom.old_user.id`*::
+*`zoom.user.client_type`*::
 +
 --
-UserID related to the user event
+Type of client used by the user. Can be browser, mac, win, iphone or android
 
 
 type: keyword
 
 --
 
-*`zoom.old_user.first_name`*::
+*`zoom.user.version`*::
 +
 --
-User first name related to the user event
+Version of the client used by the user
 
 
 type: keyword
-
---
-
-*`zoom.old_user.last_name`*::
-+
---
-User last name related to the user event
-
-
-type: keyword
-
---
-
-*`zoom.old_user.email`*::
-+
---
-User email related to the user event
-
-
-type: keyword
-
---
-
-*`zoom.old_user.type`*::
-+
---
-User type related to the user event
-
-
-type: keyword
-
---
-
-*`zoom.old_user.phone_number`*::
-+
---
-Phone number related to the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.phone_country`*::
-+
---
-Country code related to the phone number
-
-
-type: keyword
-
---
-
-*`zoom.old_user.company`*::
-+
---
-User Company
-
-
-type: keyword
-
---
-
-*`zoom.old_user.pmi`*::
-+
---
-User personal meeting ID
-
-
-type: keyword
-
---
-
-*`zoom.old_user.use_pmi`*::
-+
---
-If use PMI is enabled
-
-
-type: boolean
-
---
-
-*`zoom.old_user.pic_url`*::
-+
---
-URL to the profile picture
-
-
-type: keyword
-
---
-
-*`zoom.old_user.vanity_name`*::
-+
---
-Name of the related users personal meeting room
-
-
-type: keyword
-
---
-
-*`zoom.old_user.timezone`*::
-+
---
-Timezone configured for the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.language`*::
-+
---
-Language settings for the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.host_key`*::
-+
---
-Host key set for the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.role`*::
-+
---
-The configured role for the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.dept`*::
-+
---
-The configured departement for the user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.settings.meeting_capacity`*::
-+
---
-Maximum capacity for the user
-
-
-type: long
-
---
-
-*`zoom.old_user.settings.large_meeting`*::
-+
---
-If large meeting plan is enabled for the user
-
-
-type: boolean
-
---
-
-*`zoom.old_user.presence_status`*::
-+
---
-Current presence status of user
-
-
-type: keyword
-
---
-
-*`zoom.old_user.personal_note`*::
-+
---
-Personal notes for the User
-
-
-type: keyword
-
---
-
-*`zoom.old_user.date_time`*::
-+
---
-Time when user logged in/out
-
-
-type: date
 
 --
 
 *`zoom.webinar.id`*::
 +
 --
-Unique ID for the webinar
+Unique ID for the related webinar
+
+
+type: keyword
+
+--
+
+*`zoom.webinar.join_url`*::
++
+--
+The URL configured to join the webinar
 
 
 type: keyword
@@ -131355,7 +128665,7 @@ type: keyword
 *`zoom.webinar.uuid`*::
 +
 --
-UUID for the webinar
+UUID for the related webinar
 
 
 type: keyword
@@ -131365,7 +128675,7 @@ type: keyword
 *`zoom.webinar.host_id`*::
 +
 --
-UserID of the host of the webinar
+UserID for the configured host of the webinar
 
 
 type: keyword
@@ -131375,7 +128685,7 @@ type: keyword
 *`zoom.webinar.topic`*::
 +
 --
-Topic of the webinar
+Meeting topic of the related webinar
 
 
 type: keyword
@@ -131385,7 +128695,7 @@ type: keyword
 *`zoom.webinar.type`*::
 +
 --
-Type of webinar created
+Type of webinar created. Can be either 5(Webinar), 6(Recurring webinar without fixed time) or 9(Recurring webinar with fixed time)
 
 
 type: keyword
@@ -131395,7 +128705,7 @@ type: keyword
 *`zoom.webinar.start_time`*::
 +
 --
-Start time of the webinar
+The date and time when the webinar started
 
 
 type: date
@@ -131405,7 +128715,7 @@ type: date
 *`zoom.webinar.timezone`*::
 +
 --
-Timezone of the webinar
+Timezone used for the dates related to the webinar
 
 
 type: keyword
@@ -131415,7 +128725,7 @@ type: keyword
 *`zoom.webinar.duration`*::
 +
 --
-Duration of the webinar
+Duration of the webinar in minutes
 
 
 type: long
@@ -131425,7 +128735,7 @@ type: long
 *`zoom.webinar.agenda`*::
 +
 --
-Agenda of the webinar
+The configured agenda of the webinar
 
 
 type: keyword
@@ -131435,7 +128745,7 @@ type: keyword
 *`zoom.webinar.password`*::
 +
 --
-Password for the webinar
+Password configured to access the webinar
 
 
 type: keyword
@@ -131445,507 +128755,17 @@ type: keyword
 *`zoom.webinar.issues`*::
 +
 --
-Related issues to the webinar
+Any reported issues about a webinar is reported in this field
 
 
 type: keyword
-
---
-
-*`zoom.webinar.settings.host_video`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.panelists_video`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.practice_session`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.approval_type`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.registration_type`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.audio`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.auto_recording`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.settings.enforce_login`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.id`*::
-+
---
-Unique ID for the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.uuid`*::
-+
---
-UUID for the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.host_id`*::
-+
---
-UserID of the host of the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.topic`*::
-+
---
-Topic of the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.type`*::
-+
---
-Type of webinar created
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.start_time`*::
-+
---
-Start time of the webinar
-
-
-type: date
-
---
-
-*`zoom.old_webinar.timezone`*::
-+
---
-Timezone of the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.duration`*::
-+
---
-Duration of the webinar
-
-
-type: long
-
---
-
-*`zoom.old_webinar.agenda`*::
-+
---
-Agenda of the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.password`*::
-+
---
-Password for the webinar
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.host_video`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.panelists_video`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.practice_session`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.approval_type`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.registration_type`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.audio`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.auto_recording`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.old_webinar.settings.enforce_login`*::
-+
---
-Related webinar settings
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.id`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.email`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.first_name`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.last_name`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.address`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.city`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.country`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.zip`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.state`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.phone`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.industry`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.org`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.job_title`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.purchasing_time_frame`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.role_in_purchase_process`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.no_of_employees`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.comments`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.registrant.join_url`*::
-+
---
-Information about the person that registers to the webinar
-
-
-type: keyword
-
---
-
-*`zoom.webinar.participant.id`*::
-+
---
-Webinar ID of the related meeting
-
-
-type: keyword
-
---
-
-*`zoom.webinar.participant.user_id`*::
-+
---
-UserID of the participant trigger the sharing event
-
-
-type: keyword
-
---
-
-*`zoom.webinar.participant.user_name`*::
-+
---
-User name of the participant trigger the sharing event
-
-
-type: keyword
-
---
-
-*`zoom.webinar.participant.join_time`*::
-+
---
-The time the participant joined the related meeting
-
-
-type: date
-
---
-
-*`zoom.webinar.participant.leave_time`*::
-+
---
-The time the participant left the related meeting
-
-
-type: date
 
 --
 
 *`zoom.zoomroom.id`*::
 +
 --
-ID of the Zoom room
+Unique ID of the Zoom room
 
 
 type: keyword
@@ -131955,7 +128775,7 @@ type: keyword
 *`zoom.zoomroom.room_name`*::
 +
 --
-Name of the Zoom room
+The configured name of the Zoom room
 
 
 type: keyword
@@ -131975,7 +128795,7 @@ type: keyword
 *`zoom.zoomroom.calendar_id`*::
 +
 --
-Calendar ID of the Zoom room
+Unique ID of the calendar used by the Zoom room
 
 
 type: keyword
@@ -131985,7 +128805,7 @@ type: keyword
 *`zoom.zoomroom.event_id`*::
 +
 --
-Event ID of the Zoom room
+Unique ID of the calendar event associated with the Zoom Room
 
 
 type: keyword
@@ -131995,7 +128815,7 @@ type: keyword
 *`zoom.zoomroom.change_key`*::
 +
 --
-Change key of the Zoom room
+Key used by Microsoft products integration that represents a specific version of a calendar
 
 
 type: keyword
@@ -132005,7 +128825,7 @@ type: keyword
 *`zoom.zoomroom.resource_email`*::
 +
 --
-Resource email address related to the Zoom room
+Email address associated with the calendar in use by the Zoom room
 
 
 type: keyword
@@ -132015,7 +128835,7 @@ type: keyword
 *`zoom.zoomroom.email`*::
 +
 --
-Email related to the Zoom room
+Email address associated with the Zoom room itself
 
 
 type: keyword
@@ -132025,7 +128845,7 @@ type: keyword
 *`zoom.zoomroom.issue`*::
 +
 --
-Related issue message to the Zoom room
+Any reported alerts or issues related to the Zoom room or its equipment
 
 
 type: keyword
@@ -132035,7 +128855,7 @@ type: keyword
 *`zoom.zoomroom.alert_type`*::
 +
 --
-Zoom room alert type
+An integer value representing the type of alert. The list of alert types can be found in the Zoom documentation
 
 
 type: keyword
@@ -132045,7 +128865,7 @@ type: keyword
 *`zoom.zoomroom.component`*::
 +
 --
-Zoom room component
+An integer value representing the type of equipment or component, The list of component types can be found in the Zoom documentation
 
 
 type: keyword
@@ -132055,10 +128875,320 @@ type: keyword
 *`zoom.zoomroom.alert_kind`*::
 +
 --
-Alert kind related to the Zoom room
+An integer value showing if the Zoom room alert has been either 1(Triggered) or 2(Cleared)
 
 
 type: keyword
+
+--
+
+*`zoom.registrant.id`*::
++
+--
+Unique ID of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.status`*::
++
+--
+Status of the specific user registration
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.email`*::
++
+--
+Email of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.first_name`*::
++
+--
+First name of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.last_name`*::
++
+--
+Last name of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.address`*::
++
+--
+Address of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.city`*::
++
+--
+City of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.country`*::
++
+--
+Country of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.zip`*::
++
+--
+Zip code of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.state`*::
++
+--
+State of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.phone`*::
++
+--
+Phone number of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.industry`*::
++
+--
+Related industry of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.org`*::
++
+--
+Organization related to the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.job_title`*::
++
+--
+Job title of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.purchasing_time_frame`*::
++
+--
+Choosen purchase timeframe of the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.role_in_purchase_process`*::
++
+--
+Choosen role in a purchase process related to the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.no_of_employees`*::
++
+--
+Number of employees choosen by the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.comments`*::
++
+--
+Comments left by the user registering to a meeting or webinar
+
+
+type: keyword
+
+--
+
+*`zoom.registrant.join_url`*::
++
+--
+The URL that the registrant can use to join the webinar
+
+
+type: keyword
+
+--
+
+*`zoom.participant.id`*::
++
+--
+Unique ID of the participant related to a meeting
+
+
+type: keyword
+
+--
+
+*`zoom.participant.user_id`*::
++
+--
+UserID of the participant related to a meeting
+
+
+type: keyword
+
+--
+
+*`zoom.participant.user_name`*::
++
+--
+Username of the participant related to a meeting
+
+
+type: keyword
+
+--
+
+*`zoom.participant.join_time`*::
++
+--
+The date and time a participant joined a meeting
+
+
+type: date
+
+--
+
+*`zoom.participant.leave_time`*::
++
+--
+The date and time a participant left a meeting
+
+
+type: date
+
+--
+
+*`zoom.participant.sharing_details.link_source`*::
++
+--
+Method of sharing with dropbox integration
+
+
+type: keyword
+
+--
+
+*`zoom.participant.sharing_details.content`*::
++
+--
+Type of content that was shared
+
+
+type: keyword
+
+--
+
+*`zoom.participant.sharing_details.file_link`*::
++
+--
+The file link that was shared
+
+
+type: keyword
+
+--
+
+*`zoom.participant.sharing_details.date_time`*::
++
+--
+Timestamp the sharing started
+
+
+type: keyword
+
+--
+
+*`zoom.participant.sharing_details.source`*::
++
+--
+The file source that was share
+
+
+type: keyword
+
+--
+
+*`zoom.old_values`*::
++
+--
+Includes the old values when updating a object like user, meeting, account or webinar
+
+
+type: flattened
+
+--
+
+*`zoom.settings`*::
++
+--
+The current active settings related to a object like user, meeting, account or webinar
+
+
+type: flattened
 
 --
 

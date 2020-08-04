@@ -6,6 +6,9 @@ processors:
 - set:
     field: observer.product
     value: Webhook
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - append:
     field: event.kind
     value: event
