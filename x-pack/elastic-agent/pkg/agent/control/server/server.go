@@ -8,26 +8,29 @@ import (
 	"context"
 	"net"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 
 	"google.golang.org/grpc"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // Server is the daemon side of the control protocol.
 type Server struct {
 	logger   *logger.Logger
+	rex      reexec.ExecManager
 	listener net.Listener
 	server   *grpc.Server
 }
 
 // New creates a new control protocol server.
-func New(log *logger.Logger) *Server {
+func New(log *logger.Logger, rex reexec.ExecManager) *Server {
 	return &Server{
 		logger: log,
+		rex:    rex,
 	}
 }
 
@@ -38,13 +41,13 @@ func (s *Server) Start() error {
 		return nil
 	}
 
-	lis, err := createListener()
+	lis, err := createListener(s.logger)
 	if err != nil {
 		return err
 	}
 	s.listener = lis
 	s.server = grpc.NewServer()
-	proto.RegisterElasticAgentServer(s.server, s)
+	proto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
 	go func() {
@@ -63,6 +66,7 @@ func (s *Server) Stop() {
 		s.server.Stop()
 		s.server = nil
 		s.listener = nil
+		cleanupListener(s.logger)
 	}
 }
 
@@ -88,10 +92,9 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 
 // Restart performs re-exec.
 func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
-	// not implemented
+	s.rex.ReExec()
 	return &proto.RestartResponse{
-		Status: proto.ActionStatus_FAILURE,
-		Error:  "not implemented",
+		Status: proto.ActionStatus_SUCCESS,
 	}, nil
 }
 
