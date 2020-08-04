@@ -302,6 +302,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
+- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 
 *Packetbeat*
 
