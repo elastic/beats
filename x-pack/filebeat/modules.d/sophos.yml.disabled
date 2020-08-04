@@ -1,0 +1,25 @@
+# Module: sophos
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.9/filebeat-module-sophos.html
+
+- module: sophos
+  xg:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9005
+
+    # firewall default hostname
+    #var.default_host_name: firewall.localgroup.local
+
+    # known firewalls
+    #var.known_devices:
+    #   "device1_serialnumber": "a.host.local"
+    #   "device2_serialnumber": "b.host.local"
+
