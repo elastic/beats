@@ -22,5 +22,5 @@ func dialContext(ctx context.Context) (*grpc.ClientConn, error) {
 }
 
 func dialer(ctx context.Context, addr string) (net.Conn, error) {
-	return npipe.DialContext(arr)(ctx, "", "")
+	return npipe.DialContext(addr)(ctx, "", "")
 }

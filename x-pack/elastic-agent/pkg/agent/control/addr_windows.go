@@ -15,8 +15,8 @@ import (
 
 // Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
-	data = paths.Data()
+	data := paths.Data()
 	// entire string cannot be longer than 256 characters, this forces the
 	// length to always be 87 characters (but unique per data path)
-	return fmt.Sprintf(`\\.\pipe\elastic-agent-%s`, sha256.Sum256(data))
+	return fmt.Sprintf(`\\.\pipe\elastic-agent-%x`, sha256.Sum256([]byte(data)))
 }
