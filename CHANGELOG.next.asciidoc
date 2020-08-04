@@ -358,6 +358,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
 - Add data type conversion in `dissect` processor for converting string values to other basic data types. {pull}18683[18683]
 - Add the `ignore_failure` configuration option to the dissect processor. {pull}19464[19464]
@@ -367,7 +368,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
-- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
 
 *Auditbeat*
 
