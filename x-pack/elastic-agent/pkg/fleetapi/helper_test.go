@@ -45,7 +45,7 @@ func withServerWithAuthClient(
 ) func(t *testing.T) {
 
 	return withServer(m, func(t *testing.T, host string) {
-		log, _ := logger.New()
+		log, _ := logger.New("")
 		cfg := &kibana.Config{
 			Host: host,
 		}

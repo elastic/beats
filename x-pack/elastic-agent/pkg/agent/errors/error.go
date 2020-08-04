@@ -4,7 +4,27 @@
 
 package errors
 
-import "github.com/pkg/errors"
+import (
+	goerrors "errors"
+	"reflect"
+
+	"github.com/pkg/errors"
+)
+
+// As is just a helper so user dont have to use multiple imports for errors.
+func As(err error, target interface{}) bool {
+	return goerrors.As(err, target)
+}
+
+// Is is just a helper so user dont have to use multiple imports for errors.
+func Is(err, target error) bool {
+	return goerrors.Is(err, target)
+}
+
+// Unwrap is just a helper so user dont have to use multiple imports for errors.
+func Unwrap(err error) error {
+	return goerrors.Unwrap(err)
+}
 
 // MetaRecord is a entry of metadata enhancing an error.
 type MetaRecord struct {
@@ -99,6 +119,31 @@ func (e agentError) Meta() map[string]interface{} {
 	}
 
 	return resultingMeta
+}
+
+// Equal compares errors and evaluates if they are the same or not.
+// Agent error is not comparable due to included map so we need to
+// do the heavy lifting ourselves.
+func (e agentError) Equal(target error) bool {
+	targetErr, ok := target.(agentError)
+	if !ok {
+		return false
+	}
+
+	return errors.Is(e.err, targetErr.err) &&
+		e.errType == targetErr.errType &&
+		e.msg == targetErr.msg &&
+		reflect.DeepEqual(e.meta, targetErr.meta)
+
+}
+
+// Is checks whether agent err is an err.
+func (e agentError) Is(target error) bool {
+	if agentErr, ok := target.(agentError); ok {
+		return e.Equal(agentErr)
+	}
+
+	return goerrors.Is(e.err, target)
 }
 
 // Check it implements Error

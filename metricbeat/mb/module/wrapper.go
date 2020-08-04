@@ -142,7 +142,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			defer msw.close()
 
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
-			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
+			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
 			msw.run(done, out)
 		}(msw)

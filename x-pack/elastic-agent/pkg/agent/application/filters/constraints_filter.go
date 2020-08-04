@@ -28,6 +28,7 @@ var (
 )
 
 // ConstraintFilter filters ast based on included constraints.
+// constraints are still Experimental and should not be used in production.
 func ConstraintFilter(log *logger.Logger, ast *transpiler.AST) error {
 	// get datasources
 	inputsNode, found := transpiler.Lookup(ast, inputsKey)

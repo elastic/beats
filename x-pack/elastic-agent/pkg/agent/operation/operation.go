@@ -27,7 +27,7 @@ type operation interface {
 	// examples:
 	// - Start does not need to run if process is running
 	// - Fetch does not need to run if package is already present
-	Check(application Application) (bool, error)
+	Check(ctx context.Context, application Application) (bool, error)
 	// Run runs the operation
 	Run(ctx context.Context, application Application) error
 }
@@ -35,13 +35,15 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
+	Started() bool
 	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
+	Shutdown()
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
 	State() state.State
-	SetState(status state.Status, msg string)
-	OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string)
+	SetState(status state.Status, msg string, payload map[string]interface{})
+	OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{})
 }
 
 // Descriptor defines a program which needs to be run.
@@ -49,6 +51,7 @@ type Application interface {
 type Descriptor interface {
 	ServicePort() int
 	BinaryName() string
+	ArtifactName() string
 	Version() string
 	ID() string
 	Directory() string
@@ -65,10 +68,10 @@ type ApplicationStatusHandler struct{}
 // OnStatusChange is the handler called by the GRPC server code.
 //
 // It updates the status of the application and handles restarting the application is needed.
-func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string) {
+func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	app, ok := s.App().(Application)
 	if !ok {
 		panic(errors.New("only Application can be registered when using the ApplicationStatusHandler", errors.TypeUnexpected))
 	}
-	app.OnStatusChange(s, status, msg)
+	app.OnStatusChange(s, status, msg, payload)
 }

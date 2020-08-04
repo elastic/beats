@@ -79,9 +79,9 @@ class Test(BaseTest):
 
         output = self.read_output()
 
+        assert r.text == '{"message": "success"}'
         assert output[0]["input.type"] == "http_endpoint"
         assert output[0]["json.{}".format(self.prefix)] == message
-        assert r.text == '{"message": "success"}'
 
     def test_http_endpoint_wrong_content_header(self):
         """
@@ -112,18 +112,8 @@ class Test(BaseTest):
 """
         self.get_config(options)
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
-
-        message = "somerandommessage"
-        payload = {self.prefix: message}
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        r = requests.post(self.url, headers=headers, data=json.dumps(
-            payload), auth=HTTPBasicAuth('testuser', 'something'))
-
-        filebeat.check_kill_and_wait()
-
-        assert r.status_code == 401
-        assert r.text == '{"message": "Username and password required when basicauth is enabled"}'
+        self.wait_until(lambda: self.log_contains("Username and password required when basicauth is enabled"))
+        filebeat.kill_and_wait()
 
     def test_http_endpoint_wrong_auth_value(self):
         """
@@ -178,8 +168,9 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        print("response:", r.status_code, r.text)
         assert r.status_code == 400
-        assert r.text == '{"message": "Malformed JSON body"}'
+        assert r.text.startswith('{"message": "Malformed JSON body:')
 
     def test_http_endpoint_get_request(self):
         """
@@ -193,7 +184,7 @@ class Test(BaseTest):
         payload = {self.prefix: message}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         r = requests.get(self.url, headers=headers, data=json.dumps(payload))
-
+        print("response:", r.status_code, r.text)
         filebeat.check_kill_and_wait()
 
         assert r.status_code == 405

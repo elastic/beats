@@ -201,6 +201,10 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				// Note: tag values are not dedotted.
 				for _, tag := range tags {
 					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
+					// add cloud.instance.name and host.name into ec2 events
+					if *tag.Key == "Name" {
+						events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
+					}
 				}
 
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()

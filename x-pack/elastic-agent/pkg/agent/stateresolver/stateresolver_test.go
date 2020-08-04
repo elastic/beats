@@ -25,7 +25,7 @@ func TestStateResolverAcking(t *testing.T) {
 	}
 
 	t.Run("when we ACK the should state", func(t *testing.T) {
-		log, _ := logger.New()
+		log, _ := logger.New("")
 		r, err := NewStateResolver(log)
 		require.NoError(t, err)
 
@@ -44,7 +44,7 @@ func TestStateResolverAcking(t *testing.T) {
 	})
 
 	t.Run("when we don't ACK the should state", func(t *testing.T) {
-		log, _ := logger.New()
+		log, _ := logger.New("")
 		r, err := NewStateResolver(log)
 		require.NoError(t, err)
 

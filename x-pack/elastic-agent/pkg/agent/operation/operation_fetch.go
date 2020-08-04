@@ -8,7 +8,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -20,14 +20,14 @@ import (
 type operationFetch struct {
 	logger         *logger.Logger
 	program        Descriptor
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	downloader     download.Downloader
 }
 
 func newOperationFetch(
 	logger *logger.Logger,
 	program Descriptor,
-	operatorConfig *config.Config,
+	operatorConfig *configuration.SettingsConfig,
 	downloader download.Downloader) *operationFetch {
 
 	return &operationFetch{
@@ -46,7 +46,7 @@ func (o *operationFetch) Name() string {
 // Check checks whether fetch needs to occur.
 //
 // If the artifacts already exists then fetch will not be ran.
-func (o *operationFetch) Check(_ Application) (bool, error) {
+func (o *operationFetch) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
@@ -66,11 +66,11 @@ func (o *operationFetch) Check(_ Application) (bool, error) {
 func (o *operationFetch) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 
-	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.Version())
+	fullPath, err := o.downloader.Download(ctx, o.program.BinaryName(), o.program.ArtifactName(), o.program.Version())
 	if err == nil {
 		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
 	}

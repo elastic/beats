@@ -3,14 +3,16 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu && immutable' }
+  agent none
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
+    JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     SNAPSHOT = "true"
+    PIPELINE_LOG_LEVEL = "INFO"
   }
   options {
     timeout(time: 3, unit: 'HOURS')
@@ -23,112 +25,126 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
-    upstream('Beats/beats-beats-mbp/master')
+    // disable upstream trigger on a PR basis
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
-    booleanParam(name: 'macos', defaultValue: true, description: 'Allow macOS stages.')
+    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
   }
   stages {
-    stage('Checkout') {
+    stage('Filter build') {
+      agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
-        not {
-          triggeredBy 'SCMTrigger'
-        }
-      }
-      options { skipDefaultCheckout() }
-      steps {
-        deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}")
-        setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        //stash allowEmpty: true, name: 'source', useDefaultExcludes: false
-      }
-    }
-    stage('Build Packages'){
-      when {
-        beforeAgent true
-        not {
-          triggeredBy 'SCMTrigger'
-        }
-      }
-      matrix {
-        axes {
-          axis {
-            name 'BEATS_FOLDER'
-            values (
-              'auditbeat',
-              'filebeat',
-              'heartbeat',
-              'journalbeat',
-              'metricbeat',
-              'packetbeat',
-              'winlogbeat',
-              'x-pack/auditbeat',
-              'x-pack/elastic-agent',
-              'x-pack/dockerlogbeat',
-              'x-pack/filebeat',
-              'x-pack/functionbeat',
-              // 'x-pack/heartbeat',
-              // 'x-pack/journalbeat',
-              'x-pack/metricbeat',
-              // 'x-pack/packetbeat',
-              'x-pack/winlogbeat'
-            )
+        anyOf {
+          triggeredBy cause: "IssueCommentCause"
+          expression {
+            def ret = isUserTrigger() || isUpstreamTrigger()
+            if(!ret){
+              currentBuild.result = 'NOT_BUILT'
+              currentBuild.description = "The build has been skipped"
+              currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+              echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+            }
+            return ret
           }
         }
-        stages {
-          stage('Package Linux'){
-            agent { label 'ubuntu && immutable' }
-            options { skipDefaultCheckout() }
-            when {
-              beforeAgent true
-              expression {
-                return params.linux
-              }
-            }
-            environment {
-              HOME = "${env.WORKSPACE}"
-              PLATFORMS = [
-                '+all',
-                'linux/amd64',
-                'linux/386',
-                'linux/arm64',
-                'linux/armv7',
-                'linux/ppc64le',
-                'linux/mips64',
-                'linux/s390x',
-                'windows/amd64',
-                'windows/386',
-                (params.macos ? '' : 'darwin/amd64'),
-              ].join(' ')
-            }
-            steps {
-              withGithubNotify(context: "Packaging ${BEATS_FOLDER}") {
-                release()
-                pushCIDockerImages()
-              }
-            }
+      }
+      stages {
+        stage('Checkout') {
+          options { skipDefaultCheckout() }
+          steps {
+            deleteDir()
+            gitCheckout(basedir: "${BASE_DIR}")
+            setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+            stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
-          stage('Package Mac OS'){
-            agent { label 'macosx-10.12' }
-            options { skipDefaultCheckout() }
-            when {
-              beforeAgent true
-              expression {
-                return params.macos
+        }
+        stage('Build Packages'){
+          matrix {
+            axes {
+              axis {
+                name 'BEATS_FOLDER'
+                values (
+                  'auditbeat',
+                  'filebeat',
+                  'heartbeat',
+                  'journalbeat',
+                  'metricbeat',
+                  'packetbeat',
+                  'winlogbeat',
+                  'x-pack/auditbeat',
+                  'x-pack/elastic-agent',
+                  'x-pack/dockerlogbeat',
+                  'x-pack/filebeat',
+                  'x-pack/functionbeat',
+                  // 'x-pack/heartbeat',
+                  // 'x-pack/journalbeat',
+                  'x-pack/metricbeat',
+                  // 'x-pack/packetbeat',
+                  'x-pack/winlogbeat'
+                )
               }
             }
-            environment {
-              HOME = "${env.WORKSPACE}"
-              PLATFORMS = [
-                '+all',
-                'darwin/amd64',
-              ].join(' ')
-            }
-            steps {
-              withMacOSEnv(){
-                release()
+            stages {
+              stage('Package Linux'){
+                agent { label 'ubuntu && immutable' }
+                options { skipDefaultCheckout() }
+                when {
+                  beforeAgent true
+                  expression {
+                    return params.linux
+                  }
+                }
+                environment {
+                  HOME = "${env.WORKSPACE}"
+                  PLATFORMS = [
+                    '+all',
+                    'linux/amd64',
+                    'linux/386',
+                    'linux/arm64',
+                    'linux/armv7',
+                    'linux/ppc64le',
+                    'linux/mips64',
+                    'linux/s390x',
+                    'windows/amd64',
+                    'windows/386',
+                    (params.macos ? '' : 'darwin/amd64'),
+                  ].join(' ')
+                }
+                steps {
+                  withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                    deleteDir()
+                    release()
+                    pushCIDockerImages()
+                  }
+                }
+              }
+              stage('Package Mac OS'){
+                agent { label 'macosx-10.12' }
+                options { skipDefaultCheckout() }
+                when {
+                  beforeAgent true
+                  expression {
+                    return params.macos
+                  }
+                }
+                environment {
+                  HOME = "${env.WORKSPACE}"
+                  PLATFORMS = [
+                    '+all',
+                    'darwin/amd64',
+                  ].join(' ')
+                }
+                steps {
+                  withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+                    deleteDir()
+                    withMacOSEnv(){
+                      release()
+                    }
+                  }
+                }
               }
             }
           }
@@ -172,8 +188,14 @@ def tagAndPush(name){
   if("${env.SNAPSHOT}" == "true"){
     libbetaVer += "-SNAPSHOT"
   }
+
+  def tagName = "${libbetaVer}"
+  if (env.CHANGE_ID?.trim()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
   def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${libbetaVer}"
+  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
   def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
   retry(3){
@@ -206,7 +228,12 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+  if (env.CHANGE_ID?.trim()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+  }
+
+  googleStorageUpload(bucket: "${bucketUri}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",
@@ -216,38 +243,14 @@ def publishPackages(baseDir){
 }
 
 def withBeatsEnv(Closure body) {
-  def os = goos()
-  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
-
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
-    "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
-    "PYTHON_ENV=${WORKSPACE}/python-env"
-  ]) {
-    deleteDir()
-    //unstash 'source'
-    gitCheckout(basedir: "${BASE_DIR}")
-    dir("${env.BASE_DIR}"){
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install Mage", script: "make mage")
-      body()
+  withMageEnv(){
+    withEnv([
+      "PYTHON_ENV=${WORKSPACE}/python-env"
+    ]) {
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      dir("${env.BASE_DIR}"){
+        body()
+      }
     }
   }
-}
-
-def goos(){
-  def labels = env.NODE_LABELS
-
-  if (labels.contains('linux')) {
-    return 'linux'
-  } else if (labels.contains('windows')) {
-    return 'windows'
-  } else if (labels.contains('darwin')) {
-    return 'darwin'
-  }
-
-  error("Unhandled OS name in NODE_LABELS: " + labels)
 }

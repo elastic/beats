@@ -6,10 +6,12 @@ package zip
 
 import (
 	"archive/zip"
-	"fmt"
+	"context"
+	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -34,13 +36,19 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, installDir string) error {
+func (i *Installer) Install(_ context.Context, programName, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
 	}
 
-	if err := i.unzip(artifactPath, programName, version); err != nil {
+	// cleanup install directory before unzip
+	_, err = os.Stat(installDir)
+	if err == nil || os.IsExist(err) {
+		os.RemoveAll(installDir)
+	}
+
+	if err := i.unzip(artifactPath); err != nil {
 		return err
 	}
 
@@ -57,24 +65,62 @@ func (i *Installer) Install(programName, version, installDir string) error {
 		}
 	}
 
-	return i.runInstall(programName, version, installDir)
+	return nil
 }
 
-func (i *Installer) unzip(artifactPath, programName, version string) error {
-	if _, err := os.Stat(artifactPath); err != nil {
-		return errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
+func (i *Installer) unzip(artifactPath string) error {
+	r, err := zip.OpenReader(artifactPath)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	if err := os.MkdirAll(i.config.InstallPath, 0755); err != nil && !os.IsExist(err) {
+		// failed to create install dir
+		return err
 	}
 
-	powershellArg := fmt.Sprintf("Expand-Archive -LiteralPath \"%s\" -DestinationPath \"%s\"", artifactPath, i.config.InstallPath)
-	installCmd := exec.Command("powershell", "-command", powershellArg)
-	return installCmd.Run()
-}
+	unpackFile := func(f *zip.File) (err error) {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := rc.Close(); cerr != nil {
+				err = multierror.Append(err, cerr)
+			}
+		}()
 
-func (i *Installer) runInstall(programName, version, installPath string) error {
-	powershellCmd := fmt.Sprintf(powershellCmdTemplate, installPath, programName)
-	installCmd := exec.Command("powershell", "-command", powershellCmd)
+		path := filepath.Join(i.config.InstallPath, f.Name)
 
-	return installCmd.Run()
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(path), f.Mode())
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if cerr := f.Close(); cerr != nil {
+					err = multierror.Append(err, cerr)
+				}
+			}()
+
+			if _, err = io.Copy(f, rc); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range r.File {
+		if err := unpackFile(f); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // retrieves root directory from zip archive

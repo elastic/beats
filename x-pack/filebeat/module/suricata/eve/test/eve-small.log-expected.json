@@ -43,6 +43,7 @@
         "@timestamp": "2018-07-05T19:07:20.910Z",
         "destination.address": "192.168.156.70",
         "destination.bytes": 343,
+        "destination.domain": "l2.io",
         "destination.ip": "192.168.156.70",
         "destination.packets": 3,
         "destination.port": 443,
@@ -96,6 +97,8 @@
         "tags": [
             "suricata"
         ],
+        "tls.client.server_name": "l2.io",
+        "tls.resumed": true,
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     },
@@ -147,7 +150,7 @@
         "url.domain": "192.168.86.28",
         "url.original": "/dd.xml",
         "url.path": "/dd.xml",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.13.5",
@@ -205,7 +208,7 @@
         "url.domain": "192.168.86.28",
         "url.original": "/ssdp/device-desc.xml",
         "url.path": "/ssdp/device-desc.xml",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.13.5",

@@ -81,6 +81,7 @@ func init() {
 type PythonTestArgs struct {
 	TestName            string            // Test name used in logging.
 	Env                 map[string]string // Env vars to add to the current env.
+	Files               []string          // Globs used by nosetests to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
 }
@@ -131,9 +132,7 @@ func PythonNoseTest(params PythonTestArgs) error {
 	nosetestsOptions := []string{
 		"--process-timeout=90",
 		"--with-timer",
-	}
-	if mg.Verbose() {
-		nosetestsOptions = append(nosetestsOptions, "-v")
+		"-v",
 	}
 	if params.XUnitReportFile != "" {
 		nosetestsOptions = append(nosetestsOptions,
@@ -142,7 +141,11 @@ func PythonNoseTest(params PythonTestArgs) error {
 		)
 	}
 
-	testFiles, err := FindFiles(nosetestsTestFiles...)
+	files := nosetestsTestFiles
+	if len(params.Files) > 0 {
+		files = params.Files
+	}
+	testFiles, err := FindFiles(files...)
 	if err != nil {
 		return err
 	}
@@ -167,9 +170,23 @@ func PythonNoseTest(params PythonTestArgs) error {
 	// and HTML report.
 }
 
+// PythonNoseTestForModule executes python system tests for modules.
+//
+// Use `MODULE=module` to run only tests for `module`.
+func PythonNoseTestForModule(params PythonTestArgs) error {
+	if module := EnvOr("MODULE", ""); module != "" {
+		params.Files = []string{
+			fmt.Sprintf("module/%s/test_*.py", module),
+			fmt.Sprintf("module/%s/*/test_*.py", module),
+		}
+		params.TestName += "-" + module
+	}
+	return PythonNoseTest(params)
+}
+
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
 // defined in the requirements file pointed to by requirementsTxt. It returns
-// the path to the virutalenv.
+// the path to the virtualenv.
 func PythonVirtualenv() (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
@@ -202,6 +219,21 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
+	pipUpgrade := func(pkg string) error {
+		return sh.RunWith(env, pip, "install", "-U", pkg)
+	}
+
+	// Ensure we are using the latest pip version.
+	if err = pipUpgrade("pip"); err != nil {
+		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
+	}
+
+	// First ensure that wheel is installed so that bdists build cleanly.
+	if err = pipUpgrade("wheel"); err != nil {
+		return "", err
+	}
+
+	// Execute pip to install the dependencies.
 	args := []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
@@ -209,13 +241,6 @@ func PythonVirtualenv() (string, error) {
 	for _, req := range reqs {
 		args = append(args, "-Ur", req)
 	}
-
-	// First ensure that wheel is installed so that bdists build cleanly.
-	if err = sh.RunWith(env, pip, "install", "-U", "wheel"); err != nil {
-		return "", err
-	}
-
-	// Execute pip to install the dependencies.
 	if err := sh.RunWith(env, pip, args...); err != nil {
 		return "", err
 	}

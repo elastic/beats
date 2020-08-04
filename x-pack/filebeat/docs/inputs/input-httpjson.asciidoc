@@ -179,6 +179,73 @@ The config needs to specify `events` as the `json_objects_array` value.
 ----
 
 [float]
+==== `split_events_by`
+
+If the response body contains a JSON object containing an array then this option
+specifies the key containing that array. Each object in that array will generate
+an event, but will maintain the common fields of the document as well.
+
+["source","json",subs="attributes"]
+----
+{
+  "time": "2020-06-02 23:22:32 UTC",
+  "user": "Bob",
+  "events": [
+    {
+      "timestamp": "2020-05-02 11:10:03 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    },
+    {
+      "timestamp": "2020-05-05 13:03:11 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  ]
+}
+----
+
+The config needs to specify `events` as the `split_events_by` value.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  split_events_by: events
+----
+
+And will output the following events:
+
+["source","json",subs="attributes"]
+----
+[
+  {
+    "time": "2020-06-02 23:22:32 UTC",
+    "user": "Bob",
+    "events": {
+      "timestamp": "2020-05-02 11:10:03 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  },
+  {
+    "time": "2020-06-02 23:22:32 UTC",
+    "user": "Bob",
+    "events": {
+      "timestamp": "2020-05-05 13:03:11 UTC",
+      "event": {
+        "category": "authorization"
+      }
+    }
+  }
+]
+----
+
+It can be used in combination with `json_objects_array`, which will look for the field inside each element.
+
+[float]
 ==== `no_http_body`
 
 Force HTTP requests to be sent with an empty HTTP body. Defaults to `false`.

@@ -32,11 +32,11 @@ func NewDownloader(downloaders ...download.Downloader) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(ctx context.Context, programName, version string) (string, error) {
+func (e *Downloader) Download(ctx context.Context, programName, artifactName, version string) (string, error) {
 	var err error
 
 	for _, d := range e.dd {
-		s, e := d.Download(ctx, programName, version)
+		s, e := d.Download(ctx, programName, artifactName, version)
 		if e == nil {
 			return s, nil
 		}
