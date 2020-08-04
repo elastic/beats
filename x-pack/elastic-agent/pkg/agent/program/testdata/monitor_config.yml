@@ -1,4 +1,4 @@
-streams:
+monitors:
 - type: monitor/icmp
   name: icmp
   schedule: '*/5 * * * * * *'
@@ -8,7 +8,6 @@ streams:
   mode: any
   timeout: 16s
   wait: 1s
-- type: log/file
 - type: monitor/tcp
   name: tcp
 management:

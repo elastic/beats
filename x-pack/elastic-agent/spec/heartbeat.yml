@@ -1,0 +1,69 @@
+name: Heartbeat
+cmd: heartbeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+artifact: beats/heartbeat
+rules:
+- fix_stream: {}
+
+- inject_index:
+    type: logs
+
+- inject_stream_processor:
+    on_conflict: insert_after
+    type: logs
+
+- map:
+    path: monitors
+    rules:
+    - copy_all_to_list:
+        to: streams
+        on_conflict: noop
+        except: ["streams", "id", "enabled", "processors"]
+    - copy_to_list:
+        item: processors
+        to: streams
+        on_conflict: insert_before
+
+- map:
+    path: inputs
+    rules:
+    - translate:
+        path: type
+        mapper:
+          monitor/http: http
+          monitor/tcp: tcp
+          monitor/icmp: icmp
+    - remove_key:
+        key: use_output
+    - remove_key:
+        key: dataset
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
+        key: dataset.name
+
+- filter_values:
+    selector: monitors
+    key: type
+    values:
+    - http
+    - tcp
+    - icmp
+
+- filter_values:
+    selector: monitors
+    key: enabled
+    values:
+    - true
+
+- copy:
+    from: inputs
+    to: heartbeat
+
+- filter:
+    selectors:
+    - heartbeat
+    - output
+    - keystore
+when: HasItems(%{[heartbeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+  'kafka', 'logstash')
