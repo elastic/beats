@@ -237,6 +237,7 @@ class Test(metricbeat.BaseTest):
             else:
                 host_disk = evt["host"]["disk"]
                 self.assertCountEqual(self.de_dot(SYSTEM_DISK_HOST_FIELDS), host_disk.keys())
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
@@ -349,6 +350,7 @@ class Test(metricbeat.BaseTest):
             else:
                 host_network = evt["host"]["network"]
                 self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_summary(self):
         """
