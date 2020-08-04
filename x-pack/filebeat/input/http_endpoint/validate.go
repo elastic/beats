@@ -21,15 +21,24 @@ type apiValidator struct {
 	username, password string
 	method             string
 	contentType        string
+	authHeader         string
+	authHeaderSecret   string
 }
 
 var errIncorrectUserOrPass = errors.New("Incorrect username or password")
+var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
 		username, password, _ := r.BasicAuth()
 		if v.username != username || v.password != password {
 			return http.StatusUnauthorized, errIncorrectUserOrPass
+		}
+	}
+
+	if v.authHeader != "" && v.authHeaderSecret != "" {
+		if v.authHeaderSecret != r.Header.Get(v.authHeader) {
+			return http.StatusUnauthorized, errIncorrectHeaderSecret
 		}
 	}
 

@@ -13,42 +13,52 @@ import (
 
 // Config contains information about httpjson configuration
 type config struct {
-	TLS           *tlscommon.ServerConfig `config:"ssl"`
-	BasicAuth     bool                    `config:"basic_auth"`
-	Username      string                  `config:"username"`
-	Password      string                  `config:"password"`
-	ResponseCode  int                     `config:"response_code" validate:"positive"`
-	ResponseBody  string                  `config:"response_body"`
-	ListenAddress string                  `config:"listen_address"`
-	ListenPort    string                  `config:"listen_port"`
-	URL           string                  `config:"url"`
-	Prefix        string                  `config:"prefix"`
-	ContentType   string                  `config:"content_type"`
+	TLS              *tlscommon.ServerConfig `config:"ssl"`
+	BasicAuth        bool                    `config:"basic_auth"`
+	Username         string                  `config:"username"`
+	Password         string                  `config:"password"`
+	ResponseCode     int                     `config:"response_code" validate:"positive"`
+	ResponseBody     string                  `config:"response_body"`
+	ListenAddress    string                  `config:"listen_address"`
+	ListenPort       string                  `config:"listen_port"`
+	URL              string                  `config:"url"`
+	Prefix           string                  `config:"prefix"`
+	ContentType      string                  `config:"content_type"`
+	AuthHeader       string                  `config:"auth_header"`
+	AuthHeaderSecret string                  `config:"auth_header_secret"`
 }
 
 func defaultConfig() config {
 	return config{
-		BasicAuth:     false,
-		Username:      "",
-		Password:      "",
-		ResponseCode:  200,
-		ResponseBody:  `{"message": "success"}`,
-		ListenAddress: "127.0.0.1",
-		ListenPort:    "8000",
-		URL:           "/",
-		Prefix:        "json",
-		ContentType:   "application/json",
+		BasicAuth:        false,
+		Username:         "",
+		Password:         "",
+		ResponseCode:     200,
+		ResponseBody:     `{"message": "success"}`,
+		ListenAddress:    "127.0.0.1",
+		ListenPort:       "8000",
+		URL:              "/",
+		Prefix:           "json",
+		ContentType:      "application/json",
+		AuthHeader:       "",
+		AuthHeaderSecret: "",
 	}
 }
 
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
-		return errors.New("response_body must be valid JSON")
+		return errors.New("Response_body must be valid JSON")
 	}
 
 	if c.BasicAuth {
 		if c.Username == "" || c.Password == "" {
 			return errors.New("Username and password required when basicauth is enabled")
+		}
+	}
+
+	if c.AuthHeader != "" || c.AuthHeaderSecret != "" {
+		if c.AuthHeader == "" || c.AuthHeaderSecret == "" {
+			return errors.New("Both auth_header and auth_header_secret must be set")
 		}
 	}
 
