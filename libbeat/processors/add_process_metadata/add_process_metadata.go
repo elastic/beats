@@ -190,15 +190,29 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 		return nil, errors.Errorf("cannot parse field '%s' (not an integer or string)", pidField)
 	}
 
+	var meta common.MapStr
+
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
+		// no process metadata, lets still try to get container id
 		p.log.Debugf("failed to get process metadata for PID=%d: %v", pid, err)
-		return nil, ErrNoProcess
+		meta = common.MapStr{}
+	} else {
+		meta = metaPtr.fields
 	}
-	meta := metaPtr.fields
 
-	if err = p.enrichContainerID(pid, meta); err != nil {
-		return nil, err
+	cid, err := p.getContainerID(pid)
+	if cid == "" || err != nil {
+		p.log.Debugf("failed to get container id for PID=%d: %v", pid, err)
+	} else {
+		if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(meta) == 0 {
+		// no metadata nor container id
+		return nil, ErrNoProcess
 	}
 
 	result = event.Clone()
@@ -216,8 +230,8 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 
 		value, err := meta.GetValue(source)
 		if err != nil {
-			// Should never happen
-			return nil, err
+			// skip missing values
+			continue
 		}
 
 		if _, err = result.Put(dest, value); err != nil {
@@ -228,19 +242,15 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	return result, nil
 }
 
-// enrichContainerID adds container.id into meta for mapping to pickup
-func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) error {
+func (p *addProcessMetadata) getContainerID(pid int) (string, error) {
 	if p.cidProvider == nil {
-		return nil
+		return "", nil
 	}
 	cid, err := p.cidProvider.GetCid(pid)
 	if err != nil {
-		return err
+		return "", err
 	}
-	if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
-		return err
-	}
-	return nil
+	return cid, nil
 }
 
 // String returns the processor representation formatted as a string

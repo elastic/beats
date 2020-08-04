@@ -299,5 +299,91 @@
             "cisco-asa",
             "forwarded"
         ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106100",
+        "cisco.asa.rule_name": "incoming",
+        "cisco.asa.source_interface": "dmz2",
+        "destination.address": "127.3.4.5",
+        "destination.ip": "127.3.4.5",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106100: access-list incoming permitted udp dmz2/127.2.3.4(56575) -> inside/127.3.4.5(53) hit-cnt 1 first hit [0x93d0e533, 0x578ef52f]",
+        "event.outcome": "allow",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1171,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "related.ip": [
+            "127.2.3.4",
+            "127.3.4.5"
+        ],
+        "service.type": "cisco",
+        "source.address": "127.2.3.4",
+        "source.ip": "127.2.3.4",
+        "source.port": 56575,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106100",
+        "cisco.asa.rule_name": "incoming",
+        "cisco.asa.source_interface": "dmz2",
+        "destination.address": "127.3.4.5",
+        "destination.ip": "127.3.4.5",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106100: access-list incoming permitted udp dmz2/127.2.3.4(56575)(LOCAL\\\\username) -> inside/127.3.4.5(53) hit-cnt 1 first hit [0x93d0e533, 0x578ef52f]",
+        "event.outcome": "allow",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1334,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "related.ip": [
+            "127.2.3.4",
+            "127.3.4.5"
+        ],
+        "service.type": "cisco",
+        "source.address": "127.2.3.4",
+        "source.ip": "127.2.3.4",
+        "source.port": 56575,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
     }
 ]

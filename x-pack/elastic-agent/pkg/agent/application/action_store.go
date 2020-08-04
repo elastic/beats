@@ -33,6 +33,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	if err != nil {
 		return &actionStore{log: log, store: store}, nil
 	}
+	defer reader.Close()
 
 	var action actionConfigChangeSerializer
 

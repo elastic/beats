@@ -214,7 +214,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
@@ -227,7 +227,7 @@ def clean_keys(obj):
         "cef.log",
         "cisco.asa",
         "cisco.ios",
-        "f5.firepass",
+        "cylance.protect",
         "fortinet.clientendpoint",
         "haproxy.log",
         "icinga.startup",
@@ -239,6 +239,17 @@ def clean_keys(obj):
         "redis.log",
         "system.auth",
         "system.syslog",
+        "microsoft.defender_atp",
+        "crowdstrike.falcon_endpoint",
+        "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
@@ -275,14 +286,6 @@ def clean_keys(obj):
     if obj["event.dataset"] == "aws.vpcflow":
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
-
-    # Remove event.ingested from testing, as it will never be the same.
-    if obj["event.dataset"] == "microsoft.defender_atp":
-        delete_key(obj, "event.ingested")
-        delete_key(obj, "@timestamp")
-
-    if obj["event.module"] == "gsuite":
-        delete_key(obj, "event.ingested")
 
 
 def delete_key(obj, key):

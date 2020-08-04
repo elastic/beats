@@ -2,6 +2,25 @@
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
 {{- $repoInfo := repo }}
 
+# Prepare home in a different stage to avoid creating additional layers on
+# the final image because of permission changes.
+FROM {{ .from }} AS home
+
+COPY beat {{ $beatHome }}
+
+RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
+    chown -R root:root {{ $beatHome }} && \
+    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    chmod 0750 {{ $beatBinary }} && \
+{{- if .linux_capabilities }}
+    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
+{{- end }}
+{{- range $i, $modulesd := .ModulesDirs }}
+    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+{{- end }}
+    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+
 FROM {{ .from }}
 
 RUN yum -y --setopt=tsflags=nodocs update && \
@@ -23,26 +42,13 @@ LABEL \
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
 
-COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
-RUN groupadd --gid 1000 {{ .BeatName }}
-
-RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
-    chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
-{{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
-{{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+COPY --from=home {{ $beatHome }} {{ $beatHome }}
 
 {{- if ne .user "root" }}
+RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}
