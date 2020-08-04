@@ -256,6 +256,7 @@ from being added to events by default. {pull}18159[18159]
 - Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
+- The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
 
 *Metricbeat*
 
