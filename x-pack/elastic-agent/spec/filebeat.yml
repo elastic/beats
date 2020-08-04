@@ -49,11 +49,11 @@ rules:
     - remove_key:
         key: use_output
     - remove_key:
-        key: dataset
+        key: datastream
     - remove_key:
-        key: dataset.namespace
+        key: datastream.namespace
     - remove_key:
-        key: dataset.name
+        key: datastream.dataset
 
 - filter_values:
     selector: inputs

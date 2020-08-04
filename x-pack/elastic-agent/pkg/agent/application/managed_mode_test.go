@@ -115,7 +115,7 @@ const fleetResponse = `
 						"streams": [{
 								"id": "system/metrics-system.core",
 								"enabled": true,
-								"dataset.name": "system.core",
+								"datastream.dataset": "system.core",
 								"period": "10s",
 								"metrics": [
 									"percentages"
@@ -124,7 +124,7 @@ const fleetResponse = `
 							{
 								"id": "system/metrics-system.cpu",
 								"enabled": true,
-								"dataset.name": "system.cpu",
+								"datastream.dataset": "system.cpu",
 								"period": "10s",
 								"metrics": [
 									"percentages",
@@ -134,59 +134,59 @@ const fleetResponse = `
 							{
 								"id": "system/metrics-system.diskio",
 								"enabled": true,
-								"dataset.name": "system.diskio",
+								"datastream.dataset": "system.diskio",
 								"period": "10s",
 								"include_devices": []
 							},
 							{
 								"id": "system/metrics-system.entropy",
 								"enabled": true,
-								"dataset.name": "system.entropy",
+								"datastream.dataset": "system.entropy",
 								"period": "10s",
 								"include_devices": []
 							},
 							{
 								"id": "system/metrics-system.filesystem",
 								"enabled": true,
-								"dataset.name": "system.filesystem",
+								"datastream.dataset": "system.filesystem",
 								"period": "1m",
 								"ignore_types": []
 							},
 							{
 								"id": "system/metrics-system.fsstat",
 								"enabled": true,
-								"dataset.name": "system.fsstat",
+								"datastream.dataset": "system.fsstat",
 								"period": "1m",
 								"ignore_types": []
 							},
 							{
 								"id": "system/metrics-system.load",
 								"enabled": true,
-								"dataset.name": "system.load",
+								"datastream.dataset": "system.load",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.memory",
 								"enabled": true,
-								"dataset.name": "system.memory",
+								"datastream.dataset": "system.memory",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.network",
 								"enabled": true,
-								"dataset.name": "system.network",
+								"datastream.dataset": "system.network",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.network_summary",
 								"enabled": true,
-								"dataset.name": "system.network_summary",
+								"datastream.dataset": "system.network_summary",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.process",
 								"enabled": true,
-								"dataset.name": "system.process",
+								"datastream.dataset": "system.process",
 								"period": "10s",
 								"processes": [
 									".*"
@@ -202,39 +202,39 @@ const fleetResponse = `
 							{
 								"id": "system/metrics-system.process_summary",
 								"enabled": true,
-								"dataset.name": "system.process_summary",
+								"datastream.dataset": "system.process_summary",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.raid",
 								"enabled": true,
-								"dataset.name": "system.raid",
+								"datastream.dataset": "system.raid",
 								"period": "10s",
 								"mount_point": "/"
 							},
 							{
 								"id": "system/metrics-system.service",
 								"enabled": true,
-								"dataset.name": "system.service",
+								"datastream.dataset": "system.service",
 								"period": "10s",
 								"state_filter": []
 							},
 							{
 								"id": "system/metrics-system.socket_summary",
 								"enabled": true,
-								"dataset.name": "system.socket_summary",
+								"datastream.dataset": "system.socket_summary",
 								"period": "10s"
 							},
 							{
 								"id": "system/metrics-system.uptime",
 								"enabled": true,
-								"dataset.name": "system.uptime",
+								"datastream.dataset": "system.uptime",
 								"period": "15m"
 							},
 							{
 								"id": "system/metrics-system.users",
 								"enabled": true,
-								"dataset.name": "system.users",
+								"datastream.dataset": "system.users",
 								"period": "10s"
 							}
 						]
@@ -245,7 +245,7 @@ const fleetResponse = `
 						"streams": [{
 								"id": "logs-system.auth",
 								"enabled": true,
-								"dataset.name": "system.auth",
+								"datastream.dataset": "system.auth",
 								"paths": [
 									"/var/log/auth.log*",
 									"/var/log/secure*"
@@ -254,7 +254,7 @@ const fleetResponse = `
 							{
 								"id": "logs-system.syslog",
 								"enabled": true,
-								"dataset.name": "system.syslog",
+								"datastream.dataset": "system.syslog",
 								"paths": [
 									"/var/log/messages*",
 									"/var/log/syslog*"

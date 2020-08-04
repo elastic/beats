@@ -31,59 +31,59 @@ inputs:
       - paths: /var/log/mysql/error.log
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
   - name: Specified dataset
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    datastream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        datastream.dataset: ""
 `,
 			expectedYAML: `
 inputs:
   - name: All default
     type: file
-    dataset.namespace: default
+    datastream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        datastream.dataset: generic
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        datastream.dataset: generic
   - name: Specified dataset
     type: file
-    dataset.namespace: default
+    datastream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: default
+    datastream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        datastream.dataset: generic
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -101,7 +101,7 @@ inputs:
       - paths: /var/log/mysql/error.log
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
 
@@ -109,19 +109,19 @@ inputs:
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    datastream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        datastream.dataset: ""
 `,
 			expectedYAML: `
 inputs:
@@ -132,7 +132,7 @@ inputs:
         index: mytype-generic-default
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
         index: mytype-generic-nsns
@@ -141,21 +141,21 @@ inputs:
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
         index: mytype-dsds-default
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    datastream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        datastream.dataset: dsds
         index: mytype-dsds-nsns
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    datastream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        datastream.dataset: ""
         index: mytype-generic-default
 `,
 			rule: &RuleList{

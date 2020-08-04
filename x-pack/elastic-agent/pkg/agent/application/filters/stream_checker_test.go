@@ -40,8 +40,8 @@ func TestStreamCheck(t *testing.T) {
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
-						"dataset.namespace": "somenamespace",
-						"streams":           []map[string]interface{}{{"dataset.name": "somedatasetname"}},
+						"datastream.namespace": "somenamespace",
+						"streams":              []map[string]interface{}{{"datastream.dataset": "somedatasetname"}},
 					},
 				},
 			},
@@ -52,13 +52,13 @@ func TestStreamCheck(t *testing.T) {
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
-						"dataset": map[string]interface{}{
+						"datastream": map[string]interface{}{
 							"namespace": "somenamespace",
 						},
 						"streams": []map[string]interface{}{
 							{
-								"dataset": map[string]interface{}{
-									"name": "somedatasetname",
+								"datastream": map[string]interface{}{
+									"dataset": "somedatasetname",
 								},
 							},
 						},
@@ -68,23 +68,23 @@ func TestStreamCheck(t *testing.T) {
 			result: nil,
 		},
 		{
-			name: "dataset.name invalid - compact",
+			name: "dataset invalid - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": ""}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": ""}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid - long",
+			name: "dataset invalid - long",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
 						"streams": []map[string]interface{}{
 							{
-								"dataset": map[string]interface{}{
-									"name": "",
+								"datastream": map[string]interface{}{
+									"dataset": "",
 								},
 							},
 						},
@@ -95,55 +95,55 @@ func TestStreamCheck(t *testing.T) {
 		},
 
 		{
-			name: "dataset.name invalid dot - compact",
+			name: "dataset invalid dot - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": "."}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": "."}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid dotdot- compact",
+			name: "dataset invalid dotdot- compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": ".."}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": ".."}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid uppercase - compact",
+			name: "dataset invalid uppercase - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": "myNameIs"}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": "myNameIs"}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid space- compact",
+			name: "dataset invalid space- compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": "outer space"}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": "outer space"}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid invalid char- compact",
+			name: "dataset invalid invalid char- compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": "is\\thisvalid"}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": "is\\thisvalid"}}},
 				},
 			},
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset.name invalid invalid prefix- compact",
+			name: "dataset invalid invalid prefix- compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": "_isthisvalid"}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": "_isthisvalid"}}},
 				},
 			},
 			result: ErrInvalidDataset,
@@ -152,7 +152,7 @@ func TestStreamCheck(t *testing.T) {
 		{
 			name: "namespace invalid - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": ""}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": ""}},
 			},
 			result: ErrInvalidNamespace,
 		},
@@ -160,7 +160,7 @@ func TestStreamCheck(t *testing.T) {
 			name: "namespace invalid name 1 - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"dataset.namespace": "."},
+					{"datastream.namespace": "."},
 				},
 			},
 			result: ErrInvalidNamespace,
@@ -168,35 +168,35 @@ func TestStreamCheck(t *testing.T) {
 		{
 			name: "namespace invalid name 2 - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": ".."}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": ".."}},
 			},
 			result: ErrInvalidNamespace,
 		},
 		{
 			name: "namespace invalid name uppercase - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": "someUpper"}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": "someUpper"}},
 			},
 			result: ErrInvalidNamespace,
 		},
 		{
 			name: "namespace invalid name space - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": "some space"}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": "some space"}},
 			},
 			result: ErrInvalidNamespace,
 		},
 		{
 			name: "namespace invalid name invalid char - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": "isitok?"}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": "isitok?"}},
 			},
 			result: ErrInvalidNamespace,
 		},
 		{
 			name: "namespace invalid name invalid prefix - compact",
 			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"dataset.namespace": "+isitok"}},
+				"inputs": []map[string]interface{}{{"datastream.namespace": "+isitok"}},
 			},
 			result: ErrInvalidNamespace,
 		},
@@ -205,7 +205,7 @@ func TestStreamCheck(t *testing.T) {
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
-						"dataset": map[string]interface{}{
+						"datastream": map[string]interface{}{
 							"namespace": "",
 						},
 					},
@@ -217,7 +217,7 @@ func TestStreamCheck(t *testing.T) {
 			name: "type invalid name 1 - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"dataset.type": "-invalidstart"},
+					{"datastream.type": "-invalidstart"},
 				},
 			},
 			result: ErrInvalidIndex,
@@ -227,9 +227,9 @@ func TestStreamCheck(t *testing.T) {
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
 					{
-						"dataset.type":      semiLongString,
-						"dataset.namespace": semiLongString,
-						"streams":           []map[string]interface{}{{"dataset.name": semiLongString}},
+						"datastream.type":      semiLongString,
+						"datastream.namespace": semiLongString,
+						"streams":              []map[string]interface{}{{"datastream.dataset": semiLongString}},
 					},
 				},
 			},
@@ -239,7 +239,7 @@ func TestStreamCheck(t *testing.T) {
 			name: "type invalid type length 1 - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"dataset.type": longString},
+					{"datastream.type": longString},
 				},
 			},
 			result: ErrInvalidIndex,
@@ -249,17 +249,17 @@ func TestStreamCheck(t *testing.T) {
 			name: "type invalid namespace length 1 - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"dataset.namespace": longString},
+					{"datastream.namespace": longString},
 				},
 			},
 			result: ErrInvalidNamespace,
 		},
 
 		{
-			name: "type invalid dataset.name length 1 - compact",
+			name: "type invalid dataset length 1 - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"dataset.name": longString}}},
+					{"streams": []map[string]interface{}{{"datastream.dataset": longString}}},
 				},
 			},
 			result: ErrInvalidDataset,
