@@ -169,6 +169,18 @@
       type: keyword
       description: >
         Password related to the meeting
+    - name: phone.id
+      type: keyword
+      description: >
+        Unique ID for the phone or conversation
+    - name: phone.user_id
+      type: keyword
+      description: >
+        UserID for the phone owner
+    - name: phone.download_url
+      type: keyword
+      description: >
+        Download URL for the voicemail
     - name: phone.ringing_start_time
       type: date
       description: >
@@ -213,7 +225,7 @@
       type: keyword
       description: >
         UserID of the callee related to the voicemail
-    - name: callee_extension_type
+    - name: phone.callee_extension_type
       type: keyword
       description: >
         UserID of the callee related to the voicemail
@@ -245,10 +257,22 @@
       type: keyword
       description: >
         UserID of the person that is called
+    - name: phone.callee_name
+      type: keyword
+      description: >
+        Name of the person that is called
     - name: phone.callee.phone_number
       type: keyword
       description: >
         Phone Number of the callee
+    - name: phone.callee_number
+      type: keyword
+      description: >
+        Number of the callee related to the voicemail
+    - name: phone.callee_number_type
+      type: keyword
+      description: >
+        Type of phone number
     - name: phone.callee.extension_number
       type: keyword
       description: >
@@ -261,6 +285,10 @@
       type: keyword
       description: >
         Device type used by the callee
+    - name: phone.date_time
+      type: date
+      description: >
+        Date and time of the phone event
     - name: recording.id
       type: keyword
       description: >
@@ -389,6 +417,14 @@
       type: date
       description: >
         Time when user logged in/ou
+    - name: user.client_type
+      type: keyword
+      description: >
+        Type of client used by the user
+    - name: user.version
+      type: keyword
+      description: >
+        Version of the client used by the user
     - name: webinar.id
       type: keyword
       description: >

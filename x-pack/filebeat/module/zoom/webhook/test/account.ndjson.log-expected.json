@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-08-04T15:28:13.299Z",
+        "@timestamp": "2020-08-04T18:00:45.401Z",
         "event.action": "account.created",
         "event.category": [
             "iam"
@@ -37,7 +37,7 @@
         "zoom.sub_account_id": "aIxE1yiRR8WghhUIO6eu9L"
     },
     {
-        "@timestamp": "2020-08-04T15:28:13.300Z",
+        "@timestamp": "2020-08-04T18:00:45.401Z",
         "event.action": "account.updated",
         "event.category": [
             "iam"
@@ -77,7 +77,7 @@
         "zoom.time_stamp": 1562000584527
     },
     {
-        "@timestamp": "2020-08-04T15:28:13.300Z",
+        "@timestamp": "2020-08-04T18:00:45.401Z",
         "event.action": "account.disassociated",
         "event.category": [
             "iam"
