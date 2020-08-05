@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-08-05T23:13:21.708Z",
+        "@timestamp": "2020-08-05T23:21:00.133Z",
         "event.action": "account.created",
         "event.category": [
             "iam"
@@ -76,7 +76,7 @@
         "zoom.sub_account_id": "eFs_EGRCq6ByEyA73qCA"
     },
     {
-        "@timestamp": "2020-08-05T23:13:21.709Z",
+        "@timestamp": "2020-08-05T23:21:00.133Z",
         "event.action": "account.disassociated",
         "event.category": [
             "iam"

@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-08-05T23:13:19.349Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.caller_ringing",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -37,7 +37,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:41:55Z"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.caller_connected",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -75,7 +75,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:41:55Z"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.caller_ringing",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -111,7 +111,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:38:40Z"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.callee_answered",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -149,7 +149,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:41:56Z"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.callee_missed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -183,7 +183,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.callee_ended",
         "event.dataset": "zoom.webhook",
         "event.duration": 4000000000,
@@ -221,7 +221,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.caller_ended",
         "event.dataset": "zoom.webhook",
         "event.duration": 4000000000,
@@ -259,7 +259,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.callee_rejected",
         "event.dataset": "zoom.webhook",
         "event.duration": 6000000000,
@@ -296,7 +296,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T21:06:33Z"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.voicemail_received",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -335,7 +335,7 @@
         "zoom.phone.id": "235435"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.caller_call_log_completed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -360,7 +360,7 @@
         "zoom.phone.user_id": "caddsfsdfv_VaHE53wA"
     },
     {
-        "@timestamp": "2020-08-05T23:13:19.350Z",
+        "@timestamp": "2020-08-05T23:20:57.741Z",
         "event.action": "phone.callee_call_log_completed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
