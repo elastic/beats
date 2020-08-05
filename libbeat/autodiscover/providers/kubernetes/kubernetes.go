@@ -38,7 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
-	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -82,11 +81,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	if config.Unique {
-		// enrich the config with Unique templates before building Mapper
-		initUniqueTemplate(config)
-	}
-
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		return nil, errWrap(err)
@@ -118,23 +112,23 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		logger:    logger,
 	}
 
-	switch config.Resource {
-	case "pod":
-		p.eventer, err = NewPodEventer(uuid, c, client, p.publish)
-	case "node":
-		p.eventer, err = NewNodeEventer(uuid, c, client, p.publish)
-	case "service":
-		p.eventer, err = NewServiceEventer(uuid, c, client, p.publish)
-	default:
-		return nil, fmt.Errorf("unsupported autodiscover resource %s", config.Resource)
-	}
-
-	if err != nil {
-		return nil, errWrap(err)
-	}
-
 	if p.config.Unique {
 		p.initLeaderElectionConfig(client, uuid.String())
+	} else {
+		switch config.Resource {
+		case "pod":
+			p.eventer, err = NewPodEventer(uuid, c, client, p.publish)
+		case "node":
+			p.eventer, err = NewNodeEventer(uuid, c, client, p.publish)
+		case "service":
+			p.eventer, err = NewServiceEventer(uuid, c, client, p.publish)
+		default:
+			return nil, fmt.Errorf("unsupported autodiscover resource %s", config.Resource)
+		}
+
+		if err != nil {
+			return nil, errWrap(err)
+		}
 	}
 
 	return p, nil
@@ -142,14 +136,14 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 
 // Start for Runner interface.
 func (p *Provider) Start() {
-	if err := p.eventer.Start(); err != nil {
-		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
-	}
-
 	if p.config.Unique {
 		ctx, cancel := context.WithCancel(context.Background())
 		p.cancelLeaderElection = cancel
 		p.StartLeaderElector(ctx, p.leaderElection)
+	} else {
+		if err := p.eventer.Start(); err != nil {
+			p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
+		}
 	}
 }
 
@@ -168,7 +162,9 @@ func (p *Provider) StartLeaderElector(ctx context.Context, lec leaderelection.Le
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
-	p.eventer.Stop()
+	if p.eventer != nil {
+		p.eventer.Stop()
+	}
 	if p.cancelLeaderElection != nil {
 		p.cancelLeaderElection()
 	}
@@ -258,17 +254,5 @@ func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
 				p.stopLeading(uuid, eventID)
 			},
 		},
-	}
-}
-
-func initUniqueTemplate(config *Config) {
-	m := make(map[string]interface{})
-	m["unique"] = "true"
-	fields := &conditions.Fields{}
-	fields.Unpack(m)
-	for _, template := range config.Templates {
-		template.ConditionConfig = &conditions.Config{
-			Contains: fields,
-		}
 	}
 }
