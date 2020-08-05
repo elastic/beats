@@ -15,7 +15,7 @@ filebeat:
             name: generic
             namespace: default
       - add_fields:
-          target: "datastream"
+          target: "data_stream"
           fields:
             type: logs
             dataset: generic
@@ -39,7 +39,7 @@ filebeat:
             name: generic
             namespace: default
       - add_fields:
-          target: "datastream"
+          target: "data_stream"
           fields:
             type: testtype
             dataset: generic

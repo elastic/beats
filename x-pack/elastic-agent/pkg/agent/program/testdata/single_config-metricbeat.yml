@@ -12,7 +12,7 @@ metricbeat:
           name: docker.status
           namespace: default
     - add_fields:
-        target: "datastream"
+        target: "data_stream"
         fields:
           type: metrics
           dataset: docker.status
@@ -33,7 +33,7 @@ metricbeat:
           name: generic
           namespace: default
     - add_fields:
-        target: "datastream"
+        target: "data_stream"
         fields:
           type: metrics
           dataset: generic
@@ -57,7 +57,7 @@ metricbeat:
             name: generic
             namespace: testing
       - add_fields:
-          target: "datastream"
+          target: "data_stream"
           fields:
             type: metrics
             dataset: generic
