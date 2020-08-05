@@ -72,13 +72,13 @@ type Provider struct {
 	eventManager EventManager
 }
 
-// eventerManager implements unique autodiscover provider for Kubernetes clusters
+// eventerManager implements start/stop methods for autodiscover provider with resource eventer
 type eventerManager struct {
 	eventer Eventer
 	logger  *logp.Logger
 }
 
-// leaderElectionManager implements unique autodiscover provider for Kubernetes clusters
+// leaderElectionManager implements start/stop methods for unique autodiscover provider for Kubernetes clusters
 type leaderElectionManager struct {
 	leaderElection       leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
