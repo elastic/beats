@@ -3,7 +3,7 @@ inputs:
   id: unique-http-id
   name: my-http
   schedule: '*/5 * * * * * *'
-  hosts: ["http://localhost:80/service/status"]
+  host: "http://localhost:80/service/status"
   timeout: 16s
   wait: 1s
   dataset.namespace: default
@@ -11,7 +11,7 @@ inputs:
   id: unique-tcp-id
   name: my-tcp
   schedule: '*/5 * * * * * *'
-  hosts: ["localhost:777"]
+  host: "localhost:777"
   timeout: 16s
   wait: 1s
   dataset.namespace: default
@@ -19,7 +19,7 @@ inputs:
   id: unique-icmp-id
   name: my-icmp
   schedule: '@every 5s'
-  hosts: ["localhost"]
+  host: "localhost"
   ipv4: true
   ipv6: true
   mode: any

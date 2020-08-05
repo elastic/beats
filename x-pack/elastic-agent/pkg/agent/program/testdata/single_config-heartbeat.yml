@@ -3,7 +3,7 @@ inputs:
   id: unique-http-id
   name: my-http
   schedule: '*/5 * * * * * *'
-  hosts: ["http://localhost:80/service/status"]
+  host: "http://localhost:80/service/status"
   timeout: 16s
   wait: 1s
   dataset.namespace: default
