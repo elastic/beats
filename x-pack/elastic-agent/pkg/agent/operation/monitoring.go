@@ -200,7 +200,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				},
 				{
 					"add_fields": map[string]interface{}{
-						"target": "datastream",
+						"target": "data_stream",
 						"fields": map[string]interface{}{
 							"type":      "logs",
 							"dataset":   "elastic.agent",
@@ -244,7 +244,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 					},
 					{
 						"add_fields": map[string]interface{}{
-							"target": "datastream",
+							"target": "data_stream",
 							"fields": map[string]interface{}{
 								"type":      "logs",
 								"dataset":   fmt.Sprintf("elastic.agent.%s", name),
@@ -304,7 +304,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 				},
 				{
 					"add_fields": map[string]interface{}{
-						"target": "datastream",
+						"target": "data_stream",
 						"fields": map[string]interface{}{
 							"type":      "metrics",
 							"dataset":   fmt.Sprintf("elastic.agent.%s", name),

@@ -645,7 +645,7 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 
 			// datastream
 			processorMap = &Dict{value: make([]Node, 0)}
-			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "datastream"}})
+			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "data_stream"}})
 			processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
 				&Key{name: "type", value: &StrVal{value: datasetType}},
 				&Key{name: "namespace", value: &StrVal{value: namespace}},
