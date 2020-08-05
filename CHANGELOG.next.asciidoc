@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds Gsuite Drive support. {pull}19704[19704]
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
+- Add `while_pattern` type to multiline reader. {pull}19662[19662]
 
 *Heartbeat*
 
@@ -152,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix seccomp policy for calls to `chmod` and `chown`. {pull}20054[20054]
 - Remove unnecessary restarts of metricsets while using Node autodiscover {pull}19974[19974]
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
+- Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 
 *Auditbeat*
@@ -167,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - auditd: Fix spelling of anomaly in `event.category`.
 - auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
 - auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
+- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
 
 *Filebeat*
 
@@ -219,14 +222,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
+- Update container name for the azure filesets. {pull}19899[19899]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
 - Fix auditd module syscall table for ppc64 and ppc64le. {pull}20052[20052]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
-- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
+- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
+- Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
 
 *Heartbeat*
 
@@ -297,6 +302,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
+- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
+- Add required option for `metrics` in app_insights. {pull}20406[20406]
+- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 
 *Packetbeat*
 
@@ -359,6 +367,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
+- Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 
 *Auditbeat*
 
@@ -496,6 +505,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 - Add event.ingested for Suricata module {pull}20220[20220]
+- Add event.ingested to all Filebeat modules. {pull}20386[20386]
 
 *Heartbeat*
 
@@ -605,6 +615,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
+- Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
 
 *Packetbeat*
 

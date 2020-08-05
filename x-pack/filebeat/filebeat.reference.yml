@@ -1340,9 +1340,9 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#------------------------------- Sophosxg Module -------------------------------
-- module: sophosxg
-  firewall:
+#-------------------------------- Sophos Module --------------------------------
+- module: sophos
+  xg:
     enabled: true
 
     # Set which input to use between tcp, udp (default) or file.
@@ -1355,9 +1355,9 @@ filebeat.modules:
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9005
 
-    # firewall default hostanme 
+    # firewall default hostname
     #var.default_host_name: firewall.localgroup.local
-    
+
     # known firewalls
     #var.known_devices:
     #   "device1_serialnumber": "a.host.local"
