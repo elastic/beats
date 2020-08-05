@@ -223,3 +223,7 @@ func negatedLineMatcher(m lineMatcherFunc) lineMatcherFunc {
 		return !m(content)
 	}
 }
+
+func (pr *whilePatternReader) Close() error {
+	return pr.reader.Close()
+}
