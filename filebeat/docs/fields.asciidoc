@@ -127652,16 +127652,6 @@ type: date
 
 --
 
-*`zoom.time_stamp`*::
-+
---
-Timestamp related to the event
-
-
-type: date
-
---
-
 *`zoom.creation_type`*::
 +
 --
@@ -127772,26 +127762,6 @@ type: keyword
 
 --
 
-*`zoom.chat_channel.timestamp`*::
-+
---
-Date and time when channel was created/modified/deleted
-
-
-type: date
-
---
-
-*`zoom.chat_channel.date_time`*::
-+
---
-Epoch time when channel was created/modified/deleted
-
-
-type: date
-
---
-
 *`zoom.chat_message.id`*::
 +
 --
@@ -127809,26 +127779,6 @@ Type of message, can be either "to_contact" or "to_channel"
 
 
 type: keyword
-
---
-
-*`zoom.chat_message.date_time`*::
-+
---
-Date and time when message was created/modified/deleted
-
-
-type: date
-
---
-
-*`zoom.chat_message.timestamp`*::
-+
---
-Epoch when message was created/modified/deleted
-
-
-type: date
 
 --
 
@@ -127902,16 +127852,6 @@ type: keyword
 
 --
 
-*`zoom.meeting.join_url`*::
-+
---
-The URL to join the meeting
-
-
-type: keyword
-
---
-
 *`zoom.meeting.uuid`*::
 +
 --
@@ -127948,7 +127888,7 @@ type: keyword
 Type of meeting created
 
 
-type: integer
+type: keyword
 
 --
 
@@ -128092,60 +128032,10 @@ type: long
 
 --
 
-*`zoom.phone.caller_number`*::
+*`zoom.phone.caller.id`*::
 +
 --
-Caller number related to the voicemail
-
-
-type: keyword
-
---
-
-*`zoom.phone.caller_name`*::
-+
---
-Caller name related to the voicemail
-
-
-type: keyword
-
---
-
-*`zoom.phone.caller_number_type`*::
-+
---
-Caller type related to the voicemail, can either be 1(Internal) or 2(External)
-
-
-type: long
-
---
-
-*`zoom.phone.caller_user_id`*::
-+
---
-UserID of the caller related to the voicemail
-
-
-type: keyword
-
---
-
-*`zoom.phone.callee_user_id`*::
-+
---
-UserID of the callee related to the voicemail
-
-
-type: keyword
-
---
-
-*`zoom.phone.callee_extension_type`*::
-+
---
-Extension type of the calle related to the voicemail, can be user, callQueue, autoReceptionist or shareLineGroup
+UserID of the caller related to the voicemail/call
 
 
 type: keyword
@@ -128162,10 +128052,40 @@ type: keyword
 
 --
 
+*`zoom.phone.caller.number_type`*::
++
+--
+The type of number, can be 1(Internal) or 2(External)
+
+
+type: keyword
+
+--
+
+*`zoom.phone.caller.name`*::
++
+--
+The name of the related callee
+
+
+type: keyword
+
+--
+
 *`zoom.phone.caller.phone_number`*::
 +
 --
 Phone Number of the caller related to the call
+
+
+type: keyword
+
+--
+
+*`zoom.phone.caller.extension_type`*::
++
+--
+Extension type of the caller number, can be user, callQueue, autoReceptionist or shareLineGroup
 
 
 type: keyword
@@ -128202,10 +128122,10 @@ type: keyword
 
 --
 
-*`zoom.phone.callee_id`*::
+*`zoom.phone.callee.id`*::
 +
 --
-UserID of the related callee of the voicemail
+UserID of the callee related to the voicemail/call
 
 
 type: keyword
@@ -128215,17 +128135,27 @@ type: keyword
 *`zoom.phone.callee.user_id`*::
 +
 --
-UserID of the related callee of a call
+UserID of the related callee of a voicemail/call
 
 
 type: keyword
 
 --
 
-*`zoom.phone.callee_name`*::
+*`zoom.phone.callee.name`*::
 +
 --
-The name of the callee related to the voicemail
+The name of the related callee
+
+
+type: keyword
+
+--
+
+*`zoom.phone.callee.number_type`*::
++
+--
+The type of number, can be 1(Internal) or 2(External)
 
 
 type: keyword
@@ -128242,20 +128172,10 @@ type: keyword
 
 --
 
-*`zoom.phone.callee_number`*::
+*`zoom.phone.callee.extension_type`*::
 +
 --
-Number of the callee related to the voicemail
-
-
-type: keyword
-
---
-
-*`zoom.phone.callee_number_type`*::
-+
---
-Type of number related to the callee of the voicemail. Can be 1(Internal) or 2(External)
+Extension type of the callee number, can be user, callQueue, autoReceptionist or shareLineGroup
 
 
 type: keyword
@@ -128409,6 +128329,26 @@ Number of recording files related to the recording
 
 
 type: long
+
+--
+
+*`zoom.recording.recording_file.recording_start`*::
++
+--
+The date and time the recording started
+
+
+type: date
+
+--
+
+*`zoom.recording.recording_file.recording_end`*::
++
+--
+The date and time the recording finished
+
+
+type: date
 
 --
 
@@ -128609,16 +128549,6 @@ Personal notes for the User
 
 
 type: keyword
-
---
-
-*`zoom.user.date_time`*::
-+
---
-The date and time when user logged in or out
-
-
-type: date
 
 --
 
