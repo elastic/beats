@@ -1,6 +1,10 @@
 description: Pipeline for AWS VPC Flow Logs
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+
   # Convert Unix epoch to timestamp
   - date:
       field: "aws.vpcflow.end"

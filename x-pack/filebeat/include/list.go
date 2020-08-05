@@ -49,7 +49,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/radware"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/rapid7"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sonicwall"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sophosxg"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sophos"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/squid"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/tenable"
