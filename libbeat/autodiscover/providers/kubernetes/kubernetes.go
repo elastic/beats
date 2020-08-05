@@ -133,7 +133,11 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	if p.config.Unique {
 		p.eventManager, err = NewLeaderElectionManager(uuid, config, client, p.startLeading, p.stopLeading, logger)
 	} else {
-		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish, errWrap)
+		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish)
+	}
+
+	if err != nil {
+		return nil, errWrap(err)
 	}
 
 	return p, nil
@@ -203,7 +207,6 @@ func NewEventerManager(
 	cfg *Config,
 	client k8s.Interface,
 	publish func(event bus.Event),
-	errWrap func(err error) error,
 ) (EventManager, error) {
 	var err error
 	em := &eventerManager{}
@@ -219,7 +222,7 @@ func NewEventerManager(
 	}
 
 	if err != nil {
-		return nil, errWrap(err)
+		return nil, err
 	}
 	return em, nil
 }
