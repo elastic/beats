@@ -37919,7 +37919,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 *`host.cpu.pct`*::
 +
 --
-Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 100%.
+Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
 
 type: scaled_float
 
