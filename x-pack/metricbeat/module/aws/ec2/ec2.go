@@ -338,6 +338,9 @@ func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr
 
 	for ec2MetricName, hostMetricName := range hostFieldTable {
 		metricValue, err := resultMetricsetFields.GetValue(ec2MetricName)
+		if ec2MetricName == "cpu.total.pct" {
+			metricValue = metricValue.(float64) / 100
+		}
 		if err == nil && metricValue != nil {
 			hostRootFields.Put(hostMetricName, metricValue)
 		}
