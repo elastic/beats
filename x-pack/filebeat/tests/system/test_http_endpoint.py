@@ -143,8 +143,8 @@ class Test(BaseTest):
         Test http_endpoint input with wrong auth header and secret.
         """
         options = """
-  auth_header: Authorization
-  auth_header_secret: 123password
+  secret.header: Authorization
+  secret.value: 123password
 """
         self.get_config(options)
         filebeat = self.start_beat()
@@ -165,8 +165,8 @@ class Test(BaseTest):
         Test http_endpoint input with correct auth header and secret.
         """
         options = """
-  auth_header: Authorization
-  auth_header_secret: 123password
+  secret.header: Authorization
+  secret.value: 123password
 """
         self.get_config(options)
         filebeat = self.start_beat()
