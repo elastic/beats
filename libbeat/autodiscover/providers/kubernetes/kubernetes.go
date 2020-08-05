@@ -56,13 +56,18 @@ type Eventer interface {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config               *Config
-	bus                  bus.Bus
-	templates            template.Mapper
-	builders             autodiscover.Builders
-	appenders            autodiscover.Appenders
-	logger               *logp.Logger
-	eventer              Eventer
+	config    *Config
+	bus       bus.Bus
+	templates template.Mapper
+	builders  autodiscover.Builders
+	appenders autodiscover.Appenders
+	logger    *logp.Logger
+	eventer   Eventer
+}
+
+// UniqueProvider implements unique autodiscover provider for Kubernetes clusters
+type UniqueProvider struct {
+	Provider
 	leaderElection       leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
 }
@@ -113,7 +118,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	if p.config.Unique {
-		p.initLeaderElectionConfig(client, uuid.String())
+		return uniqueProviderBuilder(p, client, uuid)
 	} else {
 		switch config.Resource {
 		case "pod":
@@ -136,38 +141,14 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 
 // Start for Runner interface.
 func (p *Provider) Start() {
-	if p.config.Unique {
-		ctx, cancel := context.WithCancel(context.Background())
-		p.cancelLeaderElection = cancel
-		p.StartLeaderElector(ctx, p.leaderElection)
-	} else {
-		if err := p.eventer.Start(); err != nil {
-			p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
-		}
+	if err := p.eventer.Start(); err != nil {
+		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
-}
-
-// StartLeaderElector starts a Leader Elector in the background with the provided config
-func (p *Provider) StartLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
-	le, err := leaderelection.NewLeaderElector(lec)
-	if err != nil {
-		p.logger.Errorf("leader election lock GAINED, id %v", err)
-	}
-	if lec.WatchDog != nil {
-		lec.WatchDog.SetLeaderElection(le)
-	}
-	p.logger.Debugf("Starting Leader Elector")
-	go le.Run(ctx)
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
-	if p.eventer != nil {
-		p.eventer.Stop()
-	}
-	if p.cancelLeaderElection != nil {
-		p.cancelLeaderElection()
-	}
+	p.eventer.Stop()
 }
 
 // String returns a description of kubernetes autodiscover provider.
@@ -192,7 +173,42 @@ func (p *Provider) publish(event bus.Event) {
 	p.bus.Publish(event)
 }
 
-func (p *Provider) startLeading(uuid string, eventID string) {
+func uniqueProviderBuilder(p *Provider, client k8s.Interface, uuid uuid.UUID) (autodiscover.Provider, error) {
+	uniqueProvider := &UniqueProvider{
+		Provider: *p,
+	}
+	uniqueProvider.initLeaderElectionConfig(client, uuid.String())
+	return uniqueProvider, nil
+}
+
+// Start for Runner interface.
+func (p *UniqueProvider) Start() {
+	ctx, cancel := context.WithCancel(context.Background())
+	p.cancelLeaderElection = cancel
+	p.startLeaderElector(ctx, p.leaderElection)
+}
+
+// Stop signals the stop channel to force the watch loop routine to stop.
+func (p *UniqueProvider) Stop() {
+	if p.cancelLeaderElection != nil {
+		p.cancelLeaderElection()
+	}
+}
+
+// startLeaderElector starts a Leader Elector in the background with the provided config
+func (p *UniqueProvider) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
+	le, err := leaderelection.NewLeaderElector(lec)
+	if err != nil {
+		p.logger.Errorf("leader election lock GAINED, id %v", err)
+	}
+	if lec.WatchDog != nil {
+		lec.WatchDog.SetLeaderElection(le)
+	}
+	p.logger.Debugf("Starting Leader Elector")
+	go le.Run(ctx)
+}
+
+func (p *UniqueProvider) startLeading(uuid string, eventID string) {
 	event := bus.Event{
 		"start":    true,
 		"provider": uuid,
@@ -205,7 +221,7 @@ func (p *Provider) startLeading(uuid string, eventID string) {
 	p.bus.Publish(event)
 }
 
-func (p *Provider) stopLeading(uuid string, eventID string) {
+func (p *UniqueProvider) stopLeading(uuid string, eventID string) {
 	event := bus.Event{
 		"stop":     true,
 		"provider": uuid,
@@ -218,7 +234,7 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 	p.bus.Publish(event)
 }
 
-func (p *Provider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
+func (p *UniqueProvider) initLeaderElectionConfig(client k8s.Interface, uuid string) {
 	var id string
 	if p.config.Node != "" {
 		id = "beats-leader-" + p.config.Node
