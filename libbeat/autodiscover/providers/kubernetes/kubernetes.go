@@ -78,7 +78,7 @@ type eventerManager struct {
 	logger  *logp.Logger
 }
 
-// leaderElectionManager implements start/stop methods for unique autodiscover provider for Kubernetes clusters
+// leaderElectionManager implements start/stop methods for autodiscover provider with leaderElection
 type leaderElectionManager struct {
 	leaderElection       leaderelection.LeaderElectionConfig
 	cancelLeaderElection context.CancelFunc
