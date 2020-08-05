@@ -9,10 +9,10 @@ filebeat:
       var: value
     processors:
       - add_fields:
-          target: "dataset"
+          target: "data_stream"
           fields:
             type: logs
-            name: generic
+            dataset: generic
             namespace: default
       - add_fields:
           target: "event"
@@ -27,10 +27,10 @@ filebeat:
       var: value
     processors:
       - add_fields:
-          target: "dataset"
+          target: "data_stream"
           fields:
             type: testtype
-            name: generic
+            dataset: generic
             namespace: default
       - add_fields:
           target: "event"
