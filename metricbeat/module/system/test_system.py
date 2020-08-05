@@ -213,7 +213,7 @@ class Test(metricbeat.BaseTest):
                     self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
-                    self.assertCountEqual(self.de_dot(SYSTEM_DISK_HOST_FIELDS), host_disk.keys())
+                    self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):

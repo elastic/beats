@@ -43,7 +43,8 @@ func init() {
 // MetricSet for fetching system network IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	interfaces map[string]struct{}
+	interfaces   map[string]struct{}
+	prevCounters map[string]uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -69,6 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		interfaces:    interfaceSet,
+		prevCounters:  map[string]uint64{},
 	}, nil
 }
 
@@ -94,6 +96,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: ioCountersToMapStr(counters),
 		})
 
+		// accumulate values from all interfaces
 		networkInBytes += counters.BytesRecv
 		networkOutBytes += counters.BytesSent
 		networkInPackets += counters.PacketsRecv
@@ -104,22 +107,32 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
-	r.Event(mb.Event{
-		RootFields: common.MapStr{
-			"host": common.MapStr{
-				"network": common.MapStr{
-					"in": common.MapStr{
-						"bytes":   networkInBytes,
-						"packets": networkInPackets,
-					},
-					"out": common.MapStr{
-						"bytes":   networkOutBytes,
-						"packets": networkOutPackets,
+	if len(m.prevCounters) != 0 {
+		// convert network metrics from counters to gauges
+		r.Event(mb.Event{
+			RootFields: common.MapStr{
+				"host": common.MapStr{
+					"network": common.MapStr{
+						"in": common.MapStr{
+							"bytes":   networkInBytes - m.prevCounters["networkInBytes"],
+							"packets": networkInPackets - m.prevCounters["networkInPackets"],
+						},
+						"out": common.MapStr{
+							"bytes":   networkOutBytes - m.prevCounters["networkOutBytes"],
+							"packets": networkOutPackets - m.prevCounters["networkOutPackets"],
+						},
 					},
 				},
 			},
-		},
-	})
+		})
+	}
+
+	// update prevCounters
+	m.prevCounters["networkInBytes"] = networkInBytes
+	m.prevCounters["networkInPackets"] = networkInPackets
+	m.prevCounters["networkOutBytes"] = networkOutBytes
+	m.prevCounters["networkOutPackets"] = networkOutPackets
+
 	return nil
 }
 
