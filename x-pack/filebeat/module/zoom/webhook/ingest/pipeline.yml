@@ -42,28 +42,26 @@ processors:
     ignore_missing: true
 - append:
     field: related.user
-    value: "{{zoom.operator_idl}}"
+    value: "{{zoom.operator_id}}"
     if: "ctx?.zoom?.operator_id != null"
 # Removing some fields that have complex nested arrays that might impact performance
 - remove:
     field:
     - message
     - _temp_
-    - zoom.object.occurences
-    - zoom.old_object.occurences
+    - zoom.object.occurrences
+    - zoom.old_values.occurrences
     - zoom.object.recurrence
-    - zoom.old_object.recurrence
+    - zoom.old_values.recurrence
     - zoom.object.managed_domains
-    - zoom.old_object.managed_domains
+    - zoom.old_values.managed_domains
     - zoom.registrant.custom_questions
-    - zoom.object.registrant.custom_questions
-    - zoom.old_object.registrant.custom_questions
+    - zoom.old_values.registrant.custom_questions
     - zoom.object.call_logs
-    - zoom.old_object.call_logs
-    - zoom.object.recording_file
-    - zoom.old_object.recording_file
+    - zoom.old_values.call_logs
     - zoom.object.recording_files
-    - zoom.old_object.recording_files
+    - zoom.old_values.recording_files
+    - zoom.object.call_logs
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "meeting" >}'

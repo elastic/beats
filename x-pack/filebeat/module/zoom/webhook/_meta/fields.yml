@@ -29,10 +29,6 @@
       type: date
       description: >
         Timestamp related to the event
-    - name: time_stamp
-      type: date
-      description: >
-        Timestamp related to the event
     - name: creation_type
       type: keyword
       description: >
@@ -77,14 +73,6 @@
       type: keyword
       description: >
         Type of channel related to the event. Can be 1(Invite-Only), 2(Private) or 3(Public)
-    - name: chat_channel.timestamp
-      type: date
-      description: >
-        Date and time when channel was created/modified/deleted
-    - name: chat_channel.date_time
-      type: date
-      description: >
-        Epoch time when channel was created/modified/deleted
     - name: chat_message.id
       type: keyword
       description: >
@@ -93,14 +81,6 @@
       type: keyword
       description: >
         Type of message, can be either "to_contact" or "to_channel"
-    - name: chat_message.date_time
-      type: date
-      description: >
-        Date and time when message was created/modified/deleted
-    - name: chat_message.timestamp
-      type: date
-      description: >
-        Epoch when message was created/modified/deleted
     - name: chat_message.session_id
       type: keyword
       description: >
@@ -129,10 +109,6 @@
       type: keyword
       description: >
         Unique ID of the related meeting
-    - name: meeting.join_url
-      type: keyword
-      description: >
-        The URL to join the meeting
     - name: meeting.uuid
       type: keyword
       description: >
@@ -146,7 +122,7 @@
       description: >
         Topic of the related meeting
     - name: meeting.type
-      type: integer
+      type: keyword
       description: >
         Type of meeting created
     - name: meeting.start_time
@@ -205,38 +181,30 @@
       type: long
       description: >
         Duration of a voicemail in minutes
-    - name: phone.caller_number
+    - name: phone.caller.id
       type: keyword
       description: >
-        Caller number related to the voicemail
-    - name: phone.caller_name
-      type: keyword
-      description: >
-        Caller name related to the voicemail
-    - name: phone.caller_number_type
-      type: long
-      description: >
-        Caller type related to the voicemail, can either be 1(Internal) or 2(External)
-    - name: phone.caller_user_id
-      type: keyword
-      description: >
-        UserID of the caller related to the voicemail
-    - name: phone.callee_user_id
-      type: keyword
-      description: >
-        UserID of the callee related to the voicemail
-    - name: phone.callee_extension_type
-      type: keyword
-      description: >
-        Extension type of the calle related to the voicemail, can be user, callQueue, autoReceptionist or shareLineGroup
+        UserID of the caller related to the voicemail/call
     - name: phone.caller.user_id
       type: keyword
       description: >
         UserID of the person which initiated the call
+    - name: phone.caller.number_type
+      type: keyword
+      description: >
+        The type of number, can be 1(Internal) or 2(External)
+    - name: phone.caller.name
+      type: keyword
+      description: >
+        The name of the related callee
     - name: phone.caller.phone_number
       type: keyword
       description: >
         Phone Number of the caller related to the call
+    - name: phone.caller.extension_type
+      type: keyword
+      description: >
+        Extension type of the caller number, can be user, callQueue, autoReceptionist or shareLineGroup
     - name: phone.caller.extension_number
       type: keyword
       description: >
@@ -249,30 +217,30 @@
       type: keyword
       description: >
         Device type used by the caller
-    - name: phone.callee_id
+    - name: phone.callee.id
       type: keyword
       description: >
-        UserID of the related callee of the voicemail
+        UserID of the callee related to the voicemail/call
     - name: phone.callee.user_id
       type: keyword
       description: >
-        UserID of the related callee of a call
-    - name: phone.callee_name
+        UserID of the related callee of a voicemail/call
+    - name: phone.callee.name
       type: keyword
       description: >
-        The name of the callee related to the voicemail
+        The name of the related callee
+    - name: phone.callee.number_type
+      type: keyword
+      description: >
+        The type of number, can be 1(Internal) or 2(External)
     - name: phone.callee.phone_number
       type: keyword
       description: >
         Phone Number of the callee related to the call
-    - name: phone.callee_number
+    - name: phone.callee.extension_type
       type: keyword
       description: >
-        Number of the callee related to the voicemail
-    - name: phone.callee_number_type
-      type: keyword
-      description: >
-        Type of number related to the callee of the voicemail. Can be 1(Internal) or 2(External)
+        Extension type of the callee number, can be user, callQueue, autoReceptionist or shareLineGroup
     - name: phone.callee.extension_number
       type: keyword
       description: >
@@ -333,6 +301,14 @@
       type: long
       description: >
         Number of recording files related to the recording
+    - name: recording.recording_file.recording_start
+      type: date
+      description: >
+        The date and time the recording started
+    - name: recording.recording_file.recording_end
+      type: date
+      description: >
+        The date and time the recording finished
     - name: recording.host_email
       type: keyword
       description: >
@@ -413,10 +389,6 @@
       type: keyword
       description: >
         Personal notes for the User
-    - name: user.date_time
-      type: date
-      description: >
-        The date and time when user logged in or out
     - name: user.client_type
       type: keyword
       description: >

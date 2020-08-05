@@ -1,9 +1,8 @@
 [
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.created",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.625835Z",
         "event.kind": [
             "event"
         ],
@@ -19,7 +18,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "uLoRgfbbTayCX6r2Q_qQsQ",
             "uLoRgfbbTayCX6r2Q_qQsQ"
         ],
         "service.type": "zoom",
@@ -40,10 +39,9 @@
         "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626052Z",
         "event.kind": [
             "event"
         ],
@@ -59,7 +57,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            ""
+            "BBBBBBBBBB"
         ],
         "service.type": "zoom",
         "tags": [
@@ -69,53 +67,10 @@
         "zoom.account_id": "AAAAAAAAAAA",
         "zoom.old_values.id": 155184668,
         "zoom.old_values.join_url": "https://zoom.us/j/00000000",
-        "zoom.old_values.occurrences": [
-            {
-                "duration": 120,
-                "occurrence_id": "1562875200000",
-                "start_time": "2019-07-11T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1563480000000",
-                "start_time": "2019-07-18T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1564084800000",
-                "start_time": "2019-07-25T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1564689600000",
-                "start_time": "2019-08-01T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1565294400000",
-                "start_time": "2019-08-08T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1565899200000",
-                "start_time": "2019-08-15T20:00:00Z",
-                "status": "available"
-            },
-            {
-                "duration": 120,
-                "occurrence_id": "1566504000000",
-                "start_time": "2019-08-22T20:00:00Z",
-                "status": "available"
-            }
-        ],
         "zoom.old_values.settings.join_before_host": true,
         "zoom.old_values.settings.participant_video": true,
         "zoom.old_values.settings.use_pmi": false,
+        "zoom.old_values.time_stamp": 1562791953209,
         "zoom.old_values.type": 9,
         "zoom.operator": "someemail@email.com",
         "zoom.operator_id": "BBBBBBBBBB",
@@ -127,10 +82,9 @@
         "zoom.webinar.type": 5
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.deleted",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626164Z",
         "event.kind": [
             "event"
         ],
@@ -142,11 +96,11 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 1559,
+        "log.offset": 1588,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "uLoRgfbbTayCX6r2Q_qQsQ",
             "uLoRgfbbTayCX6r2Q_qQsQ"
         ],
         "service.type": "zoom",
@@ -167,10 +121,9 @@
         "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.started",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626270Z",
         "event.kind": [
             "event"
         ],
@@ -182,7 +135,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 1916,
+        "log.offset": 1945,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -205,10 +158,9 @@
         "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.ended",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626376Z",
         "event.kind": [
             "event"
         ],
@@ -220,7 +172,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 2233,
+        "log.offset": 2262,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -243,10 +195,9 @@
         "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.alert",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626471Z",
         "event.kind": [
             "event"
         ],
@@ -257,7 +208,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 2548,
+        "log.offset": 2577,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -279,10 +230,9 @@
         "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.sharing_started",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626568Z",
         "event.kind": [
             "event"
         ],
@@ -294,7 +244,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 2865,
+        "log.offset": 2894,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -324,10 +274,9 @@
         "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.sharing_started",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626666Z",
         "event.kind": [
             "event"
         ],
@@ -339,7 +288,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 3387,
+        "log.offset": 3416,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -369,10 +318,9 @@
         "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.530Z",
+        "@timestamp": "2020-08-05T23:13:23.789Z",
         "event.action": "webinar.registration_created",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626770Z",
         "event.kind": [
             "event"
         ],
@@ -384,7 +332,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 3909,
+        "log.offset": 3938,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -425,10 +373,9 @@
         "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.531Z",
+        "@timestamp": "2020-08-05T23:13:23.790Z",
         "event.action": "webinar.registration_approved",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626870Z",
         "event.kind": [
             "event"
         ],
@@ -441,11 +388,11 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 4601,
+        "log.offset": 4630,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "Lobbbbbbbbbb_qQsQ",
             "uLobbbbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
@@ -470,10 +417,9 @@
         "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.531Z",
+        "@timestamp": "2020-08-05T23:13:23.790Z",
         "event.action": "webinar.registration_denied",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.626975Z",
         "event.kind": [
             "event"
         ],
@@ -486,7 +432,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 5073,
+        "log.offset": 5102,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -513,10 +459,9 @@
         "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.531Z",
+        "@timestamp": "2020-08-05T23:13:23.790Z",
         "event.action": "webinar.registration_cancelled",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.627079Z",
         "event.kind": [
             "event"
         ],
@@ -528,7 +473,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 5510,
+        "log.offset": 5539,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -555,10 +500,9 @@
         "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.531Z",
+        "@timestamp": "2020-08-05T23:13:23.790Z",
         "event.action": "webinar.participant_joined",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.627178Z",
         "event.kind": [
             "event"
         ],
@@ -569,7 +513,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 5950,
+        "log.offset": 5979,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
@@ -596,10 +540,9 @@
         "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:14.531Z",
+        "@timestamp": "2020-08-05T23:13:23.790Z",
         "event.action": "webinar.participant_left",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:15.627273Z",
         "event.kind": [
             "event"
         ],
@@ -610,7 +553,7 @@
         ],
         "fileset.name": "webhook",
         "input.type": "log",
-        "log.offset": 6402,
+        "log.offset": 6431,
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [

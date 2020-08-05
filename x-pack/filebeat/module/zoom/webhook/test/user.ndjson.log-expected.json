@@ -1,9 +1,8 @@
 [
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.created",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.229469Z",
         "event.kind": [
             "event"
         ],
@@ -35,10 +34,9 @@
         "zoom.user.type": "3"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.invitation_accepted",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.229660Z",
         "event.kind": [
             "event"
         ],
@@ -69,10 +67,9 @@
         "zoom.user.type": 1
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2019-07-19T18:10:54.861Z",
         "event.action": "user.updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.229764Z",
         "event.kind": [
             "event"
         ],
@@ -89,7 +86,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "uLobbbbbbbb_qQsQ",
             "uLobbbbbbbb_qQsQ"
         ],
         "service.type": "zoom",
@@ -102,15 +99,13 @@
         "zoom.old_values.id": "uLobbbbbbbb_qQsQ",
         "zoom.operator": "shrija2016+dev_ma@gmail.com",
         "zoom.operator_id": "uLobbbbbbbb_qQsQ",
-        "zoom.time_stamp": 1563559854861,
         "zoom.user.company": "Zoom",
         "zoom.user.id": "uLobbbbbbbb_qQsQ"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2019-07-19T21:47:06.929Z",
         "event.action": "user.settings_updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.229871Z",
         "event.kind": [
             "event"
         ],
@@ -127,7 +122,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "uLoRgfbbTayCX6r2Q_qQsQ",
             "uL34AAbbbbAAAAAAQsQ"
         ],
         "service.type": "zoom",
@@ -141,14 +136,12 @@
         "zoom.operator": "iamtheoperator@gmail.com",
         "zoom.operator_id": "uLoRgfbbTayCX6r2Q_qQsQ",
         "zoom.settings.in_meeting.private_chat": false,
-        "zoom.time_stamp": 1563572826929,
         "zoom.user.id": "uL34AAbbbbAAAAAAQsQ"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-06-29T17:32:19.427Z",
         "event.action": "user.settings_updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.229982Z",
         "event.kind": [
             "event"
         ],
@@ -165,7 +158,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "fdhjfdhsj536274gfd",
             "fdhjfdhsj536274gfd"
         ],
         "service.type": "zoom",
@@ -179,14 +172,12 @@
         "zoom.operator": "somememail@randommailer28.com",
         "zoom.operator_id": "fdhjfdhsj536274gfd",
         "zoom.settings.meeting_authentication": false,
-        "zoom.time_stamp": 1593451939427,
         "zoom.user.id": "fdhjfdhsj536274gfd"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.deactivated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230087Z",
         "event.kind": [
             "event"
         ],
@@ -203,7 +194,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8yCxjabcdEFGHfp8uQ",
             "abcD3ojfdbjfg"
         ],
         "service.type": "zoom",
@@ -221,10 +212,9 @@
         "zoom.user.type": 1
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.activated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230201Z",
         "event.kind": [
             "event"
         ],
@@ -241,7 +231,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8yCxjabcdEFGHfp8uQ",
             "abcD3ojfdbjfg"
         ],
         "service.type": "zoom",
@@ -259,10 +249,9 @@
         "zoom.user.type": 3
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.133Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.disassociated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230301Z",
         "event.kind": [
             "event"
         ],
@@ -279,7 +268,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8yCxjabcdEFGHfp8uQ",
             "abcD3ojfdbjfg"
         ],
         "service.type": "zoom",
@@ -297,10 +286,9 @@
         "zoom.user.type": 3
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.134Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.deleted",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230406Z",
         "event.kind": [
             "event"
         ],
@@ -317,7 +305,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8yCxjabcdEFGHfp8uQ",
             "abcD3ojfdbjfg"
         ],
         "service.type": "zoom",
@@ -335,10 +323,9 @@
         "zoom.user.type": "3"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.134Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.presence_status_updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230508Z",
         "event.kind": [
             "event"
         ],
@@ -363,16 +350,14 @@
             "forwarded"
         ],
         "zoom.account_id": "EPjfyjxHMA",
-        "zoom.user.date_time": "2019-11-26T20:13:57Z",
         "zoom.user.email": "sfdhfghfgh@dkjdfd.com",
         "zoom.user.id": "z8ycx1223fq",
         "zoom.user.presence_status": "Available"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.134Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.personal_notes_updated",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230602Z",
         "event.kind": [
             "event"
         ],
@@ -398,16 +383,14 @@
         ],
         "zoom.account_id": "EPfhhdrYxHMA",
         "zoom.old_values.personal_notes": "this is the old note",
-        "zoom.user.date_time": "2019-11-26T21:29:08Z",
         "zoom.user.email": "sdfsgdfg@fjghg.ghm",
         "zoom.user.id": "z8aggp8uq",
         "zoom.user.personal_notes": "Out of Office until February 31"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.134Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.signed_in",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230693Z",
         "event.kind": [
             "event"
         ],
@@ -433,16 +416,14 @@
         ],
         "zoom.account_id": "dsjfosdfpdosgifdjg",
         "zoom.user.client_type": "android",
-        "zoom.user.date_time": "2019-09-10T14:36:10Z",
         "zoom.user.email": "awesomeuser@awesomemeail.ghkgf",
         "zoom.user.id": "djkglfdgkjdflghfdpe",
         "zoom.user.version": "4.5.3308.0902"
     },
     {
-        "@timestamp": "2020-08-04T20:19:21.134Z",
+        "@timestamp": "2020-08-05T23:13:30.442Z",
         "event.action": "user.signed_out",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:22.230781Z",
         "event.kind": [
             "event"
         ],
@@ -468,7 +449,6 @@
         ],
         "zoom.account_id": "dsjfosdfpdosgifdjg",
         "zoom.user.client_type": "android",
-        "zoom.user.date_time": "2019-09-10T14:36:10Z",
         "zoom.user.email": "awesomeuser@awesomemeail.ghkgf",
         "zoom.user.id": "djkglfdgkjdflghfdpe",
         "zoom.user.version": "4.5.3308.0902"

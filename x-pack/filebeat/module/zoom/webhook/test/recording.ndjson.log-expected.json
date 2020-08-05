@@ -1,120 +1,9 @@
 [
     {
-        "@timestamp": "2020-08-04T20:19:18.873Z",
-        "event.action": "recording.started",
-        "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.975829Z",
-        "event.kind": [
-            "event"
-        ],
-        "event.module": "zoom",
-        "event.timezone": "-02:00",
-        "event.type": [
-            "info",
-            "start"
-        ],
-        "fileset.name": "webhook",
-        "input.type": "log",
-        "log.offset": 0,
-        "observer.product": "Webhook",
-        "observer.vendor": "Zoom",
-        "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
-        ],
-        "service.type": "zoom",
-        "tags": [
-            "zoom-webhook",
-            "forwarded"
-        ],
-        "zoom.account_id": "lAAAAAAAAAAAAA",
-        "zoom.recording.duration": 1,
-        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
-        "zoom.recording.id": 150000008,
-        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
-        "zoom.recording.timezone": "America/Los_Angeles",
-        "zoom.recording.topic": "A test meeting",
-        "zoom.recording.type": 2,
-        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
-    },
-    {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
-        "event.action": "recording.paused",
-        "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976028Z",
-        "event.kind": [
-            "event"
-        ],
-        "event.module": "zoom",
-        "event.timezone": "-02:00",
-        "event.type": [
-            "info",
-            "change"
-        ],
-        "fileset.name": "webhook",
-        "input.type": "log",
-        "log.offset": 359,
-        "observer.product": "Webhook",
-        "observer.vendor": "Zoom",
-        "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
-        ],
-        "service.type": "zoom",
-        "tags": [
-            "zoom-webhook",
-            "forwarded"
-        ],
-        "zoom.account_id": "lAAAAAAAAAAAAA",
-        "zoom.recording.duration": 1,
-        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
-        "zoom.recording.id": 150000008,
-        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
-        "zoom.recording.timezone": "America/Los_Angeles",
-        "zoom.recording.topic": "A test meeting",
-        "zoom.recording.type": 2,
-        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
-    },
-    {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
-        "event.action": "recording.resumed",
-        "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976133Z",
-        "event.kind": [
-            "event"
-        ],
-        "event.module": "zoom",
-        "event.timezone": "-02:00",
-        "event.type": [
-            "info",
-            "change"
-        ],
-        "fileset.name": "webhook",
-        "input.type": "log",
-        "log.offset": 717,
-        "observer.product": "Webhook",
-        "observer.vendor": "Zoom",
-        "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
-        ],
-        "service.type": "zoom",
-        "tags": [
-            "zoom-webhook",
-            "forwarded"
-        ],
-        "zoom.account_id": "lAAAAAAAAAAAAA",
-        "zoom.recording.duration": 1,
-        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
-        "zoom.recording.id": 150000008,
-        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
-        "zoom.recording.timezone": "America/Los_Angeles",
-        "zoom.recording.topic": "A test meeting",
-        "zoom.recording.type": 2,
-        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
-    },
-    {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.177Z",
         "event.action": "recording.stopped",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976235Z",
+        "event.end": "2019-07-31T22:43:29Z",
         "event.kind": [
             "event"
         ],
@@ -141,6 +30,8 @@
         "zoom.recording.duration": 8,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.recording.id": 150000008,
+        "zoom.recording.recording_file.recording_end": "2019-07-31T22:43:29Z",
+        "zoom.recording.recording_file.recording_start": "2019-07-31T22:41:02Z",
         "zoom.recording.start_time": "2019-07-11T20:00:00Z",
         "zoom.recording.timezone": "America/Los_Angeles",
         "zoom.recording.topic": "A test meeting",
@@ -148,10 +39,49 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.177Z",
+        "event.action": "recording.completed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1455,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_email": "somemeail@someemailservice.fjdjf",
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "@timestamp": "2019-12-04T23:00:57.395Z",
         "event.action": "recording.renamed",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976474Z",
         "event.kind": [
             "event"
         ],
@@ -167,7 +97,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            ""
+            "zdhghgCfp8uQ"
         ],
         "service.type": "zoom",
         "tags": [
@@ -184,14 +114,12 @@
         "zoom.recording.id": 7000000,
         "zoom.recording.topic": "Edited Recording Title",
         "zoom.recording.type": 1,
-        "zoom.recording.uuid": "9xxxkifpPUz+Ow==",
-        "zoom.time_stamp": 1575500457395
+        "zoom.recording.uuid": "9xxxkifpPUz+Ow=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.177Z",
         "event.action": "recording.trashed",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976636Z",
         "event.kind": [
             "event"
         ],
@@ -214,12 +142,12 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.recording.id": 150000008,
         "zoom.recording.recording_count": 4,
-        "zoom.recording.share_url": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.recording.start_time": "2019-07-11T20:00:00Z",
         "zoom.recording.timezone": "America/Los_Angeles",
         "zoom.recording.topic": "A test meeting",
@@ -228,10 +156,9 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.177Z",
         "event.action": "recording.deleted",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976808Z",
         "event.kind": [
             "event"
         ],
@@ -254,12 +181,12 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.recording.id": 150000008,
         "zoom.recording.recording_count": 4,
-        "zoom.recording.share_url": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.recording.start_time": "2019-07-11T20:00:00Z",
         "zoom.recording.timezone": "America/Los_Angeles",
         "zoom.recording.topic": "A test meeting",
@@ -268,10 +195,9 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.178Z",
         "event.action": "recording.recovered",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.976926Z",
         "event.kind": [
             "event"
         ],
@@ -294,12 +220,12 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.recording.id": 150000008,
         "zoom.recording.recording_count": 4,
-        "zoom.recording.share_url": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.recording.start_time": "2019-07-11T20:00:00Z",
         "zoom.recording.timezone": "America/Los_Angeles",
         "zoom.recording.topic": "A test meeting",
@@ -308,10 +234,9 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.178Z",
         "event.action": "recording.transcript_completed",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.977026Z",
         "event.kind": [
             "event"
         ],
@@ -334,12 +259,12 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.recording.id": 150000008,
         "zoom.recording.recording_count": 4,
-        "zoom.recording.share_url": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
         "zoom.recording.start_time": "2019-07-11T20:00:00Z",
         "zoom.recording.timezone": "America/Los_Angeles",
         "zoom.recording.topic": "A test meeting",
@@ -348,10 +273,9 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.178Z",
         "event.action": "recording.registration_created",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.977120Z",
         "event.kind": [
             "event"
         ],
@@ -389,10 +313,9 @@
         "zoom.registrant.last_name": "Person"
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.874Z",
+        "@timestamp": "2020-08-05T23:13:28.178Z",
         "event.action": "recording.registration_approved",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.977224Z",
         "event.kind": [
             "event"
         ],
@@ -430,10 +353,9 @@
         "zoom.registrant.last_name": "Person"
     },
     {
-        "@timestamp": "2020-08-04T20:19:18.875Z",
+        "@timestamp": "2020-08-05T23:13:28.178Z",
         "event.action": "recording.registration_denied",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:19.977323Z",
         "event.kind": [
             "event"
         ],

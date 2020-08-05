@@ -1,9 +1,8 @@
 [
     {
-        "@timestamp": "2020-08-04T20:19:16.920Z",
+        "@timestamp": "2020-02-10T21:39:50.388Z",
         "event.action": "chat_channel.created",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:18.012505Z",
         "event.kind": [
             "event"
         ],
@@ -18,7 +17,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8dfgdfguQrdfgdf",
             "z8dfgdfguQrdfgdf",
             "sdfdsfdsKIrrCYw"
         ],
@@ -28,19 +27,16 @@
             "forwarded"
         ],
         "zoom.account_id": "vbbvnvAdsfe",
-        "zoom.chat_channel.date_time": "2020-02-10T21:39:50Z",
         "zoom.chat_channel.id": "6dfgdfgdg444447b0egga",
         "zoom.chat_channel.name": "Delivering Happiness",
-        "zoom.chat_channel.timestamp": 1581370790388,
         "zoom.chat_channel.type": 1,
         "zoom.operator": "somememai@gmtsffjdfhail.com",
         "zoom.operator_id": "z8dfgdfguQrdfgdf"
     },
     {
-        "@timestamp": "2020-08-04T20:19:16.921Z",
+        "@timestamp": "2020-02-10T21:39:50.388Z",
         "event.action": "chat_channel.member_invited",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:18.012902Z",
         "event.kind": [
             "event"
         ],
@@ -55,7 +51,7 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "",
+            "z8dfgdfguQrdfgdf",
             "s0hhFOCYw"
         ],
         "service.type": "zoom",
@@ -64,10 +60,8 @@
             "forwarded"
         ],
         "zoom.account_id": "vbbvnvAdsfe",
-        "zoom.chat_channel.date_time": "2020-02-10T21:39:50Z",
         "zoom.chat_channel.id": "6dfgdfgdg444447b0egga",
         "zoom.chat_channel.name": "Delivering Happiness",
-        "zoom.chat_channel.timestamp": 1581370790388,
         "zoom.chat_channel.type": 1,
         "zoom.operator": "somememai@gmtsffjdfhail.com",
         "zoom.operator_id": "z8dfgdfguQrdfgdf"

@@ -35,6 +35,39 @@ processors:
     field: zoom.object
     target_field: zoom.recording
     ignore_missing: true
+- rename:
+    field: zoom.recording.share_url
+    target_field: url.full
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.event?.action == 'recording.renamed'
+    ignore_failure: true
+- set:
+    field: event.start
+    value: '{{ zoom.recording.recording_file.recording_start }}'
+    if: ctx?.event?.action == 'recording.started'
+- set:
+    field: event.end
+    value: '{{ zoom.recording.recording_file.recording_end }}'
+    if: ctx?.event?.action == 'recording.stopped'
+- script:
+    lang: painless
+    if: "ctx?.event?.end != null && ctx?.event?.start != null && ctx?.event?.action == 'recording.stopped'"
+    source: >-
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ZonedDateTime end = ZonedDateTime.parse(ctx.event.end);
+      ctx.event.duration = ChronoUnit.NANOS.between(start, end);
+- date:
+    field: zoom.recording.recording_file.recording_start
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "ctx?.zoom?.recording?.recording_file?.recording_start != null && ctx?.event?.action == 'recording.started'"
+    ignore_failure: true
 - append:
     field: related.user
     value: "{{zoom.recording.host_id}}"
@@ -43,6 +76,10 @@ processors:
     field: related.user
     value: "{{zoom.recording.registrant.id}}"
     if: "ctx?.zoom?.recording?.registrant?.id != null"
+- remove:
+    field: zoom.time_stamp
+    ignore_missing: true
+    if: ctx?.event?.action == 'recording.renamed'
 on_failure:
 - set:
     field: error.message

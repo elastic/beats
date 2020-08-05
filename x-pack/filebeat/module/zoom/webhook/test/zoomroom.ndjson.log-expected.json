@@ -1,9 +1,8 @@
 [
     {
-        "@timestamp": "2020-08-04T20:19:08.054Z",
+        "@timestamp": "2020-08-05T23:13:17.231Z",
         "event.action": "zoomroom.alert",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:09.146634Z",
         "event.kind": [
             "event"
         ],
@@ -30,10 +29,9 @@
         "zoom.zoomroom.room_name": "MyFabulousZoomRoom"
     },
     {
-        "@timestamp": "2020-08-04T20:19:08.054Z",
+        "@timestamp": "2020-08-05T23:13:17.231Z",
         "event.action": "zoomroom.delayed_alert",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:09.146810Z",
         "event.kind": [
             "event"
         ],
@@ -60,10 +58,9 @@
         "zoom.zoomroom.room_name": "MyFabulousZoomRoom"
     },
     {
-        "@timestamp": "2020-08-04T20:19:08.054Z",
+        "@timestamp": "2020-08-05T23:13:17.231Z",
         "event.action": "zoomroom.checked_in",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:09.146905Z",
         "event.kind": [
             "event"
         ],
@@ -94,10 +91,9 @@
         "zoom.zoomroom.room_name": "Sharks Room"
     },
     {
-        "@timestamp": "2020-08-04T20:19:08.054Z",
+        "@timestamp": "2020-08-05T23:13:17.231Z",
         "event.action": "zoomroom.checked_in",
         "event.dataset": "zoom.webhook",
-        "event.ingested": "2020-08-04T20:19:09.146985Z",
         "event.kind": [
             "event"
         ],

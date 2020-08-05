@@ -32,10 +32,29 @@ processors:
     field: zoom.object
     target_field: zoom.user
     ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: "['user.updated', 'user.settings_updated'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- date:
+    field: zoom.user.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "['user.signed_in', 'user.signed_out', 'user.personal_notes_updated', 'user.presence_status_updated'].contains(ctx?.event?.action)"
+    ignore_failure: true
 - append:
     field: related.user
     value: "{{zoom.user.id}}"
     if: "ctx?.zoom?.user?.id != null"
+- remove:
+    field:
+    - zoom.time_stamp
+    - zoom.user.date_time
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

@@ -23,6 +23,27 @@ processors:
     field: related.user
     value: "{{zoom.chat_message.contact_id}}"
     if: "ctx?.zoom?.chat_message?.contact_id != null"
+- date:
+    field: zoom.chat_message.timestamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.zoom?.chat_message?.timestamp != null
+    ignore_failure: true
+- remove:
+    field: zoom.chat_message.date_time
+    ignore_missing: true
+    if: ctx?.zoom?.chat_message?.timestamp != null
+- date:
+    field: zoom.chat_message.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.zoom?.chat_message?.timestamp == null
+    ignore_failure: true
+- remove:
+    field: zoom.chat_message.timestamp
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message
