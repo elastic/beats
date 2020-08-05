@@ -240,7 +240,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
             else:
                 host_disk = evt["host"]["disk"]
-                self.assertCountEqual(self.de_dot(SYSTEM_DISK_HOST_FIELDS), host_disk.keys())
+                self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
