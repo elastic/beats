@@ -55,6 +55,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
+	logp.Warn("HEARTBEAT STARTING")
+
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
 	if locationName == "" {
@@ -139,6 +141,7 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+	reload.Register.MustRegisterList("inputs", monitors)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.

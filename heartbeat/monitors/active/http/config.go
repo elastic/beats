@@ -31,6 +31,7 @@ import (
 
 type Config struct {
 	URLs         []string       `config:"urls"`
+	URL			 string			`config:"url"`
 	Hosts        []string       `config:"hosts"`
 	ProxyURL     string         `config:"proxy_url"`
 	Timeout      time.Duration  `config:"timeout"`

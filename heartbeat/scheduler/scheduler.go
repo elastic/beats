@@ -126,6 +126,7 @@ func (s *Scheduler) Start() error {
 	}
 
 	s.timerQueue.Start()
+	logp.Warn("ATRACE START SCHEDULER")
 
 	// Missed deadline reporter
 	go s.missedDeadlineReporter()
@@ -158,6 +159,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
 func (s *Scheduler) Stop() error {
+	logp.Warn("ATRACE STOP SCHEDULER")
 	if s.state.CAS(stateRunning, stateStopped) {
 		s.cancelCtx()
 		return nil

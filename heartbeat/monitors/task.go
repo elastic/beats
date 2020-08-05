@@ -20,7 +20,6 @@ package monitors
 import (
 	"context"
 	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -88,7 +87,9 @@ func (e ProcessorsError) Error() string {
 }
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
+	logp.Warn("PREP SCHEDULER JOB")
 	return func(_ context.Context) []scheduler.TaskFunc {
+		logp.Warn("EXEC SCHEDULER JOB")
 		return runPublishJob(job, t.client)
 	}
 }
@@ -133,6 +134,7 @@ func (t *configuredJob) Stop() {
 }
 
 func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
+	logp.Warn("STARTING JOB")
 	event := &beat.Event{
 		Fields: common.MapStr{},
 	}
@@ -141,6 +143,9 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 	if err != nil {
 		logp.Err("Job %v failed with: ", err)
 	}
+
+	logp.Warn("ATRACE ATTEMPTING TO PUBLISH", event)
+
 
 	hasContinuations := len(conts) > 0
 
@@ -155,9 +160,11 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 				Fields:    event.Fields.Clone(),
 			}
 			client.Publish(clone)
+			logp.Warn("ATRACE PUBLISH FINISH")
 		} else {
 			// no clone needed if no continuations
 			client.Publish(*event)
+			logp.Warn("ATRACE PUBLISH FINISH")
 		}
 	}
 

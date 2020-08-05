@@ -20,6 +20,7 @@ package monitors
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"net"
 	"time"
 
@@ -154,6 +155,7 @@ func makeByHostAnyIPJob(
 	network := ipSettings.Network()
 
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		logp.Warn("ATRACE HOSTANYIPJOB")
 		resolveStart := time.Now()
 		ip, err := resolver.ResolveIPAddr(network, host)
 		if err != nil {

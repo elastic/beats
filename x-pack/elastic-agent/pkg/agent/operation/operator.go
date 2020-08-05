@@ -169,6 +169,7 @@ func (o *Operator) Shutdown() {
 // specific configuration of new process is passed
 func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 	flow := []operation{
+		/*
 		newRetryableOperations(
 			o.logger,
 			o.config.RetryConfig,
@@ -176,6 +177,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 			newOperationVerify(p, o.config, o.verifier),
 		),
 		newOperationInstall(o.logger, p, o.config, o.installer),
+		*/
 		newOperationStart(o.logger, p, o.config, cfg),
 		newOperationConfig(o.logger, o.config, cfg),
 	}

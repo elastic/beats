@@ -25,6 +25,7 @@ import (
 
 type Config struct {
 	Hosts []string            `config:"hosts" validate:"required"`
+	Host string            `config:"host" validate:"required"`
 	Mode  monitors.IPSettings `config:",inline"`
 
 	Timeout time.Duration `config:"timeout"`
