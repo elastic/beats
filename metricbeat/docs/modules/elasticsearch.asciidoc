@@ -5,7 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-elasticsearch]]
 == Elasticsearch module
 
-The `elasticsearch` module collects metrics about {es}.
+The `elasticsearch` module collects metrics about {es}. In order to get all metricsets, you must install Metricbeat on each Elasticsearch node in the monitored cluster.
 
 [float]
 === Compatibility
