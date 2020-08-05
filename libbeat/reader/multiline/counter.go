@@ -131,3 +131,7 @@ func (cr *counterReader) resetState() {
 func (cr *counterReader) setState(next func(cr *counterReader) (reader.Message, error)) {
 	cr.state = next
 }
+
+func (cr *counterReader) Close() error {
+	return cr.reader.Close()
+}

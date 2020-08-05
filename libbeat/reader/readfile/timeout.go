@@ -36,6 +36,7 @@ type TimeoutReader struct {
 	signal  error
 	running bool
 	ch      chan lineMessage
+	done    chan struct{}
 }
 
 type lineMessage struct {
@@ -54,6 +55,7 @@ func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *Time
 		signal:  signal,
 		timeout: t,
 		ch:      make(chan lineMessage, 1),
+		done:    make(chan struct{}),
 	}
 }
 
@@ -67,6 +69,11 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		r.running = true
 		go func() {
 			for {
+				select {
+				case <-r.done:
+					return
+				default:
+				}
 				message, err := r.reader.Next()
 				r.ch <- lineMessage{message, err}
 				if err != nil {
@@ -85,5 +92,13 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		return msg.line, msg.err
 	case <-timer.C:
 		return reader.Message{}, r.signal
+	case <-r.done:
+		return reader.Message{}, nil
 	}
+}
+
+func (r *TimeoutReader) Close() error {
+	close(r.done)
+
+	return r.reader.Close()
 }

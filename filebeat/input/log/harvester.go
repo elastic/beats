@@ -291,7 +291,7 @@ func (h *Harvester) Run() error {
 		}
 
 		h.stop()
-		h.log.Close()
+		h.reader.Close()
 	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s", h.state.Source)

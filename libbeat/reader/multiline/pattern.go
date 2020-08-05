@@ -254,6 +254,10 @@ func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, 
 	pr.state = next
 }
 
+func (pr *patternReader) Close() error {
+	return pr.reader.Close()
+}
+
 // matchers
 func afterMatcher(pat match.Matcher) (matcher, error) {
 	return genPatternMatcher(pat, func(last, current []byte) []byte {
