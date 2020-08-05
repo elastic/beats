@@ -30,7 +30,7 @@ type config struct {
 	// check all ports if host does not contain port
 	Hosts []string `config:"hosts" validate:"required"`
 	Ports []uint16 `config:"ports"`
-	Host string `config:"host" validate:"required"`
+	Host string `config:"host"`
 	Port uint16 `config:"port"`
 
 	Mode monitors.IPSettings `config:",inline"`
