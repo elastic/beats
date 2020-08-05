@@ -409,7 +409,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 
 	for _, inputNode := range inputsNodeList.value {
 		// fix this only if in compact form
-		if nsNode, found := inputNode.Find("datastream.namespace"); found {
+		if nsNode, found := inputNode.Find("data_stream.namespace"); found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
 				if newNamespace := nsKey.value.String(); newNamespace == "" {
@@ -417,7 +417,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				}
 			}
 		} else {
-			dsNode, found := inputNode.Find("datastream")
+			dsNode, found := inputNode.Find("data_stream")
 			if found {
 				// got a datastream
 				datastreamMap, ok := dsNode.Value().(*Dict)
@@ -434,7 +434,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 						inputMap, ok := inputNode.(*Dict)
 						if ok {
 							inputMap.value = append(inputMap.value, &Key{
-								name:  "datastream.namespace",
+								name:  "data_stream.namespace",
 								value: &StrVal{value: defaultNamespace},
 							})
 						}
@@ -444,7 +444,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				inputMap, ok := inputNode.(*Dict)
 				if ok {
 					inputMap.value = append(inputMap.value, &Key{
-						name:  "datastream.namespace",
+						name:  "data_stream.namespace",
 						value: &StrVal{value: defaultNamespace},
 					})
 				}
@@ -468,7 +468,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 			}
 
 			// fix this only if in compact form
-			if dsNameNode, found := streamMap.Find("datastream.dataset"); found {
+			if dsNameNode, found := streamMap.Find("data_stream.dataset"); found {
 				dsKey, ok := dsNameNode.(*Key)
 				if ok {
 					if newDataset := dsKey.value.String(); newDataset == "" {
@@ -477,7 +477,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				}
 			} else {
 
-				datastreamNode, found := streamMap.Find("datastream")
+				datastreamNode, found := streamMap.Find("data_stream")
 				if found {
 					datastreamMap, ok := datastreamNode.Value().(*Dict)
 					if !ok {
@@ -494,13 +494,13 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 						}
 					} else {
 						streamMap.value = append(streamMap.value, &Key{
-							name:  "datastream.dataset",
+							name:  "data_stream.dataset",
 							value: &StrVal{value: defaultDataset},
 						})
 					}
 				} else {
 					streamMap.value = append(streamMap.value, &Key{
-						name:  "datastream.dataset",
+						name:  "data_stream.dataset",
 						value: &StrVal{value: defaultDataset},
 					})
 				}
@@ -520,7 +520,7 @@ func FixStream() *FixStreamRule {
 // Index is in form {type}-{namespace}-{dataset}
 // type: is provided to the rule.
 // namespace: is collected from streams[n].namespace. If not found used 'default'.
-// dataset: is collected from streams[n].datastream.dataset. If not found used 'generic'.
+// dataset: is collected from streams[n].data_stream.dataset. If not found used 'generic'.
 type InjectIndexRule struct {
 	Type string
 }
@@ -634,7 +634,7 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 
 			// datastream
 			processorMap := &Dict{value: make([]Node, 0)}
-			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "datastream"}})
+			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "data_stream"}})
 			processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
 				&Key{name: "type", value: &StrVal{value: datastreamType}},
 				&Key{name: "namespace", value: &StrVal{value: namespace}},
@@ -1245,7 +1245,7 @@ func keys(m map[string]interface{}) []string {
 func datastreamNamespaceFromInputNode(inputNode Node) string {
 	const defaultNamespace = "default"
 
-	if namespaceNode, found := inputNode.Find("datastream.namespace"); found {
+	if namespaceNode, found := inputNode.Find("data_stream.namespace"); found {
 		nsKey, ok := namespaceNode.(*Key)
 		if ok {
 			if newNamespace := nsKey.value.String(); newNamespace != "" {
@@ -1254,7 +1254,7 @@ func datastreamNamespaceFromInputNode(inputNode Node) string {
 		}
 	}
 
-	dsNode, found := inputNode.Find("datastream")
+	dsNode, found := inputNode.Find("data_stream")
 	if found {
 		dsMapNode, ok := dsNode.Value().(*Dict)
 		if ok {
@@ -1274,7 +1274,7 @@ func datastreamNamespaceFromInputNode(inputNode Node) string {
 }
 
 func datastreamTypeFromInputNode(inputNode Node, defaultType string) string {
-	if dsTypeNode, found := inputNode.Find("datastream.type"); found {
+	if dsTypeNode, found := inputNode.Find("data_stream.type"); found {
 		dsTypeKey, ok := dsTypeNode.(*Key)
 		if ok {
 			if newDatastreamType := dsTypeKey.value.String(); newDatastreamType != "" {
@@ -1283,7 +1283,7 @@ func datastreamTypeFromInputNode(inputNode Node, defaultType string) string {
 		}
 	}
 
-	dsNode, found := inputNode.Find("datastream")
+	dsNode, found := inputNode.Find("data_stream")
 	if found {
 		dsMapNode, ok := dsNode.Value().(*Dict)
 		if ok {
@@ -1305,7 +1305,7 @@ func datastreamTypeFromInputNode(inputNode Node, defaultType string) string {
 func datasetNameFromStreamNode(streamNode Node) string {
 	const defaultDataset = "generic"
 
-	if dsNameNode, found := streamNode.Find("datastream.dataset"); found {
+	if dsNameNode, found := streamNode.Find("data_stream.dataset"); found {
 		dsNameKey, ok := dsNameNode.(*Key)
 		if ok {
 			if newDatasetName := dsNameKey.value.String(); newDatasetName != "" {
@@ -1314,7 +1314,7 @@ func datasetNameFromStreamNode(streamNode Node) string {
 		}
 	}
 
-	dsNode, found := streamNode.Find("datastream")
+	dsNode, found := streamNode.Find("data_stream")
 	if found {
 		dsMapNode, ok := dsNode.Value().(*Dict)
 		if ok {

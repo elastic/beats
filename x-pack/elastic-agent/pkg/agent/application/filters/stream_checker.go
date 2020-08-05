@@ -19,7 +19,7 @@ var ErrInvalidNamespace = errors.New("provided namespace is invalid", errors.Typ
 // ErrInvalidDataset is error returned when datastream name value provided is invalid.
 var ErrInvalidDataset = errors.New("provided datastream dataset is invalid", errors.TypeConfig)
 
-// ErrInvalidIndex occurs when concatenation of {datastream.type}-{datastream.dataset}-{datastream.namespace} does not meet index criteria.
+// ErrInvalidIndex occurs when concatenation of {data_stream.type}-{data_stream.dataset}-{data_stream.namespace} does not meet index criteria.
 var ErrInvalidIndex = errors.New("provided combination of type, datastream dataset and namespace is invalid", errors.TypeConfig)
 
 // StreamChecker checks for invalid values in stream namespace and dataset.
@@ -42,9 +42,9 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 	for _, inputNode := range inputsNodeListCollection {
 		namespace := "default"
 		datasetName := "generic"
-		// fail only if datastream.namespace or datastream[namespace] is found and invalid
+		// fail only if data_stream.namespace or data_stream[namespace] is found and invalid
 		// not provided values are ok and will be fixed by rules
-		if nsNode, found := inputNode.Find("datastream.namespace"); found {
+		if nsNode, found := inputNode.Find("data_stream.namespace"); found {
 			nsKey, ok := nsNode.(*transpiler.Key)
 			if ok {
 				newNamespace := nsKey.Value().(transpiler.Node).String()
@@ -54,7 +54,7 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 				namespace = newNamespace
 			}
 		} else {
-			dsNode, found := inputNode.Find("datastream")
+			dsNode, found := inputNode.Find("data_stream")
 			if found {
 				// got a datastream
 				datasetMap, ok := dsNode.Value().(*transpiler.Dict)
@@ -76,14 +76,14 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 
 		// get the type, longest type for now is metrics
 		datasetType := "metrics"
-		if nsNode, found := inputNode.Find("datastream.type"); found {
+		if nsNode, found := inputNode.Find("data_stream.type"); found {
 			nsKey, ok := nsNode.(*transpiler.Key)
 			if ok {
 				newDataset := nsKey.Value().(transpiler.Node).String()
 				datasetType = newDataset
 			}
 		} else {
-			dsNode, found := inputNode.Find("datastream")
+			dsNode, found := inputNode.Find("data_stream")
 			if found {
 				// got a dataset
 				datasetMap, ok := dsNode.Value().(*transpiler.Dict)
@@ -116,7 +116,7 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 					}
 
 					// fix this only if in compact form
-					if dsNameNode, found := streamMap.Find("datastream.dataset"); found {
+					if dsNameNode, found := streamMap.Find("data_stream.dataset"); found {
 						dsKey, ok := dsNameNode.(*transpiler.Key)
 						if ok {
 							newDataset := dsKey.Value().(transpiler.Node).String()
@@ -126,7 +126,7 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 							datasetName = newDataset
 						}
 					} else {
-						datasetNode, found := streamMap.Find("datastream")
+						datasetNode, found := streamMap.Find("data_stream")
 						if found {
 							datasetMap, ok := datasetNode.Value().(*transpiler.Dict)
 							if !ok {

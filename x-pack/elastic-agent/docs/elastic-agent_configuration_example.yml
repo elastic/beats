@@ -109,7 +109,7 @@ inputs:
   - type: logfile
     name: epm/nginx
     version: 1.7.0
-    datastream.namespace: prod
+    data_stream.namespace: prod
     # constraints are still Experimental and should not be used in production.
     constraints?:
       # Contraints look are not final
@@ -120,16 +120,16 @@ inputs:
     streams:
       - id?: {id}
         enabled?: true # default to true
-        datastream.dataset: nginx.acccess
+        data_stream.dataset: nginx.acccess
         paths: /var/log/nginx/access.log
       - id?: {id}
         enabled?: true # default to true
-        datastream.dataset: nginx.error
+        data_stream.dataset: nginx.error
         paths: /var/log/nginx/error.log
   - type: nginx/metricspackage?:
     name: epm/nginx
     version: 1.7.0
-    datastream.namespace: prod
+    data_stream.namespace: prod
     # constraints are still Experimental and should not be used in production.
     constraints?:
       # Contraints look are not final
@@ -139,7 +139,7 @@ inputs:
     streams:
       - id?: {id}
         enabled?: true # default to true
-        datastream.dataset: nginx.stub_status
+        data_stream.dataset: nginx.stub_status
         metricset: stub_status
 
 #################################################################################################
@@ -148,11 +148,11 @@ inputs:
   - type: kafka
     id: kafka-x1
     title: "Consume data from kafka"
-    datastream.namespace: prod
+    data_stream.namespace: prod
     use_output: long_term_storage
     host: localhost:6566
     streams:
-      - datastream.dataset: foo.dataset
+      - data_stream.dataset: foo.dataset
         topic: foo
         processors:
           - extract_bro_specifics
@@ -171,54 +171,54 @@ inputs:
       - id?: {id}
         enabled?: false # default true
         metricset: cpu
-        datastream.dataset: system.cpu
+        data_stream.dataset: system.cpu
         metrics: ["percentages", "normalized_percentages"]
         period: 10s
       - metricset: memory
-        datastream.dataset: system.memory
+        data_stream.dataset: system.memory
         period: 10s
       - metricset: diskio
-        datastream.dataset: system.diskio
+        data_stream.dataset: system.diskio
         period: 10s
       - metricset: load
-        datastream.dataset: system.load
+        data_stream.dataset: system.load
         period: 10s
       - metricset: memory
-        datastream.dataset: system.memory
+        data_stream.dataset: system.memory
         period: 10s
       - metricset: process
-        datastream.dataset: system.process
+        data_stream.dataset: system.process
         processes: ["firefox*"]
         include_top_n:
           by_cpu: 5      # include top 5 processes by CPU
           by_memory: 5   # include top 5 processes by memory
         period: 10s
       - metricset: process_summary
-        datastream.dataset: system.process_summary
+        data_stream.dataset: system.process_summary
         period: 10s
       - metricset: uptime
-        datastream.dataset: system.uptime
+        data_stream.dataset: system.uptime
         period: 15m
       - metricset: socket_summary
-        datastream.dataset: system.socket_summary
+        data_stream.dataset: system.socket_summary
         period: 10s
       - metricset: filesystem
-        datastream.dataset: system.filesystem
+        data_stream.dataset: system.filesystem
         period: 10s
       - metricset: raid
-        datastream.dataset: system.raid
+        data_stream.dataset: system.raid
         period: 10s
       - metricset: socket
-        datastream.dataset: system.socket
+        data_stream.dataset: system.socket
         period: 10s
       - metricset: service
-        datastream.dataset: system.service
+        data_stream.dataset: system.service
         period: 10s
       - metricset: fsstat
-        datastream.dataset: system.fsstat
+        data_stream.dataset: system.fsstat
         period: 10s
       - metricset: foo
-        datastream.dataset: system.foo
+        data_stream.dataset: system.foo
         period: 10s
 
 
@@ -234,23 +234,23 @@ inputs:
       streams:
       - id?: {id}
         enabled?: true # default to true
-        datastream.dataset: elasticsearch.audit
+        data_stream.dataset: elasticsearch.audit
         paths: [/var/log/elasticsearch/*_access.log, /var/log/elasticsearch/*_audit.log]
       - id?: {id}
         enabled?: true
-        datastream.dataset: elasticsearch.deprecation
+        data_stream.dataset: elasticsearch.deprecation
         paths: [/var/log/elasticsearch/*_deprecation.log]
       - id?: {id}
         enabled?: true
-        datastream.dataset: elasticsearch.gc
+        data_stream.dataset: elasticsearch.gc
         paths: [/var/log/elasticsearch/*_gc.log, /var/log/elasticsearch/*_gc.log.[0-9]*]
       - id?: {id}
         enabled?: true
-        datastream.dataset: elasticsearch.server
+        data_stream.dataset: elasticsearch.server
         paths: [/var/log/elasticsearch/*.log]
       - id?: {id}
         enabled?: true
-        datastream.dataset: elasticsearch.slowlog
+        data_stream.dataset: elasticsearch.slowlog
         paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
     - type: elasticsearch/metrics
       id?: my-endpoint
@@ -271,36 +271,36 @@ inputs:
       streams:
       - id?: {id}
         metricset: ccr
-        datastream.dataset: elasticseach.ccr
+        data_stream.dataset: elasticseach.ccr
         period: 10s
       - id?: {id}
         metricset: cluster_stats
-        datastream.dataset: elasticseach.cluster_stats
+        data_stream.dataset: elasticseach.cluster_stats
         period: 10s
       - id?: {id}
         metricset: enrich
-        datastream.dataset: elasticseach.enrich
+        data_stream.dataset: elasticseach.enrich
         period: 10s
       - id?: {id}
         metricset: index
-        datastream.dataset: elasticseach.index
+        data_stream.dataset: elasticseach.index
         period: 10s
       - id?: {id}
         metricset: index_recovery
-        datastream.dataset: elasticseach.index_recovery
+        data_stream.dataset: elasticseach.index_recovery
         active_only: true
         period: 10s
       - id?: {id}
         metricset: ml_jobs
-        datastream.dataset: elasticseach.ml_jobs
+        data_stream.dataset: elasticseach.ml_jobs
         period: 10s
       - id?: {id}
         metricset: node_stats
-        datastream.dataset: elasticseach.node_stats
+        data_stream.dataset: elasticseach.node_stats
         period: 10s
       - id?: {id}
         metricset: shard
-        datastream.dataset: elasticseach.shard
+        data_stream.dataset: elasticseach.shard
         period: 10s
 
 #################################################################################################
@@ -318,16 +318,16 @@ inputs:
     #shared_credential_file: /etc/filebeat/aws_credentials
     streams:
     - id?: {id}
-      datastream.dataset: aws.s3
+      data_stream.dataset: aws.s3
       queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
     - id?: {id}
-      datastream.dataset: aws.s3access
+      data_stream.dataset: aws.s3access
       queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
     - id?: {id}
-      datastream.dataset: aws.vpcflow
+      data_stream.dataset: aws.vpcflow
       queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
     - id?: {id}
-      datastream.dataset: aws.cloudtrail
+      data_stream.dataset: aws.cloudtrail
       queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
   - type: aws/metrics
     id?: my-aws
@@ -343,11 +343,11 @@ inputs:
     streams:
     - id?: {id}
       metricset: usage
-      datastream.dataset: aws.usage
+      data_stream.dataset: aws.usage
       period: 5m
     - id?: {id}
       metricset: cloudwatch
-      datastream.dataset: aws.cloudwatch
+      data_stream.dataset: aws.cloudwatch
       period: 5m
       name: ["CPUUtilization", "DiskWriteOps"]
       resource_type: ec2:instance
@@ -357,43 +357,43 @@ inputs:
       statistic: ["Average", "Maximum"]
     - id?: {id}
       metricset: ebs
-      datastream.dataset: aws.ebs
+      data_stream.dataset: aws.ebs
       period: 5m
     - id?: {id}
       metricset: ec2
-      datastream.dataset: aws.ec2
+      data_stream.dataset: aws.ec2
       period: 5m
     - id?: {id}
       metricset: elb
-      datastream.dataset: aws.elb
+      data_stream.dataset: aws.elb
       period: 5m
     - id?: {id}
       metricset: sns
-      datastream.dataset: aws.sns
+      data_stream.dataset: aws.sns
       period: 5m
     - id?: {id}
       metricset: sqs
-      datastream.dataset: aws.sqs
+      data_stream.dataset: aws.sqs
       period: 5m
     - id?: {id}
       metricset: rds
-      datastream.dataset: aws.rds
+      data_stream.dataset: aws.rds
       period: 5m
     - id?: {id}
       metricset: billing
-      datastream.dataset: aws.billing
+      data_stream.dataset: aws.billing
       period: 12h
     - id?: {id}
       metricset: billing
-      datastream.dataset: aws.billing
+      data_stream.dataset: aws.billing
       period: 12h
     - id?: {id}
       metricset: s3_daily_storage
-      datastream.dataset: aws.s3_daily_storage
+      data_stream.dataset: aws.s3_daily_storage
       period: 24h
     - id?: {id}
       metricset: s3_request
-      datastream.dataset: aws.s3_request
+      data_stream.dataset: aws.s3_request
       period: 24h
 
 
@@ -418,27 +418,27 @@ inputs:
     streams:
       - id?: {id}
         metricset: node
-        datastream.dataset: kubernetes.node
+        data_stream.dataset: kubernetes.node
         period: 10s
       - id?: {id}
         metricset: system
-        datastream.dataset: kubernetes.system
+        data_stream.dataset: kubernetes.system
         period: 10s
       - id?: {id}
         metricset: pod
-        datastream.dataset: kubernetes.pod
+        data_stream.dataset: kubernetes.pod
         period: 10s
       - id?: {id}
         metricset: container
-        datastream.dataset: kubernetes.container
+        data_stream.dataset: kubernetes.container
         period: 10s
       - id?: {id}
         metricset: container
-        datastream.dataset: kubernetes.container
+        data_stream.dataset: kubernetes.container
         period: 10s
       - id?: {id}
         metricset: event
-        datastream.dataset: kubernetes.event
+        data_stream.dataset: kubernetes.event
         period: 10s
   - type: kubernetes-state/metrics
     id?: my-kubernetes
@@ -450,51 +450,51 @@ inputs:
     streams:
       - id?: {id}
         metricset: state_node
-        datastream.dataset: kubernetes.node
+        data_stream.dataset: kubernetes.node
         period: 10s
       - id?: {id}
         metricset: state_deployment
-        datastream.dataset: kubernetes.deployment
+        data_stream.dataset: kubernetes.deployment
         period: 10s
       - id?: {id}
         metricset: state_replicaset
-        datastream.dataset: kubernetes.replicaset
+        data_stream.dataset: kubernetes.replicaset
         period: 10s
       - id?: {id}
         metricset: state_statefulset
-        datastream.dataset: kubernetes.statefulset
+        data_stream.dataset: kubernetes.statefulset
         period: 10s
       - id?: {id}
         metricset: state_pod
-        datastream.dataset: kubernetes.pod
+        data_stream.dataset: kubernetes.pod
         period: 10s
       - id?: {id}
         metricset: state_container
-        datastream.dataset: kubernetes.container
+        data_stream.dataset: kubernetes.container
         period: 10s
       - id?: {id}
         metricset: state_container
-        datastream.dataset: kubernetes.container
+        data_stream.dataset: kubernetes.container
         period: 10s
       - id?: {id}
         metricset: state_cronjob
-        datastream.dataset: kubernetes.cronjob
+        data_stream.dataset: kubernetes.cronjob
         period: 10s
       - id?: {id}
         metricset: state_resourcequota
-        datastream.dataset: kubernetes.resourcequota
+        data_stream.dataset: kubernetes.resourcequota
         period: 10s
       - id?: {id}
         metricset: state_service
-        datastream.dataset: kubernetes.service
+        data_stream.dataset: kubernetes.service
         period: 10s
       - id?: {id}
         metricset: state_persistentvolume
-        datastream.dataset: kubernetes.persistentvolume
+        data_stream.dataset: kubernetes.persistentvolume
         period: 10s
       - id?: {id}
         metricset: state_persistentvolumeclaim
-        datastream.dataset: kubernetes.persistentvolumeclaim
+        data_stream.dataset: kubernetes.persistentvolumeclaim
         period: 10s
 
 #################################################################################################
@@ -517,35 +517,35 @@ inputs:
     streams:
       - id?: {id}
         metricset: container
-        datastream.dataset: docker.container
+        data_stream.dataset: docker.container
         period: 10s
       - id?: {id}
         metricset: cpu
-        datastream.dataset: docker.cpu
+        data_stream.dataset: docker.cpu
         period: 10s
       - id?: {id}
         metricset: diskio
-        datastream.dataset: docker.diskio
+        data_stream.dataset: docker.diskio
         period: 10s
       - id?: {id}
         metricset: event
-        datastream.dataset: docker.event
+        data_stream.dataset: docker.event
         period: 10s
       - id?: {id}
         metricset: healthcheck
-        datastream.dataset: docker.healthcheck
+        data_stream.dataset: docker.healthcheck
         period: 10s
       - id?: {id}
         metricset: info
-        datastream.dataset: docker.info
+        data_stream.dataset: docker.info
         period: 10s
       - id?: {id}
         metricset: memory
-        datastream.dataset: docker.memory
+        data_stream.dataset: docker.memory
         period: 10s
       - id?: {id}
         metricset: network
-        datastream.dataset: docker.network
+        data_stream.dataset: docker.network
         period: 10s
 
 #################################################################################################
@@ -555,14 +555,14 @@ inputs:
   - type: log
     id?: suricata-x1
     title: Suricata's data
-    datastream.namespace: "abc"
+    data_stream.namespace: "abc"
     package:
       name: suricata
       version: x.x.x
     streams:
       -  id?: {id}
         type: "typeX"
-        datastream.dataset: suricata.logs
+        data_stream.dataset: suricata.logs
         path: /var/log/surcata/eve.json
 
 #################################################################################################
@@ -571,7 +571,7 @@ inputs:
   - type: endpoint # Reserved key word
     id?: myendpoint-x1
     title: Endpoint configuration
-    datastream.namespace: "canada"
+    data_stream.namespace: "canada"
     package:
       name: endpoint
       version: xxx
@@ -627,7 +627,7 @@ inputs:
   - type: endpoint # Reserved key word
     id?: myendpoint-1
     title: Endpoint configuration
-    datastream.namespace: "canada"
+    data_stream.namespace: "canada"
     package:
       name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
       version: xxx

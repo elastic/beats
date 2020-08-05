@@ -93,17 +93,17 @@ filesystem metrics, and sends them to the default output. For example:
 -------------------------------------------------------------------------------------
 inputs:
   - type: system/metrics
-    datastream.namespace: default
+    data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
-        datastream.dataset: system.cpu
+        data_stream.dataset: system.cpu
       - metricset: memory
-        datastream.dataset: system.memory
+        data_stream.dataset: system.memory
       - metricset: network
-        datastream.dataset: system.network
+        data_stream.dataset: system.network
       - metricset: filesystem
-        datastream.dataset: system.filesystem
+        data_stream.dataset: system.filesystem
 -------------------------------------------------------------------------------------
 
 If `use_output` is not specified, the `default` output is used.
