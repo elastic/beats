@@ -7,13 +7,7 @@ filebeat:
     index: logs-generic-default
     processors:
       - add_fields:
-          target: "dataset"
-          fields:
-            type: logs
-            name: generic
-            namespace: default
-      - add_fields:
-          target: "datastream"
+          target: "data_stream"
           fields:
             type: logs
             dataset: generic
