@@ -106,10 +106,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	r.Event(mb.Event{
 		RootFields: common.MapStr{
-			"host.network.in.bytes":    networkInBytes,
-			"host.network.in.packets":  networkInPackets,
-			"host.network.out.bytes":   networkOutBytes,
-			"host.network.out.packets": networkOutPackets,
+			"host": common.MapStr{
+				"network": common.MapStr{
+					"in": common.MapStr{
+						"bytes":   networkInBytes,
+						"packets": networkInPackets,
+					},
+					"out": common.MapStr{
+						"bytes":   networkOutBytes,
+						"packets": networkOutPackets,
+					},
+				},
+			},
 		},
 	})
 	return nil

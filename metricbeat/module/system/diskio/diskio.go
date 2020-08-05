@@ -142,8 +142,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	r.Event(mb.Event{
 		RootFields: common.MapStr{
-			"host.disk.read.bytes":  diskReadBytes,
-			"host.disk.write.bytes": diskWriteBytes,
+			"host": common.MapStr{
+				"disk": common.MapStr{
+					"read.bytes":  diskReadBytes,
+					"write.bytes": diskWriteBytes,
+				},
+			},
 		},
 	})
 	return nil
