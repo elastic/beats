@@ -3,7 +3,7 @@
 
 = Manage your {agent}s
 
-experimental[]
+beta[]
 
 // tag::agent-install-intro[]
 {agent} is a single, unified agent that you can deploy to hosts or containers to
