@@ -161,6 +161,10 @@ class Test(BaseTest):
             assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
                 module, obj["event"]["module"])
 
+            # All modules must include a set processor that adds the time that
+            # the event was ingested to Elasticsearch
+            assert "ingested" in obj["event"], "missing event.ingested timestamp"
+
             assert "error" not in obj, "not error expected but got: {}".format(
                 obj)
 
