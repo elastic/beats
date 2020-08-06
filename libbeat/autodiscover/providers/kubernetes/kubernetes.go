@@ -86,7 +86,13 @@ type leaderElectionManager struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -94,6 +100,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	config := defaultConfig()
+	config.LeaderLease = fmt.Sprintf("%v-cluster-leader", beatName)
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errWrap(err)
@@ -235,7 +242,7 @@ func NewLeaderElectionManager(
 	stopLeading func(uuid string, eventID string),
 	logger *logp.Logger,
 ) (EventManager, error) {
-	lem := &leaderElectionManager{}
+	lem := &leaderElectionManager{logger: logger}
 	var id string
 	if cfg.Node != "" {
 		id = "beats-leader-" + cfg.Node
