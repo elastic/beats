@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.stopped",
         "event.dataset": "zoom.webhook",
         "event.end": "2019-07-31T22:43:29Z",
@@ -39,7 +38,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.completed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -79,7 +77,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2019-12-04T23:00:57.395Z",
         "event.action": "recording.renamed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -117,7 +114,6 @@
         "zoom.recording.uuid": "9xxxkifpPUz+Ow=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.trashed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -156,7 +152,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.deleted",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -195,7 +190,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.recovered",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -234,7 +228,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.639Z",
         "event.action": "recording.transcript_completed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -273,7 +266,6 @@
         "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.640Z",
         "event.action": "recording.registration_created",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -313,7 +305,6 @@
         "zoom.registrant.last_name": "Person"
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.640Z",
         "event.action": "recording.registration_approved",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -353,7 +344,6 @@
         "zoom.registrant.last_name": "Person"
     },
     {
-        "@timestamp": "2020-08-05T23:21:06.640Z",
         "event.action": "recording.registration_denied",
         "event.dataset": "zoom.webhook",
         "event.kind": [

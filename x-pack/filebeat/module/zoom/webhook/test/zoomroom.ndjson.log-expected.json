@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-08-05T23:20:55.593Z",
         "event.action": "zoomroom.alert",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -29,7 +28,6 @@
         "zoom.zoomroom.room_name": "MyFabulousZoomRoom"
     },
     {
-        "@timestamp": "2020-08-05T23:20:55.593Z",
         "event.action": "zoomroom.delayed_alert",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -58,7 +56,6 @@
         "zoom.zoomroom.room_name": "MyFabulousZoomRoom"
     },
     {
-        "@timestamp": "2020-08-05T23:20:55.593Z",
         "event.action": "zoomroom.checked_in",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -91,7 +88,6 @@
         "zoom.zoomroom.room_name": "Sharks Room"
     },
     {
-        "@timestamp": "2020-08-05T23:20:55.593Z",
         "event.action": "zoomroom.checked_in",
         "event.dataset": "zoom.webhook",
         "event.kind": [

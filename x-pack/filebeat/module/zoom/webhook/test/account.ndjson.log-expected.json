@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-08-05T23:21:00.133Z",
         "event.action": "account.created",
         "event.category": [
             "iam"
@@ -37,7 +36,6 @@
         "zoom.sub_account_id": "aIxE1yiRR8WghhUIO6eu9L"
     },
     {
-        "@timestamp": "2019-07-01T17:03:04.527Z",
         "event.action": "account.updated",
         "event.category": [
             "iam"
@@ -76,7 +74,6 @@
         "zoom.sub_account_id": "eFs_EGRCq6ByEyA73qCA"
     },
     {
-        "@timestamp": "2020-08-05T23:21:00.133Z",
         "event.action": "account.disassociated",
         "event.category": [
             "iam"

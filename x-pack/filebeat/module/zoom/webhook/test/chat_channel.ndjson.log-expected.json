@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-02-10T21:39:50.388Z",
         "event.action": "chat_channel.created",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -34,7 +33,6 @@
         "zoom.operator_id": "z8dfgdfguQrdfgdf"
     },
     {
-        "@timestamp": "2020-02-10T21:39:50.388Z",
         "event.action": "chat_channel.member_invited",
         "event.dataset": "zoom.webhook",
         "event.kind": [
