@@ -51,7 +51,7 @@ when you restart your system.
 
 To start {agent} manually, run:
 
-include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-widget.asciidoc[]
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-standalone-widget.asciidoc[]
 
 Use the `-c` flag to specify the configuration file. If no configuration file is
 specified, {agent} uses the default configuration, `elastic-agent.yml`, which is
