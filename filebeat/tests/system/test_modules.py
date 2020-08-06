@@ -166,7 +166,7 @@ class Test(BaseTest):
             assert "ingested" in obj["event"], "missing event.ingested timestamp"
 
             assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
-                obj, obj["error"]["message"])
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
