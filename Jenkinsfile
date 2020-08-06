@@ -1422,6 +1422,10 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
+      def jobName = 'elastic+beats-new'
+      if (isPR()) {
+        jobName = 'elastic+beats-new+pull-request'
+      }
       dir("${env.BASE_DIR}") {
         sh(label: 'Prepare workspace context',
            script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
@@ -1432,12 +1436,12 @@ def runbld() {
           }
         }
         sh(label: 'Process JUnit reports with runbld',
-          script: '''\
+          script: """\
           cat >./runbld-script <<EOF
           echo "Processing JUnit reports with runbld..."
           EOF
-          /usr/local/bin/runbld ./runbld-script
-          '''.stripIndent())  // stripIdent() requires '''/
+          /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+          """.stripIndent())  // stripIdent() requires '''/
       }
     }
   }
