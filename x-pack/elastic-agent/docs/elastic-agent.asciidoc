@@ -1,3 +1,5 @@
+:release-state: released
+
 [[elastic-agent-installation-configuration]]
 [role="xpack"]
 
