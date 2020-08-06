@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -802,6 +803,103 @@ func TestAddTagsWithKey(t *testing.T) {
 	}
 }
 
+func TestExpand(t *testing.T) {
+	type data struct {
+		Event       MapStr
+		Expected    MapStr
+		ErrExpected bool
+	}
+	tests := []data{
+		{
+			Event: MapStr{
+				"hello.world": 15,
+			},
+			Expected: MapStr{
+				"hello": MapStr{
+					"world": 15,
+				},
+			},
+		},
+		{
+			Event: MapStr{
+				"test": 15,
+			},
+			Expected: MapStr{
+				"test": 15,
+			},
+		},
+		{
+			Event: MapStr{
+				"test":           15,
+				"hello.there":    1,
+				"hello.world.ok": "test",
+				"elastic.for":    "search",
+			},
+			Expected: MapStr{
+				"test": 15,
+				"hello": MapStr{
+					"there": 1,
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+				"elastic": MapStr{
+					"for": "search",
+				},
+			},
+		},
+		{
+			Event: MapStr{
+				"root": MapStr{
+					"ok": 1,
+				},
+				"root.shared":        "yes",
+				"root.one.two.three": 4,
+			},
+			Expected: MapStr{
+				"root": MapStr{
+					"ok":     1,
+					"shared": "yes",
+					"one":    MapStr{"two": MapStr{"three": 4}},
+				},
+			},
+		},
+		{
+			Event: MapStr{
+				"over":     1,
+				"over.lap": 5,
+			},
+			ErrExpected: true,
+		},
+
+		// This is nondeterminstic
+		// 1. Put("root.one.two", 2)
+		// 2. Put("root.one", 1)
+		// yields: {"root":{"one":1}}
+		//
+		// The reverse causes an error: "expected map but type is int"
+		//
+		//{
+		//	Event: MapStr{
+		//		"root": MapStr{
+		//			"one": 1,
+		//		},
+		//		"root.one.two": 2,
+		//	},
+		//},
+	}
+
+	for _, test := range tests {
+		x, err := test.Event.Expand()
+		if test.ErrExpected {
+			require.Error(t, err)
+			continue
+		}
+		require.NoError(t, err)
+		assert.Equal(t, test.Expected, x)
+	}
+}
+
 func TestFlatten(t *testing.T) {
 	type data struct {
 		Event    MapStr
@@ -867,6 +965,19 @@ func BenchmarkMapStrFlatten(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = m.Flatten()
+	}
+}
+
+func BenchmarkMapStrExpand(b *testing.B) {
+	m := MapStr{
+		"test":           15,
+		"hello.there":    1,
+		"hello.world.ok": "test",
+		"elastic.for":    "search",
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = m.Expand()
 	}
 }
 

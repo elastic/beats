@@ -257,6 +257,25 @@ func (m MapStr) Format(f fmt.State, c rune) {
 	io.WriteString(f, debugM.String())
 }
 
+// Expand does the reverse of Flatten - expands dotted test and return an expanded MapStr.
+//
+// Example:
+//   "hello.world": "test"
+//
+// This is converted to:
+//   "hello": MapStr{"world": "test" }
+//
+func (m MapStr) Expand() (MapStr, error) {
+	e := MapStr{}
+	f := m.Flatten()
+	for k, v := range f {
+		if _, err := e.Put(k, v); err != nil {
+			return e, err
+		}
+	}
+	return e, nil
+}
+
 // Flatten flattens the given MapStr and returns a flat MapStr.
 //
 // Example:
