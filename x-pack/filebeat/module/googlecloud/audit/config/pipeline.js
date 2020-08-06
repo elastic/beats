@@ -243,11 +243,13 @@ function Audit(keep_original_message) {
     // Rename nested fields.
     var renameNestedFields = function(evt) {
         var arr = evt.Get("googlecloud.audit.authorization_info");
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i].resourceAttributes) {
-                // Convert to snake_case.
-                arr[i].resource_attributes = arr[i].resourceAttributes;
-                delete arr[i].resourceAttributes;
+        if (Array.isArray(arr)) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i].resourceAttributes) {
+                    // Convert to snake_case.
+                    arr[i].resource_attributes = arr[i].resourceAttributes;
+                    delete arr[i].resourceAttributes;
+                }
             }
         }
     };
@@ -265,17 +267,16 @@ function Audit(keep_original_message) {
         // Try to use authorization_info.granted when there was no status code.
         if (evt.Get("googlecloud.audit.status.code") == null) {
             var authorization_info = evt.Get("googlecloud.audit.authorization_info");
-            if (authorization_info.length === 1) {
-                if (authorization_info[0].granted == null) {
-                    evt.Put("event.outcome", "unknown");
-                } else if (authorization_info[0].granted === true) {
+            if (Array.isArray(authorization_info) && authorization_info.length === 1) {
+                if (authorization_info[0].granted === true) {
                     evt.Put("event.outcome", "success");
-                } else {
+                } else if (authorization_info[0].granted === false) {
                     evt.Put("event.outcome", "failure");
                 }
-            } else {
-                evt.Put("event.outcome", "unknown");
+                return
             }
+
+            evt.Put("event.outcome", "unknown");
             return;
         }
 
