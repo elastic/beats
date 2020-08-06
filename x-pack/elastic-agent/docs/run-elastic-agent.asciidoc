@@ -2,7 +2,7 @@
 [role="xpack"]
 = Run {agent}
 
-experimental[]
+beta[]
 
 {agent} runs in two modes: standalone or fleet. The two modes differ in how you
 configure and manage the Agent.

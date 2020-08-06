@@ -1,7 +1,7 @@
 import os
 import metricbeat
 import json
-from nose.plugins.skip import SkipTest
+import unittest
 
 
 class Test(metricbeat.BaseTest):
@@ -12,7 +12,7 @@ class Test(metricbeat.BaseTest):
         """
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template("metricbeat",
                                     os.path.join(self.working_dir,

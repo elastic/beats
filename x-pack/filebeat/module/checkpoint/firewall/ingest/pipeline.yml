@@ -1,5 +1,8 @@
 description: Pipeline for parsing checkpoint firewall logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
@@ -157,7 +160,7 @@ processors:
     target_field: source.nat.port
     type: long
     ignore_failure: true
-    ignore_missing: true 
+    ignore_missing: true
     if: "ctx.checkpoint?.xlatesport != '0'"
 - rename:
     field: checkpoint.mac_source_address
@@ -691,7 +694,7 @@ processors:
     field: client.nat.port
     type: long
     ignore_failure: true
-    ignore_missing: true 
+    ignore_missing: true
 - convert:
     field: client.bytes
     type: long
@@ -711,7 +714,7 @@ processors:
     field: server.nat.port
     type: long
     ignore_failure: true
-    ignore_missing: true 
+    ignore_missing: true
 - convert:
     field: server.bytes
     type: long
@@ -721,7 +724,7 @@ processors:
     field: server.packets
     type: long
     ignore_failure: true
-    ignore_missing: true 
+    ignore_missing: true
 - script:
     lang: painless
     source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"

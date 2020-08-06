@@ -2,7 +2,7 @@
 [role="xpack"]
 = Command line options
 
-experimental[]
+beta[]
 
 The `elastic-agent run` command provides flags that alter the behavior of an
 agent:

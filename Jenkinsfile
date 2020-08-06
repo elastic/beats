@@ -1024,6 +1024,9 @@ def installTools() {
     retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
     retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Mage", script: "make mage") }
   } else {
+    // Install python3 with the specific step, even though install-tools.bat will verify if it's there anyway.
+    // TODO: as soon as python3 is installed in the CI Workers we will be able to remove the line below.
+    installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ])
     retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
@@ -1088,7 +1091,8 @@ def dumpFilteredEnvironment(){
   echo "PROCESSES: ${env.PROCESSES}"
   echo "TIMEOUT: ${env.TIMEOUT}"
   echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
-  echo "NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}"
+  echo "PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}"
+  echo "PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}"
   echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"

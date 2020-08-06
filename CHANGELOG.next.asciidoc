@@ -232,6 +232,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
 - Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
+- Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 
 *Heartbeat*
 
@@ -505,6 +506,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 - Add event.ingested for Suricata module {pull}20220[20220]
+- Add event.ingested to all Filebeat modules. {pull}20386[20386]
+- Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 
 *Heartbeat*
 
