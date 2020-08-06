@@ -1422,22 +1422,15 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      def jobName = 'elastic+beats'
-      if (isPR()) {
-        jobName = 'elastic+beats+pull-request'
-      }
+      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      // Unstash the test reports
-      stashedTestReports.each { k, v ->
-        dir(k) {
-          unstash(v)
-        }
-      }
-      // Unstash the test reports
-      stashedTestReports.each { k, v ->
-        dir(k) {
-          unstash(v)
+      dir("${env.BASE_DIR}") {
+        // Unstash the test reports
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash(v)
+          }
         }
       }
       sh(label: 'Process JUnit reports with runbld',
