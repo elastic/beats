@@ -32,6 +32,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/convert"
 	_ "github.com/elastic/beats/v7/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/v7/libbeat/processors/dns"
+	_ "github.com/elastic/beats/v7/libbeat/processors/dot_expand"
 	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
 	_ "github.com/elastic/beats/v7/libbeat/processors/fingerprint"
 	_ "github.com/elastic/beats/v7/libbeat/processors/registered_domain"
