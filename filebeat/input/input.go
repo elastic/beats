@@ -123,6 +123,7 @@ func (p *Runner) Start() {
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Runner) Run() {
 	// Initial input run
+	logp.Debug("input", "Run input initial")
 	p.input.Run()
 
 	// Shuts down after the first complete run of all input
@@ -130,13 +131,46 @@ func (p *Runner) Run() {
 		return
 	}
 
+	var t *time.Ticker
+	var offsetScan bool
+	var deltaDuration time.Duration
+
+	if (p.config.ScanOffset == 0) {
+		deltaDuration = p.config.ScanFrequency
+	} else {
+		// The next run will be at ScanOffset (zulu o-clock) and subsequent runs at ScanFrequency
+		offsetScan = true
+
+		now := time.Now().In(utc)
+
+		next := now.Truncate(scanDay) // back to midnight
+		next = next.Add(p.config.ScanOffset)  // advance to the desired time
+
+		if next.Before(now) {
+			next = now.Truncate(scanDay) // back to midnight
+			next = next.Add(scanDay)      // advance to midnight the next day
+			next = next.Add(p.config.ScanOffset)  // advance to the desired time
+		}
+
+		deltaDuration = next.Sub(now)
+		logp.Debug("input", "The next scan = %v ; deltaDuration = %v\n", next, deltaDuration)
+	}
+
+	t = time.NewTicker(deltaDuration)
+
 	for {
 		select {
 		case <-p.done:
 			logp.Info("input ticker stopped")
 			return
-		case <-time.After(p.config.ScanFrequency):
-			logp.Debug("input", "Run input")
+		case <-t.C:
+			if offsetScan {
+				logp.Debug("input", "Run input at ScanOffset")
+				t = time.NewTicker(p.config.ScanFrequency)
+				offsetScan = false
+			} else {
+				logp.Debug("input", "Run input")
+			}
 			p.input.Run()
 		}
 	}

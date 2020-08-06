@@ -26,12 +26,14 @@ import (
 
 var (
 	defaultConfig = inputConfig{
+		ScanOffset:    0 * time.Second,
 		ScanFrequency: 10 * time.Second,
 		Type:          cfg.DefaultType,
 	}
 )
 
 type inputConfig struct {
+	ScanOffset time.Duration `config:"scan_offset" validate:"min=0"`
 	ScanFrequency time.Duration `config:"scan_frequency" validate:"min=0,nonzero"`
 	Type          string        `config:"type"`
 	InputType     string        `config:"input_type"`
