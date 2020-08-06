@@ -2,7 +2,7 @@
 [role="xpack"]
 = Configuration settings
 
-experimental[]
+beta[]
 
 By default {agent} runs in standalone mode to ingest system data and send it to
 a local {es} instance running on port 9200. It uses the demo credentials of the
