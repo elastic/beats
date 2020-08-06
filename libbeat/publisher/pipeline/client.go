@@ -73,6 +73,7 @@ func (c *client) PublishAll(events []beat.Event) {
 }
 
 func (c *client) Publish(e beat.Event) {
+	logp.Warn("ATRACE publish")
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -144,6 +145,7 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
+	logp.Warn("ATRACE Closing beats Pipeline")
 	log := c.logger()
 
 	// first stop ack handling. ACK handler might block on wait (with timeout), waiting

@@ -283,6 +283,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	logp.Warn("ATRACE make client")
 	client := &client{
 		pipeline:     p,
 		closeRef:     cfg.CloseRef,

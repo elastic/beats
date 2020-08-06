@@ -54,7 +54,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
-
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
 	if locationName == "" {
