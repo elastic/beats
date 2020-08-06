@@ -5,8 +5,6 @@
 To stop {agent} and its related executables, stop the {agent} process. Use the
 commands that work for your system. 
 
-//TODO: Replace with tabbed panel when it's out of experimental phase.
-
 *Windows:*
 
 If you installed the Agent as a service, stop the service. If
