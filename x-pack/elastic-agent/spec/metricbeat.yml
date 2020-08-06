@@ -65,11 +65,11 @@ rules:
     - remove_key:
         key: enabled
     - remove_key:
-        key: dataset
+        key: data_stream
     - remove_key:
-        key: dataset.name
+        key: data_stream.dataset
     - remove_key:
-        key: dataset.namespace
+        key: data_stream.namespace
     - remove_key:
         key: use_output
 
