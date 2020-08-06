@@ -1422,11 +1422,14 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      def jobName = 'elastic+beats-new'
+      def jobName = 'elastic+beats'
+      // TODO: change ansible/roles/runbld/templates/runbld.conf.j2
+      def where = ''
       if (isPR()) {
-        jobName = 'elastic+beats-new+pull-request'
+        jobName = 'elastic+beats+pull-request'
+        where = env.BASE_DIR
       }
-      dir("${env.BASE_DIR}") {
+      dir("${where}") {
         sh(label: 'Prepare workspace context',
            script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
         // Unstash the test reports
