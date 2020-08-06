@@ -1423,29 +1423,30 @@ def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
       def jobName = 'elastic+beats'
-      // TODO: change ansible/roles/runbld/templates/runbld.conf.j2
-      def where = ''
       if (isPR()) {
         jobName = 'elastic+beats+pull-request'
-        where = env.BASE_DIR
       }
-      dir("${where}") {
-        sh(label: 'Prepare workspace context',
-           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
-        // Unstash the test reports
-        stashedTestReports.each { k, v ->
-          dir(k) {
-            unstash(v)
-          }
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      // Unstash the test reports
+      stashedTestReports.each { k, v ->
+        dir(k) {
+          unstash(v)
         }
-        sh(label: 'Process JUnit reports with runbld',
-          script: """\
-          cat >./runbld-script <<EOF
-          echo "Processing JUnit reports with runbld..."
-          EOF
-          /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
-          """.stripIndent())  // stripIdent() requires '''/
       }
+      // Unstash the test reports
+      stashedTestReports.each { k, v ->
+        dir(k) {
+          unstash(v)
+        }
+      }
+      sh(label: 'Process JUnit reports with runbld',
+        script: """\
+        cat >./runbld-script <<EOF
+        echo "Processing JUnit reports with runbld..."
+        EOF
+        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }
