@@ -366,7 +366,7 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, id: args.id)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
@@ -399,13 +399,16 @@ def junitAndStore(Map args = [:]) {
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      def jobName = "elastic+beats-new"
+      def jobName = 'elastic+beats'
+      // TODO: change ansible/roles/runbld/templates/runbld.conf.j2
+      def where = ''
       if (isPR()) {
-        jobName = "elastic+beats-new+pull-request"
+        jobName = 'elastic+beats+pull-request'
+        where = env.BASE_DIR
       }
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      dir("${env.BASE_DIR}") {
+      dir("${where}") {
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
