@@ -400,31 +400,26 @@ def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
       def jobName = 'elastic+beats'
-      // TODO: change ansible/roles/runbld/templates/runbld.conf.j2
-      def where = ''
       if (isPR()) {
         jobName = 'elastic+beats+pull-request'
-        where = env.BASE_DIR
       }
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      dir("${where}") {
-        // Unstash the test reports
-        stashedTestReports.each { k, v ->
-          dir(k) {
-            unstash(v)
-          }
+      // Unstash the test reports
+      stashedTestReports.each { k, v ->
+        dir(k) {
+          unstash(v)
         }
-        sh(label: 'Process JUnit reports with runbld',
-          script: """\
-          ## for debugging purposes
-          find . -name "TEST-*.xml"
-          cat >./runbld-script <<EOF
-          echo "Processing JUnit reports with runbld..."
-          EOF
-          /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
-          """.stripIndent())  // stripIdent() requires '''/
       }
+      sh(label: 'Process JUnit reports with runbld',
+        script: """\
+        ## for debugging purposes
+        find . -name "TEST-*.xml"
+        cat >./runbld-script <<EOF
+        echo "Processing JUnit reports with runbld..."
+        EOF
+        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }
