@@ -2,7 +2,7 @@
 [role="xpack"]
 = Install {agent}
 
-experimental[]
+beta[]
 
 Download and install the Agent on each system you want to monitor.
 

@@ -104,7 +104,7 @@ message StatusResponse {
   repeated ApplicationStatus applications = 3;
 }
 
-service ElasticAgent {
+service ElasticAgentControl {
   // Fetches the currently running version of the Elastic Agent.
   rpc Version(Empty) returns (VersionResponse);
 
