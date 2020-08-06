@@ -16,5 +16,5 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.a
 // end::install-elastic-agent[]
 
 // Add Javascript and CSS for tabbed panels
-include::{code-path}.asciidoc[]
+include::tab-widgets/code.asciidoc[]
 

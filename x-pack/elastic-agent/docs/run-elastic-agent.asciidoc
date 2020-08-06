@@ -62,4 +62,4 @@ For configuration options, see <<elastic-agent-configuration>>.
 //<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
 
 // Add Javascript and CSS for tabbed panels
-include::{code-path}.asciidoc[]
+include::tab-widgets/code.asciidoc[]
