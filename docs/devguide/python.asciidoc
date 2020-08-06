@@ -52,14 +52,14 @@ of these virtual environments:
   is created by `make` or `mage` targets when needed.  
 
 Virtual environments can also be used without `make` or `mage`, this is usual
-for example when running individual system tests with `nosetests`. There are two
+for example when running individual system tests with `pytest`. There are two
 ways to run commands from the virtual environment:
 
 * "Activating" the virtual environment in your current terminal running
   `source ./build/python-env/bin/activate`. Virtual environment can be
   deactivated by running `deactivate`.
 * Directly running commands from the virtual environment path. For example
-  `nosetests` can be executed as `./build/python-env/bin/nosetests`.
+  `pytest` can be executed as `./build/python-env/bin/pytest`.
 
 To recreate a virtual environment, remove its directory. All virtual
 environments are also removed with `make clean`.
