@@ -153,7 +153,7 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 				"availability_zone": "us-west-1a",
 			},
 			"host": common.MapStr{
-				"cpu":  common.MapStr{"pct": 0.25},
+				"cpu":  common.MapStr{"pct": 0.0025},
 				"id":   "i-123",
 				"name": "test-instance",
 			},
@@ -242,7 +242,7 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 				"availability_zone": "us-west-1a",
 			},
 			"host": common.MapStr{
-				"cpu":  common.MapStr{"pct": 0.25},
+				"cpu":  common.MapStr{"pct": 0.0025},
 				"id":   "i-123",
 				"name": "test-instance",
 			},
