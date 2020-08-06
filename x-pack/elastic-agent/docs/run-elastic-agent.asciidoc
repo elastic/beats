@@ -22,8 +22,9 @@ To enroll an {agent} to {fleet}:
 
 . Stop the agent, if it's already running.
 
-. Go the **{fleet}** tab in {ingest-manager}, and click **Enroll new agent** to
-generate a token. See <<ingest-management-getting-started>> for detailed steps.
+. In {ingest-manager}, select **{fleet}**, then click **Add agent** to
+generate an enrollment token. See <<ingest-management-getting-started>> for
+detailed steps.
 
 . Enroll the agent:
 +
@@ -31,7 +32,7 @@ generate a token. See <<ingest-management-getting-started>> for detailed steps.
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/enroll-widget.asciidoc[]
 --
 
-. Start the agent:
+. Run the agent:
 +
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-widget.asciidoc[]
