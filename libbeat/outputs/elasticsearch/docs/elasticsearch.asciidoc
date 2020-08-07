@@ -12,7 +12,7 @@ Example configuration:
 ["source","yaml",subs="attributes"]
 ----
 output.elasticsearch:
-  hosts: ["https://myEShost:9200"] <1>
+  hosts: ["http://myEShost:9200"] <1>
 ----
 <1> To enable SSL, add `https` to all URLs defined under __hosts__.
 
@@ -28,7 +28,7 @@ output, {beatname_uc} can use any of the following authentication methods:
 ["source","yaml",subs="attributes,callouts"]
 ----
 output.elasticsearch:
-  hosts: ["https://myEShost:9200"]
+  hosts: ["http://myEShost:9200"]
   username: "{beat_default_index_prefix}_writer"
   password: "{pwd}"
 ----
