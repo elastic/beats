@@ -1,4 +1,4 @@
-module github.com/elastic/beats/v7
+module github.com/richard-mauri/beats/v7
 
 go 1.14
 
