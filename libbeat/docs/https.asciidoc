@@ -30,7 +30,7 @@ For example:
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["https://myEShost:9200"]
+  hosts: ["http://myEShost:9200"]
   username: "{beat_default_index_prefix}_writer" <1>
   password: "{pwd}" <2>
 ----------------------------------------------------------------------
