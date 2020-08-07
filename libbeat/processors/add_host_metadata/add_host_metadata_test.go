@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+var hostName = "testHost"
+
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
@@ -202,7 +204,8 @@ func TestEventWithExistingHostField(t *testing.T) {
 	event := &beat.Event{
 		Fields: common.MapStr{
 			"host": common.MapStr{
-				"id": hostID,
+				"name": hostName,
+				"id":   hostID,
 			},
 		},
 		Timestamp: time.Now(),
@@ -226,13 +229,17 @@ func TestEventWithExistingHostField(t *testing.T) {
 	assert.NoError(t, err)
 
 	hostFields := v.(common.MapStr)
-	assert.Equal(t, 1, len(hostFields))
+	assert.Equal(t, 2, len(hostFields))
 	assert.Equal(t, hostID, hostFields["id"])
 }
 
 func TestEventWithoutHostFields(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields: common.MapStr{
+			"host": common.MapStr{
+				"name": hostName,
+			},
+		},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
@@ -252,5 +259,5 @@ func TestEventWithoutHostFields(t *testing.T) {
 
 	v, err := newEvent.GetValue("host")
 	assert.NoError(t, err)
-	assert.True(t, len(v.(common.MapStr)) > 0)
+	assert.True(t, len(v.(common.MapStr)) > 1)
 }
