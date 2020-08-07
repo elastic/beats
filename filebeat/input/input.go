@@ -31,6 +31,8 @@ import (
 
 var (
 	inputList = monitoring.NewUniqueList()
+	scanDay, _ = time.ParseDuration("24h")
+	utc, _ = time.LoadLocation("UTC")
 )
 
 func init() {
