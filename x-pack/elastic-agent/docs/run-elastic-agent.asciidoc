@@ -20,13 +20,14 @@ agent to {fleet}.
 
 To enroll an {agent} to {fleet}:
 
-. Stop the agent, if it's already running.
+. Stop {agent}, if it's already running.
 
 . In {ingest-manager}, select **{fleet}**, then click **Add agent** to
-generate an enrollment token. See <<ingest-management-getting-started>> for
+get an enrollment token. See <<ingest-management-getting-started>> for
 detailed steps.
 
-. Enroll the agent:
+. Change to the directory where {agent} is installed, and enroll the agent to
+{fleet}:
 +
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/enroll-widget.asciidoc[]

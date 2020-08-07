@@ -1,4 +1,10 @@
 // tag::deb[]
+
+// tag::enroll-tip[]
+TIP: We recommend that you run this command as the root user because some
+integrations require root privileges to collect sensitive data.
+
+// end::enroll-tip[]
 [source,shell]
 ----
 elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
@@ -8,6 +14,9 @@ include::enroll.asciidoc[tag=where-description]
 // end::deb[]
 
 // tag::rpm[]
+
+include::enroll.asciidoc[tag=enroll-tip]
+
 [source,shell]
 ----
 elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
@@ -17,6 +26,9 @@ include::enroll.asciidoc[tag=where-description]
 // end::rpm[]
 
 // tag::mac[]
+
+include::enroll.asciidoc[tag=enroll-tip]
+
 [source,shell]
 ----
 ./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
@@ -26,6 +38,9 @@ include::enroll.asciidoc[tag=where-description]
 // end::mac[]
 
 // tag::linux[]
+
+include::enroll.asciidoc[tag=enroll-tip]
+
 [source,shell]
 ----
 ./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY

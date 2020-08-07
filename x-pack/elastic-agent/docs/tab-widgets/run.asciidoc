@@ -64,12 +64,33 @@ rebooted.
 // end::linux[]
 
 // tag::win[]
+The first time you run {agent}, you need to install it as auto-starting Windows
+service. To do this, run the PowerShell script provided in the archive you
+downloaded:
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*).
+
+. From the PowerShell prompt, run the following commands to install {agent} as
+an service and start the service:
++
 [source,shell]
 ----
-Start-Service elastic-agent <1>
+cd 'C:\Program Files\Elastic-Agent'
+.\install-service-elastic-agent.ps1 <1> <2>
 ----
-<1> On Windows, you must run {agent} under the SYSTEM account if you plan
+<1> You must run {agent} under the SYSTEM account if you plan
 to use the {elastic-endpoint} integration.
+<2> If script execution is disabled on your system, set the execution policy for
+the current session to allow the script to run. For example:
+`PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
++
+If the service stops and you need to restart it manually, run:
++
+[source,shell]
+----
+Start-Service elastic-agent
+----
 
 NOTE: {agent} will restart automatically if the system is rebooted.
 

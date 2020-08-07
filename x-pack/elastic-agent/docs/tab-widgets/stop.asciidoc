@@ -34,21 +34,20 @@ include::stop.asciidoc[tag=stop-command]
 
 // tag::mac[]
 // tag::kill-process[]
-Run the following command to get the ID of the `elastic-agent` process:
+Get the process ID (PID) of the `elastic-agent` process:
 
 [source,shell]
 ----
 ps | grep elastic-agent
 ----
 
-Then kill the process:
+Then kill the process, replacing the PID in this example with the PID from
+the grep command:
 
 [source,shell]
 ----
-kill -9 PID
+kill -9 90682
 ----
-
-Where `PID` is the ID of the `elastic-agent` process.
 
 NOTE: {agent} will NOT restart automatically if the system is rebooted.
 
