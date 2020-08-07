@@ -334,6 +334,9 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
+		// host.name will be added by add_host_metadata processor or modules
+		// remove host.name from libbeat
+		meta.Delete("host.name")
 		processors.add(actions.NewAddFields(meta, needsCopy, false))
 	}
 

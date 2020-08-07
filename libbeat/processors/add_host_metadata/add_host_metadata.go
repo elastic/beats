@@ -81,6 +81,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	// If host fields exist in event, skip add_host_metadata.
+	hostFields, _ := event.Fields.GetValue("host")
+	if hostFields != nil && len(hostFields.(common.MapStr)) != 0 {
+		return event, nil
+	}
+
 	err := p.loadData()
 	if err != nil {
 		return nil, err

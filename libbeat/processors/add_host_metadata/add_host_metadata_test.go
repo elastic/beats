@@ -196,3 +196,61 @@ func TestConfigGeoDisabled(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, nil, eventGeoField)
 }
+
+func TestEventWithExistingHostField(t *testing.T) {
+	hostID := "9C7FAB7B"
+	event := &beat.Event{
+		Fields: common.MapStr{
+			"host": common.MapStr{
+				"id": hostID,
+			},
+		},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
+		assert.IsType(t, types.ErrNotImplemented, err)
+		return
+	}
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	v, err := newEvent.GetValue("host")
+	assert.NoError(t, err)
+
+	hostFields := v.(common.MapStr)
+	assert.Equal(t, 1, len(hostFields))
+	assert.Equal(t, hostID, hostFields["id"])
+}
+
+func TestEventWithoutHostFields(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
+		assert.IsType(t, types.ErrNotImplemented, err)
+		return
+	}
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	v, err := newEvent.GetValue("host")
+	assert.NoError(t, err)
+	assert.True(t, len(v.(common.MapStr)) > 0)
+}
