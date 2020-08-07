@@ -1,7 +1,6 @@
 import os
 from metricbeat import BaseTest
 import unittest
-from nose.plugins.attrib import attr
 import urllib.request
 import urllib.error
 import urllib.parse
