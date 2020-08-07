@@ -301,7 +301,7 @@ func (p *eventerManager) GenerateHints(event bus.Event) bus.Event {
 
 // Start for EventManager interface.
 func (p *leaderElectionManager) Start() {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.TODO())
 	p.cancelLeaderElection = cancel
 	p.startLeaderElector(ctx, p.leaderElection)
 }
@@ -322,10 +322,7 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("leader election lock GAINED, id %v", err)
-	}
-	if lec.WatchDog != nil {
-		lec.WatchDog.SetLeaderElection(le)
+		p.logger.Errorf("error while creating Leader Elector: %v", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 	go le.Run(ctx)
