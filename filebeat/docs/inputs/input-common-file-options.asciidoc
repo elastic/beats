@@ -276,6 +276,25 @@ constantly polls your files.
 The default setting is 10s.
 
 [float]
+[id="{beatname_lc}-input-{type}-scan-offset"]
+===== `scan_offset`
+
+The absolute UTC time that {beatname_uc} checks for new files in the paths that
+are specified for harvesting.
+For example, if you specify a duration value like `0h5m`, the
+directory is scanned for files at 00:05 UTC.
+This setting can be used in conjunction with scan_frequency to periodically check
+for new files precisely after a known time of log rotation. This facilitates
+using much longer scan_frequency periods, with more timely and fruitful harvesting of
+new files, than using scan_freqwuency alone.
+
+If you require log lines to be sent in near real time do not use a very low
+`scan_frequency` but adjust `close_inactive` so the file handler stays open and
+constantly polls your files.
+
+The default setting is 0.
+
+[float]
 [id="{beatname_lc}-input-{type}-scan-sort"]
 ===== `scan.sort`
 
