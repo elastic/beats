@@ -234,6 +234,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
+- Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 
 *Heartbeat*
 
