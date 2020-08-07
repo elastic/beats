@@ -31,9 +31,10 @@ type app struct {
 	rawConfig *common.Config // required for index managemnt setup... should be removed
 
 	// configured subsystems
-	statestore  *kvStore
-	scheduler   *scheduler.Scheduler
-	inputLoader *inputLoader
+	statestore   *kvStore
+	scheduler    *scheduler.Scheduler
+	inputLoader  *inputLoader
+	agentManager *agentConfigManager
 
 	// statically configured inputs. To be removed in favor of configuring via agent RPC only. Maybe keep here for testing only.
 	inputs []*input
@@ -176,6 +177,11 @@ func (app *app) configure() error {
 	}
 	app.scheduler = scheduler.NewWithLocation(app.Settings.Limits.Monitors, nil, location)
 
+	app.agentManager, err = newAgentConfigManager(app.log, app.Settings.Manager)
+	if err != nil {
+		return err
+	}
+
 	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
 	app.inputLoader = newInputLoader(app.log, inputsCollection)
 
@@ -213,6 +219,12 @@ func (app *app) Run(sigContext context.Context) error {
 	var autoCancel ctxtool.AutoCancel
 	defer autoCancel.Cancel()
 
+	forceShutdownOnError := func(err error) bool {
+		app.log.Errorf("Critical error, forcing shutdown: %v", err)
+		autoCancel.Cancel()
+		return true
+	}
+
 	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
 		app.log.Info("Shutdown signal received")
 	}))
@@ -233,15 +245,32 @@ func (app *app) Run(sigContext context.Context) error {
 		app.log.Info("Inputs stopped.")
 	}))
 
-	inputManagerTaskGroup := unison.TaskGroup{StopOnError: func(_ error) bool { return true }}
+	// App internal jobs that are required for the app to run correctly are
+	// registered with the appTaskGroup.  The app if forced to shut down if an
+	// essential subsystem fails.
+	appTaskGroup := unison.TaskGroup{StopOnError: forceShutdownOnError}
 	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
-		app.log.Info("Stopping input managers...")
-		err := inputManagerTaskGroup.Stop()
-		if err != nil {
-			app.log.Errorf("Input managers failed: %v", err)
-		}
-		app.log.Info("Input managers stopped.")
+		appTaskGroup.Stop()
 	}))
+
+	// the input manager task group is owned by the appTaskGroup. Input Managers
+	// are essential subsystems. If they fail, the app should shut down.
+	inputManagerTaskGroup := unison.TaskGroup{StopOnError: func(_ error) bool { return true }}
+	appTaskGroup.Go(func(sigCancel unison.Canceler) error {
+		var err error
+		ctx, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(sigCancel), func() {
+			app.log.Info("Stopping input managers...")
+			err := inputManagerTaskGroup.Stop()
+			if err != nil {
+				app.log.Errorf("Input managers failed: %v", err)
+			}
+			app.log.Info("Input managers stopped.")
+		})
+		defer cancel()
+
+		<-ctx.Done()
+		return err
+	})
 
 	// start input managers
 	app.log.Info("Starting input managers...")
@@ -250,6 +279,17 @@ func (app *app) Run(sigContext context.Context) error {
 		return err
 	}
 	app.log.Info("Input management active...")
+
+	// esatblish connection with agent for status reporing and dynamic configuration updates.
+	// the manager should be the last subsystem that is shutdown.
+	appTaskGroup.Go(func(cancel unison.Canceler) error {
+		return app.agentManager.Run(ctxtool.FromCanceller(cancel), agentEventHandler{
+			OnStop: autoCancel.Cancel,
+			OnConfig: func(settings dynamicSettings) error {
+				return nil
+			},
+		})
+	})
 
 	// start inputs
 	app.log.Info("Starting inputs...")

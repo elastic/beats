@@ -22,12 +22,13 @@ type flagsConfig struct {
 type settings struct {
 	ConfigID string `config:"id"`
 	Inputs   []inputSettings
+	Outputs  map[string]*common.Config
 	Path     pathSettings
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
 	Limits   limitsSettings
 	Location string // time zone info
-	Outputs  map[string]*common.Config
+	Manager  agentConfigManagerSettings
 }
 
 // configure global resource limits to be shared with input managers
