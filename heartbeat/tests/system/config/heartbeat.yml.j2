@@ -29,6 +29,14 @@ heartbeat.monitors:
     {% endfor %}
   {% endif -%}
 
+  {%- if monitor.certificate_authorities is defined %}
+  ssl:
+    certificate_authorities: [
+      {%- for ca in monitor.certificate_authorities %}
+      '{{ ca }}',
+      {% endfor %}
+    ]
+  {% endif -%}
 
   {%- if monitor.check_response_json is defined %}
   check.response.json:

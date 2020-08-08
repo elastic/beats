@@ -1,5 +1,6 @@
 import os
 import sys
+import ssl
 import http.server
 import threading
 
@@ -9,8 +10,14 @@ sys.path.append(os.path.join(os.path.dirname(
 from beat.beat import TestCase
 from time import sleep
 
+CERTIFICATES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "resources",
+                                 "certs")
+
 
 class BaseTest(TestCase):
+
+    CERTIFICATE_CHAIN = None
 
     @classmethod
     def setUpClass(self):
@@ -31,6 +38,15 @@ class BaseTest(TestCase):
                 self.wfile.write(bytes(content, "utf-8"))
 
         server = http.server.HTTPServer(('localhost', 0), HTTPHandler)
+
+        if self.CERTIFICATE_CHAIN:
+            keyfile, certfile, password = self.CERTIFICATE_CHAIN
+
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(keyfile=keyfile,
+                                    certfile=certfile,
+                                    password=password)
+            server.socket = context.wrap_socket(server.socket, server_side=True)
 
         thread = threading.Thread(target=server.serve_forever)
         thread.start()

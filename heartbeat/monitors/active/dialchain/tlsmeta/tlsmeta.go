@@ -91,6 +91,7 @@ func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 		// Legacy non-ECS field
 		tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
 		x509Fields.Put("not_after", *chainNotAfter)
+		x509Fields.Put("days_to_expiry", int64(time.Until(*chainNotAfter).Hours() / 24))
 	}
 
 	fields.DeepUpdate(common.MapStr{"tls": tlsFields})

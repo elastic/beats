@@ -131,6 +131,7 @@ func TestAddCertMetadata(t *testing.T) {
 				},
 				"not_after":            certNotAfter,
 				"not_before":           certNotBefore,
+				"days_to_expiry":       int64(time.Until(certNotAfter) / (24 * time.Hour)),
 				"serial_number":        "26610543540289562361990401194",
 				"signature_algorithm":  "SHA256-RSA",
 				"public_key_algorithm": "RSA",

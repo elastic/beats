@@ -7967,6 +7967,17 @@ example: 2019-08-16 01:40:25+00:00
 
 --
 
+*`tls.server.x509.days_to_expiry`*::
++
+--
+Number of days remaining for the server's certificate to get expired.
+
+type: long
+
+example: 30
+
+--
+
 *`tls.server.x509.public_key_algorithm`*::
 +
 --

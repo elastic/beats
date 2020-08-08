@@ -1,7 +1,8 @@
 import os
 import unittest
+from datetime import datetime
 
-from heartbeat import BaseTest
+from heartbeat import BaseTest, CERTIFICATES_PATH
 from parameterized import parameterized
 
 
@@ -219,5 +220,55 @@ class Test(BaseTest):
             monitors=[{
                 "type": "http",
                 "hosts": urls,
+            }]
+        )
+
+
+class TestHTTPS(BaseTest):
+
+    CERTIFICATE_CHAIN = (os.path.join(CERTIFICATES_PATH, "ca.key"),
+                         os.path.join(CERTIFICATES_PATH, "ca.cer"),
+                         "capass")
+
+    @parameterized.expand([
+        "200",
+    ])
+    def test_days_to_expiry(self, status_code):
+        """
+        Test https server
+        """
+        status_code = int(status_code)
+        server = self.start_server("hello world", status_code)
+
+        self.render_http_config(
+            ["https://localhost:{}".format(server.server_port)])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+        self.wait_until(
+            lambda: self.output_has(lines=1))
+
+        proc.check_kill_and_wait()
+
+        server.shutdown()
+        output = self.read_output()[0]
+
+        assert status_code == output["http.response.status_code"]
+
+        expiration_date = datetime.fromisoformat(
+            output["tls.server.x509.not_after"].replace("Z", ""))
+        current_date = datetime.fromisoformat(
+            output["@timestamp"].replace("Z", ""))
+        days_to_expiry = output["tls.server.x509.days_to_expiry"]
+
+        assert days_to_expiry == (expiration_date - current_date).days
+
+    def render_http_config(self, urls):
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "urls": urls,
+                "certificate_authorities": [os.path.join(CERTIFICATES_PATH, "ca.cer")],
             }]
         )
