@@ -1,6 +1,10 @@
 [[elastic-agent-cmd-options]]
 [role="xpack"]
-= Command line options
+= {agent} command line options
+
+++++
+<titleabbrev>Command line options</titleabbrev>
+++++
 
 beta[]
 
