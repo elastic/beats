@@ -71,19 +71,18 @@ type agentEventHandler struct {
 	OnStop func()
 }
 
-type dynamicSettings struct {
-	Inputs  []inputSettings
-	Outputs map[string]*common.Config
-}
-
 type agentConfigManagerSettings struct {
 	Enabled bool   `config:"enabled" yaml:"enabled"`
 	Mode    string `config:"mode" yaml:"mode"`
 }
 
+func isManaged(settings agentConfigManagerSettings) bool {
+	return settings.Enabled && settings.Mode == xmanagement.ModeFleet
+}
+
 func newAgentConfigManager(log *logp.Logger, settings agentConfigManagerSettings) (*agentConfigManager, error) {
 	var dialConfig agentDialConfig
-	isManaged := settings.Enabled && settings.Mode == xmanagement.ModeFleet
+	isManaged := isManaged(settings)
 
 	if isManaged {
 		var err error

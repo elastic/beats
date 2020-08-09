@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"os/signal"
-	"path/filepath"
+	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/go-concert/unison"
 )
 
 // osSignalContext creates a context.Context that will be cancelled if the
@@ -39,39 +40,26 @@ func osSignalContext(sigs ...os.Signal) (context.Context, context.CancelFunc) {
 	return ctx, cancel
 }
 
-func readConfigFiles(paths pathSettings, files []string, strictPerm bool) (*common.Config, error) {
-	configFilePaths := make([]string, len(files))
-	for i, path := range files {
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(paths.Config, path)
-		}
-		configFilePaths[i] = path
-	}
+//periodic wraps timed.Period to provide an error return and cancel the loop
+// if fn returns an error.
+//
+// XXX: elastic/go-concert#28 updated timed.Period to match the interface of
+// periodic. This function should be removed when updating to a newer version
+// of go-concert.
+func periodic(cancel unison.Canceler, period time.Duration, fn func() error) error {
+	ctx, cancelFn := context.WithCancel(ctxtool.FromCanceller(cancel))
+	defer cancelFn()
 
-	if strictPerm {
-		for _, path := range configFilePaths {
-			if err := common.OwnerHasExclusiveWritePerms(path); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	config := common.NewConfig()
-	for _, path := range configFilePaths {
-		contents, err := ioutil.ReadFile(path)
+	var err error
+	timed.Periodic(ctx, period, func() {
+		err = fn()
 		if err != nil {
-			return nil, err
+			cancelFn()
 		}
+	})
 
-		fileConfig, err := common.NewConfigWithYAML(contents, path)
-		if err != nil {
-			return nil, err
-		}
-
-		if err = config.Merge(fileConfig); err != nil {
-			return nil, err
-		}
+	if err == nil {
+		err = ctx.Err()
 	}
-
-	return config, nil
+	return err
 }

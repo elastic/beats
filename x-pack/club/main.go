@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"time"
 
+	"github.com/elastic/go-concert/chorus"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -31,13 +34,12 @@ type app struct {
 	rawConfig *common.Config // required for index managemnt setup... should be removed
 
 	// configured subsystems
-	statestore   *kvStore
-	scheduler    *scheduler.Scheduler
-	inputLoader  *inputLoader
-	agentManager *agentConfigManager
-
-	// statically configured inputs. To be removed in favor of configuring via agent RPC only. Maybe keep here for testing only.
-	inputs []*input
+	statestore      *kvStore
+	scheduler       *scheduler.Scheduler
+	inputLoader     *inputLoader
+	pipelineManager *pipelineManager
+	agentManager    *agentConfigManager
+	configWatcher   *configWatcher
 }
 
 func main() {
@@ -96,7 +98,7 @@ func (app *app) init(flags flagsConfig) error {
 	if err := app.initSettings(flags); err != nil {
 		return err
 	}
-	if err := app.configure(); err != nil {
+	if err := app.configure(flags); err != nil {
 		return err
 	}
 
@@ -118,7 +120,8 @@ func (app *app) initSettings(flags flagsConfig) error {
 		return fmt.Errorf("can not initialize application paths: %w", err)
 	}
 
-	config, err := readConfigFiles(paths, flags.ConfigFiles, flags.StrictPermissions)
+	configReader := &configReader{paths: paths, strictPerm: flags.StrictPermissions}
+	config, err := configReader.Read(flags.ConfigFiles)
 	if err != nil {
 		return fmt.Errorf("Failed to read config file(s): %w", err)
 	}
@@ -137,11 +140,18 @@ func (app *app) initSettings(flags flagsConfig) error {
 		settings.Registry.Path = filepath.Join(settings.Path.Data, "registry")
 	}
 
+	if isManaged(settings.Manager) && flags.Reload {
+		return errors.New("config reloading and managed mode must not be enabled together")
+	}
+	if !isManaged(settings.Manager) && !flags.Reload && len(settings.Inputs) == 0 {
+		return errors.New("unmanaged mode requires inputs to be configured")
+	}
+
 	app.Settings = settings
 	return app.Settings.validate()
 }
 
-func (app *app) configure() error {
+func (app *app) configure(flags flagsConfig) error {
 	// logging first!!!
 	if err := logp.Configure(app.Settings.Logging); err != nil {
 		return fmt.Errorf("failed to initialize logging output: %w", err)
@@ -185,16 +195,23 @@ func (app *app) configure() error {
 	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
 	app.inputLoader = newInputLoader(app.log, inputsCollection)
 
-	// Let's configure inputs. Inputs won't do any processing, yet.
-	var inputs []*input
-	for _, config := range app.Settings.Inputs {
-		input, err := app.inputLoader.Configure(config)
-		if err != nil {
-			return fmt.Errorf("Failed to configure inputs: %w", err)
-		}
-		inputs = append(inputs, input)
+	app.pipelineManager, err = newPipelineManager(app.log, app.info,
+		app.inputLoader,
+		app.rawConfig,
+		app.Settings.Outputs,
+		app.Settings.Inputs,
+	)
+	if err != nil {
+		return err
 	}
-	app.inputs = inputs
+
+	if flags.Reload {
+		app.configWatcher = &configWatcher{
+			log:    app.log.Named("config-watcher"),
+			files:  flags.ConfigFiles,
+			reader: &configReader{paths: app.Settings.Path, strictPerm: flags.StrictPermissions},
+		}
+	}
 
 	ok = true
 	return nil
@@ -219,94 +236,78 @@ func (app *app) Run(sigContext context.Context) error {
 	var autoCancel ctxtool.AutoCancel
 	defer autoCancel.Cancel()
 
-	forceShutdownOnError := func(err error) bool {
-		app.log.Errorf("Critical error, forcing shutdown: %v", err)
-		autoCancel.Cancel()
-		return true
-	}
-
 	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
 		app.log.Info("Shutdown signal received")
 	}))
 
-	outputManager, err := configureOutputs(app.log, app.info, app.Settings.Outputs, app.rawConfig)
-	if err != nil {
-		return err
-	}
-	defer outputManager.Close()
-
-	// setup input lifetime management and shutdown signaling
-	inputTaskGroup := unison.TaskGroup{}
-	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
-		app.log.Info("Stopping inputs...")
-		if err := inputTaskGroup.Stop(); err != nil {
-			app.log.Errorf("input failures detected: %v", err)
-		}
-		app.log.Info("Inputs stopped.")
-	}))
-
 	// App internal jobs that are required for the app to run correctly are
-	// registered with the appTaskGroup.  The app if forced to shut down if an
+	// registered with the appTaskGroup.  The app is forced to shut down if an
 	// essential subsystem fails.
-	appTaskGroup := unison.TaskGroup{StopOnError: forceShutdownOnError}
+	appTaskGroup := unison.TaskGroup{StopOnError: func(err error) bool {
+		// XXX: the check can be removed after updating go-concert to 0.0.4
+		if err == context.Canceled || err == chorus.ErrClosed {
+			return false
+		}
+
+		debug.PrintStack()
+		app.log.Errorf("Critical error, forcing shutdown: %+v", err)
+		autoCancel.Cancel()
+		return true
+	}}
 	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
 		appTaskGroup.Stop()
 	}))
 
-	// the input manager task group is owned by the appTaskGroup. Input Managers
-	// are essential subsystems. If they fail, the app should shut down.
-	inputManagerTaskGroup := unison.TaskGroup{StopOnError: func(_ error) bool { return true }}
-	appTaskGroup.Go(func(sigCancel unison.Canceler) error {
-		var err error
-		ctx, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(sigCancel), func() {
-			app.log.Info("Stopping input managers...")
-			err := inputManagerTaskGroup.Stop()
-			if err != nil {
-				app.log.Errorf("Input managers failed: %v", err)
-			}
-			app.log.Info("Input managers stopped.")
-		})
-		defer cancel()
+	// Start inputs and input managers. Input managers are essential to inputs. If an Input Manager fails,
+	// all inputs are stopped and the task returns an error, which is finally propagate to other
+	// subsystems.
+	// Inputs are not  allowed to be active if the inputs managers are not
+	// running. This requires us to propage to wait for all inputs/outputs to be stopped, before we can propagate the
+	// the shutdown signal to the input managers.
+	appTaskGroup.Go(func(cancel unison.Canceler) error {
+		pipeCtx, pipeCancel := context.WithCancel(ctxtool.FromCanceller(cancel))
+		defer pipeCancel()
 
-		<-ctx.Done()
-		return err
+		inputManagerTaskGroup := unison.TaskGroup{StopOnError: func(_ error) bool {
+			pipeCancel()
+			return false
+		}}
+
+		// Start input managers in background. We shutdown if any background task failed
+		app.log.Info("Starting input managers...")
+		if err := app.inputLoader.Init(&inputManagerTaskGroup, v2.ModeRun); err != nil {
+			logp.Err("Failed to initialize the input managers: %v", err)
+			return err
+		}
+		app.log.Info("Input management active...")
+		if pipeCtx.Err() != nil {
+			return inputManagerTaskGroup.Stop()
+		}
+
+		pipeErr := app.pipelineManager.Run(pipeCtx)
+		managerErr := inputManagerTaskGroup.Stop()
+		if pipeErr == nil || errors.Is(pipeErr, context.Canceled) {
+			return managerErr
+		}
+		return pipeErr
 	})
-
-	// start input managers
-	app.log.Info("Starting input managers...")
-	if err := app.inputLoader.Init(&inputManagerTaskGroup, v2.ModeRun); err != nil {
-		logp.Err("Failed to initialize the input managers: %v", err)
-		return err
-	}
-	app.log.Info("Input management active...")
 
 	// esatblish connection with agent for status reporing and dynamic configuration updates.
 	// the manager should be the last subsystem that is shutdown.
-	appTaskGroup.Go(func(cancel unison.Canceler) error {
-		return app.agentManager.Run(ctxtool.FromCanceller(cancel), agentEventHandler{
-			OnStop: autoCancel.Cancel,
-			OnConfig: func(settings dynamicSettings) error {
-				return nil
-			},
-		})
-	})
-
-	// start inputs
-	app.log.Info("Starting inputs...")
-	inputLogger := app.log.Named("input")
-	for _, input := range app.inputs {
-		input := input
-		inputTaskGroup.Go(func(cancel unison.Canceler) error {
-			inputContext := v2.Context{
-				Logger:      inputLogger,
-				ID:          "to-be-set-by-agent",
-				Agent:       app.info,
-				Cancelation: cancel,
-			}
-			return input.Run(inputContext, outputManager.GetPipeline(input.useOutput))
+	if app.agentManager != nil {
+		appTaskGroup.Go(func(cancel unison.Canceler) error {
+			return app.agentManager.Run(ctxtool.FromCanceller(cancel), agentEventHandler{
+				OnStop:   autoCancel.Cancel,
+				OnConfig: app.pipelineManager.OnConfig,
+			})
 		})
 	}
-	app.log.Info("Inputs active...")
+
+	if app.configWatcher != nil {
+		appTaskGroup.Go(func(cancel unison.Canceler) error {
+			return app.configWatcher.Run(cancel, app.pipelineManager.OnConfig)
+		})
+	}
 
 	// XXX: heartbeat scheduler.... we start this one last, as this is  how
 	// heartbeat itself handles the scheduler.

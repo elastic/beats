@@ -14,6 +14,7 @@ import (
 
 // flagsConfig is used for parsing all available CLI flags
 type flagsConfig struct {
+	Reload            bool
 	ConfigFiles       []string
 	StrictPermissions bool
 	Path              pathSettings
@@ -29,6 +30,15 @@ type settings struct {
 	Limits   limitsSettings
 	Location string // time zone info
 	Manager  agentConfigManagerSettings
+}
+
+// dynamicSettings can be updated for via file reloading or external services.
+// The app instance expects a complete set of mappings. If a service provides
+// delta-updates only (or a subset of Inputs that need to be run), we will need
+// to merge the delta updates first, before the dynamicSettings can be applied.
+type dynamicSettings struct {
+	Inputs  []inputSettings
+	Outputs map[string]*common.Config
 }
 
 // configure global resource limits to be shared with input managers
@@ -68,6 +78,8 @@ func (c *flagsConfig) parseArgs(args []string) error {
 func (c *flagsConfig) registerFlags(flags *flag.FlagSet) {
 	common.StringArrVarFlag(flags, &c.ConfigFiles, "c", "configuration files")
 	flags.BoolVar(&c.StrictPermissions, "strict.perms", true, "Strict permission checking on config files")
+	flags.BoolVar(&c.Reload, "reload", false, "enable config file reloading")
+
 	c.Path.registerFlags(flags)
 }
 
