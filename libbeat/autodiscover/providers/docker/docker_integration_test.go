@@ -56,7 +56,7 @@ func TestDockerStart(t *testing.T) {
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config), k)
+	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, common.MustNewConfigFrom(config), k)
 	if err != nil {
 		t.Fatal(err)
 	}
