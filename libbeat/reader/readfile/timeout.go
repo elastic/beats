@@ -75,7 +75,7 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 					return
 				case r.ch <- lineMessage{message, err}:
 					if err != nil {
-						break
+						return
 					}
 				}
 			}
