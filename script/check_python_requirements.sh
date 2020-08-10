@@ -21,7 +21,7 @@ function abspath() {
 	fi
 }
 
-BEATS_PATH=$(abspath $(dirname ${BASH_SOURCE[0]})/..)
+BEATS_PATH=$(abspath "$(dirname "${BASH_SOURCE[0]}")"/..)
 
 VERSIONS=${VERSIONS:-3.5 3.6 3.7 3.8 3.9-rc}
 REQUIREMENTS=${1:-${BEATS_PATH}/libbeat/tests/system/requirements.txt}
