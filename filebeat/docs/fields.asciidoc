@@ -105251,6 +105251,16 @@ type: long
 
 --
 
+*`panw.panos.endreason`*::
++
+--
+The reason a session terminated.
+
+
+type: keyword
+
+--
+
 [float]
 === network
 
