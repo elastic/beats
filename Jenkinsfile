@@ -1026,7 +1026,7 @@ def installTools() {
   } else {
     // Install python3 with the specific step, even though install-tools.bat will verify if it's there anyway.
     // TODO: as soon as python3 is installed in the CI Workers we will be able to remove the line below.
-    installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ])
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ]) }
     retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
