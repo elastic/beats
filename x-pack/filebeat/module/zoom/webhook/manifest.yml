@@ -20,6 +20,10 @@ var:
     default: ""
   - name: password
     default: ""
+  - name: secret
+    default:
+      header: Authorization
+      value: ""
 
   - name: tags
     default: [zoom-webhook, forwarded]

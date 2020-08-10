@@ -1465,6 +1465,12 @@ filebeat.modules:
     # The port to bind to
     #var.listen_port: 80
 
+    # The header Zoom uses to send its secret token, defaults to "Authorization"
+    #secret.header: Authorization
+
+    # The secret token value created by Zoom
+    #secret.value: ZOOMTOKEN
+
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
   zia:
