@@ -12,7 +12,16 @@
 
 set -e
 
-BEATS_PATH=$(realpath $(dirname ${BASH_SOURCE[0]})/..)
+function abspath() {
+	local path=$1
+	if [ -d $path ]; then
+		cd $path; pwd; cd - > /dev/null
+	else
+		echo $(abspath $(dirname $path))/$(basename $path)
+	fi
+}
+
+BEATS_PATH=$(abspath $(dirname ${BASH_SOURCE[0]})/..)
 
 VERSIONS=${VERSIONS:-3.5 3.6 3.7 3.8 3.9-rc}
 REQUIREMENTS=${1:-${BEATS_PATH}/libbeat/tests/system/requirements.txt}
@@ -22,7 +31,7 @@ if [ ! -f $REQUIREMENTS ]; then
 	exit -1
 fi
 
-REQUIREMENTS=$(realpath $REQUIREMENTS)
+REQUIREMENTS=$(abspath $REQUIREMENTS)
 
 echo "Versions: $VERSIONS"
 echo "Requirements file: $REQUIREMENTS"
