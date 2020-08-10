@@ -14,10 +14,10 @@ set -e
 
 function abspath() {
 	local path=$1
-	if [ -d $path ]; then
-		cd $path; pwd; cd - > /dev/null
+	if [ -d "$path" ]; then
+		cd "$path"; pwd; cd - > /dev/null
 	else
-		echo $(abspath $(dirname $path))/$(basename $path)
+		echo $(abspath "$(dirname "$path")")/$(basename "$path")
 	fi
 }
 
@@ -26,12 +26,12 @@ BEATS_PATH=$(abspath $(dirname ${BASH_SOURCE[0]})/..)
 VERSIONS=${VERSIONS:-3.5 3.6 3.7 3.8 3.9-rc}
 REQUIREMENTS=${1:-${BEATS_PATH}/libbeat/tests/system/requirements.txt}
 
-if [ ! -f $REQUIREMENTS ]; then
+if [ ! -f "$REQUIREMENTS" ]; then
 	echo "Requirements file doesn't exist: $REQUIREMENTS"
 	exit -1
 fi
 
-REQUIREMENTS=$(abspath $REQUIREMENTS)
+REQUIREMENTS=$(abspath "$REQUIREMENTS")
 
 echo "Versions: $VERSIONS"
 echo "Requirements file: $REQUIREMENTS"
@@ -39,7 +39,7 @@ echo "Requirements file: $REQUIREMENTS"
 for version in $VERSIONS; do
 	echo "==== Version: $version"
 
-	docker run -it --rm -v $REQUIREMENTS:/requirements.txt python:$version \
+	docker run -it --rm -v "$REQUIREMENTS":/requirements.txt python:$version \
 		python -m pip install -q -r /requirements.txt
 
 	echo "==== OK"
