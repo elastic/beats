@@ -122,7 +122,7 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
 	// we don't collect the same stats from every node and end up duplicating them.
 	if m.Scope == ScopeNode {
-		isMaster, err := IsMaster(m.HTTP, m.GetServiceURI())
+		isMaster, err := isMaster(m.HTTP, m.GetServiceURI())
 		if err != nil {
 			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		}

@@ -137,14 +137,14 @@ func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) 
 	return info.ClusterID, nil
 }
 
-// IsMaster checks if the given node host is a master node.
+// isMaster checks if the given node host is a master node.
 //
 // The detection of the master is done in two steps:
 // * Fetch node name from /_nodes/_local/name
 // * Fetch current master name from cluster state /_cluster/state/master_node
 //
 // The two names are compared
-func IsMaster(http *helper.HTTP, uri string) (bool, error) {
+func isMaster(http *helper.HTTP, uri string) (bool, error) {
 
 	node, err := getNodeName(http, uri)
 	if err != nil {
