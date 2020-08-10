@@ -25,7 +25,6 @@ more-itertools==8.4.0
 ordered-set==3.1.1
 packaging==20.4
 parameterized==0.7.0
-Pillow==7.2.0
 pluggy==0.13.1
 py==1.9.0
 pycodestyle==2.4.0
@@ -45,4 +44,4 @@ toml==0.10.1
 urllib3==1.24.2
 wcwidth==0.2.5
 websocket-client==0.47.0
-zipp==3.1.0
+zipp>=1.2.0,<=3.1.0
