@@ -38,10 +38,12 @@ type ClientLogger struct {
 	client beat.Client
 	// localLog manages the local JSON logs for containers
 	localLog logger.Logger
+	// hostname for event metadata
+	hostname string
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger, hostname string) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -63,7 +65,8 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		pipelineHash:  hash,
 		ContainerMeta: info,
 		localLog:      localLog,
-		logger:        clientLogger}, nil
+		logger:        clientLogger,
+		hostname:      hostname}, nil
 }
 
 // Close closes the pipeline client and reader
@@ -114,6 +117,13 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 		cl.localLog.Log(constructLogSpoolMsg(entry))
 		line := strings.TrimSpace(string(entry.Line))
 
+		splitName := strings.Split(cl.ContainerMeta.ContainerImageName, ":")
+		containerImageName := splitName[0]
+		containerImageTag := ""
+		if len(splitName) > 1 {
+			containerImageTag = splitName[1]
+		}
+
 		cl.client.Publish(beat.Event{
 			Timestamp: time.Unix(0, entry.TimeNano),
 			Fields: common.MapStr{
@@ -123,14 +133,17 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 					"id":     cl.ContainerMeta.ContainerID,
 					"name":   helper.ExtractContainerName([]string{cl.ContainerMeta.ContainerName}),
 					"image": common.MapStr{
-						"name": cl.ContainerMeta.ContainerImageName,
+						"name": containerImageName,
+						"tag":  containerImageTag,
 					},
+				},
+				"host": common.MapStr{
+					"name": cl.hostname,
 				},
 			},
 		})
 
 	}
-
 }
 
 func constructLogSpoolMsg(line logdriver.LogEntry) *logger.Message {
