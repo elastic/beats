@@ -1,6 +1,9 @@
 ---
 description: Pipeline for AWS CloudTrail Logs
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - rename:
       field: "message"
       target_field: "event.original"
@@ -614,7 +617,7 @@ processors:
         if (ctx.event.action == 'ConsoleLogin' && ctx?.aws?.cloudtrail?.flattened?.response_elements.ConsoleLogin != null) {
             ctx.event.outcome = Processors.lowercase(ctx.aws.cloudtrail.flattened.response_elements.ConsoleLogin);
         }
-        
+
         def hm = new HashMap(params.get(ctx.event.action));
         hm.forEach((k, v) -> ctx.event[k] = v);
 
