@@ -511,12 +511,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 - Add initial support for configurable file identity tracking. {pull}18748[18748]
+- Add support for reading auditd logs that are prefixed with `node=`. {pull}19659[19659]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 - Add event.ingested for Suricata module {pull}20220[20220]
 - Add support for custom header and headersecret for filebeat http_endpoint input {pull}20435[20435]
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
+
 
 *Heartbeat*
 
