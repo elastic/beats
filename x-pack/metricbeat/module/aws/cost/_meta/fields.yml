@@ -1,0 +1,57 @@
+- name: cost
+  type: group
+  description: >
+    `cost` contains the metrics that were scraped from cost explorer
+  release: experimental
+  fields:
+    - name: AmortizedCost.amount
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Amortized cost amount
+        - name: unit
+          type: keyword
+          description: Amortized cost unit
+    - name: BlendedCost
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Blended cost amount
+        - name: unit
+          type: keyword
+          description: Blended cost unit
+    - name: NormalizedUsageAmount
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Normalized usage amount
+        - name: unit
+          type: keyword
+          description: Normalized usage amount unit
+    - name: UnblendedCost
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Unblended cost amount
+        - name: unit
+          type: keyword
+          description: Unblended cost unit
+    - name: UsageQuantity
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Usage quantity amount
+        - name: unit
+          type: keyword
+          description: Usage quantity unit
+    - name: start_date
+      type: keyword
+      description: Start date for retrieving AWS costs
+    - name: end_date
+      type: keyword
+      description: End date for retrieving AWS costs
