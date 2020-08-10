@@ -31,9 +31,9 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -41,6 +41,8 @@ import (
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterGoTestDeps(fieldsYML)
+	integtest.RegisterGoTestDeps(fieldsYML)
+	integtest.RegisterPythonTestDeps(Dashboards)
 
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 }

@@ -3,9 +3,10 @@ from functionbeat import BaseTest
 import json
 import os
 import unittest
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
     @unittest.skip("temporarily disabled")
     def test_base(self):
         """

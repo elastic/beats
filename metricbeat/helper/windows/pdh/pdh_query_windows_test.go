@@ -28,7 +28,7 @@ import (
 func TestOpenSuccessful(t *testing.T) {
 	var q Query
 	err := q.Open()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer q.Close()
 }
 
@@ -85,7 +85,7 @@ func TestSuccessfulQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	list, err := q.GetFormattedCounterValues()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, list)
 }
 

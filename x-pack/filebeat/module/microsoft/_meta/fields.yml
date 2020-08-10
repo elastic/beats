@@ -1,5 +1,5 @@
 - key: microsoft
-  title: Microsoft DHCP
+  title: Microsoft
   description: >
-    microsoft fields.
+    Microsoft Module
   fields:

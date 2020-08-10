@@ -200,6 +200,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -260,6 +261,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -304,6 +306,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-token",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -382,9 +385,9 @@ func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 		return nil, err
 	}
 
-	cfg := configuration.DefaultFleetAgentConfig()
+	cfg := configuration.DefaultConfiguration()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}
-	return cfg, nil
+	return cfg.Fleet, nil
 }

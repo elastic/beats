@@ -234,6 +234,7 @@ data:
         - state_container
         - state_cronjob
         - state_resourcequota
+        - state_statefulset
         # Uncomment this to get k8s events:
         #- event
       period: 10s
@@ -366,6 +367,12 @@ rules:
   - "/metrics"
   verbs:
   - get
+- apiGroups:
+    - coordination.k8s.io
+  resources:
+    - leases
+  verbs:
+    - '*'
 ---
 apiVersion: v1
 kind: ServiceAccount

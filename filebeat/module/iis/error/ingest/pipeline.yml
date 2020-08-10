@@ -1,5 +1,8 @@
 description: Pipeline for parsing IIS error logs. Requires the geoip plugin.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:

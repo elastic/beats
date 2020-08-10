@@ -1,11 +1,11 @@
-from packetbeat import BaseTest
-from nose.tools import nottest
 import socket
+import unittest
+from packetbeat import BaseTest
 
 
+@unittest.skip("udpjson not supported anymore")
 class Test(BaseTest):
 
-    @nottest
     def test_udpjson_config(self):
         """
         Should start with sniffer and udpjson inputs configured.
@@ -21,7 +21,6 @@ class Test(BaseTest):
         assert all([o["type"] == "mysql" for o in objs])
         assert len(objs) == 7
 
-    @nottest
     def test_only_udpjson_config(self):
         """
         It should be possible to start without the sniffer configured.
@@ -39,7 +38,6 @@ class Test(BaseTest):
 
         packetbeat.kill_and_wait()
 
-    @nottest
     def test_send_udpjson_msg(self):
         """
         It should be possible to send a UDP message and read it from

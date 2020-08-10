@@ -24,7 +24,7 @@ class Test(BaseTest):
         r = requests.get("http://localhost:5066")
         assert r.status_code == 200
 
-        data = json.loads(r.content)
+        data = json.loads(r.content.decode('utf_8'))
 
         assert data["beat"] == "mockbeat"
         assert data["version"] == "9.9.9"
@@ -36,7 +36,7 @@ class Test(BaseTest):
         r = requests.get("http://localhost:5066/stats")
         assert r.status_code == 200
 
-        data = json.loads(r.content)
+        data = json.loads(r.content.decode('utf_8'))
 
         # Test one data point
         assert data["libbeat"]["config"]["scans"] == 0

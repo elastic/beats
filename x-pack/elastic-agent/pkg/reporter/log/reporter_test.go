@@ -25,9 +25,7 @@ func TestReport(t *testing.T) {
 
 	testCases := []testCase{
 		{infoEvent, DefaultString(infoEvent), ""},
-		{infoEvent, JSONString(infoEvent), ""},
 		{errorEvent, "", DefaultString(errorEvent)},
-		{errorEvent, "", JSONString(errorEvent)},
 	}
 
 	for _, tc := range testCases {
@@ -94,10 +92,6 @@ func (t testEvent) Time() time.Time               { return t.timestamp }
 func (t testEvent) Message() string               { return t.message }
 func (testEvent) Payload() map[string]interface{} { return map[string]interface{}{} }
 
-func JSONString(event testEvent) string {
-	timestamp := event.timestamp.Format(timeFormat)
-	return fmt.Sprintf(`{"Type":"%s","SubType":"%s","Time":"%s","Message":"message"}`, event.Type(), event.SubType(), timestamp)
-}
 func DefaultString(event testEvent) string {
 	timestamp := event.timestamp.Format(timeFormat)
 	return fmt.Sprintf("%s: type: '%s': sub_type: '%s' message: message", timestamp, event.Type(), event.SubType())
