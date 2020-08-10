@@ -75,3 +75,6 @@ The fields added to the event look like the following:
    }
 }
 -------------------------------------------------------------------------------
+
+Note: `add_host_metadata` processor will not overwrite host fields if `host.*`
+fields already exist in the event from Beats.
