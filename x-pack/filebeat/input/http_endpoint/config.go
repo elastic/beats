@@ -56,10 +56,8 @@ func (c *config) Validate() error {
 		}
 	}
 
-	if c.SecretHeader != "" || c.SecretValue != "" {
-		if c.SecretHeader == "" || c.SecretValue == "" {
-			return errors.New("Both secret.header and secret.value must be set")
-		}
+	if (c.SecretHeader != "" && c.SecretValue == "") || (c.SecretHeader == "" && c.SecretValue != "") {
+		return errors.New("Both secret.header and secret.value must be set")
 	}
 
 	return nil
