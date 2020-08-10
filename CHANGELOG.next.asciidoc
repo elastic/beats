@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
+- Tracking session end reason in panw module. {pull}18705[18705]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 
 *Heartbeat*
