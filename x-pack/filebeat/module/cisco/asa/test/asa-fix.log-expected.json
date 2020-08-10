@@ -385,5 +385,106 @@
             "cisco-asa",
             "forwarded"
         ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106102",
+        "cisco.asa.rule_name": "dev_inward_client",
+        "cisco.asa.source_interface": "outside",
+        "cisco.asa.suffix": "session",
+        "destination.address": "10.223.223.40",
+        "destination.ip": "10.223.223.40",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106102,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-session-3-106102: access-list dev_inward_client permitted udp for user redacted outside/10.123.123.20(49721) -> inside/10.223.223.40(53) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]",
+        "event.outcome": "allow",
+        "event.severity": 3,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 1514,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "related.ip": [
+            "10.123.123.20",
+            "10.223.223.40"
+        ],
+        "related.user": [
+            "redacted"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.123.123.20",
+        "source.ip": "10.123.123.20",
+        "source.port": 49721,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "redacted"
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "106103",
+        "cisco.asa.rule_name": "filter",
+        "cisco.asa.source_interface": "inside",
+        "destination.address": "1.2.33.40",
+        "destination.geo.continent_name": "Asia",
+        "destination.geo.country_iso_code": "CN",
+        "destination.geo.location.lat": 23.1167,
+        "destination.geo.location.lon": 113.25,
+        "destination.geo.region_iso_code": "CN-GD",
+        "destination.geo.region_name": "Guangdong",
+        "destination.ip": "1.2.33.40",
+        "destination.port": 8080,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106103,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-1-106103: access-list filter denied icmp for user joe inside/10.1.2.3(64321) -> outside/1.2.33.40(8080) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]",
+        "event.outcome": "deny",
+        "event.severity": 1,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "alert",
+        "log.offset": 1723,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "related.ip": [
+            "10.1.2.3",
+            "1.2.33.40"
+        ],
+        "related.user": [
+            "joe"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.1.2.3",
+        "source.ip": "10.1.2.3",
+        "source.port": 64321,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "joe"
     }
 ]

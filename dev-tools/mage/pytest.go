@@ -56,7 +56,7 @@ var (
 	pythonVirtualenvLock sync.Mutex
 
 	// More globs may be needed in the future if tests are added in more places.
-	nosetestsTestFiles = []string{
+	pythonTestFiles = []string{
 		"tests/system/test_*.py",
 		"module/*/test_*.py",
 		"module/*/*/test_*.py",
@@ -77,11 +77,11 @@ func init() {
 }
 
 // PythonTestArgs are the arguments used for the "python*Test" targets and they
-// define how "nosetests" is invoked.
+// define how python tests are invoked.
 type PythonTestArgs struct {
 	TestName            string            // Test name used in logging.
 	Env                 map[string]string // Env vars to add to the current env.
-	Files               []string          // Globs used by nosetests to find tests.
+	Files               []string          // Globs used to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
 }
@@ -109,8 +109,8 @@ func DefaultPythonTestUnitArgs() PythonTestArgs { return makePythonTestArgs("Uni
 // checking for INTEGRATION_TEST=1 in the test code.
 func DefaultPythonTestIntegrationArgs() PythonTestArgs { return makePythonTestArgs("Integration") }
 
-// PythonNoseTest invokes "nosetests" via a Python virtualenv.
-func PythonNoseTest(params PythonTestArgs) error {
+// PythonTest executes python tests via a Python virtualenv.
+func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
 	ve, err := PythonVirtualenv()
@@ -118,30 +118,31 @@ func PythonNoseTest(params PythonTestArgs) error {
 		return err
 	}
 
-	nosetestsEnv := map[string]string{
+	pytestEnv := map[string]string{
 		// activate sets this. Not sure if it's ever needed.
 		"VIRTUAL_ENV": ve,
 	}
 	if IsInIntegTestEnv() {
-		nosetestsEnv["INTEGRATION_TESTS"] = "1"
+		pytestEnv["INTEGRATION_TESTS"] = "1"
 	}
 	for k, v := range params.Env {
-		nosetestsEnv[k] = v
+		pytestEnv[k] = v
 	}
 
-	nosetestsOptions := []string{
-		"--process-timeout=90",
-		"--with-timer",
-		"-v",
+	pytestOptions := []string{
+		"--timeout=90",
+		"--durations=20",
+	}
+	if mg.Verbose() {
+		pytestOptions = append(pytestOptions, "-v")
 	}
 	if params.XUnitReportFile != "" {
-		nosetestsOptions = append(nosetestsOptions,
-			"--with-xunit",
-			"--xunit-file="+createDir(params.XUnitReportFile),
+		pytestOptions = append(pytestOptions,
+			"--junit-xml="+createDir(params.XUnitReportFile),
 		)
 	}
 
-	files := nosetestsTestFiles
+	files := pythonTestFiles
 	if len(params.Files) > 0 {
 		files = params.Files
 	}
@@ -157,23 +158,23 @@ func PythonNoseTest(params PythonTestArgs) error {
 	// We check both the VE and the normal PATH because on Windows if the
 	// requirements are met by the globally installed package they are not
 	// installed to the VE.
-	nosetestsPath, err := LookVirtualenvPath(ve, "nosetests")
+	pytestPath, err := LookVirtualenvPath(ve, "pytest")
 	if err != nil {
 		return err
 	}
 
 	defer fmt.Println(">> python test:", params.TestName, "Testing Complete")
-	_, err = sh.Exec(nosetestsEnv, os.Stdout, os.Stderr, nosetestsPath, append(nosetestsOptions, testFiles...)...)
+	_, err = sh.Exec(pytestEnv, os.Stdout, os.Stderr, pytestPath, append(pytestOptions, testFiles...)...)
 	return err
 
 	// TODO: Aggregate all the individual code coverage reports and generate
 	// and HTML report.
 }
 
-// PythonNoseTestForModule executes python system tests for modules.
+// PythonTestForModule executes python system tests for modules.
 //
 // Use `MODULE=module` to run only tests for `module`.
-func PythonNoseTestForModule(params PythonTestArgs) error {
+func PythonTestForModule(params PythonTestArgs) error {
 	if module := EnvOr("MODULE", ""); module != "" {
 		params.Files = []string{
 			fmt.Sprintf("module/%s/test_*.py", module),
@@ -181,7 +182,7 @@ func PythonNoseTestForModule(params PythonTestArgs) error {
 		}
 		params.TestName += "-" + module
 	}
-	return PythonNoseTest(params)
+	return PythonTest(params)
 }
 
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
