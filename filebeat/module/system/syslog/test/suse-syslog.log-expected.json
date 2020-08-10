@@ -1,9 +1,9 @@
 [
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",
@@ -15,9 +15,9 @@
     },
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",

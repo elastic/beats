@@ -28,6 +28,8 @@ This section includes additional information on how to install, set up, and run
 
 * <<running-on-docker>>
 
+* <<running-on-kubernetes>>
+
 * <<running-with-systemd>>
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
@@ -41,6 +43,8 @@ include::{libbeat-dir}/command-reference.asciidoc[]
 include::{libbeat-dir}/repositories.asciidoc[]
 
 include::./running-on-docker.asciidoc[]
+
+include::./running-on-kubernetes.asciidoc[]
 
 include::{libbeat-dir}/shared-systemd.asciidoc[]
 
