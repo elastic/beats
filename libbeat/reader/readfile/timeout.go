@@ -69,11 +69,11 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		r.running = true
 		go func() {
 			for {
+				message, err := r.reader.Next()
 				select {
 				case <-r.done:
 					return
-				case message, err := r.reader.Next():
-					r.ch <- lineMessage{message, err}
+				case r.ch <- lineMessage{message, err}:
 					if err != nil {
 						break
 					}
