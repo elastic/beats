@@ -47,7 +47,7 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
-		return errors.New("Response_body must be valid JSON")
+		return errors.New("response_body must be valid JSON")
 	}
 
 	if c.BasicAuth {

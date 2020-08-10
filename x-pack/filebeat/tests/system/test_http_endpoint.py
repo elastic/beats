@@ -79,6 +79,8 @@ class Test(BaseTest):
 
         output = self.read_output()
 
+        print("response:", r.status_code, r.text)
+
         assert r.text == '{"message": "success"}'
         assert output[0]["input.type"] == "http_endpoint"
         assert output[0]["json.{}".format(self.prefix)] == message
@@ -97,6 +99,8 @@ class Test(BaseTest):
         r = requests.post(self.url, headers=headers, data=json.dumps(payload))
 
         filebeat.check_kill_and_wait()
+
+        print("response:", r.status_code, r.text)
 
         assert r.status_code == 415
         assert r.text == '{"message": "Wrong Content-Type header, expecting application/json"}'
@@ -135,6 +139,8 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        print("response:", r.status_code, r.text)
+
         assert r.status_code == 401
         assert r.text == '{"message": "Incorrect username or password"}'
 
@@ -156,6 +162,8 @@ class Test(BaseTest):
         r = requests.post(self.url, headers=headers, data=json.dumps(payload))
 
         filebeat.check_kill_and_wait()
+
+        print("response:", r.status_code, r.text)
 
         assert r.status_code == 401
         assert r.text == '{"message": "Incorrect header or header secret"}'
@@ -197,6 +205,8 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        print("response:", r.status_code, r.text)
+
         assert r.status_code == 406
         assert r.text == '{"message": "Body cannot be empty"}'
 
@@ -214,6 +224,8 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        print("response:", r.status_code, r.text)
+
         assert r.status_code == 400
         assert r.text.startswith('{"message": "Malformed JSON body:')
 
@@ -230,6 +242,8 @@ class Test(BaseTest):
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         r = requests.get(self.url, headers=headers, data=json.dumps(payload))
         filebeat.check_kill_and_wait()
+
+        print("response:", r.status_code, r.text)
 
         assert r.status_code == 405
         assert r.text == '{"message": "Only POST requests supported"}'
