@@ -102,3 +102,4 @@
 - Improved version CLI {pull}20359[20359]
 - Enroll CLI now restarts running daemon {pull}20359[20359]
 - Add restart CLI cmd {pull}20359[20359]
+- Add new `synthetics/*` inputs to run Heartbeat {pull}20387[20387]

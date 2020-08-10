@@ -1,8 +1,11 @@
+import io
+import logging
 import os
 import sys
 import tarfile
 import time
-import io
+
+from contextlib import contextmanager
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -54,9 +57,12 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
-        project.pull(
-            ignore_pull_failures=True,
-            service_names=cls.COMPOSE_SERVICES)
+
+        with disabled_logger('compose.service'):
+            project.pull(
+                ignore_pull_failures=True,
+                service_names=cls.COMPOSE_SERVICES)
+
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
@@ -231,3 +237,14 @@ class ComposeMixin(object):
             if line.find(msg.encode("utf-8")) >= 0:
                 counter += 1
         return counter > 0
+
+
+@contextmanager
+def disabled_logger(name):
+    logger = logging.getLogger(name)
+    old_level = logger.getEffectiveLevel()
+    logger.setLevel(logging.CRITICAL)
+    try:
+        yield logger
+    finally:
+        logger.setLevel(old_level)

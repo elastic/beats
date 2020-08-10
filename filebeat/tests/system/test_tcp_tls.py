@@ -1,9 +1,10 @@
-from filebeat import BaseTest
 import socket
 import ssl
 import unittest
+import pytest
+
+from filebeat import BaseTest
 from os import path
-from nose.tools import raises, assert_raises
 
 NUMBER_OF_EVENTS = 2
 
@@ -86,7 +87,6 @@ class Test(BaseTest):
 
         sock.close()
 
-    @raises(ssl.SSLError)
     def test_tcp_over_tls_and_verify_invalid_server_without_mutual_auth(self):
         """
         Test filebeat TCP with TLS with an invalid cacert and not requiring mutual auth.
@@ -123,9 +123,10 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE2, do_handshake_on_connect=True)
-        tls.connect((config.get('host'), config.get('port')))
 
-    @raises(ssl.SSLError)
+        with pytest.raises(ssl.SSLError):
+            tls.connect((config.get('host'), config.get('port')))
+
     def test_tcp_over_tls_mutual_auth_fails(self):
         """
         Test filebeat TCP with TLS with default setting to enforce client auth, with bad client certificates
@@ -162,12 +163,13 @@ class Test(BaseTest):
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
 
-        tls.connect((config.get('host'), config.get('port')))
-        # In TLS 1.3 authentication failures are not detected by the initial
-        # connection and handshake. For the client to detect that authentication
-        # has failed (at least in python) it must wait for a server response
-        # so that the failure can be reported as an exception when it arrives.
-        tls.recv(1)
+        with pytest.raises(ssl.SSLError):
+            tls.connect((config.get('host'), config.get('port')))
+            # In TLS 1.3 authentication failures are not detected by the initial
+            # connection and handshake. For the client to detect that authentication
+            # has failed (at least in python) it must wait for a server response
+            # so that the failure can be reported as an exception when it arrives.
+            tls.recv(1)
 
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
@@ -265,7 +267,7 @@ class Test(BaseTest):
 
         # The TLS handshake will close the connection, resulting in a broken pipe.
         # no events should be written on disk.
-        with assert_raises(IOError):
+        with pytest.raises(IOError):
             for n in range(0, 100000):
                 sock.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 

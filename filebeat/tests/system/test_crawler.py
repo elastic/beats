@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-
-from filebeat import BaseTest
-
 import codecs
 import os
+import shutil
 import time
 import unittest
-from nose.plugins.skip import Skip, SkipTest
-import shutil
+from filebeat import BaseTest
 
 # Additional tests to be added:
 # * Check what happens when file renamed -> no recrawling should happen
@@ -767,7 +764,7 @@ class Test(BaseTest):
         """
         if os.name != "nt" and os.geteuid() == 0:
             # root ignores permission flags, so we have to skip the test
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -789,7 +786,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
 
-            raise SkipTest
+            raise unittest.SkipTest
             # TODO: Currently skipping this test on windows as it requires `pip install win32api`
             # which seems to have windows only dependencies.
             # To solve this problem a requirements_windows.txt could be introduced which would
