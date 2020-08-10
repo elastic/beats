@@ -414,8 +414,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.service"),
 			}
 
-			p.eventer = service
-
+			p.eventManager = NewMockServiceEventerManager(service)
 			listener := p.bus.Subscribe()
 
 			service.emit(test.Service, test.Flag)
@@ -430,4 +429,10 @@ func TestEmitEvent_Service(t *testing.T) {
 			}
 		})
 	}
+}
+
+func NewMockServiceEventerManager(svc *service) EventManager {
+	em := &eventerManager{}
+	em.eventer = svc
+	return em
 }

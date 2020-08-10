@@ -11,7 +11,7 @@ url: {{ .url }}
 oauth2: {{ .oauth2 | tojson }}
 oauth2.provider: azure
 oauth2.azure.resource: https://api.securitycenter.windows.com/
-
+http_headers: {{ .http_headers | tojson }}
 date_cursor.field: lastUpdateTime
 date_cursor.url_field: '$filter'
 date_cursor.value_template: {{ .date_cursor.value_template }}
