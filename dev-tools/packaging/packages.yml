@@ -468,6 +468,11 @@ shared:
         mode: 0600
         config: true
 
+  - &docker_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi8'
+      from: 'registry.access.redhat.com/ubi8/ubi:8.2'
+
   - &elastic_docker_spec
     extra_vars:
       repository: 'docker.elastic.co/beats'
@@ -637,6 +642,14 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
   # Elastic Beat with Elastic License and binary taken the current directory.
   elastic_beat_xpack_reduced:
     ###
@@ -715,6 +728,17 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
