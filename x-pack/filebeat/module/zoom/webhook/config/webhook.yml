@@ -7,7 +7,7 @@ prefix: {{ .prefix }}
 basic_auth: {{ .basic_auth }}
 username: {{ .username }}
 username: {{ .password }}
-content_type: {{ .content_type }}
+content_type: "{{ .content_type }}"
 secret: {{ .secret | tojson }}
 
 {{ else if eq .input "file" }}
