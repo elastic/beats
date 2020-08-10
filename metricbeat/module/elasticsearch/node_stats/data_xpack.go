@@ -187,7 +187,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
-	masterNodeID, err := elasticsearch.GetMasterNodeID(m.HTTP, m.HTTP.GetURI())
+	masterNodeID, err := m.GetMasterNodeID()
 	if err != nil {
 		return err
 	}
@@ -207,7 +207,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
-		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), nodeID)
+		mlockall, err := m.IsMLockAllEnabled(nodeID)
 		if err != nil {
 			errs = append(errs, err)
 			continue

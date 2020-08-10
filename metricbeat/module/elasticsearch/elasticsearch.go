@@ -416,7 +416,10 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 }
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
-func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
+func (m *MetricSet) IsMLockAllEnabled(nodeID string) (bool, error) {
+	http := m.HTTP
+	resetURI := m.GetServiceURI()
+
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
 	if err != nil {
 		return false, err
@@ -437,7 +440,10 @@ func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error)
 }
 
 // GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
-func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
+func (m *MetricSet) GetMasterNodeID() (string, error) {
+	http := m.HTTP
+	resetURI := m.GetServiceURI()
+
 	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
 	if err != nil {
 		return "", err

@@ -341,22 +341,23 @@ type nodesStruct struct {
 	Nodes map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, m *elasticsearch.MetricSet, info elasticsearch.Info, content []byte) error {
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
-	var errs multierror.Errors
-	for id, node := range nodeData.Nodes {
-		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
-			continue
-		}
+	masterNodeID, err := m.GetMasterNodeID()
+	if err != nil {
+		return err
+	}
 
-		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), id)
+	var errs multierror.Errors
+	for nodeID, node := range nodeData.Nodes {
+		isMaster := nodeID == masterNodeID
+
+		mlockall, err := m.IsMLockAllEnabled(nodeID)
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "error determining if mlockall is set on Elasticsearch node"))
 			continue
@@ -369,7 +370,7 @@ func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conte
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{
-				"id":       id,
+				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
 			},
