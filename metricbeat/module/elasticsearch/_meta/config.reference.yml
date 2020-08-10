@@ -13,9 +13,6 @@
   #password: "changeme"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Set to false to fetch all entries
   #index_recovery.active_only: true
-
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
+  #scope: node

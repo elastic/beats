@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing microsoft atp logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - remove:
     field:
       - message
@@ -76,9 +79,6 @@ processors:
 - set:
     field: event.provider
     value: defender_atp
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
 - set:
     field: event.created
     value: '{{json.alertCreationTime}}'
@@ -284,7 +284,7 @@ processors:
 ## Cleanup ##
 #############
 - remove:
-    field: 
+    field:
       - json.alertCreationTime
       - json.severity
       - json.relatedUser
