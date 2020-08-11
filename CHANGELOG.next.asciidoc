@@ -76,6 +76,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
+- Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
+- Tracking session end reason in panw module. {pull}18705[18705]
 
 *Heartbeat*
 
@@ -266,6 +268,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
+- Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 
 *Heartbeat*
@@ -434,6 +437,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
+- Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 
 *Auditbeat*
@@ -587,6 +591,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
+- Add event.ingested for Suricata module {pull}20220[20220]
 
 *Heartbeat*
 

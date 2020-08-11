@@ -366,6 +366,12 @@ rules:
   - "/metrics"
   verbs:
   - get
+- apiGroups:
+    - coordination.k8s.io
+  resources:
+    - leases
+  verbs:
+    - '*'
 ---
 apiVersion: v1
 kind: ServiceAccount
