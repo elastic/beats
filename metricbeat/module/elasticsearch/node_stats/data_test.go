@@ -45,7 +45,7 @@ func (m mockMetricSet) Module() mb.Module {
 	return mockModule{}
 }
 
-type mockModule struct {}
+type mockModule struct{}
 
 func (m mockModule) Name() string {
 	return "mock_module"
@@ -60,4 +60,3 @@ func (m mockModule) Config() mb.ModuleConfig {
 func (m mockModule) UnpackConfig(to interface{}) error {
 	return nil
 }
-

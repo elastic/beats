@@ -66,7 +66,7 @@ func (h *Scope) Unpack(str string) error {
 	return nil
 }
 
-type MetricSetAPI interface{
+type MetricSetAPI interface {
 	Module() mb.Module
 	GetMasterNodeID() (string, error)
 	IsMLockAllEnabled(string) (bool, error)
@@ -192,4 +192,3 @@ func (m *MetricSet) IsMLockAllEnabled(nodeID string) (bool, error) {
 
 	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
 }
-
