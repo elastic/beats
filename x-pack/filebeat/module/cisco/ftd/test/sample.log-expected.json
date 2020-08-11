@@ -30,6 +30,9 @@
         "log.offset": 0,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.2.30",
             "192.0.0.8"
@@ -74,6 +77,9 @@
         "log.offset": 139,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.2.30",
             "192.0.0.8"
@@ -119,6 +125,9 @@
         "log.offset": 294,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.2.16",
             "192.0.0.89"
@@ -164,6 +173,10 @@
         "log.offset": 465,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.hostname": "INT-FW01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "172.29.2.101",
             "192.0.2.10"
@@ -209,6 +222,10 @@
         "log.offset": 632,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.hostname": "INT-FW01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "172.29.2.3",
             "192.0.2.57"
@@ -224,7 +241,12 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 12834,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -243,7 +265,19 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 812,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.3.42",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.3.42",
+        "source.ip": "10.123.3.42",
+        "source.port": 4952,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -251,7 +285,18 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743274",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.3.42",
+        "cisco.ftd.mapped_destination_port": 12834,
+        "cisco.ftd.mapped_source_ip": "192.0.2.43",
+        "cisco.ftd.mapped_source_port": 443,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.3.42",
+        "destination.ip": "10.123.3.42",
+        "destination.nat.port": "12834",
+        "destination.port": 4952,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -270,7 +315,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 938,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.43",
+            "10.123.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.43",
+        "source.ip": "192.0.2.43",
+        "source.port": 443,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -278,7 +336,12 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 25882,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -297,7 +360,19 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1110,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.1.35",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.1.35",
+        "source.ip": "10.123.1.35",
+        "source.port": 52925,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -305,7 +380,18 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743275",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.1.35",
+        "cisco.ftd.mapped_destination_port": 25882,
+        "cisco.ftd.mapped_source_ip": "192.0.2.43",
+        "cisco.ftd.mapped_source_port": 53,
         "cisco.ftd.message_id": "302015",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.1.35",
+        "destination.ip": "10.123.1.35",
+        "destination.nat.port": "25882",
+        "destination.port": 52925,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -324,7 +410,21 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1237,
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "10.123.1.35"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.nat.ip": "192.0.2.43",
+        "source.port": 53,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -332,7 +432,12 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 45392,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -351,7 +456,19 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1405,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.3.42",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.3.42",
+        "source.ip": "10.123.3.42",
+        "source.port": 4953,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -359,7 +476,19 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743276",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.3.130",
+        "cisco.ftd.mapped_destination_port": 45392,
+        "cisco.ftd.mapped_source_ip": "192.0.2.1",
+        "cisco.ftd.mapped_source_port": 80,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.3.42",
+        "destination.ip": "10.123.3.42",
+        "destination.nat.ip": "10.123.3.130",
+        "destination.nat.port": "45392",
+        "destination.port": 4953,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -378,7 +507,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1531,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.1",
+            "10.123.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.1",
+        "source.ip": "192.0.2.1",
+        "source.port": 80,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -418,6 +560,9 @@
         "network.bytes": 140,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "10.123.1.35"
@@ -467,6 +612,9 @@
         "network.bytes": 9999999,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "10.123.1.35"
@@ -508,6 +656,10 @@
         "log.offset": 2012,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.hostname": "FJSG2NRFW01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.168.132.46",
             "172.24.177.29"
@@ -522,7 +674,12 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.130",
+        "destination.ip": "192.0.0.130",
+        "destination.port": 10879,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -541,7 +698,19 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2167,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.3.42",
+            "192.0.0.130"
+        ],
         "service.type": "cisco",
+        "source.address": "192.168.3.42",
+        "source.ip": "192.168.3.42",
+        "source.port": 4954,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -549,7 +718,19 @@
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743277",
+        "cisco.ftd.destination_interface": "inside",
+        "cisco.ftd.mapped_destination_ip": "10.0.0.130",
+        "cisco.ftd.mapped_destination_port": 10879,
+        "cisco.ftd.mapped_source_ip": "192.0.0.17",
+        "cisco.ftd.mapped_source_port": 80,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.3.42",
+        "destination.ip": "192.168.3.42",
+        "destination.nat.ip": "10.0.0.130",
+        "destination.nat.port": "10879",
+        "destination.port": 4954,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -568,7 +749,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2293,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.0.17",
+            "192.168.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.0.17",
+        "source.ip": "192.0.0.17",
+        "source.port": 80,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -604,6 +798,9 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.0.66",
             "10.1.2.60"
@@ -648,6 +845,9 @@
         "log.offset": 2567,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -692,6 +892,9 @@
         "log.offset": 2726,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -736,6 +939,9 @@
         "log.offset": 2887,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -780,6 +986,9 @@
         "log.offset": 3048,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -824,6 +1033,9 @@
         "log.offset": 3209,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -868,6 +1080,9 @@
         "log.offset": 3370,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -912,6 +1127,9 @@
         "log.offset": 3531,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -956,6 +1174,9 @@
         "log.offset": 3692,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1000,6 +1221,9 @@
         "log.offset": 3851,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.13",
             "192.168.33.31"
@@ -1044,6 +1268,9 @@
         "log.offset": 4008,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1087,6 +1314,9 @@
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.66",
             "10.1.2.42"
@@ -1130,6 +1360,9 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.66",
             "10.1.5.60"
@@ -1174,6 +1407,9 @@
         "log.offset": 4387,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1218,6 +1454,9 @@
         "log.offset": 4546,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -1262,6 +1501,9 @@
         "log.offset": 4707,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1306,6 +1548,9 @@
         "log.offset": 4866,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1350,6 +1595,9 @@
         "log.offset": 5022,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1394,6 +1642,9 @@
         "log.offset": 5178,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.126",
             "10.0.0.132"
@@ -1438,6 +1689,9 @@
         "log.offset": 5325,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.126",
             "10.0.0.132"
@@ -1482,6 +1736,9 @@
         "log.offset": 5472,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.46",
             "192.0.0.88"
@@ -1526,6 +1783,9 @@
         "log.offset": 5635,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.89"
@@ -1571,6 +1831,9 @@
         "log.offset": 5796,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.0.16",
             "192.0.0.99"
@@ -1586,7 +1849,17 @@
     },
     {
         "@timestamp": "2018-12-11T08:01:24.000-02:00",
+        "cisco.ftd.connection_id": "447235",
+        "cisco.ftd.destination_interface": "identity",
+        "cisco.ftd.mapped_destination_ip": "10.0.13.13",
+        "cisco.ftd.mapped_destination_port": 80,
+        "cisco.ftd.mapped_source_ip": "192.168.77.12",
+        "cisco.ftd.mapped_source_port": 11180,
         "cisco.ftd.message_id": "302015",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.0.13.13",
+        "destination.ip": "10.0.13.13",
+        "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -1606,35 +1879,21 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5967,
-        "service.type": "cisco",
-        "tags": [
-            "cisco-ftd",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2018-12-11T08:01:24.000-02:00",
-        "cisco.ftd.message_id": "302015",
-        "event.action": "firewall-rule",
-        "event.category": [
-            "network"
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.77.12",
+            "10.0.13.13"
         ],
-        "event.code": 302015,
-        "event.dataset": "cisco.ftd",
-        "event.kind": "event",
-        "event.module": "cisco",
-        "event.original": "%FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)",
-        "event.severity": 6,
-        "event.timezone": "-02:00",
-        "event.type": [
-            "info"
-        ],
-        "fileset.name": "ftd",
-        "host.hostname": "127.0.0.1",
-        "input.type": "log",
-        "log.level": "informational",
-        "log.offset": 6147,
         "service.type": "cisco",
+        "source.address": "192.168.77.12",
+        "source.ip": "192.168.77.12",
+        "source.port": 11180,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -1672,6 +1931,10 @@
         "log.offset": 6332,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -1717,6 +1980,10 @@
         "log.offset": 6487,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -1732,7 +1999,17 @@
     },
     {
         "@timestamp": "2018-12-11T08:01:31.000-02:00",
+        "cisco.ftd.connection_id": "447236",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_host": "OCSP_Server",
+        "cisco.ftd.mapped_destination_port": 5678,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "OCSP_Server",
+        "destination.domain": "OCSP_Server",
+        "destination.port": 5678,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -1752,7 +2029,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6642,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -1760,7 +2050,17 @@
     },
     {
         "@timestamp": "2018-12-11T08:01:31.000-02:00",
+        "cisco.ftd.connection_id": "447236",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_host": "OCSP_Server",
+        "cisco.ftd.mapped_destination_port": 5678,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "OCSP_Server",
+        "destination.domain": "OCSP_Server",
+        "destination.port": 5678,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -1780,7 +2080,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6817,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -1821,6 +2134,10 @@
         "network.bytes": 14804,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -1869,6 +2186,10 @@
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -1917,6 +2238,10 @@
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -1946,20 +2271,22 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "deny",
+        "event.outcome": "tcp",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7504,
-        "network.iana_number": 6,
-        "network.transport": "tcp",
+        "network.transport": "(no",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -1989,20 +2316,22 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "deny",
+        "event.outcome": "tcp",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7651,
-        "network.iana_number": 6,
-        "network.transport": "tcp",
+        "network.transport": "(no",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2048,6 +2377,10 @@
         "log.offset": 7798,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.168.1.34",
             "192.0.0.12"
@@ -2063,7 +2396,17 @@
     },
     {
         "@timestamp": "2018-12-11T08:01:53.000-02:00",
+        "cisco.ftd.connection_id": "447237",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_ip": "192.168.1.34",
+        "cisco.ftd.mapped_destination_port": 65000,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
+        "destination.ip": "192.168.1.34",
+        "destination.port": 65000,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -2083,7 +2426,21 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7954,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -2091,7 +2448,17 @@
     },
     {
         "@timestamp": "2018-12-11T08:01:53.000-02:00",
+        "cisco.ftd.connection_id": "447237",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_ip": "192.168.1.34",
+        "cisco.ftd.mapped_destination_port": 65000,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
+        "destination.ip": "192.168.1.34",
+        "destination.port": 65000,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -2111,7 +2478,21 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 8133,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -2152,6 +2533,10 @@
         "network.bytes": 11420,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
             "10.10.10.10"
@@ -2199,6 +2584,9 @@
         "network.bytes": 1416,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.44.4.4",
             "10.44.2.2"
@@ -2239,6 +2627,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8624,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2278,6 +2670,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8745,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2317,6 +2713,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8866,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2356,6 +2756,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8987,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2395,6 +2799,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9108,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2434,6 +2842,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9229,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2473,6 +2885,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9350,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -2512,6 +2928,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9472,
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -2556,6 +2976,10 @@
         "log.offset": 9594,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.95",
             "10.32.112.125"
@@ -2598,6 +3022,10 @@
         "log.offset": 9748,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.2.3.5"
         ],
@@ -2638,6 +3066,9 @@
         "log.offset": 9858,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "172.16.30.2",
             "172.16.1.10"
@@ -2686,6 +3117,9 @@
         "log.offset": 9994,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.1.45",
             "192.88.99.129"
@@ -2717,7 +3151,6 @@
         "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.nat.ip": "192.0.2.225",
-        "destination.nat.port": "80",
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
@@ -2740,6 +3173,9 @@
         "log.offset": 10245,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.1.1",
             "192.0.2.223"
@@ -2748,7 +3184,6 @@
         "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
-        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
             "cisco-ftd",
@@ -2769,7 +3204,6 @@
         "cisco.ftd.threat_level": "very-high",
         "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
-        "destination.nat.ip": "192.0.2.223",
         "destination.nat.port": "8080",
         "destination.port": 80,
         "event.action": "firewall-rule",
@@ -2794,6 +3228,9 @@
         "log.offset": 10544,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.1.1",
             "192.0.2.223"
@@ -2802,7 +3239,6 @@
         "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
-        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
             "cisco-ftd",
@@ -2834,6 +3270,9 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 10843,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.30.30.30",
             "192.0.2.1"
@@ -2872,6 +3311,9 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 10920,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.5.111.32",
             "192.0.2.32"
@@ -2911,6 +3353,9 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 11012,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.69.6.39",
             "192.0.0.19"
