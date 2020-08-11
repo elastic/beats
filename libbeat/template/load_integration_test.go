@@ -294,10 +294,10 @@ func TestTemplateWithData(t *testing.T) {
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
-			assert.NotNil(t, err)
+			assert.Error(t, err)
 
 		} else {
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 		}
 	}
 }

@@ -142,7 +142,7 @@ func TestAvailableProcessors(t *testing.T) {
 	}
 
 	err = checkAvailableProcessors(client, requiredProcessors)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "ingest-test")
 	assert.Contains(t, err.Error(), "ingest-hello")
 }
@@ -235,7 +235,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	}
 
 	err = reg.LoadPipelines(client, false)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid_processor")
 
 	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-pipeline", "", nil, nil)

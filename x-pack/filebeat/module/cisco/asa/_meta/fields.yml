@@ -1,4 +1,4 @@
-- name: asa
+- name: cisco.asa
   type: group
   description: >
     Fields for Cisco ASA Firewall.

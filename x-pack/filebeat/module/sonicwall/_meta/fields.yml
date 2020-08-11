@@ -1,0 +1,5 @@
+- key: sonicwall
+  title: Sonicwall-FW
+  description: >
+    sonicwall fields.
+  fields:

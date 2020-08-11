@@ -134,14 +134,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
-        template_paths = [
-            self.beat_path,
-            os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-        ]
         if not hasattr(self, 'template_paths'):
-            self.template_paths = template_paths
-        else:
-            self.template_paths.append(template_paths)
+            self.template_paths = [
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ]
 
         # Create build path
         build_dir = self.beat_path + "/build"
@@ -487,6 +484,21 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 return len([1 for line in f]) == lines
         except IOError:
             return False
+
+    def output_is_empty(self, output_file=None):
+        """
+        Returns true if the output is empty.
+        """
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
+                return len([1 for line in f]) == 0
+        except IOError:
+            return True
 
     def output_has_message(self, message, output_file=None):
         """
