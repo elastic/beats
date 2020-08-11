@@ -1,0 +1,47 @@
+[
+    {
+        "@timestamp": "2019-11-07T09:05:11.994Z",
+        "destination.address": "5.196.95.208",
+        "destination.as.number": 16276,
+        "destination.as.organization.name": "OVH SAS",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "FR",
+        "destination.geo.location.lat": 48.8582,
+        "destination.geo.location.lon": 2.3387,
+        "destination.ip": "5.196.95.208",
+        "destination.port": 1883,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.mqtt_connect",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1573117511.994134,\"uid\":\"Ccn3ty2H9WpNjPfl63\",\"id.orig_h\":\"192.168.165.100\",\"id.orig_p\":19229,\"id.resp_h\":\"5.196.95.208\",\"id.resp_p\":1883,\"proto_name\":\"MQTT\",\"proto_version\":\"3.1.1\",\"client_id\":\"mosq/ZIiAugRbhwhQQKqWgG\",\"connect_status\":\"Connection Accepted\"}",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
+        "fileset.name": "mqtt_connect",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:8yiyp8h+B1kOH8O7rRF7zz943B8=",
+        "network.protocol": "mqtt",
+        "network.transport": "tcp",
+        "related.ip": [
+            "192.168.165.100",
+            "5.196.95.208"
+        ],
+        "service.type": "zeek",
+        "source.address": "192.168.165.100",
+        "source.ip": "192.168.165.100",
+        "source.port": 19229,
+        "tags": [
+            "zeek.mqtt_connect"
+        ],
+        "zeek.mqtt_connect.client_id": "mosq/ZIiAugRbhwhQQKqWgG",
+        "zeek.mqtt_connect.connect_status": "Connection Accepted",
+        "zeek.mqtt_connect.proto_version": "3.1.1",
+        "zeek.session_id": "Ccn3ty2H9WpNjPfl63"
+    }
+]

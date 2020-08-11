@@ -144444,16 +144444,6 @@ Fields exported by the Zeek mqtt_connect log.
 
 
 
-*`zeek.mqtt_connect.proto_name`*::
-+
---
-Indicates the protocol name.
-
-
-type: keyword
-
---
-
 *`zeek.mqtt_connect.proto_version`*::
 +
 --
