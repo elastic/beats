@@ -82,12 +82,17 @@ func New(cfg *common.Config) (processors.Processor, error) {
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// If host fields exist(besides host.name added by libbeat) in event, skip add_host_metadata.
-	hostFields, _ := event.Fields.GetValue("host")
-	if hostFields != nil && len(hostFields.(common.MapStr)) > 1 {
-		return event, nil
+	hostFields, err := event.Fields.GetValue("host")
+	if err == nil && hostFields != nil && len(hostFields.(common.MapStr)) > 1 {
+		hostsClone := hostFields.(common.MapStr).Clone()
+		err := hostsClone.Delete("name")
+		// remove host.name field and then check if there are other host fields exist
+		if err == nil && len(hostsClone) > 0 {
+			return event, nil
+		}
 	}
 
-	err := p.loadData()
+	err = p.loadData()
 	if err != nil {
 		return nil, err
 	}

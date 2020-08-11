@@ -233,7 +233,7 @@ func TestEventWithExistingHostField(t *testing.T) {
 	assert.Equal(t, hostID, hostFields["id"])
 }
 
-func TestEventWithoutHostFields(t *testing.T) {
+func TestEventWithOnlyHostNameField(t *testing.T) {
 	event := &beat.Event{
 		Fields: common.MapStr{
 			"host": common.MapStr{
