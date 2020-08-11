@@ -79,7 +79,7 @@ indices. For example: +"dockerlogs-%{+yyyy.MM.dd}"+.
 |`name`
 |`testbeat`
 | A custom value that will be inserted into the document as `agent.name`.
-If not set, it will be the same value as `agent.type`
+If not set, it will be the hostname of Docker host.
 
 |`backoff_init`
 |`1s`
