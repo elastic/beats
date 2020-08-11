@@ -23,7 +23,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -31,7 +31,6 @@ import (
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterPythonTestDeps(Fields)
-	integtest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatLicense = "Elastic License"
 }
