@@ -76,6 +76,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
+- Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Tracking session end reason in panw module. {pull}18705[18705]
 
 *Heartbeat*
