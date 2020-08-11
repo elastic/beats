@@ -79,7 +79,7 @@ var (
 						"count": c.Int("total_operations"),
 					},
 				},
-			}),
+			}, c.DictOptional),
 			"docs": c.Dict("docs", s.Schema{
 				"count":   c.Int("count"),
 				"deleted": c.Int("deleted"),
@@ -293,7 +293,7 @@ var (
 		"thread_pool": c.Dict("thread_pool", s.Schema{
 			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
 			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":      c.Dict("write", threadPoolStatsSchema),
+			"write":      c.Dict("write", threadPoolStatsSchema, c.DictOptional),
 			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),
 			"management": c.Dict("management", threadPoolStatsSchema),
