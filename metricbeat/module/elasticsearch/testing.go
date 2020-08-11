@@ -76,3 +76,29 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 		})
 	}
 }
+
+// TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
+func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, mapper func(mb.ReporterV2, MetricSetAPI, Info, []byte) error) {
+	files, err := filepath.Glob(glob)
+	require.NoError(t, err)
+	// Makes sure glob matches at least 1 file
+	require.True(t, len(files) > 0)
+
+	info := Info{
+		ClusterID:   "1234",
+		ClusterName: "helloworld",
+	}
+
+	for _, f := range files {
+		t.Run(f, func(t *testing.T) {
+			input, err := ioutil.ReadFile(f)
+			require.NoError(t, err)
+
+			reporter := &mbtest.CapturingReporterV2{}
+			err = mapper(reporter, ms, info, input)
+			require.NoError(t, err)
+			require.True(t, len(reporter.GetEvents()) >= 1)
+			require.Equal(t, 0, len(reporter.GetErrors()))
+		})
+	}
+}

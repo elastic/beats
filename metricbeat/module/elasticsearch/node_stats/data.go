@@ -341,7 +341,7 @@ type nodesStruct struct {
 	Nodes map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, m *elasticsearch.MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticsearch.Info, content []byte) error {
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {

@@ -1,7 +1,7 @@
 {
   "cluster_name" : "elasticsearch",
   "nodes" : {
-    "Tf3ps4nBSruDoLz3jx2uqg" : {
+    "test_node_id" : {
       "timestamp" : 1491553881539,
       "name" : "Projector",
       "transport_address" : "127.0.0.1:9300",
