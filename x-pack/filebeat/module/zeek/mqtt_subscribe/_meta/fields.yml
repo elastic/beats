@@ -3,13 +3,12 @@
   default_field: false
   description: >
     Fields exported by the Zeek mqtt_subscribe log.
-  fields:     
-                   
+  fields:
     - name: action
       type: keyword
       description: >
         Indicates if a subscribe or unsubscribe action is taking place.
-      
+
     - name: topics
       type: keyword
       description: >

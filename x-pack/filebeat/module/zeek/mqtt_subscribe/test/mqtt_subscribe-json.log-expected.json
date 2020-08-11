@@ -1,0 +1,52 @@
+[
+    {
+        "@timestamp": "2019-11-07T09:16:00.773Z",
+        "destination.address": "5.196.95.208",
+        "destination.as.number": 16276,
+        "destination.as.organization.name": "OVH SAS",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "FR",
+        "destination.geo.location.lat": 48.8582,
+        "destination.geo.location.lon": 2.3387,
+        "destination.ip": "5.196.95.208",
+        "destination.port": 1883,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.mqtt_subscribe",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1573118160.77399,\"uid\":\"CBzcJs3dFAFJp4X7hd\",\"id.orig_h\":\"192.168.165.100\",\"id.orig_p\":18674,\"id.resp_h\":\"5.196.95.208\",\"id.resp_p\":1883,\"action\":\"MQTT::SUBSCRIBE\",\"topics\":[\"/xPablo/weather\"],\"qos_levels\":[0],\"granted_qos_level\":0,\"ack\":true}",
+        "event.type": [
+            "info",
+            "protocol"
+        ],
+        "fileset.name": "mqtt_subscribe",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:Ad56jPx2kvOLRsxb/yGTz77VlXM=",
+        "network.protocol": "mqtt",
+        "network.transport": "tcp",
+        "related.ip": [
+            "192.168.165.100",
+            "5.196.95.208"
+        ],
+        "service.type": "zeek",
+        "source.address": "192.168.165.100",
+        "source.ip": "192.168.165.100",
+        "source.port": 18674,
+        "tags": [
+            "zeek.mqtt_subscribe"
+        ],
+        "zeek.mqtt_subscribe.ack": true,
+        "zeek.mqtt_subscribe.action": "MQTT::SUBSCRIBE",
+        "zeek.mqtt_subscribe.granted_qos_level": 0,
+        "zeek.mqtt_subscribe.qos_levels": [
+            0
+        ],
+        "zeek.mqtt_subscribe.topics": [
+            "/xPablo/weather"
+        ],
+        "zeek.session_id": "CBzcJs3dFAFJp4X7hd"
+    }
+]

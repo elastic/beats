@@ -10,12 +10,10 @@ var:
       - /usr/local/var/logs/current/mqtt_subscribe.log
   - name: tags
     default: [zeek.mqtt_subscribe]
-  - name: community_id
-    default: true
 
-ingest_pipeline: ingest/pipeline.json
-input: config/mqtt_subscribe.yml
+ingest_pipeline: ingest/pipeline.yml
+input: config/config.yml
 
 requires.processors:
-- name: geoip
-  plugin: ingest-geoip
+  - name: geoip
+    plugin: ingest-geoip
