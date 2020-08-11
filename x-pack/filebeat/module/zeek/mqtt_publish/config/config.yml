@@ -1,0 +1,59 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+fields_under_root: true
+fields:
+  ecs.version: 1.5.0
+  network.protocol: mqtt
+  network.transport: tcp
+  event:
+    kind: event
+    category:
+      - network
+    type:
+      - info
+      - protocol
+
+processors:
+  - rename:
+      fields:
+        - from: message
+          to: event.original
+  - decode_json_fields:
+      fields: [event.original]
+      target: zeek.mqtt_publish
+  - convert:
+      fail_on_error: false
+      fields:
+        - from: zeek.mqtt_publish.uid
+          to: zeek.session_id
+        - from: zeek.mqtt_publish.id.orig_h
+          to: source.address
+        - from: zeek.mqtt_publish.id.orig_p
+          to: source.port
+          type: long
+        - from: zeek.mqtt_publish.id.resp_h
+          to: destination.address
+        - from: zeek.mqtt_publish.id.resp_p
+          to: destination.port
+          type: long
+      ignore_missing: true
+      mode: rename
+  - convert:
+      fail_on_error: false
+      fields:
+        - from: source.address
+          to: source.ip
+          type: ip
+        - from: destination.address
+          to: destination.ip
+          type: ip
+      ignore_missing: true
+      mode: copy
+  - community_id: ~

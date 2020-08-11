@@ -10,12 +10,10 @@ var:
       - /usr/local/var/logs/mqtt_publish/mqtt_publish.log
   - name: tags
     default: [zeek.mqtt_publish]
-  - name: community_id
-    default: true
 
-ingest_pipeline: ingest/pipeline.json
-input: config/mqtt_publish.yml
+ingest_pipeline: ingest/pipeline.yml
+input: config/config.yml
 
 requires.processors:
-- name: geoip
-  plugin: ingest-geoip
+  - name: geoip
+    plugin: ingest-geoip

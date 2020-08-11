@@ -1,0 +1,50 @@
+[
+    {
+        "@timestamp": "2019-11-07T09:08:55.833Z",
+        "destination.address": "5.196.95.208",
+        "destination.as.number": 16276,
+        "destination.as.organization.name": "OVH SAS",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "FR",
+        "destination.geo.location.lat": 48.8582,
+        "destination.geo.location.lon": 2.3387,
+        "destination.ip": "5.196.95.208",
+        "destination.port": 1883,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.mqtt_publish",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1573117735.833181,\"uid\":\"CPYuka2oWl7bHCnRYi\",\"id.orig_h\":\"192.168.165.100\",\"id.orig_p\":6572,\"id.resp_h\":\"5.196.95.208\",\"id.resp_p\":1883,\"from_client\":false,\"retain\":true,\"qos\":\"at most once\",\"status\":\"ok\",\"topic\":\"revspace/sensors/temperature/5/1\",\"payload\":\"-14.75 \u00b0C\",\"payload_len\":10}",
+        "event.type": [
+            "info",
+            "protocol"
+        ],
+        "fileset.name": "mqtt_publish",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:3GWlBMe7HQgZ088E8S4zNA17ClQ=",
+        "network.protocol": "mqtt",
+        "network.transport": "tcp",
+        "related.ip": [
+            "192.168.165.100",
+            "5.196.95.208"
+        ],
+        "service.type": "zeek",
+        "source.address": "192.168.165.100",
+        "source.ip": "192.168.165.100",
+        "source.port": 6572,
+        "tags": [
+            "zeek.mqtt_publish"
+        ],
+        "zeek.mqtt_publish.from_client": false,
+        "zeek.mqtt_publish.payload": "-14.75 \u00b0C",
+        "zeek.mqtt_publish.payload_len": 10,
+        "zeek.mqtt_publish.qos": "at most once",
+        "zeek.mqtt_publish.retain": true,
+        "zeek.mqtt_publish.status": "ok",
+        "zeek.mqtt_publish.topic": "revspace/sensors/temperature/5/1",
+        "zeek.session_id": "CPYuka2oWl7bHCnRYi"
+    }
+]
