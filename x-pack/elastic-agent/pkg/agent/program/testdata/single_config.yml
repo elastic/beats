@@ -29,11 +29,11 @@ inputs:
   use_output: default
   streams:
     - metricset: status
-      dataset:
-        name: docker.status
+      data_stream:
+        dataset: docker.status
     - metricset: info
-      dataset:
-        name: ""
+      data_stream:
+        dataset: ""
   hosts: ["http://127.0.0.1:8080"]
 - type: logfile
   use_output: default
@@ -44,7 +44,7 @@ inputs:
   vars:
     var: value
 - type: logfile
-  dataset:
+  data_stream:
     type: testtype
   use_output: default
   streams:
@@ -55,7 +55,7 @@ inputs:
     var: value
 - id: apache-metrics-id
   type: apache/metrics
-  dataset:
+  data_stream:
     namespace: testing
   use_output: default
   processors:
@@ -73,7 +73,7 @@ inputs:
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22
