@@ -144438,6 +144438,187 @@ type: integer
 --
 
 [float]
+=== mqtt_connect
+
+Fields exported by the Zeek mqtt_connect log.
+
+
+
+*`zeek.mqtt_connect.proto_name`*::
++
+--
+Indicates the protocol name.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_connect.proto_version`*::
++
+--
+The version of the protocol in use.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_connect.client_id`*::
++
+--
+Unique identifier for the client.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_connect.connect_status`*::
++
+--
+Status message from the server in response to the connect request.
+
+
+type: keyword
+
+--
+
+[float]
+=== mqtt_publish
+
+Fields exported by the Zeek mqtt_publish log.
+
+
+
+*`zeek.mqtt_publish.from_client`*::
++
+--
+Indicates if the message was published by the client of this connection or published to the client.
+
+
+type: boolean
+
+--
+
+*`zeek.mqtt_publish.retain`*::
++
+--
+Indicates if the message was to be retained by the server.
+
+
+type: boolean
+
+--
+
+*`zeek.mqtt_publish.qos`*::
++
+--
+QoS level set for the message.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_publish.status`*::
++
+--
+Status of the published message.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_publish.topic`*::
++
+--
+Topic the message was published to.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_publish.payload`*::
++
+--
+Payload of the message.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_publish.payload_len`*::
++
+--
+The actual length of the payload in the case the payload.
+
+
+type: long
+
+--
+
+[float]
+=== mqtt_subscribe
+
+Fields exported by the Zeek mqtt_subscribe log.
+
+
+
+*`zeek.mqtt_subscribe.action`*::
++
+--
+Indicates if a subscribe or unsubscribe action is taking place.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_subscribe.topics`*::
++
+--
+The topics or topic patterns being subscribed to.
+
+
+type: keyword
+
+--
+
+*`zeek.mqtt_subscribe.qos_levels`*::
++
+--
+QoS levels requested for messages from subscribed topics.
+
+
+type: double
+
+--
+
+*`zeek.mqtt_subscribe.granted_qos_level`*::
++
+--
+QoS level the server granted.
+
+
+type: long
+
+--
+
+*`zeek.mqtt_subscribe.ack`*::
++
+--
+Indicates if the request was acked by the server.
+
+
+type: boolean
+
+--
+
+[float]
 === mysql
 
 Fields exported by the Zeek MySQL log.
