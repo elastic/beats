@@ -59145,7 +59145,7 @@ type: integer
 Memory usage system statistics
 
 
-type: keyword
+type: integer
 
 --
 
