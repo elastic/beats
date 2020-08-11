@@ -601,8 +601,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add event.ingested for Suricata module {pull}20220[20220]
 - Add event.ingested for Suricata module {pull}20220[20220]
 - Add support for custom header and headersecret for filebeat http_endpoint input {pull}20435[20435]
-- Add event.ingested to all Filebeat modules. {pull}20386[20386]
-- Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 
 *Heartbeat*
 
