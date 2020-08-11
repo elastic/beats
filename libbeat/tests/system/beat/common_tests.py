@@ -27,7 +27,8 @@ class TestExportsMixin:
         pos = output.rfind(trailer)
         if pos == -1:
             raise Exception("didn't return expected trailer:{} got:{}".format(
-                trailer.__repr__(),                                                   output[-100:].__repr__()))
+                trailer.__repr__(),
+                output[-100:].__repr__()))
         return output[:pos]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -54,6 +55,19 @@ class TestExportsMixin:
         Test that the index-pattern can be exported with `export index-pattern`
         """
         output = self.run_export_cmd("index-pattern")
+        js = json.loads(output)
+        assert "objects" in js
+        size = len(output.encode('utf-8'))
+        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
+                                 "to keep the Beat setup request size below " \
+                                 "Kibana's server.maxPayloadBytes."
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_export_index_pattern_migration(self):
+        """
+        Test that the index-pattern can be exported with `export index-pattern`
+        """
+        output = self.run_export_cmd("index-pattern", extra=['-E', 'migration.6_to_7.enabled=true'])
         js = json.loads(output)
         assert "objects" in js
         size = len(output.encode('utf-8'))
