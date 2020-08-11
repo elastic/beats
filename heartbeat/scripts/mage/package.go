@@ -53,4 +53,3 @@ func CustomizePackaging() {
 func Fields() error {
 	return devtools.GenerateFieldsYAML("monitors/active")
 }
-

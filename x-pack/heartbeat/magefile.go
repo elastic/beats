@@ -23,10 +23,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
-	"github.com/magefile/mage/mg"
 
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -105,7 +106,7 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
-func Fields () error {
+func Fields() error {
 	return heartbeat.Fields()
 }
 
