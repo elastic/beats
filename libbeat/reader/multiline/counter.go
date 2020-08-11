@@ -18,6 +18,8 @@
 package multiline
 
 import (
+	"io"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
@@ -133,5 +135,10 @@ func (cr *counterReader) setState(next func(cr *counterReader) (reader.Message, 
 }
 
 func (cr *counterReader) Close() error {
+	cr.setState((*counterReader).readClosed)
 	return cr.reader.Close()
+}
+
+func (cr *counterReader) readClosed() (reader.Message, error) {
+	return reader.Message{}, io.EOF
 }
