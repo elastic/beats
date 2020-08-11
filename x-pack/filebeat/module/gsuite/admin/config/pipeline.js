@@ -421,11 +421,7 @@ var login = (function () {
             return;
         }
 
-        var millisToNano = 1e6;
-        var tsStart = Date.parse(start) * millisToNano;
-        var tsEnd = Date.parse(end) * millisToNano;
-
-        evt.Put("event.duration", tsEnd-tsStart);
+        evt.Put("event.duration", end.UnixNano() - start.UnixNano());
     };
 
     var setEventOutcome = function(evt) {
@@ -449,6 +445,34 @@ var login = (function () {
 
         evt.Put("gsuite.admin.group.allowed_list", allowedList.split(","));
         evt.Delete("gsuite.admin.WHITELISTED_GROUPS");
+    };
+
+    var deleteField = function(field) {
+        return function(evt) {
+            evt.Delete(field);
+        };
+    };
+
+    var parseDate = function(field, targetField) {
+        return new processor.Chain()
+            .Add(new processor.Timestamp({
+                field: field,
+                target_field: targetField,
+                timezone: "UTC",
+                layouts: [
+                    "2006-01-02T15:04:05Z",
+                    "2006-01-02T15:04:05.999Z",
+                    "2006/01/02 15:04:05 UTC",
+                ],
+                tests: [
+                    "2020-02-05T18:19:23Z",
+                    "2020-02-05T18:19:23.599Z",
+                    "2020/07/28 04:59:59 UTC",
+                ],
+                ignore_missing: true,
+            }))
+            .Add(deleteField(field))
+            .Build()
     };
 
     var pipeline = new processor.Chain()
@@ -622,22 +646,6 @@ var login = (function () {
                     to: "gsuite.admin.privilege.name",
                 },
                 {
-                    from: "gsuite.admin.BEGIN_DATE_TIME",
-                    to: "event.start",
-                },
-                {
-                    from: "gsuite.admin.END_DATE_TIME",
-                    to: "event.end",
-                },
-                {
-                    from: "gsuite.admin.START_DATE",
-                    to: "event.start",
-                },
-                {
-                    from: "gsuite.admin.END_DATE",
-                    to: "event.end",
-                },
-                {
                     from: "gsuite.admin.SITE_LOCATION",
                     to: "url.path",
                 },
@@ -686,10 +694,6 @@ var login = (function () {
                     to: "gsuite.admin.email.log_search_filter.message_id",
                 },
                 {
-                    from: "gsuite.admin.EMAIL_LOG_SEARCH_END_DATE",
-                    to: "gsuite.admin.email.log_search_filter.end_date",
-                },
-                {
                     from: "gsuite.admin.EMAIL_LOG_SEARCH_RECIPIENT",
                     to: "gsuite.admin.email.log_search_filter.recipient.value",
                 },
@@ -706,10 +710,6 @@ var login = (function () {
                     from: "gsuite.admin.EMAIL_LOG_SEARCH_SMTP_SENDER_IP",
                     to: "gsuite.admin.email.log_search_filter.sender.ip",
                     type: "ip",
-                },
-                {
-                    from: "gsuite.admin.EMAIL_LOG_SEARCH_START_DATE",
-                    to: "gsuite.admin.email.log_search_filter.start_date",
                 },
                 {
                     from: "gsuite.admin.QUARANTINE_NAME",
@@ -848,10 +848,6 @@ var login = (function () {
                     to: "gsuite.admin.user.nickname",
                 },
                 {
-                    from: "gsuite.admin.BIRTHDATE",
-                    to: "gsuite.admin.user.birthdate",
-                },
-                {
                     from: "gsuite.admin.ACTION_ID",
                     to: "gsuite.admin.mobile.action.id",
                 },
@@ -905,6 +901,34 @@ var login = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(parseDate(
+            "gsuite.admin.EMAIL_LOG_SEARCH_END_DATE",
+            "gsuite.admin.email.log_search_filter.end_date"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.EMAIL_LOG_SEARCH_START_DATE",
+            "gsuite.admin.email.log_search_filter.start_date"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.BIRTHDATE",
+            "gsuite.admin.user.birthdate"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.BEGIN_DATE_TIME",
+            "event.start"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.START_DATE",
+            "event.start"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.END_DATE",
+            "event.end"
+        ))
+        .Add(parseDate(
+            "gsuite.admin.END_DATE_TIME",
+            "event.end"
+        ))
         .Add(setGroupInfo)
         .Add(setRelatedUserInfo)
         .Add(setEventDuration)

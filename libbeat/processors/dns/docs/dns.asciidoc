@@ -52,6 +52,7 @@ processors:
     success_cache:
       capacity.initial: 1000
       capacity.max: 10000
+      min_ttl: 1m
     failure_cache:
       capacity.initial: 1000
       capacity.max: 10000
@@ -80,6 +81,9 @@ the memory for this number of items. Default value is `1000`.
 `success_cache.capacity.max`:: The maximum number of items that the success
 cache can hold. When the maximum capacity is reached a random item is evicted.
 Default value is `10000`.
+
+`success_cache.min_ttl`:: The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached.
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
 
 `failure_cache.capacity.initial`:: The initial number of items that the failure
 cache will be allocated to hold. When initialized the processor will allocate

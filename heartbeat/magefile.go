@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
@@ -95,7 +94,7 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseElasticBeatPackaging()
-	customizePackaging()
+	heartbeat.CustomizePackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
@@ -107,14 +106,13 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
+func Fields() error {
+	return heartbeat.Fields()
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return devtools.GenerateFieldsYAML("monitors/active")
+// Update updates the generated files (aka make update).
+func Update() {
+	mg.SerialDeps(Fields, Config)
 }
 
 // Imports generates an include/list.go file containing
@@ -125,28 +123,6 @@ func Imports() error {
 	options.Outfile = "monitors/defaults/default.go"
 	options.Pkg = "defaults"
 	return devtools.GenerateIncludeListGo(options)
-}
-
-func customizePackaging() {
-	monitorsDTarget := "monitors.d"
-	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
-	monitorsD := devtools.PackageFile{
-		Mode:   0644,
-		Source: "monitors.d",
-	}
-
-	for _, args := range devtools.Packages {
-		pkgType := args.Types[0]
-		switch pkgType {
-		case devtools.Docker:
-			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw=eip")
-			args.Spec.Files[monitorsDTarget] = monitorsD
-		case devtools.TarGz, devtools.Zip:
-			args.Spec.Files[monitorsDTarget] = monitorsD
-		case devtools.Deb, devtools.RPM, devtools.DMG:
-			args.Spec.Files[unixMonitorsDir] = monitorsD
-		}
-	}
 }
 
 // Config generates both the short/reference/docker configs.

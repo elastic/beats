@@ -18,8 +18,6 @@
 package index_recovery
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -67,14 +65,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
+	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		return err
 	}
-
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch index recovery stats from a non-master node")
+	if shouldSkip {
 		return nil
 	}
 

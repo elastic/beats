@@ -1024,6 +1024,9 @@ def installTools() {
     retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
     retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Mage", script: "make mage") }
   } else {
+    // Install python3 with the specific step, even though install-tools.bat will verify if it's there anyway.
+    // TODO: as soon as python3 is installed in the CI Workers we will be able to remove the line below.
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ]) }
     retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
@@ -1088,7 +1091,8 @@ def dumpFilteredEnvironment(){
   echo "PROCESSES: ${env.PROCESSES}"
   echo "TIMEOUT: ${env.TIMEOUT}"
   echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
-  echo "NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}"
+  echo "PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}"
+  echo "PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}"
   echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
@@ -1422,23 +1426,24 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
+      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}") {
-        sh(label: 'Prepare workspace context',
-           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
             unstash(v)
           }
         }
-        sh(label: 'Process JUnit reports with runbld',
-          script: '''\
-          cat >./runbld-script <<EOF
-          echo "Processing JUnit reports with runbld..."
-          EOF
-          /usr/local/bin/runbld ./runbld-script
-          '''.stripIndent())  // stripIdent() requires '''/
       }
+      sh(label: 'Process JUnit reports with runbld',
+        script: """\
+        cat >./runbld-script <<EOF
+        echo "Processing JUnit reports with runbld..."
+        EOF
+        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }

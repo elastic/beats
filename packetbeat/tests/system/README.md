@@ -1,7 +1,7 @@
 # System tests for Packetbeat
 
 This folder contains the system tests for Packetbeat. The system tests
-are written in Python and they make use of the nose framework.
+are written in Python and they make use of the pytest framework.
 
 ## Running
 
@@ -13,4 +13,4 @@ the setup and run all the tests with:
 Running a single test, e.g.:
 
         . env/bin/activate
-        nosetests test_0002_thrift_basics.py:Test.test_thrift_integration
+        pytest test_0002_thrift_basics.py:Test.test_thrift_integration
