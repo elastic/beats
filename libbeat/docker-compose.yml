@@ -65,14 +65,13 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200"]
-
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
   elasticsearchssl:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-u", "admin:changeme", "-f", "https://localhost:9200", "--insecure"]
+      test: ["CMD-SHELL", "curl -u admin:changeme -f http://localhost:9200/_cat/health?h=status --insecure | grep -q green"]
       retries: 1200
       interval: 5s
       start_period: 60s
