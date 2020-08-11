@@ -591,6 +591,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
+- Add support for reading auditd logs that are prefixed with `node=`. {pull}19659[19659]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
