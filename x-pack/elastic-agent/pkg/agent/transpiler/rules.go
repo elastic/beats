@@ -1199,7 +1199,7 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 
 		newAST, ok := Lookup(newRoot, r.Key)
 		if !ok {
-			// doesn't have key so its filtered out
+			newNodes = append(newNodes, item)
 			continue
 		}
 
@@ -1210,7 +1210,7 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 		}
 
 		if n.name != r.Key {
-			// doesn't match so its filtered out
+			newNodes = append(newNodes, item)
 			continue
 		}
 

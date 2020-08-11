@@ -16,7 +16,6 @@ outputs:
 
 inputs:
 - id: endpoint-id
-  type: endpoint
   name: endpoint-1
   enabled: true
   package:

@@ -33,7 +33,6 @@ import (
 
 func init() {
 	monitors.RegisterActive("http", create)
-	monitors.RegisterActive("synthetics/http", create)
 }
 
 var debugf = logp.MakeDebug("http")
