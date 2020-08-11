@@ -24,7 +24,7 @@ class Test(metricbeat.BaseTest):
     def setUp(self):
         super(Test, self).setUp()
         self.es = Elasticsearch(self.get_hosts())
-        self.ml_es = client.xpack.ml.MlClient(self.es)
+        self.ml_es = client.ml.MlClient(self.es)
 
         es_version = self.get_version()
         if es_version["major"] < 7:

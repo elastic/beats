@@ -169,8 +169,8 @@ class Test(BaseTest):
             assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
                 module, obj["event"]["module"])
 
-            assert "error" not in obj, "not error expected but got: {}".format(
-                obj)
+            assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
@@ -222,7 +222,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
@@ -284,8 +284,6 @@ def clean_keys(obj):
             delete_key(obj, "@timestamp")
             # Also remove alternate time field from rsa parsers.
             delete_key(obj, "rsa.time.event_time")
-            # Remove event.ingested from testing, as it will never be the same.
-            delete_key(obj, "event.ingested")
         else:
             # excluded events need to have their filename saved to the expected.json
             # so that the exception mechanism can be triggered when the json is

@@ -166,10 +166,11 @@ require (
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20200701041122-1837592efa10
+	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.29.1
+	google.golang.org/protobuf v1.23.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528

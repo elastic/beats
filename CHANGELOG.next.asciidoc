@@ -76,6 +76,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
+- Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
+- Tracking session end reason in panw module. {pull}18705[18705]
 
 *Heartbeat*
 
@@ -189,6 +191,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - auditd: Fix spelling of anomaly in `event.category`.
 - auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
 - auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
+- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
 
 *Filebeat*
 
@@ -252,15 +255,20 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix tls mapping in suricata module {issue}19492[19492] {pull}19494[19494]
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
+- Update container name for the azure filesets. {pull}19899[19899]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
 - Fix auditd module syscall table for ppc64 and ppc64le. {pull}20052[20052]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 - Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
 - Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
+- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
 - Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
+- Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
+- Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
+- Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 
 *Heartbeat*
 
@@ -345,6 +353,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
+- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
+- Add required option for `metrics` in app_insights. {pull}20406[20406]
+- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 
 *Packetbeat*
 
@@ -425,6 +436,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the `dns` processor. {pull}19321[19321]
+- Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
+- Add leader election for Kubernetes autodiscover. {pull}20281[20281]
+- Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 
 *Auditbeat*
 
@@ -577,6 +591,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
+- Add event.ingested for Suricata module {pull}20220[20220]
 
 *Heartbeat*
 
@@ -690,6 +705,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
+- Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
 
 *Packetbeat*
 

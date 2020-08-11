@@ -98,3 +98,6 @@
 - Will retry to enroll if the server return a 429. {pull}19918[19811]
 - Add --staging option to enroll command {pull}20026[20026]
 - Add `event.dataset` to all events {pull}20076[20076]
+- Improved version CLI {pull}20359[20359]
+- Enroll CLI now restarts running daemon {pull}20359[20359]
+- Add restart CLI cmd {pull}20359[20359]
