@@ -523,15 +523,24 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
+		packedBeats := []struct {
+			name    string
+			relPath string
+		}{
+			{"filebeat", ".."},
+			{"metricbeat", ".."},
+
+			// Built from the OSS directory
+			{"heartbeat", "../.."},
+		}
 
 		for _, b := range packedBeats {
-			pwd, err := filepath.Abs(filepath.Join("..", b))
+			pwd, err := filepath.Abs(filepath.Join(b.relPath, b.name))
 			if err != nil {
 				panic(err)
 			}
 
-			if requiredPackagesPresent(pwd, b, version, requiredPackages) {
+			if requiredPackagesPresent(pwd, b.name, version, requiredPackages) {
 				continue
 			}
 
