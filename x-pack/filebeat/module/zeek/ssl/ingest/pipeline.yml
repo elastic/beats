@@ -2,8 +2,11 @@
 description: Pipeline for normalizing Zeek ssl.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.ssl.ts
     formats:

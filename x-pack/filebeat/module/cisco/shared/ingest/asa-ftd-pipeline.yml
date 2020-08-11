@@ -1,6 +1,9 @@
 ---
 description: "Pipeline for Cisco {< .internal_PREFIX >} logs"
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   #
   # Parse the syslog header
   #

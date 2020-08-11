@@ -2,6 +2,10 @@
 description: Pipeline for Filebeat CEF
 
 processors:
+  - set:
+        field: event.ingested
+        value: '{{_ingest.timestamp}}'
+
   # IP Geolocation Lookup
   - geoip:
         field: source.ip
