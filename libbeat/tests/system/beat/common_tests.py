@@ -31,7 +31,6 @@ class TestExportsMixin:
                 output[-100:].__repr__()))
         return output[:pos]
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_ilm_policy(self):
         """
         Test that the ilm-policy can be exported with `export ilm-policy`
@@ -40,7 +39,6 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "policy" in js
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_template(self):
         """
         Test that the template can be exported with `export template`
@@ -49,7 +47,6 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "index_patterns" in js and "mappings" in js
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_index_pattern(self):
         """
         Test that the index-pattern can be exported with `export index-pattern`
@@ -62,7 +59,6 @@ class TestExportsMixin:
                                  "to keep the Beat setup request size below " \
                                  "Kibana's server.maxPayloadBytes."
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_index_pattern_migration(self):
         """
         Test that the index-pattern can be exported with `export index-pattern`
@@ -75,7 +71,6 @@ class TestExportsMixin:
                                  "to keep the Beat setup request size below " \
                                  "Kibana's server.maxPayloadBytes."
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_config(self):
         """
         Test that the config can be exported with `export config`
