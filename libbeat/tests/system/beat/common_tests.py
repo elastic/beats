@@ -61,7 +61,7 @@ class TestExportsMixin:
 
     def test_export_index_pattern_migration(self):
         """
-        Test that the index-pattern can be exported with `export index-pattern`
+        Test that the index-pattern can be exported with `export index-pattern` (migration enabled)
         """
         output = self.run_export_cmd("index-pattern", extra=['-E', 'migration.6_to_7.enabled=true'])
         js = json.loads(output)
