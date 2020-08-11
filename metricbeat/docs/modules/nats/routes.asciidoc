@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-nats-routes]]
-=== Nats routes metricset
+=== NATS routes metricset
 
 include::../../../module/nats/routes/_meta/docs.asciidoc[]
 

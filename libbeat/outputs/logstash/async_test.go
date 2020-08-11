@@ -20,14 +20,15 @@
 package logstash
 
 import (
+	"context"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 )
 
 type testAsyncDriver struct {
@@ -85,7 +86,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:
-				err := driver.client.Publish(cmd.batch)
+				err := driver.client.Publish(context.Background(), cmd.batch)
 				driver.returns = append(driver.returns, testClientReturn{cmd.batch, err})
 			}
 		}

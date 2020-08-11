@@ -20,12 +20,16 @@ package elasticsearch
 import (
 	"fmt"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *Client) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
+	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
+	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
 
 	_, err := RegisterConnectCallback(f0)
 	if err != nil {
@@ -48,9 +52,9 @@ func TestConnectCallbacksManagement(t *testing.T) {
 }
 
 func TestGlobalConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *Client) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
+	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
+	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
 
 	_, err := RegisterGlobalCallback(f0)
 	if err != nil {
@@ -69,5 +73,61 @@ func TestGlobalConnectCallbacksManagement(t *testing.T) {
 	DeregisterGlobalCallback(id1)
 	if _, ok := globalCallbackRegistry.callbacks[id2]; !ok {
 		t.Fatalf("third callback cannot be retrieved")
+	}
+}
+
+func TestPipelineSelection(t *testing.T) {
+	cases := map[string]struct {
+		cfg   map[string]interface{}
+		event beat.Event
+		want  string
+	}{
+		"no pipline configured": {},
+		"pipeline configured": {
+			cfg:  map[string]interface{}{"pipeline": "test"},
+			want: "test",
+		},
+		"pipeline must be lowercase": {
+			cfg:  map[string]interface{}{"pipeline": "Test"},
+			want: "test",
+		},
+		"pipeline via event meta": {
+			event: beat.Event{Meta: common.MapStr{"pipeline": "test"}},
+			want:  "test",
+		},
+		"pipeline via event meta must be lowercase": {
+			event: beat.Event{Meta: common.MapStr{"pipeline": "Test"}},
+			want:  "test",
+		},
+		"pipelines setting": {
+			cfg: map[string]interface{}{
+				"pipelines": []map[string]interface{}{{"pipeline": "test"}},
+			},
+			want: "test",
+		},
+		"pipelines setting must be lowercase": {
+			cfg: map[string]interface{}{
+				"pipelines": []map[string]interface{}{{"pipeline": "Test"}},
+			},
+			want: "test",
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			selector, err := buildPipelineSelector(common.MustNewConfigFrom(test.cfg))
+			if err != nil {
+				t.Fatalf("Failed to parse configuration: %v", err)
+			}
+
+			got, err := getPipeline(&test.event, &selector)
+			if err != nil {
+				t.Fatalf("Failed to create pipeline name: %v", err)
+			}
+
+			if test.want != got {
+				t.Errorf("Pipeline name missmatch (want: %v, got: %v)", test.want, got)
+			}
+		})
 	}
 }

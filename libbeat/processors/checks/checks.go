@@ -20,8 +20,8 @@ package checks
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // ConfigChecked returns a wrapper that will validate the configuration using

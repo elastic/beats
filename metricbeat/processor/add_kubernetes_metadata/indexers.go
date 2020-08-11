@@ -18,8 +18,8 @@
 package add_kubernetes_metadata
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	kubernetes "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/libbeat/common"
+	kubernetes "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
 	config := map[string]interface{}{
-		"lookup_fields": []string{"metricset.host"},
+		"lookup_fields": []string{"service.address"},
 	}
 	fieldCfg, err := common.NewConfigFrom(config)
 	if err == nil {

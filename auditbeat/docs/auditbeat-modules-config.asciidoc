@@ -1,5 +1,9 @@
 [id="configuration-{beatname_lc}"]
-== Specify which modules to run
+== Configure modules
+
+++++
+<titleabbrev>Modules</titleabbrev>
+++++
 
 To enable specific modules you add entries to the `auditbeat.modules` list in
 the +{beatname_lc}.yml+ config file. Each entry in the list begins with a dash

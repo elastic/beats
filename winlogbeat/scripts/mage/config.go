@@ -18,7 +18,7 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // config generates short/reference configs.
@@ -28,33 +28,11 @@ func config() error {
 }
 
 func configFileParams() devtools.ConfigFileParams {
-	beatDir := devtools.OSSBeatDir
-	switch SelectLogic {
-	case devtools.OSSProject:
-		beatDir = devtools.OSSBeatDir
-	case devtools.XPackProject:
-		beatDir = devtools.XPackBeatDir
-	default:
-		panic(devtools.ErrUnknownProjectType)
+	conf := devtools.DefaultConfigFileParams()
+	conf.ExtraVars = map[string]interface{}{"GOOS": "windows"}
+	conf.Templates = append(conf.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	if devtools.XPackProject == SelectLogic {
+		conf.Templates = append(conf.Templates, devtools.XPackBeatDir("_meta/config/*.tmpl"))
 	}
-
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
-			beatDir("_meta/beat.yml.tmpl"),
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
-			beatDir("_meta/beat.yml.tmpl"),
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		DockerParts: []string{
-			devtools.OSSBeatDir("_meta/beat.docker.yml"),
-			devtools.LibbeatDir("_meta/config.docker.yml"),
-		},
-		ExtraVars: map[string]interface{}{
-			"GOOS": "windows",
-		},
-	}
+	return conf
 }

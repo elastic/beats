@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains stan / nats streaming/serverz endpoint subscription metrics
-  release: beta
+  release: ga
   fields:
     - name: id
       type: keyword
@@ -33,4 +33,4 @@
       type: boolean
       description: >
         Is the subscriber known to be stalled?
-    
+

@@ -111,6 +111,9 @@ func (b *dmgBuilder) buildBeatPkg() error {
 	for _, f := range b.Files {
 		target := filepath.Join(beatPkgRoot, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return err
 		}
 
@@ -244,6 +247,7 @@ func (b *dmgBuilder) buildDMG() error {
 		"create",
 		"-volname", b.MustExpand("{{.BeatName | title}} {{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}"),
 		"-srcfolder", b.dmgDir,
+		"-size", "500m", // allowing extra space
 		"-ov",
 		createDir(dmgFile),
 	}

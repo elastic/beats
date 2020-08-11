@@ -1,15 +1,19 @@
 [[add-process-metadata]]
 === Add process metadata
 
-The Add process metadata processor enriches events with information from running
+++++
+<titleabbrev>add_process_metadata</titleabbrev>
+++++
+
+The `add_process_metadata` processor enriches events with information from running
 processes, identified by their process ID (PID).
 
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_process_metadata:
-    match_pids: [system.process.ppid]
-    target: system.process.parent
+  - add_process_metadata:
+      match_pids: [system.process.ppid]
+      target: system.process.parent
 -------------------------------------------------------------------------------
 
 The fields added to the event look as follows:
@@ -23,7 +27,10 @@ The fields added to the event look as follows:
   "pid":   1,
   "ppid":  0,
   "start_time": "2018-08-22T08:44:50.684Z",
-}
+},
+"container": {
+  "id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"
+},
 -------------------------------------------------------------------------------
 
 Optionally, the process environment can be included, too:
@@ -38,6 +45,7 @@ Optionally, the process environment can be included, too:
   }
   ...
 -------------------------------------------------------------------------------
+
 It has the following settings:
 
 `match_pids`:: List of fields to lookup for a PID. The processor will
@@ -61,3 +69,32 @@ set to `true`, this condition will be ignored.
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
+
+`host_path`:: (Optional) By default, the `host_path` field is set to the root
+directory of the host `/`. This is the path where `/proc` is mounted. For
+different runtime configurations of Kubernetes or Docker, the `host_path` can
+be set to overwrite the default.
+
+`cgroup_prefixes`:: (Optional) By default, the `cgroup_prefixes` field is set
+to `/kubepods` and `/docker`. This is the prefix where the container ID is
+inside cgroup. For different runtime configurations of Kubernetes or Docker,
+the `cgroup_prefixes` can be set to overwrite the defaults.
+
+`cgroup_regex`:: (Optional) By default, the container id is extracted from
+cgroup file based on `cgroup_prefixes`. This can be overwritten by specifying
+regular expression with capture group for capturing container id from cgroup
+path. Examples:
+. `^\/.+\/.+\/.+\/([0-9a-f]{64}).*` will match the container id of a cgroup
+like `/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1`
+. `^\/.+\/.+\/.+\/docker-([0-9a-f]{64}).scope` will match the container id of a cgroup
+like `/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/docker-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope`
+. `^\/.+\/.+\/.+\/crio-([0-9a-f]{64}).scope` will match the container id of a cgroup
+like `/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/crio-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope`
+
+`cgroup_cache_expire_time`:: (Optional) By default, the
+`cgroup_cache_expire_time` is set to 30 seconds. This is the length of time
+before cgroup cache elements expire in seconds. It can be set to 0 to disable
+the cgroup cache. In some container runtimes technology like runc, the
+container's process is also process in the host kernel, and will be affected by
+PID rollover/reuse. The expire time needs to set smaller than the PIDs wrap
+around time to avoid wrong container id.

@@ -18,12 +18,13 @@
 package prometheus
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -99,6 +100,14 @@ func OpUnixTimestampValue() MetricOption {
 func OpMultiplyBuckets(multiplier float64) MetricOption {
 	return opMultiplyBuckets{
 		multiplier: multiplier,
+	}
+}
+
+// OpSetSuffix extends the field's name with the given suffix if the value of the metric
+// is numeric (and not histogram or quantile), otherwise does nothing
+func OpSetNumericMetricSuffix(suffix string) MetricOption {
+	return opSetNumericMetricSuffix{
+		suffix: suffix,
 	}
 }
 
@@ -378,10 +387,57 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	return field, histogram, labels
 }
 
+type opSetNumericMetricSuffix struct {
+	suffix string
+}
+
+// Process will extend the field's name with the given suffix
+func (o opSetNumericMetricSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	_, ok := value.(float64)
+	if !ok {
+		return field, value, labels
+	}
+	field = fmt.Sprintf("%v.%v", field, o.suffix)
+	return field, value, labels
+}
+
 type opUnixTimestampValue struct {
 }
 
 // Process converts a value in seconds into an unix time
 func (o opUnixTimestampValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	return field, common.Time(time.Unix(int64(value.(float64)), 0)), labels
+}
+
+// OpLabelKeyPrefixRemover removes prefix from label keys
+func OpLabelKeyPrefixRemover(prefix string) MetricOption {
+	return opLabelKeyPrefixRemover{prefix}
+}
+
+// opLabelKeyPrefixRemover is a metric option processor that removes a prefix from the key of a label set
+type opLabelKeyPrefixRemover struct {
+	Prefix string
+}
+
+// Process modifies the labels map, removing a prefix when found at keys of the labels set.
+// For each label, if the key is found a new key will be created hosting the same value and the
+// old key will be deleted.
+// Fields, values and not prefixed labels will remain unmodified.
+func (o opLabelKeyPrefixRemover) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	renameKeys := []string{}
+	for k := range labels {
+		if len(k) < len(o.Prefix) {
+			continue
+		}
+		if k[:6] == o.Prefix {
+			renameKeys = append(renameKeys, k)
+		}
+	}
+
+	for i := range renameKeys {
+		v := labels[renameKeys[i]]
+		delete(labels, renameKeys[i])
+		labels[renameKeys[i][len(o.Prefix):]] = v
+	}
+	return "", value, labels
 }

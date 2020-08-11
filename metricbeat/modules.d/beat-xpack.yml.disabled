@@ -2,12 +2,9 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-beat.html
 
 - module: beat
-  metricsets:
-    - stats
-    - state
+  xpack.enabled: true
   period: 10s
   hosts: ["http://localhost:5066"]
   #username: "user"
   #password: "secret"
-  xpack.enabled: true
 

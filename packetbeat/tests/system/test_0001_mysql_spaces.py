@@ -29,5 +29,5 @@ class Test(BaseTest):
         assert objs[5]["status"] == "OK"
         assert objs[5]["destination.bytes"] == 118
 
-        assert all(["source.bytes" in o.keys() for o in objs])
-        assert all(["destination.bytes" in o.keys() for o in objs])
+        assert all(["source.bytes" in list(o.keys()) for o in objs])
+        assert all(["destination.bytes" in list(o.keys()) for o in objs])

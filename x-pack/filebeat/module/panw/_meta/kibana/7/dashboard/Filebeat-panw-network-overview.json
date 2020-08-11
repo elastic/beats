@@ -1075,7 +1075,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "panw.panos:* and event.category: \"network_traffic\""
+              "query": "event.dataset: \"panw.panos\" and event.category: \"network_traffic\""
             },
             "version": true
           }

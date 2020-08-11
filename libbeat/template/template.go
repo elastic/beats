@@ -24,18 +24,18 @@ import (
 
 	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 var (
 	// Defaults used in the template
-	defaultDateDetection         = false
-	defaultTotalFieldsLimit      = 10000
-	defaultNumberOfRoutingShards = 30
+	defaultDateDetection           = false
+	defaultTotalFieldsLimit        = 10000
+	defaultNumberOfRoutingShards   = 30
+	defaultMaxDocvalueFieldsSearch = 200
 
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
@@ -145,7 +145,6 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	var err error
 	if len(t.config.AppendFields) > 0 {
-		cfgwarn.Experimental("append_fields is used.")
 		fields, err = mapping.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
@@ -312,8 +311,9 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	}
 
 	// number_of_routing shards is only supported for ES version >= 6.1
+	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) {
+	if !ver.LessThan(version61) && ver.Major < 7 {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
@@ -324,6 +324,10 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		fields = append(fields, "fields.*")
 
 		indexSettings.Put("query.default_field", fields)
+	}
+
+	if ver.Major >= 6 {
+		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
 	}
 
 	indexSettings.DeepUpdate(userSettings)

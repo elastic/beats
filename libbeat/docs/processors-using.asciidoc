@@ -8,15 +8,15 @@ optional condition, and a set of parameters:
 [source,yaml]
 ------
 processors:
-- <processor_name>:
-    when:
-      <condition>
-    <parameters>
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
 
-- <processor_name>:
-    when:
-      <condition>
-    <parameters>
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
 
 ...
 ------
@@ -28,7 +28,7 @@ of action, such as selecting the fields that are exported or adding metadata to
 the event.
 * `<condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
-fulfilled. If no condition is passed, then the action is always executed.
+fulfilled. If no condition is set, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
 More complex conditional processing can be accomplished by using the
@@ -38,20 +38,20 @@ executed based on a single condition.
 [source,yaml]
 ----
 processors:
-- if:
-    <condition>
-  then: <1>
-    - <processor_name>:
-        <parameters>
-    - <processor_name>:
-        <parameters>
-    ...
-  else: <2>
-    - <processor_name>:
-        <parameters>
-    - <processor_name>:
-        <parameters>
-    ...
+  - if:
+      <condition>
+    then: <1>
+      - <processor_name>:
+          <parameters>
+      - <processor_name>:
+          <parameters>
+      ...
+    else: <2>
+      - <processor_name>:
+          <parameters>
+      - <processor_name>:
+          <parameters>
+      ...
 ----
 <1> `then` must contain a single processor or a list of one or more processors
 to execute when the condition evaluates to true.
@@ -99,10 +99,10 @@ ifeval::["{beatname_lc}"=="filebeat"]
 ------
 - type: <input_type>
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ...
 ------
 +
@@ -116,10 +116,10 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 - module: <module_name>
   metricsets: ["<metricset_name>"]
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
@@ -129,10 +129,10 @@ ifeval::["{beatname_lc}"=="auditbeat"]
 auditbeat.modules:
 - module: <module_name>
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -142,10 +142,10 @@ ifeval::["{beatname_lc}"=="packetbeat"]
 packetbeat.protocols:
 - type: <protocol_type>
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 
 * Under `packetbeat.flows`. The processor is applied to the data in
@@ -155,10 +155,10 @@ packetbeat.protocols:
 ----
 packetbeat.flows:
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
@@ -168,10 +168,10 @@ ifeval::["{beatname_lc}"=="heartbeat"]
 heartbeat.monitors:
 - type: <monitor_type>
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
@@ -181,10 +181,10 @@ ifeval::["{beatname_lc}"=="winlogbeat"]
 winlogbeat.event_logs:
 - name: <network_shipper_name>
   processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
+    - <processor_name>:
+        when:
+          <condition>
+        <parameters>
 ----
 endif::[]
 
@@ -267,7 +267,7 @@ For example, the following condition checks if the process name starts with
 [source,yaml]
 -----
 regexp:
-  system.process.name: "foo.*"
+  system.process.name: "^foo.*"
 -----
 
 [float]
@@ -285,8 +285,8 @@ comparing the `http.response.code` field with 400.
 [source,yaml]
 ------
 range:
-    http.response.code:
-        gte: 400
+  http.response.code:
+    gte: 400
 ------
 
 This can also be written as:
@@ -294,7 +294,7 @@ This can also be written as:
 [source,yaml]
 ----
 range:
-    http.response.code.gte: 400
+  http.response.code.gte: 400
 ----
 
 The following condition checks if the CPU usage in percentage has a value
@@ -303,8 +303,8 @@ between 0.5 and 0.8.
 [source,yaml]
 ------
 range:
-    system.cpu.user.pct.gte: 0.5
-    system.cpu.user.pct.lt: 0.8
+  system.cpu.user.pct.gte: 0.5
+  system.cpu.user.pct.lt: 0.8
 ------
 
 [float]
@@ -339,7 +339,7 @@ private address space.
 [source,yaml]
 ----
 network:
-    source.ip: private
+  source.ip: private
 ----
 
 This condition returns true if the `destination.ip` value is within the
@@ -348,7 +348,7 @@ IPv4 range of `192.168.1.0` - `192.168.1.255`.
 [source,yaml]
 ----
 network:
-    destination.ip: '192.168.1.0/24'
+  destination.ip: '192.168.1.0/24'
 ----
 
 And this condition returns true when `destination.ip` is within any of the given
@@ -357,7 +357,7 @@ subnets.
 [source,yaml]
 ----
 network:
-    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+  destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
 ----
 
 [float]
@@ -438,8 +438,8 @@ To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
 [source,yaml]
 ------
 or:
- - <condition1>
- - and:
+  - <condition1>
+  - and:
     - <condition2>
     - <condition3>
 

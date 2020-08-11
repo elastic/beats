@@ -1,0 +1,17 @@
+{
+    "failed": [],
+    "finished": [
+        {
+            "command": "osd pool stats format=json-pretty",
+            "outb": "[\n    {\n        \"pool_name\": \"rbd\",\n        \"pool_id\": 1,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": { \"read_bytes_sec\": 1, \"read_op_per_sec\": 2, \"write_bytes_sec\": 3, \"write_op_per_sec\": 4 }\n    },\n    {\n        \"pool_name\": \"cephfs_data\",\n        \"pool_id\": 2,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \"cephfs_metadata\",\n        \"pool_id\": 3,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \".rgw.root\",\n        \"pool_id\": 4,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \"default.rgw.control\",\n        \"pool_id\": 5,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \"default.rgw.meta\",\n        \"pool_id\": 6,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \"default.rgw.log\",\n        \"pool_id\": 7,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    },\n    {\n        \"pool_name\": \"default.rgw.buckets.index\",\n        \"pool_id\": 8,\n        \"recovery\": {},\n        \"recovery_rate\": {},\n        \"client_io_rate\": {}\n    }\n]\n",
+            "outs": ""
+        }
+    ],
+    "has_failed": false,
+    "id": "140301322349968",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "success",
+    "waiting": []
+}

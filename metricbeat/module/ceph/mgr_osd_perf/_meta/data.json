@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "ceph": {
+        "mgr_osd_perf": {
+            "id": 0,
+            "stats": {
+                "commit_latency_ms": 23,
+                "apply_latency_ms": 23,
+                "commit_latency_ns": 23000000,
+                "apply_latency_ns": 23000000
+            }
+        }
+    },
+    "event": {
+        "dataset": "ceph.mgr_osd_perf",
+        "duration": 115000,
+        "module": "ceph"
+    },
+    "metricset": {
+        "name": "mgr_osd_perf"
+    },
+    "service": {
+        "address": "127.0.0.1:8003",
+        "type": "ceph"
+    }
+}

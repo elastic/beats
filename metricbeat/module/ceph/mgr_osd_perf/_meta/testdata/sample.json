@@ -1,0 +1,17 @@
+{
+    "failed": [],
+    "finished": [
+        {
+            "command": "osd perf format=json-pretty",
+            "outb": "{\n    \"pg_ready\": true,\n    \"osdstats\": {\n        \"osd_perf_infos\": [\n            {\n                \"id\": 1,\n                \"perf_stats\": {\n                    \"commit_latency_ms\": 1,\n                    \"apply_latency_ms\": 2,\n                    \"commit_latency_ns\": 3,\n                    \"apply_latency_ns\": 4\n                }\n            }\n        ]\n    }\n\n}\n",
+            "outs": ""
+        }
+    ],
+    "has_failed": false,
+    "id": "140301322418768",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "success",
+    "waiting": []
+}

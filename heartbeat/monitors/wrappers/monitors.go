@@ -22,41 +22,43 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/scheduler/schedule"
-
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, id string, name string, typ string, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	statusBlockTracker := newStatusBlockTracker()
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(id, name, typ, len(js) > 1, sched, timeout)
+			return addMonitorMeta(stdMonFields, len(js) > 1, statusBlockTracker)
 		}, func() jobs.JobWrapper {
-			return makeAddSummary()
+			return makeAddSummary(statusBlockTracker)
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
+func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool, statusBlockTracker *monitorStateTracker) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
 			cont, e := job(event)
-			thisID := id
+			thisID := stdMonFields.ID
 
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -65,7 +67,7 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *sch
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", id, urlHash)
+				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
 			}
 
 			status, _ := event.Fields.GetValue("monitor.status")
@@ -76,24 +78,27 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *sch
 				trackerStatus = StatusUp
 			}
 			ip, _ := event.Fields.GetValue("monitor.ip")
-			trackerId := fmt.Sprintf("%s-%s", id, ip)
+			trackerId := fmt.Sprintf("%s-%s", stdMonFields.ID, ip)
 
-			stateTrackerMtx.Lock()
 			sb := statusBlockTracker.getID(trackerId, trackerStatus)
-			stateTrackerMtx.Unlock()
 
-			eventext.MergeEventFields(
-				event,
-				common.MapStr{
-					"monitor": common.MapStr{
-						"id":           thisID,
-						"name":         name,
-						"type":         typ,
-						"timespan":     timespan(started, sched, timeout),
-						"status_block": sb,
-					},
+			fieldsToMerge := common.MapStr{
+				"monitor": common.MapStr{
+					"id":       thisID,
+					"name":     stdMonFields.Name,
+					"type":     stdMonFields.Type,
+					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
+					"status_block": sb,
 				},
-			)
+			}
+
+			if stdMonFields.ServiceName != "" {
+				fieldsToMerge["service"] = common.MapStr{
+					"name": stdMonFields.ServiceName,
+				}
+			}
+
+			eventext.MergeEventFields(event, fieldsToMerge)
 
 			return cont, e
 		}
@@ -218,6 +223,15 @@ func NewMonitorState(currentStatus stateStatus) *monitorState {
 	}
 }
 
+
+
+func newStatusBlockTracker() *monitorStateTracker {
+	return &monitorStateTracker{
+		states: map[string]*monitorState{},
+		mtx:    sync.Mutex{},
+	}
+}
+
 type monitorStateTracker struct {
 	states map[string]*monitorState
 	mtx    sync.Mutex
@@ -229,26 +243,21 @@ func (mst *monitorStateTracker) get(monitorId string, currentStatus stateStatus)
 			// Check to see if there's still an ongoing flap after recording
 			// the new status
 			if state.flapCompute(currentStatus) {
-				fmt.Printf("STABLE FLAP\n")
 				return state
 			} else {
-				fmt.Printf("EXIT FLAP\n")
 				state = NewMonitorState(currentStatus)
 				mst.states[monitorId] = state
 				return state
 			}
 		} else if state.status == currentStatus {
 			// The state is stable, no changes needed
-			fmt.Printf("STABLE STATE\n")
 			return state
 		} else if state.startedAt.After(time.Now().Add(-FlappingThreshold)) {
 			state.flapCompute(currentStatus) // record the new state to the flap history
-			fmt.Printf("ENTER FLAP\n")
 			return state
 		}
 	}
 
-	fmt.Printf("NEW STATE\n")
 	// No previous state, so make a new one
 	state = NewMonitorState(currentStatus)
 	mst.states[monitorId] = state
@@ -261,15 +270,8 @@ func (mst *monitorStateTracker) getID(monitorId string, currentStatus stateStatu
 	return mst.get(monitorId, currentStatus).startedAt
 }
 
-func newStatusBlockTracker() *monitorStateTracker {
-	return &monitorStateTracker{
-		states: map[string]*monitorState{},
-		mtx:    sync.Mutex{},
-	}
-}
-
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary() jobs.JobWrapper {
+func makeAddSummary(sb *monitorStateTracker) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -334,9 +336,7 @@ func makeAddSummary() jobs.JobWrapper {
 					trackerStatus = StatusDown
 				}
 				monitorIdString, _ := monitorId.(string)
-				stateTrackerMtx.Lock()
-				cssId := statusBlockTracker.getID(monitorIdString, trackerStatus)
-				stateTrackerMtx.Unlock()
+				cssId := sb.getID(monitorIdString, trackerStatus)
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
 						"continuous_status_segment": cssId,

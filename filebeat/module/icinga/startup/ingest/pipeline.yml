@@ -1,0 +1,32 @@
+description: Pipeline for parsing icinga startup logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '%{WORD:log.level}/%{WORD:icinga.startup.facility}: %{GREEDYMULTILINE:message}'
+    ignore_missing: true
+    pattern_definitions:
+      GREEDYMULTILINE: |-
+        (.|
+        )*
+- set:
+    field: event.kind
+    value: event
+- script:
+    lang: painless
+    source: >-
+      def errorLevels = ["warning", "critical"];
+      if (ctx?.log?.level != null) {
+        if (errorLevels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
+      }
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

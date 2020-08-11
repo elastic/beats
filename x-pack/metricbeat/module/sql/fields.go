@@ -7,7 +7,7 @@
 package sql
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetSql returns asset data.
 // This is the base64 encoded gzipped contents of module/sql.
 func AssetSql() string {
-	return "eJykkk2O4jAUhPc5RYnlSHCALGY1yxESmgMMjl2AGycm9jPduX3L+UEQpZGaruWruOqL/dY4sysRW1cAYsWxxCq2blUAgY4qskRFUQVgGHWwF7G+KfG7AJDPofYmORbAwdKZWPbGGo2qOQVnSXdhiWPw6TJOFvKy9rF1exwo+sSImhKsjjgEX0Ph3+4vjBJVqUiMR+5777vbxNDdpksEWfO/nPQFXdY8eA5wD2GCvTI8WBPJmd27D2bmPenN+tPnIUUaiAc/qJMQcuKAtVmkmBP/EGKX46bunkN756hleq5lislsUs1g9ebXIpGv3qhlZg3D/8MXxqeq37hvIG+Hzts+jcA0z1GjBNscXyZ96Xa3vlmPV4SrcokPtJ8BAAD//zTX/E8="
+	return "eJy0k0Fu8jAQhfc5xRPLX4IDZPEvqi4REuIAlWM/wMXJgD2mze0rEoJSpa1AVb18npnvy0Se48C2RDqFAlCvgSVmm/VyVgCRgSaxREU1BeCYbPRH9dKU+F8AwGa9RC0uB2JLtXsm1NTobcI2Sg3TVTijpjKJBbD1DC6VXfMcjak5wC9H2yNL7KLk4zUZ1497XPRnxls8tB7Yvkl0o/wL6eE8dzOQEx1UwHfarITuiVNmbBcTahf/Drq+jBhYHddKCLQ6LG5KHS6aXDN6u/g3MZDqlVZHcR+89LdOchV4n96qZ9z+4lWO7nutpNE3u4etHtraSpr59fNxNiHzLrNKJNA0f6v21EN+1Pr8kj4CAAD//07X+ko="
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script generates and output a documentation from a list of Makefile files
@@ -7,7 +7,6 @@ Example usage:
 
    python generate_makefile_doc.py Makefile1 Makefile2 ...
 """
-
 import argparse
 import re
 

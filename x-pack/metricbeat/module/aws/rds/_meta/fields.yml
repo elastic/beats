@@ -98,6 +98,16 @@
       format: bytes
       description: >
         The amount of storage used by your Aurora DB instance, in bytes.
+    - name: volume.read.iops
+      type: long
+      format: bytes
+      description: >
+        The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
+    - name: volume.write.iops
+      type: long
+      format: bytes
+      description: >
+        The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.
     - name: free_local_storage.bytes
       type: long
       format: bytes
@@ -195,6 +205,11 @@
       format: duration
       description: >
         The average amount of time taken per disk I/O operation.
+    - name: latency.delete
+      type: float
+      format: duration
+      description: >
+        The amount of latency for delete queries, in milliseconds.
     - name: disk_usage.bin_log.bytes
       type: long
       format: bytes
@@ -228,3 +243,79 @@
       type: keyword
       description: >
         Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+    - name: aurora_bin_log_replica_lag
+      type: long
+      description: >
+        The amount of time a replica DB cluster running on Aurora with MySQL compatibility lags behind the source DB cluster.
+    - name: aurora_global_db.replicated_write_io.bytes
+      type: long
+      description: >
+        In an Aurora Global Database, the number of write I/O operations replicated from the primary AWS Region to the cluster volume in a secondary AWS Region.
+    - name: aurora_global_db.data_transfer.bytes
+      type: long
+      description: >
+        In an Aurora Global Database, the amount of redo log data transferred from the master AWS Region to a secondary AWS Region.
+    - name: aurora_global_db.replication_lag.ms
+      type: long
+      description: >
+        For an Aurora Global Database, the amount of lag when replicating updates from the primary AWS Region, in milliseconds.
+    - name: aurora_replica.lag.ms
+      type: long
+      description: >
+        For an Aurora Replica, the amount of lag when replicating updates from the primary instance, in milliseconds.
+    - name: aurora_replica.lag_max.ms
+      type: long
+      description: >
+        The maximum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+    - name: aurora_replica.lag_min.ms
+      type: long
+      description: >
+        The minimum amount of lag between the primary instance and each Aurora DB instance in the DB cluster, in milliseconds.
+    - name: backtrack_change_records.creation_rate
+      type: long
+      description: >
+        The number of backtrack change records created over five minutes for your DB cluster.
+    - name: backtrack_change_records.stored
+      type: long
+      description: >
+        The actual number of backtrack change records used by your DB cluster.
+    - name: backtrack_window.actual
+      type: long
+      description: >
+        The difference between the target backtrack window and the actual backtrack window.
+    - name: backtrack_window.alert
+      type: long
+      description: >
+        The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.
+    - name: storage_used.backup_retention_period.bytes
+      type: long
+      description: >
+        The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
+    - name: storage_used.snapshot.bytes
+      type: long
+      description: >
+        The total amount of backup storage in bytes consumed by all Aurora snapshots for an Aurora DB cluster outside its backup retention window.
+    - name: cache_hit_ratio.buffer
+      type: long
+      description: >
+        The percentage of requests that are served by the buffer cache.
+    - name: cache_hit_ratio.result_set
+      type: long
+      description: >
+        The percentage of requests that are served by the Resultset cache.
+    - name: engine_uptime.sec
+      type: long
+      description: >
+        The amount of time that the instance has been running, in seconds.
+    - name: rds_to_aurora_postgresql_replica_lag.sec
+      type: long
+      description: >
+        The amount of lag in seconds when replicating updates from the primary RDS PostgreSQL instance to other nodes in the cluster.
+    - name: backup_storage_billed_total.bytes
+      type: long
+      description: >
+        The total amount of backup storage in bytes for which you are billed for a given Aurora DB cluster.
+    - name: aurora_volume_left_total.bytes
+      type: long
+      description: >
+        The remaining available space for the cluster volume, measured in bytes.

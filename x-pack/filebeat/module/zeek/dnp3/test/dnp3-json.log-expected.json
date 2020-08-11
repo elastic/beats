@@ -4,9 +4,19 @@
         "destination.address": "127.0.0.1",
         "destination.ip": "127.0.0.1",
         "destination.port": 20000,
+        "event.action": "read",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.dnp3",
         "event.id": "CQV6tj1w1t4WzQpHoe",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "protocol",
+            "info"
+        ],
         "fileset.name": "dnp3",
         "input.type": "log",
         "log.offset": 0,

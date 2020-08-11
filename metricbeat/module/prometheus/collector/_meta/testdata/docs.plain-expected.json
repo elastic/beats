@@ -11,7 +11,31 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:54322",
+                "instance": "127.0.0.1:55922",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
                 "job": "prometheus",
                 "listener_name": "http"
             },

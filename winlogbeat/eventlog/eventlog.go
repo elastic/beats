@@ -26,12 +26,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // Debug selectors used in this package.
@@ -82,7 +82,7 @@ type Record struct {
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
 }
 
-// ToMapStr returns a new MapStr containing the data from this Record.
+// ToEvent returns a new beat.Event containing the data from this Record.
 func (e Record) ToEvent() beat.Event {
 	// Windows Log Specific data
 	win := common.MapStr{

@@ -1,0 +1,6 @@
+---
+  - "Team:Ingest Management":
+    - "x-pack/elastic-agent/**/*.*"
+  - "Team:Automation":
+    - ".ci/**/*.*"
+    - "Jenkinsfile"

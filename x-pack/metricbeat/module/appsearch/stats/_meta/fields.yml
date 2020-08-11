@@ -105,7 +105,7 @@
               type: long
               description: >
                 Max response time in milliseconds
-        - name: web.duration
+        - name: web.response_time
           type: group
           description: >
             Dashboard response time metrics

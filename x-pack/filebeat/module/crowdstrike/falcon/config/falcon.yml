@@ -1,0 +1,26 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+# Crowdstrike Falcon SIEM connector logs are multiline JSON by default
+multiline.pattern: '^{'
+multiline.negate: true
+multiline.match: after
+multiline.max_lines: 5000
+multiline.timeout: 10
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+- script:
+    lang: javascript
+    id: crowdstrike_falcon
+    file: ${path.home}/module/crowdstrike/falcon/config/pipeline.js
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.5.0

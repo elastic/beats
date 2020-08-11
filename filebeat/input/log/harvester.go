@@ -39,25 +39,26 @@ import (
 	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	file_helper "github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/debug"
-	"github.com/elastic/beats/libbeat/reader/multiline"
-	"github.com/elastic/beats/libbeat/reader/readfile"
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
-	"github.com/elastic/beats/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 )
 
 var (
 	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
@@ -100,7 +101,20 @@ type Harvester struct {
 	outletFactory OutletFactory
 	publishState  func(file.State) bool
 
+	metrics *harvesterProgressMetrics
+
 	onTerminate func()
+}
+
+// stores the metrics of the harvester
+type harvesterProgressMetrics struct {
+	metricsRegistry             *monitoring.Registry
+	filename                    *monitoring.String
+	started                     *monitoring.String
+	lastPublished               *monitoring.Timestamp
+	lastPublishedEventTimestamp *monitoring.Timestamp
+	currentSize                 *monitoring.Int
+	readOffset                  *monitoring.Int
 }
 
 // NewHarvester creates a new harvester
@@ -118,7 +132,7 @@ func NewHarvester(
 	}
 
 	h := &Harvester{
-		config:        defaultConfig,
+		config:        defaultConfig(),
 		state:         state,
 		states:        states,
 		publishState:  publishState,
@@ -179,8 +193,40 @@ func (h *Harvester) Setup() error {
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
+	h.metrics = newHarvesterProgressMetrics(h.id.String())
+	h.metrics.filename.Set(h.source.Name())
+	h.metrics.started.Set(common.Time(time.Now()).String())
+	h.metrics.readOffset.Set(h.state.Offset)
+	err = h.updateCurrentSize()
+	if err != nil {
+		return err
+	}
+
 	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
 
+	return nil
+}
+
+func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
+	r := filesMetrics.NewRegistry(id)
+	return &harvesterProgressMetrics{
+		metricsRegistry:             r,
+		filename:                    monitoring.NewString(r, "name"),
+		started:                     monitoring.NewString(r, "start_time"),
+		lastPublished:               monitoring.NewTimestamp(r, "last_event_published_time"),
+		lastPublishedEventTimestamp: monitoring.NewTimestamp(r, "last_event_timestamp"),
+		currentSize:                 monitoring.NewInt(r, "size"),
+		readOffset:                  monitoring.NewInt(r, "read_offset"),
+	}
+}
+
+func (h *Harvester) updateCurrentSize() error {
+	fInfo, err := h.source.Stat()
+	if err != nil {
+		return err
+	}
+
+	h.metrics.currentSize.Set(fInfo.Size())
 	return nil
 }
 
@@ -250,6 +296,8 @@ func (h *Harvester) Run() error {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
+	go h.monitorFileSize()
+
 	for {
 		select {
 		case <-h.done:
@@ -298,6 +346,28 @@ func (h *Harvester) Run() error {
 
 		// Update state of harvester as successfully sent
 		h.state = state
+
+		// Update metics of harvester as event was sent
+		h.metrics.readOffset.Set(state.Offset)
+		h.metrics.lastPublished.Set(time.Now())
+		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
+	}
+}
+
+func (h *Harvester) monitorFileSize() {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-h.done:
+			return
+		case <-ticker.C:
+			err := h.updateCurrentSize()
+			if err != nil {
+				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
+			}
+		}
 	}
 }
 
@@ -305,6 +375,8 @@ func (h *Harvester) Run() error {
 func (h *Harvester) stop() {
 	h.stopOnce.Do(func() {
 		close(h.done)
+
+		filesMetrics.Remove(h.id.String())
 	})
 }
 
@@ -372,7 +444,7 @@ func (h *Harvester) onMessage(
 
 		if id != "" {
 			meta = common.MapStr{
-				"id": id,
+				"_id": id,
 			}
 		}
 	} else if &text != nil {
@@ -433,6 +505,14 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
+	fi, err := os.Stat(h.state.Source)
+	if err != nil {
+		return fmt.Errorf("failed to stat source file %s: %v", h.state.Source, err)
+	}
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return fmt.Errorf("failed to open file %s, named pipes are not supported", h.state.Source)
+	}
+
 	f, err := file_helper.ReadOpen(h.state.Source)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
@@ -559,6 +639,8 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
+	logp.Debug("harvester", "newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
+
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
@@ -572,10 +654,17 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	// Configure MaxBytes limit for EncodeReader as multiplied by 4
+	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
+	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
+	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
+	encReaderMaxBytes := h.config.MaxBytes * 4
+
 	r, err = readfile.NewEncodeReader(reader, readfile.Config{
 		Codec:      h.encoding,
 		BufferSize: h.config.BufferSize,
 		Terminator: h.config.LineTerminator,
+		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
 		return nil, err

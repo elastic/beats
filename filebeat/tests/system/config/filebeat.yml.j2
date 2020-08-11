@@ -52,6 +52,11 @@ filebeat.{{input_config | default("inputs")}}:
     {{k}}: {{v}}
   {% endfor %}
   {% endif %}
+  {%- if publisher_pipeline %}
+  {%- for name, value in publisher_pipeline.items() %}
+  publisher_pipeline.{{name}}: {{value | tojson}}
+  {%- endfor %}
+  {% endif %}
 
   fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
 
@@ -81,6 +86,7 @@ filebeat.{{input_config | default("inputs")}}:
 
   {% if multiline %}
   multiline:
+    type: {{multiline_type}}
     pattern: {{pattern}}
     negate: {{negate}}
     match: {{match}}

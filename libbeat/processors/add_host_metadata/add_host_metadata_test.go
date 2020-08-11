@@ -26,8 +26,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -64,21 +64,21 @@ func TestConfigDefault(t *testing.T) {
 	assert.NotNil(t, v)
 
 	v, err = newEvent.GetValue("host.ip")
-	assert.Error(t, err)
-	assert.Nil(t, v)
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
 
 	v, err = newEvent.GetValue("host.mac")
-	assert.Error(t, err)
-	assert.Nil(t, v)
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
 }
 
-func TestConfigNetInfoEnabled(t *testing.T) {
+func TestConfigNetInfoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
 		Timestamp: time.Now(),
 	}
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
-		"netinfo.enabled": true,
+		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
 
@@ -107,12 +107,12 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NotNil(t, v)
 
 	v, err = newEvent.GetValue("host.ip")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
+	assert.Error(t, err)
+	assert.Nil(t, v)
 
 	v, err = newEvent.GetValue("host.mac")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
+	assert.Error(t, err)
+	assert.Nil(t, v)
 }
 
 func TestConfigName(t *testing.T) {

@@ -7,21 +7,12 @@ This is the {module} module.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 TODO: document with what versions of the software is this tested
-
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -39,6 +30,14 @@ the relevant file. For example:
 ==== `{fileset}` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
 
 :has-dashboards!:
 

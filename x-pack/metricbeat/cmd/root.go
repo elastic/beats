@@ -9,19 +9,19 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/metricbeat/beater"
-	mbcmd "github.com/elastic/beats/metricbeat/cmd"
-	"github.com/elastic/beats/metricbeat/cmd/test"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/metricbeat/beater"
+	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 
 	// Register the includes.
-	_ "github.com/elastic/beats/x-pack/metricbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
 	// Import OSS modules.
-	_ "github.com/elastic/beats/metricbeat/include"
-	_ "github.com/elastic/beats/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v7/metricbeat/include"
+	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
 // Name of this beat
@@ -33,7 +33,12 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
+	settings := instance.Settings{
+		RunFlags:      runFlags,
+		Name:          Name,
+		HasDashboards: true,
+	}
+	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 	xpackcmd.AddXPack(RootCmd, Name)

@@ -1,0 +1,45 @@
+default: true
+input:
+  module: windows
+  metricset: perfmon
+  defaults:
+    perfmon.group_measurements_by_instance: true
+    perfmon.ignore_non_existent_counters: true
+    perfmon.queries:
+    - object: "Web Service"
+      instance: "*"
+      namespace : "network"
+      counters:
+      - name: "Total Bytes Received"
+      - name: "Total Bytes Sent"
+      - name: "Bytes Sent/sec"
+      - name: "Bytes Received/sec"
+      - name: "Current Connections"
+      - name: "Maximum Connections"
+      - name: "Total Connection Attempts (all instances)"
+        field: "total_connection_attempts"
+      - name: "Total Get Requests"
+      - name: "Get Requests/sec"
+      - name: "Total Post Requests"
+      - name: "Post Requests/sec"
+      - name: "Total Delete Requests"
+      - name: "Delete Requests/sec"
+      - name: "Service Uptime"
+      - name: "Total PUT Requests"
+      - name: "PUT Requests/sec"
+
+processors:
+- drop_event.when.equals:
+    iis.website.instance: '_Total'
+- drop_fields:
+    fields: "iis.website.object"
+- rename:
+    ignore_missing: true
+    fields:
+    - from: "iis.website.instance"
+      to: "iis.website.name"
+
+
+
+
+

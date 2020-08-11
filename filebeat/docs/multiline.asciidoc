@@ -1,5 +1,9 @@
 [[multiline-examples]]
-== Manage multiline messages
+=== Manage multiline messages
+
+++++
+<titleabbrev>Multiline messages</titleabbrev>
+++++
 
 The files harvested by {beatname_uc} may contain messages that span multiple
 lines of text. For example, multiline messages are common in files that contain
@@ -15,16 +19,17 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 
 [float]
 [[multiline]]
-=== Configuration options
+==== Configuration options
 
 You can specify the following options in the +{beatname_lc}.inputs+ section of
 the +{beatname_lc}.yml+ config file to control how {beatname_uc} deals with messages
-that span multiple lines. 
+that span multiple lines.
 
 The following example shows how to configure {beatname_uc} to handle a multiline message where the first line of the message begins with a bracket (`[`).
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^\['
 multiline.negate: true
 multiline.match: after
@@ -42,6 +47,8 @@ multiline.match: after
     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
 -------------------------------------------------------------------------------------
 
+*`multiline.type`*:: Defines which aggregation method to use. The default is `pattern`. The other options
+are `count` which lets you aggregate constant number of lines and `while_pattern` which aggregate lines by pattern without match option.
 
 *`multiline.pattern`*:: Specifies the regular expression pattern to match. Note that the regexp patterns supported by {beatname_uc}
 differ somewhat from the patterns supported by Logstash. See <<regexp-support>> for a list of supported regexp patterns.
@@ -64,7 +71,7 @@ the pattern.
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message.
+*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message. Work only with `pattern` type.
 
 *`multiline.max_lines`*:: The maximum number of lines that can be combined into one event. If
 the multiline message contains more than `max_lines`, any additional
@@ -72,8 +79,12 @@ lines are discarded. The default is 500.
 
 *`multiline.timeout`*:: After the specified timeout, {beatname_uc} sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
+*`multiline.count_lines`*:: The number of lines to aggregate into a single event.
 
-=== Examples of multiline configuration
+*`multiline.skip_newline`*:: When set, multiline events are concatenated without a line separator.
+
+
+==== Examples of multiline configuration
 
 The examples in this section cover the following use cases:
 
@@ -82,7 +93,7 @@ The examples in this section cover the following use cases:
 * Combining multiple lines from time-stamped events
 
 [float]
-==== Java stack traces
+===== Java stack traces
 
 Java stack traces consist of multiple lines, with each line after the initial line beginning with whitespace, as in
 this example:
@@ -99,6 +110,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^[[:space:]]'
 multiline.negate: false
 multiline.match: after
@@ -123,7 +135,8 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-multiline.pattern: '^[[:space:]]+(at|\.{3})\b|^Caused by:'
+multiline.type: pattern
+multiline.pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
 multiline.negate: false
 multiline.match: after
 -------------------------------------------------------------------------------------
@@ -134,7 +147,7 @@ In this example, the pattern matches the following lines:
 * a line that begins with the words `Caused by:`
 
 [float]
-==== Line continuations
+===== Line continuations
 
 Several programming languages use the backslash (`\`) character at the end of a line to denote that the line continues,
 as in this example:
@@ -149,6 +162,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '\\$'
 multiline.negate: false
 multiline.match: before
@@ -157,7 +171,7 @@ multiline.match: before
 This configuration merges any line that ends with the `\` character with the line that follows.
 
 [float]
-==== Timestamps
+===== Timestamps
 
 Activity logs from services such as Elasticsearch typically begin with a timestamp, followed by information on the
 specific activity, as in this example:
@@ -172,6 +186,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
 multiline.negate: true
 multiline.match: after
@@ -181,7 +196,7 @@ This configuration uses the `negate: true` and `match: after` settings to specif
 specified pattern belongs to the previous line.
 
 [float]
-==== Application events
+===== Application events
 
 Sometimes your application logs contain events, that begin and end with custom markers, such as the following example:
 
@@ -196,6 +211,7 @@ To consolidate this as a single event in {beatname_uc}, use the following multil
 
 [source,yaml]
 -------------------------------------------------------------------------------------
+multiline.type: pattern
 multiline.pattern: 'Start new event'
 multiline.negate: true
 multiline.match: after
@@ -204,7 +220,7 @@ multiline.flush_pattern: 'End event'
 
 The `flush_pattern` option, specifies a regex at which the current multiline will be flushed. If you think of the `pattern` option specifying the beginning of an event, the `flush_pattern` option will specify the end or last line of the event.
 
-=== Test your regexp pattern for multiline
+==== Test your regexp pattern for multiline
 
 To make it easier for you to test the regexp patterns in your multiline config, we've created a
 https://play.golang.org/p/uAd5XHxscu[Go Playground]. You can simply plug in the regexp pattern along with

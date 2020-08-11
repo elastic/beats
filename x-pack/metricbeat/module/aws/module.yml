@@ -5,3 +5,8 @@ metricsets:
   - usage
   - billing
   - sns
+  - lambda
+  - dynamodb
+  - vpn
+  - transitgateway
+  - natgateway

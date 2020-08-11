@@ -21,21 +21,22 @@ package console
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/codec/format"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 // capture stdout and return captured string
@@ -114,7 +115,7 @@ func TestConsoleOutput(t *testing.T) {
 		t.Run(test.title, func(t *testing.T) {
 			batch := outest.NewBatch(test.events...)
 			lines, err := run(test.codec, batch)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, test.expected, lines)
 
 			// check batch correctly signalled
@@ -130,7 +131,7 @@ func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
 		c, _ := newConsole("test", outputs.NewNilObserver(), codec)
 		for _, b := range batches {
-			c.Publish(b)
+			c.Publish(context.Background(), b)
 		}
 	})
 }

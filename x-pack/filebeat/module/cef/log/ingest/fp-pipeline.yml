@@ -1,0 +1,27 @@
+---
+description: Pipeline for Forcepoint CEF
+
+processors:
+  # cs1 is ruleID
+  - set:
+      field: rule.id
+      value: "{{cef.extensions.deviceCustomString1}}"
+      ignore_empty_value: true
+
+  # cs2 is natRuleID
+  - set:
+      field: rule.id
+      value: "{{cef.extensions.deviceCustomString2}}"
+      ignore_empty_value: true
+
+  # cs3 is VulnerabilityReference
+  - set:
+      field: vulnerability.reference
+      value: "{{cef.extensions.deviceCustomString3}}"
+      ignore_empty_value: true
+
+  # cs4 is virusID
+  - set:
+      field: cef.forcepoint.virus_id
+      value: "{{cef.extensions.deviceCustomString4}}"
+      ignore_empty_value: true

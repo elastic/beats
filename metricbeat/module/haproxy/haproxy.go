@@ -23,15 +23,16 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 // HostParser is used for parsing the configured HAProxy hosts.
@@ -39,68 +40,96 @@ var HostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 // Stat is an instance of the HAProxy stat information
 type Stat struct {
-	PxName        string `csv:"# pxname"`
-	SvName        string `csv:"svname"`
-	Qcur          string `csv:"qcur"`
-	Qmax          string `csv:"qmax"`
-	Scur          string `csv:"scur"`
-	Smax          string `csv:"smax"`
-	Slim          string `csv:"slim"`
-	Stot          string `csv:"stot"`
-	Bin           string `csv:"bin"`
-	Bout          string `csv:"bout"`
-	Dreq          string `csv:"dreq"`
-	Dresp         string `csv:"dresp"`
-	Ereq          string `csv:"ereq"`
-	Econ          string `csv:"econ"`
-	Eresp         string `csv:"eresp"`
-	Wretr         string `csv:"wretr"`
-	Wredis        string `csv:"wredis"`
-	Status        string `csv:"status"`
-	Weight        string `csv:"weight"`
-	Act           string `csv:"act"`
-	Bck           string `csv:"bck"`
-	ChkFail       string `csv:"chkfail"`
-	ChkDown       string `csv:"chkdown"`
-	Lastchg       string `csv:"lastchg"`
-	Downtime      string `csv:"downtime"`
-	Qlimit        string `csv:"qlimit"`
-	Pid           string `csv:"pid"`
-	Iid           string `csv:"iid"`
-	Sid           string `csv:"sid"`
-	Throttle      string `csv:"throttle"`
-	Lbtot         string `csv:"lbtot"`
-	Tracked       string `csv:"tracked"`
-	Type          string `csv:"type"`
-	Rate          string `csv:"rate"`
-	RateLim       string `csv:"rate_lim"`
-	RateMax       string `csv:"rate_max"`
-	CheckStatus   string `csv:"check_status"`
-	CheckCode     string `csv:"check_code"`
-	CheckDuration string `csv:"check_duration"`
-	Hrsp1xx       string `csv:"hrsp_1xx"`
-	Hrsp2xx       string `csv:"hrsp_2xx"`
-	Hrsp3xx       string `csv:"hrsp_3xx"`
-	Hrsp4xx       string `csv:"hrsp_4xx"`
-	Hrsp5xx       string `csv:"hrsp_5xx"`
-	HrspOther     string `csv:"hrsp_other"`
-	Hanafail      string `csv:"hanafail"`
-	ReqRate       string `csv:"req_rate"`
-	ReqRateMax    string `csv:"req_rate_max"`
-	ReqTot        string `csv:"req_tot"`
-	CliAbrt       string `csv:"cli_abrt"`
-	SrvAbrt       string `csv:"srv_abrt"`
-	CompIn        string `csv:"comp_in"`
-	CompOut       string `csv:"comp_out"`
-	CompByp       string `csv:"comp_byp"`
-	CompRsp       string `csv:"comp_rsp"`
-	LastSess      string `csv:"lastsess"`
-	LastChk       string `csv:"last_chk"`
-	LastAgt       string `csv:"last_agt"`
-	Qtime         string `csv:"qtime"`
-	Ctime         string `csv:"ctime"`
-	Rtime         string `csv:"rtime"`
-	Ttime         string `csv:"ttime"`
+	PxName           string `csv:"# pxname"`
+	SvName           string `csv:"svname"`
+	Qcur             string `csv:"qcur"`
+	Qmax             string `csv:"qmax"`
+	Scur             string `csv:"scur"`
+	Smax             string `csv:"smax"`
+	Slim             string `csv:"slim"`
+	Stot             string `csv:"stot"`
+	Bin              string `csv:"bin"`
+	Bout             string `csv:"bout"`
+	Dreq             string `csv:"dreq"`
+	Dresp            string `csv:"dresp"`
+	Ereq             string `csv:"ereq"`
+	Econ             string `csv:"econ"`
+	Eresp            string `csv:"eresp"`
+	Wretr            string `csv:"wretr"`
+	Wredis           string `csv:"wredis"`
+	Status           string `csv:"status"`
+	Weight           string `csv:"weight"`
+	Act              string `csv:"act"`
+	Bck              string `csv:"bck"`
+	ChkFail          string `csv:"chkfail"`
+	ChkDown          string `csv:"chkdown"`
+	Lastchg          string `csv:"lastchg"`
+	Downtime         string `csv:"downtime"`
+	Qlimit           string `csv:"qlimit"`
+	Pid              string `csv:"pid"`
+	Iid              string `csv:"iid"`
+	Sid              string `csv:"sid"`
+	Throttle         string `csv:"throttle"`
+	Lbtot            string `csv:"lbtot"`
+	Tracked          string `csv:"tracked"`
+	Type             string `csv:"type"`
+	Rate             string `csv:"rate"`
+	RateLim          string `csv:"rate_lim"`
+	RateMax          string `csv:"rate_max"`
+	CheckStatus      string `csv:"check_status"`
+	CheckCode        string `csv:"check_code"`
+	CheckDuration    string `csv:"check_duration"`
+	Hrsp1xx          string `csv:"hrsp_1xx"`
+	Hrsp2xx          string `csv:"hrsp_2xx"`
+	Hrsp3xx          string `csv:"hrsp_3xx"`
+	Hrsp4xx          string `csv:"hrsp_4xx"`
+	Hrsp5xx          string `csv:"hrsp_5xx"`
+	HrspOther        string `csv:"hrsp_other"`
+	Hanafail         string `csv:"hanafail"`
+	ReqRate          string `csv:"req_rate"`
+	ReqRateMax       string `csv:"req_rate_max"`
+	ReqTot           string `csv:"req_tot"`
+	CliAbrt          string `csv:"cli_abrt"`
+	SrvAbrt          string `csv:"srv_abrt"`
+	CompIn           string `csv:"comp_in"`
+	CompOut          string `csv:"comp_out"`
+	CompByp          string `csv:"comp_byp"`
+	CompRsp          string `csv:"comp_rsp"`
+	LastSess         string `csv:"lastsess"`
+	LastChk          string `csv:"last_chk"`
+	LastAgt          string `csv:"last_agt"`
+	Qtime            string `csv:"qtime"`
+	Ctime            string `csv:"ctime"`
+	Rtime            string `csv:"rtime"`
+	Ttime            string `csv:"ttime"`
+	AgentStatus      string `csv:"agent_status"`
+	AgentCode        string `csv:"agent_code"`
+	AgentDuration    string `csv:"agent_duration"`
+	CheckDescription string `csv:"check_desc"`
+	AgentDescription string `csv:"agent_desc"`
+	CheckRise        string `csv:"check_rise"`
+	CheckFail        string `csv:"check_fall"`
+	CheckHealth      string `csv:"check_health"`
+	AgentRise        string `csv:"agent_rise"`
+	AgentFall        string `csv:"agent_fall"`
+	AgentHealth      string `csv:"agent_health"`
+	Addr             string `csv:"addr"`
+	Cookie           string `csv:"cookie"`
+	Mode             string `csv:"mode"`
+	Algo             string `csv:"algo"`
+	ConnRate         string `csv:"conn_rate"`
+	ConnRateMax      string `csv:"conn_rate_max"`
+	ConnTot          string `csv:"conn_tot"`
+	Intercepted      string `csv:"intercepted"`
+	Dcon             string `csv:"dcon"`
+	Dses             string `csv:"dses"`
+	Wrew             string `csv:"wrew"`
+	Connect          string `csv:"connect"`
+	Reuse            string `csv:"reuse"`
+	CacheLookups     string `csv:"cache_lookups"`
+	CacheHits        string `csv:"cache_hits"`
+	SrvIcur          string `csv:"srv_icur"`
+	SrcIlim          string `csv:"src_ilim"`
 }
 
 // Info represents the show info response from HAProxy
@@ -108,12 +137,16 @@ type Info struct {
 	Name                       string `mapstructure:"Name"`
 	Version                    string `mapstructure:"Version"`
 	ReleaseDate                string `mapstructure:"Release_date"`
+	Nbthread                   string `mapstructure:"Nbthread"`
 	Nbproc                     string `mapstructure:"Nbproc"`
 	ProcessNum                 string `mapstructure:"Process_num"`
 	Pid                        string `mapstructure:"Pid"`
 	Uptime                     string `mapstructure:"Uptime"`
 	UptimeSec                  string `mapstructure:"Uptime_sec"`
 	MemMax                     string `mapstructure:"Memmax_MB"`
+	PoolAlloc                  string `mapstructure:"PoolAlloc_MB"`
+	PoolUsed                   string `mapstructure:"PoolUsed_MB"`
+	PoolFailed                 string `mapstructure:"PoolFailed"`
 	UlimitN                    string `mapstructure:"Ulimit-n"`
 	Maxsock                    string `mapstructure:"Maxsock"`
 	Maxconn                    string `mapstructure:"Maxconn"`
@@ -153,6 +186,17 @@ type Info struct {
 	IdlePct                    string `mapstructure:"Idle_pct"`
 	Node                       string `mapstructure:"Node"`
 	Description                string `mapstructure:"Description"`
+	Stopping                   string `mapstructure:"Stopping,omitempty"`
+	Jobs                       string `mapstructure:"Jobs,omitempty"`
+	UnstoppableJobs            string `mapstructure:"Unstoppable Jobs,omitempty"`
+	Listeners                  string `mapstructure:"Listeners,omitempty"`
+	ActivePeers                string `mapstructure:"ActivePeers,omitempty"`
+	ConnectedPeers             string `mapstructure:"ConnectedPeers,omitempty"`
+	DroppedLogs                string `mapstructure:"DroppedLogs,omitempty"`
+	BusyPolling                string `mapstructure:"BusyPolling,omitempty"`
+	FailedResolutions          string `mapstructure:"FailedResolutions,omitempty"`
+	TotalBytesOut              string `mapstructure:"TotalBytesOut,omitempty"`
+	BytesOutRate               string `mapstructure:"BytesOutRate,omitempty"`
 }
 
 // Client is an instance of the HAProxy client
@@ -167,7 +211,7 @@ type Client struct {
 }
 
 // NewHaproxyClient returns a new instance of HaproxyClient
-func NewHaproxyClient(address string) (*Client, error) {
+func NewHaproxyClient(address string, base mb.BaseMetricSet) (*Client, error) {
 	u, err := url.Parse(address)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid url")
@@ -179,7 +223,11 @@ func NewHaproxyClient(address string) (*Client, error) {
 	case "unix":
 		return &Client{&unixProto{Network: u.Scheme, Address: u.Path}}, nil
 	case "http", "https":
-		return &Client{&httpProto{URL: u}}, nil
+		http, err := helper.NewHTTP(base)
+		if err != nil {
+			return nil, err
+		}
+		return &Client{&httpProto{HTTP: http}}, nil
 	default:
 		return nil, errors.Errorf("invalid protocol scheme: %s", u.Scheme)
 	}
@@ -286,44 +334,20 @@ func (p *unixProto) Info() (*bytes.Buffer, error) {
 }
 
 type httpProto struct {
-	URL *url.URL
+	HTTP *helper.HTTP
 }
 
 func (p *httpProto) Stat() (*bytes.Buffer, error) {
-	url := p.URL.String()
 	// Force csv format
-	if !strings.HasSuffix(url, ";csv") {
-		url += ";csv"
+	if !strings.HasSuffix(p.HTTP.GetURI(), ";csv") {
+		p.HTTP.SetURI(p.HTTP.GetURI() + ";csv")
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
+	b, err := p.HTTP.FetchContent()
 	if err != nil {
 		return nil, err
 	}
-
-	if p.URL.User != nil {
-		password, _ := p.URL.User.Password()
-		req.SetBasicAuth(p.URL.User.Username(), password)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Errorf("couldn't connect: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("invalid response: %s", resp.Status)
-	}
-
-	d, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Errorf("couldn't read response body: %v", err)
-	}
-	if len(d) == 0 {
-		return nil, errors.New("got empty response from HAProxy")
-	}
-	return bytes.NewBuffer(d), nil
+	return bytes.NewBuffer(b), nil
 }
 
 func (p *httpProto) Info() (*bytes.Buffer, error) {

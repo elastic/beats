@@ -23,10 +23,11 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 func init() {
@@ -52,7 +53,13 @@ type Provider struct {
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
 	}
@@ -68,15 +75,15 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		Interfaces:   config.Interfaces,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 {
+	if len(mapper.ConditionMaps) == 0 {
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}

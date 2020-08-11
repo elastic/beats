@@ -20,7 +20,7 @@ package add_host_metadata
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/processors/util"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
 
 // Config for add_host_metadata processor.
@@ -33,7 +33,7 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		NetInfoEnabled: false,
+		NetInfoEnabled: true,
 		CacheTTL:       5 * time.Minute,
 	}
 }

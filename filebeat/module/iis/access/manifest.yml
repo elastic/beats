@@ -9,7 +9,7 @@ var:
     os.windows:
       - C:/inetpub/logs/LogFiles/*/*.log
 
-ingest_pipeline: ingest/default.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/iis-access.yml
 
 requires.processors:

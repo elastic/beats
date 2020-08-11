@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/go-txfile/pq"
 )
 

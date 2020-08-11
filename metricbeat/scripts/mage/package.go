@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,10 +28,11 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
+	dirModulesGenerated  = "build/package/module"
 	dirModulesDGenerated = "build/package/modules.d"
 )
 
@@ -39,6 +41,8 @@ const (
 // not supported. You must declare a dependency on either
 // PrepareModulePackagingOSS or PrepareModulePackagingXPack.
 func CustomizePackaging() {
+	mg.Deps(customizeLightModulesPackaging)
+
 	var (
 		modulesDTarget = "modules.d"
 		modulesD       = devtools.PackageFile{
@@ -101,6 +105,10 @@ func CustomizePackaging() {
 // PrepareModulePackagingOSS generates build/package/modules and
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingOSS() error {
+	err := prepareLightModulesPackaging("module")
+	if err != nil {
+		return err
+	}
 	return prepareModulePackaging([]struct{ Src, Dst string }{
 		{devtools.OSSBeatDir("modules.d"), dirModulesDGenerated},
 	}...)
@@ -109,6 +117,10 @@ func PrepareModulePackagingOSS() error {
 // PrepareModulePackagingXPack generates build/package/modules and
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingXPack() error {
+	err := prepareLightModulesPackaging("module", devtools.OSSBeatDir("module"))
+	if err != nil {
+		return err
+	}
 	return prepareModulePackaging([]struct{ Src, Dst string }{
 		{devtools.OSSBeatDir("modules.d"), dirModulesDGenerated},
 		{"modules.d", dirModulesDGenerated},
@@ -184,6 +196,80 @@ func GenerateDirModulesD() error {
 
 		err := copyWithHeader(header, f, path, os.FileMode(mode))
 		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// customizeLightModulesPackaging customizes packaging to add light modules
+func customizeLightModulesPackaging() error {
+	var (
+		moduleTarget = "module"
+		module       = devtools.PackageFile{
+			Mode:   0644,
+			Source: dirModulesGenerated,
+		}
+	)
+
+	for _, args := range devtools.Packages {
+		pkgType := args.Types[0]
+		switch pkgType {
+		case devtools.TarGz, devtools.Zip, devtools.Docker:
+			args.Spec.Files[moduleTarget] = module
+		case devtools.Deb, devtools.RPM:
+			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
+		case devtools.DMG:
+			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
+		default:
+			return fmt.Errorf("unhandled package type: %v", pkgType)
+		}
+	}
+	return nil
+}
+
+// prepareLightModulesPackaging generates light modules
+func prepareLightModulesPackaging(paths ...string) error {
+	err := devtools.Clean([]string{dirModulesGenerated})
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dirModulesGenerated, 0755); err != nil {
+		return err
+	}
+
+	filePatterns := []string{
+		"*/module.yml",
+		"*/*/manifest.yml",
+	}
+
+	var tasks []devtools.CopyTask
+	for _, path := range paths {
+		for _, pattern := range filePatterns {
+			matches, err := filepath.Glob(filepath.Join(path, pattern))
+			if err != nil {
+				return err
+			}
+
+			for _, file := range matches {
+				rel, _ := filepath.Rel(path, file)
+				dest := filepath.Join(dirModulesGenerated, rel)
+				tasks = append(tasks, devtools.CopyTask{
+					Source:  file,
+					Dest:    dest,
+					Mode:    0644,
+					DirMode: 0755,
+				})
+			}
+		}
+	}
+
+	if len(tasks) == 0 {
+		return fmt.Errorf("no light modules found")
+	}
+
+	for _, task := range tasks {
+		if err := task.Execute(); err != nil {
 			return err
 		}
 	}

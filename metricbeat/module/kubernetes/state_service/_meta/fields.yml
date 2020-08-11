@@ -26,16 +26,8 @@
       type: keyword
       description: Ingress IP
     - name: ingress_hostname
-      type: ip
+      type: keyword
       description: Ingress Hostname
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: Labels for service
     - name: created
       type: date
       description: Service creation date
-      
-      
-
-

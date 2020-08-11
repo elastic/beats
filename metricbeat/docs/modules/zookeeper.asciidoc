@@ -6,7 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 == ZooKeeper module
 
 The ZooKeeper module fetches statistics from the ZooKeeper service. The default
-metricset is `mntr` and `server`.
+metricsets are `mntr` and `server`.
 
 [float]
 === Compatibility

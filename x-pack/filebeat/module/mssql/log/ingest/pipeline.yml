@@ -1,0 +1,53 @@
+description: Pipeline to parse MSSQL logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '%{MSSQL_DATE:date} %{DATA:mssql.log.origin} [ ]*%{GREEDYDATA:msg_temp}'
+    pattern_definitions:
+      MSSQL_DATE: '%{DATA} %{DATA}'
+- date:
+    if: ctx.event.timezone == null
+    field: date
+    formats:
+    - yyyy-MM-dd HH:mm:ss.SS
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- date:
+    if: ctx.event.timezone != null
+    field: date
+    formats:
+    - yyyy-MM-dd HH:mm:ss.SS
+    timezone: '{{ event.timezone }}'
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- remove:
+    field: date
+    ignore_missing: true
+- rename:
+    field: message
+    target_field: log.original
+- rename:
+    field: msg_temp
+    target_field: message
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: database
+- append:
+    field: event.type
+    value: info
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -1,153 +1,131 @@
 {
-    "@timestamp":"2019-09-20T11:02:00.000Z",
-    "azure":{
-        "resource":{
-            "name":"obslinux",
-            "type":"Microsoft.Compute/virtualMachines",
-            "group":"resource-group"
+    "@timestamp":"2020-08-05T10:36:00.000Z",
+    "cloud":{
+        "provider":"azure",
+        "region":"westeurope",
+        "instance":{
+            "id":"/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak",
+            "name":"obstestmemleak"
         },
-        "subscription_id":"123456-qwer-1234-5678-12345678",
+        "machine":{
+            "type":"Standard_B2ms"
+        }
+    },
+    "event":{
+        "dataset":"azure.compute_vm",
+        "module":"azure",
+        "duration":5364973100
+    },
+    "metricset":{
+        "name":"compute_vm",
+        "period":300000
+    },
+    "azure":{
+        "timegrain":"PT5M",
+        "resource":{
+            "type":"Microsoft.Compute/virtualMachines",
+            "group":"obs-infrastructure",
+            "tags":{
+                "vmtest":"value1, value 2",
+                "vmtest1":"value3"
+            }
+        },
+        "subscription_id":"fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "namespace":"Microsoft.Compute/virtualMachines",
         "compute_vm":{
-            "inbound_flows_maximum_creation_rate":{
-                "avg":14.6
-            },
-            "os_per_disk_write_bytes_per_sec":{
-                "avg":15261.86
+            "outbound_flows":{
+                "avg":291.2
             },
             "outbound_flows_maximum_creation_rate":{
-                "avg":18.6
+                "avg":6
             },
-            "os_per_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "data_disk_queue_depth":{
-                "avg":0
-            },
-            "per_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "inbound_flows":{
-                "avg":60.4
-            },
-            "os_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "per_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_write_operations_per_sec":{
-                "avg":1.03
-            },
-            "outbound_flows":{
-                "avg":60.4
-            },
-            "network_in":{
-                "total":3624009.0
-            },
-            "os_per_disk_qd":{
-                "avg":0
-            },
-            "data_disk_read_bytes_per_sec":{
-                "avg":0
-            },
-            "disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "os_disk_read_operations_per_sec":{
-                "avg":0
-            },
-            "per_disk_qd":{
-                "avg":0
-            },
-            "os_disk_write_bytes_per_sec":{
-                "avg":15261.86
-            },
-            "disk_write_bytes":{
-                "total":2806782.57
-            },
-            "per_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_out":{
-                "total":704862
-            },
-            "os_disk_read_bytes_per_sec":{
-                "avg":0
+            "inbound_flows_maximum_creation_rate":{
+                "avg":6
             },
             "os_per_disk_read_bytes_per_sec":{
-                "avg":0
+                "avg":341.35875
             },
-            "os_per_disk_write_operations_per_sec":{
-                "avg":1.0175
-            },
-            "percentage_cpu":{
-                "avg":7.683333333333334
-            },
-            "data_disk_write_operations_per_sec":{
-                "avg":0
-            },
-            "network_in_total":{
-                "total":6787492.0
-            },
-            "disk_read_bytes":{
-                "total":0
-            },
-            "data_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "per_disk_write_bytes_per_sec":{
-                "avg":0
-            },
-            "data_disk_read_operations_per_sec":{
+            "per_disk_read_bytes_per_sec":{
                 "avg":0
             },
             "os_disk_queue_depth":{
                 "avg":0
             },
+            "os_per_disk_qd":{
+                "avg":0
+            },
+            "os_disk_read_bytes_per_sec":{
+                "avg":341.35875
+            },
+            "network_in":{
+                "total":3933481.0
+            },
+            "network_out":{
+                "total":7169752.0
+            },
+            "os_disk_write_operations_per_sec":{
+                "avg":4.994285714285715
+            },
+            "percentage_cpu":{
+                "avg":8.780625
+            },
+            "cpu_credits_remaining":{
+                "avg":864
+            },
             "network_out_total":{
-                "total":1889767.0
+                "total":9249694.0
+            },
+            "disk_read_operations_per_sec":{
+                "avg":0.022857142857142857
+            },
+            "disk_write_bytes":{
+                "total":1.759878456E7
+            },
+            "os_disk_write_bytes_per_sec":{
+                "avg":73050.70375
+            },
+            "cpu_credits_consumed":{
+                "avg":0.175
+            },
+            "per_disk_qd":{
+                "avg":0
+            },
+            "disk_write_operations_per_sec":{
+                "avg":2.5221428571428572
+            },
+            "os_per_disk_write_operations_per_sec":{
+                "avg":4.994285714285715
+            },
+            "per_disk_write_operations_per_sec":{
+                "avg":0.049999999999999996
+            },
+            "inbound_flows":{
+                "avg":291.2
+            },
+            "os_disk_read_operations_per_sec":{
+                "avg":0.045714285714285714
+            },
+            "disk_read_bytes":{
+                "total":81926.52
+            },
+            "network_in_total":{
+                "total":4920267.0
+            },
+            "per_disk_read_operations_per_sec":{
+                "avg":0
+            },
+            "per_disk_write_bytes_per_sec":{
+                "avg":277.56
+            },
+            "os_per_disk_write_bytes_per_sec":{
+                "avg":73050.70375
+            },
+            "os_per_disk_read_operations_per_sec":{
+                "avg":0.045714285714285714
             }
         }
     },
     "service":{
         "type":"azure"
-    },
-    "cloud":{
-        "provider":"azure",
-        "region":"westeurope"
-    },
-    "ecs":{
-        "version":"1.1.0"
-    },
-    "host":{
-        "architecture":"x86_64",
-        "os":{
-            "build":"17134.1006",
-            "platform":"windows",
-            "version":"10.0",
-            "family":"windows",
-            "name":"Windows 10 Pro",
-            "kernel":"10.0.17134.1006 (WinBuild.160101.0800)"
-        },
-        "id":"123456-qwer-1234-5678-12345678",
-        "name":"DESKTOP-RFOOE09",
-        "hostname":"DESKTOP-RFOOE09"
-    },
-    "agent":{
-        "hostname":"DESKTOP-RFOOE09",
-        "id":"123456-qwer-1234-5678-12345678",
-        "version":"8.0.0",
-        "type":"metricbeat",
-        "ephemeral_id":"123456-qwer-1234-5678-12345678"
-    },
-    "event":{
-        "duration":4611928900,
-        "dataset":"azure.compute_vm",
-        "module":"azure"
-    },
-    "metricset":{
-        "name":"compute_vm",
-        "period":300000
     }
 }

@@ -1,0 +1,12 @@
+{"name": "github.com/elastic/elastic-agent-client/v7", "licenceType": "Elastic"}
+{"name": "github.com/gorhill/cronexpr", "licenceType": "Apache-2.0", "licenceFile":"APLv2"}
+{"name": "github.com/miekg/dns", "licenceType": "BSD"}
+{"name": "github.com/kr/logfmt", "licenceFile": "Readme", "licenceType": "MIT"}
+{"name": "github.com/samuel/go-parser", "licenceType": "BSD-3-Clause"}
+{"name": "github.com/xeipuuv/gojsonpointer", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/xeipuuv/gojsonreference", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/xeipuuv/gojsonschema", "licenceFile": "LICENSE-APACHE-2.0.txt", "licenceType": "Apache-2.0"}
+{"name": "github.com/chzyer/logex", "licenceType": "MIT"}
+{"name": "github.com/munnerz/goautoneg", "licenceType": "BSD-3-Clause"}
+{"name": "github.com/pelletier/go-buffruneio", "licenceType": "MIT"}
+{"name": "github.com/urso/magetools", "licenceType": "Apache-2.0"}

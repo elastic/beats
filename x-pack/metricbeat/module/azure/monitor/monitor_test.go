@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
@@ -60,6 +60,9 @@ func TestFetch(t *testing.T) {
 		t.Fatal(err)
 	}
 	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
 	ms, ok := metricsets[0].(*MetricSet)

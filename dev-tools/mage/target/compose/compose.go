@@ -30,7 +30,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // SupportedVersions is the definition of supported version files
@@ -86,6 +86,11 @@ func findSupportedVersionsFiles() ([]string, error) {
 
 	if module := os.Getenv("MODULE"); len(module) > 0 {
 		path := filepath.Join("module", module, "_meta/supported-versions.yml")
+		return []string{path}, nil
+	}
+
+	if input := os.Getenv("INPUT"); len(input) > 0 {
+		path := filepath.Join("input", input, "_meta/supported-versions.yml")
 		return []string{path}, nil
 	}
 

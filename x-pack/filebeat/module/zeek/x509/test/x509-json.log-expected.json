@@ -3,7 +3,11 @@
         "@timestamp": "2018-12-03T20:00:00.143Z",
         "event.dataset": "zeek.x509",
         "event.id": "FxZ6gZ3YR6vFlIocq3",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "x509",
         "input.type": "log",
         "log.offset": 0,

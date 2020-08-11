@@ -4,9 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-activemq]]
 [role="xpack"]
-== activemq module
-
-beta[]
+== ActiveMQ module
 
 This module periodically fetches JMX metrics from Apache ActiveMQ.
 
@@ -22,7 +20,7 @@ The ActiveMQ module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX m
 [float]
 === Example configuration
 
-The activemq module supports the standard configuration options that are described
+The ActiveMQ module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -35,36 +33,6 @@ metricbeat.modules:
   path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
   username: admin # default username
   password: admin # default password
-  processors:
-    - script:
-        lang: javascript
-        source: >
-          function process(event) {
-            var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
-            if (broker_memory_broker_pct != null) {
-              event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
-            }
-
-            var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
-            if (broker_memory_temp_pct != null) {
-              event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
-            }
-
-            var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
-            if (broker_memory_store_pct != null) {
-              event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
-            }
-
-            var queue_memory_broker_pct = event.Get("activemq.queue.memory.broker.pct")
-            if (queue_memory_broker_pct != null) {
-              event.Put("activemq.queue.memory.broker.pct", queue_memory_broker_pct / 100.0)
-            }
-
-            var topic_memory_broker_pct = event.Get("activemq.topic.memory.broker.pct")
-            if (topic_memory_broker_pct != null) {
-              event.Put("activemq.topic.memory.broker.pct", topic_memory_broker_pct / 100.0)
-            }
-          }
 ----
 
 [float]

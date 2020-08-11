@@ -83,11 +83,17 @@ output:
   {% if elasticsearch.ilm %}
     ilm.enabled: {{elasticsearch.ilm}}
   {% endif %}
+  {% if elasticsearch.timeout %}
+    timeout: {{elasticsearch.timeout}}
+  {% endif %}
 {%- endif %}
 
 {% if logstash %}
 output.logstash:
   hosts: ["{{ logstash.host }}"]
+  {% if logstash.timeout %}
+  timeout: {{logstash.timeout}}
+  {% endif %}
 {%- endif %}
 
 {% if not (console or elasticsearch or logstash) -%}

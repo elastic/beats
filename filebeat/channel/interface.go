@@ -18,12 +18,12 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Factory is used to create a new Outlet instance
-type Factory func(beat.Pipeline) Connector
+type Factory func(beat.PipelineConnector) Connector
 
 // Connector creates an Outlet connecting the event publishing with some internal pipeline.
 // type Connector func(*common.Config, *common.MapStrPointer) (Outleter, error)

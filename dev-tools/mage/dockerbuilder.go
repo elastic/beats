@@ -102,6 +102,9 @@ func (b *dockerBuilder) copyFiles() error {
 	for _, f := range b.Files {
 		target := filepath.Join(b.beatDir, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return errors.Wrapf(err, "failed to copy from %s to %s", f.Source, target)
 		}
 	}
@@ -120,8 +123,8 @@ func (b *dockerBuilder) prepareBuild() error {
 		"ModulesDirs": b.modulesDirs(),
 	}
 
-	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
-		if !info.IsDir() {
+	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
+		if !info.IsDir() && !isDockerFile(path) {
 			target := strings.TrimSuffix(
 				filepath.Join(b.buildDir, filepath.Base(path)),
 				".tmpl",
@@ -134,6 +137,52 @@ func (b *dockerBuilder) prepareBuild() error {
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return b.expandDockerfile(templatesDir, data)
+}
+
+func isDockerFile(path string) bool {
+	path = filepath.Base(path)
+	return strings.HasPrefix(path, "Dockerfile") || strings.HasPrefix(path, "docker-entrypoint")
+}
+
+func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
+	// has specific dockerfile
+	dockerfile := fmt.Sprintf("Dockerfile.%s.tmpl", b.imageName)
+	_, err := os.Stat(filepath.Join(templatesDir, dockerfile))
+	if err != nil {
+		// specific missing fallback to generic
+		dockerfile = "Dockerfile.tmpl"
+	}
+
+	entrypoint := fmt.Sprintf("docker-entrypoint.%s.tmpl", b.imageName)
+	_, err = os.Stat(filepath.Join(templatesDir, entrypoint))
+	if err != nil {
+		// specific missing fallback to generic
+		entrypoint = "docker-entrypoint.tmpl"
+	}
+
+	type fileExpansion struct {
+		source string
+		target string
+	}
+	for _, file := range []fileExpansion{{dockerfile, "Dockerfile.tmpl"}, {entrypoint, "docker-entrypoint.tmpl"}} {
+		target := strings.TrimSuffix(
+			filepath.Join(b.buildDir, file.target),
+			".tmpl",
+		)
+		path := filepath.Join(templatesDir, file.source)
+		err = b.ExpandFile(path, target, data)
+		if err != nil {
+			return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
+		}
+	}
+
+	return nil
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {

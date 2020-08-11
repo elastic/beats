@@ -103,7 +103,7 @@ class Test(BaseTest):
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
             inputs=False,
-            elasticsearch={"host": 'errorhost:9201'}
+            elasticsearch={"host": 'errorhost:9201', "timeout": '1'}
         )
 
         proc = self.start_beat()

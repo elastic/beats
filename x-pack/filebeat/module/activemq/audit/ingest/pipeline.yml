@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing ActiveMQ audit logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       pattern_definitions:
@@ -9,6 +12,23 @@ processors:
       patterns:
         - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{WORD:activemq.user}%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}"
       ignore_missing: true
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: user.name
+      value: "{{activemq.user}}"
+      ignore_empty_value: true
+  - script:
+      if: "ctx?.log?.level != null"
+      lang: painless
+      source: >-
+        def err_levels = ["FATAL", "ERROR", "WARN"];
+        if (err_levels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
 on_failure:
   - set:
       field: error.message

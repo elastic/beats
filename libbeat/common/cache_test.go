@@ -60,7 +60,7 @@ var (
 func TestExpireWithRemovalListener(t *testing.T) {
 	callbackKey = nil
 	callbackValue = nil
-	c := newCache(Timeout, InitalSize, removalListener, fakeClock)
+	c := newCache(Timeout, true, InitalSize, removalListener, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	currentTime = currentTime.Add(Timeout).Add(time.Nanosecond)
 	assert.Equal(t, 1, c.CleanUp())
@@ -70,7 +70,7 @@ func TestExpireWithRemovalListener(t *testing.T) {
 
 // Test that the number of removed elements is returned by Expire.
 func TestExpireWithoutRemovalListener(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	c.Put(bravoKey, bravoValue)
 	currentTime = currentTime.Add(Timeout).Add(time.Nanosecond)
@@ -78,7 +78,7 @@ func TestExpireWithoutRemovalListener(t *testing.T) {
 }
 
 func TestPutIfAbsent(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	oldValue := c.PutIfAbsent(alphaKey, alphaValue)
 	assert.Nil(t, oldValue)
 	oldValue = c.PutIfAbsent(alphaKey, bravoValue)
@@ -86,7 +86,7 @@ func TestPutIfAbsent(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	oldValue := c.Put(alphaKey, alphaValue)
 	assert.Nil(t, oldValue)
 	oldValue = c.Put(bravoKey, bravoValue)
@@ -99,7 +99,7 @@ func TestPut(t *testing.T) {
 }
 
 func TestReplace(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 
 	// Nil is returned when the value does not exist and no element is added.
 	assert.Nil(t, c.Replace(alphaKey, alphaValue))
@@ -112,7 +112,7 @@ func TestReplace(t *testing.T) {
 }
 
 func TestGetUpdatesLastAccessTime(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 
 	currentTime = currentTime.Add(Timeout / 2)
@@ -121,19 +121,29 @@ func TestGetUpdatesLastAccessTime(t *testing.T) {
 	assert.Equal(t, alphaValue, c.Get(alphaKey))
 }
 
+func TestGetDoesntUpdateLastAccessTime(t *testing.T) {
+	c := newCache(Timeout, false, InitalSize, nil, fakeClock)
+	c.Put(alphaKey, alphaValue)
+
+	currentTime = currentTime.Add(Timeout - 1)
+	assert.Equal(t, alphaValue, c.Get(alphaKey))
+	currentTime = currentTime.Add(Timeout - 1)
+	assert.Nil(t, c.Get(alphaKey))
+}
+
 func TestDeleteNonExistentKey(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	assert.Nil(t, c.Delete(alphaKey))
 }
 
 func TestDeleteExistingKey(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	assert.Equal(t, alphaValue, c.Delete(alphaKey))
 }
 
 func TestDeleteExpiredKey(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	currentTime = currentTime.Add(Timeout).Add(time.Nanosecond)
 	assert.Nil(t, c.Delete(alphaKey))
@@ -141,7 +151,7 @@ func TestDeleteExpiredKey(t *testing.T) {
 
 // Test that Entries returns the non-expired map entries.
 func TestEntries(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	currentTime = currentTime.Add(Timeout).Add(time.Nanosecond)
 	c.Put(bravoKey, bravoValue)
@@ -152,7 +162,7 @@ func TestEntries(t *testing.T) {
 
 // Test that Size returns a count of both expired and non-expired elements.
 func TestSize(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	currentTime = currentTime.Add(Timeout).Add(time.Nanosecond)
 	c.Put(bravoKey, bravoValue)
@@ -160,7 +170,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestGetExpiredValue(t *testing.T) {
-	c := newCache(Timeout, InitalSize, nil, fakeClock)
+	c := newCache(Timeout, true, InitalSize, nil, fakeClock)
 	c.Put(alphaKey, alphaValue)
 	v := c.Get(alphaKey)
 	assert.Equal(t, alphaValue, v)
@@ -174,7 +184,7 @@ func TestGetExpiredValue(t *testing.T) {
 // RemovalListener is invoked during clean up.
 func TestJanitor(t *testing.T) {
 	keyChan := make(chan Key)
-	c := newCache(Timeout, InitalSize, func(k Key, v Value) {
+	c := newCache(Timeout, true, InitalSize, func(k Key, v Value) {
 		keyChan <- k
 	}, fakeClock)
 	c.Put(alphaKey, alphaValue)

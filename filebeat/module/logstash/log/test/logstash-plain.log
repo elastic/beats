@@ -2,4 +2,10 @@
 [2017-11-20T03:55:00,318][INFO ][logstash.inputs.jdbc     ] (0.058950s) Select Name as [person.name]
 , Address as [person.address]
 from people
-
+[2020-05-13T11:00:26,431][INFO ][logstash.inputs.json     ] (0.158950s) {
+"foo": [
+{
+  "bar": "baz"
+}
+]
+}

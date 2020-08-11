@@ -13,6 +13,8 @@ created by https://www.mysql.com/[MySQL].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
@@ -21,16 +23,6 @@ MariaDB 10.1, 10.2 and 10.3, and Percona 5.7 and 8.0.
 
 On Windows, the module was tested with MySQL installed from the Chocolatey
 repository.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-mysql.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -72,6 +64,14 @@ include::../include/var-paths.asciidoc[]
 ==== `slowlog` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-mysql.png[]
 
 :has-dashboards!:
 

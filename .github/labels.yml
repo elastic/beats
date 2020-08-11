@@ -1,0 +1,5 @@
+---
+pulls:
+  opened:
+    add:
+      - needs_team

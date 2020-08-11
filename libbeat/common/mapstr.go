@@ -20,6 +20,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 
@@ -95,20 +96,26 @@ func (m MapStr) deepUpdateMap(d MapStr, overwrite bool) {
 }
 
 func deepUpdateValue(old interface{}, val MapStr, overwrite bool) interface{} {
-	if old == nil {
-		return val
-	}
-
 	switch sub := old.(type) {
 	case MapStr:
+		if sub == nil {
+			return val
+		}
+
 		sub.deepUpdateMap(val, overwrite)
 		return sub
 	case map[string]interface{}:
+		if sub == nil {
+			return val
+		}
+
 		tmp := MapStr(sub)
 		tmp.deepUpdateMap(val, overwrite)
 		return tmp
 	default:
-		// This should never happen
+		// We reach the default branch if old is no map or if old == nil.
+		// In either case we return `val`, such that the old value is completely
+		// replaced when merging.
 		return val
 	}
 }
@@ -218,13 +225,16 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	keys := make([]string, 0, len(m))
-	for k := range m {
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	keys := make([]string, 0, len(debugM))
+	for k := range debugM {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		v := m[k]
+		v := debugM[k]
 		if inner, ok := tryToMapStr(v); ok {
 			enc.AddObject(k, inner)
 			continue
@@ -232,6 +242,19 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		zap.Any(k, v).AddTo(enc)
 	}
 	return nil
+}
+
+// Format implements fmt.Formatter
+func (m MapStr) Format(f fmt.State, c rune) {
+	if f.Flag('+') || f.Flag('#') {
+		io.WriteString(f, m.String())
+		return
+	}
+
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	io.WriteString(f, debugM.String())
 }
 
 // Flatten flattens the given MapStr and returns a flat MapStr.

@@ -23,27 +23,44 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
 type runner struct {
 	id      int64
 	started bool
 	stopped bool
+	OnStart func()
+	OnStop  func()
 }
 
 func (r *runner) String() string {
 	return "test runner"
 }
 
-func (r *runner) Start() { r.started = true }
-func (r *runner) Stop()  { r.stopped = true }
+func (r *runner) Start() {
+	r.started = true
+	if r.OnStart != nil {
+		r.OnStart()
+	}
+}
 
-type runnerFactory struct{ runners []*runner }
+func (r *runner) Stop() {
+	if r.OnStop != nil {
+		r.OnStop()
+	}
+	r.stopped = true
+}
 
-func (r *runnerFactory) Create(x beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (Runner, error) {
+type runnerFactory struct {
+	CreateRunner func(beat.PipelineConnector, *common.Config) (Runner, error)
+	runners      []Runner
+}
+
+func (r *runnerFactory) Create(x beat.PipelineConnector, c *common.Config) (Runner, error) {
 	config := struct {
 		ID int64 `config:"id"`
 	}{}
@@ -56,6 +73,15 @@ func (r *runnerFactory) Create(x beat.Pipeline, c *common.Config, meta *common.M
 	// id < 0 is an invalid config
 	if config.ID < 0 {
 		return nil, errors.New("Invalid config")
+	}
+
+	if r.CreateRunner != nil {
+		runner, err := r.CreateRunner(x, c)
+		if err != nil {
+			return nil, err
+		}
+		r.runners = append(r.runners, runner)
+		return runner, err
 	}
 
 	runner := &runner{id: config.ID}
@@ -97,6 +123,28 @@ func TestReloadSameConfigs(t *testing.T) {
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
+	})
+
+	// nothing changed
+	assert.Equal(t, state, list.copyRunnerList())
+}
+
+func TestReloadDuplicateConfig(t *testing.T) {
+	factory := &runnerFactory{}
+	list := NewRunnerList("", factory, nil)
+
+	list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+	})
+
+	state := list.copyRunnerList()
+	assert.Equal(t, len(state), 1)
+
+	// This can happen in Autodiscover when a container if getting restarted
+	// but the previous one is not cleaned yet.
+	list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createConfig(1),
 	})
 
 	// nothing changed
@@ -181,6 +229,55 @@ func TestHas(t *testing.T) {
 
 	assert.True(t, list.Has(hash))
 	assert.False(t, list.Has(0))
+}
+
+func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
+	newMapStrPointer := func(m common.MapStr) *common.MapStrPointer {
+		p := common.NewMapStrPointer(m)
+		return &p
+	}
+
+	cases := map[string]struct {
+		meta *common.MapStrPointer
+	}{
+		"no dynamic metadata": {},
+		"with dynamic fields": {
+			meta: newMapStrPointer(common.MapStr{"test": 1}),
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+
+			factory := &runnerFactory{
+				CreateRunner: func(p beat.PipelineConnector, cfg *common.Config) (Runner, error) {
+					return &runner{
+						OnStart: func() {
+							c, _ := p.Connect()
+							c.Close()
+						},
+					}, nil
+				},
+			}
+
+			var config beat.ClientConfig
+			pipeline := &pubtest.FakeConnector{
+				ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
+					config = cfg
+					return &pubtest.FakeClient{}, nil
+				},
+			}
+
+			runner, _ := createRunner(factory, pipeline, &reload.ConfigWithMeta{
+				Config: common.NewConfig(),
+				Meta:   test.meta,
+			})
+			runner.Start()
+			runner.Stop()
+
+			assert.Equal(t, test.meta, config.Processing.DynamicFields)
+		})
+	}
 }
 
 func createConfig(id int64) *reload.ConfigWithMeta {

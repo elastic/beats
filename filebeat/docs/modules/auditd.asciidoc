@@ -11,7 +11,13 @@ This file is generated! See scripts/docs_collector.py
 The +{modulename}+ module collects and parses logs from the audit daemon
 (`auditd`).
 
+NOTE: Although {beatname_uc} is able to parse logs by using the `auditd` module,
+{auditbeat-ref}/auditbeat-module-auditd.html[{auditbeat}] offers more advanced
+features for monitoring audit logs.
+
 include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
@@ -20,18 +26,6 @@ The +{modulename}+ module was tested with logs from `auditd` on OSes like CentOS
 6 and CentOS 7.
 
 This module is not available for Windows.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard showing an overview of the audit log
-data. You can build more specific dashboards that are tailored to the audit
-rules that you use on your systems.
-
-[role="screenshot"]
-image::./images/kibana-audit-auditd.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -66,6 +60,16 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing an overview of the audit log
+data. You can build more specific dashboards that are tailored to the audit
+rules that you use on your systems.
+
+[role="screenshot"]
+image::./images/kibana-audit-auditd.png[]
 
 :has-dashboards!:
 

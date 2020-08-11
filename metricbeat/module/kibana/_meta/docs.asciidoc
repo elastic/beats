@@ -1,11 +1,14 @@
-There are two modules that collect metrics about {kib}: 
-
-* The Kibana module tracks only the high-level metrics. The default metricset in
-this module is `status`.
-* The Kibana X-Pack module enables you to monitor more Kibana metrics with our
-{stack} {monitor-features}. The default metricset in this module is `stats`.
+The `kibana` module collects metrics about {kib}.
 
 [float]
 === Compatibility
 
-The Kibana module is tested with Kibana 6.3.
+The `kibana` module works with {kib} 6.7.0 and later.
+
+[float]
+=== Usage for Stack Monitoring
+
+The `kibana` module can be used to collect metrics shown in our {stack} {monitor-features}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable kibana` and
+`metricbeat modules enable kibana-xpack`.

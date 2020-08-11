@@ -20,7 +20,7 @@ package jobs
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // ExecJobsAndConts recursively executes multiple jobs.

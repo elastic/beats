@@ -21,8 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // config is subset of libbeat/outputs/elasticsearch config tailored
@@ -46,7 +45,6 @@ type config struct {
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
 	Backoff          backoff           `config:"backoff"`
-	Format           report.Format     `config:"_format"`
 	ClusterUUID      string            `config:"cluster_uuid"`
 }
 

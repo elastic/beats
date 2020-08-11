@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "istio.pilot",
+        "duration": 115000,
+        "module": "istio"
+    },
+    "istio": {
+        "pilot": {
+            "cluster": "outbound_.15031_._.istio-ingressgateway.istio-system.svc.cluster.local",
+            "xds": {
+                "eds": {
+                    "instances": 1
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "pilot",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "istio"
+    }
+}

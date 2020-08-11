@@ -274,7 +274,27 @@
               type: double
               description: One of four floating point fields available to map fields that do not apply to any other in this dictionary.
 
+            - name: deviceCustomIPv6Address1
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
             - name: deviceCustomIPv6Address1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomIPv6Address2
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceCustomIPv6Address3
+              type: ip
+              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+            - name: deviceCustomIPv6Address3Label
               type: keyword
               description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
@@ -286,18 +306,6 @@
               type: keyword
               description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
-            - name: deviceCustomIPv6Address1
-              type: ip
-              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-            - name: deviceCustomIPv6Address3
-              type: ip
-              description: One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-            - name: deviceCustomIPv6Address3Label
-              type: keyword
-              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
-
             - name: deviceCustomNumber1
               type: long
               description: One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
@@ -306,7 +314,7 @@
               type: keyword
               description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
-            - name: DeviceCustomNumber2
+            - name: deviceCustomNumber2
               type: long
               description: One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
 
@@ -390,6 +398,22 @@
               type: keyword
               description: The facility generating this event. For example, Syslog has an explicit facility associated with every event.
 
+            - name: deviceFlexNumber1
+              type: long
+              description: One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceFlexNumber1Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+            - name: deviceFlexNumber2
+              type: long
+              description: One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+            - name: deviceFlexNumber2Label
+              type: keyword
+              description: All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
             - name: deviceHostName
               type: keyword
               description: The format should be a fully qualified domain name (FQDN) associated with the device node, when a node is available.
@@ -428,7 +452,7 @@
 
             - name: deviceTimeZone
               type: keyword
-              description: The timezone for the device generating the event.
+              description: The time zone for the device generating the event.
 
             - name: deviceTranslatedAddress
               type: ip

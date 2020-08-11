@@ -15,23 +15,14 @@ binaries.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from Santa 0.9.14.
 
 This module is available for MacOS only.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard showing and overview of the processes
-that are executing.
-
-[role="screenshot"]
-image::./images/kibana-santa-log-overview.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -55,6 +46,15 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing and overview of the processes
+that are executing.
+
+[role="screenshot"]
+image::./images/kibana-santa-log-overview.png[]
 
 :has-dashboards!:
 

@@ -1,0 +1,1310 @@
+[
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/networking/v1alpha3/envoyfilters",
+                "runtime": {
+                    "state_type_instances": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "virtualservices": 1
+                    }
+                },
+                "name": "bookinfo",
+                "namespace": "default",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "tcpconnectionsclosed",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/policy/v1beta1/attributemanifests",
+                "runtime": {
+                    "state_type_instances": 2
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "authentication": {
+                        "policies": 1
+                    }
+                },
+                "name": "grafana-ports-mtls-disabled",
+                "namespace": "istio-system",
+                "version": "v1alpha1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "attributemanifests": 1
+                    }
+                },
+                "name": "kubernetes",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/networking/v1alpha3/virtualservices",
+                "runtime": {
+                    "state_type_instances": 2
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "envoyfilters": 1,
+                        "gateways": 1,
+                        "virtualservices": 1
+                    }
+                },
+                "name": "istio-multicluster-egressgateway",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "mesh": {
+                        "MeshConfig": 1
+                    }
+                },
+                "name": "meshconfig",
+                "namespace": "istio-system",
+                "version": "v1alpha1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/networking/v1alpha3/sidecars",
+                "runtime": {
+                    "state_type_instances": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "tcpbytesent",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/authentication/v1alpha1/meshpolicies",
+                "runtime": {
+                    "state_type_instances": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "promtcpconnectionclosed",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "promtcp",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "handlers": 1
+                    }
+                },
+                "name": "kubernetesenv",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "attributemanifests": 1
+                    }
+                },
+                "name": "istioproxy",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "gateways": 1
+                    }
+                },
+                "name": "bookinfo-gateway",
+                "namespace": "default",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "destinationrules": 1
+                    }
+                },
+                "name": "istio-telemetry",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/policy/v1beta1/rules",
+                "runtime": {
+                    "state_type_instances": 8
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/authentication/v1alpha1/policies",
+                "runtime": {
+                    "state_type_instances": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/networking/v1alpha3/gateways",
+                "runtime": {
+                    "state_type_instances": 3
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "kubeattrgenrulerule",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "promtcpconnectionopen",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "requestduration",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/policy/v1beta1/handlers",
+                "runtime": {
+                    "state_type_instances": 3
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/networking/v1alpha3/destinationrules",
+                "runtime": {
+                    "state_type_instances": 3
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "authentication": {
+                        "meshpolicies": 1
+                    }
+                },
+                "name": "default",
+                "version": "v1alpha1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "attributes",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "sidecars": 1
+                    }
+                },
+                "name": "default",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "destinationrules": 1
+                    }
+                },
+                "name": "istio-policy",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "stdiotcp",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/policy/v1beta1/instances",
+                "runtime": {
+                    "state_type_instances": 11
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "tcpaccesslog",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "tcpbytereceived",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "handlers": 1,
+                        "rules": 1
+                    }
+                },
+                "name": "stdio",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "accesslog",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "tcpconnectionsopened",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "tcpkubeattrgenrulerule",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "requestsize",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "collection": "istio/mesh/v1alpha1/MeshConfig",
+                "runtime": {
+                    "state_type_instances": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "gateways": 1
+                    }
+                },
+                "name": "ingressgateway",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "rules": 1
+                    }
+                },
+                "name": "promhttp",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "handlers": 1
+                    }
+                },
+                "name": "prometheus",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "responsesize",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "runtime": {
+                    "processor": {
+                        "event_span": {
+                            "duration": {
+                                "ms": {
+                                    "bucket": {
+                                        "+Inf": 99,
+                                        "0": 0,
+                                        "1": 65,
+                                        "1024": 99,
+                                        "1048576": 99,
+                                        "128": 90,
+                                        "131072": 99,
+                                        "16": 72,
+                                        "16384": 99,
+                                        "2": 69,
+                                        "2048": 99,
+                                        "2097152": 99,
+                                        "256": 99,
+                                        "262144": 99,
+                                        "32": 75,
+                                        "32768": 99,
+                                        "4": 71,
+                                        "4096": 99,
+                                        "4194304": 99,
+                                        "512": 99,
+                                        "524288": 99,
+                                        "64": 80,
+                                        "65536": 99,
+                                        "8": 71,
+                                        "8193": 99,
+                                        "8388608": 99
+                                    },
+                                    "count": 99,
+                                    "sum": 2784.0000000000005
+                                }
+                            }
+                        },
+                        "snapshot_events": {
+                            "bucket": {
+                                "+Inf": 2,
+                                "0": 0,
+                                "1": 0,
+                                "128": 2,
+                                "16": 0,
+                                "2": 0,
+                                "256": 2,
+                                "32": 0,
+                                "4": 0,
+                                "64": 2,
+                                "8": 0
+                            },
+                            "count": 2,
+                            "sum": 99
+                        },
+                        "snapshot_lifetime": {
+                            "duration": {
+                                "ms": {
+                                    "bucket": {
+                                        "+Inf": 2,
+                                        "0": 0,
+                                        "1": 0,
+                                        "1024": 0,
+                                        "1048576": 0,
+                                        "128": 0,
+                                        "131072": 0,
+                                        "16": 0,
+                                        "16384": 0,
+                                        "2": 0,
+                                        "2048": 0,
+                                        "2097152": 0,
+                                        "256": 0,
+                                        "262144": 0,
+                                        "32": 0,
+                                        "32768": 0,
+                                        "4": 0,
+                                        "4096": 0,
+                                        "4194304": 0,
+                                        "512": 0,
+                                        "524288": 0,
+                                        "64": 0,
+                                        "65536": 0,
+                                        "8": 0,
+                                        "8193": 0,
+                                        "8388608": 0
+                                    },
+                                    "count": 2,
+                                    "sum": 18446744073708
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "networking": {
+                        "destinationrules": 1
+                    }
+                },
+                "name": "istio-multicluster-destinationrule",
+                "namespace": "istio-system",
+                "version": "v1alpha3"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.galley",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "galley": {
+                "istio": {
+                    "policy": {
+                        "instances": 1
+                    }
+                },
+                "name": "requestcount",
+                "namespace": "istio-system",
+                "version": "v1beta1"
+            }
+        },
+        "metricset": {
+            "name": "galley",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    }
+]

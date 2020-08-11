@@ -22,17 +22,19 @@ package state_cronjob
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
-
-const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_cronjob",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/kube-state-metrics.1.7",
-				ExpectedFile: "./_meta/test/kube-state-metrics.1.7.expected",
+				MetricsFile:  "../_meta/test/ksm.v1.3.0",
+				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
+			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
 			},
 		},
 	)

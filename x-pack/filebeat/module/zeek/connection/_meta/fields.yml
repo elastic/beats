@@ -20,17 +20,14 @@
         Missed bytes for the session.
 
     - name: state
-      type: group
-      fields:
-        - name: code
-          type: keyword
-          description: >
-            Code indicating the state of the session.
+      type: keyword
+      description: >
+        Code indicating the state of the session.
 
-        - name: msg
-          type: keyword
-          description: >
-            The meaning of the state code.
+    - name: state_message
+      type: keyword
+      description: >
+        The state of the session.
 
     - name: icmp
       type: group

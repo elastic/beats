@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
+from deepdiff import DeepDiff
 
 
 def load_fileset_test_cases():
@@ -74,14 +75,6 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
-        body = {
-            "transient": {
-                "script.max_compilations_rate": "2000/1m"
-            }
-        }
-
-        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
-
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -107,6 +100,8 @@ class Test(BaseTest):
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
+
+        self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
             self.es.indices.delete(index=self.index_name)
@@ -137,7 +132,7 @@ class Test(BaseTest):
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(" ".join(cmd) + "\n")
+        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
         # Use a fixed timezone so results don't vary depending on the environment
         # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
@@ -166,8 +161,12 @@ class Test(BaseTest):
             assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
                 module, obj["event"]["module"])
 
-            assert "error" not in obj, "not error expected but got: {}".format(
-                obj)
+            # All modules must include a set processor that adds the time that
+            # the event was ingested to Elasticsearch
+            assert "ingested" in obj["event"], "missing event.ingested timestamp"
+
+            assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
@@ -197,39 +196,73 @@ class Test(BaseTest):
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
 
-        for ev in expected:
+        for idx in range(len(expected)):
+            ev = expected[idx]
+            obj = objects[idx]
+
+            # Flatten objects for easier comparing
+            obj = self.flatten_object(obj, {}, "")
+            clean_keys(obj)
             clean_keys(ev)
-            found = False
-            for obj in objects:
 
-                # Flatten objects for easier comparing
-                obj = self.flatten_object(obj, {}, "")
-                clean_keys(obj)
+            d = DeepDiff(ev, obj, ignore_order=True)
 
-                if ev == obj:
-                    found = True
-                    break
-
-            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev), pretty_json(objects))
+            assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
+    host_keys = ["agent.name", "agent.type", "agent.ephemeral_id", "agent.id"]
+    # Strip host.name if event is not tagged as `forwarded`.
+    if "tags" not in obj or "forwarded" not in obj["tags"]:
+        host_keys.append("host.name")
+
     # The create timestamps area always new
-    time_keys = ["event.created"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
-    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
-                        "system.auth", "system.syslog", "cef.log", "activemq.audit"}
+    remove_timestamp = {
+        "activemq.audit",
+        "barracuda.waf",
+        "bluecoat.director",
+        "cef.log",
+        "cisco.asa",
+        "cisco.ios",
+        "cylance.protect",
+        "fortinet.clientendpoint",
+        "haproxy.log",
+        "icinga.startup",
+        "imperva.securesphere",
+        "infoblox.nios",
+        "iptables.log",
+        "netscout.sightline",
+        "rapid7.nexpose",
+        "redis.log",
+        "system.auth",
+        "system.syslog",
+        "microsoft.defender_atp",
+        "crowdstrike.falcon_endpoint",
+        "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
+    }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),
-        ('system.auth', 'timestamp.log')
+        ('system.auth', 'timestamp.log'),
+        ('cisco.asa', 'asa.log'),
+        ('cisco.asa', 'hostnames.log'),
+        ('cisco.asa', 'not-ip.log'),
+        ('cisco.asa', 'sample.log')
     }
 
     # Keep source log filename for exceptions
@@ -245,6 +278,8 @@ def clean_keys(obj):
     if obj["event.dataset"] in remove_timestamp:
         if not (obj['event.dataset'], filename) in remove_timestamp_exception:
             delete_key(obj, "@timestamp")
+            # Also remove alternate time field from rsa parsers.
+            delete_key(obj, "rsa.time.event_time")
         else:
             # excluded events need to have their filename saved to the expected.json
             # so that the exception mechanism can be triggered when the json is

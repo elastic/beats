@@ -21,13 +21,17 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 )
 
 type eventLogger struct {
@@ -38,14 +42,17 @@ type eventLogger struct {
 }
 
 type eventLoggerConfig struct {
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-	Processors           processors.PluginConfig `config:"processors"`
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+
+	Processors processors.PluginConfig  `config:"processors"`
+	Index      fmtstr.EventFormatString `config:"index"`
 
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
 }
 
 func newEventLogger(
+	beatInfo beat.Info,
 	source eventlog.EventLog,
 	options *common.Config,
 ) (*eventLogger, error) {
@@ -54,7 +61,7 @@ func newEventLogger(
 		return nil, err
 	}
 
-	processors, err := processors.New(config.Processors)
+	processors, err := processorsForConfig(beatInfo, config)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +83,10 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			Processor:     e.processors,
 			KeepNull:      e.keepNull,
 		},
-		ACKCount: func(n int) {
+		ACKHandler: acker.Counting(func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)
-		},
+		}),
 	})
 }
 
@@ -87,12 +94,16 @@ func (e *eventLogger) run(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
-	acker *eventACKer,
+	eventACKer *eventACKer,
 ) {
 	api := e.source
 
 	// Initialize per event log metrics.
 	initMetrics(api.Name())
+
+	pipeline = pipetool.WithACKer(pipeline, acker.EventPrivateReporter(func(_ int, private []interface{}) {
+		eventACKer.ACKEvents(private)
+	}))
 
 	client, err := e.connect(pipeline)
 	if err != nil {
@@ -150,9 +161,37 @@ func (e *eventLogger) run(
 			continue
 		}
 
-		acker.Add(len(records))
+		eventACKer.Add(len(records))
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
 		}
 	}
+}
+
+// processorsForConfig assembles the Processors for an eventLogger.
+func processorsForConfig(
+	beatInfo beat.Info, config eventLoggerConfig,
+) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor order is important! The index processor, if present, must be
+	// added before the user processors.
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
+
+	userProcs, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcs)
+
+	return procs, nil
 }

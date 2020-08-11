@@ -21,9 +21,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestUnmarshal(t *testing.T) {
@@ -185,6 +187,7 @@ func TestDecodeJSON(t *testing.T) {
 
 		var p JSONReader
 		p.cfg = &test.Config
+		p.logger = logp.NewLogger("json_test")
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
 		assert.Equal(t, test.ExpectedMap, M)

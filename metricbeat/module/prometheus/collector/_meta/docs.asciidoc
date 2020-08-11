@@ -25,7 +25,66 @@ to retrieve the metrics from (`/metrics` by default) can be configured with `met
 
 
 [float]
+[role="xpack"]
+=== Histograms and types
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+metricbeat.modules:
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  use_types: true
+  rate_counters: false
+-------------------------------------------------------------------------------------
+
+`use_types` parameter (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
+types, including https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html[histograms].
+
+`rate_counters` parameter (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
+the counter increment since the last collection. This metric should make some aggregations easier and with better
+performance. This parameter can only be enabled in combination with `use_types`.
+
+When `use_types` and `rate_counters` are enabled, metrics are stored like this:
+
+[source,json]
+----
+{
+    "prometheus": {
+        "labels": {
+            "instance": "172.27.0.2:9090",
+            "job": "prometheus"
+        },
+        "prometheus_target_interval_length_seconds_count": {
+            "counter": 1,
+            "rate": 0
+        },
+        "prometheus_target_interval_length_seconds_sum": {
+            "counter": 15.000401344,
+            "rate": 0
+        }
+        "prometheus_tsdb_compaction_chunk_range_seconds_bucket": {
+            "histogram": {
+                "values": [50, 300, 1000, 4000, 16000],
+                "counts": [10, 2, 34, 7]
+            }
+        }
+    },
+}
+----
+
+
+[float]
 === Scraping all metrics from a Prometheus server
+
+[WARNING]
+=======================================
+Depending on your scale this method may not be suitable. We recommend using the
+<<metricbeat-metricset-prometheus-remote_write,remote_write>> metricset for this,
+and make Prometheus push metrics to Metricbeat.
+=======================================
 
 This module can scrape all metrics stored in a Prometheus server, by using the
 https://prometheus.io/docs/prometheus/latest/federation/[federation API]. By pointing this
@@ -40,4 +99,38 @@ metricbeat.modules:
   metrics_path: '/federate'
   query:
     'match[]': '{__name__!=""}'
+-------------------------------------------------------------------------------------
+
+[float]
+=== Filtering metrics
+
+In order to filter out/in metrics one can make use of `metrics_filters.include` `metrics_filters.exclude` settings:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  metrics_filters:
+    include: ["node_filesystem_*"]
+    exclude: ["node_filesystem_device_*"]
+-------------------------------------------------------------------------------------
+
+The configuration above will include only metrics that match `node_filesystem_*` pattern and do not match `node_filesystem_device_*`.
+
+
+To keep only specific metrics, anchor the start and the end of the regexp of each metric:
+
+- the caret `^` matches the beginning of a text or line,
+- the dollar sign `$` matches the end of a text.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  metrics_filters:
+    include: ["^node_network_net_dev_group$", "^node_network_up$"]
 -------------------------------------------------------------------------------------

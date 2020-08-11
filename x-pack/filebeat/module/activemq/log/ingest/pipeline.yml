@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing ActiveMQ logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       pattern_definitions:
@@ -8,7 +11,7 @@ processors:
         NOPIPEGREEDYDATA: "((?! \\|).)*"
         THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.stack_trace}"
+        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}%{SPACE}%{GREEDYMULTILINE:activemq.log.stack_trace}"
       ignore_missing: true
   - date:
       if: "ctx.event.timezone == null"
@@ -24,6 +27,19 @@ processors:
   - remove:
       field:
         - timestamp
+  - set:
+      field: event.kind
+      value: event
+  - script:
+      if: "ctx?.log?.level != null"
+      lang: painless
+      source: >-
+        def err_levels = ["FATAL", "ERROR", "WARN"];
+        if (err_levels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
 on_failure:
   - set:
       field: error.message

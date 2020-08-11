@@ -19,7 +19,6 @@ package testing
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -33,21 +32,17 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/asset"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 
-	_ "github.com/elastic/beats/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
 const (
 	expectedExtension = "-expected.json"
-)
-
-var (
-	// Use `go test -generate` to update files.
-	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
 // DataConfig is the configuration for testdata tests
@@ -176,6 +171,22 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 	}
 }
 
+// TestMetricsetFieldsDocumented checks metricset fields are documented from metricsets that cannot run `TestDataFiles` test which contains this check
+func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events []mb.Event) {
+	var data []common.MapStr
+	for _, e := range events {
+		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
+		data = append(data, beatEvent.Fields)
+	}
+
+	if err := checkDocumented(data, nil); err != nil {
+		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
+			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
+			err, metricSet.Module().Name(), metricSet.Name())
+	}
+
+}
+
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL)
@@ -220,14 +231,14 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		return h1 < h2
 	})
 
-	if err := checkDocumented(t, data, config.OmitDocumentedFieldsCheck); err != nil {
+	if err := checkDocumented(data, config.OmitDocumentedFieldsCheck); err != nil {
 		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
 			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
 			err, module, metricSetName)
 	}
 
 	// Overwrites the golden files if run with -generate
-	if *generateFlag {
+	if *flags.DataFlag {
 		outputIndented, err := json.MarshalIndent(&data, "", "    ")
 		if err != nil {
 			t.Fatal(err)
@@ -283,7 +294,11 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		for _, e := range expectedMap {
 			t.Error(e)
 		}
-		t.Fatal()
+	}
+
+	// If there was some error, fail before trying to write anything.
+	if t.Failed() {
+		t.FailNow()
 	}
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
@@ -301,7 +316,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, path string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) error {
+func checkDocumented(data []common.MapStr, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		return err
@@ -311,7 +326,6 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) er
 	if err != nil {
 		return err
 	}
-
 	documentedFields := fields.GetKeys()
 	keys := map[string]interface{}{}
 
@@ -337,13 +351,33 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 					return nil
 				}
 			}
-			// If a field is defined as object it can also be defined as `status_codes.*`
-			// So this checks if such a key with the * exists by removing the last part.
+			// If a field is defined as object it can also have a * somewhere
+			// So this checks if such a key with the * exists by testing with it
 			splits := strings.Split(foundKey, ".")
+			found := false
+			for pos := 1; pos < len(splits)-1; pos++ {
+				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:len(splits)], ".")
+				if _, ok := knownKeys[key]; ok {
+					found = true
+					break
+				}
+			}
+			if found {
+				continue
+			}
+			// case `status_codes.*`:
 			prefix := strings.Join(splits[0:len(splits)-1], ".")
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
 			}
+			// should cover scenarios as status_codes.*.*` and `azure.compute_vm_scaleset.*.*`
+			if len(splits) > 2 {
+				prefix = strings.Join(splits[0:len(splits)-2], ".")
+				if _, ok := knownKeys[prefix+".*.*"]; ok {
+					continue
+				}
+			}
+
 			return errors.Errorf("field missing '%s'", foundKey)
 		}
 	}

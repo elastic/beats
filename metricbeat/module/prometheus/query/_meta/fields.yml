@@ -1,0 +1,6 @@
+- name: query
+  type: group
+  description: >
+    query metricset
+  release: beta
+  fields:

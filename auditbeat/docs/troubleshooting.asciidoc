@@ -1,5 +1,5 @@
 [[troubleshooting]]
-= Troubleshooting
+= Troubleshoot
 
 [partintro]
 --

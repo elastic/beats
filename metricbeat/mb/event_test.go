@@ -26,7 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestEventConversionToBeatEvent(t *testing.T) {
@@ -139,7 +140,7 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		e := mbEvent.BeatEvent(module, metricSet)
 		e = mbEvent.BeatEvent(module, metricSet)
 
-		assert.Equal(t, "foobar", e.Meta["id"])
+		assert.Equal(t, "foobar", e.Meta[events.FieldMetaID])
 		assert.Equal(t, timestamp, e.Timestamp)
 		assert.Equal(t, common.MapStr{
 			"type": "docker",

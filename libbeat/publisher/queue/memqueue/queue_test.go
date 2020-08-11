@@ -23,8 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/publisher/queue"
-	"github.com/elastic/beats/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 )
 
 var seed int64
@@ -74,7 +74,7 @@ func TestProducerCancelRemovesEvents(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
-		return NewBroker(nil, Settings{
+		return NewQueue(nil, Settings{
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,

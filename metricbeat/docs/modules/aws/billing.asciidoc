@@ -3,7 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-billing]]
-=== aws billing metricset
+[role="xpack"]
+=== AWS billing metricset
 
 beta[]
 

@@ -1,0 +1,20 @@
+[[elastic-agent-installation]]
+[role="xpack"]
+= Install {agent}
+
+beta[]
+
+Download and install {agent} on each system you want to monitor.
+
+// tag::install-elastic-agent[]
+
+To download and install {elastic-agent}, use the commands that work with your
+system:
+
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.asciidoc[]
+
+// end::install-elastic-agent[]
+
+// Add Javascript and CSS for tabbed panels
+include::tab-widgets/code.asciidoc[]
+

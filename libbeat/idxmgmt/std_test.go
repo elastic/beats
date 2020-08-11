@@ -25,11 +25,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/template"
 )
 
 type mockClientHandler struct {
@@ -139,12 +139,25 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
+		"without ilm must be lowercase": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "TeSt-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
+		},
 		"event alias without ilm": {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
 			meta: common.MapStr{
 				"alias": "test",
+			},
+		},
+		"event alias without ilm must be lowercae": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("test"),
+			meta: common.MapStr{
+				"alias": "Test",
 			},
 		},
 		"event index without ilm": {
@@ -155,8 +168,21 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 				"index": "test",
 			},
 		},
+		"event index without ilm must be lowercase": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     dateIdx("test"),
+			meta: common.MapStr{
+				"index": "Test",
+			},
+		},
 		"with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
+		},
+		"with ilm must be lowercase": {
+			ilmCalls: ilmTemplateSettings("Test-9.9.9", "Test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
@@ -166,6 +192,14 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			want:     stable("event-alias"),
 			meta: common.MapStr{
 				"alias": "event-alias",
+			},
+		},
+		"event alias wit ilm must be lowercase": {
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("event-alias"),
+			meta: common.MapStr{
+				"alias": "Event-alias",
 			},
 		},
 		"event index with ilm": {
@@ -182,6 +216,16 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 				"index": "test-%{[agent.version]}",
 				"indices": []map[string]interface{}{
 					{"index": "myindex"},
+				},
+			},
+			want: stable("myindex"),
+		},
+		"use indices settings must be lowercase": {
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg: map[string]interface{}{
+				"index": "test-%{[agent.version]}",
+				"indices": []map[string]interface{}{
+					{"index": "MyIndex"},
 				},
 			},
 			want: stable("myindex"),
@@ -288,7 +332,7 @@ func TestIndexManager_Setup(t *testing.T) {
 		if c.Settings.Index != nil {
 			c.Settings.Index = (map[string]interface{})(common.MapStr(c.Settings.Index).Clone())
 		}
-		if c.Settings.Index != nil {
+		if c.Settings.Source != nil {
 			c.Settings.Source = (map[string]interface{})(common.MapStr(c.Settings.Source).Clone())
 		}
 		return c
@@ -301,6 +345,12 @@ func TestIndexManager_Setup(t *testing.T) {
 			err := cfg.Unpack(&s)
 			if err != nil {
 				panic(err)
+			}
+			if s.Settings.Index != nil && len(s.Settings.Index) == 0 {
+				s.Settings.Index = nil
+			}
+			if s.Settings.Source != nil && len(s.Settings.Source) == 0 {
+				s.Settings.Source = nil
 			}
 		}
 		return &s

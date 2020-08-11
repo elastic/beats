@@ -1,42 +1,47 @@
 {
-    "@timestamp": "2019-12-05T20:15:30.847Z",
-    "cloud": {
-        "account": {
-            "name": "elastic-beats",
-            "id": "428152502467"
-        },
-        "provider": "aws",
-        "region": "eu-west-1"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
-        "metrics": {
-            "PublishSize": {
-                "avg": 28
-            },
-            "NumberOfMessagesPublished": {
-                "sum": 140
+        "cloudwatch": {
+            "namespace": "AWS/SNS"
+        },
+        "dimensions": {
+            "TopicName": "test-sns-ks"
+        },
+        "sns": {
+            "metrics": {
+                "NumberOfMessagesPublished": {
+                    "sum": 1
+                },
+                "NumberOfNotificationsFailed": {
+                    "sum": 1
+                },
+                "PublishSize": {
+                    "avg": 5
+                }
             }
         },
-        "cloudwatch": {
-            "dimensions": {
-                "TopicName": "Incoming"
-            },
-            "namespace": "AWS/SNS"
+        "tags": {
+            "created-by": "ks"
         }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.sns",
-        "module": "aws",
-        "duration": 860534784
+        "duration": 115000,
+        "module": "aws"
     },
     "metricset": {
         "name": "sns",
-        "period": 300000
+        "period": 10000
     },
     "service": {
         "type": "aws"
-    },
-    "ecs": {
-        "version": "1.2.0"
     }
 }

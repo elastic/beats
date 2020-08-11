@@ -8,21 +8,29 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"net/url"
+	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/common/useragent"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 )
 
 const (
@@ -31,6 +39,9 @@ const (
 
 var userAgent = useragent.UserAgent("Filebeat")
 
+// for testing
+var timeNow = time.Now
+
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
@@ -38,7 +49,8 @@ func init() {
 	}
 }
 
-type httpjsonInput struct {
+// HttpjsonInput struct has the HttpJsonInput configuration and other userful info.
+type HttpjsonInput struct {
 	config
 	log      *logp.Logger
 	outlet   channel.Outleter // Output of received messages.
@@ -48,12 +60,29 @@ type httpjsonInput struct {
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+
+	nextCursorValue string
 }
 
-type requestInfo struct {
+// RequestInfo struct has the information for generating an HTTP request
+type RequestInfo struct {
 	URL        string
 	ContentMap common.MapStr
 	Headers    common.MapStr
+}
+
+type retryLogger struct {
+	log *logp.Logger
+}
+
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+	}
+}
+
+func (l *retryLogger) Printf(s string, args ...interface{}) {
+	l.log.Debugf(s, args...)
 }
 
 // NewInput creates a new httpjson input
@@ -68,11 +97,7 @@ func NewInput(
 		return nil, err
 	}
 	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +117,7 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	in := &httpjsonInput{
+	in := &HttpjsonInput{
 		config: conf,
 		log: logp.NewLogger("httpjson").With(
 			"url", conf.URL),
@@ -108,7 +133,7 @@ func NewInput(
 
 // Run starts the input worker then returns. Only the first invocation
 // will ever start the worker.
-func (in *httpjsonInput) Run() {
+func (in *HttpjsonInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
@@ -125,9 +150,17 @@ func (in *httpjsonInput) Run() {
 }
 
 // createHTTPRequest creates an HTTP/HTTPs request for the input
-func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
-	b, _ := json.Marshal(ri.ContentMap)
-	body := bytes.NewReader(b)
+func (in *HttpjsonInput) createHTTPRequest(ctx context.Context, ri *RequestInfo) (*http.Request, error) {
+	var body io.Reader
+	if len(ri.ContentMap) == 0 || in.config.NoHTTPBody {
+		body = nil
+	} else {
+		b, err := json.Marshal(ri.ContentMap)
+		if err != nil {
+			return nil, err
+		}
+		body = bytes.NewReader(b)
+	}
 	req, err := http.NewRequest(in.config.HTTPMethod, ri.URL, body)
 	if err != nil {
 		return nil, err
@@ -137,7 +170,11 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", userAgent)
 	if in.config.APIKey != "" {
-		req.Header.Set("Authorization", in.config.APIKey)
+		if in.config.AuthenticationScheme != "" {
+			req.Header.Set("Authorization", in.config.AuthenticationScheme+" "+in.config.APIKey)
+		} else {
+			req.Header.Set("Authorization", in.config.APIKey)
+		}
 	}
 	for k, v := range ri.Headers {
 		switch vv := v.(type) {
@@ -149,135 +186,382 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	return req, nil
 }
 
-// processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
-	for {
-		msg, err := client.Do(req)
-		if err != nil {
-			return errors.New("failed to do http request. Stopping input worker - ")
-		}
-		if msg.StatusCode != http.StatusOK {
-			return errors.Errorf("return HTTP status is %s - ", msg.Status)
-		}
-		responseData, err := ioutil.ReadAll(msg.Body)
-		defer msg.Body.Close()
-		if err != nil {
-			return err
-		}
-		var m, v interface{}
-		err = json.Unmarshal(responseData, &m)
-		if err != nil {
-			return err
-		}
-		switch mmap := m.(type) {
+// processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
+func (in *HttpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
+	var last map[string]interface{}
+	for _, t := range events {
+		switch v := t.(type) {
 		case map[string]interface{}:
-			if in.config.JSONObjects == "" {
-				ok := in.outlet.OnEvent(makeEvent(string(responseData)))
-				if !ok {
-					return errors.New("function OnEvent returned false - ")
-				}
-			} else {
-				v, err = common.MapStr(mmap).GetValue(in.config.JSONObjects)
+			for _, e := range in.splitEvent(v) {
+				last = e
+				d, err := json.Marshal(e)
 				if err != nil {
-					return err
+					return nil, errors.Wrapf(err, "failed to marshal %+v", e)
 				}
-				switch ts := v.(type) {
-				case []interface{}:
-					for _, t := range ts {
-						switch tv := t.(type) {
-						case map[string]interface{}:
-							d, err := json.Marshal(tv)
-							if err != nil {
-								return errors.New("failed to process http response data - ")
-							}
-							ok := in.outlet.OnEvent(makeEvent(string(d)))
-							if !ok {
-								return errors.New("OnEvent returned false - ")
-							}
-						default:
-							return errors.New("invalid json_objects_array configuration")
-						}
-					}
-				default:
-					return errors.New("invalid json_objects_array configuration")
+				ok := in.outlet.OnEvent(makeEvent(string(d)))
+				if !ok {
+					return nil, errors.New("function OnEvent returned false")
 				}
 			}
-			if in.config.Pagination != nil && in.config.Pagination.IsEnabled {
-				v, err = common.MapStr(mmap).GetValue(in.config.Pagination.IDField)
+		default:
+			return nil, errors.Errorf("expected only JSON objects in the array but got a %T", v)
+		}
+	}
+	return last, nil
+}
+
+func (in *HttpjsonInput) splitEvent(event map[string]interface{}) []map[string]interface{} {
+	m := common.MapStr(event)
+
+	hasSplitKey, _ := m.HasKey(in.config.SplitEventsBy)
+	if in.config.SplitEventsBy == "" || !hasSplitKey {
+		return []map[string]interface{}{event}
+	}
+
+	splitOnIfc, _ := m.GetValue(in.config.SplitEventsBy)
+	splitOn, ok := splitOnIfc.([]interface{})
+	// if not an array or is empty, we do nothing
+	if !ok || len(splitOn) == 0 {
+		return []map[string]interface{}{event}
+	}
+
+	var events []map[string]interface{}
+	for _, split := range splitOn {
+		s, ok := split.(map[string]interface{})
+		// if not an object, we do nothing
+		if !ok {
+			return []map[string]interface{}{event}
+		}
+
+		mm := m.Clone()
+		_, err := mm.Put(in.config.SplitEventsBy, s)
+		if err != nil {
+			return []map[string]interface{}{event}
+		}
+
+		events = append(events, mm)
+	}
+
+	return events
+}
+
+// getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
+func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Regexp) (string, error) {
+	links, ok := header[fieldName]
+	if !ok {
+		return "", errors.Errorf("field %s does not exist in the HTTP Header", fieldName)
+	}
+	for _, link := range links {
+		matchArray := re.FindAllStringSubmatch(link, -1)
+		if len(matchArray) == 1 {
+			return matchArray[0][1], nil
+		}
+	}
+	return "", nil
+}
+
+// getRateLimit get the rate limit value if specified in the HTTP Header of the response,
+// and returns an init64 value in seconds since unix epoch for rate limit reset time.
+// When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
+// returns 0 for the epoch value.
+func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
+	if rateLimit != nil {
+		if rateLimit.Remaining != "" {
+			remaining := header.Get(rateLimit.Remaining)
+			if remaining == "" {
+				return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Remaining)
+			}
+			m, err := strconv.ParseInt(remaining, 10, 64)
+			if err != nil {
+				return 0, errors.Wrapf(err, "failed to parse rate-limit remaining value")
+			}
+			if m == 0 {
+				reset := header.Get(rateLimit.Reset)
+				if reset == "" {
+					return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Reset)
+				}
+				epoch, err := strconv.ParseInt(reset, 10, 64)
 				if err != nil {
-					in.log.Info("Successfully processed HTTP request. Pagination finished.")
-					return nil
+					return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
 				}
-				if in.config.Pagination.RequestField != "" {
-					ri.ContentMap.Put(in.config.Pagination.RequestField, v)
-					if in.config.Pagination.URL != "" {
-						ri.URL = in.config.Pagination.URL
-					}
-				} else {
-					switch v.(type) {
-					case string:
-						ri.URL = v.(string)
-					default:
-						return errors.New("pagination ID is not string, which is required for URL - ")
-					}
+				if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+					return 0, nil
 				}
-				if in.config.Pagination.ExtraBodyContent != nil {
-					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
-				}
-				req, err = in.createHTTPRequest(ctx, ri)
-				if err != nil {
+				return epoch, nil
+			}
+		}
+	}
+	return 0, nil
+}
+
+// applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
+func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header, rateLimit *RateLimit) error {
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil {
+		return err
+	}
+	t := time.Unix(epoch, 0)
+	w := time.Until(t)
+	if epoch == 0 || w <= 0 {
+		in.log.Debugf("Rate Limit: No need to apply rate limit.")
+		return nil
+	}
+	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
+	ticker := time.NewTicker(w)
+	defer ticker.Stop()
+	select {
+	case <-ctx.Done():
+		in.log.Info("Context done.")
+		return nil
+	case <-ticker.C:
+		in.log.Debug("Rate Limit: time is up.")
+		return nil
+	}
+}
+
+// createRequestInfoFromBody creates a new RequestInfo for a new HTTP request in pagination based on HTTP response body
+func createRequestInfoFromBody(config *Pagination, response, last common.MapStr, ri *RequestInfo) (*RequestInfo, error) {
+	// we try to get it from last element, if not found, from the original response
+	v, err := last.GetValue(config.IDField)
+	if err == common.ErrKeyNotFound {
+		v, err = response.GetValue(config.IDField)
+	}
+
+	if err == common.ErrKeyNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to retrieve id_field for pagination")
+	}
+
+	if config.RequestField != "" {
+		ri.ContentMap.Put(config.RequestField, v)
+		if config.URL != "" {
+			ri.URL = config.URL
+		}
+	} else if config.URLField != "" {
+		url, err := url.Parse(ri.URL)
+		if err == nil {
+			q := url.Query()
+			q.Set(config.URLField, fmt.Sprint(v))
+			url.RawQuery = q.Encode()
+			ri.URL = url.String()
+		}
+	} else {
+		switch vt := v.(type) {
+		case string:
+			ri.URL = vt
+		default:
+			return nil, errors.New("pagination ID is not of string type")
+		}
+	}
+	if len(config.ExtraBodyContent) > 0 {
+		ri.ContentMap.Update(common.MapStr(config.ExtraBodyContent))
+	}
+	return ri, nil
+}
+
+// processHTTPRequest processes HTTP request, and handles pagination if enabled
+func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *RequestInfo) error {
+	ri.URL = in.getURL()
+
+	var (
+		m, v         interface{}
+		response, mm map[string]interface{}
+	)
+
+	for {
+		req, err := in.createHTTPRequest(ctx, ri)
+		if err != nil {
+			return errors.Wrapf(err, "failed to create http request")
+		}
+		msg, err := client.Do(req)
+		if err != nil {
+			return errors.Wrapf(err, "failed to execute http client.Do")
+		}
+		responseData, err := ioutil.ReadAll(msg.Body)
+		header := msg.Header
+		msg.Body.Close()
+		if err != nil {
+			return errors.Wrapf(err, "failed to read http.response.body")
+		}
+		if msg.StatusCode != http.StatusOK {
+			in.log.Debugw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
+			if msg.StatusCode == http.StatusTooManyRequests {
+				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
 					return err
 				}
 				continue
 			}
-			return nil
-		default:
-			return errors.New("response is not valid JSON - ")
+			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
+
+		err = json.Unmarshal(responseData, &m)
+		if err != nil {
+			in.log.Debug("failed to unmarshal http.response.body", string(responseData))
+			return errors.Wrapf(err, "failed to unmarshal http.response.body")
+		}
+		switch obj := m.(type) {
+		// Top level Array
+		case []interface{}:
+			mm, err = in.processEventArray(obj)
+			if err != nil {
+				return err
+			}
+		case map[string]interface{}:
+			response = obj
+			if in.config.JSONObjects == "" {
+				mm, err = in.processEventArray([]interface{}{obj})
+				if err != nil {
+					return err
+				}
+			} else {
+				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
+				if err != nil {
+					if err == common.ErrKeyNotFound {
+						break
+					}
+					return err
+				}
+				switch ts := v.(type) {
+				case []interface{}:
+					mm, err = in.processEventArray(ts)
+					if err != nil {
+						return err
+					}
+				default:
+					return errors.Errorf("content of %s is not a valid array", in.config.JSONObjects)
+				}
+			}
+		default:
+			in.log.Debug("http.response.body is not a valid JSON object", string(responseData))
+			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
+		}
+
+		if mm != nil && in.config.Pagination.IsEnabled() {
+			if in.config.Pagination.Header != nil {
+				// Pagination control using HTTP Header
+				url, err := getNextLinkFromHeader(header, in.config.Pagination.Header.FieldName, in.config.Pagination.Header.RegexPattern)
+				if err != nil {
+					return errors.Wrapf(err, "failed to retrieve the next URL for pagination")
+				}
+				if ri.URL == url || url == "" {
+					in.log.Info("Pagination finished.")
+					break
+				}
+				ri.URL = url
+				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
+					return err
+				}
+				in.log.Info("Continuing with pagination to URL: ", ri.URL)
+				continue
+			} else {
+				// Pagination control using HTTP Body fields
+				ri, err = createRequestInfoFromBody(in.config.Pagination, common.MapStr(response), common.MapStr(mm), ri)
+				if err != nil {
+					return err
+				}
+				if ri == nil {
+					break
+				}
+				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
+					return err
+				}
+				in.log.Info("Continuing with pagination to URL: ", ri.URL)
+				continue
+			}
+		}
+		break
+	}
+
+	if mm != nil && in.config.DateCursor.IsEnabled() {
+		in.advanceCursor(common.MapStr(mm))
+	}
+
+	return nil
+}
+
+func (in *HttpjsonInput) getURL() string {
+	if !in.config.DateCursor.IsEnabled() {
+		return in.config.URL
+	}
+
+	var dateStr string
+	if in.nextCursorValue == "" {
+		t := timeNow().UTC().Add(-in.config.DateCursor.InitialInterval)
+		dateStr = t.Format(in.config.DateCursor.GetDateFormat())
+	} else {
+		dateStr = in.nextCursorValue
+	}
+
+	url, err := url.Parse(in.config.URL)
+	if err != nil {
+		return in.config.URL
+	}
+
+	q := url.Query()
+
+	var value string
+	if in.config.DateCursor.ValueTemplate == nil {
+		value = dateStr
+	} else {
+		buf := new(bytes.Buffer)
+		if err := in.config.DateCursor.ValueTemplate.Execute(buf, dateStr); err != nil {
+			return in.config.URL
+		}
+		value = buf.String()
+	}
+
+	q.Set(in.config.DateCursor.URLField, value)
+
+	url.RawQuery = q.Encode()
+
+	return url.String()
+}
+
+func (in *HttpjsonInput) advanceCursor(m common.MapStr) {
+	if in.config.DateCursor.Field == "" {
+		in.nextCursorValue = time.Now().UTC().Format(in.config.DateCursor.GetDateFormat())
+		return
+	}
+
+	v, err := m.GetValue(in.config.DateCursor.Field)
+	if err != nil {
+		in.log.Warnf("date_cursor field: %q", err)
+		return
+	}
+	switch t := v.(type) {
+	case string:
+		_, err := time.Parse(in.config.DateCursor.GetDateFormat(), t)
+		if err != nil {
+			in.log.Warn("date_cursor field does not have the expected layout")
+			return
+		}
+		in.nextCursorValue = t
+	default:
+		in.log.Warn("date_cursor field must be a string, cursor will not advance")
+		return
 	}
 }
 
-func (in *httpjsonInput) run() error {
+func (in *HttpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	client, err := in.newHTTPClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return err
-	}
-
-	// Make transport client
-	var client *http.Client
-	client = &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			DisableKeepAlives: true,
-		},
-		Timeout: in.config.HTTPClientTimeout,
-	}
-
-	ri := &requestInfo{
-		URL:        in.URL,
+	ri := &RequestInfo{
 		ContentMap: common.MapStr{},
 		Headers:    in.HTTPHeaders,
 	}
 	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
 		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))
 	}
-	req, err := in.createHTTPRequest(ctx, ri)
-	if err != nil {
-		return err
-	}
-	err = in.processHTTPRequest(ctx, client, req, ri)
+	err = in.processHTTPRequest(ctx, client, ri)
 	if err == nil && in.Interval > 0 {
 		ticker := time.NewTicker(in.Interval)
 		defer ticker.Stop()
@@ -287,7 +571,8 @@ func (in *httpjsonInput) run() error {
 				in.log.Info("Context done.")
 				return nil
 			case <-ticker.C:
-				err = in.processHTTPRequest(ctx, client, req, ri)
+				in.log.Info("Process another repeated request.")
+				err = in.processHTTPRequest(ctx, client, ri)
 				if err != nil {
 					return err
 				}
@@ -298,14 +583,47 @@ func (in *httpjsonInput) run() error {
 }
 
 // Stop stops the misp input and waits for it to fully stop.
-func (in *httpjsonInput) Stop() {
+func (in *HttpjsonInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
 }
 
 // Wait is an alias for Stop.
-func (in *httpjsonInput) Wait() {
+func (in *HttpjsonInput) Wait() {
 	in.Stop()
+}
+
+func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make retryable HTTP client
+	var client *retryablehttp.Client = &retryablehttp.Client{
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: in.config.HTTPClientTimeout,
+				}).DialContext,
+				TLSClientConfig:   tlsConfig.ToConfig(),
+				DisableKeepAlives: true,
+			},
+			Timeout: in.config.HTTPClientTimeout,
+		},
+		Logger:       newRetryLogger(),
+		RetryWaitMin: in.config.RetryWaitMin,
+		RetryWaitMax: in.config.RetryWaitMax,
+		RetryMax:     in.config.RetryMax,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client.StandardClient())
+	}
+
+	return client.StandardClient(), nil
 }
 
 func makeEvent(body string) beat.Event {

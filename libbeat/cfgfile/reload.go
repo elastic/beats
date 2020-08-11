@@ -26,12 +26,12 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 var (
@@ -45,10 +45,14 @@ var (
 
 	debugf = logp.MakeDebug("cfgfile")
 
+	// configScans measures how many times the config dir was scanned for
+	// changes, configReloads measures how many times there were changes that
+	// triggered an actual reload.
+	configScans   = monitoring.NewInt(nil, "libbeat.config.scans")
 	configReloads = monitoring.NewInt(nil, "libbeat.config.reloads")
 	moduleStarts  = monitoring.NewInt(nil, "libbeat.config.module.starts")
 	moduleStops   = monitoring.NewInt(nil, "libbeat.config.module.stops")
-	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running")
+	moduleRunning = monitoring.NewInt(nil, "libbeat.config.module.running") // Number of modules in the runner list (not necessarily in the running state).
 )
 
 // DynamicConfig loads config files from a given path, allowing to reload new changes
@@ -65,21 +69,16 @@ type Reload struct {
 	Enabled bool          `config:"enabled"`
 }
 
-// RunnerFactory is used for creating of new Runners
+// RunnerFactory is used for validating generated configurations and creating
+// of new Runners
 type RunnerFactory interface {
-	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
-}
+	// Create creates a new Runner based on the given configuration.
+	Create(p beat.PipelineConnector, config *common.Config) (Runner, error)
 
-// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
-// without a pipeline and metadata.
-type ConfigChecker interface {
+	// CheckConfig tests if a confiugation can be used to create an input. If it
+	// is not possible to create an input using the configuration, an error must
+	// be returned.
 	CheckConfig(config *common.Config) error
-}
-
-// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
-type CheckableRunnerFactory interface {
-	RunnerFactory
-	ConfigChecker
 }
 
 // Runner is a simple interface providing a simple way to
@@ -98,7 +97,7 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	config   DynamicConfig
 	path     string
 	done     chan struct{}
@@ -106,7 +105,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.PipelineConnector, cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
@@ -141,7 +140,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	// Load all config objects
 	configs, err := rl.loadConfigs(files)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "loading configs")
 	}
 
 	debugf("Number of module configs found: %v", len(configs))
@@ -153,13 +152,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 			continue
 		}
 
-		if checker, ok := runnerFactory.(ConfigChecker); ok {
-			err = checker.CheckConfig(c.Config)
-		} else {
-			_, err = runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
-		}
-
-		if err != nil {
+		if err = runnerFactory.CheckConfig(c.Config); err != nil {
 			return err
 		}
 	}
@@ -185,7 +178,11 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		rl.config.Reload.Period = 0
 	}
 
-	overwriteUpdate := true
+	// If forceReload is set, the configuration should be reloaded
+	// even if there are no changes. It is set on the first iteration,
+	// and whenever an attempted reload fails. It is unset whenever
+	// a reload succeeds.
+	forceReload := true
 
 	for {
 		select {
@@ -195,7 +192,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 		case <-time.After(rl.config.Reload.Period):
 			debugf("Scan for new config files")
-			configReloads.Add(1)
+			configScans.Add(1)
 
 			files, updated, err := gw.Scan()
 			if err != nil {
@@ -204,21 +201,22 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 				logp.Err("Error fetching new config files: %v", err)
 			}
 
-			// no file changes
-			if !updated && !overwriteUpdate {
-				overwriteUpdate = false
+			// if there are no changes, skip this reload unless forceReload is set.
+			if !updated && !forceReload {
 				continue
 			}
+			configReloads.Add(1)
 
 			// Load all config objects
 			configs, _ := rl.loadConfigs(files)
 
 			debugf("Number of module configs found: %v", len(configs))
 
-			if err := list.Reload(configs); err != nil {
-				// Make sure the next run also updates because some runners were not properly loaded
-				overwriteUpdate = true
-			}
+			err = list.Reload(configs)
+			// Force reload on the next iteration if and only if this one failed.
+			// (Any errors are already logged by list.Reload, so we don't need to
+			// propagate the details further.)
+			forceReload = err != nil
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.

@@ -8,7 +8,6 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -54,6 +53,30 @@ type Resource interface {
 	Mode() os.FileMode
 }
 
+// Folder returns a list of files in a folder.
+func Folder(folder, root string, filemode os.FileMode) []Resource {
+	resources := make([]Resource, 0)
+	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		resources = append(resources, &RelativeFile{LocalFile{Path: path, FileMode: filemode}, root})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	return resources
+}
+
 // LocalFile represents a local file on disk.
 type LocalFile struct {
 	Path     string
@@ -79,6 +102,21 @@ func (l *LocalFile) Name() string {
 // Mode return the permissions of the file in the zip.
 func (l *LocalFile) Mode() os.FileMode {
 	return l.FileMode
+}
+
+// RelativeFile is a Localfile which needs to be placed relatively in the
+// root of the bundle.
+type RelativeFile struct {
+	LocalFile
+	root string
+}
+
+// Name returns the name of the file.
+func (r *RelativeFile) Name() string {
+	if r.root == "" {
+		return r.LocalFile.Path
+	}
+	return r.LocalFile.Path[len(r.root)+1:]
 }
 
 // MemoryFile an in-memory representation of a physical file.
@@ -136,24 +174,7 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 
 	var uncompressed int64
 	for _, file := range p.resources {
-		r, err := file.Open()
-		if err != nil {
-			return nil, err
-		}
-		defer r.Close()
-
-		header := &zip.FileHeader{
-			Name:   file.Name(),
-			Method: zip.Deflate,
-		}
-
-		header.SetMode(file.Mode())
-		w, err := zipWriter.CreateHeader(header)
-		if err != nil {
-			return nil, err
-		}
-
-		l, err := io.Copy(w, r)
+		l, err := zipAddFile(zipWriter, file)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +191,7 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 		}
 
 		if l == 0 {
-			return nil, errors.New("no bytes written to the zip file")
+			continue
 		}
 
 		// Force a flush to accurately check for the size of the bytes.Buffer and see if
@@ -193,4 +214,30 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 	// Flush bytes/writes headers, the zip is valid at this point.
 	zipWriter.Close()
 	return buf.Bytes(), nil
+}
+
+func zipAddFile(zipWriter *zip.Writer, r Resource) (int64, error) {
+	f, err := r.Open()
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+
+	header := &zip.FileHeader{
+		Name:   r.Name(),
+		Method: zip.Deflate,
+	}
+
+	header.SetMode(r.Mode())
+	w, err := zipWriter.CreateHeader(header)
+	if err != nil {
+		return 0, err
+	}
+
+	l, err := io.Copy(w, f)
+	if err != nil {
+		return 0, err
+	}
+
+	return l, nil
 }

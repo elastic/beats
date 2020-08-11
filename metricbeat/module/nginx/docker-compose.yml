@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   nginx:
-    image: docker.elastic.co/observability-ci/beats-integration-nginx:${NGINX_VERSION:-1.9}-1
+    image: docker.elastic.co/integrations-ci/beats-nginx:${NGINX_VERSION:-1.9}-1
     build: 
       context: ./_meta
       args:

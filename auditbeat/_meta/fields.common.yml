@@ -26,11 +26,11 @@
           supported in macOS, via the kMDItemWhereFroms attribute.
           Omitted if origin information is not available.
       multi_fields:
-      - name: raw
-        type: keyword
+      - name: text
+        type: text
         description: >
-          This is a non-analyzed field that is useful for aggregations on the
-          origin data.
+          This is an analyzed field that is useful for full text search
+          on the origin data.
 
     - name: selinux
       type: group

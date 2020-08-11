@@ -1,0 +1,94 @@
+name: Filebeat
+cmd: filebeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+artifact: beats/filebeat
+rules:
+- fix_stream: {}
+- inject_index:
+    type: logs
+
+- inject_stream_processor:
+    on_conflict: insert_after
+    type: logs
+
+- map:
+    path: inputs
+    rules:
+    - copy_all_to_list:
+        to: streams
+        on_conflict: noop
+        except: ["streams", "id", "enabled", "processors"]
+    - copy_to_list:
+        item: processors
+        to: streams
+        on_conflict: insert_before
+
+- rename:
+    from: inputs
+    to: inputsstreams
+
+- extract_list_items:
+    path: inputsstreams
+    item: streams
+    to: inputs
+
+- map:
+    path: inputs
+    rules:
+    - translate:
+        path: type
+        mapper:
+          logfile: log
+          event/file: log
+          event/stdin: stdin
+          event/tcp: tcp
+          event/udp: udp
+          log/docker: docker
+          log/redis_slowlog: redis
+          log/syslog: syslog
+    - remove_key:
+        key: use_output
+    - remove_key:
+        key: data_stream
+    - remove_key:
+        key: data_stream.namespace
+    - remove_key:
+        key: data_stream.dataset
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - log
+    - stdin
+    - udp
+    - tcp
+    - docker
+    - redis
+    - syslog
+    - s3
+    - netflow
+    - httpjson
+    - o365audit
+    - azureeventhub
+    - cloudfoundry
+    - googlepubsub
+    - kafka
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
+
+- copy:
+    from: inputs
+    to: filebeat
+
+- filter:
+    selectors:
+    - filebeat
+    - output
+    - keystore
+when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+  'kafka', 'logstash')

@@ -377,7 +377,7 @@ func TestFindIdentifierFromARN(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		identifier, err := findIdentifierFromARN(c.resourceARN)
+		identifier, err := FindIdentifierFromARN(c.resourceARN)
 		assert.NoError(t, err)
 		assert.Equal(t, c.expectedIdentifier, identifier)
 	}

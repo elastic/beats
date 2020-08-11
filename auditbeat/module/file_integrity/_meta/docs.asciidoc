@@ -61,6 +61,10 @@ Linux.
   recursive: false
 ----
 
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
+
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 
@@ -117,5 +121,4 @@ of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
 
-*`keep_null`*:: If this option is set to true, fields with `null` values will be
-published in the output document. By default, `keep_null` is set to `false`.
+include::{docdir}/auditbeat-options.asciidoc[]

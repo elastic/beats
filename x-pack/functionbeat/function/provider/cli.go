@@ -5,8 +5,8 @@
 package provider
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // CLIManager is the interface implemented by each provider to expose a command CLI interface
@@ -20,6 +20,12 @@ type CLIManager interface {
 
 	// Remove takes a function name and remove the specific function from the remote provider.
 	Remove(string) error
+
+	// Export prints exported function template to stdout.
+	Export(string) error
+
+	// Package packages functions for the provider configurable output.
+	Package(string) error
 }
 
 // CLIManagerFactory factory method to call to create a new CLI manager

@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/atomic"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/atomic"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 // SessionKey is the key used to lookup sessions: exporter address + port
@@ -101,14 +101,19 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 
 // CheckReset returns if the session must be reset after the receipt of the
 // given sequence number.
-func (s *SessionState) CheckReset(seqNum uint32) (reset bool) {
+func (s *SessionState) CheckReset(seqNum uint32) (prev uint32, reset bool) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	if reset = seqNum < s.lastSequence && seqNum-s.lastSequence > MaxSequenceDifference; reset {
+	prev = s.lastSequence
+	if reset = !isValidSequence(prev, seqNum); reset {
 		s.Templates = make(map[TemplateKey]*TemplateWrapper)
 	}
 	s.lastSequence = seqNum
 	return
+}
+
+func isValidSequence(current, next uint32) bool {
+	return next-current < MaxSequenceDifference || current-next < MaxSequenceDifference
 }
 
 // SessionMap manages all the sessions for a collector.

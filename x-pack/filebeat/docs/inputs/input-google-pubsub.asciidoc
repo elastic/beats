@@ -79,15 +79,18 @@ unprocessed messages. Default is 1000.
 ==== `credentials_file`
 
 Path to a JSON file containing the credentials and key used to subscribe.
-One credential option must be set.
+As an alternative you can use the `credentials_json` config option or rely on
+https://cloud.google.com/docs/authentication/production[Google Application
+Default Credentials] (ADC).
 
 [float]
 ==== `credentials_json`
 
 JSON blob containing the credentials and key used to subscribe. This can be as
 an alternative to `credentials_file` if you want to embed the credential data
-within your config file or put the information into a keystore. One credential
-option must be set.
+within your config file or put the information into a keystore. You may also use
+https://cloud.google.com/docs/authentication/production[Google Application
+Default Credentials] (ADC).
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

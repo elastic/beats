@@ -1,6 +1,7 @@
 [
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "syslog",
@@ -14,6 +15,7 @@
     },
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "syslog",

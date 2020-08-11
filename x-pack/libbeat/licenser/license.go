@@ -13,13 +13,21 @@ import (
 //
 // The x-pack endpoint returns the following JSON response.
 //
-// "license": {
-//   "uid": "936183d8-f48c-4a3f-959a-a52aa2563279",
-//   "type": "platinum",
-//   "mode": "platinum",
-//   "status": "active"
-// },
-//
+//{
+// "license" : {
+//   "status" : "active",
+//   "uid" : "cbff45e7-c553-41f7-ae4f-9205eabd80xx",
+//   "type" : "trial",
+//   "issue_date" : "2018-10-20T22:05:12.332Z",
+//   "issue_date_in_millis" : 1540073112332,
+//   "expiry_date" : "2018-11-19T22:05:12.332Z",
+//   "expiry_date_in_millis" : 1542665112332,
+//   "max_nodes" : 1000,
+//   "issued_to" : "test",
+//   "issuer" : "elasticsearch",
+//   "start_date_in_millis" : -1
+// }
+// }
 // Definition:
 // type is the installed license.
 // mode is the license in operation. (effective license)
@@ -27,43 +35,15 @@ import (
 type License struct {
 	UUID        string      `json:"uid"`
 	Type        LicenseType `json:"type"`
-	Mode        LicenseType `json:"mode"`
 	Status      State       `json:"status"`
-	Features    features    `json:"features"`
 	TrialExpiry expiryTime  `json:"expiry_date_in_millis,omitempty"`
-}
-
-// Features defines the list of features exposed by the elasticsearch cluster.
-type features struct {
-	Graph      graph      `json:"graph"`
-	Logstash   logstash   `json:"logstash"`
-	ML         ml         `json:"ml"`
-	Monitoring monitoring `json:"monitoring"`
-	Rollup     rollup     `json:"rollup"`
-	Security   security   `json:"security"`
-	Watcher    watcher    `json:"watcher"`
 }
 
 type expiryTime time.Time
 
-// Base define the field common for every feature.
-type Base struct {
-	Enabled   bool `json:"enabled"`
-	Available bool `json:"available"`
-}
-
-// Defines all the available features
-type graph struct{ *Base }
-type logstash struct{ *Base }
-type ml struct{ *Base }
-type monitoring struct{ *Base }
-type rollup struct{ *Base }
-type security struct{ *Base }
-type watcher struct{ *Base }
-
-// Get return the current license
+// Get returns the license type.
 func (l *License) Get() LicenseType {
-	return l.Mode
+	return l.Type
 }
 
 // Cover returns true if the provided license is included in the range of license.
@@ -72,7 +52,7 @@ func (l *License) Get() LicenseType {
 // gold -> match gold and platinum
 // platinum -> match  platinum only
 func (l *License) Cover(license LicenseType) bool {
-	if l.Mode >= license {
+	if l.Type >= license {
 		return true
 	}
 	return false
@@ -80,7 +60,7 @@ func (l *License) Cover(license LicenseType) bool {
 
 // Is returns true if the provided license is an exact match.
 func (l *License) Is(license LicenseType) bool {
-	return l.Mode == license
+	return l.Type == license
 }
 
 // IsActive returns true if the current license from the server is active.
@@ -90,7 +70,7 @@ func (l *License) IsActive() bool {
 
 // IsTrial returns true if the remote cluster is in trial mode.
 func (l *License) IsTrial() bool {
-	return l.Mode == Trial
+	return l.Type == Trial
 }
 
 // IsTrialExpired returns false if the we are not in trial mode and when we are in trial mode
@@ -112,6 +92,5 @@ func (l *License) IsTrialExpired() bool {
 func (l *License) EqualTo(other *License) bool {
 	return l.UUID == other.UUID &&
 		l.Type == other.Type &&
-		l.Mode == other.Mode &&
 		l.Status == other.Status
 }

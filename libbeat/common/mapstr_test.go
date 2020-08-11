@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -86,6 +86,11 @@ func TestMapStrDeepUpdate(t *testing.T) {
 			MapStr{"a": 1},
 			MapStr{"a.b": 1},
 			MapStr{"a": 1, "a.b": 1},
+		},
+		{
+			MapStr{"a": (MapStr)(nil)},
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": MapStr{"b": 1}},
 		},
 	}
 
@@ -1001,4 +1006,27 @@ func BenchmarkWalkMap(b *testing.B) {
 			m.Put("hello.world.test", 17)
 		}
 	})
+}
+
+func TestFormat(t *testing.T) {
+	input := MapStr{
+		"foo":      "bar",
+		"password": "SUPER_SECURE",
+	}
+
+	tests := map[string]string{
+		"%v":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#v": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%s":  `{"foo":"bar","password":"xxxxx"}`,
+		"%+s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+		"%#s": `{"foo":"bar","password":"SUPER_SECURE"}`,
+	}
+
+	for verb, expected := range tests {
+		t.Run(verb, func(t *testing.T) {
+			actual := fmt.Sprintf(verb, input)
+			assert.Equal(t, expected, actual)
+		})
+	}
 }

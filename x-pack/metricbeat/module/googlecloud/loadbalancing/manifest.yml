@@ -1,0 +1,23 @@
+default: false
+input:
+  module: googlecloud
+  metricset: metrics
+  defaults:
+    metrics:
+      - service: loadbalancing
+        metric_types:
+          - "https/backend_request_bytes_count"
+          - "https/backend_request_count"
+          - "https/backend_response_bytes_count"
+          - "https/request_bytes_count"
+          - "https/request_count"
+          - "https/response_bytes_count"
+          - "l3/internal/egress_bytes_count"
+          - "l3/internal/egress_packets_count"
+          - "l3/internal/ingress_bytes_count"
+          - "l3/internal/ingress_packets_count"
+          - "tcp_ssl_proxy/closed_connections"
+          - "tcp_ssl_proxy/egress_bytes_count"
+          - "tcp_ssl_proxy/ingress_bytes_count"
+          - "tcp_ssl_proxy/new_connections"
+          - "tcp_ssl_proxy/open_connections"

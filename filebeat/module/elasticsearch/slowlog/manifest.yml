@@ -19,7 +19,7 @@ var:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_indexing_slowlog.json
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ingest/pipeline-plaintext.json
-  - ingest/pipeline-json.json
+  - ingest/pipeline.yml
+  - ingest/pipeline-plaintext.yml
+  - ingest/pipeline-json.yml
 input: config/slowlog.yml

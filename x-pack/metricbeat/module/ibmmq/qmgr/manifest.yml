@@ -1,0 +1,10 @@
+default: true
+input:
+  module: prometheus
+  metricset: collector
+  defaults:
+    metrics_path: /metrics
+    # Filtering out Prometheus metrics that are not strictly related to the
+    # IBM MQ domain, e.g. system load, process, metrics HTTP server.
+    metrics_filters:
+      include: ["ibmmq_.*", "^up$"]

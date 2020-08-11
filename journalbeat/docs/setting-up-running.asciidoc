@@ -5,21 +5,28 @@
 /////
 
 [[setting-up-and-running]]
-== Setting up and running {beatname_uc}
+== Set up and run {beatname_uc}
 
-Before reading this section, see the
-<<{beatname_lc}-getting-started,getting started documentation>> for basic
+++++
+<titleabbrev>Set up and run</titleabbrev>
+++++
+
+Before reading this section, see
+<<{beatname_lc}-installation-configuration>> for basic
 installation instructions to get you started.
 
-This section includes additional information on how to set up and run
+This section includes additional information on how to install, set up, and run
 {beatname_uc}, including:
 
 * <<directory-layout>>
 * <<keystore>>
 * <<command-line-options>>
+* <<setup-repositories>>
 * <<running-with-systemd>>
-* <<shutdown>>
 * <<running-on-docker>>
+* <<{beatname_lc}-starting>>
+* <<shutdown>>
+
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
@@ -29,8 +36,12 @@ include::{libbeat-dir}/keystore.asciidoc[]
 
 include::{libbeat-dir}/command-reference.asciidoc[]
 
+include::{libbeat-dir}/repositories.asciidoc[]
+
 include::./running-on-docker.asciidoc[]
 
 include::{libbeat-dir}/shared-systemd.asciidoc[]
 
-include::{libbeat-dir}/shared-shutdown.asciidoc[]
+include::{libbeat-dir}/shared/start-beat.asciidoc[]
+
+include::{libbeat-dir}/shared/shutdown.asciidoc[]

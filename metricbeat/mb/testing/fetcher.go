@@ -20,8 +20,9 @@ package testing
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Fetcher is an interface implemented by all fetchers for testing purpouses
@@ -32,6 +33,7 @@ type Fetcher interface {
 	FetchEvents() ([]mb.Event, []error)
 	WriteEvents(testing.TB, string)
 	WriteEventsCond(testing.TB, string, func(common.MapStr) bool)
+	StandardizeEvent(mb.Event, ...mb.EventModifier) beat.Event
 }
 
 // NewFetcher returns a test fetcher from a Metricset configuration
@@ -73,6 +75,10 @@ func (f *reportingMetricSetV2Fetcher) WriteEventsCond(t testing.TB, path string,
 	}
 }
 
+func (f *reportingMetricSetV2Fetcher) StandardizeEvent(event mb.Event, modifiers ...mb.EventModifier) beat.Event {
+	return StandardizeEvent(f, event, modifiers...)
+}
+
 type reportingMetricSetV2FetcherError struct {
 	mb.ReportingMetricSetV2Error
 }
@@ -96,6 +102,10 @@ func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path st
 	}
 }
 
+func (f *reportingMetricSetV2FetcherError) StandardizeEvent(event mb.Event, modifiers ...mb.EventModifier) beat.Event {
+	return StandardizeEvent(f, event, modifiers...)
+}
+
 type reportingMetricSetV2FetcherWithContext struct {
 	mb.ReportingMetricSetV2WithContext
 }
@@ -117,4 +127,8 @@ func (f *reportingMetricSetV2FetcherWithContext) WriteEventsCond(t testing.TB, p
 	if err != nil {
 		t.Fatal("writing events", err)
 	}
+}
+
+func (f *reportingMetricSetV2FetcherWithContext) StandardizeEvent(event mb.Event, modifiers ...mb.EventModifier) beat.Event {
+	return StandardizeEvent(f, event, modifiers...)
 }

@@ -1,0 +1,26 @@
+description: Pipeline for normalizing envoyproxy access logs
+processors:
+- json:
+    field: message
+    target_field: json
+- remove:
+    field:
+    - message
+    ignore_failure: true
+- rename:
+    field: json.message
+    target_field: message
+    ignore_failure: true
+- rename:
+    field: json.kubernetes
+    target_field: kubernetes
+    ignore_failure: true
+- remove:
+    field:
+    - json
+- pipeline:
+    name: '{< IngestPipeline "pipeline-plaintext" >}'
+on_failure:
+- set:
+    field: error.message
+    value: 'pipeline-json: {{ _ingest.on_failure_message }}'

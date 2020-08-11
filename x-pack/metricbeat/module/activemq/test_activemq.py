@@ -24,6 +24,9 @@ class ActiveMqTest(XPackTest):
             'password': 'admin'
         }
 
+    def get_hosts(self):
+        return [self.compose_host(port='8161/tcp')]
+
     def get_stomp_host_port(self):
         host_port = self.compose_host(port='61613/tcp')
         s = host_port.split(':')
@@ -63,8 +66,6 @@ class ActiveMqTest(XPackTest):
         for evt in output:
             if self.all_messages_enqueued(evt, destination_type, destination_name):
                 assert 0 < evt['activemq'][destination_type]['messages']['size']['avg']
-                if 'queue' == destination_type:
-                    assert 2 == evt['activemq'][destination_type]['size']
                 self.assert_fields_are_documented(evt)
                 passed = True
 

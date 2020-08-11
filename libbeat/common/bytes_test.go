@@ -21,8 +21,10 @@ package common
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"testing"
+	"unicode/utf16"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -255,4 +257,39 @@ func TestRandomBytes(t *testing.T) {
 
 	// unlikely to get 2 times the same results
 	assert.False(t, bytes.Equal(v1, v2))
+}
+
+func TestUTF16ToUTF8(t *testing.T) {
+	input := "abc白鵬翔\u145A6"
+	buf := &bytes.Buffer{}
+	binary.Write(buf, binary.LittleEndian, utf16.Encode([]rune(input)))
+	outputBuf := &bytes.Buffer{}
+	err := UTF16ToUTF8Bytes(buf.Bytes(), outputBuf)
+	assert.NoError(t, err)
+	assert.Equal(t, []byte(input), outputBuf.Bytes())
+}
+
+func TestUTF16BytesToStringTrimNullTerm(t *testing.T) {
+	input := "abc"
+	utf16Bytes := append(StringToUTF16Bytes(input), []byte{0, 0, 0, 0, 0, 0}...)
+
+	outputBuf := &bytes.Buffer{}
+	err := UTF16ToUTF8Bytes(utf16Bytes, outputBuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := outputBuf.Bytes()
+	assert.Len(t, b, 3)
+	assert.Equal(t, input, string(b))
+}
+
+func BenchmarkUTF16ToUTF8(b *testing.B) {
+	utf16Bytes := StringToUTF16Bytes("A logon was attempted using explicit credentials.")
+	outputBuf := &bytes.Buffer{}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		UTF16ToUTF8Bytes(utf16Bytes, outputBuf)
+		outputBuf.Reset()
+	}
 }

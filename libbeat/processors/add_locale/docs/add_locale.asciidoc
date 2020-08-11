@@ -1,6 +1,10 @@
 [[add-locale]]
 === Add the local time zone
 
+++++
+<titleabbrev>add_locale</titleabbrev>
+++++
+
 The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
 option named `format` that controls whether an offset or time zone abbreviation
@@ -12,7 +16,7 @@ The configuration below enables the processor with the default settings.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_locale: ~
+  - add_locale: ~
 -------------------------------------------------------------------------------
 
 This configuration enables the processor and configures it to add the time zone
@@ -21,8 +25,8 @@ abbreviation to events.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_locale:
-    format: abbreviation
+  - add_locale:
+      format: abbreviation
 -------------------------------------------------------------------------------
 
 NOTE: Please note that `add_locale` differentiates between daylight savings

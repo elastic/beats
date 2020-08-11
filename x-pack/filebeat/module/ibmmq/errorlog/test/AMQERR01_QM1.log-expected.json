@@ -1,6 +1,7 @@
 [
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -32,6 +33,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -63,6 +65,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -94,6 +97,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -125,6 +129,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -156,6 +161,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -187,6 +193,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -218,6 +225,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -249,6 +257,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -280,6 +289,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -311,6 +321,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -342,6 +353,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -373,6 +385,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -404,6 +417,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -435,6 +449,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -466,6 +481,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -497,6 +513,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -528,6 +545,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -559,6 +577,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -590,6 +609,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -621,6 +641,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -652,6 +673,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -683,6 +705,7 @@
     },
     {
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -715,6 +738,7 @@
     {
         "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -747,6 +771,7 @@
     {
         "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -779,6 +804,7 @@
     {
         "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -811,6 +837,7 @@
     {
         "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -843,6 +870,7 @@
     {
         "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -875,6 +903,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -907,6 +936,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -939,6 +969,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -971,6 +1002,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1003,6 +1035,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1035,6 +1068,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1067,6 +1101,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1099,6 +1134,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1131,6 +1167,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1163,6 +1200,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1195,6 +1233,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1227,6 +1266,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1259,6 +1299,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1291,6 +1332,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1323,6 +1365,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1355,6 +1398,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1387,6 +1431,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1419,6 +1464,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1451,6 +1497,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1483,6 +1530,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1515,6 +1563,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1547,6 +1596,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1579,6 +1629,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1611,6 +1662,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1642,6 +1694,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1674,6 +1727,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1706,6 +1760,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1738,6 +1793,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1770,6 +1826,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1802,6 +1859,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1833,6 +1891,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1864,6 +1923,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1895,6 +1955,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1927,6 +1988,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1959,6 +2021,7 @@
     {
         "@timestamp": "2018-07-13T07:06:04.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -1991,6 +2054,7 @@
     {
         "@timestamp": "2018-07-18T11:24:26.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2023,6 +2087,7 @@
     {
         "@timestamp": "2018-07-18T11:24:26.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2055,6 +2120,7 @@
     {
         "@timestamp": "2018-07-18T11:24:26.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2087,6 +2153,7 @@
     {
         "@timestamp": "2018-07-18T14:25:37.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2119,6 +2186,7 @@
     {
         "@timestamp": "2018-07-18T14:25:37.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2151,6 +2219,7 @@
     {
         "@timestamp": "2018-07-18T14:25:37.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2183,6 +2252,7 @@
     {
         "@timestamp": "2018-07-18T14:25:47.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2215,6 +2285,7 @@
     {
         "@timestamp": "2018-07-18T14:25:47.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2247,6 +2318,7 @@
     {
         "@timestamp": "2018-07-18T14:25:47.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2279,6 +2351,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2311,6 +2384,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2343,6 +2417,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2375,6 +2450,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2407,6 +2483,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2439,6 +2516,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2471,6 +2549,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2503,6 +2582,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2535,6 +2615,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2567,6 +2648,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2599,6 +2681,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2631,6 +2714,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2663,6 +2747,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2695,6 +2780,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2727,6 +2813,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2759,6 +2846,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2791,6 +2879,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2823,6 +2912,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2855,6 +2945,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2887,6 +2978,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2919,6 +3011,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2951,6 +3044,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -2983,6 +3077,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -3015,6 +3110,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -3046,6 +3142,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -3077,6 +3174,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -3108,6 +3206,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
@@ -3140,6 +3239,7 @@
     {
         "@timestamp": "2018-07-20T15:40:17.000Z",
         "event.dataset": "ibmmq.errorlog",
+        "event.kind": "event",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",

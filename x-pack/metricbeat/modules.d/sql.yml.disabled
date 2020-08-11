@@ -5,9 +5,8 @@
   metricsets:
     - query
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
 
   driver: "postgres"
-  datasource: "user=myuser password=mypassword dbname=mydb sslmode=disable"
   sql_query: "select now()"
-
+  sql_response_format: table

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from filebeat import BaseTest
 import os
@@ -29,7 +29,7 @@ class Test(BaseTest):
 
         iterations1 = 5
         for n in range(0, iterations1):
-            os.write(proc.stdin_write, "Hello World\n")
+            os.write(proc.stdin_write, b"Hello World\n")
 
         self.wait_until(
             lambda: self.output_has(lines=iterations1),
@@ -37,7 +37,7 @@ class Test(BaseTest):
 
         iterations2 = 10
         for n in range(0, iterations2):
-            os.write(proc.stdin_write, "Hello World\n")
+            os.write(proc.stdin_write, b"Hello World\n")
 
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + iterations2),
@@ -64,13 +64,13 @@ class Test(BaseTest):
         args += ["-c", os.path.join(self.working_dir, "filebeat.yml"), "-e",
                  "-v", "-d", "*"]
         proc = Proc(args, os.path.join(self.working_dir, "filebeat.log"))
-        os.write(proc.stdin_write, "Hello World\n")
+        os.write(proc.stdin_write, b"Hello World\n")
 
         proc.start()
         self.wait_until(lambda: self.output_has(lines=1))
 
         # Continue writing after end was reached
-        os.write(proc.stdin_write, "Hello World2\n")
+        os.write(proc.stdin_write, b"Hello World2\n")
         os.close(proc.stdin_write)
 
         self.wait_until(lambda: self.output_has(lines=2))

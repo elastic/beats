@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -38,7 +38,7 @@ import (
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/time/rate"
 
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // HashType identifies a cryptographic algorithm.

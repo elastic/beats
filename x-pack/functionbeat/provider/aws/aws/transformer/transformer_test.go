@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestCloudwatch(t *testing.T) {
@@ -35,11 +35,17 @@ func TestCloudwatch(t *testing.T) {
 	assert.Equal(t, 1, len(events))
 
 	expectedTime, err := time.ParseInLocation(time.RFC3339, "2019-08-27T12:24:51.193+00:00", time.UTC)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expectedEvent := beat.Event{
 		Timestamp: expectedTime,
 		Fields: common.MapStr{
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+			},
 			"message":              "my interesting message",
 			"id":                   "1234567890123456789",
 			"owner":                "me",
@@ -79,6 +85,13 @@ func TestKinesis(t *testing.T) {
 	assert.Equal(t, 1, len(events))
 
 	fields := common.MapStr{
+		"cloud": common.MapStr{
+			"provider": "aws",
+			"region":   "us-east-1",
+		},
+		"event": common.MapStr{
+			"kind": "event",
+		},
 		"event_id":                "1234",
 		"event_name":              "connect",
 		"event_source":            "web",
@@ -126,10 +139,17 @@ ciJ9XX0=`),
 	}
 
 	events, err := CloudwatchKinesisEvent(request, true, false)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 3, len(events))
 
 	envelopeFields := common.MapStr{
+		"cloud": common.MapStr{
+			"provider": "aws",
+			"region":   "us-east-1",
+		},
+		"event": common.MapStr{
+			"kind": "event",
+		},
 		"event_id":                "1234",
 		"event_name":              "connect",
 		"event_source":            "web",

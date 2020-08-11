@@ -23,9 +23,10 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 // Provider for autodiscover
@@ -34,7 +35,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(bus.Bus, uuid.UUID, *common.Config) (Provider, error)
+type ProviderBuilder func(string, bus.Bus, uuid.UUID, *common.Config, keystore.Keystore) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -69,7 +70,7 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 }
 
 // BuildProvider reads provider configuration and instantiate one
-func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error) {
+func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *common.Config, keystore keystore.Keystore) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -86,5 +87,5 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error
 		return nil, err
 	}
 
-	return builder(bus, uuid, c)
+	return builder(beatName, bus, uuid, c, keystore)
 }

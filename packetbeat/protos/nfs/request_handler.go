@@ -23,11 +23,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
 const nfsProgramNumber = 100003
@@ -143,7 +143,12 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		pbf:   pbf,
 		event: evt,
 	}
-	fields["nfs"] = nfs.getRequestInfo(xdr)
+	info := nfs.getRequestInfo(xdr)
+	fields["nfs"] = info
+
+	if opcode, ok := info["opcode"].(string); ok && opcode != "" {
+		pbf.Event.Action = "nfs." + opcode
+	}
 
 	// use xid+src ip to uniquely identify request
 	reqID := xid + tcptuple.SrcIP.String()
@@ -190,6 +195,8 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 		if status == 0 {
 			nfsInfo := fields["nfs"].(common.MapStr)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)
+		} else {
+			nfs.pbf.Event.Outcome = "failure"
 		}
 		r.results(nfs.event)
 	}

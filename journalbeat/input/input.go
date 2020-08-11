@@ -21,18 +21,17 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 
-	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/reader"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Input manages readers and forwards entries from journals.
@@ -40,10 +39,8 @@ type Input struct {
 	readers    []*reader.Reader
 	done       chan struct{}
 	config     Config
-	pipeline   beat.Pipeline
 	client     beat.Client
 	states     map[string]checkpoint.JournalState
-	id         uuid.UUID
 	logger     *logp.Logger
 	eventMeta  common.EventMetadata
 	processors beat.ProcessorList
@@ -52,7 +49,7 @@ type Input struct {
 // New returns a new Inout
 func New(
 	c *common.Config,
-	b *beat.Beat,
+	info beat.Info,
 	done chan struct{},
 	states map[string]checkpoint.JournalState,
 ) (*Input, error) {
@@ -61,12 +58,10 @@ func New(
 		return nil, err
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, fmt.Errorf("error while generating ID for input: %v", err)
+	logger := logp.NewLogger("input")
+	if config.ID != "" {
+		logger = logger.With("id", config.ID)
 	}
-
-	logger := logp.NewLogger("input").With("id", id)
 
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
@@ -78,12 +73,13 @@ func New(
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
 			SaveRemoteHostname: config.SaveRemoteHostname,
+			CheckpointID:       checkpointID(config.ID, reader.LocalSystemJournalID),
 		}
 
-		state := states[reader.LocalSystemJournalID]
+		state := states[cfg.CheckpointID]
 		r, err := reader.NewLocal(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for local journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for local journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}
@@ -97,16 +93,18 @@ func New(
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
 			SaveRemoteHostname: config.SaveRemoteHostname,
+			CheckpointID:       checkpointID(config.ID, p),
 		}
-		state := states[p]
+
+		state := states[cfg.CheckpointID]
 		r, err := reader.New(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}
 
-	inputProcessors, err := processorsForInput(b.Info, config)
+	inputProcessors, err := processorsForInput(info, config)
 	if err != nil {
 		return nil, err
 	}
@@ -117,9 +115,7 @@ func New(
 		readers:    readers,
 		done:       done,
 		config:     config,
-		pipeline:   b.Publisher,
 		states:     states,
-		id:         id,
 		logger:     logger,
 		eventMeta:  config.EventMetadata,
 		processors: inputProcessors,
@@ -128,18 +124,18 @@ func New(
 
 // Run connects to the output, collects entries from the readers
 // and then publishes the events.
-func (i *Input) Run() {
+func (i *Input) Run(pipeline beat.Pipeline) {
 	var err error
-	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
+	i.client, err = pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.GuaranteedSend,
 		Processing: beat.ProcessingConfig{
 			EventMetadata: i.eventMeta,
 			Meta:          nil,
 			Processor:     i.processors,
 		},
-		ACKCount: func(n int) {
-			i.logger.Infof("journalbeat successfully published %d events", n)
-		},
+		ACKHandler: acker.Counting(func(n int) {
+			i.logger.Debugw("journalbeat successfully published events", "event.count", n)
+		}),
 	})
 	if err != nil {
 		i.logger.Error("Error connecting to output: %v", err)
@@ -232,4 +228,13 @@ func processorsForInput(beatInfo beat.Info, config Config) (*processors.Processo
 	procs.AddProcessors(*userProcessors)
 
 	return procs, nil
+}
+
+// checkpointID returns the identifier used to track persistent state for the
+// input.
+func checkpointID(id, path string) string {
+	if id == "" {
+		return path
+	}
+	return "journald::" + path + "::" + id
 }

@@ -21,14 +21,14 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/ecs/code/go/ecs"
 
-	"github.com/elastic/beats/packetbeat/flows"
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	"github.com/tsg/gopacket/layers"
 )
@@ -287,7 +287,9 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 	evt, pbf := pb.NewBeatEvent(trans.ts)
 	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}
 	pbf.Destination = &ecs.Destination{IP: trans.tuple.dstIP.String()}
+	pbf.AddIP(trans.tuple.srcIP.String(), trans.tuple.dstIP.String())
 	pbf.Event.Dataset = "icmp"
+	pbf.Event.Type = []string{"connection"}
 	pbf.Error.Message = trans.notes
 
 	// common fields - group "event"

@@ -5,7 +5,12 @@
 package googlepubsub
 
 import (
-	"github.com/pkg/errors"
+	"context"
+	"fmt"
+	"os"
+
+	"cloud.google.com/go/pubsub"
+	"golang.org/x/oauth2/google"
 )
 
 type config struct {
@@ -31,10 +36,28 @@ type config struct {
 }
 
 func (c *config) Validate() error {
-	if c.CredentialsFile == "" && len(c.CredentialsJSON) == 0 {
-		return errors.New("credentials_file or credentials_json is required for pubsub input")
+	// credentials_file
+	if c.CredentialsFile != "" {
+		if _, err := os.Stat(c.CredentialsFile); os.IsNotExist(err) {
+			return fmt.Errorf("credentials_file is configured, but the file %q cannot be found", c.CredentialsFile)
+		} else {
+			return nil
+		}
 	}
-	return nil
+
+	// credentials_json
+	if len(c.CredentialsJSON) > 0 {
+		return nil
+	}
+
+	// Application Default Credentials (ADC)
+	ctx := context.Background()
+	if _, err := google.FindDefaultCredentials(ctx, pubsub.ScopePubSub); err == nil {
+		return nil
+	}
+
+	return fmt.Errorf("no authentication credentials were configured or detected " +
+		"(credentials_file, credentials_json, and application default credentials (ADC))")
 }
 
 func defaultConfig() config {

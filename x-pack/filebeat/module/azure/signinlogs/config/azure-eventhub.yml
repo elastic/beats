@@ -1,0 +1,15 @@
+type: azure-eventhub
+connection_string: {{ .connection_string }}
+eventhub: {{ .eventhub }}
+consumer_group: {{ .consumer_group }}
+storage_account: {{ .storage_account }}
+storage_account_key: {{ .storage_account_key }}
+resource_manager_endpoint: {{ .resource_manager_endpoint }}
+storage_account_container: filebeat-signinlogs-{{ .eventhub }}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

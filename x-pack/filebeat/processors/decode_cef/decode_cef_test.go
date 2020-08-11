@@ -15,8 +15,8 @@ import (
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var updateGolden = flag.Bool("update", false, "update golden test files")
@@ -299,4 +299,39 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 	})
 	t.Errorf("Expected and actual are different:\n%s", diff)
 	return false
+}
+
+func BenchmarkProcessorRun(b *testing.B) {
+	dec, err := newDecodeCEF(defaultConfig())
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	const msg = `CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5`
+	b.Run("short_msg", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_, err := dec.Run(&beat.Event{
+				Fields: map[string]interface{}{
+					"message": msg,
+				},
+			})
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+	const longMsg = `CEF:0|CISCO|ASA||305012|Teardown dynamic UDP translation|Low| eventId=56265798504 mrt=1484092683471 proto=UDP categorySignificance=/Informational categoryBehavior=/Access/Stop categoryDeviceGroup=/Firewall catdt=Firewall categoryOutcome=/Success categoryObject=/Host/Application/Service modelConfidence=0 severity=4 relevance=10 assetCriticality=0 priority=4 art=1484096108163 deviceSeverity=6 rt=1484096094000 src=1.2.3.4 sourceZoneID=GqtK3G9YBABCadQ465CqVeW\=\= sourceZoneURI=/All Zones/GTR/GTR/GTR/GTR sourceTranslatedAddress=4.3.2.1 sourceTranslatedZoneID=P84KXXTYDFYYFwwHq40BQcd\=\= sourceTranslatedZoneURI=/All Zones/GTR/GTR Internet Primary spt=5260 sourceTranslatedPort=5260 cs5=dynamic cs6=0:00:00 c6a4=ffff:0:0:0:222:5555:ffff:5555 locality=1 cs1Label=ACL cs2Label=Unit cs3Label=TCP Flags cs4Label=Order cs5Label=Connection Type cs6Label=Duration cn1Label=ICMP Type cn2Label=ICMP Code cn3Label=DurationInSeconds c6a4Label=Agent IPv6 Address ahost=host.gtr.gtr agt=100.222.333.55 av=7.1.7.7602.0 atz=LA/la aid=4p9IZi1kBABCq5RFPFdJWYUw\=\= at=agent_ac dvchost=super dvc=111.111.111.99 deviceZoneID=K-fU33AAOGVdfFpYAT3UdQ\=\= deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 deviceAssetId=5Wa8hHVSDFBCc-t56wI7mTw\=\= dtz=LA/LA deviceInboundInterface=eth0 deviceOutboundInterface=eth1 eventAnnotationStageUpdateTime=1484097686473 eventAnnotationModificationTime=1484097686475 eventAnnotationAuditTrail=1,1484012146095,root,Queued,,,,\\n eventAnnotationVersion=1 eventAnnotationFlags=0 eventAnnotationEndTime=1484096094000 eventAnnotationManagerReceiptTime=1484097686471 originalAgentHostName=host originalAgentAddress=10.2.88.3 originalAgentZoneURI=/All Zones/GR/GR/GR originalAgentVersion=7.3.0.7885.0 originalAgentId=6q0sfHVcBABCcSDFvMpvc1w\=\= originalAgentType=syslog_file _cefVer=0.1 ad.arcSightEventPath=7q0sfHVcBABCcMZVvMSDFc1w\=\=`
+	b.Run("long_msg", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_, err := dec.Run(&beat.Event{
+				Fields: map[string]interface{}{
+					"message": longMsg,
+				},
+			})
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
 }

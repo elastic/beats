@@ -21,23 +21,77 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+)
+
+type multilineType uint8
+
+const (
+	patternMode multilineType = iota
+	countMode
+	whilePatternMode
+
+	patternStr      = "pattern"
+	countStr        = "count"
+	whilePatternStr = "while_pattern"
+)
+
+var (
+	multilineTypes = map[string]multilineType{
+		patternStr:      patternMode,
+		countStr:        countMode,
+		whilePatternStr: whilePatternMode,
+	}
 )
 
 // Config holds the options of multiline readers.
 type Config struct {
+	Type multilineType `config:"type"`
+
 	Negate       bool           `config:"negate"`
-	Match        string         `config:"match" validate:"required"`
+	Match        string         `config:"match"`
 	MaxLines     *int           `config:"max_lines"`
-	Pattern      *match.Matcher `config:"pattern" validate:"required"`
+	Pattern      *match.Matcher `config:"pattern"`
 	Timeout      *time.Duration `config:"timeout" validate:"positive"`
 	FlushPattern *match.Matcher `config:"flush_pattern"`
+
+	LinesCount  int  `config:"count_lines" validate:"positive"`
+	SkipNewLine bool `config:"skip_newline"`
 }
 
 // Validate validates the Config option for multiline reader.
 func (c *Config) Validate() error {
-	if c.Match != "after" && c.Match != "before" {
-		return fmt.Errorf("unknown matcher type: %s", c.Match)
+	if c.Type == patternMode {
+		if c.Match != "after" && c.Match != "before" {
+			return fmt.Errorf("unknown matcher type: %s", c.Match)
+		}
+		if c.Pattern == nil {
+			return fmt.Errorf("multiline.pattern cannot be empty when pattern based matching is selected")
+		}
+	} else if c.Type == countMode {
+		if c.LinesCount == 0 {
+			return fmt.Errorf("multiline.count_lines cannot be zero when count based is selected")
+		}
+	} else if c.Type == whilePatternMode {
+		if c.Pattern == nil {
+			return fmt.Errorf("multiline.pattern cannot be empty when pattern based matching is selected")
+		}
 	}
+	return nil
+}
+
+// Unpack selects the approriate aggregation method for creating multiline events.
+// If it is not configured pattern matching is chosen.
+func (m *multilineType) Unpack(value string) error {
+	if value == "" {
+		*m = patternMode
+		return nil
+	}
+
+	s, ok := multilineTypes[value]
+	if !ok {
+		return fmt.Errorf("unknown multiline type: %s", value)
+	}
+	*m = s
 	return nil
 }

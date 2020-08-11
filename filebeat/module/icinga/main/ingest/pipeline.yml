@@ -1,0 +1,42 @@
+description: Pipeline for parsing icinga main logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '\[%{TIMESTAMP:icinga.main.timestamp}\] %{WORD:log.level}/%{WORD:icinga.main.facility}:
+      %{GREEDYMULTILINE:message}'
+    ignore_missing: true
+    pattern_definitions:
+      TIMESTAMP: '%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND} %{ISO8601_TIMEZONE}'
+      GREEDYMULTILINE: |-
+        (.|
+        )*
+- date:
+    field: icinga.main.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd HH:mm:ss Z
+    ignore_failure: true
+- remove:
+    field: icinga.main.timestamp
+- set:
+    field: event.kind
+    value: event
+- script:
+    lang: painless
+    source: >-
+      def errorLevels = ["warning", "critical"];
+      if (ctx?.log?.level != null) {
+        if (errorLevels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
+      }
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

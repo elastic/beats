@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2019-05-03T09:01:09.990-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -17,9 +24,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 226,
@@ -30,9 +44,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 282,
@@ -43,9 +64,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 344,
@@ -56,9 +84,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 400,
@@ -69,9 +104,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 462,
@@ -82,9 +124,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -98,9 +147,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 734,
@@ -111,9 +167,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1011,
@@ -124,9 +187,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1166,
@@ -137,9 +207,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1289,
@@ -150,9 +227,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.010-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1373,
@@ -163,9 +247,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.200-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1435,
@@ -176,9 +267,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:11.930-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1528,
@@ -189,9 +287,16 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:12.030-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mssql.log",
+        "event.kind": "event",
         "event.module": "mssql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1599,

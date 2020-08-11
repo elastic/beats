@@ -1,0 +1,140 @@
+- name: dynamodb
+  type: group
+  description: >
+    `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: SuccessfulRequestLatency.avg
+          type: double
+          description: >
+            The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams
+            during the specified time period.
+        - name: SuccessfulRequestLatency.max
+          type: double
+          description: >
+            The maximum latency of successful requests to DynamoDB or Amazon DynamoDB Streams
+            during the specified time period.
+        - name: OnlineIndexPercentageProgress.avg
+          type: double
+          description: >
+            The percentage of completion when a new global secondary index is being added to a table.
+        - name: ProvisionedWriteCapacityUnits.avg
+          type: double
+          description: >
+            The number of provisioned write capacity units for a table or a global secondary index.
+        - name: ProvisionedReadCapacityUnits.avg
+          type: double
+          description: >
+            The number of provisioned read capacity units for a table or a global secondary index.
+        - name: ConsumedReadCapacityUnits.avg
+          type: double
+          description: >
+            The average number of read capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ConsumedReadCapacityUnits.sum
+          type: long
+          description: >
+            The sum of read capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ConsumedWriteCapacityUnits.avg
+          type: double
+          description: >
+            The average number of write capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ConsumedWriteCapacityUnits.sum
+          type: long
+          description: >
+            The sum of write capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ReplicationLatency.avg
+          type: double
+          description: >
+            The average elapsed time between an updated item appearing in the DynamoDB stream for
+            one replica table, and that item appearing in another replica in the global table.
+        - name: ReplicationLatency.max
+          type: double
+          description: >
+            The maximum elapsed time between an updated item appearing in the DynamoDB stream for
+            one replica table, and that item appearing in another replica in the global table.
+        - name: TransactionConflict.avg
+          type: double
+          description: >
+            Average rejected item-level requests due to transactional conflicts between concurrent
+            requests on the same items.
+        - name: TransactionConflict.sum
+          type: long
+          description: >
+            Total rejected item-level requests due to transactional conflicts between concurrent
+            requests on the same items.
+        - name: AccountProvisionedReadCapacityUtilization.avg
+          type: double
+          description: >
+            The average percentage of provisioned read capacity units utilized by the account.
+        - name: AccountProvisionedWriteCapacityUtilization.avg
+          type: double
+          description: >
+            The average percentage of provisioned write capacity units utilized by the account.
+        - name: SystemErrors.sum
+          type: long
+          description: >
+            The requests to DynamoDB or Amazon DynamoDB Streams that generate
+            an HTTP 500 status code during the specified time period.
+        - name: ConditionalCheckFailedRequests.sum
+          type: long
+          description: >
+            The number of failed attempts to perform conditional writes.
+        - name: PendingReplicationCount.sum
+          type: long
+          description: >
+            The number of item updates that are written to one replica table,
+            but that have not yet been written to another replica in the global table.
+        - name: ReadThrottleEvents.sum
+          type: long
+          description: >
+            Requests to DynamoDB that exceed the provisioned read capacity
+            units for a table or a global secondary index.
+        - name: ThrottledRequests.sum
+          type: long
+          description: >
+            Requests to DynamoDB that exceed the provisioned throughput limits
+            on a resource (such as a table or an index).
+        - name: WriteThrottleEvents.sum
+          type: long
+          description: >
+            Requests to DynamoDB that exceed the provisioned write capacity
+            units for a table or a global secondary index.
+        - name: AccountMaxReads.max
+          type: long
+          description: >
+            The maximum number of read capacity units that can be used by an account.
+            This limit does not apply to on-demand tables or global secondary indexes.
+        - name: AccountMaxTableLevelReads.max
+          type: long
+          description: >
+            The maximum number of read capacity units that can be used by a table or global
+            secondary index of an account. For on-demand tables this limit caps the maximum
+            read request units a table or a global secondary index can use.
+        - name: AccountMaxTableLevelWrites.max
+          type: long
+          description: >
+            The maximum number of write capacity units that can be used by a table or global
+            secondary index of an account. For on-demand tables this limit caps the maximum
+            write request units a table or a global secondary index can use.
+        - name: AccountMaxWrites.max
+          type: long
+          description: >
+            The maximum number of write capacity units that can be used by an account.
+            This limit does not apply to on-demand tables or global secondary indexes.
+        - name: MaxProvisionedTableReadCapacityUtilization.max
+          type: double
+          description: >
+            The percentage of provisioned read capacity units utilized by the highest
+            provisioned read table or global secondary index of an account.
+        - name: MaxProvisionedTableWriteCapacityUtilization.max
+          type: double
+          description: >
+            The percentage of provisioned write capacity utilized by the highest provisioned
+            write table or global secondary index of an account.

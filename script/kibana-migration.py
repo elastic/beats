@@ -1,21 +1,23 @@
 import yaml
 import glob
+import argparse
 
 
-def migration():
-    print "Start Kibana files migration"
+def migration(append_ecs):
+    print("Start Kibana files migration")
 
-    print "Migrate all fields to the ECS fields"
+    print("Migrate all fields to the ECS fields")
     migration_fields = read_migration_fields()
     rename_entries(migration_fields)
 
-    print "Postfix all ids with -ecs"
-    ids = get_replaceable_ids()
-    rename_entries(ids)
+    if append_ecs:
+        print("Postfix all ids with -ecs")
+        ids = get_replaceable_ids()
+        rename_entries(ids)
 
-    print "Postfix all titles with ` ECS`"
-    titles = get_replacable_titles()
-    rename_entries(titles)
+        print("Postfix all titles with ` ECS`")
+        titles = get_replacable_titles()
+        rename_entries(titles)
 
 
 def get_replaceable_ids():
@@ -39,7 +41,7 @@ def get_replaceable_ids():
 
 def read_migration_fields():
     migration_fields = {}
-    migration_yml = "../dev-tools/ecs-migration.yml"
+    migration_yml = "ecs-migration-8x.yml"
     with open(migration_yml, 'r') as f:
         migration = yaml.safe_load(f)
         for k in migration:
@@ -48,7 +50,7 @@ def read_migration_fields():
                     continue
                 if k["alias"] == False:
                     continue
-                if not isinstance(k["to"], basestring):
+                if not isinstance(k["to"], str):
                     continue
 
                 # Add "{}" around fields to make them more unique and not have false positives
@@ -86,7 +88,7 @@ def rename_entries(renames):
     files = get_files()
 
     for file in files:
-        print file
+        print(file)
         s = open(file).read()
         for k in renames:
             s = s.replace(k, renames[k])
@@ -105,7 +107,11 @@ def get_files():
 
 
 if __name__ == "__main__":
-    migration()
+    parser = argparse.ArgumentParser(description='Migrate field names in dashboards')
+    parser.add_argument('--append-ecs', action='store_true', help='append "-ecs" to the end of all viz identifiers')
+    args = parser.parse_args()
+
+    migration(args.append_ecs)
 
 
 # There are more id's, do they matter?

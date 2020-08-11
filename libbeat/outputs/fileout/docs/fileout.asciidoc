@@ -9,6 +9,11 @@ The File output dumps the transactions into a file where each transaction is in 
 Currently, this output is used for testing, but it can be used as input for
 Logstash.
 
+To use this output, edit the {beatname_uc} configuration file to disable the {es}
+output by commenting it out, and enable the file output by adding `output.file`.
+
+Example configuration:
+
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.file:
@@ -21,14 +26,14 @@ output.file:
 
 ==== Configuration options
 
-You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
+You can specify the following `output.file` options in the +{beatname_lc}.yml+ config file:
 
 ===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
-The default value is true.
+The default value is `true`.
 
 [[path]]
 ===== `path`

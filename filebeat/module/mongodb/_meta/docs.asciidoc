@@ -8,20 +8,12 @@ https://www.mongodb.com/[MongoDB].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from versions v3.2.11 on Debian.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with one sample dashboard including error and regular logs.
-
-[role="screenshot"]
-image::./images/filebeat-mongodb-overview.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -55,6 +47,14 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with one sample dashboard including error and regular logs.
+
+[role="screenshot"]
+image::./images/filebeat-mongodb-overview.png[]
 
 :has-dashboards!:
 

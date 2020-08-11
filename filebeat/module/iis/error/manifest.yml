@@ -9,7 +9,7 @@ var:
     os.windows:
       - c:/Windows/System32/LogFiles/HTTPERR/*.log
 
-ingest_pipeline: ingest/default.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/iis-error.yml
 
 requires.processors:

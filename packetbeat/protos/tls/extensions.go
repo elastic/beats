@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // ExtensionID is the 16-bit identifier for an extension
@@ -66,7 +66,7 @@ var extensionMap = map[uint16]extension{
 	13:     {"signature_algorithms", parseSignatureSchemes, false},
 	16:     {"application_layer_protocol_negotiation", parseALPN, false},
 	35:     {"session_ticket", parseTicket, false},
-	43:     {"supported_versions", parseSupportedVersions, false},
+	43:     {"supported_versions", parseSupportedVersions, true},
 	0xff01: {"renegotiation_info", ignoreContent, false},
 }
 

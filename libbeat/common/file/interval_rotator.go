@@ -20,6 +20,7 @@ package file
 import (
 	"errors"
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -45,7 +46,7 @@ func (realClock) Now() time.Time {
 	return time.Now()
 }
 
-func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
+func newIntervalRotator(log Logger, interval time.Duration, rotateOnStartup bool, filename string) (*intervalRotator, error) {
 	if interval == 0 {
 		return nil, nil
 	}
@@ -54,11 +55,11 @@ func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
 	}
 
 	ir := &intervalRotator{interval: (interval / time.Second) * time.Second} // drop fractional seconds
-	ir.initialize()
+	ir.initialize(log, rotateOnStartup, filename)
 	return ir, nil
 }
 
-func (r *intervalRotator) initialize() error {
+func (r *intervalRotator) initialize(log Logger, rotateOnStartup bool, filename string) {
 	r.clock = realClock{}
 
 	switch r.interval {
@@ -93,7 +94,17 @@ func (r *intervalRotator) initialize() error {
 			return lastInterval != currentInterval
 		}
 	}
-	return nil
+
+	if !rotateOnStartup {
+		fi, err := os.Stat(filename)
+		if err != nil {
+			if log != nil {
+				log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
+			}
+			return
+		}
+		r.lastRotate = fi.ModTime()
+	}
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {

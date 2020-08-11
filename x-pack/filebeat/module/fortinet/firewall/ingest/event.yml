@@ -1,0 +1,327 @@
+description: Pipeline for parsing fortinet firewall logs (event pipeline)
+processors:
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx.fortinet?.firewall?.result == 'ERROR' || ctx.fortinet?.firewall?.status == 'negotiate_error'"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx.fortinet?.firewall?.result == 'OK' || ['FSSO-logon', 'auth-logon', 'FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
+- append:
+    field: event.type
+    value:
+    - user
+    - start
+    if: "['FSSO-logon', 'auth-logon'].contains(ctx.fortinet?.firewall?.action)"
+- append:
+    field: event.type
+    value:
+    - user
+    - end
+    if: "['FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
+- append:
+    field: event.type
+    value: connection
+    if: "ctx.fortinet?.firewall?.subtype == 'vpn'"
+- append:
+    field: event.category
+    value: network
+    if: "ctx.fortinet?.firewall?.subtype == 'vpn'"
+- append:
+    field: event.type
+    value: info
+    if: "ctx.fortinet?.firewall?.action == 'perf-stats'"
+- append:
+    field: event.category
+    value: host
+    if: "ctx.fortinet?.firewall?.action == 'perf-stats'"
+- append:
+    field: event.type
+    value: info
+    if: "ctx.fortinet?.firewall?.subtype == 'update'"
+- append:
+    field: event.category
+    value:
+    - host
+    - malware
+    if: "ctx.fortinet?.firewall?.subtype == 'update'"
+- append:
+    field: event.category
+    value: authentication
+    if: "ctx.fortinet?.firewall?.subtype == 'user'"
+- rename:
+    field: fortinet.firewall.dstip
+    target_field: destination.ip
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.remip
+    target_field: destination.ip
+    ignore_missing: true
+    if: "ctx.destination?.ip == null"  
+- convert:
+    field: fortinet.firewall.dstport
+    target_field: destination.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.remport
+    target_field: destination.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.destination?.port == null"
+- convert:
+    field: fortinet.firewall.rcvdbyte
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.daddr
+    target_field: destination.address
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.dst_host
+    target_field: destination.address
+    ignore_missing: true
+    if: "ctx.destination?.address == null"
+- rename:
+    field: fortinet.firewall.dst_host
+    target_field: destination.domain
+    ignore_missing: true
+    if: "ctx.destination?.address == null"
+- rename:
+    field: fortinet.firewall.group
+    target_field: source.user.group.name
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.sentbyte
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.srcip
+    target_field: source.ip
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.locip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.source?.ip == null"
+- rename:
+    field: fortinet.firewall.srcmac
+    target_field: source.mac
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.source_mac
+    target_field: source.mac
+    ignore_missing: true
+    if: "ctx.source?.mac == null"
+- convert:
+    field: fortinet.firewall.srcport
+    target_field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.locport
+    target_field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.source?.port == null"
+- rename:
+    field: fortinet.firewall.user
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.saddr
+    target_field: source.address
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.agent
+    target_field: user_agent.original
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.file
+    target_field: file.name
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.filesize
+    target_field: file.size
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.level
+    target_field: log.level
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.logid
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.event?.code == null"
+- rename:
+    field: fortinet.firewall.msg
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.policyid
+    target_field: rule.id
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.proto
+    target_field: network.iana_number
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.dir
+    target_field: network.direction
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.direction
+    target_field: network.direction
+    ignore_missing: true
+    if: "ctx.network?.direction == null"
+- rename:
+    field: fortinet.firewall.service
+    target_field: network.protocol
+    ignore_missing: true
+- lowercase:
+    field: network.protocol
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.error_num
+    target_field: error.code
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.hostname
+    target_field: url.domain
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.logdesc
+    target_field: rule.description
+    ignore_missing: true
+- rename:
+    field: fortinet.firewall.url
+    target_field: url.path
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.sess_duration
+    type: long
+    target_field: event.duration
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.event?.duration == null"
+- convert:
+    field: fortinet.firewall.mem
+    type: integer
+    ignore_failure: true
+    ignore_missing: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    field: source.nat.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.nat.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.nat.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.source?.as == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.nat.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+    if: "ctx.destination?.as == null"
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+- script:
+    lang: painless
+    source: ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes
+    if: "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+    ignore_failure: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx.destination?.ip != null"
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    if: "ctx.source?.user?.name != null"
+- remove:
+    field:
+    - fortinet.firewall.dstport
+    - fortinet.firewall.remport
+    - fortinet.firewall.rcvdbyte
+    - fortinet.firewall.sentbyte
+    - fortinet.firewall.srcport
+    - fortinet.firewall.locport
+    - fortinet.firewall.filesize
+    - fortinet.firewall.sess_duration
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

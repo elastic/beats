@@ -194,7 +194,7 @@
           type: long
 
         - name: class_id
-          type: short
+          type: long
 
         - name: minimum_ttl
           type: short

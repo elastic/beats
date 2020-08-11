@@ -10,5 +10,5 @@ var:
     os.windows:
       - "c:/program files/Redis/logs/redis.log*"
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/log.yml

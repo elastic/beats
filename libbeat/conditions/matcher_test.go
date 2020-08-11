@@ -23,9 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestRegxpCreate(t *testing.T) {
@@ -35,7 +35,7 @@ func TestRegxpCreate(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestContainsMultiFieldPositiveMatch(t *testing.T) {

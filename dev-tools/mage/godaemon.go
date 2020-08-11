@@ -21,6 +21,9 @@ import (
 	"errors"
 	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
@@ -42,8 +45,12 @@ func BuildGoDaemon() error {
 	}
 
 	// Test if binaries are up-to-date.
+	godaemonDir, err := gotool.ListModuleCacheDir("github.com/tsg/go-daemon")
+	if err != nil {
+		return err
+	}
+	input := filepath.Join(godaemonDir, "src", "god.c")
 	output := MustExpand("build/golang-crossbuild/god-{{.Platform.GOOS}}-{{.Platform.Arch}}")
-	input := MustExpand("{{ elastic_beats_dir }}/dev-tools/vendor/github.com/tsg/go-daemon/god.c")
 	if IsUpToDate(output, input) {
 		log.Println(">>> buildGoDaemon is up-to-date for", Platform.Name)
 		return nil

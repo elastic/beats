@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 func TestTokenAppender(t *testing.T) {
@@ -84,7 +84,7 @@ token_path: "test"
 		writeFile("test", "foo bar")
 
 		appender, err := NewTokenAppender(config)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.NotNil(t, appender)
 
 		appender.Append(test.event)

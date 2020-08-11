@@ -1,7 +1,7 @@
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
@@ -15,7 +15,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['mongodb']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MongoDB module outputs an event.
@@ -35,6 +35,6 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MONGODB_FIELDS + ["process"]), evt.keys())
+        self.assertCountEqual(self.de_dot(MONGODB_FIELDS + ["process"]), evt.keys())
 
         self.assert_fields_are_documented(evt)

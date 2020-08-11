@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/crowdstrike/falconhoseclient/output
+  - name: tags
+    default: [forwarded]
+
+input: config/falcon.yml
+ingest_pipeline: ingest/pipeline.yml

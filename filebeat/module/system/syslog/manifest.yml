@@ -9,5 +9,5 @@ var:
       - /var/log/system.log*
     os.windows: []
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/syslog.yml

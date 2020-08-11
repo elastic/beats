@@ -1,0 +1,569 @@
+[
+    {
+        "crowdstrike.event.HostnameField": "hostnameofmachine",
+        "crowdstrike.event.SessionId": "6020260b-0398-4d41-999d-5531b55522de",
+        "crowdstrike.event.StartTimestamp": "2020-02-27T19:12:14.000Z",
+        "crowdstrike.event.UserName": "first.last@company.com",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-27T19:12:14.000Z",
+        "crowdstrike.metadata.eventType": "RemoteResponseSessionStartEvent",
+        "crowdstrike.metadata.offset": 1045,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "remote_response_session_start_event",
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "falcon",
+        "host.name": "hostnameofmachine",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "message": "Remote response session started",
+        "related.user": "first.last@company.com",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "first.last@company.com",
+        "user.name": "first.last@company.com"
+    },
+    {
+        "crowdstrike.event.EndTimestamp": "2020-02-27T19:12:52.000Z",
+        "crowdstrike.event.HostnameField": "hostnameofmachine",
+        "crowdstrike.event.SessionId": "6020260b-0398-4d41-999d-5531b55522de",
+        "crowdstrike.event.UserName": "first.last@company.com",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-27T19:12:52.000Z",
+        "crowdstrike.metadata.eventType": "RemoteResponseSessionEndEvent",
+        "crowdstrike.metadata.offset": 1046,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "remote_response_session_end_event",
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "end"
+        ],
+        "fileset.name": "falcon",
+        "host.name": "hostnameofmachine",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 457,
+        "message": "Remote response session ended",
+        "related.user": "first.last@company.com",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "first.last@company.com",
+        "user.name": "first.last@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "APIClientID",
+                "ValueString": "1234567890abcdefghijklmnopqr"
+            },
+            {
+                "Key": "partition",
+                "ValueString": "0"
+            },
+            {
+                "Key": "offset",
+                "ValueString": "-1"
+            },
+            {
+                "Key": "appId",
+                "ValueString": "siem-connector-v2.0.0"
+            },
+            {
+                "Key": "eventType",
+                "ValueString": "[UserActivityAuditEvent HashSpreadingEvent RemoteResponseSessionStartEvent RemoteResponseSessionEndEvent DetectionSummaryEvent AuthActivityAuditEvent]"
+            }
+        ],
+        "crowdstrike.event.OperationName": "streamStarted",
+        "crowdstrike.event.ServiceName": "Crowdstrike Streaming API",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-12T21:29:10.000Z",
+        "crowdstrike.event.UserId": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz",
+        "crowdstrike.event.UserIp": "10.10.0.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-12T21:29:10.710Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 0,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "stream_started",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 910,
+        "message": "Crowdstrike Streaming API",
+        "related.ip": "10.10.0.8",
+        "related.user": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz",
+        "service.type": "crowdstrike",
+        "source.ip": "10.10.0.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.name": "api-client-id:1234567890abcdefghijklmnopqrstuvwxyz"
+    },
+    {
+        "crowdstrike.event.OperationName": "twoFactorAuthenticate",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-12T21:39:37.147Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-12T21:39:37.147Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 1,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "two_factor_authenticate",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2152,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "twoFactorAuthenticate",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-12T22:14:37.554Z",
+        "crowdstrike.event.UserId": "bob@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.3",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-12T22:14:37.554Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 2,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "two_factor_authenticate",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2645,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.3",
+        "related.user": "bob@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.3",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "bob@company.com",
+        "user.name": "bob@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "group_id",
+                "ValueString": "3c80ce30b9654cb4bd15beec6a517e65"
+            },
+            {
+                "Key": "action_name",
+                "ValueString": "add_group_member"
+            }
+        ],
+        "crowdstrike.event.OperationName": "update_group",
+        "crowdstrike.event.ServiceName": "groups",
+        "crowdstrike.event.UTCTimestamp": "2020-02-12T22:24:08.000Z",
+        "crowdstrike.event.UserId": "chris@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.13",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-12T22:24:08.000Z",
+        "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
+        "crowdstrike.metadata.offset": 3,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_activity_audit_event",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 3136,
+        "message": "update_group",
+        "related.ip": "192.168.6.13",
+        "related.user": "chris@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.13",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "chris@company.com",
+        "user.name": "chris@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "target_name",
+                "ValueString": "alice@company.com"
+            }
+        ],
+        "crowdstrike.event.OperationName": "requestResetPassword",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:41:52.140Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:41:52.140Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 4,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "request_reset_password",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 3858,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "twoFactorAuthenticate",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:42:21.730Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:42:21.730Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 5,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "two_factor_authenticate",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 4506,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "target_name",
+                "ValueString": "first.last@company.com"
+            }
+        ],
+        "crowdstrike.event.OperationName": "changePassword",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:45:20.236Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:45:20.236Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 6,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "change_password",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 4999,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "userAuthenticate",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:46:12.362Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:46:12.362Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 7,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_authenticate",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 5646,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "twoFactorAuthenticate",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:50:14.754Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:50:14.754Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 8,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "two_factor_authenticate",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 6134,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "selfAcceptEula",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:50:20.289Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:50:20.289Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 9,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "self_accept_eula",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 6627,
+        "message": "CrowdStrike Authentication",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "detection_id",
+                "ValueString": "ldt:5a6fd0b7347440cd74cb84855a8aee18:17180539745"
+            },
+            {
+                "Key": "new_state",
+                "ValueString": "in_progress"
+            },
+            {
+                "Key": "assigned_to",
+                "ValueString": "First Last"
+            },
+            {
+                "Key": "assigned_to_uid",
+                "ValueString": "first.last@company.com"
+            }
+        ],
+        "crowdstrike.event.OperationName": "detection_update",
+        "crowdstrike.event.ServiceName": "detections",
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T14:14:22.000Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.event.UserIp": "192.168.6.8",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T14:14:22.000Z",
+        "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
+        "crowdstrike.metadata.offset": 10,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_activity_audit_event",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 7113,
+        "message": "detection_update",
+        "related.ip": "192.168.6.8",
+        "related.user": "alice@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.6.8",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
+    }
+]

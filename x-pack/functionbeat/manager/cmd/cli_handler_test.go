@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 )
 
 type mockCLIManager struct {
@@ -32,6 +32,16 @@ func (m *mockCLIManager) Update(name string) error {
 
 func (m *mockCLIManager) Remove(name string) error {
 	args := m.Called(name)
+	return args.Error(0)
+}
+
+func (m *mockCLIManager) Export(name string) error {
+	args := m.Called(name)
+	return args.Error(0)
+}
+
+func (m *mockCLIManager) Package(outputPattern string) error {
+	args := m.Called(outputPattern)
 	return args.Error(0)
 }
 

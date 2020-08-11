@@ -18,22 +18,23 @@
 package module
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
-	pipeline      beat.Pipeline
-	processors    *processors.Processors
-	eventMeta     common.EventMetadata
-	dynamicFields *common.MapStrPointer
-	timeSeries    bool
-	keepNull      bool
+	pipeline   beat.PipelineConnector
+	processors *processors.Processors
+	eventMeta  common.EventMetadata
+	timeSeries bool
+	keepNull   bool
 }
 
 type connectorConfig struct {
@@ -47,9 +48,14 @@ type connectorConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
 
+type metricSetRegister interface {
+	ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error)
+}
+
 func NewConnector(
-	beatInfo beat.Info, pipeline beat.Pipeline,
-	c *common.Config, dynFields *common.MapStrPointer,
+	beatInfo beat.Info,
+	pipeline beat.PipelineConnector,
+	c *common.Config,
 ) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {
@@ -62,12 +68,32 @@ func NewConnector(
 	}
 
 	return &Connector{
-		pipeline:      pipeline,
-		processors:    processors,
-		eventMeta:     config.EventMetadata,
-		dynamicFields: dynFields,
-		keepNull:      config.KeepNull,
+		pipeline:   pipeline,
+		processors: processors,
+		eventMeta:  config.EventMetadata,
+		keepNull:   config.KeepNull,
 	}, nil
+}
+
+// UseMetricSetProcessors appends processors defined in metricset configuration to the connector properties.
+func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metricSetName string) error {
+	metricSetProcessors, err := r.ProcessorsForMetricSet(moduleName, metricSetName)
+	if err != nil {
+		return errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
+			moduleName, metricSetName)
+	}
+
+	if metricSetProcessors == nil || len(metricSetProcessors.List) == 0 {
+		return nil // no processors are defined
+	}
+
+	procs := processors.NewList(nil)
+	procs.AddProcessors(*metricSetProcessors)
+	for _, p := range c.processors.List {
+		procs.AddProcessor(p)
+	}
+	c.processors = procs
+	return nil
 }
 
 func (c *Connector) Connect() (beat.Client, error) {
@@ -75,7 +101,6 @@ func (c *Connector) Connect() (beat.Client, error) {
 		Processing: beat.ProcessingConfig{
 			EventMetadata: c.eventMeta,
 			Processor:     c.processors,
-			DynamicFields: c.dynamicFields,
 			KeepNull:      c.keepNull,
 		},
 	})
