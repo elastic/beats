@@ -190,7 +190,7 @@ def tagAndPush(name){
   }
 
   def tagName = "${libbetaVer}"
-  if (env.CHANGE_ID?.trim()) {
+  if (isPR()) {
     tagName = "pr-${env.CHANGE_ID}"
   }
 
