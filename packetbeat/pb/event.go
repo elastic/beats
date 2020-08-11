@@ -81,7 +81,7 @@ func NewFields() *Fields {
 				Kind:     "event",
 			},
 			Type:     []string{"connection", "protocol"},
-			Category: []string{"network_traffic", "network"},
+			Category: []string{"network"},
 		},
 	}
 }
