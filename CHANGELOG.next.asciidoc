@@ -63,6 +63,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Move file metrics to dataset endpoint {pull}19977[19977]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
+- Tracking session end reason in panw module. {pull}18705[18705]
+- Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 
 *Heartbeat*
 
@@ -155,6 +157,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
+- Add service resource in k8s cluster role. {pull}20546[20546]
 
 *Auditbeat*
 
@@ -173,6 +176,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix mapping of fortinet.firewall.mem as integer. {pull}19335[19335]
 - Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
 - Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
@@ -372,9 +376,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
+- Add minimum cache TTL for successful DNS responses. {pull}18986[18986]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
+
 
 *Auditbeat*
 
@@ -509,12 +515,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 - Add initial support for configurable file identity tracking. {pull}18748[18748]
+- Add support for reading auditd logs that are prefixed with `node=`. {pull}19659[19659]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
 - Add event.ingested for Suricata module {pull}20220[20220]
 - Add support for custom header and headersecret for filebeat http_endpoint input {pull}20435[20435]
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
+
 
 *Heartbeat*
 

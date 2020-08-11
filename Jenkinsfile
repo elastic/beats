@@ -1026,7 +1026,7 @@ def installTools() {
   } else {
     // Install python3 with the specific step, even though install-tools.bat will verify if it's there anyway.
     // TODO: as soon as python3 is installed in the CI Workers we will be able to remove the line below.
-    installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ])
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ]) }
     retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
@@ -1426,23 +1426,24 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
+      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}") {
-        sh(label: 'Prepare workspace context',
-           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
             unstash(v)
           }
         }
-        sh(label: 'Process JUnit reports with runbld',
-          script: '''\
-          cat >./runbld-script <<EOF
-          echo "Processing JUnit reports with runbld..."
-          EOF
-          /usr/local/bin/runbld ./runbld-script
-          '''.stripIndent())  // stripIdent() requires '''/
       }
+      sh(label: 'Process JUnit reports with runbld',
+        script: """\
+        cat >./runbld-script <<EOF
+        echo "Processing JUnit reports with runbld..."
+        EOF
+        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }
