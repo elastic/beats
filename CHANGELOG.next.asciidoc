@@ -588,6 +588,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
 - Add event.ingested for CrowdStrike module {pull}20138[20138]
 - Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
+- Add event.ingested for Suricata module {pull}20220[20220]
 
 *Heartbeat*
 
