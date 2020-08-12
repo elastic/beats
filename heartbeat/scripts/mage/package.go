@@ -17,22 +17,31 @@
 
 package mage
 
-import devtools "github.com/elastic/beats/v7/dev-tools/mage"
+import (
+	"os"
 
-const (
-	dirModuleGenerated   = "build/package/module"
-	dirModulesDGenerated = "build/package/modules.d"
+	"github.com/magefile/mage/mg"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
+
+func init() {
+	devtools.BeatDescription = "Ping remote services for availability and log " +
+		"results to Elasticsearch or send to Logstash."
+	devtools.BeatServiceName = "heartbeat-elastic"
+}
 
 // CustomizePackaging modifies the package specs to add the modules and
 // modules.d directory. You must declare a dependency on either
 // PrepareModulePackagingOSS or PrepareModulePackagingXPack.
 func CustomizePackaging() {
+	mg.Deps(dashboards)
+
 	monitorsDTarget := "monitors.d"
 	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
 	monitorsD := devtools.PackageFile{
 		Mode:   0644,
-		Source: "monitors.d",
+		Source: devtools.OSSBeatDir("monitors.d"),
 	}
 
 	for _, args := range devtools.Packages {
@@ -49,7 +58,12 @@ func CustomizePackaging() {
 	}
 }
 
+func dashboards() error {
+	// Heartbeat doesn't have any dashboards so just create the empty directory.
+	return os.MkdirAll("build/kibana", 0755)
+}
+
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return devtools.GenerateFieldsYAML("monitors/active")
+	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("monitors/active"))
 }
