@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"errors"
+	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
