@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -101,6 +102,9 @@ type diskQueue struct {
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
 
+	// Data frames waiting to be written to disk.
+	incoming *pendingFrameData
+
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
@@ -111,7 +115,11 @@ type diskQueue struct {
 
 	// The memory queue of data blobs waiting to be written to disk.
 	// To add something to the queue internally, send it to this channel.
-	inChan chan []byte
+	//	inChan chan []byte
+
+	writeRequestChan  chan *writeRequest
+	readRequestChan   chan *readRequest
+	cancelRequestChan chan *cancelRequest
 
 	outChan chan diskQueueOutput
 
@@ -191,6 +199,22 @@ type diskQueue struct {
 	done chan struct{}
 }
 
+// pendingFrame stores a single incoming event waiting to be written to disk,
+// along with its serialization and metadata needed to notify its originating
+// producer of ack / cancel state.
+type pendingFrame struct {
+	event    publisher.Event
+	producer *diskQueueProducer
+}
+
+// pendingFrameData stores data frames waiting to be written to disk, with
+// metadata to handle acks / cancellation if needed.
+type pendingFrameData struct {
+	sync.Mutex
+
+	frames []pendingFrame
+}
+
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
 	// The lock should be held to read or write any of the fields below.
@@ -261,7 +285,7 @@ func queueFactory(
 // and settings, creating it if it doesn't exist.
 func NewQueue(settings Settings) (queue.Queue, error) {
 	// Create the given directory path if it doesn't exist.
-	err := os.MkdirAll(settings.Path, os.ModePerm)
+	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
 	}
@@ -435,7 +459,10 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	panic("TODO: not implemented")
+	return &diskQueueProducer{
+		queue:  dq,
+		config: cfg,
+	}
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {

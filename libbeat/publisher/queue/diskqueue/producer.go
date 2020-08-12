@@ -35,13 +35,35 @@ type diskQueueProducer struct {
 //
 
 func (producer *diskQueueProducer) Publish(event publisher.Event) bool {
-	//data := dataForEvent(event)
-
-	panic("TODO: not implemented")
+	return producer.publish(event, true)
 }
 
 func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
-	panic("TODO: not implemented")
+	return producer.publish(event, false)
+}
+
+func (producer *diskQueueProducer) publish(
+	event publisher.Event, shouldBlock bool,
+) bool {
+	serialized := dataFrameForEvent(event, producer.queue.settings.ChecksumType)
+	request := &writeRequest{
+		frame: &writeFrame{
+			event:      event,
+			serialized: serialized,
+		},
+		shouldBlock:  shouldBlock,
+		responseChan: make(chan bool),
+	}
+
+	select {
+	case producer.queue.writeRequestChan <- request:
+		// The request has been sent, and we are now guaranteed to get a result on
+		// the response channel, so we must read from it immediately to avoid
+		// blocking the core loop.
+		return <-request.responseChan
+	case <-producer.queue.done:
+		return false
+	}
 }
 
 func (producer *diskQueueProducer) Cancel() int {
