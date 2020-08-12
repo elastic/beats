@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
+	"github.com/elastic/beats/v7/x-pack/club/internal/cfgload"
 	"github.com/elastic/beats/v7/x-pack/club/internal/registries"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
@@ -39,7 +40,7 @@ type app struct {
 	inputLoader     *inputLoader
 	pipelineManager *pipelineManager
 	agentManager    *agentConfigManager
-	configWatcher   *configWatcher
+	configWatcher   *cfgload.Watcher
 }
 
 func main() {
@@ -120,8 +121,8 @@ func (app *app) initSettings(flags flagsConfig) error {
 		return fmt.Errorf("can not initialize application paths: %w", err)
 	}
 
-	configReader := &configReader{paths: paths, strictPerm: flags.StrictPermissions}
-	config, err := configReader.Read(flags.ConfigFiles)
+	configReader := &cfgload.Loader{Home: paths.Config, StrictPermissions: flags.StrictPermissions}
+	config, err := configReader.ReadFiles(flags.ConfigFiles)
 	if err != nil {
 		return fmt.Errorf("Failed to read config file(s): %w", err)
 	}
@@ -206,10 +207,10 @@ func (app *app) configure(flags flagsConfig) error {
 	}
 
 	if flags.Reload {
-		app.configWatcher = &configWatcher{
-			log:    app.log.Named("config-watcher"),
-			files:  flags.ConfigFiles,
-			reader: &configReader{paths: app.Settings.Path, strictPerm: flags.StrictPermissions},
+		app.configWatcher = &cfgload.Watcher{
+			Log:    app.log.Named("config-watcher"),
+			Files:  flags.ConfigFiles,
+			Reader: &cfgload.Loader{Home: app.Settings.Path.Config, StrictPermissions: flags.StrictPermissions},
 		}
 	}
 
@@ -305,7 +306,13 @@ func (app *app) Run(sigContext context.Context) error {
 
 	if app.configWatcher != nil {
 		appTaskGroup.Go(func(cancel unison.Canceler) error {
-			return app.configWatcher.Run(cancel, app.pipelineManager.OnConfig)
+			return app.configWatcher.Run(cancel, func(cfg *common.Config) error {
+				var settings dynamicSettings
+				if err := cfg.Unpack(&settings); err != nil {
+					return err
+				}
+				return app.pipelineManager.OnConfig(settings)
+			})
 		})
 	}
 

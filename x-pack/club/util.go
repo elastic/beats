@@ -4,11 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"time"
-
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
 )
 
 // osSignalContext creates a context.Context that will be cancelled if the
@@ -38,28 +33,4 @@ func osSignalContext(sigs ...os.Signal) (context.Context, context.CancelFunc) {
 
 	signal.Notify(ch, sigs...)
 	return ctx, cancel
-}
-
-//periodic wraps timed.Period to provide an error return and cancel the loop
-// if fn returns an error.
-//
-// XXX: elastic/go-concert#28 updated timed.Period to match the interface of
-// periodic. This function should be removed when updating to a newer version
-// of go-concert.
-func periodic(cancel unison.Canceler, period time.Duration, fn func() error) error {
-	ctx, cancelFn := context.WithCancel(ctxtool.FromCanceller(cancel))
-	defer cancelFn()
-
-	var err error
-	timed.Periodic(ctx, period, func() {
-		err = fn()
-		if err != nil {
-			cancelFn()
-		}
-	})
-
-	if err == nil {
-		err = ctx.Err()
-	}
-	return err
 }

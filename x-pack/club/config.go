@@ -4,12 +4,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
+
+	"github.com/elastic/beats/v7/x-pack/club/internal/dirs"
 )
 
 // flagsConfig is used for parsing all available CLI flags
@@ -17,14 +18,14 @@ type flagsConfig struct {
 	Reload            bool
 	ConfigFiles       []string
 	StrictPermissions bool
-	Path              pathSettings
+	Path              dirs.Project
 }
 
 type settings struct {
 	ConfigID string `config:"id"`
 	Inputs   []inputSettings
 	Outputs  map[string]*common.Config
-	Path     pathSettings
+	Path     dirs.Project
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
 	Limits   limitsSettings
@@ -45,17 +46,6 @@ type dynamicSettings struct {
 type limitsSettings struct {
 	// heartbeat monitors scheduled concurrent active operations limit
 	Monitors int64
-}
-
-// pathSettings mimics how paths are configured in Beats.
-// NOTE: As path setup and config file reloading is interleaved and managed
-//       between multiple packages in libbeat we 'duplicate' the behavior
-//       to not rely too much on libbeat globals setup.
-type pathSettings struct {
-	Home   string
-	Config string
-	Data   string
-	Logs   string
 }
 
 func (c *flagsConfig) parseArgs(args []string) error {
@@ -80,7 +70,7 @@ func (c *flagsConfig) registerFlags(flags *flag.FlagSet) {
 	flags.BoolVar(&c.StrictPermissions, "strict.perms", true, "Strict permission checking on config files")
 	flags.BoolVar(&c.Reload, "reload", false, "enable config file reloading")
 
-	c.Path.registerFlags(flags)
+	registerFlagsPath(flags, &c.Path)
 }
 
 func (s *settings) validate() error {
@@ -100,49 +90,28 @@ func (s *settings) validate() error {
 	return nil
 }
 
-func (p *pathSettings) registerFlags(flags *flag.FlagSet) {
+func registerFlagsPath(flags *flag.FlagSet, p *dirs.Project) {
 	flags.StringVar(&p.Config, "path.config", "", "Configurations directory to look for config files")
 	flags.StringVar(&p.Home, "path.home", "", "Home path")
 	flags.StringVar(&p.Data, "path.data", "", "Data path")
 	flags.StringVar(&p.Logs, "path.logs", "", "Logs path")
 }
 
-func (s pathSettings) Unify(cwd string) pathSettings {
-	if s.Home == "" {
-		s.Home = cwd
-	}
-	if s.Config == "" {
-		s.Config = s.Home
-	}
-	if s.Data == "" {
-		s.Data = filepath.Join(s.Home, "data")
-	}
-	if s.Logs == "" {
-		s.Logs = filepath.Join(s.Home, "logs")
+func initPaths(ps dirs.Project) (dirs.Project, error) {
+	proj, err := dirs.ProjectFrom(ps.Home)
+	if err != nil {
+		return proj, err
 	}
 
-	return s
-}
-
-func initPaths(ps pathSettings) (pathSettings, error) {
-	workingDir := ps.Home
-	if workingDir == "" {
-		var err error
-		workingDir, err = os.Getwd()
-		if err != nil {
-			return ps, fmt.Errorf("Failed to read working directory: %w", err)
-		}
-	}
-
-	ps = ps.Unify(workingDir)
+	proj = proj.Update(dirs.Project(ps))
 
 	// configure libbeat globals to help inputs accessing them
 	paths.InitPaths(&paths.Path{
-		Home:   ps.Home,
-		Config: ps.Config,
-		Data:   ps.Data,
-		Logs:   ps.Logs,
+		Home:   proj.Home,
+		Config: proj.Config,
+		Data:   proj.Data,
+		Logs:   proj.Logs,
 	})
 
-	return ps, nil
+	return proj, nil
 }
