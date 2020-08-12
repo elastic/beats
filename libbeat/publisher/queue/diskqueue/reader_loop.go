@@ -22,7 +22,98 @@ import (
 	"os"
 )
 
-func (dq *diskQueue) readerLoop() {
+type finishedReadingMessage struct {
+	// The number of frames read from the last file the reader loop was given.
+	frameCount int
+
+	// If there was an error in the segment file (i.e. inconsistent data), the
+	// err field is set.
+	err error
+}
+
+type readBlock struct {
+	reader io.Reader
+	length uint64
+}
+
+type readerLoop struct {
+	// When there is a block available for reading, it will be sent to
+	// nextReadBlock. When the reader loop has finished processing it, it
+	// sends the result to finishedReading. If there is more than one block
+	// available for reading, the core loop will wait until it gets a
+	// finishedReadingMessage before it
+	nextReadBlock   chan readBlock
+	finishedReading chan finishedReadingMessage
+
+	// Frames that have been read from disk are sent to this channel.
+	// Unlike most of the queue's API channels, this one is buffered to allow
+	// the reader to read ahead and cache pending frames before a consumer
+	// explicitly requests them.
+	output chan *readFrame
+}
+
+func (rl *readerLoop) run() {
+	for {
+		block, ok := <-rl.nextReadBlock
+		if !ok {
+			// The channel has closed, we are shutting down.
+			return
+		}
+		rl.finishedReading <- rl.processBlock(block)
+	}
+}
+
+func (rl *readerLoop) processBlock(block readBlock) finishedReadingMessage {
+	frameCount := 0
+	for {
+		frame, err := block.nextFrame()
+		if err != nil {
+			return finishedReadingMessage{
+				frameCount: frameCount,
+				err:        err,
+			}
+		}
+		if frame == nil {
+			// There are no more frames in this block.
+			return finishedReadingMessage{
+				frameCount: frameCount,
+				err:        nil,
+			}
+		}
+		// We've read the frame, try sending it to the output channel.
+		select {
+		case rl.output <- frame:
+			// Success! Increment the total for this block.
+			frameCount++
+		case <-rl.nextReadBlock:
+			// Since we haven't sent a finishedReading message yet, we can only
+			// reach this case when the nextReadBlock channel is closed, indicating
+			// queue shutdown. In this case we immediately return.
+			return finishedReadingMessage{
+				frameCount: frameCount,
+				err:        nil,
+			}
+		}
+
+		// If the output channel's buffer is not full, the previous select
+		// might not recognize when the queue is being closed, so check that
+		// again separately before we move on to the next data frame.
+		select {
+		case <-rl.nextReadBlock:
+			return finishedReadingMessage{
+				frameCount: frameCount,
+				err:        nil,
+			}
+		default:
+		}
+	}
+}
+
+func (block *readBlock) nextFrame() (*readFrame, error) {
+	return nil, nil
+}
+
+/*func (dq *diskQueue) readerLoop() {
 	curFrameID := frameID(0)
 	logger := dq.settings.Logger.Named("readerLoop")
 	for {
@@ -75,7 +166,7 @@ func (dq *diskQueue) readerLoop() {
 		}
 		reader.segment.framesRead += framesRead
 	}
-}
+}*/
 
 func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 	var err error
@@ -90,7 +181,7 @@ func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 		}
 	}()
 
-	segment := &queueSegment{id: id}
+	segment := &queueSegment{queue: dq, id: id}
 
 	path := dq.settings.segmentPath(id)
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)

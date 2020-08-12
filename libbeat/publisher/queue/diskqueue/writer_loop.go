@@ -22,7 +22,53 @@ import (
 	"io"
 	"os"
 	"syscall"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+// One block for the writer loop consists of a write request and the
+// segment it should be written to.
+type writeBlock struct {
+	request *writeRequest
+	segment *queueSegment
+}
+
+type writerLoop struct {
+	logger *logp.Logger
+
+	// The writer loop listens on the input channel for write blocks, and
+	// writes them to disk immediately (all queue capacity checking etc. is
+	// done by the core loop before sending it to the writer).
+	input chan *writeBlock
+
+	// The writer loop sends to this channel when it has finished writing a
+	// frame, to signal the core loop that it is ready for the next one. To
+	// ensure that the core loop doesn't block, the writer loop always reads
+	// from input immediately after sending to finishedWriting.
+	finishedWriting chan struct{}
+
+	// The writer loop sends to nextWriteSegment to indicate that it needs a new
+	// segment file to write its frames to. The core loop must respond on
+	// nextSegmentResponse with the next segment file structure.
+	//nextSegmentRequest  chan struct{}
+	//nextSegmentResponse chan *queueSegment
+}
+
+func (wl *writerLoop) run() {
+	for {
+		block, ok := <-wl.input
+		if !ok {
+			// The input channel is closed, we are done
+			return
+		}
+		wl.processRequest(block)
+		wl.finishedWriting <- struct{}{}
+	}
+}
+
+func (wl *writerLoop) processRequest(block *writeBlock) {
+	writer := block.segment.getWriter()
+}
 
 // frameForContent wraps the given content buffer in a
 // frame header / footer and returns the resulting larger buffer.
@@ -87,7 +133,7 @@ func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
 // The writer loop's job is to continuously read a data frame from the
 // queue's intake channel, if there is one, and write it to disk.
 // It continues until the intake channel is empty or
-func (dq *diskQueue) writerLoop() {
+/*func (dq *diskQueue) writerLoop() {
 	defer dq.waitGroup.Done()
 	//logger := dq.settings.Logger.Named("writerLoop")
 	state := &writerState{}
@@ -114,7 +160,7 @@ func (dq *diskQueue) writerLoop() {
 		}
 		// We've processed
 	}
-}
+}*/
 
 // The number of bytes occupied by all the queue's segment files. Must
 // be called with segments.Mutex held.

@@ -44,7 +44,7 @@ func eventForData(data []byte) publisher.Event {
 	panic("TODO: not implemented")
 }
 
-type encoder struct {
+type frameEncoder struct {
 	buf          bytes.Buffer
 	folder       *gotype.Iterator
 	checksumType ChecksumType
@@ -64,13 +64,13 @@ type entry struct {
 	Fields    common.MapStr
 }
 
-func newEncoder(checksumType ChecksumType) (*encoder, error) {
-	e := &encoder{checksumType: checksumType}
+func newEncoder(checksumType ChecksumType) (*frameEncoder, error) {
+	e := &frameEncoder{checksumType: checksumType}
 	e.reset()
 	return e, nil
 }
 
-func (e *encoder) reset() {
+func (e *frameEncoder) reset() {
 	e.folder = nil
 
 	visitor := json.NewVisitor(&e.buf)
@@ -87,7 +87,7 @@ func (e *encoder) reset() {
 	e.folder = folder
 }
 
-func (e *encoder) encode(event *publisher.Event) ([]byte, error) {
+func (e *frameEncoder) encode(event *publisher.Event) ([]byte, error) {
 	e.buf.Reset()
 
 	var flags uint8

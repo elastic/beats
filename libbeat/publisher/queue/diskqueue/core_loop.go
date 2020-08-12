@@ -57,3 +57,50 @@ type cancelRequest struct {
 	// Otherwise, this field may be nil.
 	responseChan chan int
 }
+
+func (dq *diskQueue) coreLoop() {
+	// writing is true if a writeRequest is currently being processed by the
+	// writer loop, false otherwise.
+	writing := false
+
+	// writeRequests is a list of all write requests that have been accepted
+	// by the queue and are waiting to be written to disk.
+	writeRequests := []*writeRequest{}
+
+	for {
+		select {
+		case <-dq.writerLoop.finishedWriting:
+			if len(writeRequests) > 0 {
+				dq.forwardWriteRequest(writeRequests[0])
+				//dq.writerLoop.input <- writeRequests[0]
+				writeRequests = writeRequests[1:]
+			} else {
+				writing = false
+			}
+		case <-dq.writerLoop.nextWriteSegment:
+			// Create a new segment and send it back to the writer loop.
+
+		}
+	}
+}
+
+func (dq *diskQueue) forwardWriteRequest(request *writeRequest) {
+	// First we must decide which segment the new frame should be written to.
+	data := request.frame.serialized
+	segment := dq.segments.writing
+
+	if segment != nil &&
+		segment.size+uint64(len(data)) > dq.settings.MaxSegmentSize {
+		// The new frame is too big to fit in this segment, so close it and
+		// move it to the read queue.
+		segment.writer.Close()
+		// TODO: make reasonable attempts to sync the closed file.
+		dq.segments.reading = append(dq.segments.reading, segment)
+		segment = nil
+	}
+
+	// If we don't have a segment, we need to create one.
+	if segment == nil {
+		segment = &queueSegment{id: dq.segments.nextID}
+	}
+}

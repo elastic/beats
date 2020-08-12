@@ -108,6 +108,8 @@ type diskQueue struct {
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
+	writerLoop *writerLoop
+
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
 	// to the queue.
@@ -303,31 +305,22 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	initialSegments, err := queueSegmentsForPath(
-		settings.directoryPath(), settings.Logger)
+	initialSegments, err := settings.scanExistingSegments()
 	if err != nil {
 		return nil, err
 	}
 
-	// segments needs to be created separately so its condition variables can
-	// point at its sync.Mutex.
-	segments := &diskQueueSegments{
-		reading: initialSegments,
-	}
-	segments.segmentDeletedCond = sync.NewCond(segments)
-	segments.frameWrittenCond = sync.NewCond(segments)
-
 	return &diskQueue{
-		settings:       settings,
-		segments:       segments,
-		closedForRead:  atomic.MakeBool(false),
-		closedForWrite: atomic.MakeBool(false),
-		done:           make(chan struct{}),
+		settings: settings,
+		segments: &diskQueueSegments{
+			reading: initialSegments,
+		},
+		done: make(chan struct{}),
 	}, nil
 }
 
 // This is only called by readerLoop.
-func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
+/*func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
 	dq.segments.Lock()
 	defer dq.segments.Unlock()
 
@@ -354,7 +347,7 @@ func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
 	// read partial data from segments.writing which is still being
 	// written.
 	return nil, errors
-}
+}*/
 
 func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 	// this is a strangely fine-grained lock maybe?

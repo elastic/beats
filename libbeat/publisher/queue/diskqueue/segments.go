@@ -27,9 +27,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Every data frame read from the queue is assigned a unique sequential
@@ -44,28 +41,44 @@ type segmentOffset uint64
 
 // The metadata for a single segment file.
 type queueSegment struct {
-	sync.Mutex
-
+	// A segment id is globally unique within its originating queue.
 	id segmentID
 
-	// The length in bytes of the segment file on disk. This is updated when
+	// The settings for the queue that created this segment. Used for locating
+	// the queue file on disk and determining its checksum behavior.
+	queueSettings *Settings
+
+	// Whether the file for this segment exists on disk yet. If it does
+	// not, then calling getWriter() will create it and return a writer
+	// positioned at the start of the data region.
+	created bool
+
+	// The size in bytes of the segment file on disk. This is updated when
 	// the segment is written to, and should always correspond to the end of
-	// a complete data frame. If a write fails after writing part of a frame,
-	// size does not change, even though the on-disk size increases, because
-	// the later bytes will be overwritten by the next write and should not
-	// be counted against the number of writable bytes.
+	// a complete data frame.
 	size uint64
 
-	// The number of frames read from this segment, or zero if it has not
-	// yet been completely read.
-	// It is safe to delete a segment when framesRead > 0 and all those
-	// frames have been acknowledged.
+	// The number of frames read from this segment.
 	framesRead int64
+
+	// If this segment is being written or read, then reader / writer
+	// contain the respective file handles. To get a valid reader / writer for
+	// a segment that may not yet be open, call getReader / getWriter instead.
+	reader io.ReadCloser
+	writer io.WriteCloser
+}
+
+func (segment *queueSegment) getReader() (io.ReadCloser, error) {
+	return nil, nil
+}
+
+func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
+	return nil, nil
 }
 
 // segmentReader is a wrapper around io.Reader that provides helpers and
 // metadata for decoding segment files.
-type segmentReader struct {
+/*type segmentReader struct {
 	// The segment this reader was generated from.
 	segment *queueSegment
 
@@ -82,7 +95,7 @@ type segmentReader struct {
 
 	// The checksumType field from this segment file's header.
 	checksumType ChecksumType
-}
+}*/
 
 type segmentWriter struct {
 	segment  *queueSegment
@@ -103,8 +116,11 @@ const (
 	ChecksumTypeCRC32
 )
 
-// Each data frame has 2 32-bit lengths and 1 32-bit checksum.
-const frameMetadataSize = 12
+// Each data frame has a 32-bit lengths and 1 32-bit checksum
+// in the header, and a duplicate 32-bit length in the footer.
+const frameHeaderSize = 8
+const frameFooterSize = 4
+const frameMetadataSize = frameHeaderSize + frameFooterSize
 
 // Each segment header has a 32-bit version and a 32-bit checksum type.
 const segmentHeaderSize = 8
@@ -116,9 +132,8 @@ func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
 
-func queueSegmentsForPath(
-	path string, logger *logp.Logger,
-) ([]*queueSegment, error) {
+func (settings *Settings) scanExistingSegments() ([]*queueSegment, error) {
+	path := settings.directoryPath()
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", path, err)
@@ -139,8 +154,9 @@ func queueSegmentsForPath(
 			if id, err := strconv.ParseUint(components[0], 10, 64); err == nil {
 				segments = append(segments,
 					&queueSegment{
-						id:   segmentID(id),
-						size: uint64(file.Size()),
+						id:      segmentID(id),
+						created: true,
+						size:    uint64(file.Size()),
 					})
 			}
 		}

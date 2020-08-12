@@ -28,6 +28,8 @@ type diskQueueProducer struct {
 
 	// The configuration this producer was created with.
 	config queue.ProducerConfig
+
+	encoder frameEncoder
 }
 
 //
