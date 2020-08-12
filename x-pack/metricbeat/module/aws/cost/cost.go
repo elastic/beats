@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer/costexploreriface"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/pkg/errors"
@@ -61,8 +63,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	var events []mb.Event
-
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
@@ -73,7 +73,27 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		End:   awssdk.String(endDate),
 	}
 
+	var events []mb.Event
 	// Get total cost from GetCostAndUsage with group by type "TAG"
+	eventsByTag := m.getCostGroupByTag(timePeriod, svc, startDate, endDate)
+	events = append(events, eventsByTag...)
+
+	// Get total cost from GetCostAndUsage with group by type "DIMENSION"
+	eventsByAZ := m.getCostGroupByDimension(timePeriod, svc, startDate, endDate)
+	events = append(events, eventsByAZ...)
+
+	// report events
+	for _, event := range events {
+		if reported := report.Event(event); !reported {
+			m.Logger().Debug("Fetch interrupted, failed to emit event")
+			return nil
+		}
+	}
+	return nil
+}
+
+func (m *MetricSet) getCostGroupByTag(timePeriod costexplorer.DateInterval, svc costexploreriface.ClientAPI, startDate string, endDate string) []mb.Event {
+	var events []mb.Event
 	groupByTagCostInput := costexplorer.GetCostAndUsageInput{
 		Granularity: costexplorer.GranularityDaily,
 		// no permission for "NetAmortizedCost" and "NetUnblendedCost"
@@ -93,47 +113,92 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
 		m.Logger().Errorf(err.Error())
-		report.Error(err)
+		return nil
 	}
 
 	if len(groupByTagOutput.ResultsByTime) > 0 {
 		costResultGroups := groupByTagOutput.ResultsByTime[0].Groups
 		for _, group := range costResultGroups {
-			event := aws.InitEvent("", m.AccountName, m.AccountID)
+			event := m.addCostMetrics(group.Metrics, groupByTagOutput.GroupDefinitions[0], startDate, endDate)
 			for _, key := range group.Keys {
 				tagKey, tagValue := parseGroupKey(key)
 				event.MetricSetFields.Put("resourceTags."+tagKey, tagValue)
 			}
 
-			for metricName, metricValues := range group.Metrics {
-				cost := metricValues
-				costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
-				if err != nil {
-					err = fmt.Errorf("strconv ParseFloat failed: %w", err)
-					m.Logger().Errorf(err.Error())
-					continue
-				}
-
-				value := common.MapStr{
-					"amount": costFloat,
-					"unit":   &cost.Unit,
-				}
-
-				event.MetricSetFields.Put(metricName, value)
-				event.MetricSetFields.Put("start_date", startDate)
-				event.MetricSetFields.Put("end_date", endDate)
-			}
 			events = append(events, event)
 		}
 	}
+	return events
+}
 
-	for _, event := range events {
-		if reported := report.Event(event); !reported {
-			m.Logger().Debug("Fetch interrupted, failed to emit event")
-			return nil
+func (m *MetricSet) getCostGroupByDimension(timePeriod costexplorer.DateInterval, svc costexploreriface.ClientAPI, startDate string, endDate string) []mb.Event {
+	var events []mb.Event
+
+	groupByAZCostInput := costexplorer.GetCostAndUsageInput{
+		Granularity: costexplorer.GranularityDaily,
+		// no permission for "NetAmortizedCost" and "NetUnblendedCost"
+		Metrics: []string{"AmortizedCost", "BlendedCost",
+			"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
+		TimePeriod: &timePeriod,
+		GroupBy: []costexplorer.GroupDefinition{
+			{
+				Key:  awssdk.String("AZ"),
+				Type: costexplorer.GroupDefinitionTypeDimension,
+			},
+		},
+	}
+
+	groupByAZCostReq := svc.GetCostAndUsageRequest(&groupByAZCostInput)
+	groupByAZOutput, err := groupByAZCostReq.Send(context.Background())
+	if err != nil {
+		err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
+		m.Logger().Errorf(err.Error())
+		return nil
+	}
+
+	if len(groupByAZOutput.ResultsByTime) > 0 {
+		costResultGroups := groupByAZOutput.ResultsByTime[0].Groups
+		for _, group := range costResultGroups {
+			if group.Keys[0] == "NoAZ" {
+				continue
+			}
+
+			event := m.addCostMetrics(group.Metrics, groupByAZOutput.GroupDefinitions[0], startDate, endDate)
+			event.MetricSetFields.Put("availability_zone", group.Keys[0])
+			events = append(events, event)
 		}
 	}
-	return nil
+	return events
+}
+
+func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, groupDefinition costexplorer.GroupDefinition, startDate string, endDate string) mb.Event {
+	event := aws.InitEvent("", m.AccountName, m.AccountID)
+
+	// add group definition
+	event.MetricSetFields.Put("group_definition", common.MapStr{
+		"key":  *groupDefinition.Key,
+		"type": groupDefinition.Type,
+	})
+
+	for metricName, metricValues := range metrics {
+		cost := metricValues
+		costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
+		if err != nil {
+			err = fmt.Errorf("strconv ParseFloat failed: %w", err)
+			m.Logger().Errorf(err.Error())
+			continue
+		}
+
+		value := common.MapStr{
+			"amount": costFloat,
+			"unit":   &cost.Unit,
+		}
+
+		event.MetricSetFields.Put(metricName, value)
+		event.MetricSetFields.Put("start_date", startDate)
+		event.MetricSetFields.Put("end_date", endDate)
+	}
+	return event
 }
 
 func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {

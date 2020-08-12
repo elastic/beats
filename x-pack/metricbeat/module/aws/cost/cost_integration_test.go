@@ -17,26 +17,33 @@ import (
 )
 
 func TestData(t *testing.T) {
-	resultTypeIs := func(resultTypeIsEmpty bool) func(e common.MapStr) bool {
+	resultTypeIs := func(resultType string) func(e common.MapStr) bool {
 		return func(e common.MapStr) bool {
-			v, err := e.GetValue("aws.cost.resourceTags.aws:createdBy")
-			return err == nil && (v == "") == resultTypeIsEmpty
+			v, err := e.GetValue("aws.cost.group_definition.key")
+			if v == "aws:createdBy" {
+				t, err := e.GetValue("aws.cost.resourceTags.aws:createdBy")
+				if t == resultType {
+					return err == nil
+				}
+			}
+			return err == nil && v == resultType
 		}
 	}
 
 	dataFiles := []struct {
-		resultTypeIsEmpty bool
-		path              string
+		resultType string
+		path       string
 	}{
-		{true, "./_meta/data.json"},
-		{false, "./_meta/data_group_by.json"},
+		{"", "./_meta/data.json"},
+		{"aws:createdBy", "./_meta/data_group_by_tag.json"},
+		{"AZ", "./_meta/data_group_by_az.json"},
 	}
 
 	config := mtest.GetConfigForTest(t, "cost", "24h")
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)
-		t.Run(fmt.Sprintf("result type: %t", df.resultTypeIsEmpty), func(t *testing.T) {
-			metricSet.WriteEventsCond(t, df.path, resultTypeIs(df.resultTypeIsEmpty))
+		t.Run(fmt.Sprintf("result type: %s", df.resultType), func(t *testing.T) {
+			metricSet.WriteEventsCond(t, df.path, resultTypeIs(df.resultType))
 		})
 	}
 }
