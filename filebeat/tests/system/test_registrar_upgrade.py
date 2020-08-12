@@ -3,8 +3,7 @@
 
 import os
 import json
-
-from nose.plugins.skip import Skip, SkipTest
+import unittest
 
 from filebeat import BaseTest
 
@@ -55,7 +54,7 @@ class Test(BaseTest):
         # test is current skipped on windows, due to FileStateOS must match the
         # current OS format.
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"
