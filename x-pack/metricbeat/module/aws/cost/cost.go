@@ -7,6 +7,7 @@ package cost
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -60,6 +61,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	var events []mb.Event
+
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
@@ -70,51 +73,67 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		End:   awssdk.String(endDate),
 	}
 
-	// no permission for "NetAmortizedCost" and "NetUnblendedCost"
-	input := costexplorer.GetCostAndUsageInput{
+	// Get total cost from GetCostAndUsage with group by type "TAG"
+	groupByTagCostInput := costexplorer.GetCostAndUsageInput{
 		Granularity: costexplorer.GranularityDaily,
+		// no permission for "NetAmortizedCost" and "NetUnblendedCost"
 		Metrics: []string{"AmortizedCost", "BlendedCost",
 			"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
 		TimePeriod: &timePeriod,
+		GroupBy: []costexplorer.GroupDefinition{
+			{
+				Key:  awssdk.String("aws:createdBy"),
+				Type: costexplorer.GroupDefinitionTypeTag,
+			},
+		},
 	}
 
-	req := svc.GetCostAndUsageRequest(&input)
-	output, err := req.Send(context.Background())
+	groupByTagCostReq := svc.GetCostAndUsageRequest(&groupByTagCostInput)
+	groupByTagOutput, err := groupByTagCostReq.Send(context.Background())
 	if err != nil {
 		err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
 		m.Logger().Errorf(err.Error())
 		report.Error(err)
 	}
 
-	if len(output.ResultsByTime) > 0 {
-		costResults := output.ResultsByTime[0].Total
-		event := aws.InitEvent("", m.AccountName, m.AccountID)
-
-		for costName, costValue := range costResults {
-			cost := costValue
-			costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
-			if err != nil {
-				err = fmt.Errorf("strconv ParseFloat failed: %w", err)
-				m.Logger().Errorf(err.Error())
-				continue
+	if len(groupByTagOutput.ResultsByTime) > 0 {
+		costResultGroups := groupByTagOutput.ResultsByTime[0].Groups
+		for _, group := range costResultGroups {
+			event := aws.InitEvent("", m.AccountName, m.AccountID)
+			for _, key := range group.Keys {
+				tagKey, tagValue := parseGroupKey(key)
+				event.MetricSetFields.Put("resourceTags."+tagKey, tagValue)
 			}
 
-			value := common.MapStr{
-				"amount": costFloat,
-				"unit":   &cost.Unit,
+			for metricName, metricValues := range group.Metrics {
+				cost := metricValues
+				costFloat, err := strconv.ParseFloat(*cost.Amount, 64)
+				if err != nil {
+					err = fmt.Errorf("strconv ParseFloat failed: %w", err)
+					m.Logger().Errorf(err.Error())
+					continue
+				}
+
+				value := common.MapStr{
+					"amount": costFloat,
+					"unit":   &cost.Unit,
+				}
+
+				event.MetricSetFields.Put(metricName, value)
+				event.MetricSetFields.Put("start_date", startDate)
+				event.MetricSetFields.Put("end_date", endDate)
 			}
-			event.MetricSetFields.Put(costName, value)
+			events = append(events, event)
 		}
+	}
 
-		event.MetricSetFields.Put("start_date", startDate)
-		event.MetricSetFields.Put("end_date", endDate)
-
+	for _, event := range events {
 		if reported := report.Event(event); !reported {
 			m.Logger().Debug("Fetch interrupted, failed to emit event")
 			return nil
 		}
 	}
-	return err
+	return nil
 }
 
 func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {
@@ -122,5 +141,23 @@ func getStartDateEndDate(period time.Duration) (startDate string, endDate string
 	startTime := currentTime.Add(period * -1)
 	startDate = startTime.Format("2006-01-02")
 	endDate = currentTime.Format("2006-01-02")
+	return
+}
+
+func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
+	keys := strings.Split(groupKey, "$")
+	if len(keys) == 2 {
+		tagKey = keys[0]
+		tagValue = keys[1]
+	} else if len(keys) > 2 {
+		tagKey = keys[0]
+		tagValue = keys[1]
+		for i := 2; i < len(keys); i++ {
+			tagValue = tagValue + "$" + keys[i]
+		}
+	} else {
+		tagKey = keys[0]
+		tagValue = ""
+	}
 	return
 }

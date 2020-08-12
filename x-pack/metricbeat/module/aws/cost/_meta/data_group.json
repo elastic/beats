@@ -23,9 +23,8 @@
                 "unit": "N/A"
             },
             "end_date": "2020-08-11",
-            "resourceTags": {
-                "aws:createdBy": ""
-            },
+            "group_definition_type": "TAG",
+            "result_type": "group",
             "start_date": "2020-08-10"
         }
     },
@@ -44,6 +43,9 @@
     "metricset": {
         "name": "cost",
         "period": 10000
+    },
+    "resourceTags": {
+        "aws:createdBy": ""
     },
     "service": {
         "type": "aws"

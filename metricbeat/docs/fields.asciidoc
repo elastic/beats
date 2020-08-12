@@ -1597,6 +1597,126 @@ type: keyword
 --
 
 [float]
+=== cost
+
+`cost` contains the metrics that were scraped from cost explorer
+
+
+
+
+*`aws.cost.AmortizedCost.amount.amount`*::
++
+--
+Amortized cost amount
+
+type: double
+
+--
+
+*`aws.cost.AmortizedCost.amount.unit`*::
++
+--
+Amortized cost unit
+
+type: keyword
+
+--
+
+
+*`aws.cost.BlendedCost.amount`*::
++
+--
+Blended cost amount
+
+type: double
+
+--
+
+*`aws.cost.BlendedCost.unit`*::
++
+--
+Blended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.cost.NormalizedUsageAmount.amount`*::
++
+--
+Normalized usage amount
+
+type: double
+
+--
+
+*`aws.cost.NormalizedUsageAmount.unit`*::
++
+--
+Normalized usage amount unit
+
+type: keyword
+
+--
+
+
+*`aws.cost.UnblendedCost.amount`*::
++
+--
+Unblended cost amount
+
+type: double
+
+--
+
+*`aws.cost.UnblendedCost.unit`*::
++
+--
+Unblended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.cost.UsageQuantity.amount`*::
++
+--
+Usage quantity amount
+
+type: double
+
+--
+
+*`aws.cost.UsageQuantity.unit`*::
++
+--
+Usage quantity unit
+
+type: keyword
+
+--
+
+*`aws.cost.start_date`*::
++
+--
+Start date for retrieving AWS costs
+
+type: keyword
+
+--
+
+*`aws.cost.end_date`*::
++
+--
+End date for retrieving AWS costs
+
+type: keyword
+
+--
+
+[float]
 === dynamodb
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
