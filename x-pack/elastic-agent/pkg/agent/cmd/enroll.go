@@ -5,13 +5,17 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -20,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 var defaultDelay = 1 * time.Second
@@ -42,6 +47,8 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
+	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
+	cmd.Flags().Bool("no-restart", false, "Skip restarting the currently running daemon")
 
 	return cmd
 }
@@ -63,6 +70,13 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	staging, _ := cmd.Flags().GetString("staging")
+	if staging != "" {
+		if len(staging) < 8 {
+			return errors.New(fmt.Errorf("invalid staging build hash; must be at least 8 characters"), "Error")
+		}
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -103,6 +117,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		CASha256:             caSHA256,
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
+		Staging:              staging,
 	}
 
 	c, err := application.NewEnrollCmd(
@@ -116,11 +131,42 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	err = c.Execute()
+	signal := make(chan struct{})
+
+	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+
+	for errors.Is(err, fleetapi.ErrTooManyRequests) {
+		fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
+		backExp.Wait()
+		fmt.Fprintln(streams.Out, "Retrying to enroll...")
+		err = c.Execute()
+	}
+
+	close(signal)
+
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
 
-	fmt.Fprintln(streams.Out, "Successfully enrolled the Agent.")
+	fmt.Fprintln(streams.Out, "Successfully enrolled the Elastic Agent.")
+
+	// skip restarting
+	noRestart, _ := cmd.Flags().GetBool("no-restart")
+	if noRestart {
+		return nil
+	}
+
+	daemon := client.New()
+	err = daemon.Connect(context.Background())
+	if err == nil {
+		defer daemon.Disconnect()
+		err = daemon.Restart(context.Background())
+		if err == nil {
+			fmt.Fprintln(streams.Out, "Successfully triggered restart on running Elastic Agent.")
+			return nil
+		}
+	}
+	fmt.Fprintln(streams.Out, "Elastic Agent might not be running; unable to trigger restart")
 	return nil
 }
 

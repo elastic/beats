@@ -9,11 +9,15 @@ filebeat:
       var: value
     processors:
       - add_fields:
-          target: "dataset"
+          target: "data_stream"
           fields:
             type: logs
-            name: generic
+            dataset: generic
             namespace: default
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
   - type: log
     paths:
       - /var/log/hello3.log
@@ -23,11 +27,15 @@ filebeat:
       var: value
     processors:
       - add_fields:
-          target: "dataset"
+          target: "data_stream"
           fields:
             type: testtype
-            name: generic
+            dataset: generic
             namespace: default
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
 output:
   elasticsearch:
     hosts:

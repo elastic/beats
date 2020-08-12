@@ -10484,7 +10484,7 @@ Time at which the certificate is first considered valid.
 
 type: date
 
-example: 2019-08-16 01:40:25
+example: 2019-08-16 01:40:25+00:00
 
 --
 
@@ -10495,7 +10495,7 @@ Time at which the certificate is no longer considered valid.
 
 type: date
 
-example: 2020-07-16 03:15:39
+example: 2020-07-16 03:15:39+00:00
 
 --
 
@@ -10756,7 +10756,7 @@ Time at which the certificate is first considered valid.
 
 type: date
 
-example: 2019-08-16 01:40:25
+example: 2019-08-16 01:40:25+00:00
 
 --
 
@@ -10767,7 +10767,7 @@ Time at which the certificate is no longer considered valid.
 
 type: date
 
-example: 2020-07-16 03:15:39
+example: 2020-07-16 03:15:39+00:00
 
 --
 

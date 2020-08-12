@@ -84,6 +84,8 @@ You can configure {beatname_uc} to use the following inputs:
 
 include::multiline.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-awscloudwatch.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
