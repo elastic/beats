@@ -136,8 +136,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}()
 
 				// Publish at least 1 batch worth of events but no more than 20% events
-				//publishLimit := uint(math.Max(minEventsInBatch, float64(numEvents)*0.2))
-				publishLimit := uint(math.Max(float64(numEvents)*0.1, float64(numEvents)*0.3))
+				publishLimit := uint(math.Max(minEventsInBatch, float64(numEvents)*0.2))
 
 				var publishedFirst atomic.Uint
 				blockCtrl := make(chan struct{})
