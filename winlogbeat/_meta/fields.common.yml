@@ -508,11 +508,6 @@
       path:  winlog.user.identifier
       migration: true
 
-    - name: user.domain
-      type: alias
-      path: winlog.user.domain
-      migration: true
-
     - name: user.type
       type: alias
       path: winlog.user.type
