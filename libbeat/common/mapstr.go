@@ -268,9 +268,21 @@ func (m MapStr) Format(f fmt.State, c rune) {
 func (m MapStr) Expand() (MapStr, error) {
 	e := MapStr{}
 	f := m.Flatten()
-	for k, v := range f {
-		if _, err := e.Put(k, v); err != nil {
+	keys := make([]string, 0, len(m))
+	for k := range f {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i := len(keys) - 1; i >= 0; i-- {
+		k := keys[i]
+		old, err := e.Put(k, f[k])
+		if err != nil {
 			return e, err
+		}
+		_, oldIsMap := tryToMapStr(old)
+		_, newIsMap := tryToMapStr(f[k])
+		if oldIsMap != newIsMap {
+			return e, fmt.Errorf("incompatable types expanded for %s: old: %T new: %T", k, old, f[k])
 		}
 	}
 	return e, nil

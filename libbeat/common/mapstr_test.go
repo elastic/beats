@@ -864,21 +864,15 @@ func TestExpand(t *testing.T) {
 				},
 			},
 		},
-		// This is nondeterminstic
-		// 1. Put("root.one.two", 2)
-		// 2. Put("root.one", 1)
-		// yields: {"root":{"one":1}}
-		//
-		// The reverse causes an error: "expected map but type is int"
-		//
-		//{
-		//	Event: MapStr{
-		//		"root": MapStr{
-		//			"one": 1,
-		//		},
-		//		"root.one.two": 2,
-		//	},
-		//},
+		{
+			Event: MapStr{
+				"root": MapStr{
+					"seven": 1,
+				},
+				"root.seven.eight": 2,
+			},
+			ErrExpected: true,
+		},
 	}
 
 	for _, test := range tests {
