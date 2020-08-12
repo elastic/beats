@@ -4,7 +4,7 @@
 
 # Prepare home in a different stage to avoid creating additional layers on
 # the final image because of permission changes.
-FROM {{ .from }} AS home
+FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
@@ -23,8 +23,13 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
 
 FROM {{ .from }}
 
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum clean all
+{{- if contains .from "ubi-minimal" }}
+RUN microdnf -y --setopt=tsflags=nodocs update && \
+    microdnf install shadow-utils && \
+    microdnf clean all
+{{- else }}
+RUN yum -y --setopt=tsflags=nodocs update && yum clean all
+{{- end }}
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \

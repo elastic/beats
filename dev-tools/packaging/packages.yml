@@ -460,6 +460,7 @@ shared:
     <<: *binary_spec
     extra_vars:
       from: 'centos:7'
+      buildFrom: 'centos:7'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
@@ -471,7 +472,7 @@ shared:
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi:8.2'
+      from: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
     files:
       /licenses/ELASTIC-LICENSE.txt:
         source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
