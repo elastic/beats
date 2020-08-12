@@ -466,10 +466,7 @@
         ]
     },
     {
-        "cisco.asa.destination_interface": "fw111",
         "cisco.asa.message_id": "710006",
-        "destination.address": "127.0.1.1",
-        "destination.ip": "127.0.1.1",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -489,19 +486,11 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1384,
-        "network.protocol": "vrrp",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
-        "related.ip": [
-            "127.0.1.1",
-            "127.0.1.1"
-        ],
         "service.type": "cisco",
-        "source.address": "127.0.1.1",
-        "source.ip": "127.0.1.1",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -1549,6 +1538,7 @@
         ]
     },
     {
+        "cisco.asa.command_line_arguments": "show access-list fw211111_access_out brief",
         "cisco.asa.message_id": "111009",
         "event.action": "firewall-rule",
         "event.category": [
@@ -1574,7 +1564,6 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
-        "process.command_line": "show access-list fw211111_access_out brief",
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1582,6 +1571,7 @@
         ]
     },
     {
+        "cisco.asa.command_line_arguments": "show access-list aaa_out brief",
         "cisco.asa.message_id": "111009",
         "event.action": "firewall-rule",
         "event.category": [
@@ -1607,7 +1597,6 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
-        "process.command_line": "show access-list aaa_out brief",
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -2405,6 +2394,526 @@
         "source.address": "somedomainname.local",
         "source.domain": "somedomainname.local",
         "source.port": 27218,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "111004",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 111004,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-111004: console end configuration: OK",
+        "event.outcome": "success",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 8214,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "service.type": "cisco",
+        "source.address": "console",
+        "source.domain": "console",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.command_line_arguments": "'clear'",
+        "cisco.asa.message_id": "111010",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 111010,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-111010: User 'enable_15', running 'CLI' from IP 10.10.0.87, executed 'clear'",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "host.user.name": "'enable_15'",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 8282,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.10.0.87"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.0.87",
+        "source.ip": "10.10.0.87",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "502103",
+        "cisco.asa.privilege.new": "15",
+        "cisco.asa.privilege.old": "1",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 502103,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-502103: User priv level changed: Uname: enable_15 From: 1 To: 15",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "host.user.name": "enable_15",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 8389,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "FCD-FS-LAN",
+        "cisco.asa.message_id": "605004",
+        "destination.address": "10.10.1.254",
+        "destination.ip": "10.10.1.254",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 605004,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-605004: Login denied from 10.10.1.212/51923 to FCD-FS-LAN:10.10.1.254/https for user \"*****\"",
+        "event.outcome": "deny",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 8484,
+        "network.protocol": "https",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "FCD-FS-LAN",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.10.1.212",
+            "10.10.1.254"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.1.212",
+        "source.ip": "10.10.1.212",
+        "source.port": 51923,
+        "source.user.name": "*****",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "611102",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 611102,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-611102: User authentication failed: IP address: 10.10.0.87, Uname: admin",
+        "event.outcome": "failed",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "host.user.name": "admin",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 8607,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.10.0.87"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.0.87",
+        "source.ip": "10.10.0.87",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "FCD-FS-LAN",
+        "cisco.asa.message_id": "605005",
+        "destination.address": "10.10.1.254",
+        "destination.ip": "10.10.1.254",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 605005,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-605005: Login permitted from 10.10.0.87/6651 to FCD-FS-LAN:10.10.1.254/ssh for user \"admin\"",
+        "event.outcome": "allow",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 8710,
+        "network.protocol": "ssh",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "FCD-FS-LAN",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.10.0.87",
+            "10.10.1.254"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.0.87",
+        "source.ip": "10.10.0.87",
+        "source.port": 6651,
+        "source.user.name": "admin",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "611101",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 611101,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-611101: User authentication succeeded: IP address: 10.10.0.87, Uname: admin",
+        "event.outcome": "succeeded",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "host.user.name": "admin",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 8832,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.10.0.87"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.0.87",
+        "source.ip": "10.10.0.87",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713049",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713049,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-713049: Group = 91.240.17.178, IP = 91.240.17.178, Security negotiation complete for LAN-to-LAN Group (91.240.17.178) Responder, Inbound SPI = 0x276b1da2, Outbound SPI = 0x0e1a581d",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 8938,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "91.240.17.178"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113019",
+        "destination.address": "91.240.17.178",
+        "destination.as.number": 201126,
+        "destination.as.organization.name": "CDW Ltd",
+        "destination.bytes": 1216163,
+        "destination.geo.city_name": "London",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.location.lat": 51.5888,
+        "destination.geo.location.lon": -0.0247,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "91.240.17.178",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113019,
+        "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
+        "event.severity": 4,
+        "event.start": "2020-04-27T04:03:03.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 9149,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "91.240.17.178"
+        ],
+        "service.type": "cisco",
+        "source.bytes": 297103,
+        "source.user.name": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.assigned_ip": "8.8.4.4",
+        "cisco.asa.message_id": "722051",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 722051,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-722051: Group some-policy User testuser IP 8.8.8.8 IPv4 Address 8.8.4.4 IPv6 address 2001:4860:4860::8888 assigned to session",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 9388,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "8.8.8.8"
+        ],
+        "service.type": "cisco",
+        "source.address": "8.8.8.8",
+        "source.as.number": 15169,
+        "source.as.organization.name": "Google LLC",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "8.8.8.8",
+        "source.user.name": "testuser",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "716002",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 9544,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "8.8.8.8"
+        ],
+        "service.type": "cisco",
+        "source.address": "8.8.8.8",
+        "source.as.number": 15169,
+        "source.as.organization.name": "Google LLC",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "8.8.8.8",
+        "source.user.name": "testuser",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "710003",
+        "destination.address": "195.74.114.34",
+        "destination.as.number": 8468,
+        "destination.as.organization.name": "Entanet",
+        "destination.geo.city_name": "Stoke Newington",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.location.lat": 51.5638,
+        "destination.geo.location.lon": -0.0765,
+        "destination.geo.region_iso_code": "GB-HCK",
+        "destination.geo.region_name": "Hackney",
+        "destination.ip": "195.74.114.34",
+        "destination.port": 23,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 710003,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-3-710003: TCP access denied by ACL from 104.46.88.19/6370 to outside:195.74.114.34/23",
+        "event.severity": 3,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 9671,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "104.46.88.19",
+            "195.74.114.34"
+        ],
+        "service.type": "cisco",
+        "source.address": "104.46.88.19",
+        "source.as.number": 8075,
+        "source.as.organization.name": "Microsoft Corporation",
+        "source.geo.city_name": "Dublin",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "IE",
+        "source.geo.location.lat": 53.3338,
+        "source.geo.location.lon": -6.2488,
+        "source.geo.region_iso_code": "IE-L",
+        "source.geo.region_name": "Leinster",
+        "source.ip": "104.46.88.19",
+        "source.port": 6370,
         "tags": [
             "cisco-asa",
             "forwarded"

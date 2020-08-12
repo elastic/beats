@@ -110,6 +110,30 @@
     description: >
       The assigned DAP records
 
+  - name: command_line_arguments
+    default_field: false
+    type: keyword
+    description: >
+      The command line arguments logged by the local audit log
+
+  - name: assigned_ip
+    default_field: false
+    type: ip
+    description: >
+      The IP address assigned to a VPN client successfully connecting
+
+  - name: privilege.old
+    default_field: false
+    type: keyword
+    description: >
+      When a users privilege is changed this is the old value
+
+  - name: privilege.new
+    default_field: false
+    type: keyword
+    description: >
+      When a users privilege is changed this is the new value
+
   - name: burst.object
     default_field: false
     type: keyword

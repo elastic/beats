@@ -264,11 +264,39 @@ processors:
       if: "ctx._temp_.cisco.message_id == '106102' || ctx._temp_.cisco.message_id == '106103'"
       field: "message"
       pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} for user %{user.name} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port})%{}-> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port})%{}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '111004'"
+      field: "message"
+      pattern: "%{source.address} end configuration: %{_temp_.cisco.cli_outcome}"
+  - set:
+      field: event.outcome
+      value: "success"
+      if: "ctx._temp_.cisco.message_id == '111004' && ctx?._temp_?.cisco?.cli_outcome == 'OK'"
+  - set:
+      field: event.outcome
+      value: "failure"
+      if: "ctx._temp_.cisco.message_id == '111004' && ctx?._temp_?.cisco?.cli_outcome == 'FAILED'"
+  - remove:
+      field: _temp_.cisco.cli_outcome
+      ignore_missing: true
+  - append:
+      field: event.type
+      value: "change"
+      if: "ctx._temp_.cisco.message_id == '111004'"
   - grok:
       if: "ctx._temp_.cisco.message_id == '111009'"
       field: "message"
       patterns:
-      - "^%{NOTSPACE} %{QUOTEDSTRING:host.user.name} executed %{NOTSPACE} %{GREEDYDATA:process.command_line}"
+      - "^%{NOTSPACE} %{QUOTEDSTRING:host.user.name} executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
+  - grok:
+      if: "ctx._temp_.cisco.message_id == '111010'"
+      field: "message"
+      patterns:
+      - "User %{QUOTEDSTRING:host.user.name}, running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '113019'"
+      field: "message"
+      pattern: "Group = %{}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{message}"
   - dissect:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
@@ -470,9 +498,27 @@ processors:
       value: "{{source.port}}"
       ignore_empty_value: true
   - dissect:
+      if: "ctx._temp_.cisco.message_id == '502103'"
+      field: "message"
+      pattern: "User priv level changed: Uname: %{host.user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
+  - append:
+      if: "ctx._temp_.cisco.message_id == '502103'"
+      field: "event.type"
+      value:
+      - "group"
+      - "change"
+  - append:
+      if: "ctx._temp_.cisco.message_id == '502103'"
+      field: "event.category"
+      value: "iam"
+  - dissect:
       if: "ctx._temp_.cisco.message_id == '507003'"
       field: "message"
       pattern: "%{network.transport} flow from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} terminated by inspection engine, reason - %{message}"
+  - dissect:
+      if: '["605004", "605005"].contains(ctx._temp_.cisco.message_id)'
+      field: "message"
+      pattern: 'Login %{event.outcome} from %{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{network.protocol} for user "%{source.user.name}"'
   - dissect:
       if: "ctx._temp_.cisco.message_id == '609001'"
       field: "message"
@@ -482,13 +528,29 @@ processors:
       field: "message"
       pattern: "Teardown local-host %{_temp_.cisco.source_interface}:%{source.address} duration %{_temp_.duration_hms}"
   - dissect:
+      if: '["611102", "611101"].contains(ctx._temp_.cisco.message_id)'
+      field: "message"
+      pattern: 'User authentication %{event.outcome}: IP address: %{source.address}, Uname: %{host.user.name}'
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '710003'"
+      field: "message"
+      pattern: "%{network.transport} access denied by ACL from %{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+  - dissect:
       if: "ctx._temp_.cisco.message_id == '710005'"
       field: "message"
       pattern: "%{network.transport} request discarded from %{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
   - dissect:
-      if: "ctx._temp_.cisco.message_id == '710006'"
+      if: "ctx._temp_.cisco.message_id == '713049'"
       field: "message"
-      pattern: "%{network.protocol} request discarded from %{source.address} to %{_temp_.cisco.destination_interface}:%{destination.address}"
+      pattern: "Group = %{}, IP = %{source.address}, Security negotiation complete for LAN-to-LAN Group (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '716002'"
+      field: "message"
+      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: User Requested."
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '722051'"
+      field: "message"
+      pattern: "Group %{} User %{source.user.name} IP %{source.address} IPv4 Address %{_temp_.cisco.assigned_ip} %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '733100'"
       field: "message"
@@ -1462,11 +1524,11 @@ processors:
       ignore_empty_value: true
   - set:
       field: observer.egress.interface.name
-      value: "{{ cisco.asa.source_interface }}"
+      value: "{{ cisco.{< .internal_prefix >}.source_interface }}"
       ignore_empty_value: true
   - set:
       field: observer.ingress.interface.name
-      value: "{{ cisco.asa.destination_interface }}"
+      value: "{{ cisco.{< .internal_prefix >}.destination_interface }}"
       ignore_empty_value: true
   - append:
       field: related.ip
