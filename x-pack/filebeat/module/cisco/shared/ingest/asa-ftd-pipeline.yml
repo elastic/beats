@@ -287,12 +287,12 @@ processors:
       if: "ctx._temp_.cisco.message_id == '111009'"
       field: "message"
       patterns:
-      - "^%{NOTSPACE} %{QUOTEDSTRING:host.user.name} executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
+      - "^%{NOTSPACE} '%{NOTSPACE:host.user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '111010'"
       field: "message"
       patterns:
-      - "User %{QUOTEDSTRING:host.user.name}, running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
+      - "User '%{NOTSPACE:host.user.name}', running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '113019'"
       field: "message"
@@ -576,7 +576,7 @@ processors:
   # Handle 302xxx messages (Flow expiration a.k.a "Teardown")
   #
   - set:
-      if: '["302012", "302014", "302016", "302018", "302021", "302036", "302304", "302306", "609002"].contains(ctx._temp_.cisco.message_id)'
+      if: '["302012", "302014", "302016", "302018", "302020", "302021", "302036", "302304", "302306", "609001", "609002"].contains(ctx._temp_.cisco.message_id)'
       field: "event.action"
       value: "flow-expiration"
   - grok:
