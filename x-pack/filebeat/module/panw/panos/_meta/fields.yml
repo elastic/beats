@@ -61,6 +61,11 @@
               description: >
                 Post-NAT destination port.
 
+    - name: endreason
+      type: keyword
+      description: >
+        The reason a session terminated.
+
     - name: network
       type: group
       description: >
