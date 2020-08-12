@@ -92,7 +92,7 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 	case <-timer.C:
 		return reader.Message{}, r.signal
 	case <-r.done:
-		return reader.Message{}, nil
+		return reader.Message{}, io.EOF
 	}
 }
 
