@@ -464,7 +464,6 @@ pipeline {
           }
           stages {
             stage('Prepare cloud integration tests environments'){
-              agent { label 'ubuntu-18 && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 startCloudTestEnv('x-pack-metricbeat', [
@@ -473,7 +472,6 @@ pipeline {
               }
             }
             stage('Metricbeat x-pack'){
-              agent { label 'ubuntu-18 && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
