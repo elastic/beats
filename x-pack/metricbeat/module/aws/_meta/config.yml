@@ -30,17 +30,11 @@
     - sns
     - sqs
 - module: aws
-  period: 12h
+  period: 24h
   metricsets:
     - billing
-  regions:
-    - us-east-1
 - module: aws
   period: 24h
   metricsets:
     - s3_daily_storage
     - s3_request
-- module: aws
-  period: 24h
-  metricsets:
-    - cost

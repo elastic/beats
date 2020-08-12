@@ -1,32 +1,34 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
-        "cost": {
+        "billing": {
             "AmortizedCost": {
-                "amount": 0.016129032,
+                "amount": 0.6923612553,
                 "unit": "USD"
             },
             "BlendedCost": {
-                "amount": 0.016129032,
+                "amount": 0.6923612553,
                 "unit": "USD"
             },
             "NormalizedUsageAmount": {
-                "amount": 0,
+                "amount": 12,
                 "unit": "N/A"
             },
             "UnblendedCost": {
-                "amount": 0.016129032,
+                "amount": 0.6923612553,
                 "unit": "USD"
             },
             "UsageQuantity": {
-                "amount": 0.1612903224,
+                "amount": 312.6837588983,
                 "unit": "N/A"
             },
-            "end_date": "2020-08-11",
-            "resourceTags": {
-                "aws:createdBy": "AssumedRole:AROAWHL7AXDB2C3XGU462:1583852675450569406"
+            "availability_zone": "eu-central-1",
+            "end_date": "2020-08-12",
+            "group_definition": {
+                "key": "AZ",
+                "type": "DIMENSION"
             },
-            "start_date": "2020-08-10"
+            "start_date": "2020-08-11"
         }
     },
     "cloud": {
@@ -37,12 +39,12 @@
         "provider": "aws"
     },
     "event": {
-        "dataset": "aws.cost",
+        "dataset": "aws.billing",
         "duration": 115000,
         "module": "aws"
     },
     "metricset": {
-        "name": "cost",
+        "name": "billing",
         "period": 10000
     },
     "service": {

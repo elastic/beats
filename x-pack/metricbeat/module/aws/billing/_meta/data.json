@@ -2,18 +2,32 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "billing": {
-            "metrics": {
-                "EstimatedCharges": {
-                    "max": 0
-                }
-            }
-        },
-        "cloudwatch": {
-            "namespace": "AWS/Billing"
-        },
-        "dimensions": {
-            "Currency": "USD",
-            "ServiceName": "AmazonSNS"
+            "AmortizedCost": {
+                "amount": 7.8057745276,
+                "unit": "USD"
+            },
+            "BlendedCost": {
+                "amount": 7.7615302268,
+                "unit": "USD"
+            },
+            "NormalizedUsageAmount": {
+                "amount": 0,
+                "unit": "N/A"
+            },
+            "UnblendedCost": {
+                "amount": 7.8057745276,
+                "unit": "USD"
+            },
+            "UsageQuantity": {
+                "amount": 1673664.5747861217,
+                "unit": "N/A"
+            },
+            "end_date": "2020-08-12",
+            "group_definition": {
+                "key": "aws:createdBy",
+                "type": "TAG"
+            },
+            "start_date": "2020-08-11"
         }
     },
     "cloud": {
@@ -21,8 +35,7 @@
             "id": "428152502467",
             "name": "elastic-beats"
         },
-        "provider": "aws",
-        "region": "us-east-1"
+        "provider": "aws"
     },
     "event": {
         "dataset": "aws.billing",

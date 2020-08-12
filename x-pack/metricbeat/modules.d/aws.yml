@@ -1,0 +1,5 @@
+- module: aws
+  period: 24h
+  credential_profile_name: elastic-beats
+  metricsets:
+    - billing
