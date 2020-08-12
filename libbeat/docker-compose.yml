@@ -71,7 +71,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -u admin:changeme -f http://localhost:9200/_cat/health?h=status --insecure | grep -q green"]
+      test: ["CMD", "curl", "-u", "admin:changeme", "-f", "https://localhost:9200", "--insecure"]
       retries: 1200
       interval: 5s
       start_period: 60s
