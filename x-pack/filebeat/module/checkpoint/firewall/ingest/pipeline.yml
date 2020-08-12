@@ -40,10 +40,10 @@ processors:
     - message
     - host
     ignore_missing: true
-- rename:
-    field": "@timestamp"
-    target_field: "event.created"
-    if: "ctx.@timestamp != null"
+# - rename:
+#     field": "@timestamp"
+#     target_field: "event.created"
+#     if: "ctx.@timestamp != null"
 - date:
     field: "syslog5424_ts"
     formats: ["ISO8601"]
