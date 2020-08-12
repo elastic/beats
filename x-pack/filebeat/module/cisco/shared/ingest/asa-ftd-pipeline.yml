@@ -1505,6 +1505,7 @@ processors:
             ctx.event.type.add('denied');
           }
         }
+
   # Configures observer fields with a copy from cisco and host fields. Later on these might replace host.hostname.
   - set:
       field: observer.hostname
