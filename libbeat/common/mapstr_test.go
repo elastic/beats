@@ -864,14 +864,6 @@ func TestExpand(t *testing.T) {
 				},
 			},
 		},
-		{
-			Event: MapStr{
-				"over":     1,
-				"over.lap": 5,
-			},
-			ErrExpected: true,
-		},
-
 		// This is nondeterminstic
 		// 1. Put("root.one.two", 2)
 		// 2. Put("root.one", 1)
