@@ -291,7 +291,10 @@ func (h *Harvester) Run() error {
 		}
 
 		h.stop()
-		h.log.Close()
+		err := h.reader.Close()
+		if err != nil {
+			logp.Err("Failed to stop harvester for file %s: %v", h.state.Source, err)
+		}
 	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s", h.state.Source)

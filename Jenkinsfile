@@ -230,7 +230,7 @@ pipeline {
             mageTargetWin(context: "Filebeat x-pack Windows", directory: "x-pack/filebeat", target: "build unitTest")
           }
         }
-        stage('Heartbeat'){
+        stage('Heartbeat oss'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -239,43 +239,39 @@ pipeline {
               return env.BUILD_HEARTBEAT != "false"
             }
           }
-          stages {
-            stage('Heartbeat oss'){
-              steps {
-                mageTarget(context: "Heartbeat oss Linux", directory: "heartbeat", target: "build test")
-              }
+          steps {
+            mageTarget(context: "Heartbeat oss Linux", directory: "heartbeat", target: "build test")
+          }
+        }
+        stage('Heartbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_HEARTBEAT != "false"
             }
-            stage('Heartbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return env.BUILD_ON_MACOS != 'false'
-                }
-              }
-              steps {
-                mageTarget(context: "Heartbeat oss Mac OS X", directory: "heartbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            mageTarget(context: "Heartbeat oss Mac OS X", directory: "heartbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Heartbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Heartbeat oss Windows Unit test", directory: "heartbeat", target: "build unitTest")
-              }
+          }
+        }
+        stage('Heartbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest &&  env.BUILD_HEARTBEAT != "false"
             }
+          }
+          steps {
+            mageTargetWin(context: "Heartbeat oss Windows Unit test", directory: "heartbeat", target: "build unitTest")
           }
         }
         stage('Auditbeat oss Linux'){
@@ -464,7 +460,6 @@ pipeline {
           }
           stages {
             stage('Prepare cloud integration tests environments'){
-              agent { label 'ubuntu-18 && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 startCloudTestEnv('x-pack-metricbeat', [
@@ -473,7 +468,6 @@ pipeline {
               }
             }
             stage('Metricbeat x-pack'){
-              agent { label 'ubuntu-18 && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
@@ -558,52 +552,42 @@ pipeline {
             mageTargetWin(context: "Metricbeat x-pack Windows", directory: "x-pack/metricbeat", target: "build unitTest")
           }
         }
-        stage('Packetbeat OSS'){
+        stage('Packetbeat Linux'){
           agent { label 'ubuntu-18 && immutable' }
+          options { skipDefaultCheckout() }
+          steps {
+            mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
+          }
+        }
+        stage('Packetbeat Mac OS X'){
+          agent { label 'macosx' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
             expression {
-              return env.BUILD_PACKETBEAT != "false"
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_PACKETBEAT != "false"
             }
           }
-          stages {
-            stage('Packetbeat Linux'){
-              steps {
-                mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
-              }
+          steps {
+            mageTarget(context: "Packetbeat OSS Mac OS X", directory: "packetbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Packetbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return env.BUILD_ON_MACOS != 'false'
-                }
-              }
-              steps {
-                mageTarget(context: "Packetbeat OSS Mac OS X", directory: "packetbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+        }
+        stage('Packetbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_PACKETBEAT != "false"
             }
-            stage('Packetbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Packetbeat OSS Windows", directory: "packetbeat", target: "build unitTest")
-              }
-            }
+          }
+          steps {
+            mageTargetWin(context: "Packetbeat OSS Windows", directory: "packetbeat", target: "build unitTest")
           }
         }
         stage('dockerlogbeat'){
@@ -615,15 +599,11 @@ pipeline {
               return env.BUILD_DOCKERLOGBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Dockerlogbeat'){
-              steps {
-                mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "build test")
-              }
-            }
+          steps {
+            mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "build test")
           }
         }
-        stage('Winlogbeat'){
+        stage('Winlogbeat oss'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -632,25 +612,21 @@ pipeline {
               return env.BUILD_WINLOGBEAT != "false"
             }
           }
-          stages {
-            stage('Winlogbeat oss'){
-              steps {
-                makeTarget(context: "Winlogbeat oss crosscompile", directory: 'winlogbeat', target: "crosscompile")
-              }
+          steps {
+            makeTarget(context: "Winlogbeat oss crosscompile", directory: 'winlogbeat', target: "crosscompile")
+          }
+        }
+        stage('Winlogbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_WINLOGBEAT != "false"
             }
-            stage('Winlogbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "winlogbeat", target: "build unitTest")
-              }
-            }
+          }
+          steps {
+            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "winlogbeat", target: "build unitTest")
           }
         }
         stage('Winlogbeat Windows x-pack'){
@@ -666,7 +642,7 @@ pipeline {
             mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true)
           }
         }
-        stage('Functionbeat'){
+        stage('Functionbeat x-pack'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -675,46 +651,42 @@ pipeline {
               return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Functionbeat x-pack'){
-              steps {
-                mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
-                withEnv(["GO_VERSION=1.13.1"]){
-                  mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "testGCPFunctions")
-                }
-              }
+          steps {
+            mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
+            withEnv(["GO_VERSION=1.13.1"]){
+              mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "testGCPFunctions")
             }
-            stage('Functionbeat Mac OS X x-pack'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return env.BUILD_ON_MACOS != 'false'
-                }
-              }
-              steps {
-                mageTarget(context: "Functionbeat x-pack Mac OS X", directory: "x-pack/functionbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+        }
+        stage('Functionbeat Mac OS X x-pack'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
-            stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Functionbeat Windows Unit test", directory: "x-pack/functionbeat", target: "build unitTest")
-              }
+          }
+          steps {
+            mageTarget(context: "Functionbeat x-pack Mac OS X", directory: "x-pack/functionbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
+          }
+        }
+        stage('Functionbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_FUNCTIONBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            mageTargetWin(context: "Functionbeat Windows Unit test", directory: "x-pack/functionbeat", target: "build unitTest")
           }
         }
         stage('Journalbeat'){
@@ -726,12 +698,8 @@ pipeline {
               return env.BUILD_JOURNALBEAT != "false"
             }
           }
-          stages {
-            stage('Journalbeat oss'){
-              steps {
-                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build unitTest")
-              }
-            }
+          steps {
+            mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build unitTest")
           }
         }
         stage('Generators'){
@@ -756,41 +724,41 @@ pipeline {
                 makeTarget(context: "Generators Beat Linux", directory: 'generator/_templates/beat', target: "test-package")
               }
             }
-            stage('Generators Metricbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return env.BUILD_ON_MACOS != 'false'
-                }
-              }
-              steps {
-                makeTarget(context: "Generators Metricbeat Mac OS X", directory: 'generator/_templates/metricbeat', target: "test")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+        }
+        stage('Generators Metricbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_GENERATOR != "false"
             }
-            stage('Generators Beat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return env.BUILD_ON_MACOS != 'false'
-                }
-              }
-              steps {
-                makeTarget(context: "Generators Beat Mac OS X", directory: 'generator/_templates/beat', target: "test")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            makeTarget(context: "Generators Metricbeat Mac OS X", directory: 'generator/_templates/metricbeat', target: "test")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Generators Beat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_GENERATOR != "false"
+            }
+          }
+          steps {
+            makeTarget(context: "Generators Beat Mac OS X", directory: 'generator/_templates/beat', target: "test")
+          }
+          post {
+            always {
+              delete()
             }
           }
         }

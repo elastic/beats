@@ -51,6 +51,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `common.MapStrPointer` parameter from `cfgfile.Runnerfactory` interface. {pull}19135[19135]
 - Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
+- Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
 
 ==== Bugfixes
 
