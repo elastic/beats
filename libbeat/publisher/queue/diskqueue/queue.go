@@ -119,8 +119,16 @@ type diskQueue struct {
 	//	inChan chan []byte
 
 	writeRequestChan  chan *writeRequest
-	readRequestChan   chan *readRequest
 	cancelRequestChan chan *cancelRequest
+	readRequestChan   chan *readRequest
+
+	// When a consumer ack increments ackedUpTo, the consumer sends
+	// its new value to this channel. The core loop then decides whether to
+	// delete the containing segments.
+	// The value sent on the channel is redundant with the value of ackedUpTo,
+	// but we send it anyway so we don't have to worry about the core loop
+	// waiting on ackLock.
+	consumerAckChan chan frameID
 
 	//outChan chan diskQueueOutput
 
@@ -423,11 +431,11 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 //
 
 func (dq *diskQueue) Close() error {
-	closedForRead := dq.closedForRead.Swap(true)
+	/*closedForRead := dq.closedForRead.Swap(true)
 	closedForWrite := dq.closedForWrite.Swap(true)
 	if closedForRead && closedForWrite {
 		return fmt.Errorf("Can't close disk queue: queue already closed")
-	}
+	}*/
 	// TODO: wait for worker threads?
 	close(dq.done)
 	return nil

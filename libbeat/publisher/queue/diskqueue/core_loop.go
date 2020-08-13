@@ -58,49 +58,73 @@ type cancelRequest struct {
 	responseChan chan int
 }
 
-func (dq *diskQueue) coreLoop() {
+type coreLoop struct {
+	// The queue that created this coreLoop. The core loop is the only one of
+	// the main goroutines for the queue that has a pointer to the queue and
+	// understands its logic / structure.
+	// Possible TODO: the split between fields in coreLoop and fields in
+	// diskQueue seems artificial. Maybe the values here should be promoted
+	// to diskQueue fields, and the core loop should just be a function on
+	// diskQueue.
+	queue *diskQueue
+
 	// writing is true if a writeRequest is currently being processed by the
 	// writer loop, false otherwise.
-	writing := false
+	writing bool
 
 	// reading is true if the reader loop is processing a readBlock, false
 	// otherwise.
-	reading := false
+	reading bool
 
 	// deleting is true if the segment-deletion loop is processing a deletion
 	// request, false otherwise.
-	deleting := false
+	deleting bool
 
-	// writeRequests is a list of all write requests that have been accepted
+	// pendingWrites is a list of all write requests that have been accepted
 	// by the queue and are waiting to be written to disk.
-	writeRequests := []*writeRequest{}
+	pendingWrites []*writeRequest
+
+	// blockedWrites is a list of all write requests that are waiting for
+	// free space in the queue.
+	blockedWrites []*writeRequest
+
+	// This value represents the oldest frame ID for a segment that has not
+	// yet been moved to the acked list. It is used to detect when the oldest
+	// outstanding segment has been fully acknowledged by the consumer.
+	oldestFrameID frameID
+}
+
+func (cl *coreLoop) run() {
+	dq := cl.queue
 
 	for {
 		select {
-		// Endpoints used by the external API
+		///////////////////////////////////////
+		// Endpoints used by the public API
 		case writeRequest := <-dq.writeRequestChan:
-			// We will accept this request if there is enough capacity left in
-			// the queue (after accounting for the pending writes that were
-			// already accepted).
-			pendingBytes := 0
-			for _, request := range writeRequests {
-				pendingBytes += len(request.serialized)
-			}
+			cl.handleProducerWriteRequest(writeRequest)
 
 		case cancelRequest := <-dq.cancelRequestChan:
+			cl.handleProducerCancelRequest(cancelRequest)
 
+		case ackedUpTo := <-dq.consumerAckChan:
+			cl.handleConsumerAck(ackedUpTo)
+
+		///////////////////////////////////////
 		// Writer loop handling
 		case <-dq.writerLoop.finishedWriting:
-			if len(writeRequests) > 0 {
-				dq.forwardWriteRequest(writeRequests[0])
-				writeRequests = writeRequests[1:]
+			if len(cl.pendingWrites) > 0 {
+				cl.forwardWriteRequest(cl.pendingWrites[0])
+				cl.pendingWrites = cl.pendingWrites[1:]
 			} else {
-				writing = false
+				cl.writing = false
 			}
 
+		///////////////////////////////////////
 		// Reader loop handling
 		case readResponse := <-dq.readerLoop.finishedReading:
 
+		///////////////////////////////////////
 		// Deleter loop handling
 		case deleteResponse := <-dq.deleterLoop.response:
 			if len(deleteResponse.deleted) > 0 {
@@ -125,13 +149,14 @@ func (dq *diskQueue) coreLoop() {
 				dq.deleterLoop.input <- &deleteRequest{segments: dq.segments.acked}
 			} else {
 				// Nothing more to delete for now, update the deleting flag.
-				deleting = false
+				cl.deleting = false
 			}
 		}
 	}
 }
 
-func (dq *diskQueue) forwardWriteRequest(request *writeRequest) {
+func (cl *coreLoop) forwardWriteRequest(request *writeRequest) {
+	dq := cl.queue
 	// First we must decide which segment the new frame should be written to.
 	data := request.frame.serialized
 	segment := dq.segments.writing
@@ -149,5 +174,68 @@ func (dq *diskQueue) forwardWriteRequest(request *writeRequest) {
 	// If we don't have a segment, we need to create one.
 	if segment == nil {
 		segment = &queueSegment{id: dq.segments.nextID}
+	}
+}
+
+func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
+	if len(cl.blockedWrites) > 0 {
+		// If other requests are still waiting for space, then there
+		// definitely isn't enough for this one.
+		if request.shouldBlock {
+			cl.blockedWrites = append(cl.blockedWrites, request)
+		} else {
+			// If the request is non-blocking, send immediate failure and discard it.
+			request.responseChan <- false
+		}
+		return
+	}
+	// We will accept this request if there is enough capacity left in
+	// the queue (after accounting for the pending writes that were
+	// already accepted).
+	pendingBytes := uint64(0)
+	for _, request := range cl.pendingWrites {
+		pendingBytes += uint64(len(request.frame.serialized))
+	}
+	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
+	frameSize := uint64(len(request.frame.serialized))
+	if currentSize+frameSize > cl.queue.settings.MaxBufferSize {
+		// The queue is too full
+	}
+}
+
+func (cl *coreLoop) handleProducerCancelRequest(request *cancelRequest) {
+}
+
+func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
+	acking := cl.queue.segments.acking
+	if len(acking) == 0 {
+		return
+	}
+	segmentsAcked := 0
+	startFrame := cl.oldestFrameID
+	for ; segmentsAcked < len(acking); segmentsAcked++ {
+		segment := acking[segmentsAcked]
+		endFrame := startFrame + frameID(segment.framesRead)
+		if endFrame > ackedUpTo {
+			// This segment has not been fully read, we're done.
+			break
+		}
+	}
+	if segmentsAcked > 0 {
+		// Move fully acked segments to the acked list and remove them
+		// from the acking list.
+		cl.queue.segments.acked =
+			append(cl.queue.segments.acked, acking[:segmentsAcked]...)
+		cl.queue.segments.acking = acking[segmentsAcked:]
+		cl.maybeDeleteAcked()
+	}
+}
+
+// If the acked list is nonempty, and there are no outstanding deletion
+// requests, send one.
+func (cl *coreLoop) maybeDeleteAcked() {
+	if !cl.deleting && len(cl.queue.segments.acked) > 0 {
+		cl.queue.deleterLoop.input <- &deleteRequest{segments: cl.queue.segments.acked}
+		cl.deleting = true
 	}
 }
