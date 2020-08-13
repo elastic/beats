@@ -8,7 +8,10 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
@@ -59,11 +62,46 @@ func (pm *pipelineManager) Run(ctx context.Context) error {
 	var autoCancel ctxtool.AutoCancel
 	defer autoCancel.Cancel()
 
-	outputManager, err := configureOutputs(pm.log, pm.info, pm.outputSettings, pm.rawConfig)
+	pipelines := map[string]*pipeline.Pipeline{}
+	defer func() {
+		for _, pipeline := range pipelines {
+			pipeline.Close()
+		}
+	}()
+
+	// XXX: A little overkill to init all index management, but makes output setup easier for now
+	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, pm.info, pm.rawConfig)
 	if err != nil {
 		return err
 	}
-	defer outputManager.Close()
+
+	for name, cfg := range pm.outputSettings {
+		typeInfo := struct{ Type string }{}
+		if err := cfg.Unpack(&typeInfo); err != nil {
+			return err
+		}
+
+		var pipeConfig pipeline.Config
+		if err := cfg.Unpack(&pipeConfig); err != nil {
+			return err
+		}
+
+		pipeline, err := pipeline.Load(pm.info,
+			pipeline.Monitors{
+				Metrics:   nil,
+				Telemetry: nil,
+				Logger:    pm.log.Named("publish"),
+				Tracer:    nil,
+			},
+			pipeConfig,
+			nil,
+			makeOutputFactory(pm.info, indexManagement, typeInfo.Type, cfg),
+		)
+		if err != nil {
+			return err
+		}
+		pipelines[name] = pipeline
+	}
 
 	var inputGroup unison.TaskGroup
 	ctx = autoCancel.With(ctxtool.WithFunc(ctx, func() {
@@ -89,7 +127,7 @@ func (pm *pipelineManager) Run(ctx context.Context) error {
 				Agent:       pm.info,
 				Cancelation: cancel,
 			}
-			return input.Run(inputContext, outputManager.GetPipeline(input.useOutput))
+			return input.Run(inputContext, pipelines[input.useOutput])
 		})
 	}
 	pm.log.Info("Inputs active...")
@@ -106,4 +144,16 @@ func (pm *pipelineManager) OnConfig(settings dynamicSettings) error {
 	// 3. forward setup to run loop, updating active pipelines
 
 	return errors.New("reloading is not yet supported")
+}
+
+func makeOutputFactory(
+	info beat.Info,
+	indexManagement idxmgmt.Supporter,
+	outputType string,
+	cfg *common.Config,
+) func(outputs.Observer) (string, outputs.Group, error) {
+	return func(outStats outputs.Observer) (string, outputs.Group, error) {
+		out, err := outputs.Load(indexManagement, info, outStats, outputType, cfg)
+		return outputType, out, err
+	}
 }
