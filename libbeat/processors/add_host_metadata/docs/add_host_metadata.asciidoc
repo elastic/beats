@@ -42,7 +42,8 @@ It has the following settings:
 
 `geo.region_iso_code`:: (Optional) ISO region code.
 
-`replace_host_fields`:: (Optional) Default false. If set to true, original `host.*` fields from the event will be replaced by `host.*` fields from `add_host_metadata`.
+`replace_host_fields`:: (Optional) Default true. If set to false, original host
+fields from the event will not be replaced by host fields from `add_host_metadata`.
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event look like the following:

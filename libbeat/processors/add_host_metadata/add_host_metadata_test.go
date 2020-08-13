@@ -202,9 +202,9 @@ func TestConfigGeoDisabled(t *testing.T) {
 	assert.Equal(t, nil, eventGeoField)
 }
 
-func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
+func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	cfg := map[string]interface{}{}
-	cfg["replace_host_fields"] = false
+	cfg["replace_fields"] = false
 	testConfig, err := common.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
@@ -225,7 +225,7 @@ func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
 		expectedHostFieldLength int
 	}{
 		{
-			"replace_host_fields=false with only host.name",
+			"replace_fields=false with only host.name",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -238,7 +238,7 @@ func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
 			-1,
 		},
 		{
-			"replace_host_fields=false with only host.id",
+			"replace_fields=false with only host.id",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -251,7 +251,7 @@ func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
 			1,
 		},
 		{
-			"replace_host_fields=false with host.name and host.id",
+			"replace_fields=false with host.name and host.id",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -282,9 +282,9 @@ func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
 	}
 }
 
-func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
+func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	cfg := map[string]interface{}{}
-	cfg["replace_host_fields"] = true
+	cfg["replace_fields"] = true
 	testConfig, err := common.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
@@ -304,7 +304,7 @@ func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
 		hostLengthEqualsToOne   bool
 	}{
 		{
-			"replace_host_fields=true with host.name",
+			"replace_fields=true with host.name",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -316,7 +316,7 @@ func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
 			false,
 		},
 		{
-			"replace_host_fields=true with host.id",
+			"replace_fields=true with host.id",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -328,7 +328,7 @@ func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
 			false,
 		},
 		{
-			"replace_host_fields=true with host.name and host.id",
+			"replace_fields=true with host.name and host.id",
 			beat.Event{
 				Fields: common.MapStr{
 					"host": common.MapStr{
@@ -341,6 +341,7 @@ func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			newEvent, err := p.Run(&c.event)
@@ -350,6 +351,56 @@ func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
 			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+		})
+	}
+}
+
+func TestSkipAddingHostMetadata(t *testing.T) {
+	cases := []struct {
+		title        string
+		event        beat.Event
+		expectedSkip bool
+	}{
+		{
+			"event only with host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"event only with host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			true,
+		},
+		{
+			"event with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			skip := skipAddingHostMetadata(&c.event)
+			assert.Equal(t, c.expectedSkip, skip)
 		})
 	}
 }
