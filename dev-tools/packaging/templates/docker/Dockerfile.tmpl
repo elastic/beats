@@ -21,6 +21,8 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
 {{- end }}
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
+RUN mv {{ $beatHome }}/licenses /licenses
+
 FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
@@ -51,6 +53,7 @@ COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 COPY --from=home {{ $beatHome }} {{ $beatHome }}
+COPY --from=home /licenses /licenses
 
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}

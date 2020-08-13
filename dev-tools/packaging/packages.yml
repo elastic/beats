@@ -468,12 +468,6 @@ shared:
         source: '{{.BeatName}}.docker.yml'
         mode: 0600
         config: true
-
-  - &docker_ubi_spec
-    extra_vars:
-      image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
-    files:
       /licenses/ELASTIC-LICENSE.txt:
         source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
         mode: 0644
@@ -483,6 +477,11 @@ shared:
       /licenses/NOTICE.txt:
         source: '{{ repo.RootDir }}/NOTICE.txt'
         mode: 0644
+
+  - &docker_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi8'
+      from: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
 
   - &elastic_docker_spec
     extra_vars:
