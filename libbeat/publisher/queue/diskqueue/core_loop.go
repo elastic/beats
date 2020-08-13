@@ -70,21 +70,8 @@ type writeFrame struct {
 
 // A frame that has been read from disk
 type readFrame struct {
-}
-
-// A request sent from a producer to the core loop to add a frame to the queue.
-type writeRequest struct {
-	frame        *writeFrame
-	shouldBlock  bool
-	responseChan chan bool
-}
-
-type cancelRequest struct {
-	producer *diskQueueProducer
-	// If producer.config.DropOnCancel is true, then the core loop will respond
-	// on responseChan with the number of dropped events.
-	// Otherwise, this field may be nil.
-	responseChan chan int
+	event publisher.Event
+	id    frameID
 }
 
 func (cl *coreLoop) run() {
@@ -246,6 +233,8 @@ func (cl *coreLoop) handleShutdown() {
 	}
 
 	// TODO: wait (with timeout?) for any outstanding acks?
+
+	// TODO: write final queue state to the metadata file.
 }
 
 // If the pendingWrites list is nonempty, and there are no outstanding

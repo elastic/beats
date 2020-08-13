@@ -269,16 +269,3 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	reader.curPosition += segmentOffset(frameLength)
 	return data, nil
 }*/
-
-// returns the number of indices by which ackedUpTo was advanced.
-func (dq *diskQueue) ack(frame frameID) int {
-	dq.ackLock.Lock()
-	defer dq.ackLock.Unlock()
-	dq.acked[frame] = true
-	ackedCount := 0
-	for ; dq.acked[dq.ackedUpTo]; dq.ackedUpTo++ {
-		delete(dq.acked, dq.ackedUpTo)
-		ackedCount++
-	}
-	return ackedCount
-}

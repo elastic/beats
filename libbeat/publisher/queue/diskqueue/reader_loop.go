@@ -56,6 +56,7 @@ func (rl *readerLoop) run() {
 		block, ok := <-rl.nextReadBlock
 		if !ok {
 			// The channel has closed, we are shutting down.
+			close(rl.output)
 			return
 		}
 		rl.finishedReading <- rl.processBlock(block)

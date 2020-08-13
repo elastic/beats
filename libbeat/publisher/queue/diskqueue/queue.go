@@ -95,6 +95,7 @@ type diskQueue struct {
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
+	coreLoop    *coreLoop
 	readerLoop  *readerLoop
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
@@ -239,36 +240,6 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	}, nil
 }
 
-// This is only called by readerLoop.
-/*func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
-	dq.segments.Lock()
-	defer dq.segments.Unlock()
-
-	errors := []error{}
-	for len(dq.segments.reading) > 0 {
-		segment := dq.segments.reading[0]
-		segmentPath := dq.settings.segmentPath(segment.id)
-		reader, err := tryLoad(segment, segmentPath)
-		if err != nil {
-			// TODO: Handle this: depending on the type of error, either delete
-			// the segment or log an error and leave it alone, then skip to the
-			// next one.
-			errors = append(errors, err)
-			dq.segments.reading = dq.segments.reading[1:]
-			continue
-		}
-		// Remove the segment from the active list and move it to
-		// completedSegments until all its data has been acknowledged.
-		dq.segments.reading = dq.segments.reading[1:]
-		dq.segments.acking = append(dq.segments.acking, segment)
-		return reader, errors
-	}
-	// TODO: if segments.reading is empty we may still be able to
-	// read partial data from segments.writing which is still being
-	// written.
-	return nil, errors
-}*/
-
 //
 // bookkeeping helpers to locate queue data on disk
 //
@@ -318,3 +289,33 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 func (dq *diskQueue) Consumer() queue.Consumer {
 	panic("TODO: not implemented")
 }
+
+// This is only called by readerLoop.
+/*func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
+	dq.segments.Lock()
+	defer dq.segments.Unlock()
+
+	errors := []error{}
+	for len(dq.segments.reading) > 0 {
+		segment := dq.segments.reading[0]
+		segmentPath := dq.settings.segmentPath(segment.id)
+		reader, err := tryLoad(segment, segmentPath)
+		if err != nil {
+			// TODO: Handle this: depending on the type of error, either delete
+			// the segment or log an error and leave it alone, then skip to the
+			// next one.
+			errors = append(errors, err)
+			dq.segments.reading = dq.segments.reading[1:]
+			continue
+		}
+		// Remove the segment from the active list and move it to
+		// completedSegments until all its data has been acknowledged.
+		dq.segments.reading = dq.segments.reading[1:]
+		dq.segments.acking = append(dq.segments.acking, segment)
+		return reader, errors
+	}
+	// TODO: if segments.reading is empty we may still be able to
+	// read partial data from segments.writing which is still being
+	// written.
+	return nil, errors
+}*/
