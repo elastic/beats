@@ -14,16 +14,14 @@ data:
       # Reload module configs as they change:
       reload.enabled: false
 
-    # To enable hints based autodiscover uncomment this:
-    #metricbeat.autodiscover:
-    #  providers:
-    #    - type: kubernetes
-    #      node: ${NODE_NAME}
-    #      hints.enabled: true
-    # Unique Autodiscover provider that handles singleton instance in the whole cluster for some unique data sources,
-    # like kube-state-metrics
     metricbeat.autodiscover:
       providers:
+        # To enable hints based autodiscover uncomment this:
+        #- type: kubernetes
+        #  node: ${NODE_NAME}
+        #  hints.enabled: true
+        # Unique Autodiscover provider that handles singleton instance in the whole cluster for some unique data sources,
+        # like kube-state-metrics
         - type: kubernetes
           scope: cluster
           node: ${NODE_NAME}
