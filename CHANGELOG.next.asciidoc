@@ -523,6 +523,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for custom header and headersecret for filebeat http_endpoint input {pull}20435[20435]
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
+- Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 
 
 *Heartbeat*
