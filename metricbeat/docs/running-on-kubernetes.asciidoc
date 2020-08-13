@@ -228,9 +228,12 @@ providers:
 -----
 Users can find more info about the `unique` and `identifier` options at <<configuration-autodiscover>>.
 
-Users can download and deploy this Daemonset:
+Users can enable the respective parts the Daemonset ConfigMap and
+set the `replicas` of the Deployment to `0` in order to only deploy
+the Daemonset on the cluster with the leader election provider enabled
+in order to collect cluster-wide metrics:
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/metricbeat-leaderelection-kubernetes.yaml
-kubectl create -f metricbeat-leaderelection-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/metricbeat-kubernetes.yaml
+kubectl create -f metricbeat-kubernetes.yaml
 ------------------------------------------------
