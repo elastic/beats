@@ -73,7 +73,13 @@ func main() {
 	if err != nil {
 		fatal("DESTROY_LOGS_ON_STOP must be 'true' or 'false': %s", err)
 	}
-	pipelines := pipelinemanager.NewPipelineManager(logDestroy)
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		fatal("Error fetching hostname: %s", err)
+	}
+
+	pipelines := pipelinemanager.NewPipelineManager(logDestroy, hostname)
 
 	sdkHandler := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
 	// Create handlers for startup and shutdown of the log driver
