@@ -268,54 +268,6 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	// written.
 	return nil, errors
 }*/
-/*
-func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
-	// this is a strangely fine-grained lock maybe?
-	segment.Lock()
-	defer segment.Unlock()
-
-	// dataSize is guaranteed to be positive because we don't add
-	// anything to the segments list unless it is.
-	dataSize := segment.size - segmentHeaderSize
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Couldn't open segment %d: %w", segment.id, err)
-	}
-	reader := bufio.NewReader(file)
-	header, err := readSegmentHeader(reader)
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
-	}
-	return &segmentReader{
-		raw:          reader,
-		curPosition:  0,
-		endPosition:  segmentOffset(dataSize),
-		checksumType: header.checksumType,
-	}, nil
-}
-*/
-
-// readNextFrame reads the next pending data frame in the queue
-// and returns its contents.
-/*func (dq *diskQueue) readNextFrame() ([]byte, error) {
-	// READER LOCK --->
-	if dq.reader != nil {
-		frameData, err := dq.reader.nextDataFrame()
-		if err != nil {
-			return nil, err
-		}
-		if frameData != nil {
-			return frameData, nil
-		}
-		// If we made it here then the active reader was empty and
-		// we need to fetch a new one.
-	}
-	reader, _ := dq.nextSegmentReader()
-	dq.reader = reader
-	return reader.nextDataFrame()
-	// <--- READER LOCK
-}*/
 
 //
 // bookkeeping helpers to locate queue data on disk
@@ -344,13 +296,11 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 //
 
 func (dq *diskQueue) Close() error {
-	/*closedForRead := dq.closedForRead.Swap(true)
-	closedForWrite := dq.closedForWrite.Swap(true)
-	if closedForRead && closedForWrite {
-		return fmt.Errorf("Can't close disk queue: queue already closed")
-	}*/
-	// TODO: wait for worker threads?
+	// Closing the done channel signals to the core loop that it should
+	// shut down the other helper goroutines and wrap everything up.
 	close(dq.done)
+	dq.waitGroup.Wait()
+
 	return nil
 }
 

@@ -19,9 +19,6 @@ package diskqueue
 
 import (
 	"bytes"
-	"io"
-	"os"
-	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -80,12 +77,12 @@ func frameForContent(
 	return buf
 }
 
-type writerState struct {
+/*type writerState struct {
 	// The open file handle for the segment currently being written.
 	// This should be non-nil if and only if diskQueue.segments.writing is.
 	file         *os.File
 	filePosition int64
-}
+}*/
 
 /*func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
 	dq.segments.Lock()
@@ -156,7 +153,7 @@ type writerState struct {
 		// We've processed
 	}
 }*/
-
+/*
 func writeAll(writer io.Writer, p []byte) (int, error) {
 	var N int
 	for len(p) > 0 {
@@ -172,3 +169,4 @@ func writeAll(writer io.Writer, p []byte) (int, error) {
 func isRetryErr(err error) bool {
 	return err == syscall.EINTR || err == syscall.EAGAIN
 }
+*/

@@ -217,7 +217,35 @@ func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
 }
 
 func (cl *coreLoop) handleShutdown() {
+	// We need to close the input channels for all other goroutines and
+	// wait for any outstanding responses. Order is important: handling
+	// a read response may require the deleter, so the reader must be
+	// shut down first.
 
+	close(cl.queue.readerLoop.nextReadBlock)
+	if cl.reading {
+		response := <-cl.queue.readerLoop.finishedReading
+		cl.handleReadResponse(response)
+	}
+
+	close(cl.queue.writerLoop.input)
+	if cl.writing {
+		<-cl.queue.writerLoop.finishedWriting
+		cl.queue.segments.writing.writer.Close()
+	}
+
+	close(cl.queue.deleterLoop.input)
+	if cl.deleting {
+		response := <-cl.queue.deleterLoop.response
+		// We can't retry any more if deletion failed, but we still check the
+		// response so we can log any errors.
+		if len(response.errors) > 0 {
+			cl.queue.settings.Logger.Errorw("Couldn't delete old segment files",
+				"errors", response.errors)
+		}
+	}
+
+	// TODO: wait (with timeout?) for any outstanding acks?
 }
 
 // If the pendingWrites list is nonempty, and there are no outstanding
