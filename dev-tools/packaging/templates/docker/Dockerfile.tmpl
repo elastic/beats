@@ -43,6 +43,12 @@ LABEL \
   org.label-schema.url="{{ .BeatURL }}" \
   org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   org.label-schema.vcs-ref="{{ commit }}" \
+  name="{{ .BeatName }}" \
+  maintainer="infra@elastic.co" \
+  vendor="{{ .BeatVendor }}" \
+  version="{{ beat_version }}" \
+  release="1" \
+  summary="{{ .BeatName }}" \
   license="{{ .License }}" \
   description="{{ .BeatDescription }}"
 
