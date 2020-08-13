@@ -6,9 +6,6 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
-    - name: type
-      type: alias
-      path: metricset.name
     - name: timestamp
       type: alias
       path: "@timestamp"

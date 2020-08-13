@@ -15772,15 +15772,6 @@ Elasticsearch module
 
 
 
-*`type`*::
-+
---
-type: alias
-
-alias to: metricset.name
-
---
-
 *`timestamp`*::
 +
 --
