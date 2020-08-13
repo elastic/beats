@@ -32,6 +32,7 @@ import (
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
+	"github.com/mitchellh/hashstructure"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -186,6 +187,13 @@ func (c *Config) Clone() *Config {
 	var tmp interface{}
 	c.Unpack(&tmp)
 	return MustNewConfigFrom(tmp)
+}
+
+func (c *Config) Hash() string {
+	var tmp interface{}
+	c.Unpack(&tmp)
+	h, _ := hashstructure.Hash(tmp, nil)
+	return fmt.Sprintf("%x", h)
 }
 
 func (c *Config) Unpack(to interface{}) error {
