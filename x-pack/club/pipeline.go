@@ -29,18 +29,22 @@ type pipelineManager struct {
 	rawConfig      *common.Config
 }
 
+type pipelineSettings struct {
+	Inputs  []inputSettings
+	Outputs map[string]*common.Config
+}
+
 func newPipelineManager(
 	log *logp.Logger,
 	info beat.Info,
 	inputLoader *inputLoader,
 	rawConfig *common.Config,
-	outputSettings map[string]*common.Config,
-	inputSettings []inputSettings,
+	settings pipelineSettings,
 ) (*pipelineManager, error) {
 
 	// Let's configure inputs. Inputs won't do any processing, yet.
 	var inputs []*input
-	for _, config := range inputSettings {
+	for _, config := range settings.Inputs {
 		input, err := inputLoader.Configure(config)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to configure inputs: %w", err)
@@ -52,7 +56,7 @@ func newPipelineManager(
 		log:            log,
 		info:           info,
 		inputLoader:    inputLoader,
-		outputSettings: outputSettings,
+		outputSettings: settings.Outputs,
 		rawConfig:      rawConfig,
 		inputs:         inputs,
 	}, nil
@@ -136,7 +140,7 @@ func (pm *pipelineManager) Run(ctx context.Context) error {
 	return inputGroup.Stop()
 }
 
-func (pm *pipelineManager) OnConfig(settings dynamicSettings) error {
+func (pm *pipelineManager) OnConfig(settings pipelineSettings) error {
 	// 1. check if input and output assignments -> ignore outputs without inputs
 
 	// 2. create configured output and input instances (configuration AST)

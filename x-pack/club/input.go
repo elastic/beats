@@ -33,8 +33,9 @@ type inputMeta struct {
 }
 
 type stream struct {
-	meta   streamMeta
-	runner v2.Input
+	meta       streamMeta
+	configHash string
+	runner     v2.Input
 }
 
 type streamMeta struct {
@@ -81,7 +82,8 @@ func (l *inputLoader) Configure(settings inputSettings) (*input, error) {
 			return nil, err
 		}
 		streams[i] = stream{
-			runner: runner,
+			runner:     runner,
+			configHash: inputConfig.Hash(),
 		}
 	}
 

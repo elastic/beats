@@ -145,12 +145,12 @@ func (app *app) initSettings(flags flagsConfig) error {
 	if isManaged(settings.Manager) && flags.Reload {
 		return errors.New("config reloading and managed mode must not be enabled together")
 	}
-	if !isManaged(settings.Manager) && !flags.Reload && len(settings.Inputs) == 0 {
+	if !isManaged(settings.Manager) && !flags.Reload && len(settings.Pipeline.Inputs) == 0 {
 		return errors.New("unmanaged mode requires inputs to be configured")
 	}
 
 	app.Settings = settings
-	return app.Settings.validate()
+	return nil
 }
 
 func (app *app) configure(flags flagsConfig) error {
@@ -200,8 +200,7 @@ func (app *app) configure(flags flagsConfig) error {
 	app.pipelineManager, err = newPipelineManager(app.log, app.info,
 		app.inputLoader,
 		app.rawConfig,
-		app.Settings.Outputs,
-		app.Settings.Inputs,
+		app.Settings.Pipeline,
 	)
 	if err != nil {
 		return err
@@ -300,7 +299,7 @@ func (app *app) Run(sigContext context.Context) error {
 		appTaskGroup.Go(func(cancel unison.Canceler) error {
 			return app.agentManager.Run(ctxtool.FromCanceller(cancel), agentEventHandler{
 				OnStop:   autoCancel.Cancel,
-				OnConfig: app.pipelineManager.OnConfig,
+				OnConfig: app.onConfig,
 			})
 		})
 	}
@@ -312,7 +311,7 @@ func (app *app) Run(sigContext context.Context) error {
 				if err := cfg.Unpack(&settings); err != nil {
 					return err
 				}
-				return app.pipelineManager.OnConfig(settings)
+				return app.onConfig(settings)
 			})
 		})
 	}
@@ -330,6 +329,10 @@ func (app *app) Run(sigContext context.Context) error {
 	app.log.Info("Shutting down...")
 
 	return nil
+}
+
+func (app *app) onConfig(settings dynamicSettings) error {
+	return app.pipelineManager.OnConfig(settings.Pipeline)
 }
 
 func (app *app) Cleanup() {

@@ -22,9 +22,8 @@ type flagsConfig struct {
 }
 
 type settings struct {
-	ConfigID string `config:"id"`
-	Inputs   []inputSettings
-	Outputs  map[string]*common.Config
+	ConfigID string           `config:"id"`
+	Pipeline pipelineSettings `config:",internal"`
 	Path     dirs.Project
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
@@ -38,8 +37,7 @@ type settings struct {
 // delta-updates only (or a subset of Inputs that need to be run), we will need
 // to merge the delta updates first, before the dynamicSettings can be applied.
 type dynamicSettings struct {
-	Inputs  []inputSettings
-	Outputs map[string]*common.Config
+	Pipeline pipelineSettings `config:",internal"`
 }
 
 // configure global resource limits to be shared with input managers
@@ -73,7 +71,7 @@ func (c *flagsConfig) registerFlags(flags *flag.FlagSet) {
 	registerFlagsPath(flags, &c.Path)
 }
 
-func (s *settings) validate() error {
+func (s *pipelineSettings) Validate() error {
 	if _, exists := s.Outputs["default"]; !exists {
 		return errors.New("no default output configured")
 	}
