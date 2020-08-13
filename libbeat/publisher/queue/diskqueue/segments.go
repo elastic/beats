@@ -58,22 +58,29 @@ type queueSegment struct {
 	// a complete data frame.
 	size uint64
 
-	// The number of frames read from this segment.
+	// The header metadata for this segment file. This field is nil if the
+	// segment has not yet been opened for reading. It should only be
+	// accessed by the reader loop.
+	header *segmentHeader
+
+	// The number of frames read from this segment during this session. This
+	// does not necessarily equal the number of frames in the segment, even
+	// after reading is complete, since the segment may have been partially
+	// read during a previous session.
+	//
+	// Used to count how many frames still need to be acknowledged by consumers.
 	framesRead int64
 
 	// If this segment is being written or read, then reader / writer
 	// contain the respective file handles. To get a valid reader / writer for
 	// a segment that may not yet be open, call getReader / getWriter instead.
-	reader io.ReadCloser
-	writer io.WriteCloser
+	reader *os.File
+	writer *os.File
 }
 
-func (segment *queueSegment) getReader() (io.ReadCloser, error) {
-	return nil, nil
-}
-
-func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
-	return nil, nil
+type segmentHeader struct {
+	version      uint32
+	checksumType ChecksumType
 }
 
 // segmentReader is a wrapper around io.Reader that provides helpers and
@@ -97,11 +104,11 @@ func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
 	checksumType ChecksumType
 }*/
 
-type segmentWriter struct {
+/*type segmentWriter struct {
 	segment  *queueSegment
 	file     *os.File
 	position int64
-}
+}*/
 
 // ChecksumType specifies what checksum algorithm the queue should use to
 // verify its data frames.
@@ -132,8 +139,7 @@ func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
 
-func (settings *Settings) scanExistingSegments() ([]*queueSegment, error) {
-	path := settings.directoryPath()
+func scanExistingSegments(path string) ([]*queueSegment, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", path, err)
@@ -165,11 +171,84 @@ func (settings *Settings) scanExistingSegments() ([]*queueSegment, error) {
 	return segments, nil
 }
 
+// Should only be called from the reader loop.
+func (segment *queueSegment) getReader() (io.ReadCloser, error) {
+	if segment.reader != nil {
+		return segment.reader, nil
+	}
+	path := segment.queueSettings.segmentPath(segment.id)
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Couldn't open segment %d: %w", segment.id, err)
+	}
+	//reader := bufio.NewReader(file)
+	header, err := readSegmentHeader(file)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
+	}
+	segment.header = header
+
+	return file, nil
+}
+
+// Should only be called from the writer loop.
+func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
+	if segment.writer != nil {
+		return segment.writer, nil
+	}
+	path := segment.queueSettings.segmentPath(segment.id)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return nil, err
+	}
+	segment.writer = file
+	header := &segmentHeader{
+		version:      0,
+		checksumType: segment.queueSettings.ChecksumType,
+	}
+	err = writeSegmentHeader(file, header)
+	// TODO: write header
+	return file, nil
+}
+
+func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
+	header := segmentHeader{}
+	if header.version != 0 {
+		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
+	}
+	panic("TODO: not implemented")
+	//return nil, nil
+}
+
+func writeSegmentHeader(out io.Writer, header *segmentHeader) error {
+	panic("TODO: not implemented")
+}
+
+// The number of bytes occupied by all the queue's segment files. This
+// should only be called from the core loop.
+func (segments *diskQueueSegments) sizeOnDisk() uint64 {
+	total := uint64(0)
+	if segments.writing != nil {
+		total += segments.writing.size
+	}
+	for _, segment := range segments.reading {
+		total += segment.size
+	}
+	for _, segment := range segments.acking {
+		total += segment.size
+	}
+	for _, segment := range segments.acked {
+		total += segment.size
+	}
+	return total
+}
+
 // nextDataFrame returns the bytes of the next data frame, or an error if the
 // frame couldn't be read. If an error is returned, the caller should log it
 // and drop the containing segment. A nil return value with no error means
 // there are no frames to read.
-func (reader *segmentReader) nextDataFrame() ([]byte, error) {
+/*func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 	if reader.curPosition >= reader.endPosition {
 		return nil, nil
 	}
@@ -229,7 +308,7 @@ func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 
 	reader.curPosition += segmentOffset(frameLength)
 	return data, nil
-}
+}*/
 
 // returns the number of indices by which ackedUpTo was advanced.
 func (dq *diskQueue) ack(frame frameID) int {

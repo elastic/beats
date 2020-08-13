@@ -67,7 +67,7 @@ func (wl *writerLoop) run() {
 }
 
 func (wl *writerLoop) processRequest(block *writeBlock) {
-	writer := block.segment.getWriter()
+	writer, err := block.segment.getWriter()
 }
 
 // frameForContent wraps the given content buffer in a
@@ -92,7 +92,7 @@ type writerState struct {
 	filePosition int64
 }
 
-func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
+/*func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
 	dq.segments.Lock()
 	defer dq.segments.Unlock()
 
@@ -128,7 +128,7 @@ func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
 	// We now have a frame we want to write to disk, and enough free capacity
 	// to write it.
 	writeAll(state.file, frame.Bytes())
-}
+}*/
 
 // The writer loop's job is to continuously read a data frame from the
 // queue's intake channel, if there is one, and write it to disk.
@@ -161,25 +161,6 @@ func handleFrame(dq *diskQueue, state *writerState, frame bytes.Buffer) {
 		// We've processed
 	}
 }*/
-
-// The number of bytes occupied by all the queue's segment files. Must
-// be called with segments.Mutex held.
-func (segments *diskQueueSegments) sizeOnDiskWithLock() uint64 {
-	total := uint64(0)
-	if segments.writing != nil {
-		total += segments.writing.size
-	}
-	for _, segment := range segments.reading {
-		total += segment.size
-	}
-	for _, segment := range segments.acking {
-		total += segment.size
-	}
-	for _, segment := range segments.acked {
-		total += segment.size
-	}
-	return total
-}
 
 func writeAll(writer io.Writer, p []byte) (int, error) {
 	var N int

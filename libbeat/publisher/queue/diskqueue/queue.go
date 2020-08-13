@@ -18,15 +18,12 @@
 package diskqueue
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
@@ -103,12 +100,14 @@ type diskQueue struct {
 	stateFile *stateFile
 
 	// Data frames waiting to be written to disk.
-	incoming *pendingFrameData
+	//incoming *pendingFrameData
 
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
-	writerLoop *writerLoop
+	readerLoop  *readerLoop
+	writerLoop  *writerLoop
+	deleterLoop *deleterLoop
 
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
@@ -123,7 +122,7 @@ type diskQueue struct {
 	readRequestChan   chan *readRequest
 	cancelRequestChan chan *cancelRequest
 
-	outChan chan diskQueueOutput
+	//outChan chan diskQueueOutput
 
 	// The currently active segment reader, or nil if there is none.
 	//reader *segmentReader
@@ -150,14 +149,14 @@ type diskQueue struct {
 	// Used by writerLoop when the queue is full, to detect when to try again.
 	// When the queue is closed, this condition will receive a broadcast after
 	// diskQueue.closed is set to true.
-	segmentDeletedCond sync.Cond
+	//segmentDeletedCond sync.Cond
 
 	// A condition that is signalled when a frame has been completely
 	// written to disk.
 	// Used by readerLoop when the queue is empty, to detect when to try again.
 	// When the queue is closed, this condition will receive a broadcast after
 	// diskQueue.closed is set to true.
-	frameWrittenCond sync.Cond
+	//frameWrittenCond sync.Cond
 
 	// The oldest frame id that is still stored on disk.
 	// This will usually be less than ackedUpTo, since oldestFrame can't
@@ -179,22 +178,22 @@ type diskQueue struct {
 	// has already been added to the queue intake should continue being written
 	// to disk, but no new data should be accepted and the writerLoop routine
 	// should terminate when all data has been written.
-	closedForWrite atomic.Bool
+	//closedForWrite atomic.Bool
 
 	// Whether the queue has been closed for read. When this is true, no more
 	// frames can be read from the queue, and the readerLoop routine should
 	// terminate. The queue will continue to accept acks for already-read
 	// frames and update the on-disk state accordingly.
-	closedForRead atomic.Bool
+	//closedForRead atomic.Bool
 
 	// If true, goroutines should return as soon as possible without waiting for
 	// data updates to complete. The queue will no longer write buffered frames
 	// to disk or update the on-disk state to reflect incoming acks.
 	// If abort is true, then closedForRead and closedForWrite must be true.
-	abort atomic.Bool
+	//abort atomic.Bool
 
 	// Wait group for shutdown of the goroutines associated with this queue:
-	// reader loop, writer loop.
+	// core loop, reader loop, writer loop, deleter loop.
 	waitGroup *sync.WaitGroup
 
 	// The channel to signal our goroutines to shut down.
@@ -305,7 +304,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	initialSegments, err := settings.scanExistingSegments()
+	initialSegments, err := scanExistingSegments(settings.directoryPath())
 	if err != nil {
 		return nil, err
 	}
@@ -348,7 +347,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	// written.
 	return nil, errors
 }*/
-
+/*
 func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 	// this is a strangely fine-grained lock maybe?
 	segment.Lock()
@@ -374,20 +373,7 @@ func tryLoad(segment *queueSegment, path string) (*segmentReader, error) {
 		checksumType: header.checksumType,
 	}, nil
 }
-
-type segmentHeader struct {
-	version      uint32
-	checksumType ChecksumType
-}
-
-func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
-	header := segmentHeader{}
-	if header.version != 0 {
-		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
-	}
-	panic("TODO: not implemented")
-	//return nil, nil
-}
+*/
 
 // readNextFrame reads the next pending data frame in the queue
 // and returns its contents.

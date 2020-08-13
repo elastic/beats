@@ -63,23 +63,70 @@ func (dq *diskQueue) coreLoop() {
 	// writer loop, false otherwise.
 	writing := false
 
+	// reading is true if the reader loop is processing a readBlock, false
+	// otherwise.
+	reading := false
+
+	// deleting is true if the segment-deletion loop is processing a deletion
+	// request, false otherwise.
+	deleting := false
+
 	// writeRequests is a list of all write requests that have been accepted
 	// by the queue and are waiting to be written to disk.
 	writeRequests := []*writeRequest{}
 
 	for {
 		select {
+		// Endpoints used by the external API
+		case writeRequest := <-dq.writeRequestChan:
+			// We will accept this request if there is enough capacity left in
+			// the queue (after accounting for the pending writes that were
+			// already accepted).
+			pendingBytes := 0
+			for _, request := range writeRequests {
+				pendingBytes += len(request.serialized)
+			}
+
+		case cancelRequest := <-dq.cancelRequestChan:
+
+		// Writer loop handling
 		case <-dq.writerLoop.finishedWriting:
 			if len(writeRequests) > 0 {
 				dq.forwardWriteRequest(writeRequests[0])
-				//dq.writerLoop.input <- writeRequests[0]
 				writeRequests = writeRequests[1:]
 			} else {
 				writing = false
 			}
-		case <-dq.writerLoop.nextWriteSegment:
-			// Create a new segment and send it back to the writer loop.
 
+		// Reader loop handling
+		case readResponse := <-dq.readerLoop.finishedReading:
+
+		// Deleter loop handling
+		case deleteResponse := <-dq.deleterLoop.response:
+			if len(deleteResponse.deleted) > 0 {
+				// One or more segments were deleted, recompute the outstanding list.
+				newAckedSegments := []*queueSegment{}
+				for _, segment := range dq.segments.acked {
+					if !deleteResponse.deleted[segment] {
+						// This segment wasn't deleted, so it goes in the new list.
+						newAckedSegments = append(newAckedSegments, segment)
+					}
+				}
+				dq.segments.acked = newAckedSegments
+			}
+			if len(deleteResponse.errors) > 0 {
+				dq.settings.Logger.Errorw("Couldn't delete old segment files",
+					"errors", deleteResponse.errors)
+			}
+
+			if len(dq.segments.acked) > 0 {
+				// There are still (possibly new) segments to delete, send the
+				// next batch.
+				dq.deleterLoop.input <- &deleteRequest{segments: dq.segments.acked}
+			} else {
+				// Nothing more to delete for now, update the deleting flag.
+				deleting = false
+			}
 		}
 	}
 }

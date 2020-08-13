@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"io"
-	"os"
 )
 
 type finishedReadingMessage struct {
@@ -168,7 +167,7 @@ func (block *readBlock) nextFrame() (*readFrame, error) {
 	}
 }*/
 
-func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
+/*func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 	var err error
 	dq.segments.Lock()
 	defer dq.segments.Unlock()
@@ -181,7 +180,7 @@ func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 		}
 	}()
 
-	segment := &queueSegment{queue: dq, id: id}
+	segment := &queueSegment{queueSettings: &dq.settings, id: id}
 
 	path := dq.settings.segmentPath(id)
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
@@ -193,7 +192,7 @@ func (dq *diskQueue) newSegmentWriter() (*segmentWriter, error) {
 		segment: segment,
 		file:    file,
 	}, nil
-}
+}*/
 
 // This is only called from the writer loop.
 func (dq *diskQueue) writeFrameData(bytes []byte) error {
