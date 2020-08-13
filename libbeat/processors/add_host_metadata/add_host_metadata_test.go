@@ -395,6 +395,13 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 			},
 			true,
 		},
+		{
+			"event without host field",
+			beat.Event{
+				Fields: common.MapStr{},
+			},
+			false,
+		},
 	}
 
 	for _, c := range cases {
