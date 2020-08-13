@@ -1737,10 +1737,10 @@ type: keyword
 
 --
 
-*`aws.billing.availability_zone`*::
+*`aws.billing.group_by_key`*::
 +
 --
-Availability zone name
+Cost explorer group by key name
 
 type: keyword
 

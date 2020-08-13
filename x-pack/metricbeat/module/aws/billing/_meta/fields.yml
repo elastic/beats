@@ -76,6 +76,6 @@
     - name: resourceTags.aws:createdBy
       type: keyword
       description: aws:createdBy tag value
-    - name: availability_zone
+    - name: group_by_key
       type: keyword
-      description: Availability zone name
+      description: Cost explorer group by key name

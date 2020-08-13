@@ -3,31 +3,32 @@
     "aws": {
         "billing": {
             "AmortizedCost": {
-                "amount": 7.8057745276,
+                "amount": 0.6952566837,
                 "unit": "USD"
             },
             "BlendedCost": {
-                "amount": 7.7615302268,
+                "amount": 0.6952566837,
                 "unit": "USD"
             },
             "NormalizedUsageAmount": {
-                "amount": 0,
+                "amount": 12,
                 "unit": "N/A"
             },
             "UnblendedCost": {
-                "amount": 7.8057745276,
+                "amount": 0.6952566837,
                 "unit": "USD"
             },
             "UsageQuantity": {
-                "amount": 1673664.5747861217,
+                "amount": 312.7118693051,
                 "unit": "N/A"
             },
-            "end_date": "2020-08-12",
+            "end_date": "2020-08-13",
+            "group_by_key": "eu-central-1",
             "group_definition": {
-                "key": "aws:createdBy",
-                "type": "TAG"
+                "key": "AZ",
+                "type": "DIMENSION"
             },
-            "start_date": "2020-08-11"
+            "start_date": "2020-08-12"
         }
     },
     "cloud": {

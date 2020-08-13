@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
@@ -21,26 +22,17 @@ func TestData(t *testing.T) {
 	resultTypeIs := func(resultType string) func(e common.MapStr) bool {
 		return func(e common.MapStr) bool {
 			v, err := e.GetValue("aws.billing.group_definition.key")
-			// Check for cost explorer metrics with group by TAG
-			if v == "aws:createdBy" {
-				exists, err := e.HasKey("aws.billing.resourceTags.aws:createdBy")
-				if err != nil {
-					// aggregated total value when there is no `aws:createdBy` tag key
-					return strconv.FormatBool(exists) == resultType
-				}
-				// when tag value exists for `aws:createdBy`
-				tag, err := e.GetValue("aws.billing.resourceTags.aws:createdBy")
-				return strconv.FormatBool(tag != "") == resultType
-			}
-
 			if err == nil {
-				// group by AZ
-				return v == resultType
-			} else {
-				// Check for CloudWatch billing metrics
-				exists, err := e.HasKey("aws.billing.EstimatedCharges")
-				return err == nil && strconv.FormatBool(exists) == resultType
+				// Check for Cost Explorer billing metrcs
+				k, _ := e.GetValue("aws.billing.group_by_key")
+				exists, _ := aws.StringInSlice(k.(string), []string{"NoAZ", "NoInstanceType"})
+				if !exists {
+					return v == resultType
+				}
 			}
+			// Check for CloudWatch billing metrics
+			exists, err := e.HasKey("aws.billing.EstimatedCharges")
+			return err == nil && strconv.FormatBool(exists) == resultType
 		}
 	}
 
@@ -48,17 +40,24 @@ func TestData(t *testing.T) {
 		resultType string
 		path       string
 	}{
-		{"false", "./_meta/data.json"},
-		{"true", "./_meta/data_group_by_tag.json"},
-		{"AZ", "./_meta/data_group_by_az.json"},
+		{"AZ", "./_meta/data.json"},
+		{"INSTANCE_TYPE", "./_meta/data_group_by_instance_type.json"},
 		{"true", "./_meta/data_cloudwatch.json"},
 	}
 
 	config := mtest.GetConfigForTest(t, "billing", "24h")
+	config = addCostExplorerToConfig(config)
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)
 		t.Run(fmt.Sprintf("result type: %s", df.resultType), func(t *testing.T) {
 			metricSet.WriteEventsCond(t, df.path, resultTypeIs(df.resultType))
 		})
 	}
+}
+
+func addCostExplorerToConfig(config map[string]interface{}) map[string]interface{} {
+	costExplorerConfig := map[string]interface{}{}
+	costExplorerConfig["group_by_dimension_keys"] = []string{"AZ", "INSTANCE_TYPE"}
+	config["cost_explorer_config"] = costExplorerConfig
+	return config
 }
