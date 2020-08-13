@@ -252,11 +252,11 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":      c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"get":        c.Dict("get", threadPoolStatsSchema),
-			"search":     c.Dict("search", threadPoolStatsSchema),
+			"bulk":   c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"index":  c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"write":  c.Dict("write", threadPoolStatsSchema, c.DictOptional),
+			"get":    c.Dict("get", threadPoolStatsSchema),
+			"search": c.Dict("search", threadPoolStatsSchema),
 		}),
 	}
 
