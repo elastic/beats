@@ -7,8 +7,9 @@ processors:
 - grok:
     field: message
     pattern_definitions:
-      AUDIT_TYPE: "^type=%{NOTSPACE:auditd.log.record_type}"
-      AUDIT_PREFIX: "%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
+      AUDIT_TYPE: "type=%{NOTSPACE:auditd.log.record_type}"
+      AUDIT_NODE: "node=%{IPORHOST:auditd.log.node} "
+      AUDIT_PREFIX: "^(?:%{AUDIT_NODE})?%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
       AUDIT_KEY_VALUES: "%{WORD}=%{GREEDYDATA}"
     patterns:
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid}
