@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/go-concert/chorus"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/ctxtool/osctx"
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -46,7 +47,7 @@ type app struct {
 func main() {
 	// setup shutdown signaling based on OS signal handling
 	// We shutdown early if a signal is received during setup.
-	osSig, cancel := osSignalContext(os.Interrupt)
+	osSig, cancel := osctx.WithSignal(os.Kill, os.Interrupt)
 	defer cancel()
 
 	rc := run(osSig)

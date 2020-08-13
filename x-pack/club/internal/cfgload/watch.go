@@ -1,7 +1,6 @@
 package cfgload
 
 import (
-	"context"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )
@@ -31,7 +29,7 @@ func (w *Watcher) Run(cancel unison.Canceler, handler func(*common.Config) error
 		w.Log.Errorf("Hashing configuration files failed with: %v", err)
 	}
 
-	return periodic(cancel, 250*time.Millisecond, func() error {
+	return timed.Periodic(cancel, 250*time.Millisecond, func() error {
 		hash, err := hashFiles(w.Files)
 		if err != nil {
 			w.Log.Errorf("Hashing configuration files failed with: %v", err)
@@ -81,29 +79,5 @@ func streamFileTo(w io.Writer, path string) error {
 	defer f.Close()
 
 	_, err = io.Copy(w, f)
-	return err
-}
-
-//periodic wraps timed.Period to provide an error return and cancel the loop
-// if fn returns an error.
-//
-// XXX: elastic/go-concert#28 updated timed.Period to match the interface of
-// periodic. This function should be removed when updating to a newer version
-// of go-concert.
-func periodic(cancel unison.Canceler, period time.Duration, fn func() error) error {
-	ctx, cancelFn := context.WithCancel(ctxtool.FromCanceller(cancel))
-	defer cancelFn()
-
-	var err error
-	timed.Periodic(ctx, period, func() {
-		err = fn()
-		if err != nil {
-			cancelFn()
-		}
-	})
-
-	if err == nil {
-		err = ctx.Err()
-	}
 	return err
 }

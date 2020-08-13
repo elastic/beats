@@ -96,9 +96,10 @@ func (m *metricsetInput) runTask(ctx v2.Context, ms mb.MetricSet, pipeline beat.
 			stopCtx := ctxtool.FromCanceller(ctx.Cancelation)
 			reporter.StartFetchTimer()
 			m.fetchAndReport(stopCtx, ms, reporter)
-			timed.Periodic(stopCtx, ms.Module().Config().Period, func() {
+			timed.Periodic(stopCtx, ms.Module().Config().Period, func() error {
 				reporter.StartFetchTimer()
 				m.fetchAndReport(stopCtx, ms, reporter)
+				return nil
 			})
 		}
 	default:
