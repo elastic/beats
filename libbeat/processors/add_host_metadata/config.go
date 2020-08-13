@@ -25,15 +25,17 @@ import (
 
 // Config for add_host_metadata processor.
 type Config struct {
-	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
-	CacheTTL       time.Duration   `config:"cache.ttl"`
-	Geo            *util.GeoConfig `config:"geo"`
-	Name           string          `config:"name"`
+	NetInfoEnabled    bool            `config:"netinfo.enabled"` // Add IP and MAC to event
+	CacheTTL          time.Duration   `config:"cache.ttl"`
+	Geo               *util.GeoConfig `config:"geo"`
+	Name              string          `config:"name"`
+	ReplaceHostFields bool            `config:"replace_host_fields"` // replace existing host fields with add_host_metadata
 }
 
 func defaultConfig() Config {
 	return Config{
-		NetInfoEnabled: true,
-		CacheTTL:       5 * time.Minute,
+		NetInfoEnabled:    true,
+		CacheTTL:          5 * time.Minute,
+		ReplaceHostFields: false,
 	}
 }

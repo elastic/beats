@@ -31,7 +31,10 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-var hostName = "testHost"
+var (
+	hostName = "testHost"
+	hostID   = "9C7FAB7B"
+)
 
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
@@ -199,18 +202,10 @@ func TestConfigGeoDisabled(t *testing.T) {
 	assert.Equal(t, nil, eventGeoField)
 }
 
-func TestEventWithExistingHostField(t *testing.T) {
-	hostID := "9C7FAB7B"
-	event := &beat.Event{
-		Fields: common.MapStr{
-			"host": common.MapStr{
-				"name": hostName,
-				"id":   hostID,
-			},
-		},
-		Timestamp: time.Now(),
-	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+func TestEventWithReplaceHostFieldsFalse(t *testing.T) {
+	cfg := map[string]interface{}{}
+	cfg["replace_host_fields"] = false
+	testConfig, err := common.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -222,27 +217,75 @@ func TestEventWithExistingHostField(t *testing.T) {
 		return
 	}
 
-	newEvent, err := p.Run(event)
-	assert.NoError(t, err)
+	cases := []struct {
+		title                   string
+		event                   beat.Event
+		hostLengthLargerThanOne bool
+		hostLengthEqualsToOne   bool
+		expectedHostFieldLength int
+	}{
+		{
+			"replace_host_fields=false with only host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			true,
+			false,
+			-1,
+		},
+		{
+			"replace_host_fields=false with only host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			false,
+			true,
+			1,
+		},
+		{
+			"replace_host_fields=false with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+			false,
+			2,
+		},
+	}
 
-	v, err := newEvent.GetValue("host")
-	assert.NoError(t, err)
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			newEvent, err := p.Run(&c.event)
+			assert.NoError(t, err)
 
-	hostFields := v.(common.MapStr)
-	assert.Equal(t, 2, len(hostFields))
-	assert.Equal(t, hostID, hostFields["id"])
+			v, err := newEvent.GetValue("host")
+			assert.NoError(t, err)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			if c.expectedHostFieldLength != -1 {
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(common.MapStr)))
+			}
+		})
+	}
 }
 
-func TestEventWithOnlyHostNameField(t *testing.T) {
-	event := &beat.Event{
-		Fields: common.MapStr{
-			"host": common.MapStr{
-				"name": hostName,
-			},
-		},
-		Timestamp: time.Now(),
-	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+func TestEventWithReplaceHostFieldsTrue(t *testing.T) {
+	cfg := map[string]interface{}{}
+	cfg["replace_host_fields"] = true
+	testConfig, err := common.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -254,10 +297,59 @@ func TestEventWithOnlyHostNameField(t *testing.T) {
 		return
 	}
 
-	newEvent, err := p.Run(event)
-	assert.NoError(t, err)
+	cases := []struct {
+		title                   string
+		event                   beat.Event
+		hostLengthLargerThanOne bool
+		hostLengthEqualsToOne   bool
+	}{
+		{
+			"replace_host_fields=true with host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			true,
+			false,
+		},
+		{
+			"replace_host_fields=true with host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			true,
+			false,
+		},
+		{
+			"replace_host_fields=true with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+			false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			newEvent, err := p.Run(&c.event)
+			assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("host")
-	assert.NoError(t, err)
-	assert.True(t, len(v.(common.MapStr)) > 1)
+			v, err := newEvent.GetValue("host")
+			assert.NoError(t, err)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+		})
+	}
 }

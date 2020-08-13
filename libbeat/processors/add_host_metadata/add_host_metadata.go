@@ -81,18 +81,26 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	// If host fields exist(besides host.name added by libbeat) in event, skip add_host_metadata.
-	hostFields, err := event.Fields.GetValue("host")
-	if err == nil && hostFields != nil && len(hostFields.(common.MapStr)) > 1 {
-		hostsClone := hostFields.(common.MapStr).Clone()
-		err := hostsClone.Delete("name")
-		// remove host.name field and then check if there are other host fields exist
-		if err == nil && len(hostsClone) > 0 {
-			return event, nil
+	// check replace_host_fields field
+	if !p.config.ReplaceHostFields {
+		// If host fields exist(besides host.name added by libbeat) in event, skip add_host_metadata.
+		hostFields, err := event.Fields.GetValue("host")
+		if err == nil && hostFields != nil && len(hostFields.(common.MapStr)) >= 1 {
+			if hasName, _ := hostFields.(common.MapStr).HasKey("name"); hasName {
+				// other host fields exist on top of host.name, skip add_host_metadata.
+				if len(hostFields.(common.MapStr)) > 1 {
+					return event, nil
+				}
+			} else {
+				// host.name does not exist but other host fields exist, skip add_host_metadata.
+				if len(hostFields.(common.MapStr)) > 0 {
+					return event, nil
+				}
+			}
 		}
 	}
 
-	err = p.loadData()
+	err := p.loadData()
 	if err != nil {
 		return nil, err
 	}
