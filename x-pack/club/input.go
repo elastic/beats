@@ -42,13 +42,14 @@ type streamMeta struct {
 }
 
 type inputSettings struct {
-	ID        string                 `config:"id"`
-	Name      string                 `config:"name"`
-	Type      string                 `config:"type"`
-	Meta      map[string]interface{} `config:"name"`
-	Namespace string                 `config:"dataset.namespace"`
-	UseOutput string                 `config:"use_output"`
-	Streams   []*common.Config       `config:"streams"`
+	ID              string                 `config:"id"`
+	Name            string                 `config:"name"`
+	Type            string                 `config:"type"`
+	Meta            map[string]interface{} `config:"name"`
+	Namespace       string                 `config:"dataset.namespace"`
+	UseOutput       string                 `config:"use_output"`
+	DefaultSettings *common.Config         `config:"default"`
+	Streams         []*common.Config       `config:"streams"`
 }
 
 func newInputLoader(log *logp.Logger, registry v2.Registry) *inputLoader {
@@ -65,9 +66,17 @@ func (l *inputLoader) Configure(settings inputSettings) (*input, error) {
 		return nil, &v2.LoadError{Name: settings.Type, Reason: v2.ErrUnknownInput}
 	}
 
+	defaults := settings.DefaultSettings
+	if defaults == nil {
+		defaults = common.NewConfig()
+	}
+
 	streams := make([]stream, len(settings.Streams))
 	for i, streamConfig := range settings.Streams {
-		runner, err := p.Manager.Create(streamConfig)
+		inputConfig := defaults.Clone()
+		inputConfig.Merge(streamConfig)
+
+		runner, err := p.Manager.Create(inputConfig)
 		if err != nil {
 			return nil, err
 		}

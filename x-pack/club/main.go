@@ -45,12 +45,7 @@ type app struct {
 }
 
 func main() {
-	// setup shutdown signaling based on OS signal handling
-	// We shutdown early if a signal is received during setup.
-	osSig, cancel := osctx.WithSignal(context.Background(), os.Kill, os.Interrupt)
-	defer cancel()
-
-	rc := run(osSig)
+	rc := run()
 	if rc != 0 {
 		fmt.Fprintf(os.Stderr, "Exit with error code %v\n", rc)
 	} else {
@@ -60,7 +55,12 @@ func main() {
 	os.Exit(rc)
 }
 
-func run(osSig context.Context) (retcode int) {
+func run() (retcode int) {
+	// setup shutdown signaling based on OS signal handling
+	// We shutdown early if a signal is received during setup.
+	osSig, cancel := osctx.WithSignal(context.Background(), os.Kill, os.Interrupt)
+	defer cancel()
+
 	var flags flagsConfig
 	if err := flags.parseArgs(os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to read arguments:\n%v\n", err)

@@ -182,6 +182,12 @@ func (c *Config) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
 	return c.access().Merge(from, o...)
 }
 
+func (c *Config) Clone() *Config {
+	var tmp interface{}
+	c.Unpack(&tmp)
+	return MustNewConfigFrom(tmp)
+}
+
 func (c *Config) Unpack(to interface{}) error {
 	return c.access().Unpack(to, configOpts...)
 }
