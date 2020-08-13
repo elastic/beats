@@ -58,13 +58,6 @@ type Settings struct {
 	// disk buffer.
 	WriteToDiskACKListener queue.ACKListener
 
-	// A listener that receives ACKs when events are removed from the queue
-	// and written to their output.
-	// This can only be effective for events that are added to the queue
-	// after it is opened (there is no way to acknowledge input from a
-	// previous execution). It is ignored for events before that.
-	//WriteToOutputACKListener queue.ACKListener
-
 	ChecksumType ChecksumType
 }
 
@@ -99,9 +92,6 @@ type diskQueue struct {
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
 
-	// Data frames waiting to be written to disk.
-	//incoming *pendingFrameData
-
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
@@ -109,18 +99,9 @@ type diskQueue struct {
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
 
-	// The total bytes occupied by all segment files. This is the value
-	// we check to see if there is enough space to add an incoming event
-	// to the queue.
-	//bytesOnDisk uint64
-
-	// The memory queue of data blobs waiting to be written to disk.
-	// To add something to the queue internally, send it to this channel.
-	//	inChan chan []byte
-
+	// The API channels used by diskQueueProducer to send write / cancel calls.
 	writeRequestChan  chan *writeRequest
 	cancelRequestChan chan *cancelRequest
-	readRequestChan   chan *readRequest
 
 	// When a consumer ack increments ackedUpTo, the consumer sends
 	// its new value to this channel. The core loop then decides whether to
@@ -129,48 +110,6 @@ type diskQueue struct {
 	// but we send it anyway so we don't have to worry about the core loop
 	// waiting on ackLock.
 	consumerAckChan chan frameID
-
-	//outChan chan diskQueueOutput
-
-	// The currently active segment reader, or nil if there is none.
-	//reader *segmentReader
-
-	// The currently active segment writer. When the corresponding segment
-	// is full it is appended to segments.
-	//writer *segmentWriter
-
-	// The ol
-	//firstPosition bufferPosition
-
-	// The position of the next event to read from the queue. If this equals
-	// writePosition, then there are no events left to read.
-	// This is initialized to state.firstPosition, but generally the two differ:
-	// readPosition is advanced when an event is read, but firstPosition is
-	// only advanced when the event has been read _and_ its consumer receives
-	// an acknowledgement (meaning it has been transmitted and can be removed
-	// from the queue).
-	// This is part of diskQueue and not diskQueueState since it represents
-	// in-memory state that should not persist through a restart.
-	//readPosition bufferPosition
-
-	// A condition that is signalled when a segment file is deleted.
-	// Used by writerLoop when the queue is full, to detect when to try again.
-	// When the queue is closed, this condition will receive a broadcast after
-	// diskQueue.closed is set to true.
-	//segmentDeletedCond sync.Cond
-
-	// A condition that is signalled when a frame has been completely
-	// written to disk.
-	// Used by readerLoop when the queue is empty, to detect when to try again.
-	// When the queue is closed, this condition will receive a broadcast after
-	// diskQueue.closed is set to true.
-	//frameWrittenCond sync.Cond
-
-	// The oldest frame id that is still stored on disk.
-	// This will usually be less than ackedUpTo, since oldestFrame can't
-	// advance until the entire segment file has been acknowledged and
-	// deleted.
-	//oldestFrame frameID
 
 	// This lock must be held to read and write acked and ackedUpTo.
 	ackLock sync.Mutex
@@ -181,24 +120,6 @@ type diskQueue struct {
 	// A map of all acked indices that are above ackedUpTo (and thus
 	// can't yet be acknowledged as a continuous block).
 	acked map[frameID]bool
-
-	// Whether the queue has been closed for write. When this is true, data that
-	// has already been added to the queue intake should continue being written
-	// to disk, but no new data should be accepted and the writerLoop routine
-	// should terminate when all data has been written.
-	//closedForWrite atomic.Bool
-
-	// Whether the queue has been closed for read. When this is true, no more
-	// frames can be read from the queue, and the readerLoop routine should
-	// terminate. The queue will continue to accept acks for already-read
-	// frames and update the on-disk state accordingly.
-	//closedForRead atomic.Bool
-
-	// If true, goroutines should return as soon as possible without waiting for
-	// data updates to complete. The queue will no longer write buffered frames
-	// to disk or update the on-disk state to reflect incoming acks.
-	// If abort is true, then closedForRead and closedForWrite must be true.
-	//abort atomic.Bool
 
 	// Wait group for shutdown of the goroutines associated with this queue:
 	// core loop, reader loop, writer loop, deleter loop.
@@ -226,16 +147,8 @@ type pendingFrameData struct {
 
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
-	// The lock should be held to read or write any of the fields below.
-	sync.Mutex
-
 	// The segment that is currently being written.
 	writing *queueSegment
-
-	//writer *segmentWriter
-	//reader *segmentReader
-	segmentDeletedCond *sync.Cond
-	frameWrittenCond   *sync.Cond
 
 	// A list of the segments that have been completely written but have
 	// not yet been completely processed by the reader loop, sorted by increasing

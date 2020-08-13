@@ -18,9 +18,7 @@
 package diskqueue
 
 import (
-	"encoding/binary"
 	"fmt"
-	"hash/crc32"
 	"io"
 	"io/ioutil"
 	"os"
@@ -83,47 +81,7 @@ type segmentHeader struct {
 	checksumType ChecksumType
 }
 
-// segmentReader is a wrapper around io.Reader that provides helpers and
-// metadata for decoding segment files.
-/*type segmentReader struct {
-	// The segment this reader was generated from.
-	segment *queueSegment
-
-	// The underlying data reader.
-	raw io.Reader
-
-	// The current byte offset of the reader within the file.
-	curPosition segmentOffset
-
-	// The position at which this reader should stop reading. This is often
-	// the end of the file, but it may be earlier when the queue is reading
-	// and writing to the same segment.
-	endPosition segmentOffset
-
-	// The checksumType field from this segment file's header.
-	checksumType ChecksumType
-}*/
-
-/*type segmentWriter struct {
-	segment  *queueSegment
-	file     *os.File
-	position int64
-}*/
-
-// ChecksumType specifies what checksum algorithm the queue should use to
-// verify its data frames.
-type ChecksumType int
-
-// ChecksumTypeNone: Don't compute or verify checksums.
-// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
-//   "hash/crc32" package.
-const (
-	ChecksumTypeNone = iota
-
-	ChecksumTypeCRC32
-)
-
-// Each data frame has a 32-bit lengths and 1 32-bit checksum
+// Each data frame has a 32-bit length and a 32-bit checksum
 // in the header, and a duplicate 32-bit length in the footer.
 const frameHeaderSize = 8
 const frameFooterSize = 4
@@ -139,6 +97,8 @@ func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
 
+// Scan the given path for segment files, and return them in a list
+// ordered by segment id.
 func scanExistingSegments(path string) ([]*queueSegment, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -322,26 +282,3 @@ func (dq *diskQueue) ack(frame frameID) int {
 	}
 	return ackedCount
 }
-
-func computeChecksum(data []byte, checksumType ChecksumType) uint32 {
-	switch checksumType {
-	case ChecksumTypeNone:
-		return 0
-	case ChecksumTypeCRC32:
-		hash := crc32.NewIEEE()
-		frameLength := uint32(len(data) + frameMetadataSize)
-		binary.Write(hash, binary.LittleEndian, &frameLength)
-		hash.Write(data)
-		return hash.Sum32()
-	default:
-		panic("segmentReader: invalid checksum type")
-	}
-}
-
-/*
-func (dq *diskQueue) segmentReaderForPosition(
-	pos bufferPosition,
-) (*segmentReader, error) {
-	panic("TODO: not implemented")
-}
-*/

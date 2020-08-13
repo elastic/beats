@@ -22,6 +22,8 @@ package diskqueue
 
 import (
 	"bytes"
+	"encoding/binary"
+	"hash/crc32"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,17 +34,18 @@ import (
 	"github.com/elastic/go-structform/json"
 )
 
-func dataFrameForEvent(
-	event publisher.Event, checksumType ChecksumType,
-) []byte {
-	buf := bytes.Buffer{}
-	//checksum := computeChecksum(frameContent, checksumType)
-	panic("TODO: not implemented")
-}
+// ChecksumType specifies what checksum algorithm the queue should use to
+// verify its data frames.
+type ChecksumType int
 
-func eventForData(data []byte) publisher.Event {
-	panic("TODO: not implemented")
-}
+// ChecksumTypeNone: Don't compute or verify checksums.
+// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
+//   "hash/crc32" package.
+const (
+	ChecksumTypeNone = iota
+
+	ChecksumTypeCRC32
+)
 
 type frameEncoder struct {
 	buf          bytes.Buffer
@@ -165,4 +168,19 @@ func (d *decoder) Decode() (publisher.Event, error) {
 			Meta:      to.Meta,
 		},
 	}, nil
+}
+
+func computeChecksum(data []byte, checksumType ChecksumType) uint32 {
+	switch checksumType {
+	case ChecksumTypeNone:
+		return 0
+	case ChecksumTypeCRC32:
+		hash := crc32.NewIEEE()
+		frameLength := uint32(len(data) + frameMetadataSize)
+		binary.Write(hash, binary.LittleEndian, &frameLength)
+		hash.Write(data)
+		return hash.Sum32()
+	default:
+		panic("segmentReader: invalid checksum type")
+	}
 }

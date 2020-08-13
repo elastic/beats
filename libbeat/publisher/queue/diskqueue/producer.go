@@ -47,7 +47,12 @@ func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
 func (producer *diskQueueProducer) publish(
 	event publisher.Event, shouldBlock bool,
 ) bool {
-	serialized := dataFrameForEvent(event, producer.queue.settings.ChecksumType)
+	serialized, err := producer.encoder.encode(&event)
+	if err != nil {
+		producer.queue.settings.Logger.Errorf(
+			"Couldn't serialize incoming event: %v", err)
+		return false
+	}
 	request := &writeRequest{
 		frame: &writeFrame{
 			event:      event,

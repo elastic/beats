@@ -46,12 +46,6 @@ type writerLoop struct {
 	// ensure that the core loop doesn't block, the writer loop always reads
 	// from input immediately after sending to finishedWriting.
 	finishedWriting chan struct{}
-
-	// The writer loop sends to nextWriteSegment to indicate that it needs a new
-	// segment file to write its frames to. The core loop must respond on
-	// nextSegmentResponse with the next segment file structure.
-	//nextSegmentRequest  chan struct{}
-	//nextSegmentResponse chan *queueSegment
 }
 
 func (wl *writerLoop) run() {
@@ -66,8 +60,9 @@ func (wl *writerLoop) run() {
 	}
 }
 
+// Write the block data to disk.
 func (wl *writerLoop) processRequest(block *writeBlock) {
-	writer, err := block.segment.getWriter()
+	//writer, err := block.segment.getWriter()
 }
 
 // frameForContent wraps the given content buffer in a

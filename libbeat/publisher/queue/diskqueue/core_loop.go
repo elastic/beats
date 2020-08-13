@@ -19,45 +19,6 @@ package diskqueue
 
 import "github.com/elastic/beats/v7/libbeat/publisher"
 
-// A frame waiting to be written to disk
-type writeFrame struct {
-	// The original event provided by the client to diskQueueProducer
-	event publisher.Event
-
-	// The event, serialized for writing to disk and wrapped in a frame
-	// header / footer.
-	serialized []byte
-}
-
-// A frame that has been read from disk
-type readFrame struct {
-}
-
-// A request sent from a producer to the core loop to add a frame to the queue.
-//
-type writeRequest struct {
-	frame        *writeFrame
-	shouldBlock  bool
-	responseChan chan bool
-}
-
-// A readRequest is sent from the reader loop to the core loop when it
-// needs a new segment file to read.
-type readRequest struct {
-	responseChan chan *readResponse
-}
-
-type readResponse struct {
-}
-
-type cancelRequest struct {
-	producer *diskQueueProducer
-	// If producer.config.DropOnCancel is true, then the core loop will respond
-	// on responseChan with the number of dropped events.
-	// Otherwise, this field may be nil.
-	responseChan chan int
-}
-
 type coreLoop struct {
 	// The queue that created this coreLoop. The core loop is the only one of
 	// the main goroutines for the queue that has a pointer to the queue and
@@ -94,12 +55,43 @@ type coreLoop struct {
 	oldestFrameID frameID
 }
 
+// A frame waiting to be written to disk
+type writeFrame struct {
+	// The original event provided by the client to diskQueueProducer.
+	// We keep this as well as the serialized form until we are done
+	// writing, because we may need to send this value back to the producer
+	// callback if it is cancelled.
+	event publisher.Event
+
+	// The event, serialized for writing to disk and wrapped in a frame
+	// header / footer.
+	serialized []byte
+}
+
+// A frame that has been read from disk
+type readFrame struct {
+}
+
+// A request sent from a producer to the core loop to add a frame to the queue.
+type writeRequest struct {
+	frame        *writeFrame
+	shouldBlock  bool
+	responseChan chan bool
+}
+
+type cancelRequest struct {
+	producer *diskQueueProducer
+	// If producer.config.DropOnCancel is true, then the core loop will respond
+	// on responseChan with the number of dropped events.
+	// Otherwise, this field may be nil.
+	responseChan chan int
+}
+
 func (cl *coreLoop) run() {
 	dq := cl.queue
 
 	for {
 		select {
-		///////////////////////////////////////
 		// Endpoints used by the public API
 		case writeRequest := <-dq.writeRequestChan:
 			cl.handleProducerWriteRequest(writeRequest)
@@ -110,70 +102,25 @@ func (cl *coreLoop) run() {
 		case ackedUpTo := <-dq.consumerAckChan:
 			cl.handleConsumerAck(ackedUpTo)
 
-		///////////////////////////////////////
+		case <-dq.done:
+			cl.handleShutdown()
+			return
+
 		// Writer loop handling
 		case <-dq.writerLoop.finishedWriting:
-			if len(cl.pendingWrites) > 0 {
-				cl.forwardWriteRequest(cl.pendingWrites[0])
-				cl.pendingWrites = cl.pendingWrites[1:]
-			} else {
-				cl.writing = false
-			}
+			// Reset the writing flag and check if there's another frame waiting
+			// to be written.
+			cl.writing = false
+			cl.maybeWritePending()
 
-		///////////////////////////////////////
 		// Reader loop handling
 		case readResponse := <-dq.readerLoop.finishedReading:
+			cl.handleReadResponse(readResponse)
 
-		///////////////////////////////////////
 		// Deleter loop handling
 		case deleteResponse := <-dq.deleterLoop.response:
-			if len(deleteResponse.deleted) > 0 {
-				// One or more segments were deleted, recompute the outstanding list.
-				newAckedSegments := []*queueSegment{}
-				for _, segment := range dq.segments.acked {
-					if !deleteResponse.deleted[segment] {
-						// This segment wasn't deleted, so it goes in the new list.
-						newAckedSegments = append(newAckedSegments, segment)
-					}
-				}
-				dq.segments.acked = newAckedSegments
-			}
-			if len(deleteResponse.errors) > 0 {
-				dq.settings.Logger.Errorw("Couldn't delete old segment files",
-					"errors", deleteResponse.errors)
-			}
-
-			if len(dq.segments.acked) > 0 {
-				// There are still (possibly new) segments to delete, send the
-				// next batch.
-				dq.deleterLoop.input <- &deleteRequest{segments: dq.segments.acked}
-			} else {
-				// Nothing more to delete for now, update the deleting flag.
-				cl.deleting = false
-			}
+			cl.handleDeleteResponse(deleteResponse)
 		}
-	}
-}
-
-func (cl *coreLoop) forwardWriteRequest(request *writeRequest) {
-	dq := cl.queue
-	// First we must decide which segment the new frame should be written to.
-	data := request.frame.serialized
-	segment := dq.segments.writing
-
-	if segment != nil &&
-		segment.size+uint64(len(data)) > dq.settings.MaxSegmentSize {
-		// The new frame is too big to fit in this segment, so close it and
-		// move it to the read queue.
-		segment.writer.Close()
-		// TODO: make reasonable attempts to sync the closed file.
-		dq.segments.reading = append(dq.segments.reading, segment)
-		segment = nil
-	}
-
-	// If we don't have a segment, we need to create one.
-	if segment == nil {
-		segment = &queueSegment{id: dq.segments.nextID}
 	}
 }
 
@@ -199,11 +146,27 @@ func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
 	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
 	frameSize := uint64(len(request.frame.serialized))
 	if currentSize+frameSize > cl.queue.settings.MaxBufferSize {
-		// The queue is too full
+		// The queue is too full. Either add the request to blockedWrites,
+		// or send an immediate reject.
+		if request.shouldBlock {
+			cl.blockedWrites = append(cl.blockedWrites, request)
+		} else {
+			request.responseChan <- false
+		}
+	} else {
+		// There is enough space for the new frame! Add it to the
+		// pending list and dispatch it to the writer loop if no other
+		// writes are outstanding.
+		cl.pendingWrites = append(cl.pendingWrites, request)
+		cl.maybeWritePending()
 	}
 }
 
 func (cl *coreLoop) handleProducerCancelRequest(request *cancelRequest) {
+}
+
+func (cl *coreLoop) handleReadResponse(response readResponse) {
+
 }
 
 func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
@@ -229,6 +192,82 @@ func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
 		cl.queue.segments.acking = acking[segmentsAcked:]
 		cl.maybeDeleteAcked()
 	}
+}
+
+func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
+	dq := cl.queue
+	cl.deleting = false
+	if len(response.deleted) > 0 {
+		// One or more segments were deleted, recompute the outstanding list.
+		newAckedSegments := []*queueSegment{}
+		for _, segment := range dq.segments.acked {
+			if !response.deleted[segment] {
+				// This segment wasn't deleted, so it goes in the new list.
+				newAckedSegments = append(newAckedSegments, segment)
+			}
+		}
+		dq.segments.acked = newAckedSegments
+	}
+	if len(response.errors) > 0 {
+		dq.settings.Logger.Errorw("Couldn't delete old segment files",
+			"errors", response.errors)
+	}
+	// If there are still files to delete, send the next request.
+	cl.maybeDeleteAcked()
+}
+
+func (cl *coreLoop) handleShutdown() {
+
+}
+
+// If the pendingWrites list is nonempty, and there are no outstanding
+// requests to the writer loop, send the next frame.
+func (cl *coreLoop) maybeWritePending() {
+	dq := cl.queue
+	if cl.writing || len(cl.pendingWrites) == 0 {
+		// Nothing to do right now
+		return
+	}
+	// We are now definitely going to handle the next request, so
+	// remove it from pendingWrites.
+	request := cl.pendingWrites[0]
+	cl.pendingWrites = cl.pendingWrites[1:]
+
+	// We have a frame to write, but we need to decide which segment
+	// it should go in.
+	segment := dq.segments.writing
+
+	// If the new frame exceeds the maximum segment size, close the current
+	// writing segment.
+	frameLen := uint64(len(request.frame.serialized))
+	if segment != nil && segment.size+frameLen > dq.settings.MaxSegmentSize {
+		segment.writer.Close()
+		segment.writer = nil
+		dq.segments.reading = append(dq.segments.reading, segment)
+		segment = nil
+	}
+
+	// If there is no active writing segment need to create a new segment.
+	if segment == nil {
+		segment = &queueSegment{
+			id:            dq.segments.nextID,
+			queueSettings: &dq.settings,
+		}
+		dq.segments.writing = segment
+		dq.segments.nextID++
+	}
+
+	cl.queue.writerLoop.input <- &writeBlock{
+		request: cl.pendingWrites[0],
+		segment: segment,
+	}
+	cl.writing = true
+}
+
+// If the reading list is nonempty, and there are no outstanding read
+// requests, send one.
+func (cl *coreLoop) maybeReadPending() {
+
 }
 
 // If the acked list is nonempty, and there are no outstanding deletion

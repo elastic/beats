@@ -21,7 +21,7 @@ import (
 	"io"
 )
 
-type finishedReadingMessage struct {
+type readResponse struct {
 	// The number of frames read from the last file the reader loop was given.
 	frameCount int
 
@@ -42,7 +42,7 @@ type readerLoop struct {
 	// available for reading, the core loop will wait until it gets a
 	// finishedReadingMessage before it
 	nextReadBlock   chan readBlock
-	finishedReading chan finishedReadingMessage
+	finishedReading chan readResponse
 
 	// Frames that have been read from disk are sent to this channel.
 	// Unlike most of the queue's API channels, this one is buffered to allow
@@ -62,19 +62,19 @@ func (rl *readerLoop) run() {
 	}
 }
 
-func (rl *readerLoop) processBlock(block readBlock) finishedReadingMessage {
+func (rl *readerLoop) processBlock(block readBlock) readResponse {
 	frameCount := 0
 	for {
 		frame, err := block.nextFrame()
 		if err != nil {
-			return finishedReadingMessage{
+			return readResponse{
 				frameCount: frameCount,
 				err:        err,
 			}
 		}
 		if frame == nil {
 			// There are no more frames in this block.
-			return finishedReadingMessage{
+			return readResponse{
 				frameCount: frameCount,
 				err:        nil,
 			}
@@ -88,7 +88,7 @@ func (rl *readerLoop) processBlock(block readBlock) finishedReadingMessage {
 			// Since we haven't sent a finishedReading message yet, we can only
 			// reach this case when the nextReadBlock channel is closed, indicating
 			// queue shutdown. In this case we immediately return.
-			return finishedReadingMessage{
+			return readResponse{
 				frameCount: frameCount,
 				err:        nil,
 			}
@@ -99,7 +99,7 @@ func (rl *readerLoop) processBlock(block readBlock) finishedReadingMessage {
 		// again separately before we move on to the next data frame.
 		select {
 		case <-rl.nextReadBlock:
-			return finishedReadingMessage{
+			return readResponse{
 				frameCount: frameCount,
 				err:        nil,
 			}
@@ -229,6 +229,7 @@ func readSegment(
 	return 0, nil
 }
 
+/*
 func (dq *diskQueue) nextSegmentForReading() *queueSegment {
 	dq.segments.Lock()
 	defer dq.segments.Unlock()
@@ -242,7 +243,7 @@ func (dq *diskQueue) nextSegmentForReading() *queueSegment {
 }
 
 func (dq *diskQueue) altReaderLoop() {
-	/*curFrameID := frameID(0)
+	curFrameID := frameID(0)
 	for {
 		segment := dq.nextSegmentForReading()
 		if segment == nil {
@@ -266,5 +267,6 @@ func (dq *diskQueue) altReaderLoop() {
 		if err != nil {
 			return nil, fmt.Errorf("Couldn't read segment header: %w", err)
 		}
-	}*/
+	}
 }
+*/
