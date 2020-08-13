@@ -18,12 +18,15 @@
 package kibana
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestErrorJson(t *testing.T) {
@@ -73,4 +76,36 @@ func TestSuccess(t *testing.T) {
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, http.Header{"foo": []string{"bar"}}, nil)
 	assert.Equal(t, http.StatusOK, code)
 	assert.NoError(t, err)
+}
+
+func TestNewKibanaClient(t *testing.T) {
+	var requests []*http.Request
+	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r)
+		if r.URL.Path == "/api/status" {
+			w.Write([]byte(`{"version":{"number":"1.2.3-beta","build_snapshot":true}}`))
+		}
+	}))
+	defer kibanaTs.Close()
+
+	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
+protocol: http
+host: %s
+headers:
+  key: value
+`, kibanaTs.Listener.Addr().String())))
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	client.Request(http.MethodPost, "/foo", url.Values{}, http.Header{"key": []string{"another_value"}}, nil)
+
+	// NewKibanaClient issues a request to /api/status to fetch the version.
+	require.Len(t, requests, 2)
+	assert.Equal(t, "/api/status", requests[0].URL.Path)
+	assert.Equal(t, []string{"value"}, requests[0].Header.Values("key"))
+	assert.Equal(t, "1.2.3-beta-SNAPSHOT", client.Version.String())
+
+	// Headers specified in cient.Request are added to those defined in config.
+	assert.Equal(t, "/foo", requests[1].URL.Path)
+	assert.Equal(t, []string{"value", "another_value"}, requests[1].Header.Values("key"))
 }
