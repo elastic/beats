@@ -85,9 +85,6 @@ var (
 				"deleted": c.Int("deleted"),
 			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
-				"evictions": s.Object{
-					"count": c.Int("evictions"),
-				},
 				"memory": s.Object{
 					"bytes": c.Int("memory_size_in_bytes"),
 				},
@@ -104,29 +101,11 @@ var (
 				},
 			}),
 			"query_cache": c.Dict("query_cache", s.Schema{
-				"evictions": s.Object{
-					"count": c.Int("evictions"),
-				},
-				"hits": s.Object{
-					"count": c.Int("hit_count"),
-				},
-				"misses": s.Object{
-					"count": c.Int("miss_count"),
-				},
 				"memory": s.Object{
 					"bytes": c.Int("memory_size_in_bytes"),
 				},
 			}),
 			"request_cache": c.Dict("request_cache", s.Schema{
-				"evictions": s.Object{
-					"count": c.Int("evictions"),
-				},
-				"hits": s.Object{
-					"count": c.Int("hit_count"),
-				},
-				"misses": s.Object{
-					"count": c.Int("miss_count"),
-				},
 				"memory": s.Object{
 					"bytes": c.Int("memory_size_in_bytes"),
 				},
@@ -231,24 +210,17 @@ var (
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
 				"load_avg": c.Dict("load_average", s.Schema{
-					"1m":  c.Float("1m", s.Optional),
-					"5m":  c.Float("5m", s.Optional),
-					"15m": c.Float("15m", s.Optional),
+					"1m": c.Float("1m", s.Optional),
 				}, c.DictOptional), // No load average reported by ES on Windows
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
 				"cpuacct": c.Dict("cpuacct", s.Schema{
-					"control_group": c.Str("control_group"),
 					"usage": s.Object{
 						"ns": c.Int("usage_nanos"),
 					},
 				}),
 				"cpu": c.Dict("cpu", s.Schema{
-					"control_group": c.Str("control_group"),
 					"cfs": s.Object{
-						"period": s.Object{
-							"us": c.Int("cfs_period_micros"),
-						},
 						"quota": s.Object{
 							"us": c.Int("cfs_quota_micros"),
 						},
@@ -259,9 +231,6 @@ var (
 						},
 						"times_throttled": s.Object{
 							"count": c.Int("number_of_times_throttled"),
-						},
-						"time_throtted": s.Object{
-							"ns": c.Int("time_throttled_nanos"),
 						},
 					}),
 				}),
@@ -281,24 +250,13 @@ var (
 			"cpu": c.Dict("cpu", s.Schema{
 				"pct": c.Int("percent"),
 			}),
-			"file_descriptors": s.Object{
-				"max": s.Object{
-					"count": c.Int("max_file_descriptors"),
-				},
-				"open": s.Object{
-					"count": c.Int("open_file_descriptors"),
-				},
-			},
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
 			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
 			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),
-			"management": c.Dict("management", threadPoolStatsSchema),
 			"search":     c.Dict("search", threadPoolStatsSchema),
-			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
 		}),
 	}
 
@@ -325,9 +283,6 @@ var (
 	}
 
 	threadPoolStatsSchema = s.Schema{
-		"threads": s.Object{
-			"count": c.Int("threads"),
-		},
 		"queue": s.Object{
 			"count": c.Int("queue"),
 		},
