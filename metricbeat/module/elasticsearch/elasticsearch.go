@@ -54,7 +54,6 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"index_recovery",
 		"index_summary",
 		"ml_job",
-		"node_stats",
 		"shard",
 	}
 	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
@@ -137,14 +136,14 @@ func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) 
 	return info.ClusterID, nil
 }
 
-// IsMaster checks if the given node host is a master node.
+// isMaster checks if the given node host is a master node.
 //
 // The detection of the master is done in two steps:
 // * Fetch node name from /_nodes/_local/name
 // * Fetch current master name from cluster state /_cluster/state/master_node
 //
 // The two names are compared
-func IsMaster(http *helper.HTTP, uri string) (bool, error) {
+func isMaster(http *helper.HTTP, uri string) (bool, error) {
 
 	node, err := getNodeName(http, uri)
 	if err != nil {
@@ -413,49 +412,6 @@ func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSet
 	}
 
 	return ret, nil
-}
-
-// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
-func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
-	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
-	if err != nil {
-		return false, err
-	}
-
-	var response map[string]map[string]map[string]map[string]bool
-	err = json.Unmarshal(content, &response)
-	if err != nil {
-		return false, err
-	}
-
-	for _, nodeInfo := range response["nodes"] {
-		mlockall := nodeInfo["process"]["mlockall"]
-		return mlockall, nil
-	}
-
-	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
-}
-
-// GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
-func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
-	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
-	if err != nil {
-		return "", err
-	}
-
-	var response struct {
-		Nodes map[string]interface{} `json:"nodes"`
-	}
-
-	if err := json.Unmarshal(content, &response); err != nil {
-		return "", err
-	}
-
-	for nodeID, _ := range response.Nodes {
-		return nodeID, nil
-	}
-
-	return "", errors.New("could not determine master node ID")
 }
 
 // PassThruField copies the field at the given path from the given source data object into
