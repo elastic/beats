@@ -326,43 +326,43 @@
                   fields:
                     - name: query_total
                       type: alias
-                      path: elasticsearch.index_summary.primaries.search.query.count
+                      path: elasticsearch.index.summary.primaries.search.query.count
                     - name: query_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.primaries.search.query.time.ms
+                      path: elasticsearch.index.summary.primaries.search.query.time.ms
                 - name: bulk
                   type: group
                   fields:
                     - name: total_operations
                       type: alias
-                      path: elasticsearch.index_summary.primaries.bulk.operations.count
+                      path: elasticsearch.index.summary.primaries.bulk.operations.count
                     - name: total_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.primaries.bulk.time.count.ms
+                      path: elasticsearch.index.summary.primaries.bulk.time.count.ms
                     - name: avg_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.primaries.bulk.time.avg.ms
+                      path: elasticsearch.index.summary.primaries.bulk.time.avg.ms
                     - name: avg_size_in_bytes
                       type: alias
-                      path: elasticsearch.index_summary.primaries.bulk.time.avg.bytes
+                      path: elasticsearch.index.summary.primaries.bulk.time.avg.bytes
                     - name: total_size_in_bytes
                       type: alias
-                      path: elasticsearch.index_summary.primaries.bulk.size.bytes
+                      path: elasticsearch.index.summary.primaries.bulk.size.bytes
                 - name: indexing
                   type: group
                   fields:
                     - name: index_total
                       type: alias
-                      path: elasticsearch.index_summary.primaries.indexing.index.count
+                      path: elasticsearch.index.summary.primaries.indexing.index.count
                     - name: index_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.primaries.indexing.index.time.ms
+                      path: elasticsearch.index.summary.primaries.indexing.index.time.ms
                     - name: is_throttled
                       type: alias
-                      path: elasticsearch.index_summary.primaries.indexing.is_throttled
+                      path: elasticsearch.index.summary.primaries.indexing.is_throttled
                     - name: throttle_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.primaries.indexing.throttled_time.ms
+                      path: elasticsearch.index.summary.primaries.indexing.throttled_time.ms
             - name: total
               type: group
               fields:
@@ -371,40 +371,40 @@
                   fields:
                     - name: query_total
                       type: alias
-                      path: elasticsearch.index_summary.total.search.query.count
+                      path: elasticsearch.index.summary.total.search.query.count
                     - name: query_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.total.search.query.time.ms
+                      path: elasticsearch.index.summary.total.search.query.time.ms
                 - name: bulk
                   type: group
                   fields:
                     - name: total_operations
                       type: alias
-                      path: elasticsearch.index_summary.total.bulk.operations.count
+                      path: elasticsearch.index.summary.total.bulk.operations.count
                     - name: total_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.total.bulk.time.count.ms
+                      path: elasticsearch.index.summary.total.bulk.time.count.ms
                     - name: avg_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.total.bulk.time.avg.ms
+                      path: elasticsearch.index.summary.total.bulk.time.avg.ms
                     - name: avg_size_in_bytes
                       type: alias
-                      path: elasticsearch.index_summary.total.bulk.time.avg.bytes
+                      path: elasticsearch.index.summary.total.bulk.time.avg.bytes
                     - name: total_size_in_bytes
                       type: alias
-                      path: elasticsearch.index_summary.total.bulk.size.bytes
+                      path: elasticsearch.index.summary.total.bulk.size.bytes
                 - name: indexing
                   type: group
                   fields:
                     - name: index_total
                       type: alias
-                      path: elasticsearch.index_summary.total.indexing.index.count
+                      path: elasticsearch.index.summary.total.indexing.index.count
                     - name: index_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.total.indexing.index.time.ms
+                      path: elasticsearch.index.summary.total.indexing.index.time.ms
                     - name: is_throttled
                       type: alias
-                      path: elasticsearch.index_summary.total.indexing.is_throttled
+                      path: elasticsearch.index.summary.total.indexing.is_throttled
                     - name: throttle_time_in_millis
                       type: alias
-                      path: elasticsearch.index_summary.total.indexing.throttled_time.ms
+                      path: elasticsearch.index.summary.total.indexing.throttled_time.ms
