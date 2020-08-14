@@ -45,7 +45,7 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 8)
+	require.Len(t, metricSets, 9)
 	for _, ms := range metricSets {
 		name := ms.Name()
 		switch name {
