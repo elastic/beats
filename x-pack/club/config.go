@@ -1,9 +1,7 @@
 package main
 
 import (
-	"errors"
 	"flag"
-	"fmt"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -23,7 +21,7 @@ type flagsConfig struct {
 
 type settings struct {
 	ConfigID string           `config:"id"`
-	Pipeline pipelineSettings `config:",internal"`
+	Pipeline pipelineSettings `config:",inline"`
 	Path     dirs.Project
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
@@ -69,23 +67,6 @@ func (c *flagsConfig) registerFlags(flags *flag.FlagSet) {
 	flags.BoolVar(&c.Reload, "reload", false, "enable config file reloading")
 
 	registerFlagsPath(flags, &c.Path)
-}
-
-func (s *pipelineSettings) Validate() error {
-	if _, exists := s.Outputs["default"]; !exists {
-		return errors.New("no default output configured")
-	}
-
-	for _, inp := range s.Inputs {
-		if inp.UseOutput == "" {
-			continue
-		}
-		if _, exist := s.Outputs[inp.UseOutput]; !exist {
-			return fmt.Errorf("output '%v' not defined", inp.UseOutput)
-		}
-	}
-
-	return nil
 }
 
 func registerFlagsPath(flags *flag.FlagSet, p *dirs.Project) {

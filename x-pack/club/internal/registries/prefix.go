@@ -24,7 +24,7 @@ type prefixRegistry struct {
 //    - type: logs/journald
 //
 func Prefixed(name string, reg v2.Registry) v2.Registry {
-	return &prefixRegistry{Registry: reg, prefix: name + "/"}
+	return &prefixRegistry{Registry: reg, prefix: name + "."}
 }
 
 func (r *prefixRegistry) Find(name string) (v2.Plugin, bool) {

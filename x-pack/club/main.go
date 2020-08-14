@@ -31,9 +31,8 @@ type app struct {
 	info beat.Info
 
 	// app settings
-	Name      string
-	Settings  settings
-	rawConfig *common.Config // required for index managemnt setup... should be removed
+	Name     string
+	Settings settings
 
 	// configured subsystems
 	statestore      *kvStore
@@ -127,7 +126,6 @@ func (app *app) initSettings(flags flagsConfig) error {
 	if err != nil {
 		return fmt.Errorf("Failed to read config file(s): %w", err)
 	}
-	app.rawConfig = config
 
 	settings := app.defaultSettings()
 	settings.Path = flags.Path
@@ -197,11 +195,7 @@ func (app *app) configure(flags flagsConfig) error {
 	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
 	app.inputLoader = newInputLoader(app.log, inputsCollection)
 
-	app.pipelineManager, err = newPipelineManager(app.log, app.info,
-		app.inputLoader,
-		app.rawConfig,
-		app.Settings.Pipeline,
-	)
+	app.pipelineManager, err = newPipelineManager(app.log, app.info, app.inputLoader, app.Settings.Pipeline)
 	if err != nil {
 		return err
 	}

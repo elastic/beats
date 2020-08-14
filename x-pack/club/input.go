@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
-	"github.com/urso/sderr"
 )
 
 type inputLoader struct {
@@ -19,9 +18,16 @@ type inputLoader struct {
 }
 
 type input struct {
-	streams   []stream
-	meta      inputMeta
-	useOutput string
+	inputMeta  inputMeta
+	streamMeta streamMeta
+	configHash string
+	useOutput  string
+	runner     v2.Input
+}
+
+type streamMeta struct {
+	ID      string `config:"id"`
+	DataSet string `config:"data_stream.dataset"`
 }
 
 type inputMeta struct {
@@ -29,17 +35,7 @@ type inputMeta struct {
 	Name      string                 `config:"name"`
 	Type      string                 `config:"type"`
 	Meta      map[string]interface{} `config:"name"`
-	Namespace string                 `config:"dataset.namespace"`
-}
-
-type stream struct {
-	meta       streamMeta
-	configHash string
-	runner     v2.Input
-}
-
-type streamMeta struct {
-	ID string `config:"id"`
+	Namespace string                 `config:"data_stream.namespace"`
 }
 
 type inputSettings struct {
@@ -47,7 +43,7 @@ type inputSettings struct {
 	Name            string                 `config:"name"`
 	Type            string                 `config:"type"`
 	Meta            map[string]interface{} `config:"name"`
-	Namespace       string                 `config:"dataset.namespace"`
+	Namespace       string                 `config:"data_stream.namespace"`
 	UseOutput       string                 `config:"use_output"`
 	DefaultSettings *common.Config         `config:"default"`
 	Streams         []*common.Config       `config:"streams"`
@@ -61,90 +57,120 @@ func (l *inputLoader) Init(group unison.Group, mode v2.Mode) error {
 	return l.registry.Init(group, mode)
 }
 
-func (l *inputLoader) Configure(settings inputSettings) (*input, error) {
-	p, exists := l.registry.Find(settings.Type)
-	if !exists {
-		return nil, &v2.LoadError{Name: settings.Type, Reason: v2.ErrUnknownInput}
-	}
-
+func (l *inputLoader) Configure(settings inputSettings) ([]*input, error) {
 	defaults := settings.DefaultSettings
 	if defaults == nil {
 		defaults = common.NewConfig()
 	}
 
-	streams := make([]stream, len(settings.Streams))
-	for i, streamConfig := range settings.Streams {
-		inputConfig := defaults.Clone()
-		inputConfig.Merge(streamConfig)
-
-		runner, err := p.Manager.Create(inputConfig)
-		if err != nil {
-			return nil, err
-		}
-		streams[i] = stream{
-			runner:     runner,
-			configHash: inputConfig.Hash(),
-		}
-	}
-
-	useOutput := settings.UseOutput
-	if useOutput == "" {
-		useOutput = "default"
-	}
-
-	meta := inputMeta{
+	inputMeta := inputMeta{
 		ID:        settings.ID,
 		Name:      settings.Name,
 		Type:      settings.Type,
 		Meta:      settings.Meta,
 		Namespace: settings.Namespace,
 	}
+	log := inputMeta.loggerWith(l.log)
 
-	log := meta.logWith(l.log)
-	switch p.Stability {
-	case feature.Experimental:
-		log.Warnf("EXPERIMENTAL: The %v input is experimental", settings.Type)
-	case feature.Beta:
-		log.Warnf("BETA: The %v input is beta", settings.Type)
-	}
-	if p.Deprecated {
-		log.Warnf("DEPRECATED: The %v input is deprecated", settings.Type)
+	useOutput := settings.UseOutput
+	if useOutput == "" {
+		useOutput = "default"
 	}
 
-	return &input{meta: meta, streams: streams, useOutput: useOutput}, nil
+	inputs := make([]*input, 0, len(settings.Streams))
+	for _, cfg := range settings.Streams {
+		streamConfig := defaults.Clone()
+		streamConfig.Merge(cfg)
+
+		var streamMeta streamMeta
+		if err := streamConfig.Unpack(&streamMeta); err != nil {
+			return nil, err
+		}
+
+		name, plugin, err := l.findInputPlugin(settings, streamConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		switch plugin.Stability {
+		case feature.Experimental:
+			log.Warnf("EXPERIMENTAL: The %v input is experimental", name)
+		case feature.Beta:
+			log.Warnf("BETA: The %v input is beta", name)
+		}
+		if plugin.Deprecated {
+			log.Warnf("DEPRECATED: The %v input is deprecated", name)
+		}
+
+		runner, err := plugin.Manager.Create(streamConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		inputs = append(inputs, &input{
+			inputMeta:  inputMeta,
+			streamMeta: streamMeta,
+			configHash: streamConfig.Hash(),
+			useOutput:  useOutput,
+			runner:     runner,
+		})
+	}
+
+	return inputs, nil
+}
+
+func (l *inputLoader) findInputPlugin(settings inputSettings, streamConfig *common.Config) (string, v2.Plugin, error) {
+	streamSettings := struct {
+		DataSet string `config:"data_stream.dataset"`
+		Type    string `config:"type"`
+	}{}
+
+	if err := streamConfig.Unpack(&streamSettings); err != nil {
+		return "", v2.Plugin{}, err
+	}
+
+	if t := streamSettings.Type; t != "" {
+		p, exists := l.registry.Find(t)
+		if !exists {
+			return "", v2.Plugin{}, &v2.LoadError{Name: t, Reason: v2.ErrUnknownInput}
+		}
+		return t, p, nil
+	}
+
+	//input type names can follow multiple patterns. Lets precompute allowed names
+	// first. The name order in the array specifies the priority of a given naming scheme.
+	var names []string
+	if t := streamSettings.DataSet; t != "" {
+		names = append(names, t)
+		if it := settings.Type; it != "" {
+			names = append(names, fmt.Sprintf("%v.%v", it, t))
+		}
+	}
+	if it := settings.Type; it != "" {
+		names = append(names, it)
+	}
+
+	if len(names) == 0 {
+		return "", v2.Plugin{}, &v2.LoadError{Message: "no input type configured", Reason: v2.ErrUnknownInput}
+	}
+
+	for _, name := range names {
+		if p, exists := l.registry.Find(name); exists {
+			return name, p, nil
+		}
+	}
+
+	return "", v2.Plugin{}, &v2.LoadError{Name: names[0], Reason: v2.ErrUnknownInput}
 }
 
 func (inp *input) Test(ctx v2.TestContext) error {
-	var grp unison.MultiErrGroup
-	for _, stream := range inp.streams {
-		stream := stream
-		grp.Go(func() (err error) {
-			return stream.runner.Test(ctx)
-		})
-	}
-	return sderr.WrapAll(grp.Wait(), "input tests failed")
+	return inp.runner.Test(ctx)
 }
 
-func (inp *input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
-	ctx.Logger = inp.meta.logWith(ctx.Logger)
+func (inp *input) Run(ctx v2.Context, pipeline beat.Pipeline) (err error) {
+	ctx.Logger = inp.inputMeta.loggerWith(ctx.Logger)
+	ctx.Logger = inp.streamMeta.loggerWith(ctx.Logger)
 
-	// We wait for all inputs to complete or fail individually. The input allows
-	// existing streams to continue, even if a subset of streams have failed.
-	var grp unison.MultiErrGroup
-	for _, stream := range inp.streams {
-		stream := stream
-		grp.Go(func() (err error) {
-			streamCtx := ctx
-			streamCtx.Logger = stream.meta.loggerWith(ctx.Logger)
-
-			return inp.runStream(streamCtx, pipeline, stream)
-		})
-	}
-
-	return sderr.WrapAll(grp.Wait(), "input failures")
-}
-
-func (inp *input) runStream(ctx v2.Context, pipeline beat.Pipeline, stream stream) (err error) {
 	defer func() {
 		if v := recover(); v != nil {
 			err = fmt.Errorf("input panic with: %+v\n%s", v, debug.Stack())
@@ -152,10 +178,10 @@ func (inp *input) runStream(ctx v2.Context, pipeline beat.Pipeline, stream strea
 		}
 	}()
 
-	return stream.runner.Run(ctx, pipeline)
+	return inp.runner.Run(ctx, pipeline)
 }
 
-func (m *inputMeta) logWith(log *logp.Logger) *logp.Logger {
+func (m *inputMeta) loggerWith(log *logp.Logger) *logp.Logger {
 	log = log.With("type", m.Type)
 	if m.ID != "" {
 		log = log.With("input_id", m.ID)
