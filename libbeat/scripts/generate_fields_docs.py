@@ -106,7 +106,7 @@ grouped in the following categories:
 
 """.format(**dict))
 
-    docs = yaml.load(input)
+    docs = yaml.load(input, Loader=yaml.FullLoader)
 
     # fields file is empty
     if docs is None:
