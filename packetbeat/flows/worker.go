@@ -213,7 +213,7 @@ func createEvent(
 		"duration": f.ts.Sub(f.createTS),
 		"dataset":  "flow",
 		"kind":     "event",
-		"category": []string{"network_traffic", "network"},
+		"category": []string{"network"},
 		"action":   "network_flow",
 	}
 	flow := common.MapStr{

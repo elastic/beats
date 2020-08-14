@@ -101,7 +101,7 @@ func TestCreateEvent(t *testing.T) {
 			"duration": isdef.KeyPresent,
 			"dataset":  "flow",
 			"kind":     "event",
-			"category": []string{"network_traffic", "network"},
+			"category": []string{"network"},
 			"action":   "network_flow",
 		},
 		"type": "flow",
