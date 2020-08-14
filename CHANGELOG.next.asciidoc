@@ -554,6 +554,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for v10, v11 and v12 logs on Postgres {issue}13810[13810] {pull}17732[17732]
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
 - Added http_endpoint input{pull}18298[18298]
+- Add http_endpoint input. {pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
 - Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
@@ -614,7 +615,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Journalbeat*
 
 - Added an `id` config option to inputs to allow running multiple inputs on the
-  same journal. {pull}18467{18467}
+  same journal. {pull}18467[18467]
 - Add basic ECS categorization and `log.syslog` fields. {pull}19176[19176]
 
 *Metricbeat*
@@ -756,6 +757,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Journalbeat*
 
 *Metricbeat*
+
 - Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
 - Deprecate tags.resource_type_filter config parameter and replace with resource_type. {pull}19688[19688]
 
