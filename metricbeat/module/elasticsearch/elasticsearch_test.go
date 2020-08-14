@@ -50,7 +50,7 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 		name := ms.Name()
 		switch name {
 		case "ccr", "enrich", "cluster_stats", "index", "index_recovery",
-			"index_summary", "ml_job", "shard":
+			"index_summary", "ml_job", "node_stats", "shard":
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}

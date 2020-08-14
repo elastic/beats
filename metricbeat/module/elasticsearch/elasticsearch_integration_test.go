@@ -133,7 +133,6 @@ func TestXPackEnabled(t *testing.T) {
 		"index_recovery": []string{"index_recovery"},
 		"index_summary":  []string{"indices_stats"},
 		"ml_job":         []string{"job_stats"},
-		"node_stats":     []string{"node_stats"},
 	}
 
 	config := getXPackConfig(host)
