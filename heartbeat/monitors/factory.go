@@ -136,9 +136,3 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return clientCfg, nil
 	}, nil
 }
-
-func setOptional(to common.MapStr, key string, value string) {
-	if value != "" {
-		to.Put(key, value)
-	}
-}
