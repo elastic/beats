@@ -468,15 +468,6 @@ shared:
         source: '{{.BeatName}}.docker.yml'
         mode: 0600
         config: true
-      /licenses/ELASTIC-LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
-        mode: 0644
-      /licenses/LICENSE.txt:
-        source: '{{ repo.RootDir }}/LICENSE.txt'
-        mode: 0644
-      /licenses/NOTICE.txt:
-        source: '{{ repo.RootDir }}/NOTICE.txt'
-        mode: 0644
 
   - &docker_ubi_spec
     extra_vars:
