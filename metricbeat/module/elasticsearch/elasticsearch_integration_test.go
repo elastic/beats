@@ -177,6 +177,8 @@ func TestXPackEnabled(t *testing.T) {
 			}
 
 			types := metricSetToTypesMap[metricSet.Name()]
+			fmt.Println("***** debugging: types:", types)
+			fmt.Println("***** debugging: len(events):", len(events))
 			require.Len(t, events, len(types))
 
 			for i, event := range events {
