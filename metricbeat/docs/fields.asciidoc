@@ -26947,7 +26947,7 @@ type: keyword
 --
 Internal IP for the service.
 
-type: ip
+type: keyword
 
 --
 
