@@ -150,7 +150,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Filebeat*
 
 
-- Added http_endpoint input{pull}18298[18298]
+- Added http_endpoint input. {pull}18298[18298]
 - Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
@@ -199,7 +199,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Journalbeat*
 
-- Added an `id` config option to inputs to allow running multiple inputs on the same journal. {pull}18467{18467}
+- Added an `id` config option to inputs to allow running multiple inputs on the same journal. {pull}18467[18467]
 - Add basic ECS categorization and `log.syslog` fields. {pull}19176[19176]
 
 *Metricbeat*
@@ -246,6 +246,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Journalbeat*
 
 *Metricbeat*
+
 - Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
 - Deprecate tags.resource_type_filter config parameter and replace with resource_type. {pull}19688[19688]
 
