@@ -8,7 +8,7 @@
       type: keyword
       description: Service name.
     - name: cluster_ip
-      type: ip
+      type: keyword
       description: Internal IP for the service.
     - name: external_name
       type: keyword
