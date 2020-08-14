@@ -281,6 +281,8 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			continue
 		}
 
+		logp.Debug("Checking matches of %s: %v", path, matches)
+
 	OUTER:
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
