@@ -47,6 +47,46 @@ var (
 					"bytes": c.Int("memory_in_bytes"),
 				},
 			}),
+			"indexing": c.Dict("indexing", s.Schema{
+				"index": s.Object{
+					"count": c.Int("index_total"),
+					"time": s.Object{
+						"ms": c.Int("index_time_in_millis"),
+					},
+				},
+				// following field is not included in the Stack Monitoring UI mapping
+				"is_throttled": c.Bool("is_throttled"),
+				// following field is not included in the Stack Monitoring UI mapping
+				"throttle_time": s.Object{
+					"ms": c.Int("throttle_time_in_millis"),
+				},
+			}),
+			// following field is not included in the Stack Monitoring UI mapping
+			"bulk": s.Object{
+				"operations": s.Object{
+					"count": c.Int("total_operations"),
+				},
+				"time": s.Object{
+					"count": s.Object{
+						"ms": c.Int("total_time_in_millis"),
+					},
+					"avg": s.Object{
+						"ms":    c.Int("avg_time_in_millis"),
+						"bytes": c.Int("avg_size_in_bytes"),
+					},
+				},
+				"size": s.Object{
+					"bytes": c.Int("total_size_in_bytes"),
+				},
+			},
+			"search": s.Object{
+				"query": s.Object{
+					"count": c.Int("query_total"),
+					"time": s.Object{
+						"ms": c.Int("query_time_in_millis"),
+					},
+				},
+			},
 		}),
 		"total": c.Dict("total", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
@@ -64,6 +104,46 @@ var (
 					"bytes": c.Int("memory_in_bytes"),
 				},
 			}),
+			"indexing": c.Dict("indexing", s.Schema{
+				"index": s.Object{
+					"count": c.Int("index_total"),
+					// following field is not included in the Stack Monitoring UI mapping
+					"time": s.Object{
+						"ms": c.Int("index_time_in_millis"),
+					},
+				},
+				// following field is not included in the Stack Monitoring UI mapping
+				"is_throttled": c.Bool("is_throttled"),
+				// following field is not included in the Stack Monitoring UI mapping
+				"throttle_time": s.Object{
+					"ms": c.Int("throttle_time_in_millis"),
+				},
+			}),
+			"bulk": s.Object{
+				"operations": s.Object{
+					"count": c.Int("total_operations"),
+				},
+				"time": s.Object{
+					"count": s.Object{
+						"ms": c.Int("total_time_in_millis"),
+					},
+					"avg": s.Object{
+						"ms":    c.Int("avg_time_in_millis"),
+						"bytes": c.Int("avg_size_in_bytes"),
+					},
+				},
+				"size": s.Object{
+					"bytes": c.Int("total_size_in_bytes"),
+				},
+			},
+			"search": s.Object{
+				"query": s.Object{
+					"count": c.Int("query_total"),
+					"time": s.Object{
+						"ms": c.Int("query_time_in_millis"),
+					},
+				},
+			},
 		}),
 	}
 )
