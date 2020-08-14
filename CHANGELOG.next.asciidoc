@@ -179,6 +179,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Add service resource in k8s cluster role. {pull}20546[20546]
+- [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 
 *Auditbeat*
 
