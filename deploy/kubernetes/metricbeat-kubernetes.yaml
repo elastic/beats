@@ -29,7 +29,6 @@ data:
         #  scope: cluster
         #  node: ${NODE_NAME}
         #  unique: true
-        #  # identifier: <lease_lock_name>
         #  templates:
         #    - config:
         #        - module: kubernetes
