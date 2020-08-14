@@ -75,7 +75,6 @@
         "kind": "event",
         "action": "network_flow",
         "category": [
-            "network_traffic",
             "network"
         ]
     }
