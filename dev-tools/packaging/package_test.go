@@ -425,7 +425,8 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 	if vendor != "Elastic" {
 		return
 	}
-	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+
+	t.Run(fmt.Sprintf("%s license labels", p.Name), func(t *testing.T) {
 		expectedLicense := "Elastic License"
 		ossPrefix := strings.Join([]string{
 			info.Config.Labels["org.label-schema.name"],
@@ -435,8 +436,24 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
 			expectedLicense = "ASL 2.0"
 		}
-		if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
-			t.Errorf("unexpected license label: %s", license)
+		licenseLabels := []string{
+			"license",
+			"org.label-schema.license",
+		}
+		for _, licenseLabel := range licenseLabels {
+			if license, present := info.Config.Labels[licenseLabel]; !present || license != expectedLicense {
+				t.Errorf("unexpected license label %s: %s", licenseLabel, license)
+			}
+		}
+	})
+
+	t.Run(fmt.Sprintf("%s required labels", p.Name), func(t *testing.T) {
+		// From https://redhat-connect.gitbook.io/partner-guide-for-red-hat-openshift-and-container/program-on-boarding/technical-prerequisites
+		requiredLabels := []string{"name", "vendor", "version", "release", "summary", "description"}
+		for _, label := range requiredLabels {
+			if value, present := info.Config.Labels[label]; !present || value == "" {
+				t.Errorf("missing required label %s", label)
+			}
 		}
 	})
 }
