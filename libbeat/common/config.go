@@ -184,16 +184,32 @@ func (c *Config) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
 }
 
 func (c *Config) Clone() *Config {
+	if !c.IsArray() && !c.IsDict() {
+		return NewConfig()
+	}
+
 	var tmp interface{}
 	c.Unpack(&tmp)
 	return MustNewConfigFrom(tmp)
 }
 
 func (c *Config) Hash() string {
-	var tmp interface{}
-	c.Unpack(&tmp)
-	h, _ := hashstructure.Hash(tmp, nil)
-	return fmt.Sprintf("%x", h)
+	var hash uint64
+
+	if c.IsDict() {
+		tmp := map[string]interface{}{}
+		c.Unpack(&tmp)
+		hash, _ = hashstructure.Hash(tmp, nil)
+	}
+
+	if c.IsArray() {
+		var tmp []interface{}
+		c.Unpack(&tmp)
+		hashAr, _ := hashstructure.Hash(tmp, nil)
+		hash = hash ^ hashAr
+	}
+
+	return fmt.Sprintf("%x", hash)
 }
 
 func (c *Config) Unpack(to interface{}) error {
