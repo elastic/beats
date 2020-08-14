@@ -79,6 +79,7 @@ var (
 					"bytes": c.Int("total_size_in_bytes"),
 				},
 			},
+			// following field is not included in the Stack Monitoring UI mapping
 			"search": s.Object{
 				"query": s.Object{
 					"count": c.Int("query_total"),
