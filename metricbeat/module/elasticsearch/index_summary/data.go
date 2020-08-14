@@ -119,6 +119,7 @@ var (
 					"ms": c.Int("throttle_time_in_millis"),
 				},
 			}),
+			// following field is not included in the Stack Monitoring UI mapping
 			"bulk": s.Object{
 				"operations": s.Object{
 					"count": c.Int("total_operations"),
@@ -149,14 +150,6 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var event mb.Event
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
-	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cluster.name", info.ClusterName)
-	event.ModuleFields.Put("cluster.id", info.ClusterID)
-
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -170,6 +163,14 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 	if err != nil {
 		return errors.Wrap(err, "failure applying stats schema")
 	}
+
+	var event mb.Event
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+	event.ModuleFields = common.MapStr{}
+	event.ModuleFields.Put("cluster.name", info.ClusterName)
+	event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 	event.MetricSetFields = fields
 
