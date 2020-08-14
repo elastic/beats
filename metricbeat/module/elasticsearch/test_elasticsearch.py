@@ -127,6 +127,7 @@ class Test(metricbeat.BaseTest):
                 "index_recovery",
                 "index_summary",
                 "ml_job",
+                "node_stats",
                 "shard"
             ],
             "hosts": self.get_hosts(),
