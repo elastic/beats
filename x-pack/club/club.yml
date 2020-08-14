@@ -1,4 +1,4 @@
-inputs:
+club.inputs:
 
 ## collect linux system and services logs
 #- type:  logs/journald
@@ -7,16 +7,19 @@ inputs:
 #  # - syslog.identifier=test
 
 # collect system metrics
-- type: metrics/system/process
-  enabled: true
-  use_output: other
-  streams:
-  - period: 60
+#- type: metrics
+#  enabled: true
+#  use_output: other
+#  streams:
+#  - type: metrics.system.process
+#  - type: metrics.system.cpu
+#    period: 60
 
-- type: metrics/system/cpu
+- type: metrics.system
   enabled: true
   streams:
-  - period: 10
+  - type: metrics.system.cpu
+    period: 10
 
 #- type: audit/file_integrity
 #  streams:
