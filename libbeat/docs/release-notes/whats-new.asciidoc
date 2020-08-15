@@ -10,7 +10,14 @@ Here are the highlights of what's new and improved in {minor-version}.
 //<<release-notes-7.9.0,release notes>> and
 //<<breaking-changes-7.9,breaking changes>>.
 
-coming[7.9.0]
+[float]
+=== {log-driver-long} now supports `docker logs` command
+
+Starting with version 7.9, the {log-driver-long} fully supports the `docker logs`
+command. The plugin maintains a local copy of logs that can be read without a
+connection to {es}. The plugin mounts the `/var/lib/docker` directory on the
+host to write logs to `/var/log/containers`. For more information, see the
+{docker-logging-ref}/index.html[Elastic Logging Plugin for Docker] docs.
 
 //Starting with n.1, uncomment this list and add links to previous releases
 //with most recent listed first:
