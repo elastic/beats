@@ -44,39 +44,30 @@ func NewController(
 }
 
 func (pm *Controller) Run(ctx context.Context) error {
-	type pipelineHandle struct {
-		ctx      context.Context
-		cancel   func()
-		pipeline *pipeline
-	}
+	var pipelineGroup managedGroup
+	defer pipelineGroup.Stop()
 
-	var wgActive sync.WaitGroup
-	defer wgActive.Wait()
-
+	// keep track of active pipeline in order to send configuration updates
 	var muPipelines sync.Mutex
-	pipelines := map[string]pipelineHandle{}
-	defer func() {
-		muPipelines.Lock()
-		defer muPipelines.Unlock()
-		for _, hdl := range pipelines {
-			hdl.cancel()
-		}
-	}()
+	pipelines := map[string]*pipeline{}
 
 	pipelineState := pm.getState()
 	for {
 		muPipelines.Lock()
-		// 1. stop pipelines
-		for name, hdl := range pipelines {
-			if _, exists := pipelineState[name]; !exists {
-				hdl.cancel()
-				delete(pipelines, name)
-			}
+
+		stopped := pipelineGroup.FindAll(func(name string) bool {
+			_, exists := pipelineState[name]
+			return !exists
+		})
+		for _, hdl := range stopped {
+			hdl.cancel()
 		}
 
 		// 2. reconfigure existing pipelines
-		for name, hdl := range pipelines {
-			hdl.pipeline.OnReconfigure(*pipelineState[name])
+		for name, pipeline := range pipelines {
+			if st := pipelineState[name]; st != nil {
+				pipeline.OnReconfigure(*st)
+			}
 		}
 
 		// 3. start new pipelines
@@ -85,40 +76,36 @@ func (pm *Controller) Run(ctx context.Context) error {
 				continue
 			}
 
-			pipeline := newPipeline(pm.log, pm.info, name, *st)
-			pipeCtx, pipeCancel := context.WithCancel(context.Background())
-			hdl := pipelineHandle{ctx: pipeCtx, cancel: pipeCancel, pipeline: *&pipeline}
-			pipelines[name] = hdl
+			pipeline := newPipeline(pm.log.With("output", name), pm.info, name, *st)
+			pipelines[name] = pipeline
 
-			wgActive.Add(1)
-			go func() {
+			pipelineGroup.Go(name, func(cancel unison.Canceler) {
+				// XXX: We always unregister a pipeline on error. On an reconfiguration event
+				//      the stopped pipeline will be started again.
+				//      Better consider to either:
+				//      a) do not remove the handle, but keep the state as failed (more complicate reloading?)
+				//      b) pipelines should not fail unless something went really
+				//         really wrong. Try to backoff and retry to run the pipeline (makes reloading more consistent).
 				defer func() {
-					defer wgActive.Done()
-					defer pipeCancel()
-
-					// XXX: We always unregister a pipeline on error. On an reconfiguration event
-					//      the stopped pipeline will be started again.
-					//      Better consider to either:
-					//      a) do not remove the handle, but keep the state as failed (more complicate reloading?)
-					//      b) pipelines should not fail unless something went really
-					//         really wrong. Try to backoff and retry to run the pipeline (makes reloading more consistent).
 					muPipelines.Lock()
 					defer muPipelines.Unlock()
-					delete(pipelines, name)
+					delete(pipelines, pipeline.name)
 				}()
 
-				pm.log.Infof("Starting pipeline %v", name)
-				defer pm.log.Infof("Pipeline %v stopped", name)
+				pipeline.log.Infof("Starting pipeline %v", pipeline.name)
+				defer pipeline.log.Infof("Pipeline %v stopped", pipeline.name)
 
-				err := pipeline.Run(hdl.ctx)
+				err := pipeline.Run(cancel)
 				if err != nil && err != context.Canceled {
-					pm.log.Errorf("Pipeline %v failed: %v", name, err)
+					pipeline.log.Errorf("Pipeline %v failed: %v", pipeline.name, err)
 				}
-			}()
+			})
 		}
+
 		muPipelines.Unlock()
 
 		var err error
+		waitAll(stopped)
 		pipelineState, err = pm.waitStateUpdate(ctx)
 		if err != nil {
 			break

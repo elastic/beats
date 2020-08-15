@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -17,6 +16,7 @@ import (
 type pipeline struct {
 	log  *logp.Logger
 	info beat.Info
+	name string
 
 	// pipeline config updates Cell[pipelineState]
 	shouldState *cell.Cell
@@ -35,6 +35,7 @@ func newPipeline(
 ) *pipeline {
 	return &pipeline{
 		log:         log.With("output", name),
+		name:        name,
 		info:        info,
 		shouldState: cell.NewCell(st),
 	}
@@ -45,17 +46,8 @@ func (p *pipeline) OnReconfigure(st pipelineState) {
 }
 
 func (p *pipeline) Run(cancel unison.Canceler) error {
-	type inputHandle struct {
-		ctx    context.Context
-		cancel func()
-		input  *input
-	}
-
 	// XXX: add input metadata
 	log := p.log.Named("input")
-
-	var wgActive sync.WaitGroup
-	defer wgActive.Wait()
 
 	state := p.readState()
 
@@ -65,15 +57,8 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 	}
 	defer outputPipeline.Close()
 
-	var muInputs sync.Mutex
-	inputs := map[string]inputHandle{}
-	defer func() {
-		muInputs.Lock()
-		defer muInputs.Unlock()
-		for _, hdl := range inputs {
-			hdl.cancel()
-		}
-	}()
+	var inputGroup managedGroup
+	defer inputGroup.Stop()
 
 	for {
 		inputHashes := common.StringSet{}
@@ -81,36 +66,22 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 			inputHashes.Add(input.configHash)
 		}
 
-		muInputs.Lock()
 		// 1. stop unknown inputs
-		for hash, hdl := range inputs {
-			if !inputHashes.Has(hash) {
-				hdl.cancel()
-				delete(inputs, hash)
-			}
+		stopped := inputGroup.FindAll(func(hash string) bool {
+			return !inputHashes.Has(hash)
+		})
+		for _, hdl := range stopped {
+			hdl.cancel()
 		}
 
 		// 2. start new inputs
 		for _, inp := range state.inputs {
-			if _, exists := inputs[inp.configHash]; exists {
+			inp := inp
+			if inputGroup.Has(inp.configHash) {
 				continue
 			}
 
-			inpCtx, inpCancel := context.WithCancel(context.Background())
-			hdl := inputHandle{ctx: inpCtx, cancel: inpCancel, input: inp}
-			inputs[inp.configHash] = hdl
-
-			wgActive.Add(1)
-			go func(inp *input) {
-				defer func() {
-					defer wgActive.Done()
-					defer inpCancel()
-
-					muInputs.Lock()
-					defer muInputs.Unlock()
-					delete(inputs, inp.configHash)
-				}()
-
+			inputGroup.Go(inp.configHash, func(cancel unison.Canceler) {
 				log.Info("start input")
 				defer log.Info("stop input")
 
@@ -118,7 +89,7 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 					Logger:      log,
 					ID:          "to-be-set-by-agent",
 					Agent:       p.info,
-					Cancelation: inpCtx,
+					Cancelation: cancel,
 				}
 
 				// Input main loop. We restart the input (after a short wait delay), in
@@ -129,16 +100,28 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 						log.Errorf("Input failed with: %v", err)
 					}
 
+					if cancel.Err() != nil {
+						break
+					}
+
 					// TODO: exponential backoff? Shall we kill the input at some point?
-					if err := timed.Wait(inpCtx, 5*time.Second); err != nil {
+					if err := timed.Wait(cancel, 5*time.Second); err != nil {
 						break
 					}
 
 					log.Info("Restarting failed input")
 				}
-			}(inp)
+			})
 		}
-		muInputs.Unlock()
+
+		// Wait for completion before we check for another state update.  Go routines
+		// started by the managedGroup unregister themselves from the
+		// group after they have returned. We need to wait for the internal state
+		// to finally match the shouldState, so we do not try to
+		// restart/reconfigure an input that is still shutting down, potentially
+		// overwriting state in the managedGroup, of having an unbound number of
+		// go-routines still shutting down if updates are too fast.
+		waitAll(stopped)
 
 		// wait for an update to trigger a reconfiguration
 		var err error
