@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cfgload"
+	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
 	"github.com/elastic/beats/v7/x-pack/club/internal/registries"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
@@ -31,16 +32,16 @@ type app struct {
 	info beat.Info
 
 	// app settings
-	Name     string
-	Settings settings
+	Name           string
+	Settings       settings
+	inputsRegistry v2.Registry
 
 	// configured subsystems
-	statestore      *kvStore
-	scheduler       *scheduler.Scheduler
-	inputLoader     *inputLoader
-	pipelineManager *pipelineManager
-	agentManager    *agentConfigManager
-	configWatcher   *cfgload.Watcher
+	statestore    *kvStore
+	scheduler     *scheduler.Scheduler
+	pipelines     *pipeline.Controller
+	agentManager  *agentConfigManager
+	configWatcher *cfgload.Watcher
 }
 
 func main() {
@@ -192,10 +193,8 @@ func (app *app) configure(flags flagsConfig) error {
 		return err
 	}
 
-	inputsCollection := makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
-	app.inputLoader = newInputLoader(app.log, inputsCollection)
-
-	app.pipelineManager, err = newPipelineManager(app.log, app.info, app.inputLoader, app.Settings.Pipeline)
+	app.inputsRegistry = makeInputRegistry(app.info, app.log, app.scheduler, app.statestore)
+	app.pipelines, err = pipeline.NewController(app.log, app.info, app.inputsRegistry, app.Settings.Pipeline)
 	if err != nil {
 		return err
 	}
@@ -270,7 +269,7 @@ func (app *app) Run(sigContext context.Context) error {
 
 		// Start input managers in background. We shutdown if any background task failed
 		app.log.Info("Starting input managers...")
-		if err := app.inputLoader.Init(&inputManagerTaskGroup, v2.ModeRun); err != nil {
+		if err := app.inputsRegistry.Init(&inputManagerTaskGroup, v2.ModeRun); err != nil {
 			logp.Err("Failed to initialize the input managers: %v", err)
 			return err
 		}
@@ -279,7 +278,7 @@ func (app *app) Run(sigContext context.Context) error {
 			return inputManagerTaskGroup.Stop()
 		}
 
-		pipeErr := app.pipelineManager.Run(pipeCtx)
+		pipeErr := app.pipelines.Run(pipeCtx)
 		managerErr := inputManagerTaskGroup.Stop()
 		if pipeErr == nil || errors.Is(pipeErr, context.Canceled) {
 			return managerErr
@@ -326,7 +325,7 @@ func (app *app) Run(sigContext context.Context) error {
 }
 
 func (app *app) onConfig(settings dynamicSettings) error {
-	return app.pipelineManager.OnConfig(settings.Pipeline)
+	return app.pipelines.OnConfig(settings.Pipeline)
 }
 
 func (app *app) Cleanup() {

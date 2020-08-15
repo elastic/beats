@@ -1,15 +1,12 @@
-package main
+package pipeline
 
 import (
 	"fmt"
-	"runtime/debug"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/unison"
 	"github.com/mitchellh/hashstructure"
 )
 
@@ -18,47 +15,11 @@ type inputLoader struct {
 	registry v2.Registry
 }
 
-type input struct {
-	inputMeta  inputMeta
-	streamMeta streamMeta
-	configHash string
-	useOutput  string
-	runner     v2.Input
-}
-
-type streamMeta struct {
-	ID      string `config:"id"`
-	DataSet string `config:"data_stream.dataset"`
-}
-
-type inputMeta struct {
-	ID        string                 `config:"id"`
-	Name      string                 `config:"name"`
-	Type      string                 `config:"type"`
-	Meta      map[string]interface{} `config:"name"`
-	Namespace string                 `config:"data_stream.namespace"`
-}
-
-type inputSettings struct {
-	ID              string                 `config:"id"`
-	Name            string                 `config:"name"`
-	Type            string                 `config:"type"`
-	Meta            map[string]interface{} `config:"name"`
-	Namespace       string                 `config:"data_stream.namespace"`
-	UseOutput       string                 `config:"use_output"`
-	DefaultSettings *common.Config         `config:"default"`
-	Streams         []*common.Config       `config:"streams"`
-}
-
 func newInputLoader(log *logp.Logger, registry v2.Registry) *inputLoader {
 	return &inputLoader{log: log, registry: registry}
 }
 
-func (l *inputLoader) Init(group unison.Group, mode v2.Mode) error {
-	return l.registry.Init(group, mode)
-}
-
-func (l *inputLoader) Configure(settings inputSettings) ([]*input, error) {
+func (l *inputLoader) Configure(settings InputSettings) ([]*input, error) {
 	defaults := settings.DefaultSettings
 	if defaults == nil {
 		defaults = common.NewConfig()
@@ -120,7 +81,7 @@ func (l *inputLoader) Configure(settings inputSettings) ([]*input, error) {
 	return inputs, nil
 }
 
-func (l *inputLoader) findInputPlugin(settings inputSettings, streamConfig *common.Config) (string, v2.Plugin, error) {
+func (l *inputLoader) findInputPlugin(settings InputSettings, streamConfig *common.Config) (string, v2.Plugin, error) {
 	streamSettings := struct {
 		DataSet string `config:"data_stream.dataset"`
 		Type    string `config:"type"`
@@ -162,42 +123,6 @@ func (l *inputLoader) findInputPlugin(settings inputSettings, streamConfig *comm
 	}
 
 	return "", v2.Plugin{}, &v2.LoadError{Name: names[0], Reason: v2.ErrUnknownInput}
-}
-
-func (inp *input) Test(ctx v2.TestContext) error {
-	return inp.runner.Test(ctx)
-}
-
-func (inp *input) Run(ctx v2.Context, pipeline beat.Pipeline) (err error) {
-	ctx.Logger = inp.inputMeta.loggerWith(ctx.Logger)
-	ctx.Logger = inp.streamMeta.loggerWith(ctx.Logger)
-
-	defer func() {
-		if v := recover(); v != nil {
-			err = fmt.Errorf("input panic with: %+v\n%s", v, debug.Stack())
-			ctx.Logger.Errorf("Input crashed with: %+v", err)
-		}
-	}()
-
-	return inp.runner.Run(ctx, pipeline)
-}
-
-func (m *inputMeta) loggerWith(log *logp.Logger) *logp.Logger {
-	log = log.With("type", m.Type)
-	if m.ID != "" {
-		log = log.With("input_id", m.ID)
-	}
-	if m.Name != "" {
-		log = log.With("input_name", m.Name)
-	}
-	return log
-}
-
-func (m *streamMeta) loggerWith(log *logp.Logger) *logp.Logger {
-	if m.ID != "" {
-		log = log.With("input_id", m.ID)
-	}
-	return log
 }
 
 func inputConfigHash(im inputMeta, sm streamMeta, out string, cfg *common.Config) string {

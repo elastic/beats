@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 
 	"github.com/elastic/beats/v7/x-pack/club/internal/dirs"
+	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
 )
 
 // flagsConfig is used for parsing all available CLI flags
@@ -20,8 +21,8 @@ type flagsConfig struct {
 }
 
 type settings struct {
-	ConfigID string           `config:"id"`
-	Pipeline pipelineSettings `config:",inline"`
+	ConfigID string            `config:"id"`
+	Pipeline pipeline.Settings `config:",inline"`
 	Path     dirs.Project
 	Logging  logp.Config
 	Registry kvStoreSettings // XXX: copied from filebeat
@@ -35,7 +36,7 @@ type settings struct {
 // delta-updates only (or a subset of Inputs that need to be run), we will need
 // to merge the delta updates first, before the dynamicSettings can be applied.
 type dynamicSettings struct {
-	Pipeline pipelineSettings `config:",inline"`
+	Pipeline pipeline.Settings `config:",inline"`
 }
 
 // configure global resource limits to be shared with input managers
