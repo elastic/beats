@@ -2,16 +2,13 @@ package pipeline
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	beatpipe "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cell"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
@@ -60,44 +57,11 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 	var wgActive sync.WaitGroup
 	defer wgActive.Wait()
 
-	// XXX: A little overkill to init all index management, but makes output setup easier for now
-	indexManagementConfig := common.MustNewConfigFrom(map[string]interface{}{
-		"setup.ilm.enabled":      false,
-		"setup.template.enabled": false,
-		"output.something":       map[string]interface{}{},
-	})
-
-	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, p.info, indexManagementConfig)
-	if err != nil {
-		// the config is hard coded, if we panic here, we've messed up
-		panic(err)
-	}
-
 	state := p.readState()
 
-	var pipeConfig beatpipe.Config
-	if err := state.output.Unpack(&pipeConfig); err != nil {
-		return err
-	}
-
-	typeInfo := struct{ Type string }{}
-	if err := state.output.Unpack(&typeInfo); err != nil {
-		return err
-	}
-
-	outputPipeline, err := beatpipe.Load(p.info,
-		beatpipe.Monitors{
-			Metrics:   nil,
-			Telemetry: nil,
-			Logger:    log.Named("publish"),
-			Tracer:    nil,
-		},
-		pipeConfig,
-		nil,
-		makeOutputFactory(p.info, indexManagement, typeInfo.Type, state.output),
-	)
+	outputPipeline, err := createPublishPipeline(p.log, p.info, state.output)
 	if err != nil {
-		return fmt.Errorf("invalid output configuration: %w", err)
+		return err
 	}
 	defer outputPipeline.Close()
 
