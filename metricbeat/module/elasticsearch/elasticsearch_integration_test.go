@@ -183,7 +183,9 @@ func TestXPackEnabled(t *testing.T) {
 			// is no longer indexing events into .monitoring-* indices. But instead it is indexing
 			// events into the default Metricbeat indices.
 			if numTypes == 0 {
-				require.Empty(t, event.Index)
+				for _, event := range events {
+					require.Empty(t, event.Index)
+				}
 				return
 			}
 
