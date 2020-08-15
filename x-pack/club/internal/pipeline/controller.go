@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cell"
+	"github.com/elastic/go-concert/unison"
 )
 
 type Controller struct {
@@ -17,7 +18,7 @@ type Controller struct {
 
 	inputLoader *inputLoader
 
-	// processing config updates Cell[pipeBundleState]
+	// processing config updates Cell[map[string]*pipelineState]
 	shouldState *cell.Cell
 }
 
@@ -62,12 +63,12 @@ func (pm *Controller) Run(ctx context.Context) error {
 		}
 	}()
 
-	pipelineState := pm.shouldState.Get().(pipeBundleState)
+	pipelineState := pm.getState()
 	for {
 		muPipelines.Lock()
 		// 1. stop pipelines
 		for name, hdl := range pipelines {
-			if _, exists := pipelineState.pipelines[name]; !exists {
+			if _, exists := pipelineState[name]; !exists {
 				hdl.cancel()
 				delete(pipelines, name)
 			}
@@ -75,21 +76,16 @@ func (pm *Controller) Run(ctx context.Context) error {
 
 		// 2. reconfigure existing pipelines
 		for name, hdl := range pipelines {
-			hdl.pipeline.OnReconfigure(*pipelineState.pipelines[name])
+			hdl.pipeline.OnReconfigure(*pipelineState[name])
 		}
 
 		// 3. start new pipelines
-		for name, st := range pipelineState.pipelines {
+		for name, st := range pipelineState {
 			if _, exists := pipelines[name]; exists {
 				continue
 			}
 
-			pipeline, err := newPipeline(pm.log, pm.info, name, *st)
-			if err != nil {
-				pm.log.Error("Failed to create pipeline: %v", name)
-				continue
-			}
-
+			pipeline := newPipeline(pm.log, pm.info, name, *st)
 			pipeCtx, pipeCancel := context.WithCancel(context.Background())
 			hdl := pipelineHandle{ctx: pipeCtx, cancel: pipeCancel, pipeline: *&pipeline}
 			pipelines[name] = hdl
@@ -122,15 +118,27 @@ func (pm *Controller) Run(ctx context.Context) error {
 		}
 		muPipelines.Unlock()
 
-		// wait for an update to trigger a reconfiguration
-		ifcStateUpdate, err := pm.shouldState.Wait(ctx)
+		var err error
+		pipelineState, err = pm.waitStateUpdate(ctx)
 		if err != nil {
 			break
 		}
-		pipelineState = ifcStateUpdate.(pipeBundleState)
 	}
 
 	return ctx.Err()
+}
+
+func (pm *Controller) getState() map[string]*pipelineState {
+	return pm.shouldState.Get().(map[string]*pipelineState)
+}
+
+func (pm *Controller) waitStateUpdate(ctx unison.Canceler) (map[string]*pipelineState, error) {
+	// wait for an update to trigger a reconfiguration
+	ifcStateUpdate, err := pm.shouldState.Wait(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ifcStateUpdate.(map[string]*pipelineState), nil
 }
 
 func (pm *Controller) OnConfig(settings Settings) error {
@@ -147,12 +155,12 @@ func (pm *Controller) OnConfig(settings Settings) error {
 	return nil
 }
 
-func makePipelineStates(loader *inputLoader, settings Settings) (pipeBundleState, error) {
+func makePipelineStates(loader *inputLoader, settings Settings) (map[string]*pipelineState, error) {
 	var inputs []*input
 	for _, config := range settings.Inputs {
 		tmp, err := loader.Configure(config)
 		if err != nil {
-			return pipeBundleState{}, fmt.Errorf("Failed to configure inputs: %w", err)
+			return nil, fmt.Errorf("Failed to configure inputs: %w", err)
 		}
 		inputs = append(inputs, tmp...)
 	}
@@ -167,5 +175,5 @@ func makePipelineStates(loader *inputLoader, settings Settings) (pipeBundleState
 		st.inputs = append(st.inputs, input)
 	}
 
-	return pipeBundleState{pipelineStates}, nil
+	return pipelineStates, nil
 }
