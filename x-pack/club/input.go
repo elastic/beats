@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
+	"github.com/mitchellh/hashstructure"
 )
 
 type inputLoader struct {
@@ -110,7 +111,7 @@ func (l *inputLoader) Configure(settings inputSettings) ([]*input, error) {
 		inputs = append(inputs, &input{
 			inputMeta:  inputMeta,
 			streamMeta: streamMeta,
-			configHash: streamConfig.Hash(),
+			configHash: inputConfigHash(inputMeta, streamMeta, useOutput, streamConfig),
 			useOutput:  useOutput,
 			runner:     runner,
 		})
@@ -197,4 +198,14 @@ func (m *streamMeta) loggerWith(log *logp.Logger) *logp.Logger {
 		log = log.With("input_id", m.ID)
 	}
 	return log
+}
+
+func inputConfigHash(im inputMeta, sm streamMeta, out string, cfg *common.Config) string {
+	metaHashData := struct {
+		UseOutput  string
+		InputMeta  inputMeta
+		StreamNeta streamMeta
+	}{out, im, sm}
+	metaHash, _ := hashstructure.Hash(&metaHashData, nil)
+	return fmt.Sprintf("%x-%v", metaHash, cfg.Hash())
 }

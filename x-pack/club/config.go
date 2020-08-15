@@ -35,7 +35,7 @@ type settings struct {
 // delta-updates only (or a subset of Inputs that need to be run), we will need
 // to merge the delta updates first, before the dynamicSettings can be applied.
 type dynamicSettings struct {
-	Pipeline pipelineSettings `config:",internal"`
+	Pipeline pipelineSettings `config:",inline"`
 }
 
 // configure global resource limits to be shared with input managers
