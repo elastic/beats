@@ -1,0 +1,12 @@
+- key: script
+  title: "HTTP monitor"
+  description:
+  fields:
+    - name: script
+      type: group
+      description: >
+        Script related fields.
+      fields:
+        - name: output
+          type: object
+          index: false
