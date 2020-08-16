@@ -76,5 +76,5 @@ class TestExportsMixin:
         Test that the config can be exported with `export config`
         """
         output = self.run_export_cmd("config")
-        yml = yaml.load(output)
+        yml = yaml.load(output, Loader=yaml.FullLoader)
         assert isinstance(yml, dict)
