@@ -17,24 +17,24 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
 func TestHTTPJSONInput(t *testing.T) {
 	testCases := []struct {
-		name       string
-		setup      func(map[string]interface{}) interface{}
-		teardown   func(interface{})
-		baseConfig map[string]interface{}
-		ssl        bool
-		handler    http.HandlerFunc
-		expected   []string
-		duration   time.Duration
+		name          string
+		setupServer   func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig    map[string]interface{}
+		handler       http.HandlerFunc
+		expected      []string
+		expectedError string
+		duration      time.Duration
 	}{
 		{
-			name: "Test simple GET request",
+			name:        "Test simple GET request",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "GET",
 				"interval":    0,
@@ -43,7 +43,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test simple HTTPS GET request",
+			name:        "Test simple HTTPS GET request",
+			setupServer: newTestServer(httptest.NewTLSServer),
 			baseConfig: map[string]interface{}{
 				"http_method":           "GET",
 				"interval":              0,
@@ -51,10 +52,10 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 			handler:  defaultHandler("GET", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
-			ssl:      true,
 		},
 		{
-			name: "Test request honors rate limit",
+			name:        "Test request honors rate limit",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":          "GET",
 				"interval":             0,
@@ -66,7 +67,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"hello":"world"}`},
 		},
 		{
-			name: "Test request retries when failed",
+			name:        "Test request retries when failed",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "GET",
 				"interval":    0,
@@ -75,7 +77,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"hello":"world"}`},
 		},
 		{
-			name: "Test POST request with body",
+			name:        "Test POST request with body",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "POST",
 				"interval":    0,
@@ -87,7 +90,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test repeated POST requests",
+			name:        "Test repeated POST requests",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "POST",
 				"interval":    "400ms",
@@ -100,7 +104,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			duration: 700 * time.Millisecond,
 		},
 		{
-			name: "Test json objects array",
+			name:        "Test json objects array",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":        "GET",
 				"interval":           0,
@@ -110,7 +115,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
-			name: "Test split events by",
+			name:        "Test split events by",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":     "GET",
 				"interval":        0,
@@ -123,7 +129,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test split events by with array",
+			name:        "Test split events by with array",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":        "GET",
 				"interval":           0,
@@ -137,7 +144,8 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test split events by not found",
+			name:        "Test split events by not found",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":     "GET",
 				"interval":        0,
@@ -148,6 +156,17 @@ func TestHTTPJSONInput(t *testing.T) {
 		},
 		{
 			name: "Test date cursor",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				server := httptest.NewServer(h)
+				config["url"] = server.URL
+				t.Cleanup(server.Close)
+			},
 			baseConfig: map[string]interface{}{
 				"http_method":                  "GET",
 				"interval":                     "400ms",
@@ -163,16 +182,10 @@ func TestHTTPJSONInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			},
 			duration: 700 * time.Millisecond,
-			setup: func(map[string]interface{}) interface{} {
-				timeNow = func() time.Time {
-					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
-					return t
-				}
-				return nil
-			},
 		},
 		{
-			name: "Test pagination",
+			name:        "Test pagination",
+			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method":          "GET",
 				"interval":             0,
@@ -184,7 +197,25 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{`{"foo":"bar"}`, `{"foo":"bar"}`},
 		},
 		{
+			name:        "Test loop breaks on irrecoverable failure",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":        "GET",
+				"interval":           "300ms",
+				"retry.max_attempts": 1,
+			},
+			handler:       failAfterFirstAttemptHandler(),
+			expectedError: "giving up after 2 attempts",
+			expected:      []string{`{"hello":"world"}`},
+		},
+		{
 			name: "Test oauth2",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				server := httptest.NewServer(h)
+				config["url"] = server.URL
+				config["oauth2.token_url"] = server.URL + "/token"
+				t.Cleanup(server.Close)
+			},
 			baseConfig: map[string]interface{}{
 				"http_method":          "POST",
 				"interval":             "0",
@@ -195,15 +226,6 @@ func TestHTTPJSONInput(t *testing.T) {
 				},
 				"oauth2.scopes": []string{"scope1", "scope2"},
 			},
-			setup: func(config map[string]interface{}) interface{} {
-				server := httptest.NewServer(http.HandlerFunc(oauth2TokenHandler))
-				config["oauth2.token_url"] = server.URL
-				return server
-			},
-			teardown: func(i interface{}) {
-				server := i.(*httptest.Server)
-				server.Close()
-			},
 			handler:  oauth2Handler,
 			expected: []string{`{"hello": "world"}`},
 		},
@@ -212,23 +234,7 @@ func TestHTTPJSONInput(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
-			server := func() *httptest.Server {
-				if tc.ssl {
-					return httptest.NewTLSServer(tc.handler)
-				}
-				return httptest.NewServer(tc.handler)
-			}()
-			defer server.Close()
-
-			tc.baseConfig["url"] = server.URL
-
-			var setupResult interface{}
-			if tc.setup != nil {
-				setupResult = tc.setup(tc.baseConfig)
-			}
-			if tc.teardown != nil {
-				defer tc.teardown(setupResult)
-			}
+			tc.setupServer(t, tc.handler, tc.baseConfig)
 
 			cfg := common.MustNewConfigFrom(tc.baseConfig)
 
@@ -238,20 +244,41 @@ func TestHTTPJSONInput(t *testing.T) {
 			assert.Equal(t, "httpjson", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
-			pub := &publisher{}
+			pub := beattest.NewChanClient(len(tc.expected))
+			t.Cleanup(func() { _ = pub.Close() })
 
 			ctx, cancel := newV2Context(tc.duration)
-			defer cancel()
+			t.Cleanup(cancel)
 
-			assert.NoError(t, input.Run(ctx, pub))
-
-			assert.Equal(t, len(tc.expected), len(pub.events))
-			for i, e := range pub.events {
-				val, err := e.Fields.GetValue("message")
+			err = input.Run(ctx, pub)
+			switch tc.expectedError {
+			case "":
 				assert.NoError(t, err)
-				assert.JSONEq(t, tc.expected[i], val.(string))
+			default:
+				// retryable client errors use dynamic method / host / port in the message
+				// and no custom type. There is no other easy way to test for a specific one
+				assert.Contains(t, err.Error(), tc.expectedError)
+			}
+
+			assert.Equal(t, len(tc.expected), len(pub.Channel))
+			for _, e := range tc.expected {
+				got := pub.ReceiveEvent()
+
+				val, err := got.Fields.GetValue("message")
+				assert.NoError(t, err)
+				assert.JSONEq(t, e, val.(string))
 			}
 		})
+	}
+}
+
+func newTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server := newServer(h)
+		config["url"] = server.URL
+		t.Cleanup(server.Close)
 	}
 }
 
@@ -267,14 +294,6 @@ func newV2Context(d time.Duration) (v2.Context, func()) {
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel
-}
-
-type publisher struct {
-	events []beat.Event
-}
-
-func (p *publisher) Publish(e beat.Event) {
-	p.events = append(p.events, e)
 }
 
 func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
@@ -325,7 +344,19 @@ func retryHandler() http.HandlerFunc {
 		}
 		w.WriteHeader(rand.Intn(100) + 500)
 		count += 1
-		_, _ = w.Write([]byte(`{"error":"failed"}`))
+	}
+}
+
+func failAfterFirstAttemptHandler() http.HandlerFunc {
+	count := 0
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		if count == 1 {
+			w.WriteHeader(rand.Intn(100) + 500)
+			return
+		}
+		_, _ = w.Write([]byte(`{"hello":"world"}`))
+		count += 1
 	}
 }
 
@@ -357,6 +388,11 @@ func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func oauth2Handler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/token" {
+		oauth2TokenHandler(w, r)
+		return
+	}
+
 	w.Header().Set("content-type", "application/json")
 	switch {
 	case r.Method != "POST":

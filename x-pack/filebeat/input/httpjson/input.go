@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -158,21 +159,15 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 
 	err = requester.processHTTPRequest(stdCtx, publisher)
 	if err == nil && in.config.Interval > 0 {
-		ticker := time.NewTicker(in.config.Interval)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-stdCtx.Done():
-				log.Info("Context done.")
-				return nil
-			case <-ticker.C:
-				log.Info("Process another repeated request.")
-				err = requester.processHTTPRequest(stdCtx, publisher)
-				if err != nil {
-					return err
-				}
+		periodCtx, periodCancel := context.WithCancel(stdCtx)
+
+		timed.Periodic(periodCtx, in.config.Interval, func() {
+			log.Info("Process another repeated request.")
+			err = requester.processHTTPRequest(stdCtx, publisher)
+			if err != nil {
+				periodCancel()
 			}
-		}
+		})
 	}
 
 	return err
