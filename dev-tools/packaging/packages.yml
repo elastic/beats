@@ -311,6 +311,8 @@ shared:
     extra_vars:
       from: 'centos:7'
       buildFrom: 'centos:7'
+      dockerfile: 'Dockerfile.elastic-agent.tmpl'
+      docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: 'root'
       linux_capabilities: ''
     files:
