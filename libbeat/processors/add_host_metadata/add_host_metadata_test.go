@@ -31,6 +31,11 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+var (
+	hostName = "testHost"
+	hostID   = "9C7FAB7B"
+)
+
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
@@ -195,4 +200,214 @@ func TestConfigGeoDisabled(t *testing.T) {
 	eventGeoField, err := newEvent.GetValue("host.geo")
 	assert.Error(t, err)
 	assert.Equal(t, nil, eventGeoField)
+}
+
+func TestEventWithReplaceFieldsFalse(t *testing.T) {
+	cfg := map[string]interface{}{}
+	cfg["replace_fields"] = false
+	testConfig, err := common.NewConfigFrom(cfg)
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
+		assert.IsType(t, types.ErrNotImplemented, err)
+		return
+	}
+
+	cases := []struct {
+		title                   string
+		event                   beat.Event
+		hostLengthLargerThanOne bool
+		hostLengthEqualsToOne   bool
+		expectedHostFieldLength int
+	}{
+		{
+			"replace_fields=false with only host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			true,
+			false,
+			-1,
+		},
+		{
+			"replace_fields=false with only host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			false,
+			true,
+			1,
+		},
+		{
+			"replace_fields=false with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+			false,
+			2,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			newEvent, err := p.Run(&c.event)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("host")
+			assert.NoError(t, err)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			if c.expectedHostFieldLength != -1 {
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(common.MapStr)))
+			}
+		})
+	}
+}
+
+func TestEventWithReplaceFieldsTrue(t *testing.T) {
+	cfg := map[string]interface{}{}
+	cfg["replace_fields"] = true
+	testConfig, err := common.NewConfigFrom(cfg)
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	switch runtime.GOOS {
+	case "windows", "darwin", "linux":
+		assert.NoError(t, err)
+	default:
+		assert.IsType(t, types.ErrNotImplemented, err)
+		return
+	}
+
+	cases := []struct {
+		title                   string
+		event                   beat.Event
+		hostLengthLargerThanOne bool
+		hostLengthEqualsToOne   bool
+	}{
+		{
+			"replace_fields=true with host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			true,
+			false,
+		},
+		{
+			"replace_fields=true with host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			true,
+			false,
+		},
+		{
+			"replace_fields=true with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			newEvent, err := p.Run(&c.event)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("host")
+			assert.NoError(t, err)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+		})
+	}
+}
+
+func TestSkipAddingHostMetadata(t *testing.T) {
+	cases := []struct {
+		title        string
+		event        beat.Event
+		expectedSkip bool
+	}{
+		{
+			"event only with host.name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"event only with host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"id": hostID,
+					},
+				},
+			},
+			true,
+		},
+		{
+			"event with host.name and host.id",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": common.MapStr{
+						"name": hostName,
+						"id":   hostID,
+					},
+				},
+			},
+			true,
+		},
+		{
+			"event without host field",
+			beat.Event{
+				Fields: common.MapStr{},
+			},
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			skip := skipAddingHostMetadata(&c.event)
+			assert.Equal(t, c.expectedSkip, skip)
+		})
+	}
 }

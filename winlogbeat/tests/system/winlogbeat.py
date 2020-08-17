@@ -111,7 +111,7 @@ class WriteReadTest(BaseTest):
 
     def read_registry(self, requireBookmark=False):
         f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "r")
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.FullLoader)
         self.assertIn("update_time", data)
         self.assertIn("event_logs", data)
 
