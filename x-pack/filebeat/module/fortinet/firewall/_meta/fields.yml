@@ -1126,7 +1126,7 @@
             Fabric medium count
 
         - name: mem
-          type: keyword
+          type: integer
           description: >
             Memory usage system statistics
 

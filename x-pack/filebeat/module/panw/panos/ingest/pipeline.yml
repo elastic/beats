@@ -1,5 +1,8 @@
 description: "Pipeline for Palo Alto Networks PAN-OS Logs"
 processors:
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
 
 # keep message as log.original.
  - rename:
@@ -291,7 +294,7 @@ processors:
      if: 'ctx?._temp_?.message_subtype == "vulnerability"'
  - set:
      field: event.action
-     value: wildfire_veredict
+     value: wildfire_verdict
      if: 'ctx?._temp_?.message_subtype == "wildfire"'
  - set:
      field: event.action

@@ -2,6 +2,10 @@
 description: Pipeline for CylanceProtect
 
 processors:
+  - set:
+        field: event.ingested
+        value: '{{_ingest.timestamp}}'
+
   # User agent
   - user_agent:
         field: user_agent.original

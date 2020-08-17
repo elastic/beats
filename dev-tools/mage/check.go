@@ -43,12 +43,12 @@ import (
 // if it finds any modifications. If executed in in verbose mode it will write
 // the results of 'git diff' to stdout to indicate what changes have been made.
 //
-// It checks the file permissions of nosetests test cases and YAML files.
+// It checks the file permissions of python test cases and YAML files.
 // It checks .go source files using 'go vet'.
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
+	mg.Deps(GoVet, CheckPythonTestNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -124,16 +124,15 @@ func GitDiff() error {
 	return err
 }
 
-// CheckNosetestsNotExecutable checks that none of the nosetests files are
-// executable. Nosetests silently skips executable .py files and we don't want
-// this to happen.
-func CheckNosetestsNotExecutable() error {
+// CheckPythonTestNotExecutable checks that none of the python test files are
+// executable. They are silently skipped and we don't want this to happen.
+func CheckPythonTestNotExecutable() error {
 	if runtime.GOOS == "windows" {
 		// Skip windows because it doesn't have POSIX permissions.
 		return nil
 	}
 
-	tests, err := FindFiles(nosetestsTestFiles...)
+	tests, err := FindFiles(pythonTestFiles...)
 	if err != nil {
 		return err
 	}
@@ -151,7 +150,7 @@ func CheckNosetestsNotExecutable() error {
 	}
 
 	if len(executableTestFiles) > 0 {
-		return errors.Errorf("nosetests files cannot be executable because "+
+		return errors.Errorf("python test files cannot be executable because "+
 			"they will be skipped. Fix permissions of %v", executableTestFiles)
 	}
 	return nil

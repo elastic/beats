@@ -182,3 +182,44 @@ metricbeat                1         1         1            1           1m
 ------------------------------------------------
 
 Metrics should start flowing to Elasticsearch.
+
+
+[float]
+==== Deploying Metricbeat Daemonset with Leader Election enabled
+
+In some cases users may want to avoid deploying both a Deployment and a Daemonset
+to collect cluser-wide metrics and node-level metrics.
+For this case, we provide the option to deploy Metricbeat only as a Daemonset
+and leverage the leader election feature which allows to define configurations
+that are enabled only by the leader Pod. The leader Pod is automatically chosen
+between the Pods of the Daemonset.
+Here is an example of a configuration that enables leader election:
+[source,yaml]
+-----
+metricbeat.autodiscover:
+  providers:
+  - type: kubernetes
+    scope: cluster
+    node: ${NODE_NAME}
+    unique: true
+    identifier: leaderelectionmetricbeat
+    templates:
+      - config:
+          - module: kubernetes
+            hosts: ["kube-state-metrics:8080"]
+            period: 10s
+            add_metadata: true
+            metricsets:
+              - state_node
+-----
+Users can find more info about the `unique` and `identifier` options at <<configuration-autodiscover>>.
+
+Users can enable the respective parts the Daemonset ConfigMap and
+set the `replicas` of the Deployment to `0` in order to only deploy
+the Daemonset on the cluster with the leader election provider enabled
+in order to collect cluster-wide metrics:
+["source", "sh", subs="attributes"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/metricbeat-kubernetes.yaml
+kubectl create -f metricbeat-kubernetes.yaml
+------------------------------------------------

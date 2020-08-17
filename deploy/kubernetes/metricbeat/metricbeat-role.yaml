@@ -12,6 +12,7 @@ rules:
   - events
   - pods
   - secrets
+  - services
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
@@ -32,3 +33,9 @@ rules:
   - "/metrics"
   verbs:
   - get
+- apiGroups:
+    - coordination.k8s.io
+  resources:
+    - leases
+  verbs:
+    - '*'
