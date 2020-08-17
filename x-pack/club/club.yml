@@ -15,10 +15,12 @@ club.inputs:
 #  - type: metrics.system.cpu
 #    period: 60
 
-- type: metrics.system
+- type: metrics
   enabled: true
   streams:
-  - type: metrics.system.cpu
+  - data_stream.dataset: system.process_summary
+    period: 10
+  - data_stream.dataset: system.cpu
     period: 10
 
 #- type: audit/file_integrity
