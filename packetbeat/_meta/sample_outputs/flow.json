@@ -70,6 +70,12 @@
         "end": "2018-11-30T01:16:45.645Z",
         "duration": 3965826800,
         "type": "flow",
-        "start": "2018-11-30T01:16:41.679Z"
+        "start": "2018-11-30T01:16:41.679Z",
+        "dataset": "flow",
+        "kind": "event",
+        "action": "network_flow",
+        "category": [
+            "network"
+        ]
     }
 }

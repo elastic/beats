@@ -7,8 +7,8 @@
 package control
 
 import (
+	"crypto/sha256"
 	"fmt"
-	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
@@ -16,5 +16,7 @@ import (
 // Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
 	data := paths.Data()
-	return fmt.Sprintf("unix://%s", filepath.Join(data, "agent.sock"))
+	// entire string cannot be longer than 107 characters, this forces the
+	// length to always be 88 characters (but unique per data path)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent-%x.sock`, sha256.Sum256([]byte(data)))
 }

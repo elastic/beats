@@ -1,5 +1,8 @@
 description: Pipeline for parsing system authorisation/secure logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     ignore_missing: true

@@ -1,6 +1,9 @@
 description: Pipeline for parsing Nginx ingress controller access logs. Requires the
   geoip and user_agent plugins.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
