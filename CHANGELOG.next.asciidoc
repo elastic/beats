@@ -186,6 +186,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 
 *Functionbeat*
 

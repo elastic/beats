@@ -1,13 +1,14 @@
+import nose.tools
 import os
 import unittest
 
-from heartbeat import BaseTest
-from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
-import nose.tools
+from beat import common_tests
+from elasticsearch import Elasticsearch
+from heartbeat import BaseTest
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_base(self):
         """

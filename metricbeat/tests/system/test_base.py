@@ -3,12 +3,14 @@ import sys
 import unittest
 import os
 import shutil
-from metricbeat import BaseTest
-from elasticsearch import Elasticsearch
+
+from beat import common_tests
 from beat.beat import INTEGRATION_TESTS
+from elasticsearch import Elasticsearch
+from metricbeat import BaseTest
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
