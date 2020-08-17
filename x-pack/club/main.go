@@ -142,10 +142,10 @@ func (app *app) initSettings(flags flagsConfig) error {
 		settings.Registry.Path = filepath.Join(settings.Path.Data, "registry")
 	}
 
-	if isManaged(settings.Manager) && flags.Reload {
+	if settings.Manager.IsManaged() && flags.Reload {
 		return errors.New("config reloading and managed mode must not be enabled together")
 	}
-	if !isManaged(settings.Manager) && !flags.Reload && len(settings.Pipeline.Inputs) == 0 {
+	if settings.Manager.IsManaged() && !flags.Reload && len(settings.Pipeline.Inputs) == 0 {
 		return errors.New("unmanaged mode requires inputs to be configured")
 	}
 

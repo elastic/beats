@@ -83,13 +83,13 @@ type agentDialConfig struct {
 	CAs         *x509.CertPool
 }
 
-func isManaged(settings Settings) bool {
+func (settings Settings) IsManaged() bool {
 	return settings.Enabled && settings.Mode == xmanagement.ModeFleet
 }
 
 func NewConfigManager(log *logp.Logger, settings Settings) (*ConfigManager, error) {
 	var dialConfig agentDialConfig
-	isManaged := isManaged(settings)
+	isManaged := settings.IsManaged()
 
 	if isManaged {
 		var err error
