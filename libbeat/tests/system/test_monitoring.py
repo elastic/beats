@@ -1,12 +1,13 @@
-from base import BaseTest
 import os
-from elasticsearch import Elasticsearch
-import re
-from nose.plugins.attrib import attr
-import unittest
-import requests
+import pytest
 import random
+import re
+import requests
 import string
+import unittest
+
+from base import BaseTest
+from elasticsearch import Elasticsearch
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -21,7 +22,7 @@ class Test(BaseTest):
         self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_direct_to_monitoring_cluster(self):
         """
         Test shipping monitoring data directly to the monitoring cluster.
@@ -55,7 +56,7 @@ class Test(BaseTest):
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_cluster_uuid_setting(self):
         """
         Test that monitoring.cluster_uuid setting may be set without any other monitoring.* settings
@@ -78,7 +79,7 @@ class Test(BaseTest):
         self.assertEqual(test_cluster_uuid, state["monitoring"]["cluster_uuid"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_cluster_uuid_setting_monitoring_disabled(self):
         """
         Test that monitoring.cluster_uuid setting may be set with monitoring.enabled explicitly set to false

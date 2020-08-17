@@ -35,7 +35,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(bus.Bus, uuid.UUID, *common.Config, keystore.Keystore) (Provider, error)
+type ProviderBuilder func(string, bus.Bus, uuid.UUID, *common.Config, keystore.Keystore) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -70,7 +70,7 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 }
 
 // BuildProvider reads provider configuration and instantiate one
-func (r *registry) BuildProvider(bus bus.Bus, c *common.Config, keystore keystore.Keystore) (Provider, error) {
+func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *common.Config, keystore keystore.Keystore) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -87,5 +87,5 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config, keystore keystor
 		return nil, err
 	}
 
-	return builder(bus, uuid, c, keystore)
+	return builder(beatName, bus, uuid, c, keystore)
 }

@@ -1,11 +1,11 @@
-from base import BaseTest
-from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
 import logging
-from nose.tools import raises
+import os
+import pytest
+import unittest
+
+from base import BaseTest
 from elasticsearch import RequestError
+from idxmgmt import IdxMgmt
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -47,7 +47,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_default(self):
         """
         Test setup --index-management with default config
@@ -64,8 +64,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
-    @raises(RequestError)
+    @pytest.mark.tag('integration')
     def test_setup_default(self):
         """
         Test setup --index-management with default config
@@ -80,10 +79,11 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # try deleting policy needs to raise an error as it is in use
-        self.idxmgmt.delete_policy(self.policy_name)
+        with pytest.raises(RequestError):
+            self.idxmgmt.delete_policy(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_disabled(self):
         """
         Test setup --index-management when ilm disabled
@@ -99,7 +99,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_disabled(self):
         """
         Test setup --index-management when ilm disabled
@@ -115,7 +115,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_policy_name(self):
         """
         Test  setup --index-management when policy_name is configured
@@ -130,7 +130,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_policy_no_overwrite(self):
         """
         Test setup --index-management respects overwrite configuration
@@ -177,7 +177,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert "hot" in resp[policy_name]["policy"]["phases"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_rollover_alias(self):
         """
         Test setup --index-management when ilm.rollover_alias is configured
@@ -193,7 +193,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_rollover_alias_with_fieldref(self):
         """
         Test setup --index-management when ilm.rollover_alias is configured and using field reference.
@@ -212,7 +212,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_name_and_pattern(self):
         """
         Test setup --index-management ignores template.name and template.pattern when ilm is enabled
@@ -229,7 +229,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_alias_created(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_name_and_pattern_on_ilm_disabled(self):
         """
         Test setup --index-management respects template.name and template.pattern when ilm is disabled
@@ -248,7 +248,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_with_opts(self):
         """
         Test setup --index-management with config options
@@ -270,7 +270,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert index["number_of_shards"] == "2", index["number_of_shards"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_overwrite_template_on_ilm_policy_created(self):
         """
         Test setup --index-management overwrites template when new ilm policy is created
