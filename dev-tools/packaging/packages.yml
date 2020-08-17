@@ -28,6 +28,9 @@ shared:
       /usr/share/{{.BeatName}}/LICENSE.txt:
         source: '{{ repo.RootDir }}/LICENSE.txt'
         mode: 0644
+      /usr/share/{{.BeatName}}/NOTICE.txt:
+        source: '{{ repo.RootDir }}/NOTICE.txt'
+        mode: 0644
       /usr/share/{{.BeatName}}/README.md:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
         mode: 0644
@@ -116,6 +119,9 @@ shared:
         mode: 0755
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
         source: '{{ repo.RootDir }}/LICENSE.txt'
+        mode: 0644
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/NOTICE.txt:
+        source: '{{ repo.RootDir }}/NOTICE.txt'
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/README.md:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'

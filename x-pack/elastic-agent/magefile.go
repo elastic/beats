@@ -313,7 +313,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages()
+	return devtools.TestPackages(devtools.WithRootUserContainer())
 }
 
 // RunGo runs go command and output the feedback to the stdout and the stderr.
@@ -572,7 +572,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 func copyAll(from, to string) error {
