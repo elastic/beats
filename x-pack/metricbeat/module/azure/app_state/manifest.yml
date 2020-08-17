@@ -1,0 +1,28 @@
+default: true
+input:
+  module: azure
+  metricset: app_insights
+  defaults:
+    metrics:
+      - id: ["requests/count", "requests/failed"]
+        segment: "request/name"
+        aggregation: ["sum"]
+        interval: "P5M"
+      - id: ["users/count", "sessions/count", "users/authenticated"]
+        segment: "request/name"
+        aggregation: ["unique"]
+        interval: "P5M"
+      - id: ["browserTimings/networkDuration", "browserTimings/sendDuration", "browserTimings/receiveDuration", "browserTimings/processingDuration", "browserTimings/totalDuration"]
+        segment: "operation/name"
+        aggregation: ["avg"]
+        interval: "P5M"
+        top: 5
+      - id: ["exceptions/count", "exceptions/browser", "exceptions/server"]
+        segment: "exception/type"
+        aggregation: ["sum"]
+        interval: "P5M"
+      - id: ["performanceCounters/memoryAvailableBytes", "performanceCounters/processCpuPercentageTotal", "performanceCounters/processCpuPercentage", "performanceCounters/processIOBytesPerSecond",
+      "performanceCounters/processPrivateBytes", "performanceCounters/processorCpuPercentage"]
+        aggregation: ["avg"]
+        interval: "P5M"
+

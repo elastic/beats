@@ -4567,6 +4567,16 @@ type: object
 
 --
 
+*`azure.app_state.*.*`*::
++
+--
+container registry
+
+
+type: object
+
+--
+
 [float]
 === billing
 
