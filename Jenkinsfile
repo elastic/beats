@@ -555,6 +555,12 @@ pipeline {
         stage('Packetbeat Linux'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_PACKETBEAT != "false"
+            }
+          }
           steps {
             mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
           }
