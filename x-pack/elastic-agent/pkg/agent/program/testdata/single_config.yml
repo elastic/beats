@@ -67,7 +67,15 @@ inputs:
       metricset: info
       hosts: ["http://apache.remote"]
   hosts: ["http://apache.local"]
+- type: synthetics/http
+  id: unique-http-id
+  name: my-http
+  schedule: '*/5 * * * * * *'
+  host: "http://localhost:80/service/status"
+  timeout: 16s
+  wait: 1s
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
