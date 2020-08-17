@@ -1,4 +1,8 @@
-package main
+// Package management provides the integration of the collector with the
+// elastic-agent via grpc.
+package management
+
+//go:generate godocdown -plain=false -output Readme.md
 
 import (
 	"context"
@@ -22,7 +26,8 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-type agentConfigManager struct {
+// ConfigManager establishes a connection with the elastic-agent.
+type ConfigManager struct {
 	log        *logp.Logger
 	dialConfig agentDialConfig
 	isManaged  bool
@@ -34,9 +39,26 @@ type agentConfigManager struct {
 	status   status.State
 }
 
+// EventHandler is used to configure callbacks that can be triggered by RPC calls from the Agent to the Collector.
+type EventHandler struct {
+	// OnConfig is called when the Elastic Agent is requesting that the configuration
+	// be set to the provided new value.
+	//
+	// XXX: Is this the complete configuration or a delta?
+	OnConfig func(*common.Config) error
+
+	OnStop func()
+}
+
+// Settings used to configure the ConfigManager.
+type Settings struct {
+	Enabled bool   `config:"enabled" yaml:"enabled"`
+	Mode    string `config:"mode" yaml:"mode"`
+}
+
 type agentRPCListener struct {
 	log            *logp.Logger
-	handler        agentEventHandler
+	handler        EventHandler
 	statusReporter status.Reporter
 
 	// ctx and cancel hold the reference to the cancellation context, allowing
@@ -61,26 +83,11 @@ type agentDialConfig struct {
 	CAs         *x509.CertPool
 }
 
-type agentEventHandler struct {
-	// OnConfig is called when the Elastic Agent is requesting that the configuration
-	// be set to the provided new value.
-	//
-	// XXX: Is this the complete configuration or a delta?
-	OnConfig func(dynamicSettings) error
-
-	OnStop func()
-}
-
-type agentConfigManagerSettings struct {
-	Enabled bool   `config:"enabled" yaml:"enabled"`
-	Mode    string `config:"mode" yaml:"mode"`
-}
-
-func isManaged(settings agentConfigManagerSettings) bool {
+func isManaged(settings Settings) bool {
 	return settings.Enabled && settings.Mode == xmanagement.ModeFleet
 }
 
-func newAgentConfigManager(log *logp.Logger, settings agentConfigManagerSettings) (*agentConfigManager, error) {
+func NewConfigManager(log *logp.Logger, settings Settings) (*ConfigManager, error) {
 	var dialConfig agentDialConfig
 	isManaged := isManaged(settings)
 
@@ -93,7 +100,7 @@ func newAgentConfigManager(log *logp.Logger, settings agentConfigManagerSettings
 	}
 
 	log = log.Named("agent-client")
-	return &agentConfigManager{log: log, dialConfig: dialConfig, isManaged: isManaged}, nil
+	return &ConfigManager{log: log, dialConfig: dialConfig, isManaged: isManaged}, nil
 }
 
 func readAgentDialConfig(r io.Reader) (agentDialConfig, error) {
@@ -124,7 +131,7 @@ func readAgentDialConfig(r io.Reader) (agentDialConfig, error) {
 	}, nil
 }
 
-func (m *agentConfigManager) Run(ctx context.Context, handler agentEventHandler) error {
+func (m *ConfigManager) Run(ctx context.Context, handler EventHandler) error {
 	if !m.isManaged {
 		return nil
 	}
@@ -179,7 +186,7 @@ func (m *agentConfigManager) Run(ctx context.Context, handler agentEventHandler)
 	return clientHandler.err
 }
 
-func (m *agentConfigManager) UpdateStatus(status status.Status, msg string) {
+func (m *ConfigManager) UpdateStatus(status status.Status, msg string) {
 	m.muStatus.Lock()
 	defer m.muStatus.Unlock()
 	if !m.status.Update(status, msg) {
@@ -237,18 +244,9 @@ func (c *agentRPCListener) OnConfig(input string) {
 	}
 }
 
-func parseAgentConfig(input string) (dynamicSettings, error) {
-	uconfig, err := common.NewConfigFrom(input)
-	if err != nil {
-		return dynamicSettings{}, fmt.Errorf("config blocks unsuccessfully generated: %w", err)
-	}
-
-	var settings dynamicSettings
-	if err := uconfig.Unpack(&settings); err != nil {
-		return dynamicSettings{}, fmt.Errorf("failed to unpack the configuration: %w", err)
-	}
-
-	return settings, err
+func parseAgentConfig(input string) (*common.Config, error) {
+	// XXX: do we need to do more here? Beats integration seems to support a blocklist
+	return common.NewConfigFrom(input)
 }
 
 func encodeStatus(st status.State) (code proto.StateObserved_Status, msg string, extra map[string]interface{}) {
@@ -276,8 +274,8 @@ func encodeStatus(st status.State) (code proto.StateObserved_Status, msg string,
 	return code, st.Message, nil
 }
 
-func defaultAgentConfigManagerSettings() agentConfigManagerSettings {
-	return agentConfigManagerSettings{
+func defaultAgentConfigManagerSettings() Settings {
+	return Settings{
 		Mode: xmanagement.ModeCentralManagement,
 	}
 }

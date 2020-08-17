@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
 	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/registries"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cfgload"
+	"github.com/elastic/beats/v7/x-pack/club/internal/management"
 	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
@@ -40,7 +41,7 @@ type app struct {
 	statestore    *kvStore
 	scheduler     *scheduler.Scheduler
 	pipelines     *pipeline.Controller
-	agentManager  *agentConfigManager
+	agentManager  *management.ConfigManager
 	configWatcher *cfgload.Watcher
 }
 
@@ -188,7 +189,7 @@ func (app *app) configure(flags flagsConfig) error {
 	}
 	app.scheduler = scheduler.NewWithLocation(app.Settings.Limits.Monitors, nil, location)
 
-	app.agentManager, err = newAgentConfigManager(app.log, app.Settings.Manager)
+	app.agentManager, err = management.NewConfigManager(app.log, app.Settings.Manager)
 	if err != nil {
 		return err
 	}
@@ -290,7 +291,7 @@ func (app *app) Run(sigContext context.Context) error {
 	// the manager should be the last subsystem that is shutdown.
 	if app.agentManager != nil {
 		appTaskGroup.Go(func(cancel unison.Canceler) error {
-			return app.agentManager.Run(ctxtool.FromCanceller(cancel), agentEventHandler{
+			return app.agentManager.Run(ctxtool.FromCanceller(cancel), management.EventHandler{
 				OnStop:   autoCancel.Cancel,
 				OnConfig: app.onConfig,
 			})
@@ -299,13 +300,7 @@ func (app *app) Run(sigContext context.Context) error {
 
 	if app.configWatcher != nil {
 		appTaskGroup.Go(func(cancel unison.Canceler) error {
-			return app.configWatcher.Run(cancel, func(cfg *common.Config) error {
-				var settings dynamicSettings
-				if err := cfg.Unpack(&settings); err != nil {
-					return err
-				}
-				return app.onConfig(settings)
-			})
+			return app.configWatcher.Run(cancel, app.onConfig)
 		})
 	}
 
@@ -324,7 +319,11 @@ func (app *app) Run(sigContext context.Context) error {
 	return nil
 }
 
-func (app *app) onConfig(settings dynamicSettings) error {
+func (app *app) onConfig(cfg *common.Config) error {
+	var settings dynamicSettings
+	if err := cfg.Unpack(&settings); err != nil {
+		return err
+	}
 	return app.pipelines.UpdateConfig(settings.Pipeline)
 }
 

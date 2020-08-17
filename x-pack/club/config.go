@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 
 	"github.com/elastic/beats/v7/x-pack/club/internal/dirs"
+	"github.com/elastic/beats/v7/x-pack/club/internal/management"
 	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
 )
 
@@ -28,7 +29,7 @@ type settings struct {
 	Registry kvStoreSettings // XXX: copied from filebeat
 	Limits   limitsSettings
 	Location string // time zone info
-	Manager  agentConfigManagerSettings
+	Manager  management.Settings
 }
 
 // dynamicSettings can be updated for via file reloading or external services.
