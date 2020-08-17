@@ -747,6 +747,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
+- Add support to change beat name, and support for Kibana Logs. {pull}20522[20522]
 
 ==== Deprecated
 
