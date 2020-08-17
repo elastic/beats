@@ -49,7 +49,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Groups support. {pull}19725[19725]
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 
-
 *Heartbeat*
 
 
@@ -88,7 +87,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Add service resource in k8s cluster role. {pull}20546[20546]
-
 
 *Auditbeat*
 
@@ -164,7 +162,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
-
 
 *Auditbeat*
 
