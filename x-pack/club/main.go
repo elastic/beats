@@ -21,9 +21,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
+	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/registries"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cfgload"
 	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
-	"github.com/elastic/beats/v7/x-pack/club/internal/registries"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
 
@@ -325,7 +325,7 @@ func (app *app) Run(sigContext context.Context) error {
 }
 
 func (app *app) onConfig(settings dynamicSettings) error {
-	return app.pipelines.OnConfig(settings.Pipeline)
+	return app.pipelines.UpdateConfig(settings.Pipeline)
 }
 
 func (app *app) Cleanup() {

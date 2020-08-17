@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// Watcher monitors the paths given in Files for changes.
 type Watcher struct {
 	Log    *logp.Logger
 	Files  []string
@@ -23,6 +24,8 @@ type Reader interface {
 	ReadFiles(files []string) (*common.Config, error)
 }
 
+// Run executes the watchers main loop. It blocks until the watcher is shut down.
+// The handler function is called with the merged configuration if the watcher detects any file changes.
 func (w *Watcher) Run(cancel unison.Canceler, handler func(*common.Config) error) error {
 	lastHash, err := hashFiles(w.Files)
 	if err != nil {

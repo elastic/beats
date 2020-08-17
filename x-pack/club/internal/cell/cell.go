@@ -1,4 +1,8 @@
+// Package cell provides a Cell data types to safely read and write, and wait
+// for concurrent updates from multiple go-routines.
 package cell
+
+//go:generate godocdown -plain=false -output Readme.md
 
 import (
 	"github.com/elastic/go-concert/unison"

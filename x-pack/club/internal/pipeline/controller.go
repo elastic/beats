@@ -12,6 +12,12 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// Controller manages inputs and outputs by creating a pipeline per output and
+// associating inputs with the pipelines.
+// The Settings struct is used to set the controllers should state. The
+// UpdateConfig method can be used to update said state. Once updated, the
+// controller tries to modify its pipelines, inputs, and outputs in order to
+// converge to the new state.
 type Controller struct {
 	log  *logp.Logger
 	info beat.Info
@@ -22,6 +28,8 @@ type Controller struct {
 	shouldState *cell.Cell
 }
 
+// NewController creates a new controller. The logger and input registry MUST NOT be nil.
+// The controller is not active yet. The Run method must be used to activate the controller.
 func NewController(
 	log *logp.Logger,
 	info beat.Info,
@@ -43,6 +51,17 @@ func NewController(
 	}, nil
 }
 
+// Run executes the controllers run loop. The run loop creates the internal
+// pipelines for Inputs and Outputs, and waits for configuration updates via
+// UpdateConfig.
+//
+// All internal pipelines, inputs, and outputs are guaranteed to be stopped
+// when Run returns. The shutdown blocks until all internal go-routines are stopped.
+//
+// The Controller struct stores no execution state, besides the execution
+// settings that can be modified asynchonously via UpdateConfig. It is safe to
+// call Run again in case it returned with (or without) an error. It is not
+// safe to call Run concurrently from multiple go-routines.
 func (pm *Controller) Run(ctx context.Context) error {
 	var pipelineGroup managedGroup
 	defer pipelineGroup.Stop()
@@ -128,7 +147,18 @@ func (pm *Controller) waitStateUpdate(ctx unison.Canceler) (map[string]*pipeline
 	return ifcStateUpdate.(map[string]*pipelineState), nil
 }
 
-func (pm *Controller) OnConfig(settings Settings) error {
+// UpdateConfig updates the controllers settings. If the controller is already
+// running, it will try to adapt itself to the latest settings dynamically.
+//
+// UpdateConfig returns an error if it finds that the configuration can not be
+// applied. This normally indicates a parsing/validation error only. Even if
+// nil is returned, there is no guarantee that the input/output can actually be
+// executed.
+//
+// UpdateConfig does not block. Instead old updates that have not been processed yet by the controller
+// are dropped. This ensures that the controller can always react to the most recent available configuration,
+// even in cases with a burst of sudden configuration updates.
+func (pm *Controller) UpdateConfig(settings Settings) error {
 	if err := settings.Validate(); err != nil {
 		return err
 	}

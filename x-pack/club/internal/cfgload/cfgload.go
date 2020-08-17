@@ -1,4 +1,7 @@
+// Package cfgload provides support for reading configuration files from disk.
 package cfgload
+
+//go:generate godocdown -plain=false -output Readme.md
 
 import (
 	"io/ioutil"
@@ -7,11 +10,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// Loader is used to configuration files.
 type Loader struct {
 	Home              string
 	StrictPermissions bool
 }
 
+// ReadFiles reads and merges the configurations provided by the files slice.
+// Load order depends on the the files are passed in. Settings in later files
+// overwrite already existing settings.
 func (r *Loader) ReadFiles(files []string) (*common.Config, error) {
 	configFilePaths := make([]string, len(files))
 	for i, path := range files {

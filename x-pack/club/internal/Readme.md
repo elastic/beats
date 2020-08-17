@@ -1,0 +1,1 @@
+Package internal contains code and packages that are used by the collector application directly. Packages providing interface implementations (like inputs) must not share functionality via the internal package.

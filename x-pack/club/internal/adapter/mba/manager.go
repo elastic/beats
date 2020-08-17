@@ -12,12 +12,16 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+// ModuleManager interfaces that can provide a metricset with a custom
+// mb.Module at initialization time. Normally one want to use ModuleAdapter, in order to wrap
+// an existing Module, or create a ModuleManager with dedicated Module implementation.
 type ModuleManager interface {
 	ModuleName() string
 	Create(base mb.BaseModule) (mb.Module, error)
 	EventModifiers() []mb.EventModifier
 }
 
+// MetricsetManager provides the v2.InputManager that will provide a Metricset as an v2.Input.
 type MetricsetManager struct {
 	MetricsetName string
 	InputName     string
@@ -29,11 +33,13 @@ type MetricsetManager struct {
 	Namespace  string
 }
 
+// WithHostParser creates a new MetricsetManager using the new host parser.
 func (m MetricsetManager) WithHostParser(p mb.HostParser) MetricsetManager {
 	m.HostParser = p
 	return m
 }
 
+// WithNamespace creates a new MetricsetManager using the new namespace.
 func (m MetricsetManager) WithNamespace(n string) MetricsetManager {
 	m.Namespace = n
 	return m
@@ -41,7 +47,7 @@ func (m MetricsetManager) WithNamespace(n string) MetricsetManager {
 
 func (m *MetricsetManager) Init(grp unison.Group, mode v2.Mode) error { return nil }
 
-// Creates builds a new Input instance from the given configuation, or returns
+// Create builds a new Input instance from the given configuation, or returns
 // an error if the configuation is invalid.
 // The input must establish any connection for data collection yet. The Beat
 // will use the Test/Run methods of the input.

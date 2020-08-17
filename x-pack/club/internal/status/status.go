@@ -1,12 +1,23 @@
+// Package status provides internal status reporting. Subsystems update their
+// status via status.Reporter.
 package status
 
+//go:generate godocdown -plain=false -output Readme.md
+
+// Reporter is used by subsystems to report their current state. If a system
+// itself has multiple subsystems, it might want to create a separate reporter
+// per subsystem in order to merge status states into one common state.
 type Reporter interface {
 	UpdateStatus(s Status, reason string)
 }
 
+// TODO: create special reporter type merges its state from child reporters. It
+// must be possible to add/remove children dynamically.
+
 // Status describes the current status of the beat.
 type Status int
 
+// State stores a status state. The state can be updated via Update.
 type State struct {
 	Status  Status
 	Message string
