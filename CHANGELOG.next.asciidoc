@@ -6,9 +6,6 @@
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
 
-=== Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
-
 ==== Breaking changes
 
 *Affecting all Beats*
