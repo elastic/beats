@@ -362,6 +362,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
+- Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
 
 *Packetbeat*
 
