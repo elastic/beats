@@ -4,11 +4,11 @@
         "ec2": {
             "cpu": {
                 "credit_balance": 144,
-                "credit_usage": 0.061395,
+                "credit_usage": 0.058005,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 1.1651199407241788
+                    "pct": 1.1631008613503082
                 }
             },
             "diskio": {
@@ -51,16 +51,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 7375.4,
-                    "bytes_per_sec": 24.584666666666667,
-                    "packets": 49,
-                    "packets_per_sec": 0.16333333333333333
+                    "bytes": 786.6,
+                    "bytes_per_sec": 2.622,
+                    "packets": 5.8,
+                    "packets_per_sec": 0.019333333333333334
                 },
                 "out": {
-                    "bytes": 11567,
-                    "bytes_per_sec": 38.556666666666665,
-                    "packets": 44.8,
-                    "packets_per_sec": 0.14933333333333332
+                    "bytes": 627,
+                    "bytes_per_sec": 2.09,
+                    "packets": 5.8,
+                    "packets_per_sec": 0.019333333333333334
                 }
             },
             "status": {
@@ -94,6 +94,31 @@
         "dataset": "aws.ec2",
         "duration": 115000,
         "module": "aws"
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.011631008613503082
+        },
+        "disk": {
+            "read": {
+                "bytes": 0
+            },
+            "write": {
+                "bytes": 0
+            }
+        },
+        "id": "i-0516ddaca5c1d231f",
+        "name": "mysql-test",
+        "network": {
+            "in": {
+                "bytes": 786.6,
+                "packets": 5.8
+            },
+            "out": {
+                "bytes": 627,
+                "packets": 5.8
+            }
+        }
     },
     "metricset": {
         "name": "ec2",
