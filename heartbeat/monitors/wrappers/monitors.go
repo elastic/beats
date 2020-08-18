@@ -36,22 +36,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	statusBlockTracker := newStatusBlockTracker()
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(stdMonFields, len(js) > 1)
+			return addMonitorMeta(stdMonFields, len(js) > 1, statusBlockTracker)
 		}, func() jobs.JobWrapper {
-			return makeAddSummary()
+			return makeAddSummary(statusBlockTracker)
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
+func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool, statusBlockTracker *monitorStateTracker) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
@@ -68,12 +70,25 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
 			}
 
+			status, _ := event.Fields.GetValue("monitor.status")
+			var trackerStatus stateStatus
+			if status == "down" {
+				trackerStatus = StatusDown
+			} else {
+				trackerStatus = StatusUp
+			}
+			ip, _ := event.Fields.GetValue("monitor.ip")
+			trackerId := fmt.Sprintf("%s-%s", stdMonFields.ID, ip)
+
+			sb := statusBlockTracker.getID(trackerId, trackerStatus)
+
 			fieldsToMerge := common.MapStr{
 				"monitor": common.MapStr{
 					"id":       thisID,
 					"name":     stdMonFields.Name,
 					"type":     stdMonFields.Type,
 					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
+					"status_block": sb,
 				},
 			}
 
@@ -110,6 +125,7 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 func addMonitorStatus(origJob jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		cont, err := origJob(event)
+
 		fields := common.MapStr{
 			"monitor": common.MapStr{
 				"status": look.Status(err),
@@ -143,8 +159,119 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
+const FlappingThreshold time.Duration = time.Minute
+
+const (
+	StatusUp stateStatus = iota
+	StatusDown
+	StatusMixed
+)
+
+type stateStatus int8
+
+type historicalStatus struct {
+	ts     time.Time
+	status stateStatus
+}
+
+type monitorState struct {
+	startedAt   time.Time
+	status      stateStatus
+	flapHistory []historicalStatus
+}
+
+func (state *monitorState) isFlapping() bool {
+	return len(state.flapHistory) > 0
+}
+
+func (state *monitorState) isStateStillStable(currentStatus stateStatus) bool {
+	return state.status == currentStatus && state.isFlapping()
+}
+
+func (state *monitorState) flapCompute(currentStatus stateStatus) bool {
+	state.flapHistory = append(state.flapHistory, historicalStatus{time.Now(), state.status})
+	state.status = currentStatus
+
+	// Figure out which values are old enough that we can discard them for our calculation
+	cutOff := time.Now().Add(-FlappingThreshold)
+	discardIndex := -1
+	for idx, hs := range state.flapHistory {
+		if hs.ts.Before(cutOff) {
+			discardIndex = idx
+		} else {
+			break
+		}
+	}
+	// Do the discarding
+	if discardIndex != -1 {
+		state.flapHistory = state.flapHistory[discardIndex+1:]
+	}
+
+	// Check to see if we are no longer flapping, and if so clear flap history
+	for _, hs := range state.flapHistory {
+		if hs.status != currentStatus {
+			return false
+		}
+	}
+	return true
+}
+
+func NewMonitorState(currentStatus stateStatus) *monitorState {
+	return &monitorState{
+		startedAt: time.Now(),
+		status:    currentStatus,
+	}
+}
+
+
+
+func newStatusBlockTracker() *monitorStateTracker {
+	return &monitorStateTracker{
+		states: map[string]*monitorState{},
+		mtx:    sync.Mutex{},
+	}
+}
+
+type monitorStateTracker struct {
+	states map[string]*monitorState
+	mtx    sync.Mutex
+}
+
+func (mst *monitorStateTracker) get(monitorId string, currentStatus stateStatus) (state *monitorState) {
+	if state, ok := mst.states[monitorId]; ok {
+		if state.isFlapping() {
+			// Check to see if there's still an ongoing flap after recording
+			// the new status
+			if state.flapCompute(currentStatus) {
+				return state
+			} else {
+				state = NewMonitorState(currentStatus)
+				mst.states[monitorId] = state
+				return state
+			}
+		} else if state.status == currentStatus {
+			// The state is stable, no changes needed
+			return state
+		} else if state.startedAt.After(time.Now().Add(-FlappingThreshold)) {
+			state.flapCompute(currentStatus) // record the new state to the flap history
+			return state
+		}
+	}
+
+	// No previous state, so make a new one
+	state = NewMonitorState(currentStatus)
+	mst.states[monitorId] = state
+	return state
+}
+
+func (mst *monitorStateTracker) getID(monitorId string, currentStatus stateStatus) time.Time {
+	mst.mtx.Lock()
+	defer mst.mtx.Unlock()
+	return mst.get(monitorId, currentStatus).startedAt
+}
+
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary() jobs.JobWrapper {
+func makeAddSummary(sb *monitorStateTracker) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -199,10 +326,22 @@ func makeAddSummary() jobs.JobWrapper {
 
 			// After last job
 			if state.remaining == 0 {
+				monitorId, _ := event.GetValue("monitor.id")
+				var trackerStatus stateStatus
+				if state.down == 0 {
+					trackerStatus = StatusUp
+				} else if state.up > 0 {
+					trackerStatus = StatusMixed
+				} else {
+					trackerStatus = StatusDown
+				}
+				monitorIdString, _ := monitorId.(string)
+				cssId := sb.getID(monitorIdString, trackerStatus)
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
-						"up":   state.up,
-						"down": state.down,
+						"continuous_status_segment": cssId,
+						"up":                        state.up,
+						"down":                      state.down,
 					},
 				})
 				resetState()

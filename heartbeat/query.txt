@@ -1,0 +1,44 @@
+GET /heartbeat-*/_search?size=0
+{
+  "query": {
+    "match": {
+      "monitor.id": "localhost"
+    }
+  },
+  "aggs": {
+    "dateHist": {
+      "auto_date_histogram": {
+        "field": "@timestamp",
+        "buckets": 10
+      },
+      "aggs": {
+        "location": {
+          "terms": {
+            "field": "observer.geo.name",
+            "missing": "N/A"
+          },
+          "aggs": {
+            "css": {
+              "terms": {
+                "field": "monitor.continuous_status_segment",
+                "order": {"_key": "asc"}
+              },
+              "aggs": {
+                "up": {
+                  "sum": {
+                    "field": "summary.up"
+                  }
+                },
+                "down": {
+                  "sum": {
+                    "field": "summary.down"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
