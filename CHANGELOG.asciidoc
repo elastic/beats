@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.12]]
+=== Beats version 6.8.12
+https://github.com/elastic/beats/compare/v6.8.11...v6.8.12[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
+
 [[release-notes-6.8.11]]
 === Beats version 6.8.11
 https://github.com/elastic/beats/compare/v6.8.10...v6.8.11[View commits]
