@@ -79,7 +79,7 @@ pipeline {
                   'x-pack/dockerlogbeat',
                   'x-pack/filebeat',
                   'x-pack/functionbeat',
-                  // 'x-pack/heartbeat',
+                   'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
                   // 'x-pack/packetbeat',
@@ -161,7 +161,6 @@ def pushCIDockerImages(){
     } else if ("${env.BEATS_FOLDER}" == "filebeat") {
       tagAndPush('filebeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
-      tagAndPush('heartbeat')
       tagAndPush('heartbeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
@@ -177,6 +176,8 @@ def pushCIDockerImages(){
       tagAndPush('elastic-agent')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
       tagAndPush('filebeat')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
+        tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
       tagAndPush('metricbeat')
     }
