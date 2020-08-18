@@ -105,6 +105,18 @@ type dnsMessage struct {
 	length       int        // Length of the DNS message in bytes (without DecodeOffset).
 }
 
+// strLength contains the dns.question.name and dns.answers.data string lengths.
+type strLength struct {
+	string struct {
+		question struct {
+			name    int		// Single question.
+		}
+		answers struct {
+			data 	[]int 	// Multiple answers.
+		}
+	}
+}
+
 // DnsTuple contains source IP/port, destination IP/port, transport protocol,
 // and DNS ID.
 type dnsTuple struct {
@@ -487,6 +499,9 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 	}
 	m["header_flags"] = hf
 
+	// Initialize the string length.
+	var length strLength
+
 	if len(dns.Question) > 0 {
 		q := dns.Question[0]
 		qMapStr := common.MapStr{
@@ -520,6 +535,11 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 			}
 			qMapStr["registered_domain"] = q.Name
 		}
+
+		// Add the dns.question.name string lengths.
+		for _, question := range dns.Question {
+			length.string.question.name = len(question.Name)
+		}
 	}
 
 	rrOPT := dns.IsEdns0()
@@ -530,11 +550,22 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
 		var resolvedIPs []string
-		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true)
+		answers, resolvedIPs := rrsToMapStrs(dns.Answer, true)
+		m["answers"] = answers
 		if len(resolvedIPs) > 0 {
 			m["resolved_ip"] = resolvedIPs
 		}
+		// Add the dns.answer.data string lengths.
+		for _, answer := range answers {
+			data, ok := answer["data"]
+			if ok {
+				length.string.answers.data = append(length.string.answers.data, len(data.(string)))
+			}
+		}
 	}
+
+	// Set dns.string.length fields in the map.
+	m["string"] = length
 
 	m["authorities_count"] = len(dns.Ns)
 	if authority && len(dns.Ns) > 0 {
