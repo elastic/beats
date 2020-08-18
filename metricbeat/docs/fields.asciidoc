@@ -16565,7 +16565,7 @@ type: boolean
 [float]
 === node.stats
 
-node_stats
+Statistics about each node in a Elasticsearch cluster
 
 
 

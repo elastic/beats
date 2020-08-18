@@ -1,7 +1,7 @@
 - name: node.stats
   type: group
   description: >
-    node_stats
+    Statistics about each node in a Elasticsearch cluster
   release: ga
   fields:
     - name: indices
