@@ -94,14 +94,14 @@ func TestHTTPJSONInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "POST",
-				"interval":    "400ms",
+				"interval":    "500ms",
 			},
 			handler: defaultHandler("POST", ""),
 			expected: []string{
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 			},
-			duration: 700 * time.Millisecond,
+			duration: 900 * time.Millisecond,
 		},
 		{
 			name:        "Test json objects array",
@@ -169,7 +169,7 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"http_method":                  "GET",
-				"interval":                     "400ms",
+				"interval":                     "500ms",
 				"date_cursor.field":            "@timestamp",
 				"date_cursor.url_field":        "$filter",
 				"date_cursor.value_template":   "alertCreationTime ge {{.}}",
@@ -181,7 +181,7 @@ func TestHTTPJSONInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			},
-			duration: 700 * time.Millisecond,
+			duration: 900 * time.Millisecond,
 		},
 		{
 			name:        "Test pagination",

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -174,7 +175,8 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 		return nil
 	}
 
-	if err == context.Canceled || err == context.DeadlineExceeded {
+	switch errors.Cause(err) {
+	case context.Canceled, context.DeadlineExceeded:
 		log.Infof("Context done: %v", err)
 		return nil
 	}
