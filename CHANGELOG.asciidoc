@@ -9,7 +9,7 @@ https://github.com/elastic/beats/compare/v6.8.11...v6.8.12[View commits]
 
 ==== Bugfixes
 
-*Metricbeat*
+*Filebeat*
 
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 
