@@ -157,17 +157,26 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 		log,
 	)
 
-	err = requester.processHTTPRequest(stdCtx, publisher)
-	if err == nil && in.config.Interval > 0 {
-		periodCtx, periodCancel := context.WithCancel(stdCtx)
+	if err := requester.processHTTPRequest(stdCtx, publisher); err != nil {
+		return err
+	}
 
-		timed.Periodic(periodCtx, in.config.Interval, func() {
-			log.Info("Process another repeated request.")
-			err = requester.processHTTPRequest(stdCtx, publisher)
-			if err != nil {
-				periodCancel()
-			}
-		})
+	if in.config.Interval == 0 {
+		return nil
+	}
+
+	err = timed.Periodic(stdCtx, in.config.Interval, func() error {
+		log.Info("Process another repeated request.")
+		return requester.processHTTPRequest(stdCtx, publisher)
+	})
+
+	if err == nil {
+		return nil
+	}
+
+	if err == context.Canceled || err == context.DeadlineExceeded {
+		log.Infof("Context done: %v", err)
+		return nil
 	}
 
 	return err
