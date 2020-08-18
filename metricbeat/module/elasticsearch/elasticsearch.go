@@ -54,6 +54,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"index_recovery",
 		"index_summary",
 		"ml_job",
+		"node_stats",
 		"shard",
 	}
 	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))

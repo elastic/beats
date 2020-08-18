@@ -133,7 +133,7 @@ func TestXPackEnabled(t *testing.T) {
 		"index_recovery": []string{"index_recovery"},
 		"index_summary":  []string{"indices_stats"},
 		"ml_job":         []string{"job_stats"},
-		"node_stats":     []string{"node_stats"},
+		"node_stats":     []string{}, // no longer indexed into .monitoring-es-*
 	}
 
 	config := getXPackConfig(host)
@@ -177,8 +177,19 @@ func TestXPackEnabled(t *testing.T) {
 			}
 
 			types := metricSetToTypesMap[metricSet.Name()]
-			require.Len(t, events, len(types))
+			numTypes := len(types)
 
+			// If no types are returned for this metricset, then it's because this metricset
+			// is no longer indexing events into .monitoring-* indices. But instead it is indexing
+			// events into the default Metricbeat indices.
+			if numTypes == 0 {
+				for _, event := range events {
+					require.Empty(t, event.Index)
+				}
+				return
+			}
+
+			require.Len(t, events, numTypes)
 			for i, event := range events {
 				require.Equal(t, types[i], event.RootFields["type"])
 				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
