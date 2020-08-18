@@ -26,7 +26,9 @@ var (
 	metricsetName  = "ec2"
 	instanceIDIdx  = 0
 	metricNameIdx  = 1
+	statisticIdx   = 2
 	labelSeparator = "|"
+	statistics     = []string{"Average", "Sum"}
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -149,11 +151,13 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID st
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, period)
-		if metricDataQuery == metricDataQueryEmpty {
-			continue
+		for _, statistic := range statistics {
+			metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, period, statistic)
+			if metricDataQuery == metricDataQueryEmpty {
+				continue
+			}
+			metricDataQueries = append(metricDataQueries, metricDataQuery)
 		}
-		metricDataQueries = append(metricDataQueries, metricDataQuery)
 	}
 	return metricDataQueries
 }
@@ -163,8 +167,10 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 	for instanceID := range instanceOutput {
-		events[instanceID] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-		metricSetFieldResults[instanceID] = map[string]interface{}{}
+		for _, statistic := range statistics {
+			events[instanceID] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
+			metricSetFieldResults[instanceID+labelSeparator+statistic] = map[string]interface{}{}
+		}
 	}
 
 	// monitoring state for each instance
@@ -182,7 +188,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 			if exists {
 				labels := strings.Split(*output.Label, labelSeparator)
 				instanceID := labels[instanceIDIdx]
+				statistic := labels[statisticIdx]
 
+				idStat := instanceID + labelSeparator + statistic
 				// Add tags
 				tags := instanceOutput[instanceID].Tags
 				if m.TagsFilter != nil {
@@ -222,7 +230,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				}
 
 				if len(output.Values) > timestampIdx {
-					metricSetFieldResults[instanceID][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+					metricSetFieldResults[idStat][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
 				}
 
 				instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
@@ -263,9 +271,23 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 		}
 	}
 
-	for instanceID, metricSetFieldsPerInstance := range metricSetFieldResults {
+	for idStat, metricSetFieldsPerInstance := range metricSetFieldResults {
+		idStatSplit := strings.Split(idStat, labelSeparator)
+		instanceID := idStatSplit[0]
+		statistic := idStatSplit[1]
+
+		var resultMetricsetFields common.MapStr
+		var err error
+
 		if len(metricSetFieldsPerInstance) != 0 {
-			resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
+			if statistic == "Average" {
+				// Use "Average" statistic method for CPU and status metrics
+				resultMetricsetFields, err = aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFieldsAverage)
+			} else if statistic == "Sum" {
+				// Use "Sum" statistic method for disk and network metrics
+				resultMetricsetFields, err = aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFieldsSum)
+			}
+
 			if err != nil {
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
@@ -338,7 +360,7 @@ func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr
 
 	for ec2MetricName, hostMetricName := range hostFieldTable {
 		metricValue, err := resultMetricsetFields.GetValue(ec2MetricName)
-		if ec2MetricName == "cpu.total.pct" {
+		if metricValue != nil && ec2MetricName == "cpu.total.pct" {
 			metricValue = metricValue.(float64) / 100
 		}
 		if err == nil && metricValue != nil {
@@ -372,16 +394,15 @@ func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instan
 	return
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
-	statistic := "Average"
+func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, period time.Duration, statistic string) (metricDataQuery cloudwatch.MetricDataQuery) {
 	periodInSeconds := int64(period.Seconds())
-	id := metricsetName + strconv.Itoa(index)
+	id := metricsetName + statistic + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	for _, dim := range metricDims {
 		if *dim.Name == "InstanceId" && *dim.Value == instanceID {
 			metricName := *metric.MetricName
-			label := instanceID + labelSeparator + metricName
+			label := instanceID + labelSeparator + metricName + labelSeparator + statistic
 			metricDataQuery = cloudwatch.MetricDataQuery{
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{

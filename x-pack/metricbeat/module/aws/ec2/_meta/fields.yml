@@ -27,7 +27,7 @@
     - name: network.in.packets
       type: long
       description: >
-        The number of packets received on all network interfaces by the instance.
+        The total number of packets received on all network interfaces by the instance in collection period.
     - name: network.in.packets_per_sec
       type: long
       description: >
@@ -35,7 +35,7 @@
     - name: network.out.packets
       type: long
       description: >
-        The number of packets sent out on all network interfaces by the instance.
+        The total number of packets sent out on all network interfaces by the instance in collection period.
     - name: network.out.packets_per_sec
       type: long
       description: >
@@ -44,7 +44,7 @@
       type: long
       format: bytes
       description: >
-        The number of bytes received on all network interfaces by the instance.
+        The total number of bytes received on all network interfaces by the instance in collection period.
     - name: network.in.bytes_per_sec
       type: long
       description: >
@@ -53,7 +53,7 @@
       type: long
       format: bytes
       description: >
-        The number of bytes sent out on all network interfaces by the instance.
+        The total number of bytes sent out on all network interfaces by the instance in collection period.
     - name: network.out.bytes_per_sec
       type: long
       description: >
@@ -62,7 +62,7 @@
       type: long
       format: bytes
       description: >
-        Bytes read from all instance store volumes available to the instance.
+        Total bytes read from all instance store volumes available to the instance in collection period.
     - name: diskio.read.bytes_per_sec
       type: long
       description: >
@@ -71,7 +71,7 @@
       type: long
       format: bytes
       description: >
-        Bytes written to all instance store volumes available to the instance.
+        Total bytes written to all instance store volumes available to the instance in collection period.
     - name: diskio.write.bytes_per_sec
       type: long
       description: >
@@ -79,7 +79,7 @@
     - name: diskio.read.ops
       type: long
       description: >
-        Completed read operations from all instance store volumes available to the instance in a specified period of time.
+        Total completed read operations from all instance store volumes available to the instance in collection period.
     - name: diskio.read.ops_per_sec
       type: long
       description: >
@@ -87,7 +87,7 @@
     - name: diskio.write.ops
       type: long
       description: >
-        Completed write operations to all instance store volumes available to the instance in a specified period of time.
+        Total completed write operations to all instance store volumes available to the instance in collection period.
     - name: diskio.write.ops_per_sec
       type: long
       description: >

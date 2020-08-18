@@ -2041,7 +2041,7 @@ type: long
 *`aws.ec2.network.in.packets`*::
 +
 --
-The number of packets received on all network interfaces by the instance.
+The total number of packets received on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2061,7 +2061,7 @@ type: long
 *`aws.ec2.network.out.packets`*::
 +
 --
-The number of packets sent out on all network interfaces by the instance.
+The total number of packets sent out on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2081,7 +2081,7 @@ type: long
 *`aws.ec2.network.in.bytes`*::
 +
 --
-The number of bytes received on all network interfaces by the instance.
+The total number of bytes received on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2103,7 +2103,7 @@ type: long
 *`aws.ec2.network.out.bytes`*::
 +
 --
-The number of bytes sent out on all network interfaces by the instance.
+The total number of bytes sent out on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2125,7 +2125,7 @@ type: long
 *`aws.ec2.diskio.read.bytes`*::
 +
 --
-Bytes read from all instance store volumes available to the instance.
+Total bytes read from all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2147,7 +2147,7 @@ type: long
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
-Bytes written to all instance store volumes available to the instance.
+Total bytes written to all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2169,7 +2169,7 @@ type: long
 *`aws.ec2.diskio.read.ops`*::
 +
 --
-Completed read operations from all instance store volumes available to the instance in a specified period of time.
+Total completed read operations from all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2189,7 +2189,7 @@ type: long
 *`aws.ec2.diskio.write.ops`*::
 +
 --
-Completed write operations to all instance store volumes available to the instance in a specified period of time.
+Total completed write operations to all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -6410,7 +6410,7 @@ type: scaled_float
 --
 The number of bytes received on all network interfaces by the host in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
@@ -6419,7 +6419,7 @@ type: scaled_float
 --
 The number of bytes sent out on all network interfaces by the host in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
@@ -6428,7 +6428,7 @@ type: scaled_float
 --
 The number of packets received on all network interfaces by the host in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
@@ -6437,7 +6437,7 @@ type: scaled_float
 --
 The number of packets sent out on all network interfaces by the host in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
@@ -6446,7 +6446,7 @@ type: scaled_float
 --
 The total number of bytes read successfully in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
@@ -6455,7 +6455,7 @@ type: scaled_float
 --
 The total number of bytes write successfully in a given period of time.
 
-type: scaled_float
+type: long
 
 --
 
