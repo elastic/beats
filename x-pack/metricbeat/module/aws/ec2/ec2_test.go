@@ -82,6 +82,10 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 			Key:   awssdk.String("helm.sh/chart"),
 			Value: awssdk.String("foo-chart"),
 		},
+		{
+			Key:   awssdk.String("Name"),
+			Value: awssdk.String("test-instance"),
+		},
 	}
 
 	instance := ec2.Instance{
@@ -144,9 +148,14 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu":  common.MapStr{"pct": 0.0025},
+				"id":   "i-123",
+				"name": "test-instance",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -171,6 +180,7 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
@@ -227,9 +237,14 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu":  common.MapStr{"pct": 0.0025},
+				"id":   "i-123",
+				"name": "test-instance",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -254,6 +269,7 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
@@ -454,4 +470,63 @@ func TestCalculateRate(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, c.rateMetricValueDetailed, output)
 	}
+}
+
+func TestCreateCloudWatchEventsWithInstanceName(t *testing.T) {
+	expectedEvent := mb.Event{
+		RootFields: common.MapStr{
+			"cloud": common.MapStr{
+				"region":            regionName,
+				"provider":          "aws",
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
+				"machine":           common.MapStr{"type": "t2.medium"},
+				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu": common.MapStr{"pct": 0.25},
+				"id":  "i-123",
+			},
+		},
+		MetricSetFields: common.MapStr{
+			"tags": common.MapStr{
+				"app_kubernetes_io/name": "foo",
+				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
+			},
+		},
+	}
+	svcEC2Mock := &MockEC2Client{}
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(instanceIDs))
+	instanceID := instanceIDs[0]
+	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
+
+	getMetricDataOutput := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
+		},
+	}
+
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+	}
+
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(events))
+
+	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
+
+	hostID, err := events[instanceID].RootFields.GetValue("host.id")
+	assert.NoError(t, err)
+	assert.Equal(t, "i-123", hostID)
+
+	instanceName, err := events[instanceID].RootFields.GetValue("cloud.instance.name")
+	assert.NoError(t, err)
+	assert.Equal(t, "test-instance", instanceName)
 }
