@@ -47,6 +47,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adds Gsuite Admin support. {pull}19769[19769]
 - Adds Gsuite Drive support. {pull}19704[19704]
 - Adds Gsuite Groups support. {pull}19725[19725]
+- Disable the option of running --machine-learning on its own. {pull}20241[20241]
 
 *Heartbeat*
 
@@ -82,10 +83,15 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix config reload metrics (`libbeat.config.module.start/stops/running`). {pull}19168[19168]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates that certificate and key settings are both specified {pull}19584[19584]
+- Fix terminating pod autodiscover issue. {pull}20084[20084]
+- Output errors when Kibana index pattern setup fails. {pull}20121[20121]
+- Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
+- Add service resource in k8s cluster role. {pull}20546[20546]
 
 *Auditbeat*
 
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
+- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
 
 *Filebeat*
 
@@ -98,6 +104,16 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix memory leak in tcp and unix input sources. {pull}19459[19459]
 - Fix Cisco ASA dissect pattern for 313008 & 313009 messages. {pull}19149[19149]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
+- Update container name for the azure filesets. {pull}19899[19899]
+- Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
+- Ignore missing in Zeek module when dropping unnecessary fields. {pull}19984[19984]
+- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
+- Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
+- Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
+- Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
+- Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
+- Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
+- Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 
 *Heartbeat*
 
@@ -107,6 +123,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Metricbeat*
 
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898]
 - Fix incorrect usage of hints builder when exposed port is a substring of the hint {pull}19052[19052]
 - Stop counterCache only when already started {pull}19103[19103]
 - Remove dedot for tag values in aws module. {issue}19112[19112] {pull}19221[19221]
@@ -114,7 +131,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix mapping of service start type in the service metricset, windows module. {pull}19551[19551]
 - Fix config example in the perfmon configuration files. {pull}19539[19539]
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
-- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
+- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
+- Add required option for `metrics` in app_insights. {pull}20406[20406]
+- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 
 *Packetbeat*
 
@@ -142,6 +161,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add the `overwrite_keys` configuration option to the dissect processor. {pull}19464[19464]
 - Add support to trim captured values in the dissect processor. {pull}19464[19464]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
+- Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 
 *Auditbeat*
 
@@ -506,7 +526,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Add examples to the kubernetes manifests to show how to
 configure the auditd module and use processors to enrich events with metadata.
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
-- Log to stderr when using kubernetes manifests. {pull}17443[174443]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
