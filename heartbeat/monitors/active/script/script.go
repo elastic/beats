@@ -1,4 +1,4 @@
-package synthetic
+package script
 
 import (
 	"bufio"
@@ -10,12 +10,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/google/uuid"
 	"io"
-	"io/ioutil"
-	"os"
 	"os/exec"
-	"path/filepath"
 )
 
 func init() {
@@ -35,23 +31,13 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	}
 
 	job := monitors.MakeSimpleCont(func(event *beat.Event) error {
-		dataDir := filepath.Join("data",  uuid.New().String())
-		scriptPath := filepath.Join(dataDir, "script.js")
-		os.MkdirAll(dataDir, 0755)
-		//defer os.RemoveAll(dataDir)
-
-		err = ioutil.WriteFile(scriptPath, []byte(config.Script), 0644)
-		if err != nil {
-			return fmt.Errorf("could not write script file %s: %w", scriptPath, err)
-		}
-
 		logp.Info("Start script job")
 		cmd := exec.Command(
 			"node",
-			"/home/andrewvc/projects/synthetic-monitoring/elastic-synthetics/built/run",
+			"/home/andrewvc/projects/synthetic-monitoring/elastic-synthetics/dist",
 			"run",
+			"--stdin",
 			"--json",
-			scriptPath,
 		)
 
 		logp.Warn("EXEC %s",cmd.String())
@@ -66,9 +52,20 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			return fmt.Errorf("could not attach stderr: %w", err)
 		}
 
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			return fmt.Errorf("could not attach stdin: %w", err)
+		}
+
 		if err = cmd.Start(); err != nil {
 			return fmt.Errorf("Could not start cmd: %w", err)
 		}
+
+		_, err = stdin.Write([]byte(config.Script))
+		if err != nil {
+			return fmt.Errorf("could not write to script stdin: %w", err)
+		}
+		stdin.Close()
 
 		stdoutResults := decodePipe(stdout)
 		stderrResults := decodePipe(stderr)

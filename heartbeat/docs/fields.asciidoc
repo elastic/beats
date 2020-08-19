@@ -7719,12 +7719,26 @@ Script related fields.
 
 
 
-*`script.output`*::
+*`script.stderr`*::
++
+--
+type: text
+
+--
+
+*`script.stdout`*::
++
+--
+type: text
+
+--
+
+*`script.journey`*::
 +
 --
 type: object
 
-Field is not indexed.
+Object is not enabled.
 
 --
 

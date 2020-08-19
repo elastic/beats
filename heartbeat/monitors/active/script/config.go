@@ -1,4 +1,4 @@
-package synthetic
+package script
 
 import "github.com/elastic/beats/v7/libbeat/common"
 
