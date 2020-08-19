@@ -1,7 +1,24 @@
-- name: app_state.*.*
-  release: ga
-  type: object
-  object_type: float
-  object_type_mapping_type: "*"
+- name: app_state
+  type: group
+  release: beta
   description: >
-    container registry
+    application state
+  fields:
+    - name: application_id
+      type: keyword
+      description: >
+        The application ID
+    - name: start_date
+      type: date
+      description: >
+        The start date
+    - name: end_date
+      type: date
+      description: >
+        The end date
+    - name: metrics.*.*
+      type: object
+      object_type: float
+      object_type_mapping_type: "*"
+      description: >
+        The metrics
