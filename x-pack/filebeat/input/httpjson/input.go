@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -126,7 +125,7 @@ func (in *httpJSONInput) Test(v2.TestContext) error {
 }
 
 // Run starts the input and blocks until it ends the execution.
-// It will return on context cancellation or irrecoverable errors.
+// It will return on context cancellation, any other error will be retried.
 func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("url", in.config.URL)
 
@@ -152,30 +151,22 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 		log,
 	)
 
-	if err := requester.processHTTPRequest(stdCtx, publisher); err != nil {
-		return err
-	}
-
+	// TODO: disallow passing interval = 0 as a mean to run once.
 	if in.config.Interval == 0 {
-		return nil
+		return requester.processHTTPRequest(stdCtx, publisher)
 	}
 
 	err = timed.Periodic(stdCtx, in.config.Interval, func() error {
 		log.Info("Process another repeated request.")
-		return requester.processHTTPRequest(stdCtx, publisher)
+		if err := requester.processHTTPRequest(stdCtx, publisher); err != nil {
+			log.Error(err)
+		}
+		return nil
 	})
 
-	if err == nil {
-		return nil
-	}
+	log.Infof("Context done: %v", err)
 
-	switch errors.Cause(err) {
-	case context.Canceled, context.DeadlineExceeded:
-		log.Infof("Context done: %v", err)
-		return nil
-	}
-
-	return err
+	return nil
 }
 
 func (in *httpJSONInput) newHTTPClient(ctx context.Context) (*http.Client, error) {

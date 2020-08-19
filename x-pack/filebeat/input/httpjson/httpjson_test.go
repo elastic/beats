@@ -265,47 +265,6 @@ func TestHTTPJSONInput(t *testing.T) {
 	}
 }
 
-func TestLoopBreaksOnIrrecoverableFailure(t *testing.T) {
-	baseConfig := map[string]interface{}{
-		"http_method":        "GET",
-		"interval":           "100ms",
-		"retry.max_attempts": 1,
-	}
-
-	expected := `{"hello":"world"}`
-
-	setupServer := newTestServer(httptest.NewServer)
-
-	setupServer(t, failAfterFirstAttemptHandler(), baseConfig)
-
-	cfg := common.MustNewConfigFrom(baseConfig)
-
-	input, err := configure(cfg)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "httpjson", input.Name())
-	assert.NoError(t, input.Test(v2.TestContext{}))
-
-	pub := beattest.NewChanClient(len(expected))
-	t.Cleanup(func() { _ = pub.Close() })
-
-	ctx, cancel := newV2Context()
-	t.Cleanup(cancel)
-
-	if err := input.Run(ctx, pub); assert.Error(t, err) {
-		// retryable client errors use dynamic method / host / port in the message
-		// and no custom type. There is no other easy way to test for a specific one
-		assert.Contains(t, err.Error(), "giving up after 2 attempts")
-	}
-
-	if assert.Equal(t, 1, len(pub.Channel)) {
-		got := pub.ReceiveEvent()
-		val, err := got.Fields.GetValue("message")
-		assert.NoError(t, err)
-		assert.JSONEq(t, expected, val.(string))
-	}
-}
-
 func newTestServer(
 	newServer func(http.Handler) *httptest.Server,
 ) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
@@ -372,19 +331,6 @@ func retryHandler() http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(rand.Intn(100) + 500)
-		count += 1
-	}
-}
-
-func failAfterFirstAttemptHandler() http.HandlerFunc {
-	count := 0
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
-		if count == 1 {
-			w.WriteHeader(rand.Intn(100) + 500)
-			return
-		}
-		_, _ = w.Write([]byte(`{"hello":"world"}`))
 		count += 1
 	}
 }
