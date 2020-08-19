@@ -39,7 +39,6 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
-	eventTypeError = "error"
 )
 
 type eventAction uint8
@@ -247,7 +246,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 			report.Event(event)
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessError))
 		}
 	}
 
@@ -287,7 +286,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStarted))
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessError))
 		}
 	}
 
