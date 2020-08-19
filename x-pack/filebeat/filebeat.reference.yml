@@ -1030,6 +1030,7 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+<<<<<<< HEAD
 
   netscreen:
     enabled: true
@@ -1049,10 +1050,8 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
-
-#------------------------------ Junipersrx Module ------------------------------
-- module: junipersrx
-  firewall:
+=======
+  srx:
     enabled: true
 
     # Set which input to use between tcp, udp (default) or file.
@@ -1064,6 +1063,7 @@ filebeat.modules:
 
     # The port to listen for syslog traffic. Defaults to 9006.
     #var.syslog_port: 9006
+>>>>>>> stashing changes for later
 
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka

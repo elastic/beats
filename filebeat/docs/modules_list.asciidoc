@@ -32,7 +32,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-infoblox>>
   * <<filebeat-module-iptables>>
   * <<filebeat-module-juniper>>
-  * <<filebeat-module-junipersrx>>
   * <<filebeat-module-kafka>>
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
@@ -101,7 +100,6 @@ include::modules/imperva.asciidoc[]
 include::modules/infoblox.asciidoc[]
 include::modules/iptables.asciidoc[]
 include::modules/juniper.asciidoc[]
-include::modules/junipersrx.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]

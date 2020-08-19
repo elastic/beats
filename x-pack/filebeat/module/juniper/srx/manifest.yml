@@ -4,7 +4,7 @@ var:
   - name: syslog_host
     default: localhost
   - name: tags
-    default: [junipersrx-firewall, forwarded]
+    default: [juniper-srx, forwarded]
   - name: syslog_port
     default: 9006
   - name: input
@@ -19,7 +19,7 @@ ingest_pipeline:
   - ingest/atp.yml
   - ingest/secintel.yml
 
-input: config/firewall.yml
+input: config/srx.yml
 
 requires.processors:
 - name: geoip

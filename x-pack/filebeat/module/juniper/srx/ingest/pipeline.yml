@@ -12,7 +12,7 @@ processors:
     field: log.original
     field_split: " (?=[a-z0-9\\_\\-]+=)"
     value_split: "="
-    prefix: "junipersrx.firewall."
+    prefix: "juniper.srx."
     ignore_missing: true
     ignore_failure: false
     trim_value: "\""
@@ -40,19 +40,23 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - ISO8601
 
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+
 # Can possibly be omitted if there is a solution for the equal signs and the calculation of the start time.
-# -> junipersrx.firewall.elapsed-time
+# -> juniper.srx.elapsed-time
 - rename:
-    field: junipersrx.firewall.elapsed-time
-    target_field: junipersrx.firewall.duration
-    if: "ctx.junipersrx?.firewall['elapsed-time'] != null"
+    field: juniper.srx.elapsed-time
+    target_field: juniper.srx.duration
+    if: "ctx.juniper?.srx['elapsed-time'] != null"
 
 # Sets starts, end and duration when start and duration is known
 - script:
     lang: painless
-    if: ctx?.junipersrx?.firewall?.duration != null
+    if: ctx?.juniper?.srx?.duration != null
     source: >-
-      ctx.event.duration = Integer.parseInt(ctx.junipersrx.firewall.duration) * 1000000000L;
+      ctx.event.duration = Integer.parseInt(ctx.juniper.srx.duration) * 1000000000L;
       ctx.event.start = ctx['@timestamp'];
       ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
       ctx.event.end = start.plus(ctx.event.duration, ChronoUnit.NANOS);
@@ -67,17 +71,17 @@ processors:
         - "N/A"
         - "-"
     source: >-
-      ctx?.junipersrx?.firewall.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      ctx?.juniper?.srx.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
 
 #######################
 ## ECS Event Mapping ##
 #######################
 - set:
     field: event.module
-    value: junipersrx
+    value: juniper
 - set:
     field: event.dataset
-    value: junipersrx.firewall
+    value: juniper.srx
 - set:
     field: event.severity
     value: '{{syslog_pri}}'
@@ -140,44 +144,44 @@ processors:
     target_field: observer.name
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.packet-incoming-interface
+    field: juniper.srx.packet-incoming-interface
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.destination-interface-name
+    field: juniper.srx.destination-interface-name
     target_field: observer.egress.interface.name
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.source-interface-name
+    field: juniper.srx.source-interface-name
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.interface-name
+    field: juniper.srx.interface-name
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.source-zone-name
+    field: juniper.srx.source-zone-name
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.source-zone
+    field: juniper.srx.source-zone
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.destination-zone-name
+    field: juniper.srx.destination-zone-name
     target_field: observer.egress.zone
     ignore_missing: true
 - rename:
-    field: junipersrx.firewall.destination-zone
+    field: juniper.srx.destination-zone
     target_field: observer.egress.zone
     ignore_missing: true
 - rename:
     field: syslog_program
-    target_field: junipersrx.firewall.process
+    target_field: juniper.srx.process
     ignore_missing: true
 - rename:
     field: log_type
-    target_field: junipersrx.firewall.tag
+    target_field: juniper.srx.tag
     ignore_missing: true
 
 
@@ -189,36 +193,36 @@ processors:
         - message
         - _temp_
         - _temp
-        - junipersrx.firewall.duration
-        - junipersrx.firewall.dir_disp
-        - junipersrx.firewall.srczone
-        - junipersrx.firewall.dstzone
-        - junipersrx.firewall.duration
+        - juniper.srx.duration
+        - juniper.srx.dir_disp
+        - juniper.srx.srczone
+        - juniper.srx.dstzone
+        - juniper.srx.duration
         - syslog_pri
         - syslog_hostname
     ignore_missing: true
 
-###############################
-## Product Speific Pipelines ##
-###############################
+################################
+## Product Specific Pipelines ##
+################################
 - pipeline:
     name: '{< IngestPipeline "flow" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_FLOW'"
+    if: "ctx.juniper?.srx?.process == 'RT_FLOW'"
 - pipeline:
     name: '{< IngestPipeline "utm" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_UTM'"
+    if: "ctx.juniper?.srx?.process == 'RT_UTM'"
 - pipeline:
     name: '{< IngestPipeline "idp" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_IDP'"
+    if: "ctx.juniper?.srx?.process == 'RT_IDP'"
 - pipeline:
     name: '{< IngestPipeline "ids" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_IDS'"
+    if: "ctx.juniper?.srx?.process == 'RT_IDS'"
 - pipeline:
     name: '{< IngestPipeline "atp" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_AAMW'"
+    if: "ctx.juniper?.srx?.process == 'RT_AAMW'"
 - pipeline:
     name: '{< IngestPipeline "secintel" >}'
-    if: "ctx.junipersrx?.firewall?.process == 'RT_SECINTEL'"
+    if: "ctx.juniper?.srx?.process == 'RT_SECINTEL'"
 
 on_failure:
 - set:

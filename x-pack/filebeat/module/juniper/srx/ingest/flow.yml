@@ -9,72 +9,72 @@ processors:
 - set:
     field: event.outcome
     value: success
-    if: "ctx.junipersrx?.firewall?.tag != null"
+    if: "ctx.juniper?.srx?.tag != null"
 - append:
     field: event.category
     value: network
 - rename:
-    field: junipersrx.firewall.application-risk
+    field: juniper.srx.application-risk
     target_field: event.risk_score
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['application-risk'] != null"
+    if: "ctx.juniper?.srx['application-risk'] != null"
 - append:
     field: event.type
-    value: 
+    value:
       - start
       - allowed
       - connection
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('CREATE') || ctx.junipersrx?.firewall?.tag.endsWith('UPDATE') || ctx.junipersrx?.firewall?.tag.endsWith('CREATE_LS') || ctx.junipersrx?.firewall?.tag.endsWith('UPDATE_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('CREATE') || ctx.juniper?.srx?.tag.endsWith('UPDATE') || ctx.juniper?.srx?.tag.endsWith('CREATE_LS') || ctx.juniper?.srx?.tag.endsWith('UPDATE_LS')"
 - append:
     field: event.type
-    value: 
+    value:
       - end
       - allowed
       - connection
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('CLOSE') || ctx.junipersrx?.firewall?.tag.endsWith('CLOSE_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('CLOSE') || ctx.juniper?.srx?.tag.endsWith('CLOSE_LS')"
 - append:
     field: event.type
     value:
       - denied
       - connection
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('DENY') || ctx.junipersrx?.firewall?.tag.endsWith('DENY_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('DENY') || ctx.juniper?.srx?.tag.endsWith('DENY_LS')"
 - set:
     field: event.action
     value: flow_started
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('CREATE') || ctx.junipersrx?.firewall?.tag.endsWith('UPDATE') || ctx.junipersrx?.firewall?.tag.endsWith('CREATE_LS') || ctx.junipersrx?.firewall?.tag.endsWith('UPDATE_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('CREATE') || ctx.juniper?.srx?.tag.endsWith('UPDATE') || ctx.juniper?.srx?.tag.endsWith('CREATE_LS') || ctx.juniper?.srx?.tag.endsWith('UPDATE_LS')"
 - set:
     field: event.action
     value: flow_close
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('CLOSE') || ctx.junipersrx?.firewall?.tag.endsWith('CLOSE_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('CLOSE') || ctx.juniper?.srx?.tag.endsWith('CLOSE_LS')"
 - set:
     field: event.action
     value: flow_deny
-    if: "ctx.junipersrx?.firewall?.tag.endsWith('DENY') || ctx.junipersrx?.firewall?.tag.endsWith('DENY_LS')"
+    if: "ctx.juniper?.srx?.tag.endsWith('DENY') || ctx.juniper?.srx?.tag.endsWith('DENY_LS')"
 
 ####################################
 ## ECS Server/Destination Mapping ##
 ####################################
 - rename:
-    field: junipersrx.firewall.destination-address
+    field: juniper.srx.destination-address
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['destination-address'] != null"
+    if: "ctx.juniper?.srx['destination-address'] != null"
 - set:
     field: server.ip
     value: '{{destination.ip}}'
     if: "ctx.destination?.ip != null"
 - rename:
-    field: junipersrx.firewall.nat-destination-address
+    field: juniper.srx.nat-destination-address
     target_field: destination.nat.ip
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['nat-destination-address'] != null"
+    if: "ctx.juniper?.srx['nat-destination-address'] != null"
 - convert:
-    field: junipersrx.firewall.destination-port
+    field: juniper.srx.destination-port
     target_field: destination.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['destination-port'] != null"
+    if: "ctx.juniper?.srx['destination-port'] != null"
 - set:
     field: server.port
     value: '{{destination.port}}'
@@ -87,12 +87,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.port != null"
 - convert:
-    field: junipersrx.firewall.nat-destination-port
+    field: juniper.srx.nat-destination-port
     target_field: destination.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['nat-destination-port'] != null"
+    if: "ctx.juniper?.srx['nat-destination-port'] != null"
 - set:
     field: server.nat.port
     value: '{{destination.nat.port}}'
@@ -105,12 +105,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.nat?.port != null"
 - convert:
-    field: junipersrx.firewall.bytes-from-server
+    field: juniper.srx.bytes-from-server
     target_field: destination.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['bytes-from-server'] != null"
+    if: "ctx.juniper?.srx['bytes-from-server'] != null"
 - set:
     field: server.bytes
     value: '{{destination.bytes}}'
@@ -123,12 +123,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.bytes != null"
 - convert:
-    field: junipersrx.firewall.packets-from-server
+    field: juniper.srx.packets-from-server
     target_field: destination.packets
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['packets-from-server'] !=null"
+    if: "ctx.juniper?.srx['packets-from-server'] !=null"
 - set:
     field: server.packets
     value: '{{destination.packets}}'
@@ -145,31 +145,31 @@ processors:
 ## ECS Client/Source Mapping ##
 ###############################
 - rename:
-    field: junipersrx.firewall.source-address
+    field: juniper.srx.source-address
     target_field: source.ip
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['source-address'] != null"
+    if: "ctx.juniper?.srx['source-address'] != null"
 - set:
     field: client.ip
     value: '{{source.ip}}'
     if: "ctx.source?.ip != null"
 - rename:
-    field: junipersrx.firewall.nat-source-address
+    field: juniper.srx.nat-source-address
     target_field: source.nat.ip
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['nat-source-address'] != null"
+    if: "ctx.juniper?.srx['nat-source-address'] != null"
 - rename:
-    field: junipersrx.firewall.sourceip
+    field: juniper.srx.sourceip
     target_field: source.ip
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall?.sourceip != null"
+    if: "ctx.juniper?.srx?.sourceip != null"
 - convert:
-    field: junipersrx.firewall.source-port
+    field: juniper.srx.source-port
     target_field: source.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['source-port'] != null"
+    if: "ctx.juniper?.srx['source-port'] != null"
 - set:
     field: client.port
     value: '{{source.port}}'
@@ -182,12 +182,12 @@ processors:
     ignore_missing: true
     if: "ctx.client?.port != null"
 - convert:
-    field: junipersrx.firewall.nat-source-port
+    field: juniper.srx.nat-source-port
     target_field: source.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['nat-source-port'] != null"
+    if: "ctx.juniper?.srx['nat-source-port'] != null"
 - set:
     field: client.nat.port
     value: '{{source.nat.port}}'
@@ -198,14 +198,14 @@ processors:
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.client?.nat?.port != null"    
+    if: "ctx.client?.nat?.port != null"
 - convert:
-    field: junipersrx.firewall.bytes-from-client
+    field: juniper.srx.bytes-from-client
     target_field: source.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['bytes-from-client'] != null"
+    if: "ctx.juniper?.srx['bytes-from-client'] != null"
 - set:
     field: client.bytes
     value: '{{source.bytes}}'
@@ -218,12 +218,12 @@ processors:
     ignore_missing: true
     if: "ctx.client?.bytes != null"
 - convert:
-    field: junipersrx.firewall.packets-from-client
+    field: juniper.srx.packets-from-client
     target_field: source.packets
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['packets-from-client'] != null"
+    if: "ctx.juniper?.srx['packets-from-client'] != null"
 - set:
     field: client.packets
     value: '{{source.packets}}'
@@ -236,28 +236,28 @@ processors:
     ignore_missing: true
     if: "ctx.client?.packets != null"
 - rename:
-    field: junipersrx.firewall.username
+    field: juniper.srx.username
     target_field: source.user.name
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall?.username != null"
+    if: "ctx.juniper?.srx?.username != null"
 
 ######################
 ## ECS Rule Mapping ##
 ######################
 - rename:
-    field: junipersrx.firewall.policy-name
+    field: juniper.srx.policy-name
     target_field: rule.name
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['policy-name'] != null"
+    if: "ctx.juniper?.srx['policy-name'] != null"
 
 #############################
 ## ECS Network/Geo Mapping ##
 #############################
 - rename:
-    field: junipersrx.firewall.protocol-id
+    field: juniper.srx.protocol-id
     target_field: network.iana_number
     ignore_missing: true
-    if: "ctx.junipersrx?.firewall['protocol-id'] != null"
+    if: "ctx.juniper?.srx['protocol-id'] != null"
 - geoip:
     field: source.ip
     target_field: source.geo
@@ -364,14 +364,14 @@ processors:
 #############
 - remove:
     field:
-    - junipersrx.firewall.destination-port
-    - junipersrx.firewall.nat-destination-port
-    - junipersrx.firewall.bytes-from-client
-    - junipersrx.firewall.packets-from-client
-    - junipersrx.firewall.source-port
-    - junipersrx.firewall.nat-source-port
-    - junipersrx.firewall.bytes-from-server
-    - junipersrx.firewall.packets-from-server
+    - juniper.srx.destination-port
+    - juniper.srx.nat-destination-port
+    - juniper.srx.bytes-from-client
+    - juniper.srx.packets-from-client
+    - juniper.srx.source-port
+    - juniper.srx.nat-source-port
+    - juniper.srx.bytes-from-server
+    - juniper.srx.packets-from-server
     ignore_missing: true
 
 on_failure:

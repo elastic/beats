@@ -1,7 +1,8 @@
-- name: firewall
+- name: srx
   type: group
   release: beta
   default_field: false
+  overwrite: true
   description: >
     Module for parsing junipersrx syslog.
   fields:
@@ -214,7 +215,7 @@
       type: integer
       description: >
         application risk
-  
+
     - name: urlcategory-risk
       type: integer
       description: >
@@ -279,7 +280,7 @@
       type: keyword
       description: >
         process that generated the message
-  
+
     - name: apbr-rule-type
       type: keyword
       description: >
@@ -314,12 +315,12 @@
       type: keyword
       description: >
         rule name
-  
+
     - name: uplink-tx-bytes
       type: integer
       description: >
         uplink tx bytes
-  
+
     - name: uplink-rx-bytes
       type: integer
       description: >
@@ -554,7 +555,7 @@
       type: keyword
       description: >
         status
-  
+
     - name: state
       type: keyword
       description: >
