@@ -125,8 +125,8 @@ func (in *httpJSONInput) Test(v2.TestContext) error {
 	return nil
 }
 
-// Run starts the input worker then returns. Only the first invocation
-// will ever start the worker.
+// Run starts the input and blocks until it ends the execution.
+// It will return on context cancellation or irrecoverable errors.
 func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("url", in.config.URL)
 
