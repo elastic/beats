@@ -94,6 +94,9 @@ protocol: http
 host: %s
 headers:
   key: value
+  content-type: text/plain
+  accept: text/plain
+  kbn-xsrf: 0
 `, kibanaTs.Listener.Addr().String())))
 	require.NoError(t, err)
 	require.NotNil(t, client)
@@ -107,6 +110,12 @@ headers:
 	assert.Equal(t, "1.2.3-beta-SNAPSHOT", client.Version.String())
 
 	// Headers specified in cient.Request are added to those defined in config.
+	//
+	// Content-Type, Accept, and kbn-xsrf cannot be overridden.
 	assert.Equal(t, "/foo", requests[1].URL.Path)
 	assert.Equal(t, []string{"value", "another_value"}, requests[1].Header.Values("key"))
+	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Content-Type"))
+	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Accept"))
+	assert.Equal(t, []string{"1"}, requests[1].Header.Values("kbn-xsrf"))
+
 }

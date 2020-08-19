@@ -210,11 +210,11 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-	req.Header.Set("kbn-xsrf", "1")
 	addHeaders(req.Header, conn.Headers)
 	addHeaders(req.Header, headers)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("kbn-xsrf", "1")
 
 	return conn.RoundTrip(req)
 }
