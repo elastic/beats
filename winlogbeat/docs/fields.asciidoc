@@ -7204,15 +7204,6 @@ alias to: winlog.user.identifier
 
 --
 
-*`user.domain`*::
-+
---
-type: alias
-
-alias to: winlog.user.domain
-
---
-
 *`user.type`*::
 +
 --

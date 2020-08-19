@@ -166,4 +166,4 @@ metricbeat.modules:
 
 Note that when using `types_patterns`, the provided patterns have higher priority than the default patterns.
 For instance if `_histogram_total` is a defined histogram pattern, then a metric like `network_bytes_histogram_total`
-will be handled as a histogram even of it has the suffix `_total` which is a default pattern for counters.
+will be handled as a histogram, even if it has the suffix `_total` which is a default pattern for counters.
