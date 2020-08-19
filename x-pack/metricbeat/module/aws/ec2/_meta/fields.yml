@@ -29,7 +29,7 @@
       description: >
         The total number of packets received on all network interfaces by the instance in collection period.
     - name: network.in.packets_per_sec
-      type: long
+      type: scaled_float
       description: >
         The number of packets per second sent out on all network interfaces by the instance.
     - name: network.out.packets
@@ -37,7 +37,7 @@
       description: >
         The total number of packets sent out on all network interfaces by the instance in collection period.
     - name: network.out.packets_per_sec
-      type: long
+      type: scaled_float
       description: >
         The number of packets per second sent out on all network interfaces by the instance.
     - name: network.in.bytes
@@ -46,7 +46,7 @@
       description: >
         The total number of bytes received on all network interfaces by the instance in collection period.
     - name: network.in.bytes_per_sec
-      type: long
+      type: scaled_float
       description: >
         The number of bytes per second received on all network interfaces by the instance.
     - name: network.out.bytes
@@ -55,7 +55,7 @@
       description: >
         The total number of bytes sent out on all network interfaces by the instance in collection period.
     - name: network.out.bytes_per_sec
-      type: long
+      type: scaled_float
       description: >
         The number of bytes per second sent out on all network interfaces by the instance.
     - name: diskio.read.bytes
@@ -64,7 +64,7 @@
       description: >
         Total bytes read from all instance store volumes available to the instance in collection period.
     - name: diskio.read.bytes_per_sec
-      type: long
+      type: scaled_float
       description: >
         Bytes read per second from all instance store volumes available to the instance.
     - name: diskio.write.bytes
@@ -73,7 +73,7 @@
       description: >
         Total bytes written to all instance store volumes available to the instance in collection period.
     - name: diskio.write.bytes_per_sec
-      type: long
+      type: scaled_float
       description: >
         Bytes written per second to all instance store volumes available to the instance.
     - name: diskio.read.ops
