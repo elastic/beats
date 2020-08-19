@@ -298,11 +298,7 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 
 	for _, singleEvent := range groupedEvents {
 		if hostMetricName, ok := hostFieldTable[singleEvent.Key]; ok {
-			if hostMetricName == "host.cpu.pct" {
-				hostRootFields.Put(hostMetricName, singleEvent.Value.(float64)*100)
-			} else {
-				hostRootFields.Put(hostMetricName, singleEvent.Value)
-			}
+			hostRootFields.Put(hostMetricName, singleEvent.Value)
 		}
 	}
 	return hostRootFields

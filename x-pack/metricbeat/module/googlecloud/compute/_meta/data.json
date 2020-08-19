@@ -5,15 +5,16 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "17557085450298074",
-            "name": "gke-chrismark-leaderelec-default-pool-896893cb-t17x"
+            "id": "2438671519308240892",
+            "name": "heartbeat-mumbai"
         },
         "machine": {
-            "type": "e2-medium"
+            "type": "f1-micro"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-c",
+    "cloud.availability_zone": "asia-south1-c",
+    "cloud.region": "asia-south1",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,57 +24,37 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 432
+                    "value": 435
                 },
                 "dropped_packets_count": {
-                    "value": 6
+                    "value": 7
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 1
+                        "value": 0.2
                     },
                     "usage_time": {
-                        "value": 9.515682164234931
+                        "value": 0.8653667340986431
                     },
                     "utilization": {
-                        "value": 0.15859470273724885
-                    }
-                },
-                "memory": {
-                    "balloon": {
-                        "ram_size": {
-                            "value": 4140863488
-                        },
-                        "ram_used": {
-                            "value": 2765357056
-                        },
-                        "swap_in_bytes_count": {
-                            "value": 0
-                        },
-                        "swap_out_bytes_count": {
-                            "value": 0
-                        }
+                        "value": 0.07211389450822024
                     }
                 },
                 "uptime": {
-                    "value": 60.000000000007276
+                    "value": 60
                 }
             }
         },
-        "labels": {
-            "user": {
-                "goog-gke-node": ""
-            }
-        }
+        "labels": {}
     },
     "host": {
         "cpu": {
-            "pct": 15.859470273724884
+            "pct": 0.07211389450822024
         },
-        "id": "17557085450298074",
-        "name": "gke-chrismark-leaderelec-default-pool-896893cb-t17x"
+        "id": "2438671519308240892",
+        "name": "heartbeat-mumbai"
     },
     "metricset": {
         "name": "compute",
