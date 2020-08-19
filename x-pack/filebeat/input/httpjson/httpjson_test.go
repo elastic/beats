@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -24,13 +25,11 @@ import (
 
 func TestHTTPJSONInput(t *testing.T) {
 	testCases := []struct {
-		name          string
-		setupServer   func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig    map[string]interface{}
-		handler       http.HandlerFunc
-		expected      []string
-		expectedError string
-		duration      time.Duration
+		name        string
+		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig  map[string]interface{}
+		handler     http.HandlerFunc
+		expected    []string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -94,14 +93,13 @@ func TestHTTPJSONInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"http_method": "POST",
-				"interval":    "500ms",
+				"interval":    "100ms",
 			},
 			handler: defaultHandler("POST", ""),
 			expected: []string{
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 			},
-			duration: 900 * time.Millisecond,
 		},
 		{
 			name:        "Test json objects array",
@@ -169,7 +167,7 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"http_method":                  "GET",
-				"interval":                     "500ms",
+				"interval":                     "100ms",
 				"date_cursor.field":            "@timestamp",
 				"date_cursor.url_field":        "$filter",
 				"date_cursor.value_template":   "alertCreationTime ge {{.}}",
@@ -181,7 +179,6 @@ func TestHTTPJSONInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			},
-			duration: 900 * time.Millisecond,
 		},
 		{
 			name:        "Test pagination",
@@ -195,18 +192,6 @@ func TestHTTPJSONInput(t *testing.T) {
 			},
 			handler:  paginationHandler(),
 			expected: []string{`{"foo":"bar"}`, `{"foo":"bar"}`},
-		},
-		{
-			name:        "Test loop breaks on irrecoverable failure",
-			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
-				"http_method":        "GET",
-				"interval":           "300ms",
-				"retry.max_attempts": 1,
-			},
-			handler:       failAfterFirstAttemptHandler(),
-			expectedError: "giving up after 2 attempts",
-			expected:      []string{`{"hello":"world"}`},
 		},
 		{
 			name: "Test oauth2",
@@ -247,28 +232,76 @@ func TestHTTPJSONInput(t *testing.T) {
 			pub := beattest.NewChanClient(len(tc.expected))
 			t.Cleanup(func() { _ = pub.Close() })
 
-			ctx, cancel := newV2Context(tc.duration)
+			ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
 
-			err = input.Run(ctx, pub)
-			switch tc.expectedError {
-			case "":
-				assert.NoError(t, err)
-			default:
-				// retryable client errors use dynamic method / host / port in the message
-				// and no custom type. There is no other easy way to test for a specific one
-				assert.Contains(t, err.Error(), tc.expectedError)
-			}
+			var g errgroup.Group
+			g.Go(func() error { return input.Run(ctx, pub) })
 
-			assert.Equal(t, len(tc.expected), len(pub.Channel))
-			for _, e := range tc.expected {
-				got := pub.ReceiveEvent()
+			timeout := time.NewTimer(5 * time.Second)
+			t.Cleanup(func() { _ = timeout.Stop() })
 
-				val, err := got.Fields.GetValue("message")
-				assert.NoError(t, err)
-				assert.JSONEq(t, e, val.(string))
+			var receivedCount int
+		wait:
+			for {
+				select {
+				case <-timeout.C:
+					t.Errorf("timed out waiting for %d events", len(tc.expected))
+					return
+				case got := <-pub.Channel:
+					val, err := got.Fields.GetValue("message")
+					assert.NoError(t, err)
+					assert.JSONEq(t, tc.expected[receivedCount], val.(string))
+					receivedCount += 1
+					if receivedCount == len(tc.expected) {
+						cancel()
+						break wait
+					}
+				}
 			}
+			assert.NoError(t, g.Wait())
 		})
+	}
+}
+
+func TestLoopBreaksOnIrrecoverableFailure(t *testing.T) {
+	baseConfig := map[string]interface{}{
+		"http_method":        "GET",
+		"interval":           "100ms",
+		"retry.max_attempts": 1,
+	}
+
+	expected := `{"hello":"world"}`
+
+	setupServer := newTestServer(httptest.NewServer)
+
+	setupServer(t, failAfterFirstAttemptHandler(), baseConfig)
+
+	cfg := common.MustNewConfigFrom(baseConfig)
+
+	input, err := configure(cfg)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "httpjson", input.Name())
+	assert.NoError(t, input.Test(v2.TestContext{}))
+
+	pub := beattest.NewChanClient(len(expected))
+	t.Cleanup(func() { _ = pub.Close() })
+
+	ctx, cancel := newV2Context()
+	t.Cleanup(cancel)
+
+	if err := input.Run(ctx, pub); assert.Error(t, err) {
+		// retryable client errors use dynamic method / host / port in the message
+		// and no custom type. There is no other easy way to test for a specific one
+		assert.Contains(t, err.Error(), "giving up after 2 attempts")
+	}
+
+	if assert.Equal(t, 1, len(pub.Channel)) {
+		got := pub.ReceiveEvent()
+		val, err := got.Fields.GetValue("message")
+		assert.NoError(t, err)
+		assert.JSONEq(t, expected, val.(string))
 	}
 }
 
@@ -282,13 +315,8 @@ func newTestServer(
 	}
 }
 
-func newV2Context(d time.Duration) (v2.Context, func()) {
-	ctx, cancel := func() (context.Context, func()) {
-		if d == 0 {
-			return context.WithCancel(context.Background())
-		}
-		return context.WithTimeout(context.Background(), d)
-	}()
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
 		ID:          "test_id",
