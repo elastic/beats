@@ -53,6 +53,10 @@ The IP address of the interface the module should listen on. Also supports 0.0.0
 
 The port the module should be listening on.
 
+*`var.ssl`*::
+
+Configuration options for SSL parameters like the SSL certificate and CA to use for the HTTP(s) listener See <<configuration-ssl>> for more information.
+
 :modulename!:
 :has-dashboards!:
 
