@@ -61,3 +61,9 @@ type Settings struct {
 ```
 
 Settings used to configure the ConfigManager.
+
+#### func (Settings) IsManaged
+
+```go
+func (settings Settings) IsManaged() bool
+```
