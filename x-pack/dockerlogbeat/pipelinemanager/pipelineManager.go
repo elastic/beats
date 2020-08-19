@@ -55,10 +55,12 @@ type PipelineManager struct {
 	logDirectory string
 	// destroyLogsOnStop indicates for the client to remove log files when a container stops
 	destroyLogsOnStop bool
+	// hostname of the docker host
+	hostname string
 }
 
 // NewPipelineManager creates a new Pipeline map
-func NewPipelineManager(logDestroy bool) *PipelineManager {
+func NewPipelineManager(logDestroy bool, hostname string) *PipelineManager {
 	return &PipelineManager{
 		Logger:            logp.NewLogger("PipelineManager"),
 		pipelines:         make(map[uint64]*Pipeline),
@@ -66,6 +68,7 @@ func NewPipelineManager(logDestroy bool) *PipelineManager {
 		clientLogger:      make(map[string]logger.Logger),
 		logDirectory:      "/var/log/docker/containers",
 		destroyLogsOnStop: logDestroy,
+		hostname:          hostname,
 	}
 }
 
@@ -102,7 +105,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating config hash")
 	}
-	pipeline, err := pm.getOrCreatePipeline(containerConfig, file, hashstring)
+	pipeline, err := pm.getOrCreatePipeline(containerConfig, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
@@ -135,7 +138,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog)
+	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}
@@ -198,7 +201,7 @@ func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config log
 
 // checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
 // It will either return a new pipeline, or an existing one from the pipeline map
-func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, file string, hash uint64) (*Pipeline, error) {
+func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, hash uint64) (*Pipeline, error) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
@@ -206,7 +209,7 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 	var err error
 	pipeline, test := pm.pipelines[hash]
 	if !test {
-		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
+		pipeline, err = loadNewPipeline(logOptsConfig, pm.hostname, pm.Logger)
 		if err != nil {
 			return nil, errors.Wrap(err, "error loading pipeline")
 		}

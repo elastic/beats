@@ -2,14 +2,13 @@ import re
 import sys
 import os
 import unittest
-from elasticsearch import Elasticsearch, TransportError, client
-from parameterized import parameterized
-from nose.plugins.skip import SkipTest
 import urllib.request
 import urllib.error
 import urllib.parse
 import json
 import semver
+from elasticsearch import Elasticsearch, TransportError, client
+from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
@@ -24,7 +23,7 @@ class Test(metricbeat.BaseTest):
     def setUp(self):
         super(Test, self).setUp()
         self.es = Elasticsearch(self.get_hosts())
-        self.ml_es = client.xpack.ml.MlClient(self.es)
+        self.ml_es = client.ml.MlClient(self.es)
 
         es_version = self.get_version()
         if es_version["major"] < 7:
@@ -317,10 +316,12 @@ class Test(metricbeat.BaseTest):
 
     def check_skip(self, metricset):
         if metricset == 'ccr' and not self.is_ccr_available():
-            raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
         if metricset == 'enrich' and not self.is_enrich_available():
-            raise SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
+            raise unittest.SkipTest(
+                "elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
 
     def is_ccr_available(self):
         es_version = self.get_version()

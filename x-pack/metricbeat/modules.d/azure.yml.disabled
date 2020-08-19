@@ -112,3 +112,5 @@
 #  period: 300s
 #  application_id: ''
 #  api_key: ''
+#  metrics:
+#   - id: ["requests/count", "requests/duration"]
