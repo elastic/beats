@@ -3,76 +3,76 @@
     "azure": {
         "compute_vm": {
             "cpu_credits_consumed": {
-                "avg": 0.07
+                "avg": 0.01
             },
             "cpu_credits_remaining": {
-                "avg": 576
+                "avg": 288
             },
             "disk_read_bytes": {
-                "total": 4863478.41
+                "total": 4019543.24
             },
             "disk_read_operations_per_sec": {
-                "avg": 0.1
+                "avg": 0.0605
             },
             "disk_write_bytes": {
-                "total": 12664679.24
+                "total": 16739967.27
             },
             "disk_write_operations_per_sec": {
-                "avg": 1.8094999999999999
+                "avg": 1.9525
             },
             "inbound_flows": {
-                "avg": 257
+                "avg": 31
             },
             "inbound_flows_maximum_creation_rate": {
-                "avg": 4
+                "avg": 0.8
             },
             "network_in": {
-                "total": 1268082
+                "total": 1501534
             },
             "network_in_total": {
-                "total": 1463307
+                "total": 1806936
             },
             "network_out": {
-                "total": 876498
+                "total": 1647640
             },
             "network_out_total": {
-                "total": 1517541
+                "total": 3633130
             },
             "os_disk_queue_depth": {
-                "avg": 0.002
+                "avg": 0
             },
             "os_disk_read_bytes_per_sec": {
-                "avg": 16211.591
+                "avg": 13398.475
             },
             "os_disk_read_operations_per_sec": {
-                "avg": 0.2
+                "avg": 0.121
             },
             "os_disk_write_bytes_per_sec": {
-                "avg": 42215.592
+                "avg": 55799.886
             },
             "os_disk_write_operations_per_sec": {
-                "avg": 3.6189999999999998
+                "avg": 3.905
             },
             "os_per_disk_qd": {
-                "avg": 0.002
+                "avg": 0
             },
             "os_per_disk_read_bytes_per_sec": {
-                "avg": 16211.591
+                "avg": 13398.475
             },
             "os_per_disk_read_operations_per_sec": {
-                "avg": 0.2
+                "avg": 0.121
             },
             "os_per_disk_write_bytes_per_sec": {
-                "avg": 42215.592
+                "avg": 55799.886
             },
             "os_per_disk_write_operations_per_sec": {
-                "avg": 3.6189999999999998
+                "avg": 3.905
             },
             "outbound_flows": {
-                "avg": 257
+                "avg": 31
             },
             "outbound_flows_maximum_creation_rate": {
-                "avg": 4
+                "avg": 0.8
             },
             "per_disk_qd": {
                 "avg": 0
@@ -90,7 +90,13 @@
                 "avg": 0
             },
             "percentage_cpu": {
-                "avg": 3.901
+                "avg": 1.585
+            },
+            "premium_os_disk_cache_read_hit": {
+                "avg": 100
+            },
+            "premium_os_disk_cache_read_miss": {
+                "avg": 0
             }
         },
         "namespace": "Microsoft.Compute/virtualMachines",
@@ -103,11 +109,11 @@
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/test1067",
-            "name": "test1067"
+            "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
+            "name": "perfmon-test"
         },
         "machine": {
-            "type": "Standard_B2s"
+            "type": "Standard_B1ms"
         },
         "provider": "azure",
         "region": "westeurope"
@@ -119,26 +125,26 @@
     },
     "host": {
         "cpu": {
-            "pct": 3.901
+            "pct": 0.01585
         },
         "disk": {
             "read": {
-                "bytes": 4863478.41
+                "bytes": 4019543.24
             },
             "write": {
-                "bytes": 12664679.24
+                "bytes": 16739967.27
             }
         },
-        "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/test1067",
-        "name": "test1067",
+        "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
+        "name": "perfmon-test",
         "network": {
             "in": {
-                "bytes": 1463307,
-                "packets": 1517541
+                "bytes": 1806936,
+                "packets": 1501534
             },
             "out": {
-                "bytes": 1268082,
-                "packets": 876498
+                "bytes": 3633130,
+                "packets": 1647640
             }
         }
     },

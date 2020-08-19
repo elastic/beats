@@ -238,8 +238,8 @@ func addHostFields(event mb.Event, metricList common.MapStr) mb.Event {
 	hostFieldTable := map[string]string{
 		"percentage_cpu.avg":      "host.cpu.pct",
 		"network_in_total.total":  "host.network.in.bytes",
-		"network_in.total":        "host.network.out.bytes",
-		"network_out_total.total": "host.network.in.packets",
+		"network_in.total":        "host.network.in.packets",
+		"network_out_total.total": "host.network.out.bytes",
 		"network_out.total":       "host.network.out.packets",
 		"disk_read_bytes.total":   "host.disk.read.bytes",
 		"disk_write_bytes.total":  "host.disk.write.bytes",
@@ -247,8 +247,15 @@ func addHostFields(event mb.Event, metricList common.MapStr) mb.Event {
 
 	for metricName, hostName := range hostFieldTable {
 		metricValue, err := metricList.GetValue(metricName)
-		if err == nil {
-			event.RootFields.Put(hostName, metricValue)
+		if err != nil {
+			continue
+		}
+
+		if value, ok := metricValue.(float64); ok {
+			if metricName == "percentage_cpu.avg" {
+				value = value / 100
+			}
+			event.RootFields.Put(hostName, value)
 		}
 	}
 	return event
