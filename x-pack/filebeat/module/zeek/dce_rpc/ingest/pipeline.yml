@@ -15,6 +15,7 @@ processors:
 - append:
     field: related.ip
     value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
 - geoip:
     field: source.ip
     target_field: source.geo
@@ -37,6 +38,7 @@ processors:
 - append:
     field: related.ip
     value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
 - geoip:
     field: destination.ip
     target_field: destination.geo
