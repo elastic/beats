@@ -17,7 +17,7 @@ type dateCursor struct {
 	log             *logp.Logger
 	enabled         bool
 	field           string
-	url             string
+	url             url.URL
 	urlField        string
 	initialInterval time.Duration
 	dateFormat      string
@@ -29,7 +29,7 @@ type dateCursor struct {
 func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 	c := &dateCursor{
 		enabled: config.DateCursor.IsEnabled(),
-		url:     config.URL,
+		url:     *config.URL.URL,
 	}
 
 	if !c.enabled {
@@ -38,7 +38,6 @@ func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 
 	c.log = log
 	c.field = config.DateCursor.Field
-	c.url = config.URL
 	c.urlField = config.DateCursor.URLField
 	c.initialInterval = config.DateCursor.InitialInterval
 	c.dateFormat = config.DateCursor.GetDateFormat()
@@ -49,7 +48,7 @@ func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 
 func (c *dateCursor) getURL() string {
 	if !c.enabled {
-		return c.url
+		return c.url.String()
 	}
 
 	var dateStr string
@@ -60,12 +59,7 @@ func (c *dateCursor) getURL() string {
 		dateStr = c.value
 	}
 
-	url, err := url.Parse(c.url)
-	if err != nil {
-		return c.url
-	}
-
-	q := url.Query()
+	q := c.url.Query()
 
 	var value string
 	if c.valueTpl == nil {
@@ -73,16 +67,16 @@ func (c *dateCursor) getURL() string {
 	} else {
 		buf := new(bytes.Buffer)
 		if err := c.valueTpl.Template.Execute(buf, dateStr); err != nil {
-			return c.url
+			return c.url.String()
 		}
 		value = buf.String()
 	}
 
 	q.Set(c.urlField, value)
 
-	url.RawQuery = q.Encode()
+	c.url.RawQuery = q.Encode()
 
-	return url.String()
+	return c.url.String()
 }
 
 func (c *dateCursor) advance(m common.MapStr) {

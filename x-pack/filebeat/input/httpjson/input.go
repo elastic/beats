@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -107,23 +106,18 @@ func newHTTPJSONInput(config config) (*httpJSONInput, error) {
 func (*httpJSONInput) Name() string { return inputName }
 
 func (in *httpJSONInput) Test(v2.TestContext) error {
-	url, err := url.Parse(in.config.URL)
-	if err != nil {
-		return err
-	}
-
 	port := func() string {
-		if url.Port() != "" {
-			return url.Port()
+		if in.config.URL.Port() != "" {
+			return in.config.URL.Port()
 		}
-		switch url.Scheme {
+		switch in.config.URL.Scheme {
 		case "https":
 			return "443"
 		}
 		return "80"
 	}()
 
-	_, err = net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(in.config.URL.Hostname(), port), time.Second)
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", in.config.URL)
 	}

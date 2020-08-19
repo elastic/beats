@@ -178,6 +178,7 @@ func TestHTTPJSONInput(t *testing.T) {
 			expected: []string{
 				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
 		},
 		{
@@ -453,6 +454,13 @@ func dateCursorHandler() http.HandlerFunc {
 				return
 			}
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`))
+		case 2:
+			if r.URL.Query().Get("$filter") != "alertCreationTime ge 2002-10-02T15:00:01Z" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong cursor value"`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`))
 		}
 		count += 1
 	}

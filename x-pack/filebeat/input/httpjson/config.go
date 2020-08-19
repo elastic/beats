@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"net/url"
 	"regexp"
 	"strings"
 	"text/template"
@@ -35,7 +36,7 @@ type config struct {
 	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
-	URL                  string            `config:"url" validate:"required"`
+	URL                  *URL              `config:"url" validate:"required"`
 	DateCursor           *DateCursor       `config:"date_cursor"`
 }
 
@@ -88,6 +89,21 @@ func (t *Template) Unpack(in string) error {
 	}
 
 	*t = Template{Template: tpl}
+
+	return nil
+}
+
+type URL struct {
+	*url.URL
+}
+
+func (u *URL) Unpack(in string) error {
+	parsed, err := url.Parse(in)
+	if err != nil {
+		return err
+	}
+
+	*u = URL{URL: parsed}
 
 	return nil
 }
