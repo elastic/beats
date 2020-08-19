@@ -8,11 +8,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/pkg/errors"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -98,11 +97,11 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 			func(ctx context.Context) (*http.Response, error) {
 				req, err := r.createHTTPRequest(ctx, ri)
 				if err != nil {
-					return nil, errors.Wrapf(err, "failed to create http request")
+					return nil, fmt.Errorf("failed to create http request: %w", err)
 				}
 				msg, err := r.client.Do(req)
 				if err != nil {
-					return nil, errors.Wrapf(err, "failed to execute http client.Do")
+					return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 				}
 				return msg, nil
 			},
@@ -113,13 +112,13 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 
 		responseData, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read http response")
+			return fmt.Errorf("failed to read http response: %w", err)
 		}
 		_ = resp.Body.Close()
 
 		if err = json.Unmarshal(responseData, &m); err != nil {
 			r.log.Debug("failed to unmarshal http.response.body", string(responseData))
-			return errors.Wrapf(err, "failed to unmarshal http.response.body %q", string(responseData))
+			return fmt.Errorf("failed to unmarshal http.response.body: %w", err)
 		}
 
 		switch obj := m.(type) {
@@ -151,12 +150,12 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 						return err
 					}
 				default:
-					return errors.Errorf("content of %s is not a valid array", r.jsonObjects)
+					return fmt.Errorf("content of %s is not a valid array", r.jsonObjects)
 				}
 			}
 		default:
 			r.log.Debug("http.response.body is not a valid JSON object", string(responseData))
-			return errors.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
+			return fmt.Errorf("http.response.body is not a valid JSON object, but a %T", obj)
 		}
 
 		ri, hasNext, err = r.pagination.nextRequestInfo(ri, response, lastObj)
@@ -219,12 +218,12 @@ func (r *requester) processEventArray(publisher stateless.Publisher, events []in
 				last = e
 				d, err := json.Marshal(e)
 				if err != nil {
-					return nil, errors.Wrapf(err, "failed to marshal %+v", e)
+					return nil, fmt.Errorf("failed to marshal %+v: %w", e, err)
 				}
 				publisher.Publish(makeEvent(string(d)))
 			}
 		default:
-			return nil, errors.Errorf("expected only JSON objects in the array but got a %T", v)
+			return nil, fmt.Errorf("expected only JSON objects in the array but got a %T", v)
 		}
 	}
 	return last, nil

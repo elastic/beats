@@ -6,11 +6,10 @@ package httpjson
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -45,7 +44,7 @@ func (r *rateLimiter) execute(ctx context.Context, f func(context.Context) (*htt
 
 		header := resp.Header
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read http.response.body")
+			return nil, fmt.Errorf("failed to read http.response.body: %w", err)
 		}
 
 		if r == nil || resp.StatusCode == http.StatusOK {
@@ -53,7 +52,7 @@ func (r *rateLimiter) execute(ctx context.Context, f func(context.Context) (*htt
 		}
 
 		if resp.StatusCode != http.StatusTooManyRequests {
-			return nil, errors.Errorf("http request was unsuccessful with a status code %d", resp.StatusCode)
+			return nil, fmt.Errorf("http request was unsuccessful with a status code %d", resp.StatusCode)
 		}
 
 		if err := r.applyRateLimit(ctx, header); err != nil {
@@ -104,11 +103,11 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 
 	remaining := header.Get(r.remaining)
 	if remaining == "" {
-		return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", r.remaining)
+		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.remaining)
 	}
 	m, err := strconv.ParseInt(remaining, 10, 64)
 	if err != nil {
-		return 0, errors.Wrapf(err, "failed to parse rate-limit remaining value")
+		return 0, fmt.Errorf("failed to parse rate-limit remaining value: %w", err)
 	}
 
 	if m != 0 {
@@ -117,11 +116,11 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 
 	reset := header.Get(r.reset)
 	if reset == "" {
-		return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", r.reset)
+		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.reset)
 	}
 	epoch, err := strconv.ParseInt(reset, 10, 64)
 	if err != nil {
-		return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
+		return 0, fmt.Errorf("failed to parse rate-limit reset value: %w", err)
 	}
 	if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
 		return 0, nil

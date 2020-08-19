@@ -6,11 +6,11 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/google"
 

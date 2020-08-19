@@ -5,12 +5,11 @@
 package httpjson
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -48,7 +47,7 @@ func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj
 		// Pagination control using HTTP Body fields
 		if err = p.setRequestInfoFromBody(response.body, lastObj, ri); err != nil {
 			// if the field is not found, there is no next page
-			if errors.Cause(err) == common.ErrKeyNotFound {
+			if errors.Is(err, common.ErrKeyNotFound) {
 				return ri, false, nil
 			}
 			return ri, false, err
@@ -60,7 +59,7 @@ func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj
 	// Pagination control using HTTP Header
 	url, err := getNextLinkFromHeader(response.header, p.header.FieldName, p.header.RegexPattern)
 	if err != nil {
-		return ri, false, errors.Wrapf(err, "failed to retrieve the next URL for pagination")
+		return ri, false, fmt.Errorf("failed to retrieve the next URL for pagination: %w", err)
 	}
 	if ri.url == url || url == "" {
 		return ri, false, nil
@@ -75,7 +74,7 @@ func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj
 func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Regexp) (string, error) {
 	links, ok := header[fieldName]
 	if !ok {
-		return "", errors.Errorf("field %s does not exist in the HTTP Header", fieldName)
+		return "", fmt.Errorf("field %s does not exist in the HTTP Header", fieldName)
 	}
 	for _, link := range links {
 		matchArray := re.FindAllStringSubmatch(link, -1)
@@ -95,11 +94,11 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 	}
 
 	if err != nil {
-		return errors.Wrapf(err, "failed to retrieve id_field for pagination")
+		return fmt.Errorf("failed to retrieve id_field for pagination: %w", err)
 	}
 
 	if p.requestField != "" {
-		ri.contentMap.Put(p.requestField, v)
+		_, _ = ri.contentMap.Put(p.requestField, v)
 		if p.url != "" {
 			ri.url = p.url
 		}
