@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"io"
 	"os/exec"
+	"os/user"
 )
 
 func init() {
@@ -19,12 +20,15 @@ func init() {
 	monitors.RegisterActive("synthetic/script", create)
 }
 
-type synthproxyReq struct {
-	ScriptParams map[string]interface{} `json:"script_params"`
-	Script string `json:"script"`
-}
-
 func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {
+	curUser, err := user.Current()
+	if err != nil {
+		return nil, 0, fmt.Errorf("could not determine current user for script monitor %w: ", err)
+	}
+	if curUser.Uid == "0" {
+		return nil, 0, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
+	}
+
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -39,8 +43,6 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			"--stdin",
 			"--json",
 		)
-
-		logp.Warn("EXEC %s",cmd.String())
 
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
@@ -103,6 +105,7 @@ func decodePipe(pipe io.ReadCloser) []map[string]interface{} {
 			decoded = map[string]interface{}{"message": string(line)}
 		}
 
+		logp.Warn("> %s", string(line))
 		results = append(results, decoded)
 	}
 
