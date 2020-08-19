@@ -142,7 +142,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add text and flattened versions of fields with unknown subfields in AWS cloudtrail fileset. {issue}18866[18866] {pull}19121[19121]
 - Add Microsoft Defender ATP Module. {issue}17997[17997] {pull}19197[19197]
 - Add initial support for configurable file identity tracking. {pull}18748[18748]
-- Add experimental dataset tomcat/log for Apache TomCat logs. {pull}19713[19713]
+- Add experimental dataset tomcat/log for Apache Tomcat logs. {pull}19713[19713]
 - Add experimental dataset netscout/sightline for Netscout Arbor Sightline logs. {pull}19713[19713]
 - Add experimental dataset barracuda/waf for Barracuda Web Application Firewall logs. {pull}19713[19713]
 - Add experimental dataset f5/bigipapm for F5 Big-IP Access Policy Manager logs. {pull}19713[19713]
