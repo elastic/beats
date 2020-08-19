@@ -9,6 +9,7 @@ username: {{ .username }}
 username: {{ .password }}
 content_type: "{{ .content_type }}"
 secret: {{ .secret | tojson }}
+ssl: {{ .ssl | tojson }}
 
 {{ else if eq .input "file" }}
 
