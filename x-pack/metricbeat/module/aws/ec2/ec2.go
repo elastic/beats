@@ -204,6 +204,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					// add cloud.instance.name and host.name into ec2 events
 					if *tag.Key == "Name" {
 						events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
+						events[instanceID].RootFields.Put("host.name", *tag.Value)
 					}
 				}
 
@@ -269,6 +270,10 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
+			// add host cpu/network/disk fields and host.id
+			hostFields := addHostFields(resultMetricsetFields, events[instanceID].RootFields, instanceID)
+			events[instanceID].RootFields.Update(hostFields)
+
 			// add rate metrics
 			calculateRate(resultMetricsetFields, monitoringStates[instanceID])
 
@@ -307,6 +312,40 @@ func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) 
 			resultMetricsetFields.Put(metricName+"_per_sec", rateValue)
 		}
 	}
+}
+
+func addHostFields(resultMetricsetFields common.MapStr, rootFields common.MapStr, instanceID string) common.MapStr {
+	hostRootFields := common.MapStr{}
+	hostRootFields.Put("host.id", instanceID)
+
+	// If there is no instance name, use instance ID as the host.name
+	hostName, err := rootFields.GetValue("host.name")
+	if err == nil && hostName != nil {
+		hostRootFields.Put("host.name", hostName)
+	} else {
+		hostRootFields.Put("host.name", instanceID)
+	}
+
+	hostFieldTable := map[string]string{
+		"cpu.total.pct":       "host.cpu.pct",
+		"network.in.bytes":    "host.network.in.bytes",
+		"network.out.bytes":   "host.network.out.bytes",
+		"network.in.packets":  "host.network.in.packets",
+		"network.out.packets": "host.network.out.packets",
+		"diskio.read.bytes":   "host.disk.read.bytes",
+		"diskio.write.bytes":  "host.disk.write.bytes",
+	}
+
+	for ec2MetricName, hostMetricName := range hostFieldTable {
+		metricValue, err := resultMetricsetFields.GetValue(ec2MetricName)
+		if ec2MetricName == "cpu.total.pct" {
+			metricValue = metricValue.(float64) / 100
+		}
+		if err == nil && metricValue != nil {
+			hostRootFields.Put(hostMetricName, metricValue)
+		}
+	}
+	return hostRootFields
 }
 
 func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
