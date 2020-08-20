@@ -197,7 +197,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
-				label := convertLabel(*output.Label)
+				label, err := newLabelFromJSON(*output.Label)
+				if err != nil {
+					m.logger.Errorf("convert cloudwatch MetricDataResult label failed for label = %s: %w", *output.Label, err)
+					continue
+				}
+
 				instanceID := label.InstanceID
 				statistic := label.Statistic
 
@@ -407,7 +412,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 	for _, dim := range metricDims {
 		if *dim.Name == "InstanceId" && *dim.Value == instanceID {
 			metricName := *metric.MetricName
-			label := constructLabel(instanceID, metricName, statistic)
+			label := newLabel(instanceID, metricName, statistic).JSON()
 			metricDataQuery = cloudwatch.MetricDataQuery{
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{
@@ -423,18 +428,22 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 	return
 }
 
-func constructLabel(instanceID string, metricName string, statistic string) string {
-	constructedLabel := &label{InstanceID: instanceID, MetricName: metricName, Statistic: statistic}
-	out, err := json.Marshal(constructedLabel)
-	if err == nil {
-		test := string(out)
-		return test
-	}
-	return ""
+func newLabel(instanceID string, metricName string, statistic string) *label {
+	return &label{InstanceID: instanceID, MetricName: metricName, Statistic: statistic}
 }
 
-func convertLabel(labelStr string) label {
-	labelStruct := &label{}
-	json.Unmarshal([]byte(labelStr), labelStruct)
-	return *labelStruct
+// JSON is a method of label object for converting label to string
+func (l *label) JSON() string {
+	// Ignore error, this cannot fail
+	out, _ := json.Marshal(l)
+	return string(out)
+}
+
+func newLabelFromJSON(labelJSON string) (label, error) {
+	labelStruct := label{}
+	err := json.Unmarshal([]byte(labelJSON), &labelStruct)
+	if err != nil {
+		return labelStruct, fmt.Errorf("json.Unmarshal failed: %w", err)
+	}
+	return labelStruct, nil
 }

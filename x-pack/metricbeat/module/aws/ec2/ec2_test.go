@@ -36,19 +36,19 @@ var (
 
 	id1         = "cpu1"
 	metricName1 = "CPUUtilization"
-	label1      = constructLabel(instanceID, metricName1, statistic)
+	label1      = newLabel(instanceID, metricName1, statistic).JSON()
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = constructLabel(instanceID, metricName2, statistic)
+	label2      = newLabel(instanceID, metricName2, statistic).JSON()
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = constructLabel(instanceID, metricName3, statistic)
+	label3      = newLabel(instanceID, metricName3, statistic).JSON()
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = constructLabel(instanceID, metricName4, statistic)
+	label4      = newLabel(instanceID, metricName4, statistic).JSON()
 )
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
@@ -537,17 +537,18 @@ func TestCreateCloudWatchEventsWithInstanceName(t *testing.T) {
 	assert.Equal(t, "test-instance", instanceName)
 }
 
-func TestConstructLabel(t *testing.T) {
+func TestNewLabel(t *testing.T) {
 	instanceID := "i-123"
 	metricName := "CPUUtilization"
 	statistic := "Average"
-	label := constructLabel(instanceID, metricName, statistic)
+	label := newLabel(instanceID, metricName, statistic).JSON()
 	assert.Equal(t, "{\"InstanceID\":\"i-123\",\"MetricName\":\"CPUUtilization\",\"Statistic\":\"Average\"}", label)
 }
 
 func TestConvertLabel(t *testing.T) {
 	labelStr := "{\"InstanceID\":\"i-123\",\"MetricName\":\"CPUUtilization\",\"Statistic\":\"Average\"}"
-	label := convertLabel(labelStr)
+	label, err := newLabelFromJSON(labelStr)
+	assert.NoError(t, err)
 	assert.Equal(t, "i-123", label.InstanceID)
 	assert.Equal(t, "CPUUtilization", label.MetricName)
 	assert.Equal(t, "Average", label.Statistic)
