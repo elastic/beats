@@ -235,14 +235,14 @@ The list of known Logstash servers to connect to. If load balancing is disabled,
 multiple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
-All entries in this list can contain a port number. The default port number 5044 will be used, if no number is given.
+All entries in this list can contain a port number. The default port number 5044 will be used if no number is given.
 
 ===== `compression_level`
 
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
 
-Increasing the compression level will reduce the network usage but will increase the cpu usage.
+Increasing the compression level will reduce the network usage but will increase the CPU usage.
 
 The default value is 3.
 
@@ -288,7 +288,7 @@ NOTE: The "ttl" option is not yet supported on an async Logstash client (one wit
 
 ===== `pipelining`
 
-Configures number of batches to be sent asynchronously to logstash while waiting
+Configures the number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a value of 0 is
 configured. The default value is 2.
@@ -317,7 +317,7 @@ output.logstash:
 ===== `proxy_use_local_resolver`
 
 The `proxy_use_local_resolver` option determines if Logstash hostnames are
-resolved locally when using a proxy. The default value is false which means
+resolved locally when using a proxy. The default value is false, which means
 that when a proxy is used the name resolution occurs on the proxy server.
 
 [[logstash-index]]
@@ -375,9 +375,9 @@ number of events to be contained in a batch.
 
 ===== `slow_start`
 
-If enabled only a subset of events in a batch of events is transferred per transaction.
+If enabled, only a subset of events in a batch of events is transferred per transaction.
 The number of events to be sent increases up to `bulk_max_size` if no error is encountered.
-On error the number of events per transaction is reduced again.
+On error, the number of events per transaction is reduced again.
 
 The default is `false`.
 
