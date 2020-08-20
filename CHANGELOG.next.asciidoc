@@ -649,6 +649,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 - Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 
 *Packetbeat*
 
