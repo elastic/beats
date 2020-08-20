@@ -47,7 +47,6 @@ func OpenBucket(name string) (Bucket, error) {
 }
 
 // Datastore
-
 type Datastore interface {
 	OpenBucket(name string) (Bucket, error)
 }
@@ -60,10 +59,12 @@ type boltDatastore struct {
 	db       *bolt.DB
 }
 
+// New creates a new datastore that can be used to open buckets
 func New(path string, mode os.FileMode) Datastore {
 	return &boltDatastore{path: path, mode: mode}
 }
 
+// OpenBucket opens a connection to a bucket
 func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 	ds.mutex.Lock()
 	defer ds.mutex.Unlock()
@@ -76,6 +77,7 @@ func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 			return nil, err
 		}
 	}
+	ds.useCount++
 
 	// Ensure the name exists.
 	err := ds.db.Update(func(tx *bolt.Tx) error {
@@ -83,6 +85,7 @@ func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 		return err
 	})
 	if err != nil {
+		ds.done()
 		return nil, err
 	}
 
@@ -90,9 +93,6 @@ func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 }
 
 func (ds *boltDatastore) done() {
-	ds.mutex.Lock()
-	defer ds.mutex.Unlock()
-
 	if ds.useCount > 0 {
 		ds.useCount--
 
@@ -104,7 +104,6 @@ func (ds *boltDatastore) done() {
 }
 
 // Bucket
-
 type Bucket interface {
 	io.Closer
 	Load(key string, f func(blob []byte) error) error
@@ -185,7 +184,10 @@ func (b *boltBucket) Update(f func(*bolt.Bucket) error) error {
 }
 
 func (b *boltBucket) Close() error {
+	b.ds.mutex.Lock()
 	b.ds.done()
+	b.ds.mutex.Unlock()
+
 	b.ds = nil
 	return nil
 }
