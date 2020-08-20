@@ -196,6 +196,13 @@ func (s *store) Remove(key string) error {
 	return s.logOperation(&opRemove{K: key})
 }
 
+func (s *store) Checkpoint() error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	return s.disk.WriteCheckpoint(s.mem.table)
+}
+
 // lopOperation ensures that the diskstore reflects the recent changes to the
 // in memory store by either triggering a checkpoint operations or adding the
 // operation type to the update log file.
