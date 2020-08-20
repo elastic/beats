@@ -30,7 +30,6 @@ logstash section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-#----------------------------- Logstash output --------------------------------
 output.logstash:
   hosts: ["127.0.0.1:5044"]
 ------------------------------------------------------------------------------
@@ -71,6 +70,9 @@ for more about the `@metadata` field.
 <2> The default is {beat_default_index_prefix}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
 <3> The current version of {beatname_uc}.
+
+You can access this metadata from within the Logstash config file to set values
+dynamically based on the contents of the metadata.
 endif::[]
 
 ifdef::apm-server[]
@@ -93,16 +95,16 @@ for more about the `@metadata` field.
 <3> The default pipeline configuration: `apm`. Additional pipelines can be enabled
 with a {logstash-ref}/use-ingest-pipelines.html[Logstash pipeline config].
 <4> The current version of {beatname_uc}.
+
+In addition to metadata, {beatname_uc} provides the `processor.event` field, which
+can be used to separate {apm-overview-ref-v}/apm-data-model.html[event types] into different indices.
 endif::[]
 
-You can access this metadata from within the Logstash config file to set values
-dynamically based on the contents of the metadata.
-
+ifndef::apm-server[]
 For example, the following Logstash configuration file tells
 Logstash to use the index reported by {beatname_uc} for indexing events
 into Elasticsearch:
 
-ifndef::apm-server[]
 [source,logstash]
 ------------------------------------------------------------------------------
 
@@ -126,6 +128,10 @@ the Beat's version. For example:
 endif::[]
 
 ifdef::apm-server[]
+For example, the following Logstash configuration file tells
+Logstash to use the index and event types reported by {beatname_uc} for indexing events
+into Elasticsearch:
+
 [source,logstash]
 ------
 input {
@@ -156,7 +162,7 @@ output {
 }
 ------
 <1> Creates a new field named `@metadata.index`.
-`%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field.
+`%{[@metadata][beat]}` sets the first part of the index name to the value of the `metadata.beat` field.
 `%{[@metadata][version]}` sets the second part to {beatname_uc}'s version.
 `%{[processor][event]}` sets the final part based on the APM event type.
 For example: +{beat_default_index_prefix}-{version}-sourcemap+.
@@ -188,10 +194,15 @@ input {
 output {
     elasticsearch {
         hosts => ["http://localhost:9200"]
-        index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}"
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}" <1>
     }
 }
 ------
+<1> Outputs documents to an index:
+`%{[@metadata][beat]}` sets the first part of the index name to the value of the `metadata.beat` field.
+`%{[@metadata][version]}` sets the second part to {beatname_uc}'s version.
+`%{[processor][event]}` sets the final part based on the APM event type.
+For example: +{beat_default_index_prefix}-{version}-sourcemap+.
 endif::[]
 
 ==== Compatibility
