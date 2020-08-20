@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/beatsout"
 	"github.com/elastic/beats/v7/x-pack/club/internal/publishing"
 	"github.com/elastic/go-concert/unison"
 )
@@ -30,6 +29,11 @@ type pipelinePublishing struct {
 	processorFactory processing.Supporter
 	out              publishing.Publisher
 	events           *eventTracker
+}
+
+type output struct {
+	configHash string
+	output     publishing.Output
 }
 
 type client struct {
@@ -73,7 +77,7 @@ type eventContext struct {
 	status []publishing.EventStatus
 }
 
-func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config) (*pipelinePublishing, error) {
+func createPublishPipeline(log *logp.Logger, info beat.Info, output output) (*pipelinePublishing, error) {
 	processorFactory, err := processorsSupport(info, log, emptyConfig)
 	if err != nil {
 		// We configure the processor using a static config. This must never fail
@@ -82,13 +86,7 @@ func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config)
 
 	events := &eventTracker{}
 
-	outputFactory := beatsout.NewOutputFactory(info)
-	output, err := outputFactory.ConfigureOutput(log, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	out, err := output.Open(context.Background(), log, events)
+	out, err := output.output.Open(context.Background(), log, events)
 	if err != nil {
 		return nil, err
 	}

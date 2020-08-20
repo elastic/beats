@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/club/internal/cell"
+	"github.com/elastic/beats/v7/x-pack/club/internal/publishing"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -22,7 +23,8 @@ type Controller struct {
 	log  *logp.Logger
 	info beat.Info
 
-	inputLoader *inputLoader
+	inputLoader   *inputLoader
+	outputFactory publishing.OutputFactory
 
 	// processing config updates Cell[map[string]*pipelineState]
 	shouldState *cell.Cell
@@ -34,20 +36,22 @@ func NewController(
 	log *logp.Logger,
 	info beat.Info,
 	inputsRegistry v2.Registry,
+	outputFactory publishing.OutputFactory,
 	settings Settings,
 ) (*Controller, error) {
 	inputLoader := newInputLoader(log, inputsRegistry)
 
-	state, err := makePipelineStates(inputLoader, settings)
+	state, err := makePipelineStates(log, inputLoader, outputFactory, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Controller{
-		log:         log,
-		info:        info,
-		inputLoader: inputLoader,
-		shouldState: cell.NewCell(state),
+		log:           log,
+		info:          info,
+		inputLoader:   inputLoader,
+		outputFactory: outputFactory,
+		shouldState:   cell.NewCell(state),
 	}, nil
 }
 
@@ -163,7 +167,7 @@ func (pm *Controller) UpdateConfig(settings Settings) error {
 		return err
 	}
 
-	state, err := makePipelineStates(pm.inputLoader, settings)
+	state, err := makePipelineStates(pm.log, pm.inputLoader, pm.outputFactory, settings)
 	if err != nil {
 		return err
 	}
@@ -172,7 +176,13 @@ func (pm *Controller) UpdateConfig(settings Settings) error {
 	return nil
 }
 
-func makePipelineStates(loader *inputLoader, settings Settings) (map[string]*pipelineState, error) {
+func makePipelineStates(log *logp.Logger, loader *inputLoader, outFactory publishing.OutputFactory, settings Settings) (map[string]*pipelineState, error) {
+	// TODO: we might find quite a few errors here. Maybe better collect errors
+	// such that per input/output errors can be better associated with the
+	// configuration in Integration Manager or standalone Agent.
+
+	// XXX: right now we bail out on any error. Do we want to be able to run with a partial complete configuration?
+
 	var inputs []*input
 	for _, config := range settings.Inputs {
 		tmp, err := loader.Configure(config)
@@ -182,9 +192,21 @@ func makePipelineStates(loader *inputLoader, settings Settings) (map[string]*pip
 		inputs = append(inputs, tmp...)
 	}
 
-	pipelineStates := make(map[string]*pipelineState, len(settings.Outputs))
+	outputs := map[string]output{}
 	for name, outConfig := range settings.Outputs {
-		pipelineStates[name] = &pipelineState{output: outConfig}
+		out, err := outFactory.ConfigureOutput(log, outConfig)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to configure output: %w", err)
+		}
+		outputs[name] = output{
+			configHash: outConfig.Hash(),
+			output:     out,
+		}
+	}
+
+	pipelineStates := make(map[string]*pipelineState, len(outputs))
+	for name, output := range outputs {
+		pipelineStates[name] = &pipelineState{output: output}
 	}
 
 	for _, input := range inputs {

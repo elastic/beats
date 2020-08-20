@@ -24,7 +24,7 @@ type pipeline struct {
 
 type pipelineState struct {
 	inputs []*input
-	output *common.Config
+	output output
 }
 
 func newPipeline(
