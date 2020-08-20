@@ -28,8 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/datastore"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
