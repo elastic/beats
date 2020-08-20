@@ -21,9 +21,6 @@ include::tab-widgets/code.asciidoc[]
 [[elastic-agent-install-service-macos]]
 == Manually install {agent} as a service on macOS
 
-//REVIEWERS: I'm not including this in the tabbed panel display because I
-//don't want it to end up in the quick start.
-
 If you want {agent} to be persistent after restarts, you need to
 install and run it as a service. Improved support for running {agent} as a
 service on macOS will be available in a future release.
@@ -101,6 +98,3 @@ the agent, such as Elastic {endpoint-sec} and data shippers.
 
 . If necessary, manually kill the `elastic-agent` process and any other
 processes started by the agent. 
-
-// REVIEWERS: Is the last step ^^ actually needed? Seemed to me that it worked
-// without it.
