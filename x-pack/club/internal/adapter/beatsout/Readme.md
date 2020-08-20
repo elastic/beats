@@ -5,10 +5,8 @@
 Package beatsouts allows the reuse of existing libbeat based outputs.
 
 TODO: The packag currently wraps libbeat outputs by accessing the outputs
-registry.
-
-    It would be better to allow developers to create wrappers more selectively, such that
-    configuration rewrites are possible.
+registry. It would be better to allow developers to create wrappers more
+selectively, such that configuration rewrites are possible.
 
 ## Usage
 
