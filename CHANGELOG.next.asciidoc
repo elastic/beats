@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
+- Change network.direction values to ECS recommended values (inbound, outbound). {issue}12445[12445] {pull}20695[20695]
 
 *Filebeat*
 
@@ -247,6 +248,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
+- Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 
 *Heartbeat*
 
@@ -535,13 +537,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
-
+- Convert httpjson to v2 input {pull}20226[20226]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
 - Record HTTP response headers. {pull}18327[18327]
+- Add index and pipeline settings to monitor configurations. {pull}20610[20610]
 
 *Journalbeat*
 
@@ -647,6 +650,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 - Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
+- Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 
 *Packetbeat*
 
