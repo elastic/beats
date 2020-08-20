@@ -10,6 +10,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/beatsout"
+	"github.com/elastic/beats/v7/x-pack/club/internal/publishing"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -20,10 +22,13 @@ import (
 var processorsSupport = processing.MakeDefaultSupport(true)
 var emptyConfig = common.NewConfig()
 
-type publishing struct {
+var errEventFlitered = errors.New("event filtered out")
+
+// TODO: all/most of this to the publishing package?
+type pipelinePublishing struct {
 	log              *logp.Logger
 	processorFactory processing.Supporter
-	out              output
+	out              publishing.Publisher
 	events           *eventTracker
 }
 
@@ -37,7 +42,7 @@ type client struct {
 	events    *eventTracker
 	eventsCtx *eventContext
 
-	output    output
+	output    publishing.Publisher
 	processor beat.Processor
 	acker     beat.ACKer
 }
@@ -65,15 +70,10 @@ type eventContext struct {
 
 	// TODO: track event memory usage, so we account for overal memory usage for
 	// events in progress and events published
-	status []eventStatus
+	status []publishing.EventStatus
 }
 
-type event struct {
-	published beat.Event
-	from      client
-}
-
-func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config) (*publishing, error) {
+func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config) (*pipelinePublishing, error) {
 	processorFactory, err := processorsSupport(info, log, emptyConfig)
 	if err != nil {
 		// We configure the processor using a static config. This must never fail
@@ -82,12 +82,18 @@ func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config)
 
 	events := &eventTracker{}
 
-	out, err := createOutput(log, info, cfg, events)
+	outputFactory := beatsout.NewOutputFactory(info)
+	output, err := outputFactory.ConfigureOutput(log, cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &publishing{
+	out, err := output.Open(context.Background(), log, events)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pipelinePublishing{
 		log:              log,
 		out:              out,
 		processorFactory: processorFactory,
@@ -95,17 +101,17 @@ func createPublishPipeline(log *logp.Logger, info beat.Info, cfg *common.Config)
 	}, nil
 }
 
-func (p *publishing) Close() error {
+func (p *pipelinePublishing) Close() error {
 	err := p.out.Close()
 	p.out = nil
 	return err
 }
 
-func (p *publishing) Connect() (beat.Client, error) {
+func (p *pipelinePublishing) Connect() (beat.Client, error) {
 	return p.ConnectWith(beat.ClientConfig{})
 }
 
-func (p *publishing) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+func (p *pipelinePublishing) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	if err := validateClientConfig(&cfg); err != nil {
 		return nil, err
 	}
@@ -190,7 +196,7 @@ func (c *client) publishEvent(event beat.Event) error {
 	id := c.eventsCtx.RecordEvent()
 	err := c.output.Publish(c.mode, id, event)
 	if err != nil && err != context.Canceled {
-		c.events.EventSendStatus(id, eventFailed)
+		c.events.UpdateEventStatus(id, publishing.EventFailed)
 	}
 	return err
 }
@@ -245,7 +251,7 @@ func (t *eventTracker) release(ctx *eventContext) {
 
 }
 
-func (t *eventTracker) EventSendStatus(id eventID, status eventStatus) {
+func (t *eventTracker) UpdateEventStatus(id publishing.EventID, status publishing.EventStatus) {
 	idx := id >> 32
 	t.contextsMu.Lock()
 	ec := t.contexts[idx]
@@ -257,19 +263,19 @@ func (t *eventTracker) EventSendStatus(id eventID, status eventStatus) {
 	}
 }
 
-func (c *eventContext) RecordEvent() eventID {
+func (c *eventContext) RecordEvent() publishing.EventID {
 	c.statusMu.Lock()
 	defer c.statusMu.Unlock()
 
 	idx := len(c.status)
-	c.status = append(c.status, eventPending)
+	c.status = append(c.status, publishing.EventPending)
 	c.ref++
 
-	id := eventID(uint64(c.contextID)<<32 | uint64(c.startID+uint32(idx)))
+	id := publishing.EventID(uint64(c.contextID)<<32 | uint64(c.startID+uint32(idx)))
 	return id
 }
 
-func (c *eventContext) updateStatus(id eventID, status eventStatus) bool {
+func (c *eventContext) updateStatus(id publishing.EventID, status publishing.EventStatus) bool {
 	refs, acked := func() (uint32, uint32) {
 		c.statusMu.Lock()
 		defer c.statusMu.Unlock()
@@ -279,7 +285,7 @@ func (c *eventContext) updateStatus(id eventID, status eventStatus) bool {
 
 		var n uint32
 		for _, st := range c.status {
-			if st == eventPending {
+			if st == publishing.EventPending {
 				break
 			}
 			n++
