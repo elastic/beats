@@ -6,11 +6,12 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -108,6 +109,16 @@ func TestConfigValidationCase7(t *testing.T) {
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
 	}
+}
+
+func TestConfigMustFailWithInvalidURL(t *testing.T) {
+	m := map[string]interface{}{
+		"url": "::invalid::",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	err := cfg.Unpack(&conf)
+	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'url'`)
 }
 
 func TestConfigOauth2Validation(t *testing.T) {
