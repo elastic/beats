@@ -615,6 +615,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Add event.ingested for Suricata module {pull}20220[20220]
 - Add support for custom header and headersecret for filebeat http_endpoint input {pull}20435[20435]
+- Convert httpjson to v2 input {pull}20226[20226]
 
 *Heartbeat*
 
