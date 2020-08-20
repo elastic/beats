@@ -12,9 +12,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.0.0.1\" source-port=\"594\" destination-address=\"10.128.0.1\" destination-port=\"10400\" connection-tag=\"0\" service-name=\"icmp\" nat-source-address=\"10.0.0.1\" nat-source-port=\"594\" nat-destination-address=\"10.128.0.1\" nat-destination-port=\"10400\" nat-connection-tag=\"0\" src-nat-rule-type=\"N/A\" src-nat-rule-name=\"N/A\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"1\" policy-name=\"vpn_trust_permit-all\" source-zone-name=\"vpn\" destination-zone-name=\"trust\" session-id-32=\"6093\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"st0.0\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" encrypted=\"UNKNOWN\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"1\" application-characteristics=\"N/A\"",
         "event.outcome": "success",
         "event.risk_score": "1",
@@ -25,14 +25,14 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.nat-connection-tag": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "icmp",
-        "junipersrx.firewall.session-id-32": "6093",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CREATE",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.nat_connection_tag": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "icmp",
+        "juniper.srx.session_id_32": "6093",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CREATE",
         "log.level": "informational",
         "log.offset": 0,
         "network.iana_number": "1",
@@ -53,13 +53,13 @@
         "server.ip": "10.128.0.1",
         "server.nat.port": 10400,
         "server.port": 10400,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.0.0.1",
         "source.nat.ip": "10.0.0.1",
         "source.nat.port": 594,
         "source.port": 594,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -72,9 +72,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.0.0.26\" source-port=\"37233\" destination-address=\"10.128.0.1\" destination-port=\"161\" connection-tag=\"0\" service-name=\"None\" protocol-id=\"17\" icmp-type=\"0\" policy-name=\"MgmtAccess-trust-cleanup\" source-zone-name=\"trust\" destination-zone-name=\"junos-host\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\".local..0\" encrypted=\"No\" reason=\"Denied by policy\" session-id-32=\"7087\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"1\" application-characteristics=\"N/A\"",
         "event.outcome": "success",
         "event.risk_score": "1",
@@ -84,15 +84,15 @@
             "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.icmp-type": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "Denied by policy",
-        "junipersrx.firewall.session-id-32": "7087",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_DENY",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.icmp_type": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "Denied by policy",
+        "juniper.srx.session_id_32": "7087",
+        "juniper.srx.tag": "RT_FLOW_SESSION_DENY",
         "log.level": "informational",
         "log.offset": 850,
         "network.iana_number": "17",
@@ -110,11 +110,11 @@
         "rule.name": "MgmtAccess-trust-cleanup",
         "server.ip": "10.128.0.1",
         "server.port": 161,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -133,9 +133,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No \"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -144,12 +144,12 @@
             "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.encrypted": "No ",
-        "junipersrx.firewall.icmp-type": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_DENY",
+        "juniper.srx.encrypted": "No ",
+        "juniper.srx.icmp_type": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.tag": "RT_FLOW_SESSION_DENY",
         "log.level": "informational",
         "log.offset": 1513,
         "network.iana_number": "6",
@@ -167,7 +167,7 @@
         "rule.name": "log-all-else",
         "server.ip": "5.6.7.8",
         "server.port": 2003,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
@@ -178,7 +178,7 @@
         "source.ip": "1.2.3.4",
         "source.port": 56639,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -204,11 +204,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 60000000000,
         "event.end": "2014-05-01T06:29:10.933-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"unset\" source-address=\"1.2.3.4\" source-port=\"63456\" destination-address=\"5.6.7.8\" destination-port=\"902\" service-name=\"None\" nat-source-address=\"1.2.3.4\" nat-source-port=\"63456\" nat-destination-address=\"5.6.7.8\" nat-destination-port=\"902\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"17\" policy-name=\"mngmt-to-vcenter\" source-zone-name=\"mngmt\" destination-zone-name=\"intra\" session-id-32=\"15353\" packets-from-client=\"1\" bytes-from-client=\"94\" packets-from-server=\"0\" bytes-from-server=\"0\" elapsed-time=\"60\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth3.5\" encrypted=\"No \"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -219,13 +219,13 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.encrypted": "No ",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "unset",
-        "junipersrx.firewall.session-id-32": "15353",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.encrypted": "No ",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "unset",
+        "juniper.srx.session_id_32": "15353",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 1966,
         "network.bytes": 94,
@@ -250,7 +250,7 @@
         "server.nat.port": 902,
         "server.packets": 0,
         "server.port": 902,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 94,
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
@@ -265,7 +265,7 @@
         "source.packets": 1,
         "source.port": 63456,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -285,9 +285,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"50.0.0.100\" source-port=\"24065\" destination-address=\"30.0.0.100\" destination-port=\"768\" service-name=\"icmp\" nat-source-address=\"50.0.0.100\" nat-source-port=\"24065\" nat-destination-address=\"30.0.0.100\" nat-destination-port=\"768\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"1\" policy-name=\"alg-policy\" source-zone-name=\"untrust\" destination-zone-name=\"trust\" session-id-32=\"100000165\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth2.0\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" encrypted=\"UNKNOWN\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -297,12 +297,12 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "icmp",
-        "junipersrx.firewall.session-id-32": "100000165",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CREATE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "icmp",
+        "juniper.srx.session_id_32": "100000165",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CREATE",
         "log.level": "informational",
         "log.offset": 2721,
         "network.iana_number": "1",
@@ -323,7 +323,7 @@
         "server.ip": "30.0.0.100",
         "server.nat.port": 768,
         "server.port": 768,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.location.lat": 37.751,
@@ -333,7 +333,7 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -353,9 +353,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"192.0.2.1\" source-port=\"1\" destination-address=\"198.51.100.12\" destination-port=\"46384\" service-name=\"icmp\" nat-source-address=\"192.0.2.1\" nat-source-port=\"1\" nat-destination-address=\"18.51.100.12\" nat-destination-port=\"46384\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"1\" policy-name=\"policy1\" source-zone-name=\"trustZone\" destination-zone-name=\"untrustZone\" session-id-32=\"41\" packet-incoming-interface=\"ge-0/0/1.0\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -365,12 +365,12 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "icmp",
-        "junipersrx.firewall.session-id-32": "41",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CREATE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "icmp",
+        "juniper.srx.session_id_32": "41",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CREATE",
         "log.level": "informational",
         "log.offset": 3366,
         "network.iana_number": "1",
@@ -391,13 +391,13 @@
         "server.ip": "198.51.100.12",
         "server.nat.port": 46384,
         "server.port": 46384,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "192.0.2.1",
         "source.nat.ip": "192.0.2.1",
         "source.nat.port": 1,
         "source.port": 1,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -421,11 +421,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 0,
         "event.end": "2010-09-30T04:55:07.188-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"response received\" source-address=\"192.0.2.1\" source-port=\"1\" destination-address=\"198.51.100.12\" destination-port=\"46384\" service-name=\"icmp\" nat-source-address=\"192.0.2.1\" nat-source-port=\"1\" nat-destination-address=\"18.51.100.12\" nat-destination-port=\"46384\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"1\" policy-name=\"policy1\" source-zone-name=\"trustZone\" destination-zone-name=\"untrustZone\" session-id-32=\"41\" packets-from-client=\"1\" bytes-from-client=\"84\" packets-from-server=\"1\" bytes-from-server=\"84\" elapsed-time=\"0\" packet-incoming-interface=\"ge-0/0/1.0\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -436,13 +436,13 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "response received",
-        "junipersrx.firewall.service-name": "icmp",
-        "junipersrx.firewall.session-id-32": "41",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "response received",
+        "juniper.srx.service_name": "icmp",
+        "juniper.srx.session_id_32": "41",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 3933,
         "network.bytes": 168,
@@ -467,7 +467,7 @@
         "server.nat.port": 46384,
         "server.packets": 1,
         "server.port": 46384,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 84,
         "source.ip": "192.0.2.1",
         "source.nat.ip": "192.0.2.1",
@@ -475,7 +475,7 @@
         "source.packets": 1,
         "source.port": 1,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -501,11 +501,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 1000000000,
         "event.end": "2019-04-12T12:29:07.576-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"TCP FIN\" source-address=\"10.3.255.203\" source-port=\"47776\" destination-address=\"8.23.224.110\" destination-port=\"80\" connection-tag=\"0\" service-name=\"junos-http\" nat-source-address=\"10.3.136.49\" nat-source-port=\"19162\" nat-destination-address=\"8.23.224.110\" nat-destination-port=\"80\" nat-connection-tag=\"0\" src-nat-rule-type=\"source rule\" src-nat-rule-name=\"nat1\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"permit_all\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"5\" packets-from-client=\"6\" bytes-from-client=\"337\" packets-from-server=\"4\" bytes-from-server=\"535\" elapsed-time=\"1\" application=\"HTTP\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"ge-0/0/0.0\" encrypted=\"No\" application-category=\"Web\" application-sub-category=\"N/A\" application-risk=\"4\" application-characteristics=\"Can Leak Information;Supports File Transfer;Prone to Misuse;Known Vulnerabilities;Carrier of Malware;Capable of Tunneling;\"",
         "event.outcome": "success",
         "event.risk_score": "4",
@@ -517,21 +517,21 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.application": "HTTP",
-        "junipersrx.firewall.application-category": "Web",
-        "junipersrx.firewall.application-characteristics": "Can Leak Information;Supports File Transfer;Prone to Misuse;Known Vulnerabilities;Carrier of Malware;Capable of Tunneling;",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.nat-connection-tag": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "TCP FIN",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "5",
-        "junipersrx.firewall.src-nat-rule-name": "nat1",
-        "junipersrx.firewall.src-nat-rule-type": "source rule",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.application": "HTTP",
+        "juniper.srx.application_category": "Web",
+        "juniper.srx.application_characteristics": "Can Leak Information;Supports File Transfer;Prone to Misuse;Known Vulnerabilities;Carrier of Malware;Capable of Tunneling;",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.nat_connection_tag": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "TCP FIN",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "5",
+        "juniper.srx.src_nat_rule_name": "nat1",
+        "juniper.srx.src_nat_rule_type": "source rule",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 4637,
         "network.bytes": 872,
@@ -556,7 +556,7 @@
         "server.nat.port": 80,
         "server.packets": 4,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 337,
         "source.ip": "10.3.255.203",
         "source.nat.ip": "10.3.136.49",
@@ -564,7 +564,7 @@
         "source.packets": 6,
         "source.port": 47776,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -584,11 +584,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 16000000000,
         "event.end": "2019-04-13T12:33:22.576-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"TCP RST\" source-address=\"192.168.2.164\" source-port=\"53232\" destination-address=\"172.16.1.19\" destination-port=\"445\" service-name=\"junos-smb\" nat-source-address=\"192.168.2.164\" nat-source-port=\"53232\" nat-destination-address=\"172.16.1.19\" nat-destination-port=\"445\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"6\" policy-name=\"35\" source-zone-name=\"Trust\" destination-zone-name=\"Trust\" session-id-32=\"206\" packets-from-client=\"13\" bytes-from-client=\"4274\" packets-from-server=\"9\" bytes-from-server=\"1575\" elapsed-time=\"16\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"ge-0/0/2.0\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -599,13 +599,13 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "TCP RST",
-        "junipersrx.firewall.service-name": "junos-smb",
-        "junipersrx.firewall.session-id-32": "206",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "TCP RST",
+        "juniper.srx.service_name": "junos-smb",
+        "juniper.srx.session_id_32": "206",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 5739,
         "network.bytes": 5849,
@@ -630,7 +630,7 @@
         "server.nat.port": 445,
         "server.packets": 9,
         "server.port": 445,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 4274,
         "source.ip": "192.168.2.164",
         "source.nat.ip": "192.168.2.164",
@@ -638,7 +638,7 @@
         "source.packets": 13,
         "source.port": 53232,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -664,11 +664,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 8000000000,
         "event.end": "2018-10-06T23:32:28.898-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"idle Timeout\" source-address=\"100.73.10.92\" source-port=\"52890\" destination-address=\"58.68.126.198\" destination-port=\"53\" service-name=\"junos-dns-udp\" nat-source-address=\"58.78.140.131\" nat-source-port=\"11152\" nat-destination-address=\"58.68.126.198\" nat-destination-port=\"53\" src-nat-rule-type=\"source rule\" src-nat-rule-name=\"NAT_S\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"17\" policy-name=\"NAT\" source-zone-name=\"Gi_nat\" destination-zone-name=\"Internet\" session-id-32=\"220368889\" packets-from-client=\"1\" bytes-from-client=\"72\" packets-from-server=\"1\" bytes-from-server=\"136\" elapsed-time=\"8\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth0.108\" encrypted=\"UNKNOWN\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -679,15 +679,15 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "idle Timeout",
-        "junipersrx.firewall.service-name": "junos-dns-udp",
-        "junipersrx.firewall.session-id-32": "220368889",
-        "junipersrx.firewall.src-nat-rule-name": "NAT_S",
-        "junipersrx.firewall.src-nat-rule-type": "source rule",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "idle Timeout",
+        "juniper.srx.service_name": "junos-dns-udp",
+        "juniper.srx.session_id_32": "220368889",
+        "juniper.srx.src_nat_rule_name": "NAT_S",
+        "juniper.srx.src_nat_rule_type": "source rule",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 6497,
         "network.bytes": 208,
@@ -712,7 +712,7 @@
         "server.nat.port": 53,
         "server.packets": 1,
         "server.port": 53,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 3786,
         "source.as.organization.name": "LG DACOM Corporation",
         "source.bytes": 72,
@@ -729,7 +729,7 @@
         "source.packets": 1,
         "source.port": 52890,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -755,11 +755,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 3000000000,
         "event.end": "2018-06-30T00:17:25.753-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"idle Timeout\" source-address=\"192.168.255.2\" source-port=\"62047\" destination-address=\"8.8.8.8\" destination-port=\"53\" service-name=\"junos-dns-udp\" nat-source-address=\"192.168.0.47\" nat-source-port=\"20215\" nat-destination-address=\"8.8.8.8\" nat-destination-port=\"53\" src-nat-rule-type=\"source rule\" src-nat-rule-name=\"rule001\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"17\" policy-name=\"trust-to-untrust-001\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"9621\" packets-from-client=\"1\" bytes-from-client=\"67\" packets-from-server=\"1\" bytes-from-server=\"116\" elapsed-time=\"3\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"fe-0/0/1.0\" encrypted=\"UNKNOWN\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -770,15 +770,15 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "idle Timeout",
-        "junipersrx.firewall.service-name": "junos-dns-udp",
-        "junipersrx.firewall.session-id-32": "9621",
-        "junipersrx.firewall.src-nat-rule-name": "rule001",
-        "junipersrx.firewall.src-nat-rule-type": "source rule",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "idle Timeout",
+        "juniper.srx.service_name": "junos-dns-udp",
+        "juniper.srx.session_id_32": "9621",
+        "juniper.srx.src_nat_rule_name": "rule001",
+        "juniper.srx.src_nat_rule_type": "source rule",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 7350,
         "network.bytes": 183,
@@ -803,7 +803,7 @@
         "server.nat.port": 53,
         "server.packets": 1,
         "server.port": 53,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 67,
         "source.ip": "192.168.255.2",
         "source.nat.ip": "192.168.0.47",
@@ -811,7 +811,7 @@
         "source.packets": 1,
         "source.port": 62047,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -831,11 +831,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 1000000000,
         "event.end": "2015-09-25T12:19:54.846-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"application failure or action\" source-address=\"10.164.110.223\" source-port=\"9057\" destination-address=\"10.104.12.161\" destination-port=\"21\" service-name=\"junos-ftp\" nat-source-address=\"10.9.1.150\" nat-source-port=\"58020\" nat-destination-address=\"10.12.70.1\" nat-destination-port=\"21\" src-nat-rule-name=\"SNAT-Policy5\" dst-nat-rule-name=\"NAT-Policy10\" protocol-id=\"6\" policy-name=\"FW-FTP\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"24311\" packets-from-client=\"0\" bytes-from-client=\"0\" packets-from-server=\"0\" bytes-from-server=\"0\" elapsed-time=\"1\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth0.0\" encrypted=\"No \"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -846,16 +846,16 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.dst-nat-rule-name": "NAT-Policy10",
-        "junipersrx.firewall.encrypted": "No ",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "application failure or action",
-        "junipersrx.firewall.service-name": "junos-ftp",
-        "junipersrx.firewall.session-id-32": "24311",
-        "junipersrx.firewall.src-nat-rule-name": "SNAT-Policy5",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.dst_nat_rule_name": "NAT-Policy10",
+        "juniper.srx.encrypted": "No ",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "application failure or action",
+        "juniper.srx.service_name": "junos-ftp",
+        "juniper.srx.session_id_32": "24311",
+        "juniper.srx.src_nat_rule_name": "SNAT-Policy5",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 8203,
         "network.bytes": 0,
@@ -880,7 +880,7 @@
         "server.nat.port": 21,
         "server.packets": 0,
         "server.port": 21,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 0,
         "source.ip": "10.164.110.223",
         "source.nat.ip": "10.9.1.150",
@@ -888,7 +888,7 @@
         "source.packets": 0,
         "source.port": 9057,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -910,9 +910,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"192.168.224.30\" source-port=\"3129\" destination-address=\"207.17.137.56\" destination-port=\"21\" service-name=\"junos-ftp\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"173.167.224.7\" nat-source-port=\"14406\" nat-destination-address=\"207.17.137.56\" nat-destination-port=\"21\" src-nat-rule-name=\"1\" dst-nat-rule-name=\"None\" protocol-id=\"6\" policy-name=\"General-Outbound\" source-zone-name=\"LAN\" destination-zone-name=\"Danger\" session-id-32=\"5058\" username=\"N/A\" roles=\"N/A\" encrypted=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -922,13 +922,13 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "junos-ftp",
-        "junipersrx.firewall.session-id-32": "5058",
-        "junipersrx.firewall.src-nat-rule-name": "1",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_CREATE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "junos-ftp",
+        "juniper.srx.session_id_32": "5058",
+        "juniper.srx.src_nat_rule_name": "1",
+        "juniper.srx.tag": "APPTRACK_SESSION_CREATE",
         "log.level": "informational",
         "log.offset": 9012,
         "network.iana_number": "6",
@@ -948,7 +948,7 @@
         "server.ip": "207.17.137.56",
         "server.nat.port": 21,
         "server.port": 21,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 7922,
         "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.geo.city_name": "Plymouth",
@@ -963,7 +963,7 @@
         "source.nat.port": 14406,
         "source.port": 3129,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -989,11 +989,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 0,
         "event.end": "2013-01-19T15:18:17.040-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"192.168.224.30\" source-port=\"3129\" destination-address=\"207.17.137.56\" destination-port=\"21\" service-name=\"junos-ftp\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"173.167.224.7\" nat-source-port=\"14406\" nat-destination-address=\"207.17.137.56\" nat-destination-port=\"21\" src-nat-rule-name=\"1\" dst-nat-rule-name=\"None\" protocol-id=\"6\" policy-name=\"General-Outbound\" source-zone-name=\"LAN\" destination-zone-name=\"Danger\" session-id-32=\"5058\" packets-from-client=\"1\" bytes-from-client=\"48\" packets-from-server=\"0\" bytes-from-server=\"0\" elapsed-time=\"0\" username=\"N/A\" roles=\"N/A\" encrypted=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1004,13 +1004,13 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "junos-ftp",
-        "junipersrx.firewall.session-id-32": "5058",
-        "junipersrx.firewall.src-nat-rule-name": "1",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_VOL_UPDATE",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "junos-ftp",
+        "juniper.srx.session_id_32": "5058",
+        "juniper.srx.src_nat_rule_name": "1",
+        "juniper.srx.tag": "APPTRACK_SESSION_VOL_UPDATE",
         "log.level": "informational",
         "log.offset": 9631,
         "network.bytes": 48,
@@ -1034,7 +1034,7 @@
         "server.nat.port": 21,
         "server.packets": 0,
         "server.port": 21,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 7922,
         "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.bytes": 48,
@@ -1051,7 +1051,7 @@
         "source.packets": 1,
         "source.port": 3129,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1077,11 +1077,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 1000000000,
         "event.end": "2013-01-19T15:18:18.040-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"application failure or action\" source-address=\"192.168.224.30\" source-port=\"3129\" destination-address=\"207.17.137.56\" destination-port=\"21\" service-name=\"junos-ftp\" application=\"FTP\" nested-application=\"UNKNOWN\" nat-source-address=\"173.167.224.7\" nat-source-port=\"14406\" nat-destination-address=\"207.17.137.56\" nat-destination-port=\"21\" src-nat-rule-name=\"1\" dst-nat-rule-name=\"None\" protocol-id=\"6\" policy-name=\"General-Outbound\" source-zone-name=\"LAN\" destination-zone-name=\"Danger\" session-id-32=\"5058\" packets-from-client=\"3\" bytes-from-client=\"144\" packets-from-server=\"2\" bytes-from-server=\"104\" elapsed-time=\"1\" username=\"N/A\" roles=\"N/A\" encrypted=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1092,15 +1092,15 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.application": "FTP",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "application failure or action",
-        "junipersrx.firewall.service-name": "junos-ftp",
-        "junipersrx.firewall.session-id-32": "5058",
-        "junipersrx.firewall.src-nat-rule-name": "1",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_CLOSE",
+        "juniper.srx.application": "FTP",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "application failure or action",
+        "juniper.srx.service_name": "junos-ftp",
+        "juniper.srx.session_id_32": "5058",
+        "juniper.srx.src_nat_rule_name": "1",
+        "juniper.srx.tag": "APPTRACK_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 10364,
         "network.bytes": 248,
@@ -1124,7 +1124,7 @@
         "server.nat.port": 21,
         "server.packets": 2,
         "server.port": 21,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 7922,
         "source.as.organization.name": "Comcast Cable Communications, LLC",
         "source.bytes": 144,
@@ -1141,7 +1141,7 @@
         "source.packets": 3,
         "source.port": 3129,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1167,11 +1167,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 60000000000,
         "event.end": "2013-01-19T15:19:18.040-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"4.0.0.1\" source-port=\"33040\" destination-address=\"5.0.0.1\" destination-port=\"80\" service-name=\"junos-http\" application=\"HTTP\" nested-application=\"FACEBOOK-SOCIALRSS\" nat-source-address=\"4.0.0.1\" nat-source-port=\"33040\" nat-destination-address=\"5.0.0.1\" nat-destination-port=\"80\" src-nat-rule-name=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"permit-all\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"28\" packets-from-client=\"371\" bytes-from-client=\"19592\" packets-from-server=\"584\" bytes-from-server=\"686432\" elapsed-time=\"60\" username=\"user1\" roles=\"DEPT1\" encrypted=\"No\" destination-interface-name=\u201dst0.0\u201d apbr-rule-type=\u201ddefault\u201d",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1182,17 +1182,17 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.apbr-rule-type": "\u201ddefault\u201d",
-        "junipersrx.firewall.application": "HTTP",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.nested-application": "FACEBOOK-SOCIALRSS",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.roles": "DEPT1",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "28",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_VOL_UPDATE",
+        "juniper.srx.apbr_rule_type": "\u201ddefault\u201d",
+        "juniper.srx.application": "HTTP",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.nested_application": "FACEBOOK-SOCIALRSS",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.roles": "DEPT1",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "28",
+        "juniper.srx.tag": "APPTRACK_SESSION_VOL_UPDATE",
         "log.level": "informational",
         "log.offset": 11130,
         "network.bytes": 706024,
@@ -1217,7 +1217,7 @@
         "server.nat.port": 80,
         "server.packets": 584,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 3356,
         "source.as.organization.name": "Level 3 Parent, LLC",
         "source.bytes": 19592,
@@ -1232,7 +1232,7 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1254,9 +1254,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"4.0.0.1\" source-port=\"33040\" destination-address=\"5.0.0.1\" destination-port=\"80\" service-name=\"junos-http\" application=\"HTTP\" nested-application=\"FACEBOOK-SOCIALRSS\" nat-source-address=\"4.0.0.1\" nat-source-port=\"33040\" nat-destination-address=\"5.0.0.1\" nat-destination-port=\"80\" src-nat-rule-name=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"permit-all\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"28\" username=\"user1\" roles=\"DEPT1\" encrypted=\"No\" profile-name=\u201dpf1\u201d rule-name=\u201dfacebook1\u201d routing-instance=\u201dinstance1\u201d destination-interface-name=\u201dst0.0\u201d apbr-rule-type=\u201ddefault\u201d",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1266,20 +1266,20 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.apbr-rule-type": "\u201ddefault\u201d",
-        "junipersrx.firewall.application": "HTTP",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.nested-application": "FACEBOOK-SOCIALRSS",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.profile-name": "\u201dpf1\u201d",
-        "junipersrx.firewall.roles": "DEPT1",
-        "junipersrx.firewall.routing-instance": "\u201dinstance1\u201d",
-        "junipersrx.firewall.rule-name": "\u201dfacebook1\u201d",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "28",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_ROUTE_UPDATE",
+        "juniper.srx.apbr_rule_type": "\u201ddefault\u201d",
+        "juniper.srx.application": "HTTP",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.nested_application": "FACEBOOK-SOCIALRSS",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.profile_name": "\u201dpf1\u201d",
+        "juniper.srx.roles": "DEPT1",
+        "juniper.srx.routing_instance": "\u201dinstance1\u201d",
+        "juniper.srx.rule_name": "\u201dfacebook1\u201d",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "28",
+        "juniper.srx.tag": "APPTRACK_SESSION_ROUTE_UPDATE",
         "log.level": "informational",
         "log.offset": 11929,
         "network.iana_number": "6",
@@ -1300,7 +1300,7 @@
         "server.ip": "5.0.0.1",
         "server.nat.port": 80,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 3356,
         "source.as.organization.name": "Level 3 Parent, LLC",
         "source.geo.continent_name": "North America",
@@ -1313,7 +1313,7 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1339,11 +1339,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 3000000000,
         "event.end": "2013-01-19T15:18:23.040-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"TCP CLIENT RST\" source-address=\"4.0.0.1\" source-port=\"48873\" destination-address=\"5.0.0.1\" destination-port=\"80\" service-name=\"junos-http\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"4.0.0.1\" nat-source-port=\"48873\" nat-destination-address=\"5.0.0.1\" nat-destination-port=\"80\" src-nat-rule-name=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"permit-all\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"32\" packets-from-client=\"5\" bytes-from-client=\"392\" packets-from-server=\"3\" bytes-from-server=\"646\" elapsed-time=\"3\" username=\"user1\" roles=\"DEPT1\" encrypted=\"No\" destination-interface-name=\u201dst0.0\u201d apbr-rule-type=\u201ddefault\u201d",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1354,16 +1354,16 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.apbr-rule-type": "\u201ddefault\u201d",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "TCP CLIENT RST",
-        "junipersrx.firewall.roles": "DEPT1",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "32",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_CLOSE",
+        "juniper.srx.apbr_rule_type": "\u201ddefault\u201d",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "TCP CLIENT RST",
+        "juniper.srx.roles": "DEPT1",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "32",
+        "juniper.srx.tag": "APPTRACK_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 12689,
         "network.bytes": 1038,
@@ -1388,7 +1388,7 @@
         "server.nat.port": 80,
         "server.packets": 3,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 3356,
         "source.as.organization.name": "Level 3 Parent, LLC",
         "source.bytes": 392,
@@ -1403,7 +1403,7 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1423,9 +1423,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"50.0.0.100\" source-port=\"24065\" destination-address=\"30.0.0.100\" destination-port=\"768\" service-name=\"icmp\" nat-source-address=\"50.0.0.100\" nat-source-port=\"24065\" nat-destination-address=\"30.0.0.100\" nat-destination-port=\"768\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"1\" policy-name=\"alg-policy\" source-zone-name=\"untrust\" destination-zone-name=\"trust\" session-id-32=\"100000165\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth2.0\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" encrypted=\"UNKNOWN\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1435,12 +1435,12 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "icmp",
-        "junipersrx.firewall.session-id-32": "100000165",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CREATE_LS",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "icmp",
+        "juniper.srx.session_id_32": "100000165",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CREATE_LS",
         "log.level": "informational",
         "log.offset": 13489,
         "network.iana_number": "1",
@@ -1461,7 +1461,7 @@
         "server.ip": "30.0.0.100",
         "server.nat.port": 768,
         "server.port": 768,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.location.lat": 37.751,
@@ -1471,7 +1471,7 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1484,9 +1484,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.0.0.26\" source-port=\"37233\" destination-address=\"10.128.0.1\" destination-port=\"161\" connection-tag=\"0\" service-name=\"None\" protocol-id=\"17\" icmp-type=\"0\" policy-name=\"MgmtAccess-trust-cleanup\" source-zone-name=\"trust\" destination-zone-name=\"junos-host\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\".local..0\" encrypted=\"No\" reason=\"Denied by policy\" session-id-32=\"7087\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"1\" application-characteristics=\"N/A\"",
         "event.outcome": "success",
         "event.risk_score": "1",
@@ -1496,15 +1496,15 @@
             "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.icmp-type": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "Denied by policy",
-        "junipersrx.firewall.session-id-32": "7087",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_DENY_LS",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.icmp_type": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "Denied by policy",
+        "juniper.srx.session_id_32": "7087",
+        "juniper.srx.tag": "RT_FLOW_SESSION_DENY_LS",
         "log.level": "informational",
         "log.offset": 14137,
         "network.iana_number": "17",
@@ -1522,11 +1522,11 @@
         "rule.name": "MgmtAccess-trust-cleanup",
         "server.ip": "10.128.0.1",
         "server.port": 161,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1552,11 +1552,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 3000000000,
         "event.end": "2020-01-19T15:18:23.040-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"TCP CLIENT RST\" source-address=\"4.0.0.1\" source-port=\"48873\" destination-address=\"5.0.0.1\" destination-port=\"80\" service-name=\"junos-http\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"4.0.0.1\" nat-source-port=\"48873\" nat-destination-address=\"5.0.0.1\" nat-destination-port=\"80\" src-nat-rule-name=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"permit-all\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"32\" packets-from-client=\"5\" bytes-from-client=\"392\" packets-from-server=\"3\" bytes-from-server=\"646\" elapsed-time=\"3\" username=\"user1\" roles=\"DEPT1\" encrypted=\"No\" destination-interface-name=\u201dst0.0\u201d apbr-rule-type=\u201ddefault\u201d",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1567,16 +1567,16 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.apbr-rule-type": "\u201ddefault\u201d",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "TCP CLIENT RST",
-        "junipersrx.firewall.roles": "DEPT1",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "32",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_CLOSE_LS",
+        "juniper.srx.apbr_rule_type": "\u201ddefault\u201d",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "TCP CLIENT RST",
+        "juniper.srx.roles": "DEPT1",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "32",
+        "juniper.srx.tag": "APPTRACK_SESSION_CLOSE_LS",
         "log.level": "informational",
         "log.offset": 14803,
         "network.bytes": 1038,
@@ -1601,7 +1601,7 @@
         "server.nat.port": 80,
         "server.packets": 3,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 3356,
         "source.as.organization.name": "Level 3 Parent, LLC",
         "source.bytes": 392,
@@ -1616,7 +1616,7 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1645,11 +1645,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 60000000000,
         "event.end": "2020-07-14T12:18:11.928-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.1.1.100\" source-port=\"58943\" destination-address=\"46.165.154.241\" destination-port=\"80\" service-name=\"junos-http\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"172.19.34.100\" nat-source-port=\"6018\" nat-destination-address=\"46.165.154.241\" nat-destination-port=\"80\" src-nat-rule-name=\"our-nat-rule\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"default-permit\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"16118\" packets-from-client=\"42\" bytes-from-client=\"2322\" packets-from-server=\"34\" bytes-from-server=\"2132\" elapsed-time=\"60\" username=\"N/A\" roles=\"N/A\" encrypted=\"No\" destination-interface-name=\"ge-0/0/0.0\" category=\"N/A\" sub-category=\"N/A\" src-vrf-grp=\"N/A\" dst-vrf-grp=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1660,14 +1660,14 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "junos-http",
-        "junipersrx.firewall.session-id-32": "16118",
-        "junipersrx.firewall.src-nat-rule-name": "our-nat-rule",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_VOL_UPDATE",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "junos-http",
+        "juniper.srx.session_id_32": "16118",
+        "juniper.srx.src_nat_rule_name": "our-nat-rule",
+        "juniper.srx.tag": "APPTRACK_SESSION_VOL_UPDATE",
         "log.level": "informational",
         "log.offset": 15606,
         "network.bytes": 4454,
@@ -1692,7 +1692,7 @@
         "server.nat.port": 80,
         "server.packets": 34,
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 2322,
         "source.ip": "10.1.1.100",
         "source.nat.ip": "172.19.34.100",
@@ -1700,7 +1700,7 @@
         "source.packets": 42,
         "source.port": 58943,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1729,11 +1729,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 23755000000000,
         "event.end": "2020-07-13T21:19:00.041-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"idle Timeout\" source-address=\"10.1.1.100\" source-port=\"64720\" destination-address=\"91.228.167.172\" destination-port=\"8883\" connection-tag=\"0\" service-name=\"None\" nat-source-address=\"172.19.34.100\" nat-source-port=\"24519\" nat-destination-address=\"91.228.167.172\" nat-destination-port=\"8883\" nat-connection-tag=\"0\" src-nat-rule-type=\"source rule\" src-nat-rule-name=\"our-nat-rule\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"6\" policy-name=\"default-permit\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"3851\" packets-from-client=\"161\" bytes-from-client=\"9530\" packets-from-server=\"96\" bytes-from-server=\"9670\" elapsed-time=\"23755\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"ge-0/0/1.0\" encrypted=\"UNKNOWN\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"1\" application-characteristics=\"N/A\" secure-web-proxy-session-type=\"NA\" peer-session-id=\"0\" peer-source-address=\"0.0.0.0\" peer-source-port=\"0\" peer-destination-address=\"0.0.0.0\" peer-destination-port=\"0\" hostname=\"NA NA\" src-vrf-grp=\"N/A\" dst-vrf-grp=\"N/A\"",
         "event.outcome": "success",
         "event.risk_score": "1",
@@ -1745,23 +1745,23 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.hostname": "NA NA",
-        "junipersrx.firewall.nat-connection-tag": "0",
-        "junipersrx.firewall.peer-destination-address": "0.0.0.0",
-        "junipersrx.firewall.peer-destination-port": "0",
-        "junipersrx.firewall.peer-session-id": "0",
-        "junipersrx.firewall.peer-source-address": "0.0.0.0",
-        "junipersrx.firewall.peer-source-port": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "idle Timeout",
-        "junipersrx.firewall.secure-web-proxy-session-type": "NA",
-        "junipersrx.firewall.session-id-32": "3851",
-        "junipersrx.firewall.src-nat-rule-name": "our-nat-rule",
-        "junipersrx.firewall.src-nat-rule-type": "source rule",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CLOSE",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.hostname": "NA NA",
+        "juniper.srx.nat_connection_tag": "0",
+        "juniper.srx.peer_destination_address": "0.0.0.0",
+        "juniper.srx.peer_destination_port": "0",
+        "juniper.srx.peer_session_id": "0",
+        "juniper.srx.peer_source_address": "0.0.0.0",
+        "juniper.srx.peer_source_port": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "idle Timeout",
+        "juniper.srx.secure_web_proxy_session_type": "NA",
+        "juniper.srx.session_id_32": "3851",
+        "juniper.srx.src_nat_rule_name": "our-nat-rule",
+        "juniper.srx.src_nat_rule_type": "source rule",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CLOSE",
         "log.level": "informational",
         "log.offset": 16469,
         "network.bytes": 19200,
@@ -1786,7 +1786,7 @@
         "server.nat.port": 8883,
         "server.packets": 96,
         "server.port": 8883,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 9530,
         "source.ip": "10.1.1.100",
         "source.nat.ip": "172.19.34.100",
@@ -1794,7 +1794,7 @@
         "source.packets": 161,
         "source.port": 64720,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1816,9 +1816,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.1.1.100\" source-port=\"49583\" destination-address=\"8.8.8.8\" destination-port=\"53\" connection-tag=\"0\" service-name=\"junos-dns-udp\" nat-source-address=\"172.19.34.100\" nat-source-port=\"30838\" nat-destination-address=\"8.8.8.8\" nat-destination-port=\"53\" nat-connection-tag=\"0\" src-nat-rule-type=\"source rule\" src-nat-rule-name=\"our-nat-rule\" dst-nat-rule-type=\"N/A\" dst-nat-rule-name=\"N/A\" protocol-id=\"17\" policy-name=\"default-permit\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"15399\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"ge-0/0/1.0\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" encrypted=\"UNKNOWN\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"1\" application-characteristics=\"N/A\" src-vrf-grp=\"N/A\" dst-vrf-grp=\"N/A\"",
         "event.outcome": "success",
         "event.risk_score": "1",
@@ -1829,16 +1829,16 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.connection-tag": "0",
-        "junipersrx.firewall.nat-connection-tag": "0",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.service-name": "junos-dns-udp",
-        "junipersrx.firewall.session-id-32": "15399",
-        "junipersrx.firewall.src-nat-rule-name": "our-nat-rule",
-        "junipersrx.firewall.src-nat-rule-type": "source rule",
-        "junipersrx.firewall.tag": "RT_FLOW_SESSION_CREATE",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.nat_connection_tag": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.service_name": "junos-dns-udp",
+        "juniper.srx.session_id_32": "15399",
+        "juniper.srx.src_nat_rule_name": "our-nat-rule",
+        "juniper.srx.src_nat_rule_type": "source rule",
+        "juniper.srx.tag": "RT_FLOW_SESSION_CREATE",
         "log.level": "informational",
         "log.offset": 17715,
         "network.iana_number": "17",
@@ -1859,13 +1859,13 @@
         "server.ip": "8.8.8.8",
         "server.nat.port": 53,
         "server.port": 53,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.1.1.100",
         "source.nat.ip": "172.19.34.100",
         "source.nat.port": 30838,
         "source.port": 49583,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -1891,11 +1891,11 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.duration": 3000000000,
         "event.end": "2020-07-13T14:12:08.530-02:00",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "reason=\"Closed by junos-alg\" source-address=\"10.1.1.100\" source-port=\"63381\" destination-address=\"8.8.8.8\" destination-port=\"53\" service-name=\"junos-dns-udp\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" nat-source-address=\"172.19.34.100\" nat-source-port=\"26764\" nat-destination-address=\"8.8.8.8\" nat-destination-port=\"53\" src-nat-rule-name=\"our-nat-rule\" dst-nat-rule-name=\"N/A\" protocol-id=\"17\" policy-name=\"default-permit\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" session-id-32=\"15361\" packets-from-client=\"1\" bytes-from-client=\"66\" packets-from-server=\"1\" bytes-from-server=\"82\" elapsed-time=\"3\" username=\"N/A\" roles=\"N/A\" encrypted=\"No\" profile-name=\"N/A\" rule-name=\"N/A\" routing-instance=\"default\" destination-interface-name=\"ge-0/0/0.0\" uplink-incoming-interface-name=\"N/A\" uplink-tx-bytes=\"0\" uplink-rx-bytes=\"0\" category=\"N/A\" sub-category=\"N/A\" apbr-policy-name=\"N/A\" multipath-rule-name=\"N/A\" src-vrf-grp=\"N/A\" dst-vrf-grp=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
@@ -1906,18 +1906,18 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.encrypted": "No",
-        "junipersrx.firewall.process": "RT_FLOW",
-        "junipersrx.firewall.reason": "Closed by junos-alg",
-        "junipersrx.firewall.routing-instance": "default",
-        "junipersrx.firewall.service-name": "junos-dns-udp",
-        "junipersrx.firewall.session-id-32": "15361",
-        "junipersrx.firewall.src-nat-rule-name": "our-nat-rule",
-        "junipersrx.firewall.tag": "APPTRACK_SESSION_CLOSE",
-        "junipersrx.firewall.uplink-rx-bytes": "0",
-        "junipersrx.firewall.uplink-tx-bytes": "0",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "Closed by junos-alg",
+        "juniper.srx.routing_instance": "default",
+        "juniper.srx.service_name": "junos-dns-udp",
+        "juniper.srx.session_id_32": "15361",
+        "juniper.srx.src_nat_rule_name": "our-nat-rule",
+        "juniper.srx.tag": "APPTRACK_SESSION_CLOSE",
+        "juniper.srx.uplink_rx_bytes": "0",
+        "juniper.srx.uplink_tx_bytes": "0",
         "log.level": "informational",
         "log.offset": 18627,
         "network.bytes": 148,
@@ -1942,7 +1942,7 @@
         "server.nat.port": 53,
         "server.packets": 1,
         "server.port": 53,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.bytes": 66,
         "source.ip": "10.1.1.100",
         "source.nat.ip": "172.19.34.100",
@@ -1950,7 +1950,7 @@
         "source.packets": 1,
         "source.port": 63381,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     }
 ]

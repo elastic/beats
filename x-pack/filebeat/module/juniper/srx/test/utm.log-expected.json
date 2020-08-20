@@ -16,25 +16,25 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"192.168.1.100\" source-port=\"58071\" destination-address=\"103.235.46.39\" destination-port=\"80\" category=\"cat1\" reason=\"BY_BLACK_LIST\" profile=\"uf1\" url=\"www.baidu.com\" obj=\"/\" username=\"user01\" roles=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "12",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.category": "cat1",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile": "uf1",
-        "junipersrx.firewall.reason": "BY_BLACK_LIST",
-        "junipersrx.firewall.tag": "WEBFILTER_URL_BLOCKED",
+        "juniper.srx.category": "cat1",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile": "uf1",
+        "juniper.srx.reason": "BY_BLACK_LIST",
+        "juniper.srx.tag": "WEBFILTER_URL_BLOCKED",
         "log.level": "warning",
         "log.offset": 0,
         "observer.name": "utm-srx550-b",
@@ -43,12 +43,12 @@
         "observer.vendor": "Juniper",
         "server.ip": "103.235.46.39",
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "192.168.1.100",
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -68,9 +68,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.10.10.50\" source-port=\"1402\" destination-address=\"216.200.241.66\" destination-port=\"80\" category=\"N/A\" reason=\"BY_OTHER\" profile=\"wf-profile\" url=\"www.checkpoint.com\" obj=\"/css/homepage2012.css\" username=\"user02\" roles=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "12",
@@ -79,12 +79,12 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile": "wf-profile",
-        "junipersrx.firewall.reason": "BY_OTHER",
-        "junipersrx.firewall.tag": "WEBFILTER_URL_PERMITTED",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile": "wf-profile",
+        "juniper.srx.reason": "BY_OTHER",
+        "juniper.srx.tag": "WEBFILTER_URL_PERMITTED",
         "log.level": "warning",
         "log.offset": 319,
         "observer.name": "utm-srx550-b",
@@ -93,12 +93,12 @@
         "observer.vendor": "Juniper",
         "server.ip": "216.200.241.66",
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.10.10.50",
         "source.port": 1402,
         "source.user.name": "user02",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "www.checkpoint.com",
         "url.path": "/css/homepage2012.css"
@@ -114,25 +114,25 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"188.40.238.250\" source-port=\"80\" destination-address=\"10.1.1.103\" destination-port=\"47095\" source-zone-name=\"untrust\" filename=\"www.eicar.org/download/eicar.com\" temporary-filename=\"www.eicar.org/download/eicar.com\" name=\"EICAR-Test-File\" url=\"EICAR-Test-File\"",
         "event.outcome": "success",
         "event.severity": "12",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "file.name": "www.eicar.org/download/eicar.com",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.name": "EICAR-Test-File",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.tag": "AV_VIRUS_DETECTED_MT",
-        "junipersrx.firewall.temporary-filename": "www.eicar.org/download/eicar.com",
+        "juniper.srx.name": "EICAR-Test-File",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.tag": "AV_VIRUS_DETECTED_MT",
+        "juniper.srx.temporary_filename": "www.eicar.org/download/eicar.com",
         "log.level": "warning",
         "log.offset": 664,
         "observer.ingress.zone": "untrust",
@@ -142,7 +142,7 @@
         "observer.vendor": "Juniper",
         "server.ip": "10.1.1.103",
         "server.port": 47095,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 24940,
         "source.as.organization.name": "Hetzner Online GmbH",
         "source.geo.continent_name": "Europe",
@@ -152,7 +152,7 @@
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -165,9 +165,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"74.125.155.147\" source-port=\"80\" destination-address=\"10.1.1.103\" destination-port=\"33578\" filename=\"www.google.com/\" error-code=\"14\" error-message=\"scan engine is not ready\"",
         "event.outcome": "success",
         "event.severity": "12",
@@ -177,12 +177,12 @@
             "connection"
         ],
         "file.name": "www.google.com/",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.error-code": "14",
-        "junipersrx.firewall.error-message": "scan engine is not ready",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.tag": "AV_SCANNER_DROP_FILE_MT",
+        "juniper.srx.error_code": "14",
+        "juniper.srx.error_message": "scan engine is not ready",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.tag": "AV_SCANNER_DROP_FILE_MT",
         "log.level": "warning",
         "log.offset": 1035,
         "observer.name": "SRX650-1",
@@ -191,7 +191,7 @@
         "observer.vendor": "Juniper",
         "server.ip": "10.1.1.103",
         "server.port": 33578,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 15169,
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
@@ -201,7 +201,7 @@
         "source.ip": "74.125.155.147",
         "source.port": 80,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -213,9 +213,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"10.2.1.101\" source-port=\"80\" destination-address=\"10.1.1.103\" destination-port=\"51727\" filename=\"10.2.1.101/images/junos- srxsme-10.2-20100106.0-domestic.tgz\"",
         "event.outcome": "success",
         "event.severity": "12",
@@ -225,10 +225,10 @@
             "connection"
         ],
         "file.name": "10.2.1.101/images/junos- srxsme-10.2-20100106.0-domestic.tgz",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.tag": "AV_HUGE_FILE_DROPPED_MT",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.tag": "AV_HUGE_FILE_DROPPED_MT",
         "log.level": "warning",
         "log.offset": 1323,
         "observer.name": "SRX650-1",
@@ -237,11 +237,11 @@
         "observer.vendor": "Juniper",
         "server.ip": "10.1.1.103",
         "server.port": 51727,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.2.1.101",
         "source.port": 80,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -252,25 +252,25 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-zone=\"trust\" destination-zone=\"untrust\" source-name=\"N/A\" source-address=\"10.10.10.1\" profile-name=\"antispam01\" action=\"drop\" reason=\"Match local blacklist\" username=\"user01\" roles=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "14",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.action": "drop",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile-name": "antispam01",
-        "junipersrx.firewall.reason": "Match local blacklist",
-        "junipersrx.firewall.tag": "ANTISPAM_SPAM_DETECTED_MT",
+        "juniper.srx.action": "drop",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile_name": "antispam01",
+        "juniper.srx.reason": "Match local blacklist",
+        "juniper.srx.tag": "ANTISPAM_SPAM_DETECTED_MT",
         "log.level": "informational",
         "log.offset": 1595,
         "observer.egress.zone": "untrust",
@@ -279,11 +279,11 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.10.10.1",
         "source.user.name": "user01",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -297,26 +297,26 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-zone=\"untrust\" destination-zone=\"trust\" protocol=\"http\" source-address=\"192.0.2.3\" source-port=\"58071\" destination-address=\"198.51.100.2\" destination-port=\"80\" profile-name=\"content02\" action=\"drop\" reason=\"blocked due to file extension block list\" username=\"user01@testuser.com\" roles=\"N/A\" filename=\"test.cmd\"",
         "event.outcome": "success",
         "event.severity": "14",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "file.name": "test.cmd",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.action": "drop",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile-name": "content02",
-        "junipersrx.firewall.reason": "blocked due to file extension block list",
-        "junipersrx.firewall.tag": "CONTENT_FILTERING_BLOCKED_MT",
+        "juniper.srx.action": "drop",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile_name": "content02",
+        "juniper.srx.reason": "blocked due to file extension block list",
+        "juniper.srx.tag": "CONTENT_FILTERING_BLOCKED_MT",
         "log.level": "informational",
         "log.offset": 1892,
         "network.protocol": "http",
@@ -328,12 +328,12 @@
         "observer.vendor": "Juniper",
         "server.ip": "198.51.100.2",
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "192.0.2.3",
         "source.port": 58071,
         "source.user.name": "user01@testuser.com",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     },
     {
@@ -353,25 +353,25 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"192.168.1.100\" source-port=\"58071\" destination-address=\"103.235.46.39\" destination-port=\"80\" category=\"cat1\" reason=\"BY_BLACK_LIST\" profile=\"uf1\" url=\"www.baidu.com\" obj=\"/\" username=\"user01\" roles=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "12",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.category": "cat1",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile": "uf1",
-        "junipersrx.firewall.reason": "BY_BLACK_LIST",
-        "junipersrx.firewall.tag": "WEBFILTER_URL_BLOCKED_LS",
+        "juniper.srx.category": "cat1",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile": "uf1",
+        "juniper.srx.reason": "BY_BLACK_LIST",
+        "juniper.srx.tag": "WEBFILTER_URL_BLOCKED_LS",
         "log.level": "warning",
         "log.offset": 2317,
         "observer.name": "utm-srx550-b",
@@ -380,12 +380,12 @@
         "observer.vendor": "Juniper",
         "server.ip": "103.235.46.39",
         "server.port": 80,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "192.168.1.100",
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -401,25 +401,25 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-address=\"188.40.238.250\" source-port=\"80\" destination-address=\"10.1.1.103\" destination-port=\"47095\" source-zone-name=\"untrust\" filename=\"www.eicar.org/download/eicar.com\" temporary-filename=\"www.eicar.org/download/eicar.com\" name=\"EICAR-Test-File\" url=\"EICAR-Test-File\"",
         "event.outcome": "success",
         "event.severity": "12",
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
         "file.name": "www.eicar.org/download/eicar.com",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.name": "EICAR-Test-File",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.tag": "AV_VIRUS_DETECTED_MT_LS",
-        "junipersrx.firewall.temporary-filename": "www.eicar.org/download/eicar.com",
+        "juniper.srx.name": "EICAR-Test-File",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.tag": "AV_VIRUS_DETECTED_MT_LS",
+        "juniper.srx.temporary_filename": "www.eicar.org/download/eicar.com",
         "log.level": "warning",
         "log.offset": 2639,
         "observer.ingress.zone": "untrust",
@@ -429,7 +429,7 @@
         "observer.vendor": "Juniper",
         "server.ip": "10.1.1.103",
         "server.port": 47095,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 24940,
         "source.as.organization.name": "Hetzner Online GmbH",
         "source.geo.continent_name": "Europe",
@@ -439,7 +439,7 @@
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -458,9 +458,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-zone=\"trust\" destination-zone=\"untrust\" source-address=\"10.1.1.100\" source-port=\"58974\" destination-address=\"104.26.15.142\" destination-port=\"443\" session-id=\"16297\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" category=\"Enhanced_Information_Technology\" reason=\"BY_SITE_REPUTATION_MODERATELY_SAFE\" profile=\"WCF1\" url=\"datawrapper.dwcdn.net\" obj=\"/\" username=\"N/A\" roles=\"N/A\" application-sub-category=\"N/A\" urlcategory-risk=\"0\"",
         "event.outcome": "success",
         "event.risk_score": "0",
@@ -470,14 +470,14 @@
             "allowed",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.category": "Enhanced_Information_Technology",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile": "WCF1",
-        "junipersrx.firewall.reason": "BY_SITE_REPUTATION_MODERATELY_SAFE",
-        "junipersrx.firewall.session-id": "16297",
-        "junipersrx.firewall.tag": "WEBFILTER_URL_PERMITTED",
+        "juniper.srx.category": "Enhanced_Information_Technology",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile": "WCF1",
+        "juniper.srx.reason": "BY_SITE_REPUTATION_MODERATELY_SAFE",
+        "juniper.srx.session_id": "16297",
+        "juniper.srx.tag": "WEBFILTER_URL_PERMITTED",
         "log.level": "informational",
         "log.offset": 3013,
         "observer.egress.zone": "untrust",
@@ -488,11 +488,11 @@
         "observer.vendor": "Juniper",
         "server.ip": "104.26.15.142",
         "server.port": 443,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.1.1.100",
         "source.port": 58974,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "datawrapper.dwcdn.net",
         "url.path": "/"
@@ -514,9 +514,9 @@
             "network",
             "malware"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "alert",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-zone=\"trust\" destination-zone=\"untrust\" source-address=\"10.1.1.100\" source-port=\"59075\" destination-address=\"85.114.159.93\" destination-port=\"443\" session-id=\"16490\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" category=\"Enhanced_Advertisements\" reason=\"BY_SITE_REPUTATION_SUSPICIOUS\" profile=\"WCF1\" url=\"dsp.adfarm1.adition.com\" obj=\"/\" username=\"N/A\" roles=\"N/A\" application-sub-category=\"N/A\" urlcategory-risk=\"3\"",
         "event.outcome": "success",
         "event.risk_score": "3",
@@ -524,17 +524,17 @@
         "event.timezone": "-02:00",
         "event.type": [
             "info",
-            "diened",
+            "denied",
             "connection"
         ],
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.category": "Enhanced_Advertisements",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile": "WCF1",
-        "junipersrx.firewall.reason": "BY_SITE_REPUTATION_SUSPICIOUS",
-        "junipersrx.firewall.session-id": "16490",
-        "junipersrx.firewall.tag": "WEBFILTER_URL_BLOCKED",
+        "juniper.srx.category": "Enhanced_Advertisements",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile": "WCF1",
+        "juniper.srx.reason": "BY_SITE_REPUTATION_SUSPICIOUS",
+        "juniper.srx.session_id": "16490",
+        "juniper.srx.tag": "WEBFILTER_URL_BLOCKED",
         "log.level": "warning",
         "log.offset": 3552,
         "observer.egress.zone": "untrust",
@@ -545,11 +545,11 @@
         "observer.vendor": "Juniper",
         "server.ip": "85.114.159.93",
         "server.port": 443,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.ip": "10.1.1.100",
         "source.port": 59075,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ],
         "url.domain": "dsp.adfarm1.adition.com",
         "url.path": "/"
@@ -563,9 +563,9 @@
         "event.category": [
             "network"
         ],
-        "event.dataset": "junipersrx.firewall",
+        "event.dataset": "juniper.srx",
         "event.kind": "event",
-        "event.module": "junipersrx",
+        "event.module": "juniper",
         "event.original": "source-zone=\"trust\" destination-zone=\"untrust\" source-address=\"23.209.86.45\" source-port=\"80\" destination-address=\"10.1.1.100\" destination-port=\"58954\" profile-name=\"Custom-Sophos-Profile\" filename=\"download.cdn.mozilla.net/pub/firefox/releases/78.0.2/update/win64/de/firefox-78.0.2.complete.mar\" action=\"BLOCKED\" reason=\"exceeding maximum content size\" error-code=\"7\" username=\"N/A\" roles=\"N/A\"",
         "event.outcome": "success",
         "event.severity": "12",
@@ -575,14 +575,14 @@
             "connection"
         ],
         "file.name": "download.cdn.mozilla.net/pub/firefox/releases/78.0.2/update/win64/de/firefox-78.0.2.complete.mar",
-        "fileset.name": "firewall",
+        "fileset.name": "srx",
         "input.type": "log",
-        "junipersrx.firewall.action": "BLOCKED",
-        "junipersrx.firewall.error-code": "7",
-        "junipersrx.firewall.process": "RT_UTM",
-        "junipersrx.firewall.profile-name": "Custom-Sophos-Profile",
-        "junipersrx.firewall.reason": "exceeding maximum content size",
-        "junipersrx.firewall.tag": "AV_FILE_NOT_SCANNED_DROPPED_MT",
+        "juniper.srx.action": "BLOCKED",
+        "juniper.srx.error_code": "7",
+        "juniper.srx.process": "RT_UTM",
+        "juniper.srx.profile_name": "Custom-Sophos-Profile",
+        "juniper.srx.reason": "exceeding maximum content size",
+        "juniper.srx.tag": "AV_FILE_NOT_SCANNED_DROPPED_MT",
         "log.level": "warning",
         "log.offset": 4078,
         "observer.egress.zone": "untrust",
@@ -593,7 +593,7 @@
         "observer.vendor": "Juniper",
         "server.ip": "10.1.1.100",
         "server.port": 58954,
-        "service.type": "junipersrx",
+        "service.type": "juniper",
         "source.as.number": 16625,
         "source.as.organization.name": "Akamai Technologies, Inc.",
         "source.geo.continent_name": "Europe",
@@ -603,7 +603,7 @@
         "source.ip": "23.209.86.45",
         "source.port": 80,
         "tags": [
-            "junipersrx-firewall forwarded"
+            "juniper-srx forwarded"
         ]
     }
 ]

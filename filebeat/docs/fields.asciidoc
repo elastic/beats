@@ -88081,13 +88081,13 @@ type: keyword
 --
 
 [float]
-=== srx
+=== juniper.srx
 
 Module for parsing junipersrx syslog.
 
 
 
-*`srx.reason`*::
+*`juniper.srx.reason`*::
 +
 --
 reason
@@ -88097,7 +88097,7 @@ type: keyword
 
 --
 
-*`srx.source-address`*::
+*`juniper.srx.source_address`*::
 +
 --
 source address
@@ -88107,7 +88107,7 @@ type: ip
 
 --
 
-*`srx.source-port`*::
+*`juniper.srx.source_port`*::
 +
 --
 source port
@@ -88117,7 +88117,7 @@ type: integer
 
 --
 
-*`srx.destination-address`*::
+*`juniper.srx.destination_address`*::
 +
 --
 destination address
@@ -88127,7 +88127,7 @@ type: ip
 
 --
 
-*`srx.destination-port`*::
+*`juniper.srx.destination_port`*::
 +
 --
 destination port
@@ -88137,7 +88137,7 @@ type: integer
 
 --
 
-*`srx.connection-tag`*::
+*`juniper.srx.connection_tag`*::
 +
 --
 connection tag
@@ -88147,7 +88147,7 @@ type: keyword
 
 --
 
-*`srx.service-name`*::
+*`juniper.srx.service_name`*::
 +
 --
 service name
@@ -88157,7 +88157,7 @@ type: keyword
 
 --
 
-*`srx.nat-source-address`*::
+*`juniper.srx.nat_source_address`*::
 +
 --
 nat source address
@@ -88167,7 +88167,7 @@ type: ip
 
 --
 
-*`srx.nat-source-port`*::
+*`juniper.srx.nat_source_port`*::
 +
 --
 nat source port
@@ -88177,7 +88177,7 @@ type: integer
 
 --
 
-*`srx.nat-destination-address`*::
+*`juniper.srx.nat_destination_address`*::
 +
 --
 nat destination address
@@ -88187,7 +88187,7 @@ type: ip
 
 --
 
-*`srx.nat-destination-port`*::
+*`juniper.srx.nat_destination_port`*::
 +
 --
 nat destination port
@@ -88197,7 +88197,7 @@ type: integer
 
 --
 
-*`srx.nat-connection-tag`*::
+*`juniper.srx.nat_connection_tag`*::
 +
 --
 nat connection tag
@@ -88207,7 +88207,7 @@ type: keyword
 
 --
 
-*`srx.src-nat-rule-type`*::
+*`juniper.srx.src_nat_rule_type`*::
 +
 --
 src nat rule type
@@ -88217,7 +88217,7 @@ type: keyword
 
 --
 
-*`srx.src-nat-rule-name`*::
+*`juniper.srx.src_nat_rule_name`*::
 +
 --
 src nat rule name
@@ -88227,7 +88227,7 @@ type: keyword
 
 --
 
-*`srx.dst-nat-rule-type`*::
+*`juniper.srx.dst_nat_rule_type`*::
 +
 --
 dst nat rule type
@@ -88237,7 +88237,7 @@ type: keyword
 
 --
 
-*`srx.dst-nat-rule-name`*::
+*`juniper.srx.dst_nat_rule_name`*::
 +
 --
 dst nat rule name
@@ -88247,7 +88247,7 @@ type: keyword
 
 --
 
-*`srx.protocol-id`*::
+*`juniper.srx.protocol_id`*::
 +
 --
 protocol id
@@ -88257,7 +88257,7 @@ type: keyword
 
 --
 
-*`srx.policy-name`*::
+*`juniper.srx.policy_name`*::
 +
 --
 policy name
@@ -88267,7 +88267,7 @@ type: keyword
 
 --
 
-*`srx.source-zone-name`*::
+*`juniper.srx.source_zone_name`*::
 +
 --
 source zone name
@@ -88277,7 +88277,7 @@ type: keyword
 
 --
 
-*`srx.source-zone`*::
+*`juniper.srx.source_zone`*::
 +
 --
 source zone
@@ -88287,7 +88287,7 @@ type: keyword
 
 --
 
-*`srx.destination-zone-name`*::
+*`juniper.srx.destination_zone_name`*::
 +
 --
 destination zone name
@@ -88297,7 +88297,7 @@ type: keyword
 
 --
 
-*`srx.destination-zone`*::
+*`juniper.srx.destination_zone`*::
 +
 --
 destination zone
@@ -88307,7 +88307,7 @@ type: keyword
 
 --
 
-*`srx.session-id-32`*::
+*`juniper.srx.session_id_32`*::
 +
 --
 session id 32
@@ -88317,7 +88317,7 @@ type: keyword
 
 --
 
-*`srx.session-id`*::
+*`juniper.srx.session_id`*::
 +
 --
 session id
@@ -88327,7 +88327,7 @@ type: keyword
 
 --
 
-*`srx.packets-from-client`*::
+*`juniper.srx.packets_from_client`*::
 +
 --
 packets from client
@@ -88337,7 +88337,7 @@ type: integer
 
 --
 
-*`srx.outbound-packets`*::
+*`juniper.srx.outbound_packets`*::
 +
 --
 packets from client
@@ -88347,7 +88347,7 @@ type: integer
 
 --
 
-*`srx.bytes-from-client`*::
+*`juniper.srx.bytes_from_client`*::
 +
 --
 bytes from client
@@ -88357,7 +88357,7 @@ type: integer
 
 --
 
-*`srx.outbound-bytes`*::
+*`juniper.srx.outbound_bytes`*::
 +
 --
 bytes from client
@@ -88367,7 +88367,7 @@ type: integer
 
 --
 
-*`srx.packets-from-server`*::
+*`juniper.srx.packets_from_server`*::
 +
 --
 packets from server
@@ -88377,7 +88377,7 @@ type: integer
 
 --
 
-*`srx.inbound-packets`*::
+*`juniper.srx.inbound_packets`*::
 +
 --
 packets from server
@@ -88387,7 +88387,7 @@ type: integer
 
 --
 
-*`srx.bytes-from-server`*::
+*`juniper.srx.bytes_from_server`*::
 +
 --
 bytes from server
@@ -88397,7 +88397,7 @@ type: integer
 
 --
 
-*`srx.inbound-bytes`*::
+*`juniper.srx.inbound_bytes`*::
 +
 --
 bytes from server
@@ -88407,7 +88407,7 @@ type: integer
 
 --
 
-*`srx.elapsed-time`*::
+*`juniper.srx.elapsed_time`*::
 +
 --
 elapsed time
@@ -88417,7 +88417,7 @@ type: date
 
 --
 
-*`srx.application`*::
+*`juniper.srx.application`*::
 +
 --
 application
@@ -88427,7 +88427,7 @@ type: keyword
 
 --
 
-*`srx.nested-application`*::
+*`juniper.srx.nested_application`*::
 +
 --
 nested application
@@ -88437,7 +88437,7 @@ type: keyword
 
 --
 
-*`srx.username`*::
+*`juniper.srx.username`*::
 +
 --
 username
@@ -88447,7 +88447,7 @@ type: keyword
 
 --
 
-*`srx.roles`*::
+*`juniper.srx.roles`*::
 +
 --
 roles
@@ -88457,7 +88457,7 @@ type: keyword
 
 --
 
-*`srx.packet-incoming-interface`*::
+*`juniper.srx.packet_incoming_interface`*::
 +
 --
 packet incoming interface
@@ -88467,7 +88467,7 @@ type: keyword
 
 --
 
-*`srx.encrypted`*::
+*`juniper.srx.encrypted`*::
 +
 --
 encrypted
@@ -88477,7 +88477,7 @@ type: keyword
 
 --
 
-*`srx.application-category`*::
+*`juniper.srx.application_category`*::
 +
 --
 application category
@@ -88487,7 +88487,7 @@ type: keyword
 
 --
 
-*`srx.application-sub-category`*::
+*`juniper.srx.application_sub_category`*::
 +
 --
 application sub category
@@ -88497,7 +88497,7 @@ type: keyword
 
 --
 
-*`srx.application-risk`*::
+*`juniper.srx.application_risk`*::
 +
 --
 application risk
@@ -88507,7 +88507,7 @@ type: integer
 
 --
 
-*`srx.urlcategory-risk`*::
+*`juniper.srx.urlcategory_risk`*::
 +
 --
 urlcategory risk
@@ -88517,7 +88517,7 @@ type: integer
 
 --
 
-*`srx.application-characteristics`*::
+*`juniper.srx.application_characteristics`*::
 +
 --
 application characteristics
@@ -88527,7 +88527,7 @@ type: keyword
 
 --
 
-*`srx.secure-web-proxy-session-type`*::
+*`juniper.srx.secure_web_proxy_session_type`*::
 +
 --
 secure web proxy session type
@@ -88537,7 +88537,7 @@ type: keyword
 
 --
 
-*`srx.peer-session-id`*::
+*`juniper.srx.peer_session_id`*::
 +
 --
 peer session id
@@ -88547,7 +88547,7 @@ type: keyword
 
 --
 
-*`srx.peer-source-address`*::
+*`juniper.srx.peer_source_address`*::
 +
 --
 peer source address
@@ -88557,7 +88557,7 @@ type: ip
 
 --
 
-*`srx.peer-source-port`*::
+*`juniper.srx.peer_source_port`*::
 +
 --
 peer source port
@@ -88567,7 +88567,7 @@ type: integer
 
 --
 
-*`srx.peer-destination-address`*::
+*`juniper.srx.peer_destination_address`*::
 +
 --
 peer destination address
@@ -88577,7 +88577,7 @@ type: ip
 
 --
 
-*`srx.peer-destination-port`*::
+*`juniper.srx.peer_destination_port`*::
 +
 --
 peer destination port
@@ -88587,7 +88587,7 @@ type: integer
 
 --
 
-*`srx.hostname`*::
+*`juniper.srx.hostname`*::
 +
 --
 hostname
@@ -88597,27 +88597,27 @@ type: keyword
 
 --
 
-*`srx.src-vrf-grp`*::
+*`juniper.srx.src_vrf_grp`*::
 +
 --
-src-vrf-grp
+src_vrf_grp
 
 
 type: keyword
 
 --
 
-*`srx.dst-vrf-grp`*::
+*`juniper.srx.dst_vrf_grp`*::
 +
 --
-dst-vrf-grp
+dst_vrf_grp
 
 
 type: keyword
 
 --
 
-*`srx.icmp-type`*::
+*`juniper.srx.icmp_type`*::
 +
 --
 icmp type
@@ -88627,7 +88627,7 @@ type: integer
 
 --
 
-*`srx.process`*::
+*`juniper.srx.process`*::
 +
 --
 process that generated the message
@@ -88637,7 +88637,7 @@ type: keyword
 
 --
 
-*`srx.apbr-rule-type`*::
+*`juniper.srx.apbr_rule_type`*::
 +
 --
 apbr rule type
@@ -88647,7 +88647,7 @@ type: keyword
 
 --
 
-*`srx.dscp-value`*::
+*`juniper.srx.dscp_value`*::
 +
 --
 apbr rule type
@@ -88657,7 +88657,7 @@ type: integer
 
 --
 
-*`srx.logical-system-name`*::
+*`juniper.srx.logical_system_name`*::
 +
 --
 logical system name
@@ -88667,7 +88667,7 @@ type: keyword
 
 --
 
-*`srx.destination-interface-name`*::
+*`juniper.srx.destination_interface_name`*::
 +
 --
 destination interface name
@@ -88677,7 +88677,7 @@ type: keyword
 
 --
 
-*`srx.profile-name`*::
+*`juniper.srx.profile_name`*::
 +
 --
 profile name
@@ -88687,7 +88687,7 @@ type: keyword
 
 --
 
-*`srx.routing-instance`*::
+*`juniper.srx.routing_instance`*::
 +
 --
 routing instance
@@ -88697,7 +88697,7 @@ type: keyword
 
 --
 
-*`srx.rule-name`*::
+*`juniper.srx.rule_name`*::
 +
 --
 rule name
@@ -88707,7 +88707,7 @@ type: keyword
 
 --
 
-*`srx.uplink-tx-bytes`*::
+*`juniper.srx.uplink_tx_bytes`*::
 +
 --
 uplink tx bytes
@@ -88717,7 +88717,7 @@ type: integer
 
 --
 
-*`srx.uplink-rx-bytes`*::
+*`juniper.srx.uplink_rx_bytes`*::
 +
 --
 uplink rx bytes
@@ -88727,7 +88727,7 @@ type: integer
 
 --
 
-*`srx.obj`*::
+*`juniper.srx.obj`*::
 +
 --
 url path
@@ -88737,7 +88737,7 @@ type: keyword
 
 --
 
-*`srx.url`*::
+*`juniper.srx.url`*::
 +
 --
 url domain
@@ -88747,7 +88747,7 @@ type: keyword
 
 --
 
-*`srx.profile`*::
+*`juniper.srx.profile`*::
 +
 --
 filter profile
@@ -88757,7 +88757,7 @@ type: keyword
 
 --
 
-*`srx.category`*::
+*`juniper.srx.category`*::
 +
 --
 filter category
@@ -88767,7 +88767,7 @@ type: keyword
 
 --
 
-*`srx.filename`*::
+*`juniper.srx.filename`*::
 +
 --
 filename
@@ -88777,17 +88777,17 @@ type: keyword
 
 --
 
-*`srx.temporary-filename`*::
+*`juniper.srx.temporary_filename`*::
 +
 --
-temporary-filename
+temporary_filename
 
 
 type: keyword
 
 --
 
-*`srx.name`*::
+*`juniper.srx.name`*::
 +
 --
 name
@@ -88797,27 +88797,27 @@ type: keyword
 
 --
 
-*`srx.error-message`*::
+*`juniper.srx.error_message`*::
 +
 --
-error-message
+error_message
 
 
 type: keyword
 
 --
 
-*`srx.error-code`*::
+*`juniper.srx.error_code`*::
 +
 --
-error-code
+error_code
 
 
 type: keyword
 
 --
 
-*`srx.action`*::
+*`juniper.srx.action`*::
 +
 --
 action
@@ -88827,7 +88827,7 @@ type: keyword
 
 --
 
-*`srx.protocol`*::
+*`juniper.srx.protocol`*::
 +
 --
 protocol
@@ -88837,7 +88837,7 @@ type: keyword
 
 --
 
-*`srx.protocol-name`*::
+*`juniper.srx.protocol_name`*::
 +
 --
 protocol name
@@ -88847,7 +88847,7 @@ type: keyword
 
 --
 
-*`srx.type`*::
+*`juniper.srx.type`*::
 +
 --
 type
@@ -88857,7 +88857,7 @@ type: keyword
 
 --
 
-*`srx.repeat-count`*::
+*`juniper.srx.repeat_count`*::
 +
 --
 repeat count
@@ -88867,7 +88867,7 @@ type: integer
 
 --
 
-*`srx.alert`*::
+*`juniper.srx.alert`*::
 +
 --
 repeat alert
@@ -88877,7 +88877,7 @@ type: keyword
 
 --
 
-*`srx.message-type`*::
+*`juniper.srx.message_type`*::
 +
 --
 message type
@@ -88887,7 +88887,7 @@ type: keyword
 
 --
 
-*`srx.threat-severity`*::
+*`juniper.srx.threat_severity`*::
 +
 --
 threat severity
@@ -88897,7 +88897,7 @@ type: keyword
 
 --
 
-*`srx.application-name`*::
+*`juniper.srx.application_name`*::
 +
 --
 application name
@@ -88907,7 +88907,7 @@ type: keyword
 
 --
 
-*`srx.attack-name`*::
+*`juniper.srx.attack_name`*::
 +
 --
 attack name
@@ -88917,7 +88917,7 @@ type: keyword
 
 --
 
-*`srx.index`*::
+*`juniper.srx.index`*::
 +
 --
 index
@@ -88927,7 +88927,7 @@ type: keyword
 
 --
 
-*`srx.message`*::
+*`juniper.srx.message`*::
 +
 --
 mesagge
@@ -88937,7 +88937,7 @@ type: keyword
 
 --
 
-*`srx.epoch-time`*::
+*`juniper.srx.epoch_time`*::
 +
 --
 epoch time
@@ -88947,7 +88947,7 @@ type: date
 
 --
 
-*`srx.packet-log-id`*::
+*`juniper.srx.packet_log_id`*::
 +
 --
 packet log id
@@ -88957,7 +88957,7 @@ type: integer
 
 --
 
-*`srx.export-id`*::
+*`juniper.srx.export_id`*::
 +
 --
 packet log id
@@ -88967,7 +88967,7 @@ type: integer
 
 --
 
-*`srx.ddos-application-name`*::
+*`juniper.srx.ddos_application_name`*::
 +
 --
 ddos application name
@@ -88977,7 +88977,7 @@ type: keyword
 
 --
 
-*`srx.connection-hit-rate`*::
+*`juniper.srx.connection_hit_rate`*::
 +
 --
 connection hit rate
@@ -88987,7 +88987,7 @@ type: integer
 
 --
 
-*`srx.time-scope`*::
+*`juniper.srx.time_scope`*::
 +
 --
 time scope
@@ -88997,7 +88997,7 @@ type: keyword
 
 --
 
-*`srx.context-hit-rate`*::
+*`juniper.srx.context_hit_rate`*::
 +
 --
 context hit rate
@@ -89007,7 +89007,7 @@ type: integer
 
 --
 
-*`srx.context-value-hit-rate`*::
+*`juniper.srx.context_value_hit_rate`*::
 +
 --
 context value hit rate
@@ -89017,7 +89017,7 @@ type: integer
 
 --
 
-*`srx.time-count`*::
+*`juniper.srx.time_count`*::
 +
 --
 time count
@@ -89027,7 +89027,7 @@ type: integer
 
 --
 
-*`srx.time-period`*::
+*`juniper.srx.time_period`*::
 +
 --
 time period
@@ -89037,7 +89037,7 @@ type: integer
 
 --
 
-*`srx.context-value`*::
+*`juniper.srx.context_value`*::
 +
 --
 context value
@@ -89047,7 +89047,7 @@ type: keyword
 
 --
 
-*`srx.context-name`*::
+*`juniper.srx.context_name`*::
 +
 --
 context name
@@ -89057,7 +89057,7 @@ type: keyword
 
 --
 
-*`srx.ruleebase-name`*::
+*`juniper.srx.ruleebase_name`*::
 +
 --
 ruleebase name
@@ -89067,7 +89067,7 @@ type: keyword
 
 --
 
-*`srx.interface-name`*::
+*`juniper.srx.interface_name`*::
 +
 --
 interface name
@@ -89077,7 +89077,7 @@ type: keyword
 
 --
 
-*`srx.verdict-source`*::
+*`juniper.srx.verdict_source`*::
 +
 --
 verdict source
@@ -89087,7 +89087,7 @@ type: keyword
 
 --
 
-*`srx.verdict-number`*::
+*`juniper.srx.verdict_number`*::
 +
 --
 verdict number
@@ -89097,7 +89097,7 @@ type: integer
 
 --
 
-*`srx.http-host`*::
+*`juniper.srx.http_host`*::
 +
 --
 http host
@@ -89107,7 +89107,7 @@ type: keyword
 
 --
 
-*`srx.file-category`*::
+*`juniper.srx.file_category`*::
 +
 --
 file category
@@ -89117,7 +89117,7 @@ type: keyword
 
 --
 
-*`srx.sample-sha256`*::
+*`juniper.srx.sample_sha256`*::
 +
 --
 sample sha256
@@ -89127,7 +89127,7 @@ type: keyword
 
 --
 
-*`srx.malware-info`*::
+*`juniper.srx.malware_info`*::
 +
 --
 malware info
@@ -89137,7 +89137,7 @@ type: keyword
 
 --
 
-*`srx.client-ip`*::
+*`juniper.srx.client_ip`*::
 +
 --
 client ip
@@ -89147,7 +89147,7 @@ type: ip
 
 --
 
-*`srx.tenant-id`*::
+*`juniper.srx.tenant_id`*::
 +
 --
 tenant id
@@ -89157,7 +89157,7 @@ type: keyword
 
 --
 
-*`srx.timestamp`*::
+*`juniper.srx.timestamp`*::
 +
 --
 timestamp
@@ -89167,7 +89167,7 @@ type: date
 
 --
 
-*`srx.th`*::
+*`juniper.srx.th`*::
 +
 --
 th
@@ -89177,7 +89177,7 @@ type: keyword
 
 --
 
-*`srx.status`*::
+*`juniper.srx.status`*::
 +
 --
 status
@@ -89187,7 +89187,7 @@ type: keyword
 
 --
 
-*`srx.state`*::
+*`juniper.srx.state`*::
 +
 --
 state
@@ -89197,7 +89197,7 @@ type: keyword
 
 --
 
-*`srx.file-hash-lookup`*::
+*`juniper.srx.file_hash_lookup`*::
 +
 --
 file hash lookup
@@ -89207,7 +89207,7 @@ type: keyword
 
 --
 
-*`srx.file-name`*::
+*`juniper.srx.file_name`*::
 +
 --
 file name
@@ -89217,7 +89217,7 @@ type: keyword
 
 --
 
-*`srx.action-detail`*::
+*`juniper.srx.action_detail`*::
 +
 --
 action detail
@@ -89227,7 +89227,7 @@ type: keyword
 
 --
 
-*`srx.sub-category`*::
+*`juniper.srx.sub_category`*::
 +
 --
 sub category
@@ -89237,7 +89237,7 @@ type: keyword
 
 --
 
-*`srx.feed-name`*::
+*`juniper.srx.feed_name`*::
 +
 --
 feed name
@@ -89247,7 +89247,7 @@ type: keyword
 
 --
 
-*`srx.occur-count`*::
+*`juniper.srx.occur_count`*::
 +
 --
 occur count
@@ -89257,7 +89257,7 @@ type: integer
 
 --
 
-*`srx.tag`*::
+*`juniper.srx.tag`*::
 +
 --
 system log message tag, which uniquely identifies the message.

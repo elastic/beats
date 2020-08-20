@@ -17,6 +17,12 @@ processors:
     ignore_failure: false
     trim_value: "\""
 
+# Removes all empty fields
+- script:
+    lang: painless
+    source: >-
+      ctx.juniper.srx = ctx?.juniper?.srx.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace('-', '_'), e -> e.getValue()));
+
 #
 # Parse the date
 #
@@ -45,11 +51,11 @@ processors:
     value: '{{_ingest.timestamp}}'
 
 # Can possibly be omitted if there is a solution for the equal signs and the calculation of the start time.
-# -> juniper.srx.elapsed-time
+# -> juniper.srx.elapsed_time
 - rename:
-    field: juniper.srx.elapsed-time
+    field: juniper.srx.elapsed_time
     target_field: juniper.srx.duration
-    if: "ctx.juniper?.srx['elapsed-time'] != null"
+    if: "ctx.juniper?.srx?.elapsed_time != null"
 
 # Sets starts, end and duration when start and duration is known
 - script:
@@ -144,35 +150,35 @@ processors:
     target_field: observer.name
     ignore_missing: true
 - rename:
-    field: juniper.srx.packet-incoming-interface
+    field: juniper.srx.packet_incoming_interface
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: juniper.srx.destination-interface-name
+    field: juniper.srx.destination_interface_name
     target_field: observer.egress.interface.name
     ignore_missing: true
 - rename:
-    field: juniper.srx.source-interface-name
+    field: juniper.srx.source_interface_name
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: juniper.srx.interface-name
+    field: juniper.srx.interface_name
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: juniper.srx.source-zone-name
+    field: juniper.srx.source_zone_name
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
-    field: juniper.srx.source-zone
+    field: juniper.srx.source_zone
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
-    field: juniper.srx.destination-zone-name
+    field: juniper.srx.destination_zone_name
     target_field: observer.egress.zone
     ignore_missing: true
 - rename:
-    field: juniper.srx.destination-zone
+    field: juniper.srx.destination_zone
     target_field: observer.egress.zone
     ignore_missing: true
 - rename:
@@ -199,7 +205,6 @@ processors:
         - juniper.srx.dstzone
         - juniper.srx.duration
         - syslog_pri
-        - syslog_hostname
     ignore_missing: true
 
 ################################

@@ -25,7 +25,7 @@ processors:
     field: event.type
     value:
       - info
-      - diened
+      - denied
       - connection
     if: '["IDP_ATTACK_LOG_EVENT", "IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_ATTACK_LOG_EVENT_LS", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
 - append:
@@ -48,26 +48,26 @@ processors:
 ## ECS Server/Destination Mapping ##
 ####################################
 - rename:
-    field: juniper.srx.destination-address
+    field: juniper.srx.destination_address
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.juniper?.srx['destination-address'] != null"
+    if: "ctx.juniper?.srx?.destination_address != null"
 - set:
     field: server.ip
     value: '{{destination.ip}}'
     if: "ctx.destination?.ip != null"
 - rename:
-    field: juniper.srx.nat-destination-address
+    field: juniper.srx.nat_destination_address
     target_field: destination.nat.ip
     ignore_missing: true
-    if: "ctx.juniper?.srx['nat-destination-address'] != null"
+    if: "ctx.juniper?.srx?.nat_destination_address != null"
 - convert:
-    field: juniper.srx.destination-port
+    field: juniper.srx.destination_port
     target_field: destination.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['destination-port'] != null"
+    if: "ctx.juniper?.srx?.destination_port != null"
 - set:
     field: server.port
     value: '{{destination.port}}'
@@ -80,12 +80,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.port != null"
 - convert:
-    field: juniper.srx.nat-destination-port
+    field: juniper.srx.nat_destination_port
     target_field: destination.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['nat-destination-port'] != null"
+    if: "ctx.juniper?.srx['nat_destination_port'] != null"
 - set:
     field: server.nat.port
     value: '{{destination.nat.port}}'
@@ -98,12 +98,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.nat?.port != null"
 - convert:
-    field: juniper.srx.inbound-bytes
+    field: juniper.srx.inbound_bytes
     target_field: destination.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['inbound-bytes'] != null"
+    if: "ctx.juniper?.srx?.inbound_bytes != null"
 - set:
     field: server.bytes
     value: '{{destination.bytes}}'
@@ -116,12 +116,12 @@ processors:
     ignore_missing: true
     if: "ctx.server?.bytes != null"
 - convert:
-    field: juniper.srx.inbound-packets
+    field: juniper.srx.inbound_packets
     target_field: destination.packets
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['inbound-packets'] !=null"
+    if: "ctx.juniper?.srx?.inbound_packets !=null"
 - set:
     field: server.packets
     value: '{{destination.packets}}'
@@ -138,31 +138,31 @@ processors:
 ## ECS Client/Source Mapping ##
 ###############################
 - rename:
-    field: juniper.srx.source-address
+    field: juniper.srx.source_address
     target_field: source.ip
     ignore_missing: true
-    if: "ctx.juniper?.srx['source-address'] != null"
+    if: "ctx.juniper?.srx?.source_address != null"
 - set:
     field: client.ip
     value: '{{source.ip}}'
     if: "ctx.source?.ip != null"
 - rename:
-    field: juniper.srx.nat-source-address
+    field: juniper.srx.nat_source_address
     target_field: source.nat.ip
     ignore_missing: true
-    if: "ctx.juniper?.srx['nat-source-address'] != null"
+    if: "ctx.juniper?.srx?.nat_source_address != null"
 - rename:
     field: juniper.srx.sourceip
     target_field: source.ip
     ignore_missing: true
     if: "ctx.juniper?.srx?.sourceip != null"
 - convert:
-    field: juniper.srx.source-port
+    field: juniper.srx.source_port
     target_field: source.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['source-port'] != null"
+    if: "ctx.juniper?.srx?.source_port != null"
 - set:
     field: client.port
     value: '{{source.port}}'
@@ -175,12 +175,12 @@ processors:
     ignore_missing: true
     if: "ctx.client?.port != null"
 - convert:
-    field: juniper.srx.nat-source-port
+    field: juniper.srx.nat_source_port
     target_field: source.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['nat-source-port'] != null"
+    if: "ctx.juniper?.srx?.nat_source_port != null"
 - set:
     field: client.nat.port
     value: '{{source.nat.port}}'
@@ -193,12 +193,12 @@ processors:
     ignore_missing: true
     if: "ctx.client?.nat?.port != null"
 - convert:
-    field: juniper.srx.outbound-bytes
+    field: juniper.srx.outbound_bytes
     target_field: source.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['outbound-bytes'] != null"
+    if: "ctx.juniper?.srx?.outbound_bytes != null"
 - set:
     field: client.bytes
     value: '{{source.bytes}}'
@@ -211,12 +211,12 @@ processors:
     ignore_missing: true
     if: "ctx.client?.bytes != null"
 - convert:
-    field: juniper.srx.outbound-packets
+    field: juniper.srx.outbound_packets
     target_field: source.packets
     type: long
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.juniper?.srx['packets-from-client'] != null"
+    if: "ctx.juniper?.srx?.outbound_packets != null"
 - set:
     field: client.packets
     value: '{{source.packets}}'
@@ -238,24 +238,24 @@ processors:
 ## ECS Rule Mapping ##
 ######################
 - rename:
-    field: juniper.srx.rulebase-name
+    field: juniper.srx.rulebase_name
     target_field: rule.name
     ignore_missing: true
-    if: "ctx.juniper?.srx['rulebase-name'] != null"
+    if: "ctx.juniper?.srx?.rulebase_name != null"
 - rename:
-    field: juniper.srx.rule-name
+    field: juniper.srx.rule_name
     target_field: rule.id
     ignore_missing: true
-    if: "ctx.juniper?.srx['rule-name'] != null"
+    if: "ctx.juniper?.srx?.rule_name != null"
 
 #########################
 ## ECS Network Mapping ##
 #########################
 - rename:
-    field: juniper.srx.protocol-name
+    field: juniper.srx.protocol_name
     target_field: network.protocol
     ignore_missing: true
-    if: "ctx.juniper?.srx['protocol-name'] != null"
+    if: "ctx.juniper?.srx?.protocol_name != null"
 
 #########################
 ## ECS message Mapping ##
@@ -271,14 +271,14 @@ processors:
 #############
 - remove:
     field:
-    - juniper.srx.destination-port
-    - juniper.srx.nat-destination-port
-    - juniper.srx.outbound-bytes
-    - juniper.srx.outbound-packets
-    - juniper.srx.source-port
-    - juniper.srx.nat-source-port
-    - juniper.srx.inbound-bytes
-    - juniper.srx.inbound-packets
+    - juniper.srx.destination_port
+    - juniper.srx.nat_destination_port
+    - juniper.srx.outbound_bytes
+    - juniper.srx.outbound_packets
+    - juniper.srx.source_port
+    - juniper.srx.nat_source_port
+    - juniper.srx.inbound_bytes
+    - juniper.srx.inbound_packets
     ignore_missing: true
 
 on_failure:

@@ -1,4 +1,4 @@
-- name: srx
+- name: juniper.srx
   type: group
   release: beta
   default_field: false
@@ -11,162 +11,162 @@
       description: >
         reason
 
-    - name: source-address
+    - name: source_address
       type: ip
       description: >
         source address
 
-    - name: source-port
+    - name: source_port
       type: integer
       description: >
         source port
 
-    - name: destination-address
+    - name: destination_address
       type: ip
       description: >
         destination address
 
-    - name: destination-port
+    - name: destination_port
       type: integer
       description: >
         destination port
 
-    - name: connection-tag
+    - name: connection_tag
       type: keyword
       description: >
         connection tag
 
-    - name: service-name
+    - name: service_name
       type: keyword
       description: >
         service name
 
-    - name: nat-source-address
+    - name: nat_source_address
       type: ip
       description: >
         nat source address
 
-    - name: nat-source-port
+    - name: nat_source_port
       type: integer
       description: >
         nat source port
 
-    - name: nat-destination-address
+    - name: nat_destination_address
       type: ip
       description: >
         nat destination address
 
-    - name: nat-destination-port
+    - name: nat_destination_port
       type: integer
       description: >
         nat destination port
 
-    - name: nat-connection-tag
+    - name: nat_connection_tag
       type: keyword
       description: >
         nat connection tag
 
-    - name: src-nat-rule-type
+    - name: src_nat_rule_type
       type: keyword
       description: >
         src nat rule type
 
-    - name: src-nat-rule-name
+    - name: src_nat_rule_name
       type: keyword
       description: >
         src nat rule name
 
-    - name: dst-nat-rule-type
+    - name: dst_nat_rule_type
       type: keyword
       description: >
         dst nat rule type
 
-    - name: dst-nat-rule-name
+    - name: dst_nat_rule_name
       type: keyword
       description: >
         dst nat rule name
 
-    - name: protocol-id
+    - name: protocol_id
       type: keyword
       description: >
         protocol id
 
-    - name: policy-name
+    - name: policy_name
       type: keyword
       description: >
         policy name
 
-    - name: source-zone-name
+    - name: source_zone_name
       type: keyword
       description: >
         source zone name
 
-    - name: source-zone
+    - name: source_zone
       type: keyword
       description: >
         source zone
 
-    - name: destination-zone-name
+    - name: destination_zone_name
       type: keyword
       description: >
         destination zone name
 
-    - name: destination-zone
+    - name: destination_zone
       type: keyword
       description: >
         destination zone
 
-    - name: session-id-32
+    - name: session_id_32
       type: keyword
       description: >
         session id 32
 
-    - name: session-id
+    - name: session_id
       type: keyword
       description: >
         session id
 
-    - name: packets-from-client
+    - name: packets_from_client
       type: integer
       description: >
         packets from client
 
-    - name: outbound-packets
+    - name: outbound_packets
       type: integer
       description: >
         packets from client
 
-    - name: bytes-from-client
+    - name: bytes_from_client
       type: integer
       description: >
         bytes from client
 
-    - name: outbound-bytes
+    - name: outbound_bytes
       type: integer
       description: >
         bytes from client
 
-    - name: packets-from-server
+    - name: packets_from_server
       type: integer
       description: >
         packets from server
 
-    - name: inbound-packets
+    - name: inbound_packets
       type: integer
       description: >
         packets from server
 
-    - name: bytes-from-server
+    - name: bytes_from_server
       type: integer
       description: >
         bytes from server
 
-    - name: inbound-bytes
+    - name: inbound_bytes
       type: integer
       description: >
         bytes from server
 
-    - name: elapsed-time
+    - name: elapsed_time
       type: date
       description: >
         elapsed time
@@ -176,7 +176,7 @@
       description: >
         application
 
-    - name: nested-application
+    - name: nested_application
       type: keyword
       description: >
         nested application
@@ -191,7 +191,7 @@
       description: >
         roles
 
-    - name: packet-incoming-interface
+    - name: packet_incoming_interface
       type: keyword
       description: >
         packet incoming interface
@@ -201,57 +201,57 @@
       description: >
         encrypted
 
-    - name: application-category
+    - name: application_category
       type: keyword
       description: >
         application category
 
-    - name: application-sub-category
+    - name: application_sub_category
       type: keyword
       description: >
         application sub category
 
-    - name: application-risk
+    - name: application_risk
       type: integer
       description: >
         application risk
 
-    - name: urlcategory-risk
+    - name: urlcategory_risk
       type: integer
       description: >
         urlcategory risk
 
-    - name: application-characteristics
+    - name: application_characteristics
       type: keyword
       description: >
         application characteristics
 
-    - name: secure-web-proxy-session-type
+    - name: secure_web_proxy_session_type
       type: keyword
       description: >
         secure web proxy session type
 
-    - name: peer-session-id
+    - name: peer_session_id
       type: keyword
       description: >
         peer session id
 
-    - name: peer-source-address
+    - name: peer_source_address
       type: ip
       description: >
         peer source address
 
-    - name: peer-source-port
+    - name: peer_source_port
       type: integer
       description: >
         peer source port
 
-    - name: peer-destination-address
+    - name: peer_destination_address
       type: ip
       description: >
         peer destination address
 
-    - name: peer-destination-port
+    - name: peer_destination_port
       type: integer
       description: >
         peer destination port
@@ -261,17 +261,17 @@
       description: >
         hostname
 
-    - name: src-vrf-grp
+    - name: src_vrf_grp
       type: keyword
       description: >
-        src-vrf-grp
+        src_vrf_grp
 
-    - name: dst-vrf-grp
+    - name: dst_vrf_grp
       type: keyword
       description: >
-        dst-vrf-grp
+        dst_vrf_grp
 
-    - name: icmp-type
+    - name: icmp_type
       type: integer
       description: >
         icmp type
@@ -281,47 +281,47 @@
       description: >
         process that generated the message
 
-    - name: apbr-rule-type
+    - name: apbr_rule_type
       type: keyword
       description: >
         apbr rule type
 
-    - name: dscp-value
+    - name: dscp_value
       type: integer
       description: >
         apbr rule type
 
-    - name: logical-system-name
+    - name: logical_system_name
       type: keyword
       description: >
         logical system name
 
-    - name: destination-interface-name
+    - name: destination_interface_name
       type: keyword
       description: >
         destination interface name
 
-    - name: profile-name
+    - name: profile_name
       type: keyword
       description: >
         profile name
 
-    - name: routing-instance
+    - name: routing_instance
       type: keyword
       description: >
         routing instance
 
-    - name: rule-name
+    - name: rule_name
       type: keyword
       description: >
         rule name
 
-    - name: uplink-tx-bytes
+    - name: uplink_tx_bytes
       type: integer
       description: >
         uplink tx bytes
 
-    - name: uplink-rx-bytes
+    - name: uplink_rx_bytes
       type: integer
       description: >
         uplink rx bytes
@@ -351,25 +351,25 @@
       description: >
         filename
 
-    - name: temporary-filename
+    - name: temporary_filename
       type: keyword
       description: >
-        temporary-filename
+        temporary_filename
 
     - name: name
       type: keyword
       description: >
         name
 
-    - name: error-message
+    - name: error_message
       type: keyword
       description: >
-        error-message
+        error_message
 
-    - name: error-code
+    - name: error_code
       type: keyword
       description: >
-        error-code
+        error_code
 
     - name: action
       type: keyword
@@ -381,7 +381,7 @@
       description: >
         protocol
 
-    - name: protocol-name
+    - name: protocol_name
       type: keyword
       description: >
         protocol name
@@ -391,7 +391,7 @@
       description: >
         type
 
-    - name: repeat-count
+    - name: repeat_count
       type: integer
       description: >
         repeat count
@@ -401,22 +401,22 @@
       description: >
         repeat alert
 
-    - name: message-type
+    - name: message_type
       type: keyword
       description: >
         message type
 
-    - name: threat-severity
+    - name: threat_severity
       type: keyword
       description: >
         threat severity
 
-    - name: application-name
+    - name: application_name
       type: keyword
       description: >
         application name
 
-    - name: attack-name
+    - name: attack_name
       type: keyword
       description: >
         attack name
@@ -431,112 +431,112 @@
       description: >
         mesagge
 
-    - name: epoch-time
+    - name: epoch_time
       type: date
       description: >
         epoch time
 
-    - name: packet-log-id
+    - name: packet_log_id
       type: integer
       description: >
         packet log id
 
-    - name: export-id
+    - name: export_id
       type: integer
       description: >
         packet log id
 
-    - name: ddos-application-name
+    - name: ddos_application_name
       type: keyword
       description: >
         ddos application name
 
-    - name: connection-hit-rate
+    - name: connection_hit_rate
       type: integer
       description: >
         connection hit rate
 
-    - name: time-scope
+    - name: time_scope
       type: keyword
       description: >
         time scope
 
-    - name: context-hit-rate
+    - name: context_hit_rate
       type: integer
       description: >
         context hit rate
 
-    - name: context-value-hit-rate
+    - name: context_value_hit_rate
       type: integer
       description: >
         context value hit rate
 
-    - name: time-count
+    - name: time_count
       type: integer
       description: >
         time count
 
-    - name: time-period
+    - name: time_period
       type: integer
       description: >
         time period
 
-    - name: context-value
+    - name: context_value
       type: keyword
       description: >
         context value
 
-    - name: context-name
+    - name: context_name
       type: keyword
       description: >
         context name
 
-    - name: ruleebase-name
+    - name: ruleebase_name
       type: keyword
       description: >
         ruleebase name
 
-    - name: interface-name
+    - name: interface_name
       type: keyword
       description: >
         interface name
 
-    - name: verdict-source
+    - name: verdict_source
       type: keyword
       description: >
         verdict source
 
-    - name: verdict-number
+    - name: verdict_number
       type: integer
       description: >
         verdict number
 
-    - name: http-host
+    - name: http_host
       type: keyword
       description: >
         http host
 
-    - name: file-category
+    - name: file_category
       type: keyword
       description: >
         file category
 
-    - name: sample-sha256
+    - name: sample_sha256
       type: keyword
       description: >
         sample sha256
 
-    - name: malware-info
+    - name: malware_info
       type: keyword
       description: >
         malware info
 
-    - name: client-ip
+    - name: client_ip
       type: ip
       description: >
         client ip
 
-    - name: tenant-id
+    - name: tenant_id
       type: keyword
       description: >
         tenant id
@@ -561,32 +561,32 @@
       description: >
         state
 
-    - name: file-hash-lookup
+    - name: file_hash_lookup
       type: keyword
       description: >
        file hash lookup
 
-    - name: file-name
+    - name: file_name
       type: keyword
       description: >
        file name
 
-    - name: action-detail
+    - name: action_detail
       type: keyword
       description: >
        action detail
 
-    - name: sub-category
+    - name: sub_category
       type: keyword
       description: >
        sub category
 
-    - name: feed-name
+    - name: feed_name
       type: keyword
       description: >
        feed name
 
-    - name: occur-count
+    - name: occur_count
       type: integer
       description: >
        occur count
