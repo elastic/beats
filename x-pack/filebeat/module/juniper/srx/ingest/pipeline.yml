@@ -17,7 +17,7 @@ processors:
     ignore_failure: false
     trim_value: "\""
 
-# Removes all empty fields
+# Converts all kebab-case key names to snake_case
 - script:
     lang: painless
     source: >-
