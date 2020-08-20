@@ -19,11 +19,12 @@
         ],
         "event.dataset": "zeek.ssl",
         "event.id": "CAOvs1BMFCX2Eh0Y3",
-        "event.kind": [
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
             "connection",
             "protocol"
         ],
-        "event.module": "zeek",
         "fileset.name": "ssl",
         "input.type": "log",
         "log.offset": 0,
@@ -90,11 +91,12 @@
         ],
         "event.dataset": "zeek.ssl",
         "event.id": "C3mki91FnnNtm0u1ok",
-        "event.kind": [
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
             "connection",
             "protocol"
         ],
-        "event.module": "zeek",
         "fileset.name": "ssl",
         "input.type": "log",
         "log.offset": 635,

@@ -59147,7 +59147,7 @@ type: integer
 Memory usage system statistics
 
 
-type: keyword
+type: integer
 
 --
 
@@ -105248,6 +105248,16 @@ Post-NAT destination port.
 
 
 type: long
+
+--
+
+*`panw.panos.endreason`*::
++
+--
+The reason a session terminated.
+
+
+type: keyword
 
 --
 
