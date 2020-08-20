@@ -47,8 +47,14 @@ NOTE: {agent} will restart automatically if the system is rebooted.
 ./elastic-agent run
 ----
 
-NOTE: You must restart {agent} manually if the agent terminates or the system is
-rebooted.
+[NOTE]
+====
+This command starts {agent} in the foreground. You must restart {agent}
+manually if the agent terminates or the system is rebooted.
+
+To start the agent automatically when the system is rebooted, 
+{ingest-guide}/elastic-agent-installation.html#elastic-agent-install-service-macos[Install the agent as a service].
+====
 
 // end::mac[]
 
@@ -58,8 +64,14 @@ rebooted.
 ./elastic-agent run
 ----
 
-NOTE: You must restart {agent} manually if the agent terminates or the system is
-rebooted.
+[NOTE]
+====
+This command starts {agent} in the foreground. You must restart {agent} manually
+if the agent terminates or the system is rebooted.
+
+To start the agent automatically when the system is rebooted, 
+use the DEB or RPM package instead of the tarball.
+====
 
 // end::linux[]
 
@@ -80,7 +92,7 @@ cd 'C:\Program Files\Elastic-Agent'
 .\install-service-elastic-agent.ps1 <1> <2>
 ----
 <1> You must run {agent} under the SYSTEM account if you plan
-to use the {elastic-endpoint} integration.
+to use the {elastic-endpoint-integration} integration.
 <2> If script execution is disabled on your system, set the execution policy for
 the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.

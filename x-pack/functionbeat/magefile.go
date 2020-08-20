@@ -159,9 +159,11 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
-		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
-		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
+		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{

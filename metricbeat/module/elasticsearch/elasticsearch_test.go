@@ -45,12 +45,12 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 8)
+	require.Len(t, metricSets, 9)
 	for _, ms := range metricSets {
 		name := ms.Name()
 		switch name {
 		case "ccr", "enrich", "cluster_stats", "index", "index_recovery",
-			"index_summary", "ml_job", "shard":
+			"index_summary", "ml_job", "node_stats", "shard":
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}

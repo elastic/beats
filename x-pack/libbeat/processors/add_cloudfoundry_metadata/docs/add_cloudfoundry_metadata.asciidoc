@@ -6,8 +6,6 @@
 <titleabbrev>add_cloudfoundry_metadata</titleabbrev>
 ++++
 
-beta[]
-
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
 from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
 only if the event contains a reference to a Cloud Foundry application (using field
@@ -21,6 +19,11 @@ Each event is annotated with:
 * Space Name
 * Organization ID
 * Organization Name
+
+NOTE: Pivotal Application Service and Tanzu Application Service include this
+metadata in all events from the firehose since version 2.8. In these cases the
+metadata in the events is used, and `add_cloudfoundry_metadata` processor
+doesn't modify these fields.
 
 
 [source,yaml]

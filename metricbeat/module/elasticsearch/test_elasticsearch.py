@@ -1,18 +1,15 @@
-import re
-import sys
+import json
+import metricbeat
 import os
+import re
+import semver
+import sys
 import unittest
-import urllib.request
 import urllib.error
 import urllib.parse
-import json
-import semver
+import urllib.request
 from elasticsearch import Elasticsearch, TransportError, client
 from parameterized import parameterized
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):
@@ -127,6 +124,7 @@ class Test(metricbeat.BaseTest):
                 "index_recovery",
                 "index_summary",
                 "ml_job",
+                "node_stats",
                 "shard"
             ],
             "hosts": self.get_hosts(),
@@ -144,6 +142,9 @@ class Test(metricbeat.BaseTest):
 
         docs = self.read_output_json()
         for doc in docs:
+            if "type" not in doc:
+                continue
+
             t = doc["type"]
             if t != "cluster_stats":
                 continue
@@ -296,7 +297,7 @@ class Test(metricbeat.BaseTest):
         # Enable xpack trial
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
 
@@ -308,7 +309,7 @@ class Test(metricbeat.BaseTest):
 
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Basic license already enabled. Error: {}".format(e))
 

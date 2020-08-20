@@ -12,7 +12,7 @@ import (
 // Service interface for the azure monitor service and mock for testing
 type Service interface {
 	GetResourceDefinitionById(id string) (resources.GenericResource, error)
-	GetResourceDefinitions(id []string, group []string, rType string, query string) (resources.ListResultPage, error)
+	GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResource, error)
 	GetMetricDefinitions(resourceId string, namespace string) (insights.MetricDefinitionCollection, error)
 	GetMetricNamespaces(resourceId string) (insights.MetricNamespaceCollection, error)
 	GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error)

@@ -1,0 +1,43 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "gcp"
+    },
+    "event": {
+        "dataset": "gcp.pubsub",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {
+            "resource": {
+                "topic_id": "test-ks"
+            }
+        },
+        "pubsub": {
+            "topic": {
+                "message_sizes": {
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "num_finite_buckets": 16,
+                                "growth_factor": 4,
+                                "scale": 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "pubsub",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

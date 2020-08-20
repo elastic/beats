@@ -10,6 +10,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -67,10 +68,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37679,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -106,6 +112,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -163,10 +170,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28249,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -202,6 +214,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -259,10 +272,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63898,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -298,6 +316,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -355,10 +374,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 7515,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -394,6 +418,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -451,10 +476,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3225,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -490,6 +520,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -547,10 +578,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60449,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -586,6 +622,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -643,10 +680,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60559,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -682,6 +724,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -739,10 +782,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 47414,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -778,6 +826,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -835,10 +884,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37673,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -874,6 +928,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -931,10 +986,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 8232,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -970,6 +1030,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1027,10 +1088,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32982,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1066,6 +1132,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1123,10 +1190,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10473,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1162,6 +1234,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1219,10 +1292,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20446,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1258,6 +1336,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1315,10 +1394,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 34699,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1354,6 +1438,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1411,10 +1496,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22820,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1450,6 +1540,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1507,10 +1598,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 41060,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1546,6 +1642,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1603,10 +1700,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 9058,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1642,6 +1744,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1699,10 +1802,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 54846,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1738,6 +1846,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1795,10 +1904,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52731,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1834,6 +1948,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1891,10 +2006,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 15165,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1930,6 +2050,7 @@
         "destination.as.organization.name": "Akamai International B.V.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1987,10 +2108,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53918,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.137.131",
@@ -2026,6 +2152,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2083,10 +2210,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 40792,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2122,6 +2254,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2179,10 +2312,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 54044,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2218,6 +2356,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2275,10 +2414,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19544,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2314,6 +2458,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2371,10 +2516,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13462,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2410,6 +2560,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2467,10 +2618,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 44892,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2506,6 +2662,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2563,10 +2720,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16487,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2602,6 +2764,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2659,10 +2822,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 23952,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2698,6 +2866,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2755,10 +2924,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2810,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2794,6 +2968,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2851,10 +3026,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13272,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2890,6 +3070,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2947,10 +3128,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 8663,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2986,6 +3172,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3043,10 +3230,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 55738,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3082,6 +3274,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3139,10 +3332,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10650,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3178,6 +3376,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3235,10 +3434,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 44087,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3274,6 +3478,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3331,10 +3536,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 15915,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3370,6 +3580,7 @@
         "destination.as.organization.name": "Fastly",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3427,10 +3638,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 41165,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "cdn.taboola.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -3467,6 +3683,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6109,
         "destination.geo.location.lon": -122.3303,
         "destination.geo.name": "United States",
@@ -3526,10 +3743,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 54133,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "rules.quantcount.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.192.7.152",
@@ -3566,6 +3788,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3625,10 +3848,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 8485,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3665,6 +3893,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3724,10 +3953,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12496,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3764,6 +3998,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3823,10 +4058,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 17029,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3863,6 +4103,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3922,10 +4163,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 23696,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3962,6 +4208,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4021,10 +4268,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 34769,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4061,6 +4313,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4120,10 +4373,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22486,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4160,6 +4418,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4219,10 +4478,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12894,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4259,6 +4523,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4318,10 +4583,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 62348,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4358,6 +4628,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4417,10 +4688,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6224,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4457,6 +4733,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4516,10 +4793,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 44120,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4556,6 +4838,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4615,10 +4898,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 44228,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4655,6 +4943,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4714,10 +5003,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 31322,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4754,6 +5048,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.3861,
         "destination.geo.location.lon": -122.0839,
         "destination.geo.name": "United States",
@@ -4813,10 +5108,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 1672,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "www.googleadservices.com/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.98",
@@ -4852,6 +5152,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -4909,10 +5210,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20801,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -4948,6 +5254,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5005,10 +5312,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24533,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5044,6 +5356,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5101,10 +5414,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 30150,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5140,6 +5458,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5197,10 +5516,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 36305,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5236,6 +5560,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5293,10 +5618,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42682,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5332,6 +5662,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5389,10 +5720,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22530,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5428,6 +5764,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5485,10 +5822,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 43713,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5524,6 +5866,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5581,10 +5924,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60608,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5620,6 +5968,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5677,10 +6026,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 9302,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5716,6 +6070,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5773,10 +6128,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 11634,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "service.maxymiser.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5813,6 +6173,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -5872,10 +6233,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 30818,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -5912,6 +6278,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -5971,10 +6338,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64260,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6011,6 +6383,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6070,10 +6443,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 7071,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6110,6 +6488,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6169,10 +6548,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 4512,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6209,6 +6593,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6268,10 +6653,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3422,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6308,6 +6698,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6367,10 +6758,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 4651,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6407,6 +6803,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6466,10 +6863,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19068,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6506,6 +6908,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6565,10 +6968,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5831,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6605,6 +7013,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6664,10 +7073,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 7084,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6704,6 +7118,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6763,10 +7178,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 18633,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6803,6 +7223,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6862,10 +7283,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 25557,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6902,6 +7328,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6961,10 +7388,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20661,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7001,6 +7433,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7060,10 +7493,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 65438,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7100,6 +7538,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7159,10 +7598,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53101,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7199,6 +7643,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7258,10 +7703,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 35463,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7298,6 +7748,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7357,10 +7808,15 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 45769,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "url",
         "panw.panos.threat.id": "9999",
         "panw.panos.threat.name": "URL-filtering",
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
+        "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",

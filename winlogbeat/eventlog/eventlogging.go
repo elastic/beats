@@ -40,9 +40,6 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
-var eventLoggingConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"ignore_older", "read_buffer_size", "format_buffer_size")...)
-
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`
 	IgnoreOlder      time.Duration `config:"ignore_older"`
@@ -284,7 +281,7 @@ func newEventLogging(options *common.Config) (EventLog, error) {
 		ReadBufferSize:   win.MaxEventBufferSize,
 		FormatBufferSize: win.MaxFormatMessageBufferSize,
 	}
-	if err := readConfig(options, &c, eventLoggingConfigKeys); err != nil {
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 

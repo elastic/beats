@@ -39,7 +39,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	}()
 
 	// already started if not stopped or crashed
-	if a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed {
+	if a.Started() {
 		return nil
 	}
 
@@ -152,6 +152,6 @@ func injectLogLevel(logLevel string, args []string) []string {
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
+	dataPath := filepath.Join(paths.Home(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }

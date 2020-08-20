@@ -19,10 +19,6 @@
       "name": "test.test.exe",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\1\\go-build583768550\\b001\\test.test.exe"
     },
-    "hash": {
-      "imphash": "d90d8c7812aec8da0fa173afa1293ab2",
-      "md5": "199e1cf5b2250bd515ecccf4ca686301"
-    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -104,9 +100,6 @@
       "name": "lastalive0.dat",
       "path": "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\lastalive0.dat"
     },
-    "hash": {
-      "sha1": "115106f5b338c87ae6836d50dd890de3da296367"
-    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -180,9 +173,6 @@
       "directory": "C:\\Windows\\System32\\LogFiles\\Scm",
       "name": "8b34f644-f627-47e7-98e0-957ba1c5eb6d",
       "path": "C:\\Windows\\System32\\LogFiles\\Scm\\8b34f644-f627-47e7-98e0-957ba1c5eb6d"
-    },
-    "hash": {
-      "md5": "5a9bddf83be530b481f0fd24db28a6ff"
     },
     "host": {
       "name": "vagrant-2012-r2"
