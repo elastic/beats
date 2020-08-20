@@ -111,6 +111,10 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	return message, nil
 }
 
+func (r *JSONReader) Close() error {
+	return r.reader.Close()
+}
+
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }

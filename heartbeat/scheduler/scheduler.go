@@ -188,6 +188,12 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	var taskFn timerqueue.TimerTaskFn
 
 	taskFn = func(_ time.Time) {
+		select {
+		case <-jobCtx.Done():
+			debugf("Job '%v' canceled", id)
+			return
+		default:
+		}
 		s.stats.activeJobs.Inc()
 		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
 		s.stats.activeJobs.Dec()
