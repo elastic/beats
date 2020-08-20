@@ -21,4 +21,8 @@ setup.kibana:
   # Optional Kibana space ID.
   #space.id: ""
 
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
+
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}

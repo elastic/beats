@@ -41,6 +41,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  http.Header
 
 	HTTP    *http.Client
 	Version common.Version
@@ -132,11 +133,17 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		return nil, err
 	}
 
+	headers := make(http.Header)
+	for k, v := range config.Headers {
+		headers.Set(k, v)
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
+			Headers:  headers,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
 					Dial:            dialer.Dial,
@@ -203,17 +210,21 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
+	addHeaders(req.Header, conn.Headers)
+	addHeaders(req.Header, headers)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
-	for header, values := range headers {
-		for _, value := range values {
-			req.Header.Add(header, value)
+	return conn.RoundTrip(req)
+}
+
+func addHeaders(out, in http.Header) {
+	for k, vs := range in {
+		for _, v := range vs {
+			out.Add(k, v)
 		}
 	}
-
-	return conn.RoundTrip(req)
 }
 
 // Implements RoundTrip interface
