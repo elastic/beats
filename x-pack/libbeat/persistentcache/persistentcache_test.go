@@ -28,7 +28,7 @@ func TestPutGet(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err := newCache(registry, "test", Options{})
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -56,7 +56,7 @@ func TestPersist(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err := newCache(registry, "test", Options{})
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -71,7 +71,7 @@ func TestPersist(t *testing.T) {
 
 	cache.Close()
 
-	cache, err = newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err = newCache(registry, "test", Options{})
 	require.NoError(t, err)
 
 	var result valueType
@@ -85,7 +85,7 @@ func TestExpired(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err := newCache(registry, "test", Options{})
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -116,7 +116,7 @@ func TestCleanup(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err := newCache(registry, "test", Options{})
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -150,7 +150,7 @@ func TestJanitor(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	cache, err := newCache(registry, "test", Options{})
 	require.NoError(t, err)
 
 	cache.StartJanitor(10 * time.Millisecond)
@@ -193,12 +193,12 @@ func TestRefreshOnAccess(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	options := PersistentCacheOptions{
+	options := Options{
 		Timeout:         60 * time.Second,
 		RefreshOnAccess: true,
 	}
 
-	cache, err := newPersistentCache(registry, "test", options)
+	cache, err := newCache(registry, "test", options)
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -236,7 +236,7 @@ func TestRefreshOnAccess(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestRegistry(t *testing.T) *PersistentCacheRegistry {
+func newTestRegistry(t *testing.T) *Registry {
 	t.Helper()
 
 	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
@@ -244,7 +244,7 @@ func newTestRegistry(t *testing.T) *PersistentCacheRegistry {
 
 	t.Cleanup(func() { os.RemoveAll(tempDir) })
 
-	return &PersistentCacheRegistry{
+	return &Registry{
 		path: filepath.Join(tempDir, cacheFile),
 	}
 }

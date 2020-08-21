@@ -25,11 +25,11 @@ const (
 )
 
 // registry is the global persistent caches registry
-var registry PersistentCacheRegistry
+var registry Registry
 
 var expiredError = errors.New("key expired")
 
-// Persistent cache is a persistent map of keys to values. Elements added to the
+// PersistentCache is a persistent map of keys to values. Elements added to the
 // cache are stored until they are explicitly deleted or are expired due to time-based
 // eviction based on last access or add time.
 //
@@ -49,8 +49,8 @@ type PersistentCache struct {
 	clock func() time.Time
 }
 
-// PersistentCacheOptions are the options that can be used to custimize
-type PersistentCacheOptions struct {
+// Options are the options that can be used to custimize
+type Options struct {
 	// Lenght of time before cache elements expire
 	Timeout time.Duration
 
@@ -59,14 +59,14 @@ type PersistentCacheOptions struct {
 	RefreshOnAccess bool
 }
 
-// NewPersistentCache creates and returns a new persistent cache. d is the length of time after last
+// New creates and returns a new persistent cache. d is the length of time after last
 // access that cache elements expire. Cache returned by this method must be closed with Close() when
 // not needed anymore.
-func NewPersistentCache(name string, opts PersistentCacheOptions) (*PersistentCache, error) {
-	return newPersistentCache(&registry, name, opts)
+func New(name string, opts Options) (*PersistentCache, error) {
+	return newCache(&registry, name, opts)
 }
 
-func newPersistentCache(registry *PersistentCacheRegistry, name string, opts PersistentCacheOptions) (*PersistentCache, error) {
+func newCache(registry *Registry, name string, opts Options) (*PersistentCache, error) {
 	logger := logp.NewLogger("persistentcache")
 
 	store, err := registry.OpenStore(logger, name)
@@ -211,13 +211,13 @@ func (c *PersistentCache) now() time.Time {
 	return time.Now()
 }
 
-type PersistentCacheRegistry struct {
+type Registry struct {
 	mutex    sync.Mutex
 	path     string
 	registry *statestore.Registry
 }
 
-func (r *PersistentCacheRegistry) OpenStore(logger *logp.Logger, name string) (*statestore.Store, error) {
+func (r *Registry) OpenStore(logger *logp.Logger, name string) (*statestore.Store, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
