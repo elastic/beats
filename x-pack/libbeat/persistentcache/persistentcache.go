@@ -5,6 +5,7 @@
 package persistentcache
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -83,12 +83,12 @@ func newCache(registry *Registry, name string, opts Options) (*PersistentCache, 
 	}, nil
 }
 
-type persistentCacheEntry struct {
-	Expiration int64
-	Item       []byte
+type cacheEntry struct {
+	Expiration int64  `json:"e,omitempty"`
+	Item       string `json:"i,omitempty"`
 }
 
-func (e *persistentCacheEntry) refresh(now time.Time, initialTimeout, defaultTimeout time.Duration) bool {
+func (e *cacheEntry) refresh(now time.Time, initialTimeout, defaultTimeout time.Duration) bool {
 	timeout := initialTimeout
 	if timeout == 0 {
 		timeout = defaultTimeout
@@ -102,7 +102,7 @@ func (e *persistentCacheEntry) refresh(now time.Time, initialTimeout, defaultTim
 
 // Put writes the given key and value to the map replacing any
 // existing value if it exists.
-func (c *PersistentCache) Put(k string, v common.Value) error {
+func (c *PersistentCache) Put(k string, v interface{}) error {
 	return c.PutWithTimeout(k, v, 0)
 }
 
@@ -110,10 +110,13 @@ func (c *PersistentCache) Put(k string, v common.Value) error {
 // existing value if it exists.
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
-func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.Duration) error {
-	var err error
-	var entry persistentCacheEntry
-	entry.Item, err = json.Marshal(v)
+func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.Duration) error {
+	var entry cacheEntry
+	d, err := json.Marshal(v)
+	if err != nil {
+		return fmt.Errorf("encoding item to store in cache: %w", err)
+	}
+	entry.Item = base64.StdEncoding.EncodeToString(d)
 	if err != nil {
 		return fmt.Errorf("encoding item to store in cache: %w", err)
 	}
@@ -123,8 +126,8 @@ func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.
 
 // Get the current value associated with a key or nil if the key is not
 // present. The last access time of the element is updated.
-func (c *PersistentCache) Get(k string, v common.Value) error {
-	var entry persistentCacheEntry
+func (c *PersistentCache) Get(k string, v interface{}) error {
+	var entry cacheEntry
 	err := c.store.Get(k, &entry)
 	if err != nil {
 		return err
@@ -135,7 +138,11 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 	if c.refreshOnAccess && c.refresh(&entry, 0) {
 		c.store.Set(k, entry)
 	}
-	err = json.Unmarshal(entry.Item, v)
+	d, err := base64.StdEncoding.DecodeString(entry.Item)
+	if err != nil {
+		return fmt.Errorf("decoding base64 string: %w", err)
+	}
+	err = json.Unmarshal(d, v)
 	if err != nil {
 		return fmt.Errorf("decoding item stored in cache: %w", err)
 	}
@@ -146,7 +153,7 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 // the cache.
 func (c *PersistentCache) CleanUp() int {
 	var expired []string
-	var entry persistentCacheEntry
+	var entry cacheEntry
 	c.store.Each(func(key string, decoder statestore.ValueDecoder) (bool, error) {
 		decoder.Decode(&entry)
 		if c.expired(&entry) {
@@ -160,7 +167,7 @@ func (c *PersistentCache) CleanUp() int {
 	return len(expired)
 }
 
-func (c *PersistentCache) refresh(e *persistentCacheEntry, timeout time.Duration) bool {
+func (c *PersistentCache) refresh(e *cacheEntry, timeout time.Duration) bool {
 	if timeout == 0 {
 		timeout = c.timeout
 	}
@@ -171,7 +178,7 @@ func (c *PersistentCache) refresh(e *persistentCacheEntry, timeout time.Duration
 	return false
 }
 
-func (c *PersistentCache) expired(entry *persistentCacheEntry) bool {
+func (c *PersistentCache) expired(entry *cacheEntry) bool {
 	return entry.Expiration != 0 && c.now().Unix() > entry.Expiration
 }
 
