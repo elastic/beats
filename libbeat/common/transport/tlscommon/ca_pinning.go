@@ -28,46 +28,38 @@ import (
 // ErrCAPinMissmatch is returned when no pin is matched in the verified chain.
 var ErrCAPinMissmatch = errors.New("provided CA certificate pins doesn't match any of the certificate authorities used to validate the certificate")
 
-type pins []string
-
-func (p pins) Matches(candidate string) bool {
-	for _, pin := range p {
-		if pin == candidate {
-			return true
-		}
-	}
-	return false
-}
-
 // verifyPeerCertFunc is a callback defined on the tls.Config struct that will called when a
 // TLS connection is used.
 type verifyPeerCertFunc func([][]byte, [][]*x509.Certificate) error
 
-// MakeCAPinCallback loops through the verified chains and will try to match the certificates pin.
+// verifyCAPin loops through the verified chains and will try to match the certificates pin.
 //
 // NOTE: Defining a PIN to check certificates is not a replacement for the normal TLS validations it's
 // an additional validation. In fact if you set `InsecureSkipVerify` to true and a PIN, the
 // verifiedChains variable will be empty and the added validation will fail.
-func MakeCAPinCallback(hashes pins) func([][]byte, [][]*x509.Certificate) error {
-	return func(_ [][]byte, verifiedChains [][]*x509.Certificate) error {
-		// The chain of trust has been already established before the call to the VerifyPeerCertificate
-		// function, after we go through the chain to make sure we have at least a certificate certificate
-		//	that match the provided pin.
-		for _, chain := range verifiedChains {
-			for _, certificate := range chain {
-				h := Fingerprint(certificate)
-				if hashes.Matches(h) {
-					return nil
-				}
+func verifyCAPin(hashes []string, verifiedChains [][]*x509.Certificate) error {
+	for _, chain := range verifiedChains {
+		for _, certificate := range chain {
+			h := Fingerprint(certificate)
+			if matches(hashes, h) {
+				return nil
 			}
 		}
-
-		return ErrCAPinMissmatch
 	}
+	return ErrCAPinMissmatch
 }
 
 // Fingerprint takes a certificate and create a hash of the DER encoded public key.
 func Fingerprint(certificate *x509.Certificate) string {
 	hash := sha256.Sum256(certificate.RawSubjectPublicKeyInfo)
 	return base64.StdEncoding.EncodeToString(hash[:])
+}
+
+func matches(pins []string, candidate string) bool {
+	for _, pin := range pins {
+		if pin == candidate {
+			return true
+		}
+	}
+	return false
 }
