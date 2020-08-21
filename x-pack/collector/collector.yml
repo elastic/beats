@@ -17,9 +17,15 @@ collector.inputs:
 
 - type: metrics
   enabled: true
+  use_output: other
   streams:
   - data_stream.dataset: system.process_summary
     period: 10
+
+
+- type: metrics
+  enabled: true
+  streams:
   - data_stream.dataset: system.cpu
     period: 10
 
@@ -65,7 +71,8 @@ logging.selectors: ['*']
 
 outputs.default:
   type: console
-  pretty: true
+  #codec.format.string: "test service type: %{[service.type]}"
+  codec.json.pretty: true
 
 outputs.other:
   type: console
