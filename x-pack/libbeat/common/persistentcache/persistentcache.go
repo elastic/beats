@@ -5,6 +5,7 @@
 package persistentcache
 
 import (
+	"encoding/json"
 	"os"
 	"sync"
 	"time"
@@ -23,6 +24,9 @@ const (
 	cacheFileMode = os.FileMode(0600)
 )
 
+// registry is the global persistent caches registry
+var registry PersistentCacheRegistry
+
 // Persistent cache is a persistent map of keys to values. Elements added to the
 // cache are stored until they are explicitly deleted or are expired due to time-based
 // eviction based on last access or add time.
@@ -40,10 +44,13 @@ type PersistentCache struct {
 
 	store           *statestore.Store
 	refreshOnAdd    bool
-	removalListener common.RemovalListener
+	removalListener RemovalListener
 
 	clock func() time.Time
 }
+
+// RemovalListener is a function called when a entry is removed from cache
+type RemovalListener func(k string, v common.Value)
 
 // PersistentCacheOptions are the options that can be used to custimize
 type PersistentCacheOptions struct {
@@ -53,7 +60,7 @@ type PersistentCacheOptions struct {
 	RefreshOnAdd bool
 
 	// RemovalListener is called every time a key is removed.
-	RemovalListener common.RemovalListener
+	RemovalListener RemovalListener
 }
 
 // NewPersistentCache creates and returns a new persistent cache. d is the length of time after last
@@ -63,10 +70,10 @@ func NewPersistentCache(name string, d time.Duration, opts PersistentCacheOption
 	return newPersistentCache(&registry, name, d, opts)
 }
 
-func newPersistentCache(registry *persistentCacheRegistry, name string, d time.Duration, opts PersistentCacheOptions) (*PersistentCache, error) {
+func newPersistentCache(registry *PersistentCacheRegistry, name string, d time.Duration, opts PersistentCacheOptions) (*PersistentCache, error) {
 	logger := logp.NewLogger("persistentcache")
 
-	store, err := registry.openStore(logger, name)
+	store, err := registry.OpenStore(logger, name)
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +87,11 @@ func newPersistentCache(registry *persistentCacheRegistry, name string, d time.D
 	}, nil
 }
 
+type persistentCacheEntry struct {
+	Expiry time.Time
+	Item   []byte
+}
+
 // Put writes the given key and value to the map replacing any
 // existing value if it exists.
 func (c *PersistentCache) Put(k string, v common.Value) error {
@@ -91,13 +103,31 @@ func (c *PersistentCache) Put(k string, v common.Value) error {
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
 func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.Duration) error {
-	return c.store.Set(k, v)
+	var err error
+	var entry persistentCacheEntry
+	entry.Item, err = json.Marshal(v)
+	if err != nil {
+		return errors.Wrap(err, "encoding item to store in cache")
+	}
+	if timeout > 0 {
+		entry.Expiry = c.now().Add(timeout)
+	}
+	return c.store.Set(k, entry)
 }
 
 // Get the current value associated with a key or nil if the key is not
 // present. The last access time of the element is updated.
 func (c *PersistentCache) Get(k string, v common.Value) error {
-	return c.store.Get(k, v)
+	var entry persistentCacheEntry
+	err := c.store.Get(k, &entry)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(entry.Item, v)
+	if err != nil {
+		return errors.Wrap(err, "decoding item stored in cache")
+	}
+	return nil
 }
 
 // CleanUp performs maintenance on the cache by removing expired elements from
@@ -105,7 +135,23 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 // element that is removed during this clean up operation. The RemovalListener
 // is invoked on the caller's goroutine.
 func (c *PersistentCache) CleanUp() int {
-	return 0
+	var expired []string
+	var entry persistentCacheEntry
+	c.store.Each(func(key string, decoder statestore.ValueDecoder) (bool, error) {
+		decoder.Decode(&entry)
+		if c.expired(&entry) {
+			expired = append(expired, key)
+		}
+		return true, nil
+	})
+	for _, key := range expired {
+		c.store.Remove(key)
+	}
+	return len(expired)
+}
+
+func (c *PersistentCache) expired(entry *persistentCacheEntry) bool {
+	return !entry.Expiry.IsZero() && c.now().After(entry.Expiry)
 }
 
 // StartJanitor starts a goroutine that will periodically invoke the cache's
@@ -119,7 +165,6 @@ func (c *PersistentCache) StopJanitor() {
 
 // Close releases all resources associated with this cache.
 func (c *PersistentCache) Close() error {
-	// TODO: Close the global registry when all stores have been closed
 	return c.store.Close()
 }
 
@@ -130,16 +175,15 @@ func (c *PersistentCache) now() time.Time {
 	return time.Now()
 }
 
-type persistentCacheRegistry struct {
-	sync.Mutex
-
+type PersistentCacheRegistry struct {
+	mutex    sync.Mutex
 	path     string
 	registry *statestore.Registry
 }
 
-func (r *persistentCacheRegistry) openStore(logger *logp.Logger, name string) (*statestore.Store, error) {
-	r.Lock()
-	defer r.Unlock()
+func (r *PersistentCacheRegistry) OpenStore(logger *logp.Logger, name string) (*statestore.Store, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	if r.registry == nil {
 		rootPath := r.path
@@ -157,10 +201,4 @@ func (r *persistentCacheRegistry) openStore(logger *logp.Logger, name string) (*
 	}
 
 	return r.registry.Get(name)
-}
-
-var registry persistentCacheRegistry
-
-func openStore(logger *logp.Logger, name string) (*statestore.Store, error) {
-	return registry.openStore(logger, name)
 }
