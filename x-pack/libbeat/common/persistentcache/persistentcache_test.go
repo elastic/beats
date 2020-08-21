@@ -37,6 +37,10 @@ func TestPutGet(t *testing.T) {
 	var key = "somekey"
 	var value = valueType{Something: "foo"}
 
+	assert.Panics(t, func() {
+		cache.Put(key, nil)
+	})
+
 	err = cache.Put(key, value)
 	assert.NoError(t, err)
 
@@ -76,6 +80,37 @@ func TestPersist(t *testing.T) {
 	err = cache.Get(key, &result)
 	assert.NoError(t, err)
 	assert.Equal(t, value, result)
+}
+
+func TestExpired(t *testing.T) {
+	t.Parallel()
+
+	registry := newTestRegistry(t)
+
+	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	require.NoError(t, err)
+
+	now := time.Now()
+	cache.clock = func() time.Time { return now }
+
+	type valueType struct {
+		Something string
+	}
+
+	var key = "somekey"
+	var value = valueType{Something: "foo"}
+
+	err = cache.PutWithTimeout(key, value, 5*time.Minute)
+	assert.NoError(t, err)
+
+	var result valueType
+	err = cache.Get(key, &result)
+	assert.NoError(t, err)
+	assert.Equal(t, value, result)
+
+	now = now.Add(10 * time.Minute)
+	err = cache.Get(key, &result)
+	assert.Error(t, err)
 }
 
 func TestCleanup(t *testing.T) {

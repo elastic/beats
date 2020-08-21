@@ -6,6 +6,7 @@ package persistentcache
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -80,8 +81,8 @@ func newPersistentCache(registry *PersistentCacheRegistry, name string, d time.D
 }
 
 type persistentCacheEntry struct {
-	Expiry time.Time
-	Item   []byte
+	Expiration int64
+	Item       []byte
 }
 
 // Put writes the given key and value to the map replacing any
@@ -95,6 +96,9 @@ func (c *PersistentCache) Put(k string, v common.Value) error {
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
 func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.Duration) error {
+	if v == nil {
+		panic("Cache does not support storing nil values")
+	}
 	var err error
 	var entry persistentCacheEntry
 	entry.Item, err = json.Marshal(v)
@@ -102,7 +106,7 @@ func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.
 		return errors.Wrap(err, "encoding item to store in cache")
 	}
 	if timeout > 0 {
-		entry.Expiry = c.now().Add(timeout)
+		entry.Expiration = c.now().Add(timeout).Unix()
 	}
 	return c.store.Set(k, entry)
 }
@@ -114,6 +118,9 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 	err := c.store.Get(k, &entry)
 	if err != nil {
 		return err
+	}
+	if c.expired(&entry) {
+		return fmt.Errorf("expired")
 	}
 	err = json.Unmarshal(entry.Item, v)
 	if err != nil {
@@ -141,7 +148,7 @@ func (c *PersistentCache) CleanUp() int {
 }
 
 func (c *PersistentCache) expired(entry *persistentCacheEntry) bool {
-	return !entry.Expiry.IsZero() && c.now().After(entry.Expiry)
+	return entry.Expiration != 0 && c.now().Unix() > entry.Expiration
 }
 
 // StartJanitor starts a goroutine that will periodically invoke the cache's
