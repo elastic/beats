@@ -104,3 +104,4 @@
 - Add restart CLI cmd {pull}20359[20359]
 - Add new `synthetics/*` inputs to run Heartbeat {pull}20387[20387]
 - Prepare packaging for endpoint and asc files {pull}20186[20186]
+- Users of the Docker image can now pass `FLEET_ENROLL_INSECURE=1` to include the `--insecure` flag with the `elastic-agent enroll` command {issue}20312[20312] {pull}20713[20713]
