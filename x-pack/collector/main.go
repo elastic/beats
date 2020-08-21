@@ -226,7 +226,7 @@ func makeInputRegistry(info beat.Info, log *logp.Logger, sched *scheduler.Schedu
 		registries.Prefixed("net", v2.MustPluginRegistry([]v2.Plugin{pb.Plugin()})),
 
 		// metricbeat,`auditbeat, heartbeat based on legacy runner factories
-		registries.Prefixed("monitor", makeHeartbeatRegistry(sched)),
+		registries.Prefixed("monitor", makeHeartbeatRegistry(info, sched)),
 		registries.Prefixed("metrics", makeMetricbeatRegistry()),
 	)
 }
