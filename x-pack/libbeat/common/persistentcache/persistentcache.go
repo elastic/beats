@@ -37,34 +37,34 @@ var registry PersistentCacheRegistry
 // invoked periodically to prevent the cache from becoming a memory leak. If
 // you want to start a goroutine to perform periodic clean-up then see
 // StartJanitor().
-//
-// Cache does not support storing nil values. Any attempt to put nil into
-// the cache will cause a panic.
 type PersistentCache struct {
 	log *logp.Logger
 
-	store        *statestore.Store
-	refreshOnAdd bool
+	store           *statestore.Store
+	refreshOnAccess bool
+	timeout         time.Duration
 
 	clock func() time.Time
 }
 
 // PersistentCacheOptions are the options that can be used to custimize
 type PersistentCacheOptions struct {
-	// If set to true, expiration time of an entry is only updated
-	// when the object is added to the cache, and not when the
-	// cache is accessed.
-	RefreshOnAdd bool
+	// Lenght of time before cache elements expire
+	Timeout time.Duration
+
+	// If set to true, expiration time of an entry is updated
+	// when the object is accessed.
+	RefreshOnAccess bool
 }
 
 // NewPersistentCache creates and returns a new persistent cache. d is the length of time after last
 // access that cache elements expire. Cache returned by this method must be closed with Close() when
 // not needed anymore.
-func NewPersistentCache(name string, d time.Duration, opts PersistentCacheOptions) (*PersistentCache, error) {
-	return newPersistentCache(&registry, name, d, opts)
+func NewPersistentCache(name string, opts PersistentCacheOptions) (*PersistentCache, error) {
+	return newPersistentCache(&registry, name, opts)
 }
 
-func newPersistentCache(registry *PersistentCacheRegistry, name string, d time.Duration, opts PersistentCacheOptions) (*PersistentCache, error) {
+func newPersistentCache(registry *PersistentCacheRegistry, name string, opts PersistentCacheOptions) (*PersistentCache, error) {
 	logger := logp.NewLogger("persistentcache")
 
 	store, err := registry.OpenStore(logger, name)
@@ -76,13 +76,26 @@ func newPersistentCache(registry *PersistentCacheRegistry, name string, d time.D
 		log:   logger,
 		store: store,
 
-		refreshOnAdd: opts.RefreshOnAdd,
+		refreshOnAccess: opts.RefreshOnAccess,
+		timeout:         opts.Timeout,
 	}, nil
 }
 
 type persistentCacheEntry struct {
 	Expiration int64
 	Item       []byte
+}
+
+func (e *persistentCacheEntry) refresh(now time.Time, initialTimeout, defaultTimeout time.Duration) bool {
+	timeout := initialTimeout
+	if timeout == 0 {
+		timeout = defaultTimeout
+	}
+	if timeout > 0 {
+		e.Expiration = now.Add(timeout).Unix()
+		return true
+	}
+	return false
 }
 
 // Put writes the given key and value to the map replacing any
@@ -96,18 +109,13 @@ func (c *PersistentCache) Put(k string, v common.Value) error {
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
 func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.Duration) error {
-	if v == nil {
-		panic("Cache does not support storing nil values")
-	}
 	var err error
 	var entry persistentCacheEntry
 	entry.Item, err = json.Marshal(v)
 	if err != nil {
 		return errors.Wrap(err, "encoding item to store in cache")
 	}
-	if timeout > 0 {
-		entry.Expiration = c.now().Add(timeout).Unix()
-	}
+	c.refresh(&entry, timeout)
 	return c.store.Set(k, entry)
 }
 
@@ -121,6 +129,9 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 	}
 	if c.expired(&entry) {
 		return fmt.Errorf("expired")
+	}
+	if c.refreshOnAccess && c.refresh(&entry, 0) {
+		c.store.Set(k, entry)
 	}
 	err = json.Unmarshal(entry.Item, v)
 	if err != nil {
@@ -145,6 +156,17 @@ func (c *PersistentCache) CleanUp() int {
 		c.store.Remove(key)
 	}
 	return len(expired)
+}
+
+func (c *PersistentCache) refresh(e *persistentCacheEntry, timeout time.Duration) bool {
+	if timeout == 0 {
+		timeout = c.timeout
+	}
+	if timeout > 0 {
+		e.Expiration = c.now().Add(timeout).Unix()
+		return true
+	}
+	return false
 }
 
 func (c *PersistentCache) expired(entry *persistentCacheEntry) bool {

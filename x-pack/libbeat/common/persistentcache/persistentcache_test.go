@@ -26,7 +26,7 @@ func TestPutGet(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -36,10 +36,6 @@ func TestPutGet(t *testing.T) {
 
 	var key = "somekey"
 	var value = valueType{Something: "foo"}
-
-	assert.Panics(t, func() {
-		cache.Put(key, nil)
-	})
 
 	err = cache.Put(key, value)
 	assert.NoError(t, err)
@@ -58,7 +54,7 @@ func TestPersist(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -73,7 +69,7 @@ func TestPersist(t *testing.T) {
 
 	cache.Close()
 
-	cache, err = newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	cache, err = newPersistentCache(registry, "test", PersistentCacheOptions{})
 	require.NoError(t, err)
 
 	var result valueType
@@ -87,7 +83,7 @@ func TestExpired(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -118,7 +114,7 @@ func TestCleanup(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
+	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -144,6 +140,54 @@ func TestCleanup(t *testing.T) {
 	assert.Equal(t, 1, removedCount)
 
 	err = cache.Get(key, &result)
+	assert.Error(t, err)
+}
+
+func TestRefreshOnAccess(t *testing.T) {
+	t.Parallel()
+
+	registry := newTestRegistry(t)
+
+	options := PersistentCacheOptions{
+		Timeout:         60 * time.Second,
+		RefreshOnAccess: true,
+	}
+
+	cache, err := newPersistentCache(registry, "test", options)
+	require.NoError(t, err)
+
+	now := time.Now()
+	cache.clock = func() time.Time { return now }
+
+	type valueType struct {
+		Something string
+	}
+
+	var key1 = "somekey"
+	var value1 = valueType{Something: "foo"}
+	var key2 = "otherkey"
+	var value2 = valueType{Something: "bar"}
+
+	err = cache.Put(key1, value1)
+	assert.NoError(t, err)
+	err = cache.Put(key2, value2)
+	assert.NoError(t, err)
+
+	now = now.Add(40 * time.Second)
+
+	var result valueType
+	err = cache.Get(key1, &result)
+	assert.NoError(t, err)
+	assert.Equal(t, value1, result)
+
+	now = now.Add(40 * time.Second)
+	removedCount := cache.CleanUp()
+	assert.Equal(t, 1, removedCount)
+
+	err = cache.Get(key1, &result)
+	assert.NoError(t, err)
+	assert.Equal(t, value1, result)
+	err = cache.Get(key2, &result)
 	assert.Error(t, err)
 }
 
