@@ -35,6 +35,7 @@ import (
 type frameID uint64
 
 // segmentOffset is a byte index into the segment's data region.
+// An offset of 0 means the first byte after the segment file header.
 type segmentOffset uint64
 
 // The metadata for a single segment file.
@@ -51,10 +52,11 @@ type queueSegment struct {
 	// positioned at the start of the data region.
 	created bool
 
-	// The size in bytes of the segment file on disk. This is updated when
-	// the segment is written to, and should always correspond to the end of
-	// a complete data frame.
-	size uint64
+	// The byte offset of the end of the segment's data region. This is
+	// updated when the segment is written to, and should always correspond
+	// to the end of a complete data frame. The total size of a segment file
+	// on disk is segmentHeaderSize + segment.endOffset.
+	endOffset segmentOffset
 
 	// The header metadata for this segment file. This field is nil if the
 	// segment has not yet been opened for reading. It should only be
@@ -95,7 +97,7 @@ type bySegmentID []*queueSegment
 
 func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
+func (s bySegmentID) Less(i, j int) bool { return s[i].endOffset < s[j].endOffset }
 
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
@@ -120,9 +122,9 @@ func scanExistingSegments(path string) ([]*queueSegment, error) {
 			if id, err := strconv.ParseUint(components[0], 10, 64); err == nil {
 				segments = append(segments,
 					&queueSegment{
-						id:      segmentID(id),
-						created: true,
-						size:    uint64(file.Size()),
+						id:        segmentID(id),
+						created:   true,
+						endOffset: segmentOffset(file.Size() - segmentHeaderSize),
 					})
 			}
 		}
@@ -131,18 +133,18 @@ func scanExistingSegments(path string) ([]*queueSegment, error) {
 	return segments, nil
 }
 
+func (segment *queueSegment) sizeOnDisk() uint64 {
+	return uint64(segment.endOffset) + segmentHeaderSize
+}
+
 // Should only be called from the reader loop.
-func (segment *queueSegment) getReader() (io.ReadCloser, error) {
-	if segment.reader != nil {
-		return segment.reader, nil
-	}
+func (segment *queueSegment) getReader() (*os.File, error) {
 	path := segment.queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"Couldn't open segment %d: %w", segment.id, err)
 	}
-	//reader := bufio.NewReader(file)
 	header, err := readSegmentHeader(file)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
@@ -172,7 +174,7 @@ func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
 	return file, nil
 }
 
-func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
+func readSegmentHeader(in *os.File) (*segmentHeader, error) {
 	header := segmentHeader{}
 	if header.version != 0 {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
@@ -190,16 +192,16 @@ func writeSegmentHeader(out io.Writer, header *segmentHeader) error {
 func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	total := uint64(0)
 	if segments.writing != nil {
-		total += segments.writing.size
+		total += segments.writing.sizeOnDisk()
 	}
 	for _, segment := range segments.reading {
-		total += segment.size
+		total += segment.sizeOnDisk()
 	}
 	for _, segment := range segments.acking {
-		total += segment.size
+		total += segment.sizeOnDisk()
 	}
 	for _, segment := range segments.acked {
-		total += segment.size
+		total += segment.sizeOnDisk()
 	}
 	return total
 }

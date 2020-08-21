@@ -241,7 +241,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 }
 
 //
-// bookkeeping helpers to locate queue data on disk
+// bookkeeping helpers
 //
 
 func (settings Settings) directoryPath() string {
@@ -260,6 +260,10 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 	return filepath.Join(
 		settings.directoryPath(),
 		fmt.Sprintf("%v.seg", segmentID))
+}
+
+func (settings Settings) maxSegmentOffset() segmentOffset {
+	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
 }
 
 //

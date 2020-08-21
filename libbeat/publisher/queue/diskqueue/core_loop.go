@@ -41,6 +41,13 @@ type coreLoop struct {
 	// request, false otherwise.
 	deleting bool
 
+	// nextReadOffset is the segment offset to start reading at during
+	// the next read request. This offset always refers to the first read
+	// segment: either segments.reading[0], if that list is nonempty, or
+	// segments.writing (if all segments have been read except the one
+	// currently being written).
+	nextReadOffset segmentOffset
+
 	// pendingWrites is a list of all write requests that have been accepted
 	// by the queue and are waiting to be written to disk.
 	pendingWrites []*writeRequest
@@ -77,6 +84,9 @@ type readFrame struct {
 func (cl *coreLoop) run() {
 	dq := cl.queue
 
+	// Wake up the reader loop if there are segments available to read.
+	cl.maybeReadPending()
+
 	for {
 		select {
 		// Endpoints used by the public API
@@ -101,7 +111,7 @@ func (cl *coreLoop) run() {
 			cl.maybeWritePending()
 
 		// Reader loop handling
-		case readResponse := <-dq.readerLoop.finishedReading:
+		case readResponse := <-dq.readerLoop.responseChan:
 			cl.handleReadResponse(readResponse)
 
 		// Deleter loop handling
@@ -144,6 +154,11 @@ func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
 		// There is enough space for the new frame! Add it to the
 		// pending list and dispatch it to the writer loop if no other
 		// writes are outstanding.
+		// Right now we accept any request if there is enough space for it
+		// on disk. High-throughput inputs may produce events faster than
+		// they can be written to disk, so it would make sense to
+		// additionally bound the amount of data in pendingWrites to some
+		// configurable limit to avoid out-of-memory errors.
 		cl.pendingWrites = append(cl.pendingWrites, request)
 		cl.maybeWritePending()
 	}
@@ -152,33 +167,39 @@ func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
 func (cl *coreLoop) handleProducerCancelRequest(request *cancelRequest) {
 }
 
-func (cl *coreLoop) handleReadResponse(response readResponse) {
-
+// Returns the active read segment, or nil if there is none.
+func (segments *diskQueueSegments) readingSegment() *queueSegment {
+	if len(segments.reading) > 0 {
+		return segments.reading[0]
+	}
+	return segments.writing
 }
 
-func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
-	acking := cl.queue.segments.acking
-	if len(acking) == 0 {
-		return
+func (cl *coreLoop) handleReadResponse(response readResponse) {
+	cl.reading = false
+	segments := cl.queue.segments
+	segment := segments.readingSegment()
+	segment.framesRead += response.frameCount
+	newOffset := cl.nextReadOffset + segmentOffset(response.byteCount)
+
+	// A (non-writing) segment is finished if we have read all the data, or
+	// the read response reports an error.
+	segmentFinished :=
+		segment != segments.writing &&
+			(newOffset >= segment.endOffset || response.err != nil)
+	if segmentFinished {
+		// Move to the acking list and reset the read offset.
+		segments.reading = segments.reading[1:]
+		segments.acking = append(segments.acking, segment)
+		cl.nextReadOffset = 0
+	} else {
+		// We aren't done reading this segment; next time we'll start from
+		// the end of this read response.
+		cl.nextReadOffset = newOffset
 	}
-	segmentsAcked := 0
-	startFrame := cl.oldestFrameID
-	for ; segmentsAcked < len(acking); segmentsAcked++ {
-		segment := acking[segmentsAcked]
-		endFrame := startFrame + frameID(segment.framesRead)
-		if endFrame > ackedUpTo {
-			// This segment has not been fully read, we're done.
-			break
-		}
-	}
-	if segmentsAcked > 0 {
-		// Move fully acked segments to the acked list and remove them
-		// from the acking list.
-		cl.queue.segments.acked =
-			append(cl.queue.segments.acked, acking[:segmentsAcked]...)
-		cl.queue.segments.acking = acking[segmentsAcked:]
-		cl.maybeDeleteAcked()
-	}
+
+	// If there is more data to read, start a new read request.
+	cl.maybeReadPending()
 }
 
 func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
@@ -203,15 +224,42 @@ func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
 	cl.maybeDeleteAcked()
 }
 
+func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
+	acking := cl.queue.segments.acking
+	if len(acking) == 0 {
+		return
+	}
+	startFrame := cl.oldestFrameID
+	endFrame := startFrame
+	ackedSegmentCount := 0
+	for ; ackedSegmentCount < len(acking); ackedSegmentCount++ {
+		segment := acking[ackedSegmentCount]
+		endFrame += frameID(segment.framesRead)
+		if endFrame > ackedUpTo {
+			// This segment is still waiting for acks, we're done.
+			break
+		}
+	}
+	if ackedSegmentCount > 0 {
+		// Move fully acked segments to the acked list and remove them
+		// from the acking list.
+		cl.queue.segments.acked =
+			append(cl.queue.segments.acked, acking[:ackedSegmentCount]...)
+		cl.queue.segments.acking = acking[ackedSegmentCount:]
+		cl.oldestFrameID = endFrame
+		cl.maybeDeleteAcked()
+	}
+}
+
 func (cl *coreLoop) handleShutdown() {
 	// We need to close the input channels for all other goroutines and
 	// wait for any outstanding responses. Order is important: handling
 	// a read response may require the deleter, so the reader must be
 	// shut down first.
 
-	close(cl.queue.readerLoop.nextReadBlock)
+	close(cl.queue.readerLoop.requestChan)
 	if cl.reading {
-		response := <-cl.queue.readerLoop.finishedReading
+		response := <-cl.queue.readerLoop.responseChan
 		cl.handleReadResponse(response)
 	}
 
@@ -256,8 +304,9 @@ func (cl *coreLoop) maybeWritePending() {
 
 	// If the new frame exceeds the maximum segment size, close the current
 	// writing segment.
-	frameLen := uint64(len(request.frame.serialized))
-	if segment != nil && segment.size+frameLen > dq.settings.MaxSegmentSize {
+	frameLen := segmentOffset(len(request.frame.serialized))
+	newEndOffset := segment.endOffset + frameLen
+	if segment != nil && newEndOffset > dq.settings.maxSegmentOffset() {
 		segment.writer.Close()
 		segment.writer = nil
 		dq.segments.reading = append(dq.segments.reading, segment)
@@ -284,7 +333,22 @@ func (cl *coreLoop) maybeWritePending() {
 // If the reading list is nonempty, and there are no outstanding read
 // requests, send one.
 func (cl *coreLoop) maybeReadPending() {
-
+	if cl.reading {
+		// A read request is already pending
+		return
+	}
+	segment := cl.queue.segments.readingSegment()
+	if segment == nil || cl.nextReadOffset >= segmentOffset(segment.endOffset) {
+		// Nothing to read
+		return
+	}
+	request := readRequest{
+		segment:     segment,
+		startOffset: cl.nextReadOffset,
+		endOffset:   segment.endOffset,
+	}
+	cl.queue.readerLoop.requestChan <- request
+	cl.reading = true
 }
 
 // If the acked list is nonempty, and there are no outstanding deletion
