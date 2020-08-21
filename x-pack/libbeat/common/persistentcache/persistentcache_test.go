@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
@@ -84,14 +83,7 @@ func TestCleanup(t *testing.T) {
 
 	registry := newTestRegistry(t)
 
-	removeChan := make(chan common.Value)
-	options := PersistentCacheOptions{
-		RemovalListener: func(k string, v common.Value) {
-			removeChan <- v
-		},
-	}
-
-	cache, err := newPersistentCache(registry, "test", 0, options)
+	cache, err := newPersistentCache(registry, "test", 0, PersistentCacheOptions{})
 	require.NoError(t, err)
 
 	now := time.Now()

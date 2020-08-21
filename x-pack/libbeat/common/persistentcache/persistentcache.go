@@ -42,15 +42,11 @@ var registry PersistentCacheRegistry
 type PersistentCache struct {
 	log *logp.Logger
 
-	store           *statestore.Store
-	refreshOnAdd    bool
-	removalListener RemovalListener
+	store        *statestore.Store
+	refreshOnAdd bool
 
 	clock func() time.Time
 }
-
-// RemovalListener is a function called when a entry is removed from cache
-type RemovalListener func(k string, v common.Value)
 
 // PersistentCacheOptions are the options that can be used to custimize
 type PersistentCacheOptions struct {
@@ -58,9 +54,6 @@ type PersistentCacheOptions struct {
 	// when the object is added to the cache, and not when the
 	// cache is accessed.
 	RefreshOnAdd bool
-
-	// RemovalListener is called every time a key is removed.
-	RemovalListener RemovalListener
 }
 
 // NewPersistentCache creates and returns a new persistent cache. d is the length of time after last
@@ -82,8 +75,7 @@ func newPersistentCache(registry *PersistentCacheRegistry, name string, d time.D
 		log:   logger,
 		store: store,
 
-		refreshOnAdd:    opts.RefreshOnAdd,
-		removalListener: opts.RemovalListener,
+		refreshOnAdd: opts.RefreshOnAdd,
 	}, nil
 }
 
@@ -131,9 +123,7 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 }
 
 // CleanUp performs maintenance on the cache by removing expired elements from
-// the cache. If a RemoveListener is registered it will be invoked for each
-// element that is removed during this clean up operation. The RemovalListener
-// is invoked on the caller's goroutine.
+// the cache.
 func (c *PersistentCache) CleanUp() int {
 	var expired []string
 	var entry persistentCacheEntry
