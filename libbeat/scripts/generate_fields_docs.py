@@ -5,7 +5,7 @@ import os
 import yaml
 
 
-def document_fields(output, section, sections, path):
+def document_fields(output, section, sections, path, depth_level):
     if "skipdocs" in section:
         return
     if "anchor" in section:
@@ -16,14 +16,14 @@ def document_fields(output, section, sections, path):
 
     # Intermediate level titles
     if ("description" in section and "prefix" not in section and
-            "anchor" not in section):
+        "anchor" not in section):
         output.write("[float]\n")
 
     if "description" in section:
         if "anchor" in section:
             output.write("== {} fields\n\n".format(section["name"]))
         else:
-            output.write("=== {}\n\n".format(section["name"]))
+            output.write(("=" * depth_level) + "== {}\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -42,13 +42,12 @@ def document_fields(output, section, sections, path):
             newpath = path + "." + field["name"]
 
         if "type" in field and field["type"] == "group":
-            document_fields(output, field, sections, newpath)
+            document_fields(output, field, sections, newpath, depth_level+1)
         else:
             document_field(output, field, newpath)
 
 
 def document_field(output, field, field_path):
-
     if "field_path" not in field:
         field["field_path"] = field_path
 
@@ -87,7 +86,6 @@ def document_field(output, field, field_path):
 
 
 def fields_to_asciidoc(input, output, beat):
-
     dict = {'beat': beat}
 
     output.write("""
@@ -146,7 +144,7 @@ grouped in the following categories:
         section["name"] = section["title"]
         if "anchor" not in section:
             section["anchor"] = section["key"]
-        document_fields(output, section, sections, "")
+        document_fields(output, section, sections, "", 0)
 
 
 if __name__ == "__main__":
