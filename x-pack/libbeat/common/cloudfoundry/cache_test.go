@@ -13,6 +13,7 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -25,7 +26,8 @@ func TestClientCacheWrap(t *testing.T) {
 		Memory: 1, // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
-	cache := newClientCacheWrap(fakeClient, ttl, ttl, logp.NewLogger("cloudfoundry"))
+	cache, err := newClientCacheWrap(fakeClient, ttl, ttl, logp.NewLogger("cloudfoundry"))
+	require.NoError(t, err)
 
 	missingAppGuid := mustCreateFakeGuid()
 

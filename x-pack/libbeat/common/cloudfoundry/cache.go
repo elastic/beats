@@ -5,6 +5,7 @@
 package cloudfoundry
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -49,26 +50,52 @@ func newClientCacheWrap(client cfClient, ttl time.Duration, errorTTL time.Durati
 }
 
 type appResponse struct {
-	app *cfclient.App
-	err error
+	// TODO: Store only the fields we need from the App.
+	App          cfclient.App               `json:"a"`
+	Error        cfclient.CloudFoundryError `json:"e,omitempty"`
+	ErrorMessage string                     `json:"em,omitempty"`
+}
+
+func (r *appResponse) fromStructs(app cfclient.App, err error) {
+	if err != nil {
+		switch e := err.(type) {
+		case cfclient.CloudFoundryError:
+			r.Error = e
+		default:
+			r.ErrorMessage = e.Error()
+		}
+		return
+	}
+	r.App = app
+}
+
+func (r *appResponse) toStructs() (*cfclient.App, error) {
+	if len(r.ErrorMessage) > 0 {
+		return nil, errors.New(r.ErrorMessage)
+	}
+	var empty cfclient.CloudFoundryError
+	if r.Error != empty {
+		return nil, r.Error
+	}
+	return &r.App, nil
 }
 
 // fetchApp uses the cfClient to retrieve an App entity and
 // stores it in the internal cache
 func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 	app, err := c.client.GetAppByGuid(guid)
-	resp := appResponse{
-		app: &app,
-		err: err,
-	}
+	var resp appResponse
+	resp.fromStructs(app, err)
 	timeout := time.Duration(0)
 	if err != nil {
 		// Cache nil, because is what we want to return when there was an error
-		resp.app = nil
 		timeout = c.errorTTL
 	}
-	c.cache.PutWithTimeout(guid, &resp, timeout)
-	return resp.app, resp.err
+	err = c.cache.PutWithTimeout(guid, resp, timeout)
+	if err != nil {
+		return nil, fmt.Errorf("storing app response in cache: %w", err)
+	}
+	return resp.toStructs()
 }
 
 // GetApp returns CF Application info, either from the cache or
@@ -79,7 +106,7 @@ func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
 	if err != nil {
 		return c.fetchAppByGuid(guid)
 	}
-	return resp.app, resp.err
+	return resp.toStructs()
 }
 
 // StartJanitor starts a goroutine that will periodically clean the applications cache.
