@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
+- Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
 
 *Auditbeat*
 
