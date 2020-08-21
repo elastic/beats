@@ -724,6 +724,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 - Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 
 *Packetbeat*
 
