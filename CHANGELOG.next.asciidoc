@@ -19,10 +19,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
+- Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
 
 *Auditbeat*
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
+- Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
+- Change network.direction values to ECS recommended values (inbound, outbound). {issue}12445[12445] {pull}20695[20695]
 
 *Filebeat*
 
@@ -97,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
 - Fix Powershell processing of downgraded engine events. {pull}18966[18966]
 - Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
+- Remove top level `hash` property from sysmon events {pull}20653[20653]
 
 *Functionbeat*
 
@@ -244,6 +248,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
+- Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
+- Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 
 *Heartbeat*
 
@@ -319,6 +325,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 - Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
+- Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
+- Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 
 *Packetbeat*
 
@@ -331,6 +339,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 - Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[20564]
+- Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 
 *Functionbeat*
 
@@ -529,13 +538,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add event.ingested to all Filebeat modules. {pull}20386[20386]
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
-
+- Convert httpjson to v2 input {pull}20226[20226]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
 - Record HTTP response headers. {pull}18327[18327]
+- Add index and pipeline settings to monitor configurations. {pull}20610[20610]
 
 *Journalbeat*
 
@@ -639,7 +649,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
+- Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
+- Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 
 *Packetbeat*
 
