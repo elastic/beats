@@ -2041,7 +2041,7 @@ type: long
 *`aws.ec2.network.in.packets`*::
 +
 --
-The number of packets received on all network interfaces by the instance.
+The total number of packets received on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2054,14 +2054,14 @@ type: long
 The number of packets per second sent out on all network interfaces by the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.network.out.packets`*::
 +
 --
-The number of packets sent out on all network interfaces by the instance.
+The total number of packets sent out on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2074,14 +2074,14 @@ type: long
 The number of packets per second sent out on all network interfaces by the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.network.in.bytes`*::
 +
 --
-The number of bytes received on all network interfaces by the instance.
+The total number of bytes received on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2096,14 +2096,14 @@ format: bytes
 The number of bytes per second received on all network interfaces by the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.network.out.bytes`*::
 +
 --
-The number of bytes sent out on all network interfaces by the instance.
+The total number of bytes sent out on all network interfaces by the instance in collection period.
 
 
 type: long
@@ -2118,14 +2118,14 @@ format: bytes
 The number of bytes per second sent out on all network interfaces by the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.diskio.read.bytes`*::
 +
 --
-Bytes read from all instance store volumes available to the instance.
+Total bytes read from all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2140,14 +2140,14 @@ format: bytes
 Bytes read per second from all instance store volumes available to the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
-Bytes written to all instance store volumes available to the instance.
+Total bytes written to all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2162,14 +2162,14 @@ format: bytes
 Bytes written per second to all instance store volumes available to the instance.
 
 
-type: long
+type: scaled_float
 
 --
 
 *`aws.ec2.diskio.read.ops`*::
 +
 --
-Completed read operations from all instance store volumes available to the instance in a specified period of time.
+Total completed read operations from all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -2189,7 +2189,7 @@ type: long
 *`aws.ec2.diskio.write.ops`*::
 +
 --
-Completed write operations to all instance store volumes available to the instance in a specified period of time.
+Total completed write operations to all instance store volumes available to the instance in collection period.
 
 
 type: long
@@ -6392,6 +6392,80 @@ type: keyword
 the unit name of the systemd service
 
 type: keyword
+
+--
+
+
+*`host.cpu.pct`*::
++
+--
+Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`host.network.in.bytes`*::
++
+--
+The number of bytes received on all network interfaces by the host in a given period of time.
+
+type: long
+
+format: bytes
+
+--
+
+*`host.network.out.bytes`*::
++
+--
+The number of bytes sent out on all network interfaces by the host in a given period of time.
+
+type: long
+
+format: bytes
+
+--
+
+*`host.network.in.packets`*::
++
+--
+The number of packets received on all network interfaces by the host in a given period of time.
+
+type: long
+
+--
+
+*`host.network.out.packets`*::
++
+--
+The number of packets sent out on all network interfaces by the host in a given period of time.
+
+type: long
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes read successfully in a given period of time.
+
+type: long
+
+format: bytes
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes write successfully in a given period of time.
+
+type: long
+
+format: bytes
 
 --
 
@@ -16501,14 +16575,8 @@ type: boolean
 [float]
 === node.stats
 
-node_stats
+Statistics about each node in a Elasticsearch cluster
 
-
-
-[float]
-=== indices
-
-Node indices stats
 
 
 
@@ -16564,24 +16632,13 @@ type: long
 
 --
 
-[float]
-=== jvm.mem.pools
-
-JVM memory pool stats
-
-
-
-[float]
-=== old
-
-Old memory pool stats.
-
 
 
 *`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`*::
 +
 --
 Max bytes.
+
 
 type: long
 
@@ -16594,6 +16651,7 @@ format: bytes
 --
 Peak bytes.
 
+
 type: long
 
 format: bytes
@@ -16604,6 +16662,7 @@ format: bytes
 +
 --
 Peak max bytes.
+
 
 type: long
 
@@ -16616,23 +16675,19 @@ format: bytes
 --
 Used bytes.
 
+
 type: long
 
 format: bytes
 
 --
 
-[float]
-=== young
-
-Young memory pool stats.
-
-
 
 *`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`*::
 +
 --
 Max bytes.
+
 
 type: long
 
@@ -16645,6 +16700,7 @@ format: bytes
 --
 Peak bytes.
 
+
 type: long
 
 format: bytes
@@ -16655,6 +16711,7 @@ format: bytes
 +
 --
 Peak max bytes.
+
 
 type: long
 
@@ -16667,23 +16724,19 @@ format: bytes
 --
 Used bytes.
 
+
 type: long
 
 format: bytes
 
 --
 
-[float]
-=== survivor
-
-Survivor memory pool stats.
-
-
 
 *`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`*::
 +
 --
 Max bytes.
+
 
 type: long
 
@@ -16696,6 +16749,7 @@ format: bytes
 --
 Peak bytes.
 
+
 type: long
 
 format: bytes
@@ -16706,6 +16760,7 @@ format: bytes
 +
 --
 Peak max bytes.
+
 
 type: long
 
@@ -16718,31 +16773,18 @@ format: bytes
 --
 Used bytes.
 
+
 type: long
 
 format: bytes
 
 --
 
-[float]
-=== jvm.gc.collectors
-
-GC collector stats.
-
-
-
-[float]
-=== old.collection
-
-Old collection gc.
-
 
 
 *`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`*::
 +
 --
-
-
 type: long
 
 --
@@ -16750,24 +16792,14 @@ type: long
 *`elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms`*::
 +
 --
-
-
 type: long
 
 --
-
-[float]
-=== young.collection
-
-Young collection gc.
-
 
 
 *`elasticsearch.node.stats.jvm.gc.collectors.young.collection.count`*::
 +
 --
-
-
 type: long
 
 --
@@ -16775,24 +16807,14 @@ type: long
 *`elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms`*::
 +
 --
-
-
 type: long
 
 --
-
-[float]
-=== fs.summary
-
-File system summary
-
 
 
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -16802,8 +16824,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.free.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -16813,8 +16833,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.available.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes

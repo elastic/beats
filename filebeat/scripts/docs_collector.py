@@ -45,7 +45,7 @@ This file is generated! See scripts/docs_collector.py
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml", encoding='utf_8') as f:
-            fields = yaml.load(f.read())
+            fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
 
         modules_list[module] = title
