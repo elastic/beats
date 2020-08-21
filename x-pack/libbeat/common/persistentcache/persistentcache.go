@@ -6,12 +6,11 @@ package persistentcache
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -28,6 +27,8 @@ const (
 // registry is the global persistent caches registry
 var registry PersistentCacheRegistry
 
+var expiredError = errors.New("key expired")
+
 // Persistent cache is a persistent map of keys to values. Elements added to the
 // cache are stored until they are explicitly deleted or are expired due to time-based
 // eviction based on last access or add time.
@@ -43,6 +44,7 @@ type PersistentCache struct {
 	store           *statestore.Store
 	refreshOnAccess bool
 	timeout         time.Duration
+	janitorQuit     chan struct{}
 
 	clock func() time.Time
 }
@@ -113,7 +115,7 @@ func (c *PersistentCache) PutWithTimeout(k string, v common.Value, timeout time.
 	var entry persistentCacheEntry
 	entry.Item, err = json.Marshal(v)
 	if err != nil {
-		return errors.Wrap(err, "encoding item to store in cache")
+		return fmt.Errorf("encoding item to store in cache: %w", err)
 	}
 	c.refresh(&entry, timeout)
 	return c.store.Set(k, entry)
@@ -128,14 +130,14 @@ func (c *PersistentCache) Get(k string, v common.Value) error {
 		return err
 	}
 	if c.expired(&entry) {
-		return fmt.Errorf("expired")
+		return expiredError
 	}
 	if c.refreshOnAccess && c.refresh(&entry, 0) {
 		c.store.Set(k, entry)
 	}
 	err = json.Unmarshal(entry.Item, v)
 	if err != nil {
-		return errors.Wrap(err, "decoding item stored in cache")
+		return fmt.Errorf("decoding item stored in cache: %w", err)
 	}
 	return nil
 }
@@ -176,10 +178,25 @@ func (c *PersistentCache) expired(entry *persistentCacheEntry) bool {
 // StartJanitor starts a goroutine that will periodically invoke the cache's
 // CleanUp() method.
 func (c *PersistentCache) StartJanitor(interval time.Duration) {
+	c.janitorQuit = make(chan struct{})
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				c.CleanUp()
+			case <-c.janitorQuit:
+				return
+			}
+		}
+	}()
 }
 
 // StopJanitor stops the goroutine created by StartJanitor.
 func (c *PersistentCache) StopJanitor() {
+	close(c.janitorQuit)
 }
 
 // Close releases all resources associated with this cache.
@@ -214,7 +231,7 @@ func (r *PersistentCacheRegistry) OpenStore(logger *logp.Logger, name string) (*
 			FileMode: cacheFileMode,
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "opening store for persistent cache")
+			return nil, fmt.Errorf("opening store for persistent cache: %w", err)
 		}
 		r.registry = statestore.NewRegistry(backend)
 	}

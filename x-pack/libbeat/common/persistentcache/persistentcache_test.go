@@ -5,16 +5,18 @@
 package persistentcache
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 func init() {
@@ -141,6 +143,49 @@ func TestCleanup(t *testing.T) {
 
 	err = cache.Get(key, &result)
 	assert.Error(t, err)
+}
+
+func TestJanitor(t *testing.T) {
+	defer resources.NewGoroutinesChecker().Check(t)
+
+	registry := newTestRegistry(t)
+
+	cache, err := newPersistentCache(registry, "test", PersistentCacheOptions{})
+	require.NoError(t, err)
+
+	cache.StartJanitor(10 * time.Millisecond)
+	defer cache.StopJanitor()
+
+	now := time.Now()
+	cache.clock = func() time.Time { return now }
+
+	type valueType struct {
+		Something string
+	}
+
+	var key = "somekey"
+	var value = valueType{Something: "foo"}
+
+	err = cache.PutWithTimeout(key, value, 10*time.Second)
+	assert.NoError(t, err)
+
+	now = now.Add(20 * time.Second)
+
+	var result valueType
+	timeout := time.After(5 * time.Second)
+	removed := false
+	for !removed {
+		select {
+		case <-time.After(1 * time.Millisecond):
+			err = cache.Get(key, &result)
+			require.Error(t, err)
+			if !errors.Is(err, expiredError) {
+				removed = true
+			}
+		case <-timeout:
+			t.Fatal("timeout waiting for janitor to remove key")
+		}
+	}
 }
 
 func TestRefreshOnAccess(t *testing.T) {
