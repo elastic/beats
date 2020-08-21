@@ -7,10 +7,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"io"
+	"net/url"
 	"os/exec"
 	"os/user"
 )
@@ -37,11 +39,12 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	job := monitors.MakeSimpleCont(func(event *beat.Event) error {
 		logp.Info("Start script job")
 		cmd := exec.Command(
-			"node",
-			"/home/andrewvc/projects/synthetic-monitoring/elastic-synthetics/dist",
+			"npx",
+			"elastic-synthetics",
 			"run",
 			"--stdin",
 			"--json",
+			"--headless",
 		)
 
 		stdout, err := cmd.StdoutPipe()
@@ -69,12 +72,49 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		}
 		stdin.Close()
 
-		stdoutResults := decodePipe(stdout)
 		stderrResults := decodePipe(stderr)
 
-		eventext.MergeEventFields(event, map[string]interface{}{
-			"script.stdout": stdoutResults,
-			"script.stderr": stderrResults,
+		var stdoutResults []string
+		var rawResults map[string]interface{}
+		for _, line := range decodePipe(stdout) {
+			if s, ok := line.(string); ok {
+				logp.Warn("STRING HERE")
+				stdoutResults = append(stdoutResults, s)
+			} else if r, ok := line.(Results); ok {
+				status := "down"
+				rawResults = r.Raw
+
+				if len(r.Journeys) > 0 {
+					journey := r.Journeys[0]
+					if journey.error != nil {
+						status = "down"
+					}
+					logp.Warn("RESULTS HERE %#v",  r)
+
+					eventext.MergeEventFields(event, common.MapStr{
+						"monitor": common.MapStr{
+							"status": status,
+							"duration.us": journey.duration,
+						},
+					})
+
+					u, err := url.Parse(journey.Url)
+					if err != nil {
+						eventext.MergeEventFields(event, common.MapStr{
+							"url": wrappers.URLFields(u),
+						})
+					}
+				}
+			}
+		}
+
+
+		eventext.MergeEventFields(event, common.MapStr{
+			"script": common.MapStr{
+				"stdout": stdoutResults,
+				"stderr": stderrResults,
+				"journey": rawResults,
+			},
 		})
 
 		if err = cmd.Wait(); err != nil {
@@ -87,10 +127,9 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	return []jobs.Job{job}, 1, nil
 }
 
-
-func decodePipe(pipe io.ReadCloser) []map[string]interface{} {
+func decodePipe(pipe io.ReadCloser) []interface{} {
 	pipeBio := bufio.NewReader(pipe)
-	var results []map[string]interface{}
+	var results []interface{}
 	for {
 		line, _, err := pipeBio.ReadLine()
 		if err == io.EOF {
@@ -99,15 +138,36 @@ func decodePipe(pipe io.ReadCloser) []map[string]interface{} {
 			logp.Warn("error reading line: %w", err)
 		}
 
-		var decoded map[string]interface{}
+		var decoded Results
 		err = json.Unmarshal(line, &decoded)
+		var raw map[string]interface{}
+		json.Unmarshal(line, &raw)
+		decoded.Raw = raw
+		logp.Warn("> %s", string(line))
 		if err != nil {
-			decoded = map[string]interface{}{"message": string(line)}
+			results = append(results, line)
 		}
 
-		logp.Warn("> %s", string(line))
 		results = append(results, decoded)
 	}
 
 	return results
+}
+
+type Results struct {
+	formatVersion string `json:"format_version"`
+	Journeys []Journey `json:"journeys"`
+	Raw common.MapStr
+}
+
+type Journey struct {
+	Url   string `json:"url"`
+	Steps []Step `json:"steps"`
+	dataType string `json:"__type__"`
+	error interface{} `json:"error"`
+	duration interface{} `json:"elapsedMs"`
+}
+
+type Step struct {
+
 }

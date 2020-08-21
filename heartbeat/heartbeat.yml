@@ -18,14 +18,12 @@ heartbeat.monitors:
     step("click uptime", async (page) => {
         await page.click('css=a[href="/uptime-monitoring"]');
     });
-    /**
     step("broken step", async (page) => {
-        await page.click('css=a#missing-id-that-is-not-real');
+        await page.click('css=a#missing-id-that-is-not-real', {timeout: 1000});
     });
     step("unreachable step", async (page) => {
         await page.click('css=a#missing-id-that-is-not-real');
     });
-    **/
   schedule: "@every 1m"
 
 setup.template.settings:
