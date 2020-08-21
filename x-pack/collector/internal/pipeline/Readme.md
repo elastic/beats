@@ -107,7 +107,7 @@ will be configured.
 
 ```go
 type Settings struct {
-	Inputs  []InputSettings           `config:"club.inputs"`
+	Inputs  []InputSettings           `config:"collector.inputs"`
 	Outputs map[string]*common.Config `config:"outputs"`
 }
 ```
