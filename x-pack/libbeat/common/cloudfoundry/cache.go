@@ -10,8 +10,8 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfclient"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
 )
 
 // cfClient interface is provided so unit tests can mock the actual client.
@@ -20,37 +20,32 @@ type cfClient interface {
 	GetAppByGuid(guid string) (cfclient.App, error)
 }
 
-// internalCache is the interface for internal caches
-type internalCache interface {
-	PutWithTimeout(common.Key, common.Value, time.Duration) common.Value
-	Get(common.Key) common.Value
-	StartJanitor(time.Duration)
-	StopJanitor()
-}
-
-// openCloser is the interface for resources that need to be opened and closed
-// before and after using them.
-type openCloser interface {
-	Open() error
-	Close() error
-}
-
 // clientCacheWrap wraps the cloudfoundry client to add a cache in front of GetAppByGuid.
 type clientCacheWrap struct {
-	cache    internalCache
+	cache    *persistentcache.PersistentCache
 	client   cfClient
 	log      *logp.Logger
 	errorTTL time.Duration
 }
 
 // newClientCacheWrap creates a new cache for application data.
-func newClientCacheWrap(client cfClient, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) *clientCacheWrap {
+func newClientCacheWrap(client cfClient, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
+	options := persistentcache.Options{
+		Timeout: ttl,
+	}
+
+	// TODO: Use an unique name per API endpoint
+	cache, err := persistentcache.New("cloudfoundry", options)
+	if err != nil {
+		return nil, fmt.Errorf("creating metadata cache: %w", err)
+	}
+
 	return &clientCacheWrap{
-		cache:    common.NewCacheWithExpireOnAdd(ttl, 100),
+		cache:    cache,
 		client:   client,
 		errorTTL: errorTTL,
 		log:      log,
-	}
+	}, nil
 }
 
 type appResponse struct {
@@ -79,13 +74,10 @@ func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 // GetApp returns CF Application info, either from the cache or
 // using the CF client.
 func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
-	cachedResp := c.cache.Get(guid)
-	if cachedResp == nil {
+	var resp appResponse
+	err := c.cache.Get(guid, &resp)
+	if err != nil {
 		return c.fetchAppByGuid(guid)
-	}
-	resp, ok := cachedResp.(*appResponse)
-	if !ok {
-		return nil, fmt.Errorf("error converting cached app response (of type %T), this is likely a bug", cachedResp)
 	}
 	return resp.app, resp.err
 }
