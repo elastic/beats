@@ -20,12 +20,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/beatsout"
-	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/pb"
-	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/registries"
-	"github.com/elastic/beats/v7/x-pack/club/internal/cfgload"
-	"github.com/elastic/beats/v7/x-pack/club/internal/management"
-	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/beatsout"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/pb"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/registries"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/cfgload"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/management"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/pipeline"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 )
 

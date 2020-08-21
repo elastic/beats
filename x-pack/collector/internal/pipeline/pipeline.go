@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/club/internal/cell"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/cell"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )

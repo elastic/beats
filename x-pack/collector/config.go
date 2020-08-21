@@ -8,9 +8,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 
-	"github.com/elastic/beats/v7/x-pack/club/internal/dirs"
-	"github.com/elastic/beats/v7/x-pack/club/internal/management"
-	"github.com/elastic/beats/v7/x-pack/club/internal/pipeline"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/dirs"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/management"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/pipeline"
 )
 
 // flagsConfig is used for parsing all available CLI flags

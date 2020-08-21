@@ -1,4 +1,4 @@
-club.inputs:
+collector.inputs:
 
 ## collect linux system and services logs
 #- type:  logs/journald

@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/club/internal/publishing"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/publishing"
 	"github.com/elastic/go-concert/unison"
 )
 

@@ -9,7 +9,7 @@ import (
 
 // Settings describes the configuration of inputs and output to be run.
 type Settings struct {
-	Inputs  []InputSettings           `config:"club.inputs"`
+	Inputs  []InputSettings           `config:"collector.inputs"`
 	Outputs map[string]*common.Config `config:"outputs"`
 }
 

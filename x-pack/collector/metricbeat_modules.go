@@ -4,7 +4,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
 
-	"github.com/elastic/beats/v7/x-pack/club/internal/adapter/mba"
+	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/mba"
 
 	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/beats/v7/metricbeat/module/system/core"
