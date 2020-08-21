@@ -20,9 +20,24 @@ type cfClient interface {
 	GetAppByGuid(guid string) (cfclient.App, error)
 }
 
+// internalCache is the interface for internal caches
+type internalCache interface {
+	PutWithTimeout(common.Key, common.Value, time.Duration) common.Value
+	Get(common.Key) common.Value
+	StartJanitor(time.Duration)
+	StopJanitor()
+}
+
+// openCloser is the interface for resources that need to be opened and closed
+// before and after using them.
+type openCloser interface {
+	Open() error
+	Close() error
+}
+
 // clientCacheWrap wraps the cloudfoundry client to add a cache in front of GetAppByGuid.
 type clientCacheWrap struct {
-	cache    *common.Cache
+	cache    internalCache
 	client   cfClient
 	log      *logp.Logger
 	errorTTL time.Duration
