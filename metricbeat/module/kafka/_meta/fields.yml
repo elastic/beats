@@ -1,12 +1,17 @@
 - key: kafka
   title: "Kafka"
   description: >
-    Kafka module
+    The Kafka Metricbeat module has two types of metrics. Those who are related with the cluster and can be present
+    across all metricset which are usually called module level metrics. And those metrics that are only present using
+    a specific metricset for example, the `broker` metricset.
   short_config: false
   release: ga
   fields:
     - name: kafka
       type: group
+      description: >
+        Kafka module level metrics. These metrics aren't related with a particular metricset and can be present in any
+        of them
       fields:
         - name: topic.name
           type: keyword

@@ -14,7 +14,7 @@
     - name: net
       type: group
       description: >
-        Network metrics
+        Network metrics in the broker
       fields:
         - name: in.bytes_per_sec
           description: The incoming byte rate
