@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -70,11 +71,14 @@ func (p *pipeline) Run(cancel unison.Canceler) error {
 		stopped := inputGroup.FindAll(func(hash string) bool {
 			return !inputHashes.Has(hash)
 		})
-		for _, hdl := range stopped {
-			hdl.cancel()
+		cancelAll(stopped)
+
+		// 2. update output
+		if err := outputPipeline.UpdateOutput(state.output); err != nil {
+			return fmt.Errorf("pipeline without output after reconfiguration attempt: %w", err)
 		}
 
-		// 2. start new inputs
+		// 3. start new inputs
 		for _, inp := range state.inputs {
 			inp := inp
 			if inputGroup.Has(inp.configHash) {

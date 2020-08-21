@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -17,6 +18,11 @@ type processHandle struct {
 	ctx    context.Context
 	cancel func()
 	wg     sync.WaitGroup
+}
+
+type cancelCtx struct {
+	signaler unison.Canceler
+	cancel   func()
 }
 
 func (grp *managedGroup) Go(name string, fn func(unison.Canceler)) {
@@ -87,8 +93,29 @@ func (grp *managedGroup) signalStop() {
 	grp.active = nil
 }
 
+func cancelAll(handles []*processHandle) {
+	for _, h := range handles {
+		h.cancel()
+	}
+}
+
 func waitAll(handles []*processHandle) {
 	for _, h := range handles {
 		h.wg.Wait()
+	}
+}
+
+func backgroundCancelCtx() cancelCtx {
+	return cancelCtx{
+		signaler: context.Background(),
+		cancel:   func() {},
+	}
+}
+
+func makeCancelCtx(parent cancelCtx) cancelCtx {
+	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(parent.signaler))
+	return cancelCtx{
+		signaler: ctx,
+		cancel:   cancel,
 	}
 }

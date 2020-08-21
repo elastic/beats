@@ -27,13 +27,9 @@ var errEventFlitered = errors.New("event filtered out")
 type pipelinePublishing struct {
 	log              *logp.Logger
 	processorFactory processing.Supporter
-	out              publishing.Publisher
 	events           *eventTracker
-}
-
-type output struct {
-	configHash string
-	output     publishing.Output
+	outputMigrations managedGroup
+	output           *replacableOutput
 }
 
 type client struct {
@@ -46,35 +42,9 @@ type client struct {
 	events    *eventTracker
 	eventsCtx *eventContext
 
-	output    publishing.Publisher
+	output    *replacableOutput
 	processor beat.Processor
 	acker     beat.ACKer
-}
-
-type eventTracker struct {
-	// contexts stores the status of events. Each client has it's own status. This guarantees that we can
-	// correctly ACK events to the original publisher.
-	// The freelist tracks event contexts currently not in use. Old contexts get
-	// reuse when a new client is connected (ensure IDs are stable and lookup is O(1)
-	// Modifications to contextsMu and freelist must be protected using contextsMu.
-	contextsMu sync.Mutex
-	contexts   []*eventContext
-	freelist   []uint32
-}
-
-type eventContext struct {
-	ref uint32
-
-	contextID uint32
-
-	acker beat.ACKer
-
-	statusMu sync.Mutex
-	startID  uint32
-
-	// TODO: track event memory usage, so we account for overal memory usage for
-	// events in progress and events published
-	status []publishing.EventStatus
 }
 
 func createPublishPipeline(log *logp.Logger, info beat.Info, output output) (*pipelinePublishing, error) {
@@ -86,23 +56,83 @@ func createPublishPipeline(log *logp.Logger, info beat.Info, output output) (*pi
 
 	events := &eventTracker{}
 
-	out, err := output.output.Open(context.Background(), log, events)
+	pipelineOutput, err := newPipelineOutput(log, 0, output, events)
 	if err != nil {
 		return nil, err
 	}
 
 	return &pipelinePublishing{
 		log:              log,
-		out:              out,
 		processorFactory: processorFactory,
 		events:           events,
+		output:           newReplacablePublisher(pipelineOutput),
 	}, nil
 }
 
 func (p *pipelinePublishing) Close() error {
-	err := p.out.Close()
-	p.out = nil
+	p.outputMigrations.Stop()
+	err := p.output.Close()
+	p.output = nil
 	return err
+}
+
+func (p *pipelinePublishing) UpdateOutput(out output) error {
+	// no change, no work
+	old := p.output.GetActive()
+	if old.output.configHash == out.configHash {
+		return nil
+	}
+
+	outputID := old.id + 1
+	replacement, err := newPipelineOutput(p.log, outputID, out, p.events)
+	if err != nil {
+		return err
+	}
+
+	// atomically update the outputID for all ACK handlers, such that ACKs from the currently active output
+	// are ignored. There is still the chance that clients send new events to the old output, but
+	// we clean this up when we send old non-acked events to the new output.
+	// The number of events that get ACKed can not change anymore after this block has succeeded.
+	old.acker.closed.Store(true)
+	p.events.SetOutputID(outputID)
+
+	// Block all clients while we try to make a snapshot of the current state.
+	// We want to send again all events that are still pending, such that we can
+	// correctly receive ACK from the new output. In order to not get an event ACKed
+	// twice we need to ensure that clients can not publish new events while we swap out the output.
+	//
+	// IMPORTANT: Making the snapshot of pending events and replacing the output
+	//            must be atomic, such that we do not ignore any events, that would otherwise
+	//            be send to the old output by accident.
+	//
+	// IMPORTANT: Clients must be able to shutdown without waiting for too long. All works within this
+	//            critical section must not block unbounded. It must only be
+	//            required to collect information that is required to fixup
+	//            processing after the output swap. No IO or send via channels must happen here.
+	p.events.Lock()
+	p.output.SetActive(replacement)
+	snapshot := p.events.SnapshotPending()
+	p.events.Unlock()
+
+	oldMigrations := p.outputMigrations.FindAll(func(_ string) bool { return true })
+	cancelAll(oldMigrations)
+	old.Close()
+
+	if len(snapshot) > 0 {
+		p.outputMigrations.Go(out.configHash, func(cancel unison.Canceler) {
+			for ; len(snapshot) > 0 && cancel.Err() == nil; snapshot = snapshot[1:] {
+				pending := snapshot[0]
+				err := replacement.Publish(pending.mode, pending.id, pending.event)
+				if err != nil {
+					replacement.acker.UpdateEventStatus(pending.id, publishing.EventFailed)
+				}
+			}
+			return
+		})
+	}
+
+	waitAll(oldMigrations)
+	return nil
 }
 
 func (p *pipelinePublishing) Connect() (beat.Client, error) {
@@ -130,8 +160,8 @@ func (p *pipelinePublishing) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 		mode: cfg.PublishMode,
 
 		events:    p.events,
-		eventsCtx: p.events.Register(acker),
-		output:    p.out,
+		eventsCtx: p.events.Register(cfg.PublishMode, acker),
+		output:    p.output,
 
 		processor: processors,
 		acker:     cfg.ACKHandler,
@@ -191,115 +221,17 @@ func (c *client) publishEvent(event beat.Event) error {
 		c.acker.AddEvent(event, true)
 	}
 
-	id := c.eventsCtx.RecordEvent()
-	err := c.output.Publish(c.mode, id, event)
+	id := c.eventsCtx.RecordEvent(event)
+	activeOutput := c.output.GetActive()
+	if activeOutput == nil {
+		return nil // event is recorded. Publishing gets postponed until after new output is in place
+	}
+
+	err := activeOutput.Publish(c.mode, id, event)
 	if err != nil && err != context.Canceled {
-		c.events.UpdateEventStatus(id, publishing.EventFailed)
+		activeOutput.acker.UpdateEventStatus(id, publishing.EventFailed)
 	}
 	return err
-}
-
-func (t *eventTracker) Register(acker beat.ACKer) *eventContext {
-	t.contextsMu.Lock()
-	defer t.contextsMu.Unlock()
-
-	var idx uint32
-	if L := len(t.freelist); L > 0 {
-		idx = uint32(L - 1)
-		t.freelist = t.freelist[:L-1]
-	} else {
-		idx = uint32(len(t.contexts))
-		t.contexts = append(t.contexts, nil)
-	}
-
-	ectx := &eventContext{
-		ref:       1,
-		contextID: idx,
-		acker:     acker,
-	}
-
-	t.contexts[idx] = ectx
-	return ectx
-}
-
-func (t *eventTracker) Unregister(ctx *eventContext) {
-	ctx.statusMu.Lock()
-	ctx.ref--
-	release := ctx.ref == 0
-	ctx.statusMu.Unlock()
-
-	if release {
-		t.release(ctx)
-	}
-}
-
-func (t *eventTracker) release(ctx *eventContext) {
-	t.contextsMu.Lock()
-	defer t.contextsMu.Unlock()
-
-	idx := ctx.contextID
-	t.contexts[idx] = nil
-
-	// TODO: try to free more space
-	if L := len(t.contexts); L-1 == int(idx) {
-		t.contexts = t.contexts[:L-1]
-	} else {
-		t.freelist = append(t.freelist, idx)
-	}
-
-}
-
-func (t *eventTracker) UpdateEventStatus(id publishing.EventID, status publishing.EventStatus) {
-	idx := id >> 32
-	t.contextsMu.Lock()
-	ec := t.contexts[idx]
-	t.contextsMu.Unlock()
-
-	more := ec.updateStatus(id, status)
-	if !more {
-		t.release(ec)
-	}
-}
-
-func (c *eventContext) RecordEvent() publishing.EventID {
-	c.statusMu.Lock()
-	defer c.statusMu.Unlock()
-
-	idx := len(c.status)
-	c.status = append(c.status, publishing.EventPending)
-	c.ref++
-
-	id := publishing.EventID(uint64(c.contextID)<<32 | uint64(c.startID+uint32(idx)))
-	return id
-}
-
-func (c *eventContext) updateStatus(id publishing.EventID, status publishing.EventStatus) bool {
-	refs, acked := func() (uint32, uint32) {
-		c.statusMu.Lock()
-		defer c.statusMu.Unlock()
-
-		idx := uint32(id) - c.startID
-		c.status[idx] = status
-
-		var n uint32
-		for _, st := range c.status {
-			if st == publishing.EventPending {
-				break
-			}
-			n++
-		}
-
-		c.startID += n
-		c.status = c.status[n:]
-		c.ref -= n
-		return c.ref, n
-	}()
-
-	if acked > 0 && c.acker != nil {
-		c.acker.ACKEvents(int(acked))
-	}
-
-	return refs > 0
 }
 
 // validateClientConfig checks a ClientConfig can be used with (*Pipeline).ConnectWith.
