@@ -615,6 +615,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
 - Record HTTP response headers. {pull}18327[18327]
+- Add index and pipeline settings to monitor configurations. {pull}20610[20610]
 
 *Heartbeat*
 
