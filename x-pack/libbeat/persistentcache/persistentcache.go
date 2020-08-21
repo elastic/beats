@@ -94,7 +94,7 @@ func (e *cacheEntry) refresh(now time.Time, initialTimeout, defaultTimeout time.
 		timeout = defaultTimeout
 	}
 	if timeout > 0 {
-		e.Expiration = now.Add(timeout).Unix()
+		e.Expiration = now.Add(timeout).UnixNano()
 		return true
 	}
 	return false
@@ -172,14 +172,14 @@ func (c *PersistentCache) refresh(e *cacheEntry, timeout time.Duration) bool {
 		timeout = c.timeout
 	}
 	if timeout > 0 {
-		e.Expiration = c.now().Add(timeout).Unix()
+		e.Expiration = c.now().Add(timeout).UnixNano()
 		return true
 	}
 	return false
 }
 
 func (c *PersistentCache) expired(entry *cacheEntry) bool {
-	return entry.Expiration != 0 && c.now().Unix() > entry.Expiration
+	return entry.Expiration != 0 && c.now().UnixNano() >= entry.Expiration
 }
 
 // StartJanitor starts a goroutine that will periodically invoke the cache's

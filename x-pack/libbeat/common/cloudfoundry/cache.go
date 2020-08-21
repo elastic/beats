@@ -60,6 +60,8 @@ func (r *appResponse) fromStructs(app cfclient.App, err error) {
 	if err != nil {
 		switch e := err.(type) {
 		case cfclient.CloudFoundryError:
+			// Store native CF errors as they are. They are serializable and
+			// contain relevant information.
 			r.Error = e
 		default:
 			r.ErrorMessage = e.Error()
