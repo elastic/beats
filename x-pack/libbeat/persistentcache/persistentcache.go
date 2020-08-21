@@ -49,9 +49,9 @@ type PersistentCache struct {
 	clock func() time.Time
 }
 
-// Options are the options that can be used to custimize
+// Options are the options that can be used to customize persistent caches
 type Options struct {
-	// Lenght of time before cache elements expire
+	// Length of time before cache elements expire
 	Timeout time.Duration
 
 	// If set to true, expiration time of an entry is updated
@@ -59,8 +59,8 @@ type Options struct {
 	RefreshOnAccess bool
 }
 
-// New creates and returns a new persistent cache. d is the length of time after last
-// access that cache elements expire. Cache returned by this method must be closed with Close() when
+// New creates and returns a new persistent cache.
+// Cache returned by this method must be closed with Close() when
 // not needed anymore.
 func New(name string, opts Options) (*PersistentCache, error) {
 	return newCache(&registry, name, opts)
