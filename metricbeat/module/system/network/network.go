@@ -44,7 +44,15 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	interfaces   map[string]struct{}
-	prevCounters map[string]uint64
+	prevCounters networkCounter
+}
+
+// networkCounter stores previous network counter values for calculating gauges in next collection
+type networkCounter struct {
+	prevNetworkInBytes    uint64
+	prevNetworkInPackets  uint64
+	prevNetworkOutBytes   uint64
+	prevNetworkOutPackets uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -70,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		interfaces:    interfaceSet,
-		prevCounters:  map[string]uint64{},
+		prevCounters:  networkCounter{},
 	}, nil
 }
 
@@ -103,23 +111,23 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		networkOutPackets += counters.PacketsSent
 
 		if !isOpen {
-			continue
+			return nil
 		}
 	}
 
-	if len(m.prevCounters) != 0 {
+	if m.prevCounters != (networkCounter{}) {
 		// convert network metrics from counters to gauges
 		r.Event(mb.Event{
 			RootFields: common.MapStr{
 				"host": common.MapStr{
 					"network": common.MapStr{
 						"in": common.MapStr{
-							"bytes":   networkInBytes - m.prevCounters["networkInBytes"],
-							"packets": networkInPackets - m.prevCounters["networkInPackets"],
+							"bytes":   networkInBytes - m.prevCounters.prevNetworkInBytes,
+							"packets": networkInPackets - m.prevCounters.prevNetworkInPackets,
 						},
 						"out": common.MapStr{
-							"bytes":   networkOutBytes - m.prevCounters["networkOutBytes"],
-							"packets": networkOutPackets - m.prevCounters["networkOutPackets"],
+							"bytes":   networkOutBytes - m.prevCounters.prevNetworkOutBytes,
+							"packets": networkOutPackets - m.prevCounters.prevNetworkOutPackets,
 						},
 					},
 				},
@@ -128,10 +136,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	// update prevCounters
-	m.prevCounters["networkInBytes"] = networkInBytes
-	m.prevCounters["networkInPackets"] = networkInPackets
-	m.prevCounters["networkOutBytes"] = networkOutBytes
-	m.prevCounters["networkOutPackets"] = networkOutPackets
+	m.prevCounters.prevNetworkInBytes = networkInBytes
+	m.prevCounters.prevNetworkInPackets = networkInPackets
+	m.prevCounters.prevNetworkOutBytes = networkOutBytes
+	m.prevCounters.prevNetworkOutPackets = networkOutPackets
 
 	return nil
 }

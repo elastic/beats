@@ -38,7 +38,13 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	statistics     *DiskIOStat
 	includeDevices []string
-	prevCounters   map[string]uint64
+	prevCounters   diskCounter
+}
+
+// diskCounter stores previous disk counter values for calculating gauges in next collection
+type diskCounter struct {
+	prevDiskReadBytes  uint64
+	prevDiskWriteBytes uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -55,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:  base,
 		statistics:     NewDiskIOStat(),
 		includeDevices: config.IncludeDevices,
-		prevCounters:   map[string]uint64{},
+		prevCounters:   diskCounter{},
 	}, nil
 }
 
@@ -139,18 +145,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: event,
 		})
 		if !isOpen {
-			continue
+			return nil
 		}
 	}
 
-	if len(m.prevCounters) != 0 {
+	if m.prevCounters != (diskCounter{}) {
 		// convert network metrics from counters to gauges
 		r.Event(mb.Event{
 			RootFields: common.MapStr{
 				"host": common.MapStr{
 					"disk": common.MapStr{
-						"read.bytes":  diskReadBytes - m.prevCounters["diskReadBytes"],
-						"write.bytes": diskWriteBytes - m.prevCounters["diskWriteBytes"],
+						"read.bytes":  diskReadBytes - m.prevCounters.prevDiskReadBytes,
+						"write.bytes": diskWriteBytes - m.prevCounters.prevDiskWriteBytes,
 					},
 				},
 			},
@@ -158,8 +164,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	// update prevCounters
-	m.prevCounters["diskReadBytes"] = diskReadBytes
-	m.prevCounters["diskWriteBytes"] = diskWriteBytes
+	m.prevCounters.prevDiskReadBytes = diskReadBytes
+	m.prevCounters.prevDiskWriteBytes = diskWriteBytes
 
 	return nil
 }
