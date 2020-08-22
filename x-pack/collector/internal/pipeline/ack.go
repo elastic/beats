@@ -179,13 +179,14 @@ func (t *eventTracker) Unregister(ctx *eventContext) {
 
 	if release {
 		t.release(ctx)
-		if ctx.acker != nil {
-			ctx.acker.Release()
-		}
 	}
 }
 
 func (t *eventTracker) release(ctx *eventContext) {
+	if ctx.acker != nil {
+		ctx.acker.Release()
+	}
+
 	t.contextsMu.Lock()
 	defer t.contextsMu.Unlock()
 
@@ -199,7 +200,6 @@ func (t *eventTracker) release(ctx *eventContext) {
 	} else {
 		t.freelist = append(t.freelist, idx)
 	}
-
 }
 
 func (t *eventTracker) UpdateEventStatus(outputID uint64, id publishing.EventID, status publishing.EventStatus) {
