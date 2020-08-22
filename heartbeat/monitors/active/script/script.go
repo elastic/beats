@@ -72,48 +72,15 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		}
 		stdin.Close()
 
-		stderrResults := decodePipe(stderr)
+		stdoutLines, result := decodePipe(stdout)
+		stderrLines, _ := decodePipe(stderr)
 
-		var stdoutResults []string
-		var rawResults map[string]interface{}
-		for _, line := range decodePipe(stdout) {
-			if s, ok := line.(string); ok {
-				logp.Warn("STRING HERE")
-				stdoutResults = append(stdoutResults, s)
-			} else if r, ok := line.(Results); ok {
-				status := "down"
-				rawResults = r.Raw
-
-				if len(r.Journeys) > 0 {
-					journey := r.Journeys[0]
-					if journey.error != nil {
-						status = "down"
-					}
-					logp.Warn("RESULTS HERE %#v",  r)
-
-					eventext.MergeEventFields(event, common.MapStr{
-						"monitor": common.MapStr{
-							"status": status,
-							"duration.us": journey.duration,
-						},
-					})
-
-					u, err := url.Parse(journey.Url)
-					if err != nil {
-						eventext.MergeEventFields(event, common.MapStr{
-							"url": wrappers.URLFields(u),
-						})
-					}
-				}
-			}
-		}
-
+		processResult(event, result)
 
 		eventext.MergeEventFields(event, common.MapStr{
 			"script": common.MapStr{
-				"stdout": stdoutResults,
-				"stderr": stderrResults,
-				"journey": rawResults,
+				"stdout": stdoutLines,
+				"stderr": stderrLines,
 			},
 		})
 
@@ -127,9 +94,40 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	return []jobs.Job{job}, 1, nil
 }
 
-func decodePipe(pipe io.ReadCloser) []interface{} {
+func processResult(event *beat.Event, result *result) {
+	if result == nil {
+		logp.Warn("no result received!")
+		return
+	}
+	if result.Journeys == nil || len(result.Journeys) == 0 {
+		logp.Warn("result received with no journies: %#v", result.raw)
+		return
+	}
+
+	journey := result.Journeys[0]
+	status := "up"
+	if journey.Error != nil {
+		status = "down"
+	}
+
+	eventext.MergeEventFields(event, common.MapStr{
+		"monitor": common.MapStr{
+			"status": status,
+			"duration.us": journey.Duration,
+		},
+	})
+
+	u, err := url.Parse(journey.Url)
+	if err != nil {
+		logp.Warn("Could not parse journey URL %s", journey.Url)
+	}
+	eventext.MergeEventFields(event, common.MapStr{
+		"url": wrappers.URLFields(u),
+	})
+}
+
+func decodePipe(pipe io.ReadCloser) (lines []string, result *result) {
 	pipeBio := bufio.NewReader(pipe)
-	var results []interface{}
 	for {
 		line, _, err := pipeBio.ReadLine()
 		if err == io.EOF {
@@ -138,34 +136,61 @@ func decodePipe(pipe io.ReadCloser) []interface{} {
 			logp.Warn("error reading line: %w", err)
 		}
 
-		var decoded Results
-		err = json.Unmarshal(line, &decoded)
-		var raw map[string]interface{}
-		json.Unmarshal(line, &raw)
-		decoded.Raw = raw
-		logp.Warn("> %s", string(line))
-		if err != nil {
-			results = append(results, line)
+		res, ok := decodeResults(line)
+		if ok { // append the rich results if that's what this line is
+			result = res
+		} else { // otherwise just append
+			lines = append(lines, string(line))
 		}
-
-		results = append(results, decoded)
 	}
 
-	return results
+	return
 }
 
-type Results struct {
+func decodeResults(line []byte) (res *result, ok bool) {
+	// We need to yield both a map[string]interface{} version of "Journeys" to pass through to ES
+	// and a richer version that has accessible fields. Let's do both
+	var rawRes *rawResult = &rawResult{}
+	res = &result{}
+
+	err := json.Unmarshal(line, rawRes)
+	// This must just be a plain line
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(line, res)
+	if err != nil {
+		logp.Warn("Raw result decoded successfully, but richer one did not: %s", line)
+		return
+	}
+
+	res.raw = rawRes
+	ok = true
+	for idx, j := range res.Journeys {
+		j.Raw = rawRes.Journeys[idx]
+	}
+
+	return
+}
+
+type result struct {
 	formatVersion string `json:"format_version"`
 	Journeys []Journey `json:"journeys"`
-	Raw common.MapStr
+	raw *rawResult
+}
+
+type rawResult struct {
+	Journeys []map[string]interface{} `json:"journeys"`
 }
 
 type Journey struct {
-	Url   string `json:"url"`
-	Steps []Step `json:"steps"`
-	dataType string `json:"__type__"`
-	error interface{} `json:"error"`
-	duration interface{} `json:"elapsedMs"`
+	Url      string      `json:"url"`
+	Steps    []Step      `json:"steps"`
+	DataType string      `json:"__type__"`
+	Error    interface{} `json:"error"`
+	Duration interface{} `json:"elapsedMs"`
+	Raw      map[string]interface{}
 }
 
 type Step struct {
