@@ -107,11 +107,13 @@ func (dc inputACKDecoupler) run(acker beat.ACKer) {
 
 		st := ifc.(ackStatus)
 		n := st.acked - acked
+		acked = st.acked
 		if n > 0 {
 			acker.ACKEvents(int(n))
 		}
-		if st.closed != closed {
-			closed = st.closed
+
+		if st.closed && !closed {
+			closed = true
 			acker.Close()
 		}
 
