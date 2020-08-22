@@ -75,10 +75,12 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status      []uint16             `config:"status"`
-	RecvHeaders map[string]string    `config:"headers"`
-	RecvBody    []match.Matcher      `config:"body"`
-	RecvJSON    []*jsonResponseCheck `config:"json"`
+	Status                  []uint16             `config:"status"`
+	RecvHeaders             map[string]string    `config:"headers"`
+	RecvBody                []match.Matcher      `config:"body"`
+	RecvJSON                []*jsonResponseCheck `config:"json"`
+	// add this option to control the match on http body is positive check or negative check
+	PositiveCheckOnHTTPBody bool                 `config:"positive_check_on_http_body"`
 }
 
 type jsonResponseCheck struct {
@@ -107,9 +109,10 @@ var defaultConfig = Config{
 			SendBody:    "",
 		},
 		Response: responseParameters{
-			RecvHeaders: nil,
-			RecvBody:    []match.Matcher{},
-			RecvJSON:    nil,
+			RecvHeaders:             nil,
+			RecvBody:                []match.Matcher{},
+			RecvJSON:                nil,
+			PositiveCheckOnHTTPBody: true,
 		},
 	},
 }

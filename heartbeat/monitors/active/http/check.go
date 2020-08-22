@@ -88,7 +88,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if len(config.RecvBody) > 0 {
-		bodyValidators = append(bodyValidators, checkBody(config.RecvBody))
+		bodyValidators = append(bodyValidators, checkBody(config.RecvBody, config.PositiveCheckOnHTTPBody))
 	}
 
 	if len(config.RecvJSON) > 0 {
@@ -132,14 +132,22 @@ func checkHeaders(headers map[string]string) respValidator {
 	}
 }
 
-func checkBody(matcher []match.Matcher) bodyValidator {
+func checkBody(matcher []match.Matcher, positiveCheck bool) bodyValidator {
 	return func(r *http.Response, body string) error {
 		for _, m := range matcher {
 			if m.MatchString(body) {
-				return nil
+				if positiveCheck {
+					return nil
+				} else {
+					return errBodyMismatch
+				}
 			}
 		}
-		return errBodyMismatch
+		if positiveCheck {
+			return errBodyMismatch
+		} else {
+			return nil
+		}
 	}
 }
 

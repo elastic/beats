@@ -35,21 +35,24 @@ import (
 func TestCheckBody(t *testing.T) {
 
 	var matchTests = []struct {
-		description string
-		body        string
-		patterns    []string
-		result      bool
+		description   string
+		body          string
+		patterns      []string
+		result        bool
+		positiveCheck bool
 	}{
 		{
 			"Single regex that matches",
 			"ok",
 			[]string{"ok"},
 			true,
+			true,
 		},
 		{
 			"Regex matching json example",
 			`{"status": "ok"}`,
 			[]string{`{"status": "ok"}`},
+			true,
 			true,
 		},
 		{
@@ -58,12 +61,14 @@ func TestCheckBody(t *testing.T) {
 			second line`,
 			[]string{"first"},
 			true,
+			true,
 		},
 		{
 			"Regex matching lastline of multiline body string",
 			`first line
 			second line`,
 			[]string{"second"},
+			true,
 			true,
 		},
 		{
@@ -73,6 +78,7 @@ func TestCheckBody(t *testing.T) {
 			third line`,
 			[]string{"(?s)first.*second.*third"},
 			true,
+			true,
 		},
 		{
 			"Regex not matching multiple lines of multiline body string",
@@ -81,23 +87,55 @@ func TestCheckBody(t *testing.T) {
 			third line`,
 			[]string{"(?s)first.*fourth.*third"},
 			false,
+			true,
 		},
 		{
 			"Single regex that doesn't match",
 			"ok",
 			[]string{"notok"},
 			false,
+			true,
 		},
 		{
 			"Multiple regex match where at least one must match",
 			"ok",
 			[]string{"ok", "yay"},
 			true,
+			true,
 		},
 		{
 			"Multiple regex match where none of the patterns match",
 			"ok",
 			[]string{"notok", "yay"},
+			false,
+			true,
+		},
+		{
+			"Positive check on HTTP body when body check is matched and positiveCheck is true",
+			"'status': 'red'",
+			[]string{"red"},
+			true,
+			true,
+		},
+		{
+			"Negative check on HTTP body when body check is matched and positiveCheck is false",
+			"'status': 'red'",
+			[]string{"red"},
+			false,
+			false,
+		},
+		{
+			"Positive check on HTTP body when body check is not matched and positiveCheck is true",
+			"'status': 'red'",
+			[]string{"green"},
+			false,
+			true,
+		},
+		{
+			"Negative check on HTTP body when body check is not matched and positiveCheck is false",
+			"'status': 'red'",
+			[]string{"green"},
+			true,
 			false,
 		},
 	}
@@ -120,7 +158,7 @@ func TestCheckBody(t *testing.T) {
 			}
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
-			check := checkBody(patterns)(res, string(body))
+			check := checkBody(patterns, test.positiveCheck)(res, string(body))
 
 			if result := (check == nil); result != test.result {
 				if test.result {

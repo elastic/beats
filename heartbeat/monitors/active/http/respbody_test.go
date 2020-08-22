@@ -36,8 +36,8 @@ import (
 )
 
 func Test_handleRespBody(t *testing.T) {
-	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")})
-	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")})
+	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")}, true)
+	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")}, true)
 
 	matchingComboValidator := multiValidator{bodyValidators: []bodyValidator{matchingBodyValidator}}
 	failingComboValidator := multiValidator{bodyValidators: []bodyValidator{failingBodyValidator}}
