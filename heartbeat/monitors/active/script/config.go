@@ -3,6 +3,7 @@ package script
 import "github.com/elastic/beats/v7/libbeat/common"
 
 type Config struct {
+	SuiteFile string `config:"suite_file"`
 	Script string `config:"script"`
 	ScriptParams common.MapStr `config:"script_params"`
 }

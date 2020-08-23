@@ -6,6 +6,11 @@ heartbeat.config.monitors:
 
 heartbeat.monitors:
 - type: script
+  id: my-suite
+  name: My Suite
+  suite_file: "/home/andrewvc/projects/synthetic-monitoring/examples/sample-app/journeys/dist"
+  schedule: "@every 1m"
+- type: script
   id: my-monitor
   name: My Monitor
   script: |-

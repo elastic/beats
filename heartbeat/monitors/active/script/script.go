@@ -38,14 +38,26 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 
 	job := monitors.MakeSimpleCont(func(event *beat.Event) error {
 		logp.Info("Start script job")
-		cmd := exec.Command(
-			"npx",
-			"elastic-synthetics",
-			"run",
-			"--stdin",
-			"--json",
-			"--headless",
-		)
+
+		var cmd *exec.Cmd
+		if config.SuiteFile != "" {
+			cmd = exec.Command(
+				"node",
+				config.SuiteFile,
+				"--json",
+				"--headless",
+			)
+		} else {
+			cmd = exec.Command(
+				"npx",
+				"elastic-synthetics",
+				"--stdin",
+				"--json",
+				"--headless",
+			)
+		}
+
+
 
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
