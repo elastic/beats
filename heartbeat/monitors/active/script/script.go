@@ -44,6 +44,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			cmd = exec.Command(
 				"node",
 				config.SuiteFile,
+				"-e", "production",
 				"--json",
 				"--headless",
 			)
@@ -96,6 +97,14 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			},
 		})
 
+		if result != nil && len(result.Journeys) > 0 {
+			eventext.MergeEventFields(event, common.MapStr{
+				"script": common.MapStr{
+					"journey": result.Journeys[0].Raw,
+				},
+			})
+		}
+
 		if err = cmd.Wait(); err != nil {
 			return fmt.Errorf("error running cmd: %w", err)
 		}
@@ -133,6 +142,7 @@ func processResult(event *beat.Event, result *result) {
 	if err != nil {
 		logp.Warn("Could not parse journey URL %s", journey.Url)
 	}
+
 	eventext.MergeEventFields(event, common.MapStr{
 		"url": wrappers.URLFields(u),
 	})
@@ -162,7 +172,7 @@ func decodePipe(pipe io.ReadCloser) (lines []string, result *result) {
 func decodeResults(line []byte) (res *result, ok bool) {
 	// We need to yield both a map[string]interface{} version of "Journeys" to pass through to ES
 	// and a richer version that has accessible fields. Let's do both
-	var rawRes *rawResult = &rawResult{}
+	var rawRes = &rawResult{}
 	res = &result{}
 
 	err := json.Unmarshal(line, rawRes)
@@ -188,7 +198,7 @@ func decodeResults(line []byte) (res *result, ok bool) {
 
 type result struct {
 	formatVersion string `json:"format_version"`
-	Journeys []Journey `json:"journeys"`
+	Journeys []*Journey `json:"journeys"`
 	raw *rawResult
 }
 
