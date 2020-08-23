@@ -7,7 +7,12 @@ processors:
   - set:
       field: event.created
       value: '{{@timestamp}}'
-
+  - date:
+      field: zeek.intel.ts
+      formats:
+        - UNIX
+  - remove:
+      field: zeek.intel.ts
   # IP Geolocation Lookup
   - geoip:
       if: ctx.source?.geo == null
