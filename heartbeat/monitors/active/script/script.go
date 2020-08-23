@@ -47,6 +47,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 				"-e", "production",
 				"--json",
 				"--headless",
+				"--screenshots",
 			)
 		} else {
 			cmd = exec.Command(
@@ -55,6 +56,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 				"--stdin",
 				"--json",
 				"--headless",
+				"--screenshots",
 			)
 		}
 
@@ -151,7 +153,8 @@ func processResult(event *beat.Event, result *result) {
 func decodePipe(pipe io.ReadCloser) (lines []string, result *result) {
 	pipeBio := bufio.NewReader(pipe)
 	for {
-		line, _, err := pipeBio.ReadLine()
+		line, err := pipeBio.ReadBytes([]byte("\n")[0])
+
 		if err == io.EOF {
 			break
 		} else if err != nil {
@@ -213,8 +216,9 @@ type Journey struct {
 	Error    interface{} `json:"error"`
 	Duration interface{} `json:"elapsedMs"`
 	Raw      map[string]interface{}
+	Status string `json:"status"`
 }
 
 type Step struct {
-
+	Screenshot string `json:"screenshot"`
 }
