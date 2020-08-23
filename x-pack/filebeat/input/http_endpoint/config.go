@@ -26,6 +26,9 @@ type config struct {
 	ContentType   string                  `config:"content_type"`
 	SecretHeader  string                  `config:"secret.header"`
 	SecretValue   string                  `config:"secret.value"`
+	HmacHeader    string                  `config:"hmac.header"`
+	HmacPrefix    string                  `config:"hmac.prefix"`
+	HmacToken     string                  `config:"hmac.token"`
 }
 
 func defaultConfig() config {
@@ -42,6 +45,9 @@ func defaultConfig() config {
 		ContentType:   "application/json",
 		SecretHeader:  "",
 		SecretValue:   "",
+		HmacHeader:    "",
+		HmacPrefix:    "",
+		HmacToken:     "",
 	}
 }
 

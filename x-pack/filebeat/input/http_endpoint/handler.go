@@ -36,17 +36,16 @@ var errUnsupportedType = errors.New("Only JSON objects are accepted")
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	obj, status, err := httpReadJsonObject(r.Body)
 	if err != nil {
-		w.Header().Add("Content-Type", "application/json")
 		sendErrorResponse(w, status, err)
 		return
 	}
 
 	h.publishEvent(obj)
-	w.Header().Add("Content-Type", "application/json")
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	io.WriteString(w, message)
 }

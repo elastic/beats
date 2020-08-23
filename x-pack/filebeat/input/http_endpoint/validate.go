@@ -5,8 +5,12 @@
 package http_endpoint
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -14,6 +18,8 @@ type validator interface {
 	// ValidateHeader checks the HTTP headers for compliance. The body must not
 	// be touched.
 	ValidateHeader(*http.Request) (int, error)
+	// ValidateHmac ensures that the body is signed with the correct HMAC token
+	ValidateHmac(*http.Request) (int, error)
 }
 
 type apiValidator struct {
@@ -23,10 +29,14 @@ type apiValidator struct {
 	contentType        string
 	secretHeader       string
 	secretValue        string
+	hmacHeader         string
+	hmacToken          string
+	hmacPrefix         string
 }
 
 var errIncorrectUserOrPass = errors.New("Incorrect username or password")
 var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
+var errIncorrectHmac = errors.New("The HMAC signature of the request body does not match with the configured secret")
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {
@@ -48,6 +58,36 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 
 	if v.contentType != "" && r.Header.Get("Content-Type") != v.contentType {
 		return http.StatusUnsupportedMediaType, fmt.Errorf("Wrong Content-Type header, expecting %v", v.contentType)
+	}
+
+	return 0, nil
+}
+
+func (v *apiValidator) ValidateHmac(r *http.Request) (int, error) {
+	if v.hmacHeader != "" && v.hmacToken == "" {
+		return http.StatusMethodNotAllowed, fmt.Errorf("A hmacToken and has to be configured if hmacHeader is set")
+	}
+
+	if v.hmacToken != "" && v.hmacHeader != "" {
+		if len(r.Header.Get(v.hmacHeader)) != 0 {
+			return http.StatusInternalServerError, fmt.Errorf("The HMAC signature in the configured request header is empty")
+		}
+		s := hmac.New(sha1.New, []byte(v.hmacToken))
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("Failed to read the request body: %v", err)
+		}
+
+		s.Write(b)
+		h := r.Header.Get(v.hmacHeader)
+		// If the header includes a prefix before the SHA-1 key, we need to only grab the signature after the prefix. Can also be 0
+		hWithPrefix := make([]byte, 20)
+		hex.Decode(hWithPrefix, []byte(h[len(v.hmacPrefix):]))
+
+		if !hmac.Equal(s.Sum(nil), hWithPrefix) {
+			return http.StatusUnauthorized, errIncorrectHmac
+		}
+
 	}
 
 	return 0, nil
