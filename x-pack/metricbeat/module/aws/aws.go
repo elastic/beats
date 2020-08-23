@@ -109,10 +109,15 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		config.AWSConfig.Endpoint, "iam", "", awsConfig))
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
-	if err != nil || len(output.AccountAliases) == 0 {
+	if err != nil {
 		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
 		metricSet.AccountName = metricSet.AccountID
 	} else {
+		// When there is no account alias, account ID will be used as cloud.account.name
+		if len(output.AccountAliases) == 0 {
+			metricSet.AccountName = metricSet.AccountID
+		}
+
 		// There can be more than one aliases for each account, for now we are only
 		// collecting the first one.
 		metricSet.AccountName = output.AccountAliases[0]
