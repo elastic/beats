@@ -220,14 +220,14 @@ Fields provided by journald.
 
 
 [float]
-=== object
+==== object
 
 Fields to log on behalf of a different program.
 
 
 
 [float]
-=== audit
+===== audit
 
 Audit fields of event.
 
@@ -340,7 +340,7 @@ required: False
 --
 
 [float]
-=== systemd
+===== systemd
 
 Systemd fields of event.
 
@@ -395,7 +395,7 @@ required: False
 --
 
 [float]
-=== kernel
+==== kernel
 
 Fields to log on behalf of a different program.
 
@@ -462,7 +462,7 @@ required: False
 --
 
 [float]
-=== code
+==== code
 
 Fields of the code generating the event.
 
@@ -511,14 +511,14 @@ required: False
 --
 
 [float]
-=== process
+==== process
 
 Fields to log on behalf of a different program.
 
 
 
 [float]
-=== audit
+===== audit
 
 Audit fields of event.
 

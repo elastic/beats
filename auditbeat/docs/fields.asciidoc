@@ -115,7 +115,7 @@ alias to: user.filesystem.group.id
 --
 
 [float]
-=== name_map
+==== name_map
 
 If `resolve_ids` is set to true in the configuration then `name_map` will contain a mapping of uid field names to the resolved name (e.g. auid -> root).
 
@@ -203,7 +203,7 @@ alias to: user.filesystem.group.name
 --
 
 [float]
-=== selinux
+==== selinux
 
 The SELinux identity of the actor.
 
@@ -348,7 +348,7 @@ example: success or fail
 
 
 [float]
-=== actor
+===== actor
 
 The actor is the user that triggered the audit event.
 
@@ -373,7 +373,7 @@ type: keyword
 --
 
 [float]
-=== object
+===== object
 
 This is the thing or object being acted upon in the event.
 
@@ -418,7 +418,7 @@ type: keyword
 --
 
 [float]
-=== paths
+==== paths
 
 List of paths associated with the event.
 
@@ -550,7 +550,7 @@ type: keyword
 --
 
 [float]
-=== data
+==== data
 
 The data from the audit messages.
 
@@ -2659,7 +2659,7 @@ type: text
 --
 
 [float]
-=== selinux
+==== selinux
 
 The SELinux identity of the file.
 
@@ -2709,7 +2709,7 @@ User information.
 
 
 [float]
-=== audit
+==== audit
 
 Audit user information.
 
@@ -2733,7 +2733,7 @@ type: keyword
 --
 
 [float]
-=== effective
+==== effective
 
 Effective user information.
 
@@ -2757,7 +2757,7 @@ type: keyword
 --
 
 [float]
-=== group
+===== group
 
 Effective group information.
 
@@ -2781,7 +2781,7 @@ type: keyword
 --
 
 [float]
-=== filesystem
+==== filesystem
 
 Filesystem user information.
 
@@ -2805,7 +2805,7 @@ type: keyword
 --
 
 [float]
-=== group
+===== group
 
 Filesystem group information.
 
@@ -2829,7 +2829,7 @@ type: keyword
 --
 
 [float]
-=== saved
+==== saved
 
 Saved user information.
 
@@ -2853,7 +2853,7 @@ type: keyword
 --
 
 [float]
-=== group
+===== group
 
 Saved group information.
 
@@ -10199,7 +10199,7 @@ type: keyword
 
 
 [float]
-=== hash
+==== hash
 
 Hashes of the executable. The keys are algorithm names and the values are the hex encoded digest values.
 
@@ -10331,7 +10331,7 @@ type: keyword
 
 
 [float]
-=== host
+==== host
 
 `host` contains general host information.
 
@@ -10440,7 +10440,7 @@ type: ip
 --
 
 [float]
-=== os
+===== os
 
 `os` contains information about the operating system.
 
@@ -10507,7 +10507,7 @@ type: keyword
 --
 
 [float]
-=== package
+==== package
 
 `package` contains information about an installed or removed package.
 
@@ -10613,7 +10613,7 @@ type: keyword
 --
 
 [float]
-=== user
+==== user
 
 `user` contains information about the users on a system.
 
@@ -10690,7 +10690,7 @@ type: object
 --
 
 [float]
-=== password
+===== password
 
 `password` contains information about a user's password (not the password itself).
 

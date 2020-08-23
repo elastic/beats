@@ -97,7 +97,7 @@ activemq module
 
 
 [float]
-=== broker
+==== broker
 
 Broker metrics from org.apache.activemq:brokerName=*,type=Broker
 
@@ -208,7 +208,7 @@ type: long
 --
 
 [float]
-=== queue
+==== queue
 
 Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
 
@@ -351,7 +351,7 @@ type: long
 --
 
 [float]
-=== topic
+==== topic
 
 Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
 
@@ -498,21 +498,21 @@ Aerospike module
 
 
 [float]
-=== namespace
+==== namespace
 
 namespace
 
 
 
 [float]
-=== client
+===== client
 
 Client stats.
 
 
 
 [float]
-=== delete
+====== delete
 
 Client delete transactions stats.
 
@@ -559,7 +559,7 @@ type: long
 --
 
 [float]
-=== read
+====== read
 
 Client read transactions stats.
 
@@ -606,7 +606,7 @@ type: long
 --
 
 [float]
-=== write
+====== write
 
 Client write transactions stats.
 
@@ -643,7 +643,7 @@ type: long
 --
 
 [float]
-=== device
+===== device
 
 Disk storage stats
 
@@ -708,7 +708,7 @@ type: boolean
 --
 
 [float]
-=== memory
+===== memory
 
 Memory storage stats.
 
@@ -805,7 +805,7 @@ type: keyword
 --
 
 [float]
-=== objects
+===== objects
 
 Records stats.
 
@@ -856,7 +856,7 @@ Apache HTTPD server metricsets collected from the Apache web server.
 
 
 [float]
-=== status
+==== status
 
 `status` contains the metrics that were scraped from the Apache status page.
 
@@ -943,7 +943,7 @@ type: long
 --
 
 [float]
-=== uptime
+===== uptime
 
 Uptime stats.
 
@@ -970,7 +970,7 @@ type: long
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU stats.
 
@@ -1027,7 +1027,7 @@ type: scaled_float
 --
 
 [float]
-=== connections
+===== connections
 
 Connection stats.
 
@@ -1074,7 +1074,7 @@ type: long
 --
 
 [float]
-=== load
+===== load
 
 Load averages.
 
@@ -1111,7 +1111,7 @@ type: scaled_float
 --
 
 [float]
-=== scoreboard
+===== scoreboard
 
 Scoreboard metrics.
 
@@ -1251,21 +1251,21 @@ App Search module
 
 
 [float]
-=== stats
+==== stats
 
 App Search stats
 
 
 
 [float]
-=== jvm
+===== jvm
 
 JVM stats
 
 
 
 [float]
-=== memory_usage
+====== memory_usage
 
 Memory usage
 
@@ -1332,7 +1332,7 @@ type: long
 --
 
 [float]
-=== queues
+===== queues
 
 Worker queues
 
@@ -1439,7 +1439,7 @@ type: long
 --
 
 [float]
-=== requests
+===== requests
 
 Request metrics
 
@@ -1456,7 +1456,7 @@ type: long
 --
 
 [float]
-=== api.duration
+====== api.duration
 
 API response time metrics
 
@@ -1483,7 +1483,7 @@ type: long
 --
 
 [float]
-=== web.response_time
+====== web.response_time
 
 Dashboard response time metrics
 
@@ -1563,7 +1563,7 @@ type: object
 --
 
 [float]
-=== billing
+==== billing
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
 
@@ -1580,7 +1580,7 @@ type: long
 --
 
 [float]
-=== cloudwatch
+==== cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
 
@@ -1597,7 +1597,7 @@ type: keyword
 --
 
 [float]
-=== dynamodb
+==== dynamodb
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
 
@@ -1875,7 +1875,7 @@ type: double
 --
 
 [float]
-=== ebs
+==== ebs
 
 `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
 
@@ -1982,7 +1982,7 @@ type: double
 --
 
 [float]
-=== ec2
+==== ec2
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
 
@@ -2337,7 +2337,7 @@ type: integer
 --
 
 [float]
-=== elb
+==== elb
 
 `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
 
@@ -2498,7 +2498,7 @@ type: double
 --
 
 [float]
-=== applicationelb
+==== applicationelb
 
 `applicationelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ApplicationELB.
 
@@ -2686,7 +2686,7 @@ type: double
 --
 
 [float]
-=== networkelb
+==== networkelb
 
 `networkelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS NetworkELB.
 
@@ -2838,7 +2838,7 @@ type: long
 --
 
 [float]
-=== lambda
+==== lambda
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
 
@@ -2963,7 +2963,7 @@ type: long
 --
 
 [float]
-=== natgateway
+==== natgateway
 
 `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
 
@@ -3097,7 +3097,7 @@ type: long
 --
 
 [float]
-=== rds
+==== rds
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
 
@@ -3882,7 +3882,7 @@ type: long
 --
 
 [float]
-=== s3_daily_storage
+==== s3_daily_storage
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
@@ -3911,7 +3911,7 @@ type: long
 --
 
 [float]
-=== s3_request
+==== s3_request
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
@@ -4090,7 +4090,7 @@ format: duration
 --
 
 [float]
-=== sns
+==== sns
 
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
 
@@ -4197,7 +4197,7 @@ type: long
 --
 
 [float]
-=== sqs
+==== sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
 
@@ -4308,7 +4308,7 @@ type: keyword
 --
 
 [float]
-=== transitgateway
+==== transitgateway
 
 `transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
 
@@ -4370,7 +4370,7 @@ type: long
 --
 
 [float]
-=== usage
+==== usage
 
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
@@ -4396,7 +4396,7 @@ type: long
 --
 
 [float]
-=== vpn
+==== vpn
 
 `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
 
@@ -4454,7 +4454,7 @@ type: keyword
 --
 
 [float]
-=== resource
+==== resource
 
 The resource specified
 
@@ -4521,7 +4521,7 @@ type: object
 --
 
 [float]
-=== app_insights
+==== app_insights
 
 application insights
 
@@ -4568,7 +4568,7 @@ type: object
 --
 
 [float]
-=== billing
+==== billing
 
 billing and usage details
 
@@ -4745,7 +4745,7 @@ type: object
 --
 
 [float]
-=== monitor
+==== monitor
 
 monitor
 
@@ -4870,7 +4870,7 @@ type: keyword
 --
 
 [float]
-=== state
+==== state
 
 Beat state
 
@@ -4917,7 +4917,7 @@ type: keyword
 --
 
 [float]
-=== stats
+==== stats
 
 Beat stats
 
@@ -4944,14 +4944,14 @@ type: long
 --
 
 [float]
-=== libbeat
+===== libbeat
 
 Fields common to all Beats
 
 
 
 [float]
-=== output
+====== output
 
 Output stats
 
@@ -4968,7 +4968,7 @@ type: keyword
 --
 
 [float]
-=== events
+======= events
 
 Event counters
 
@@ -5055,7 +5055,7 @@ type: long
 --
 
 [float]
-=== read
+======= read
 
 Read stats
 
@@ -5082,7 +5082,7 @@ type: long
 --
 
 [float]
-=== write
+======= write
 
 Write stats
 
@@ -5123,7 +5123,7 @@ Ceph module
 
 
 [float]
-=== cluster_disk
+==== cluster_disk
 
 cluster_disk
 
@@ -5166,7 +5166,7 @@ format: bytes
 --
 
 [float]
-=== cluster_health
+==== cluster_health
 
 cluster_health
 
@@ -5213,7 +5213,7 @@ type: keyword
 --
 
 [float]
-=== cluster_status
+==== cluster_status
 
 cluster_status
 
@@ -5486,19 +5486,19 @@ type: long
 --
 
 [float]
-=== mgr_cluster_disk
+==== mgr_cluster_disk
 
 see: cluster_disk
 
 
 [float]
-=== mgr_cluster_health
+==== mgr_cluster_health
 
 see: cluster_health
 
 
 [float]
-=== mgr_osd_perf
+==== mgr_osd_perf
 
 OSD performance metrics of Ceph cluster
 
@@ -5550,7 +5550,7 @@ type: long
 --
 
 [float]
-=== mgr_osd_pool_stats
+==== mgr_osd_pool_stats
 
 OSD pool stats of Ceph cluster
 
@@ -5584,19 +5584,19 @@ type: object
 --
 
 [float]
-=== mgr_osd_tree
+==== mgr_osd_tree
 
 see: osd_tree
 
 
 [float]
-=== mgr_pool_disk
+==== mgr_pool_disk
 
 see: pool_disk
 
 
 [float]
-=== monitor_health
+==== monitor_health
 
 monitor_health stats data
 
@@ -5731,7 +5731,7 @@ type: long
 --
 
 [float]
-=== osd_df
+==== osd_df
 
 ceph osd disk usage information
 
@@ -5826,7 +5826,7 @@ format: percent
 --
 
 [float]
-=== osd_tree
+==== osd_tree
 
 ceph osd tree info
 
@@ -5963,7 +5963,7 @@ type: keyword
 --
 
 [float]
-=== pool_disk
+==== pool_disk
 
 pool_disk
 
@@ -6147,7 +6147,7 @@ type: keyword
 --
 
 [float]
-=== app
+==== app
 
 The application the metric is associated with.
 
@@ -6164,7 +6164,7 @@ type: keyword
 --
 
 [float]
-=== container
+==== container
 
 `container` contains container metrics from Cloud Foundry.
 
@@ -6231,7 +6231,7 @@ type: long
 --
 
 [float]
-=== counter
+==== counter
 
 `counter` contains counter metrics from Cloud Foundry.
 
@@ -6268,7 +6268,7 @@ type: long
 --
 
 [float]
-=== value
+==== value
 
 `value` contains counter metrics from Cloud Foundry.
 
@@ -6478,7 +6478,7 @@ Consul module
 
 
 [float]
-=== agent
+==== agent
 
 Agent Metricset fetches metrics information from a Consul instance running as Agent
 
@@ -6495,7 +6495,7 @@ type: boolean
 --
 
 [float]
-=== runtime
+===== runtime
 
 Runtime related metrics
 
@@ -6548,7 +6548,7 @@ type: long
 --
 
 [float]
-=== garbage_collector
+====== garbage_collector
 
 Garbage collector metrics
 
@@ -6563,7 +6563,7 @@ type: long
 --
 
 [float]
-=== pause
+======= pause
 
 Time that the garbage collector has paused the app
 
@@ -6603,7 +6603,7 @@ coredns Module
 
 
 [float]
-=== stats
+==== stats
 
 Contains statistics related to the coreDNS service
 
@@ -6846,7 +6846,7 @@ Metrics collected from Couchbase servers.
 
 
 [float]
-=== bucket
+==== bucket
 
 Couchbase bucket metrics.
 
@@ -6963,7 +6963,7 @@ type: long
 --
 
 [float]
-=== cluster
+==== cluster
 
 Couchbase cluster metrics.
 
@@ -7144,7 +7144,7 @@ format: bytes
 --
 
 [float]
-=== node
+==== node
 
 Couchbase node metrics.
 
@@ -7400,14 +7400,14 @@ Couchdb metrics
 
 
 [float]
-=== server
+==== server
 
 Contains CouchDB server stats
 
 
 
 [float]
-=== httpd
+===== httpd
 
 HTTP statistics
 
@@ -7464,7 +7464,7 @@ type: long
 --
 
 [float]
-=== httpd_request_methods
+===== httpd_request_methods
 
 HTTP request methods
 
@@ -7531,7 +7531,7 @@ type: long
 --
 
 [float]
-=== httpd_status_codes
+===== httpd_status_codes
 
 HTTP status codes statistics
 
@@ -7668,7 +7668,7 @@ type: long
 --
 
 [float]
-=== couchdb
+===== couchdb
 
 couchdb statistics
 
@@ -7804,7 +7804,7 @@ Information and statistics about docker's running containers.
 
 
 [float]
-=== container
+==== container
 
 Docker container metrics.
 
@@ -7851,7 +7851,7 @@ type: ip
 --
 
 [float]
-=== size
+===== size
 
 Container size metrics.
 
@@ -7888,7 +7888,7 @@ type: keyword
 --
 
 [float]
-=== cpu
+==== cpu
 
 Runtime CPU metrics.
 
@@ -8055,14 +8055,14 @@ type: object
 --
 
 [float]
-=== diskio
+==== diskio
 
 Disk I/O metrics.
 
 
 
 [float]
-=== read
+===== read
 
 Accumulated reads during the life of the container
 
@@ -8144,7 +8144,7 @@ type: scaled_float
 --
 
 [float]
-=== write
+===== write
 
 Accumulated writes during the life of the container
 
@@ -8226,7 +8226,7 @@ type: scaled_float
 --
 
 [float]
-=== summary
+===== summary
 
 Accumulated reads and writes during the life of the container
 
@@ -8308,7 +8308,7 @@ type: scaled_float
 --
 
 [float]
-=== event
+==== event
 
 Docker event
 
@@ -8365,7 +8365,7 @@ type: keyword
 --
 
 [float]
-=== actor
+===== actor
 
 Actor
 
@@ -8392,7 +8392,7 @@ type: object
 --
 
 [float]
-=== healthcheck
+==== healthcheck
 
 Docker healthcheck metrics.
 Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
@@ -8420,7 +8420,7 @@ type: keyword
 --
 
 [float]
-=== event
+===== event
 
 event fields.
 
@@ -8467,14 +8467,14 @@ type: integer
 --
 
 [float]
-=== image
+==== image
 
 Docker image metrics.
 
 
 
 [float]
-=== id
+===== id
 
 The image layers identifier.
 
@@ -8511,7 +8511,7 @@ type: date
 --
 
 [float]
-=== size
+===== size
 
 Image size layers.
 
@@ -8558,14 +8558,14 @@ type: keyword
 --
 
 [float]
-=== info
+==== info
 
 Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
 
 [float]
-=== containers
+===== containers
 
 Overall container stats.
 
@@ -8632,7 +8632,7 @@ type: long
 --
 
 [float]
-=== memory
+==== memory
 
 Memory metrics.
 
@@ -8649,7 +8649,7 @@ type: object
 --
 
 [float]
-=== commit
+===== commit
 
 Committed bytes on Windows
 
@@ -8714,7 +8714,7 @@ format: bytes
 --
 
 [float]
-=== rss
+===== rss
 
 RSS memory stats.
 
@@ -8745,7 +8745,7 @@ format: percent
 --
 
 [float]
-=== usage
+===== usage
 
 Usage memory stats.
 
@@ -8788,7 +8788,7 @@ format: bytes
 --
 
 [float]
-=== network
+==== network
 
 Network metrics.
 
@@ -8805,7 +8805,7 @@ type: keyword
 --
 
 [float]
-=== in
+===== in
 
 Incoming network stats per second.
 
@@ -8854,7 +8854,7 @@ type: long
 --
 
 [float]
-=== out
+===== out
 
 Outgoing network stats per second.
 
@@ -8903,7 +8903,7 @@ type: long
 --
 
 [float]
-=== inbound
+===== inbound
 
 Incoming network stats since the container started.
 
@@ -8952,7 +8952,7 @@ type: long
 --
 
 [float]
-=== outbound
+===== outbound
 
 Outgoing network stats since the container started.
 
@@ -15903,7 +15903,7 @@ type: keyword
 --
 
 [float]
-=== ccr
+==== ccr
 
 Cross-cluster replication stats
 
@@ -15982,7 +15982,7 @@ type: long
 --
 
 [float]
-=== cluster.stats
+==== cluster.stats
 
 Cluster stats
 
@@ -15999,7 +15999,7 @@ type: keyword
 --
 
 [float]
-=== nodes
+===== nodes
 
 Nodes statistics.
 
@@ -16036,7 +16036,7 @@ type: long
 --
 
 [float]
-=== indices
+===== indices
 
 Indices statistics.
 
@@ -16053,7 +16053,7 @@ type: long
 --
 
 [float]
-=== shards
+====== shards
 
 Shard statistics.
 
@@ -16090,7 +16090,7 @@ type: long
 --
 
 [float]
-=== enrich
+==== enrich
 
 Enrich stats
 
@@ -16138,7 +16138,7 @@ type: long
 --
 
 [float]
-=== index
+==== index
 
 index
 
@@ -16210,7 +16210,7 @@ format: bytes
 --
 
 [float]
-=== index.recovery
+==== index.recovery
 
 index
 
@@ -16317,7 +16317,7 @@ type: keyword
 --
 
 [float]
-=== index.summary
+==== index.summary
 
 index
 
@@ -16434,7 +16434,7 @@ format: bytes
 --
 
 [float]
-=== ml.job
+==== ml.job
 
 ml
 
@@ -16481,7 +16481,7 @@ type: long
 --
 
 [float]
-=== node
+==== node
 
 node
 
@@ -16498,7 +16498,7 @@ type: keyword
 --
 
 [float]
-=== jvm
+===== jvm
 
 JVM Info.
 
@@ -16573,7 +16573,7 @@ type: boolean
 --
 
 [float]
-=== node.stats
+==== node.stats
 
 Statistics about each node in a Elasticsearch cluster
 
@@ -16840,7 +16840,7 @@ format: bytes
 --
 
 [float]
-=== cluster.pending_task
+==== cluster.pending_task
 
 `cluster.pending_task` contains a pending task description.
 
@@ -16887,7 +16887,7 @@ type: long
 --
 
 [float]
-=== shard
+==== shard
 
 shard fields
 
@@ -16947,7 +16947,7 @@ envoyproxy module
 
 
 [float]
-=== server
+==== server
 
 Contains envoy proxy server stats
 
@@ -17543,14 +17543,14 @@ type: keyword
 --
 
 [float]
-=== leader
+==== leader
 
 Contains etcd leader statistics.
 
 
 
 [float]
-=== followers.counts
+===== followers.counts
 
 The number of failed and successful Raft RPC requests.
 
@@ -17575,7 +17575,7 @@ type: integer
 --
 
 [float]
-=== followers.latency
+===== followers.latency
 
 latency to each peer in the cluster
 
@@ -17626,7 +17626,7 @@ type: keyword
 --
 
 [float]
-=== server
+==== server
 
 Server metrics from the Etcd V3 /metrics endpoint
 
@@ -17703,7 +17703,7 @@ type: long
 --
 
 [float]
-=== disk
+==== disk
 
 Disk metrics from the Etcd V3 /metrics endpoint
 
@@ -17782,7 +17782,7 @@ type: long
 --
 
 [float]
-=== memory
+==== memory
 
 Memory metrics from the Etcd V3 /metrics endpoint
 
@@ -17801,7 +17801,7 @@ format: bytes
 --
 
 [float]
-=== network
+==== network
 
 Network metrics from the Etcd V3 /metrics endpoint
 
@@ -17832,7 +17832,7 @@ format: bytes
 --
 
 [float]
-=== self
+==== self
 
 Contains etcd self statistics.
 
@@ -17969,7 +17969,7 @@ type: keyword
 --
 
 [float]
-=== store
+==== store
 
 The store statistics include information about the operations that this node has handled.
 
@@ -18101,7 +18101,7 @@ Golang module
 
 
 [float]
-=== expvar
+==== expvar
 
 expvar
 
@@ -18118,7 +18118,7 @@ type: keyword
 --
 
 [float]
-=== heap
+==== heap
 
 The Go program heap information exposed by expvar.
 
@@ -18135,14 +18135,14 @@ type: keyword
 --
 
 [float]
-=== gc
+===== gc
 
 Garbage collector summary.
 
 
 
 [float]
-=== total_pause
+====== total_pause
 
 Total GC pause duration over lifetime of process.
 
@@ -18191,7 +18191,7 @@ type: float
 --
 
 [float]
-=== pause
+====== pause
 
 Last GC pause durations during the monitoring period.
 
@@ -18208,7 +18208,7 @@ type: long
 --
 
 [float]
-=== sum
+======= sum
 
 Total GC pause duration during this collect period.
 
@@ -18225,7 +18225,7 @@ type: long
 --
 
 [float]
-=== max
+======= max
 
 Max GC pause duration during this collect period.
 
@@ -18242,7 +18242,7 @@ type: long
 --
 
 [float]
-=== avg
+======= avg
 
 Average GC pause duration during this collect period.
 
@@ -18259,7 +18259,7 @@ type: long
 --
 
 [float]
-=== system
+===== system
 
 Heap summary,which bytes was obtained from system.
 
@@ -18314,7 +18314,7 @@ format: bytes
 --
 
 [float]
-=== allocations
+===== allocations
 
 Heap allocations summary.
 
@@ -18427,7 +18427,7 @@ type: object
 --
 
 [float]
-=== compute
+==== compute
 
 Google Cloud Compute metrics
 
@@ -18601,13 +18601,13 @@ type: long
 --
 
 [float]
-=== loadbalancing
+==== loadbalancing
 
 Google Cloud Load Balancing metrics
 
 
 [float]
-=== https
+===== https
 
 Google Cloud Load Balancing metrics
 
@@ -18658,7 +18658,7 @@ type: long
 --
 
 [float]
-=== l3.internal
+===== l3.internal
 
 Google Cloud Load Balancing metrics
 
@@ -18700,7 +18700,7 @@ type: long
 --
 
 [float]
-=== tcp_ssl_proxy
+===== tcp_ssl_proxy
 
 Google Cloud Load Balancing metrics
 
@@ -18751,13 +18751,13 @@ type: long
 --
 
 [float]
-=== pubsub
+==== pubsub
 
 Google Cloud PubSub metrics
 
 
 [float]
-=== subscription
+===== subscription
 
 Suscription related metrics
 
@@ -19042,7 +19042,7 @@ type: long
 --
 
 [float]
-=== topic
+===== topic
 
 Topic related metrics
 
@@ -19138,7 +19138,7 @@ type: long
 --
 
 [float]
-=== snapshot
+===== snapshot
 
 Snapshot related metrics
 
@@ -19207,7 +19207,7 @@ type: long
 --
 
 [float]
-=== storage
+==== storage
 
 Google Cloud Storage metrics
 
@@ -19311,7 +19311,7 @@ graphite Module
 
 
 [float]
-=== server
+==== server
 
 server
 
@@ -19342,7 +19342,7 @@ HAProxy metrics.
 
 
 [float]
-=== info
+==== info
 
 General information about HAProxy processes.
 
@@ -19585,13 +19585,13 @@ type: long
 --
 
 [float]
-=== compress
+===== compress
 
 
 
 
 [float]
-=== bps
+====== bps
 
 
 
@@ -19627,13 +19627,13 @@ type: long
 --
 
 [float]
-=== connection
+===== connection
 
 
 
 
 [float]
-=== rate
+====== rate
 
 
 
@@ -19768,7 +19768,7 @@ type: long
 --
 
 [float]
-=== pipes
+===== pipes
 
 
 
@@ -19804,7 +19804,7 @@ type: integer
 --
 
 [float]
-=== session
+===== session
 
 None
 
@@ -19840,7 +19840,7 @@ type: integer
 --
 
 [float]
-=== ssl
+===== ssl
 
 None
 
@@ -19876,7 +19876,7 @@ type: integer
 --
 
 [float]
-=== frontend
+====== frontend
 
 None
 
@@ -19914,7 +19914,7 @@ format: percent
 --
 
 [float]
-=== backend
+====== backend
 
 None
 
@@ -19960,7 +19960,7 @@ type: long
 --
 
 [float]
-=== zlib_mem_usage
+===== zlib_mem_usage
 
 
 
@@ -19998,7 +19998,7 @@ format: percent
 --
 
 [float]
-=== stat
+==== stat
 
 Stats collected from HAProxy processes.
 
@@ -20357,7 +20357,7 @@ type: long
 --
 
 [float]
-=== rate
+====== rate
 
 
 
@@ -20435,7 +20435,7 @@ type: integer
 --
 
 [float]
-=== http
+====== http
 
 
 
@@ -20586,7 +20586,7 @@ type: integer
 --
 
 [float]
-=== check
+===== check
 
 
 
@@ -20698,7 +20698,7 @@ type: integer
 --
 
 [float]
-=== server
+===== server
 
 
 
@@ -20744,7 +20744,7 @@ type: integer
 --
 
 [float]
-=== compressor
+===== compressor
 
 
 
@@ -20798,7 +20798,7 @@ format: bytes
 --
 
 [float]
-=== proxy
+===== proxy
 
 
 
@@ -20834,7 +20834,7 @@ type: keyword
 --
 
 [float]
-=== queue
+===== queue
 
 
 
@@ -20860,7 +20860,7 @@ type: integer
 --
 
 [float]
-=== agent
+===== agent
 
 
 
@@ -21053,7 +21053,7 @@ HTTP module
 
 
 [float]
-=== request
+==== request
 
 HTTP request information
 
@@ -21070,7 +21070,7 @@ type: object
 --
 
 [float]
-=== response
+==== response
 
 HTTP response information
 
@@ -21111,13 +21111,13 @@ example: Not found
 --
 
 [float]
-=== json
+==== json
 
 json metricset
 
 
 [float]
-=== server
+==== server
 
 server
 
@@ -21144,7 +21144,7 @@ iis module
 
 
 [float]
-=== application_pool
+==== application_pool
 
 application_pool
 
@@ -21195,7 +21195,7 @@ istio Module
 
 
 [float]
-=== citadel
+==== citadel
 
 Contains statistics related to the Istio Citadel service
 
@@ -21324,7 +21324,7 @@ type: long
 --
 
 [float]
-=== galley
+==== galley
 
 Contains statistics related to the Istio galley service
 
@@ -21655,7 +21655,7 @@ type: long
 --
 
 [float]
-=== mesh
+==== mesh
 
 Contains statistics related to the Istio mesh service
 
@@ -21954,7 +21954,7 @@ type: keyword
 --
 
 [float]
-=== mixer
+==== mixer
 
 Contains statistics related to the Istio mixer service
 
@@ -22191,7 +22191,7 @@ type: keyword
 --
 
 [float]
-=== pilot
+==== pilot
 
 Contains statistics related to the Istio pilot service
 
@@ -22501,42 +22501,16 @@ type: boolean
 [[exported-fields-kafka]]
 == Kafka fields
 
-Kafka module
+The Kafka Metricbeat module has two types of metrics. Those who are related with the cluster and can be present across all metricset which are usually called module level metrics. And those metrics that are only present using a specific metricset for example, the `broker` metricset.
 
 
 
 [float]
 === kafka
 
+Kafka module level metrics. These metrics aren't related with a particular metricset and can be present in any of them
 
 
-
-[float]
-=== broker
-
-Broker Consumer Group Information have been read from (Broker handling the consumer group).
-
-
-
-*`kafka.broker.id`*::
-+
---
-Broker id
-
-
-type: long
-
---
-
-*`kafka.broker.address`*::
-+
---
-Broker advertised address
-
-
-type: keyword
-
---
 
 *`kafka.topic.name`*::
 +
@@ -22587,10 +22561,41 @@ type: keyword
 --
 
 [float]
-=== broker
+==== broker
 
-Broker metrics from Kafka Broker JMX
+Module level Broker Consumer Group Information that have been read from (Broker handling the consumer group).
 
+
+
+*`kafka.broker.id`*::
++
+--
+Broker id
+
+
+type: long
+
+--
+
+*`kafka.broker.address`*::
++
+--
+Broker advertised address
+
+
+type: keyword
+
+--
+
+
+*`kafka.broker.log.flush_rate`*::
++
+--
+The log flush rate
+
+type: float
+
+--
 
 *`kafka.broker.mbean`*::
 +
@@ -22600,6 +22605,56 @@ Mbean that this event is related to
 type: keyword
 
 --
+
+*`kafka.broker.messages_in`*::
++
+--
+The incoming message rate
+
+type: float
+
+--
+
+[float]
+===== net
+
+Network metrics in the broker
+
+
+
+*`kafka.broker.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate
+
+type: float
+
+--
+
+[float]
+===== request
+
+Metrics about the requests in the broker
+
+
 
 *`kafka.broker.request.channel.queue.size`*::
 +
@@ -22646,6 +22701,13 @@ type: float
 
 --
 
+[float]
+===== replication
+
+Broker replication metrics
+
+
+
 *`kafka.broker.replication.leader_elections`*::
 +
 --
@@ -22663,6 +22725,13 @@ The unclean leader election rate
 type: float
 
 --
+
+[float]
+===== session
+
+Zookeeper related session metrics
+
+
 
 *`kafka.broker.session.zookeeper.disconnect`*::
 +
@@ -22700,14 +22769,12 @@ type: float
 
 --
 
-*`kafka.broker.log.flush_rate`*::
-+
---
-The log flush rate
+[float]
+===== topic
 
-type: float
+Metrics that expose topic information in the broker
 
---
+
 
 *`kafka.broker.topic.net.in.bytes_per_sec`*::
 +
@@ -22745,44 +22812,8 @@ type: float
 
 --
 
-*`kafka.broker.net.in.bytes_per_sec`*::
-+
---
-The incoming byte rate
-
-type: float
-
---
-
-*`kafka.broker.net.out.bytes_per_sec`*::
-+
---
-The outgoing byte rate
-
-type: float
-
---
-
-*`kafka.broker.net.rejected.bytes_per_sec`*::
-+
---
-The rejected byte rate
-
-type: float
-
---
-
-*`kafka.broker.messages_in`*::
-+
---
-The incoming message rate
-
-type: float
-
---
-
 [float]
-=== consumer
+==== consumer
 
 Consumer metrics from Kafka Consumer JMX
 
@@ -22869,38 +22900,11 @@ type: float
 --
 
 [float]
-=== consumergroup
+==== consumergroup
 
 consumergroup
 
 
-
-[float]
-=== broker
-
-Broker Consumer Group Information have been read from (Broker handling the consumer group).
-
-
-
-*`kafka.consumergroup.broker.id`*::
-+
---
-Broker id
-
-
-type: long
-
---
-
-*`kafka.consumergroup.broker.address`*::
-+
---
-Broker address
-
-
-type: keyword
-
---
 
 *`kafka.consumergroup.id`*::
 +
@@ -22973,7 +22977,34 @@ type: long
 --
 
 [float]
-=== client
+===== broker
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
+
+
+*`kafka.consumergroup.broker.id`*::
++
+--
+Broker id
+
+
+type: long
+
+--
+
+*`kafka.consumergroup.broker.address`*::
++
+--
+Broker address
+
+
+type: keyword
+
+--
+
+[float]
+===== client
 
 Assigned client reading events from partition
 
@@ -23007,43 +23038,82 @@ type: keyword
 --
 
 [float]
-=== partition
+==== partition
 
 partition
 
 
 
 [float]
-=== offset
+===== broker
 
-Available offsets of the given partition.
+Metrics about the broker that the partition belongs to
 
 
 
-*`kafka.partition.offset.newest`*::
+*`kafka.partition.broker.broker.id`*::
 +
 --
-Newest offset of the partition.
+
+deprecated:[6.5]
+
+Broker id
 
 
 type: long
 
 --
 
-*`kafka.partition.offset.oldest`*::
+*`kafka.partition.broker.broker.address`*::
 +
 --
-Oldest offset of the partition.
+
+deprecated:[6.5]
+
+Broker address
 
 
-type: long
+type: keyword
 
 --
 
 [float]
-=== partition
+===== topic
 
-Partition data.
+Metrics about the topics in the exposed partition
+
+
+
+*`kafka.partition.topic.error.code`*::
++
+--
+
+deprecated:[6.5]
+
+topic error code.
+
+
+type: long
+
+--
+
+*`kafka.partition.topic.name`*::
++
+--
+
+deprecated:[6.5]
+
+Topic name
+
+
+type: keyword
+
+--
+
+[float]
+===== partition
+
+Overall metrics of the partitions
 
 
 
@@ -23120,60 +23190,35 @@ type: long
 
 --
 
-*`kafka.partition.topic.error.code`*::
+[float]
+===== offset
+
+Available offsets of the given partition.
+
+
+
+*`kafka.partition.offset.newest`*::
 +
 --
-
-deprecated:[6.5]
-
-topic error code.
+Newest offset of the partition.
 
 
 type: long
 
 --
 
-*`kafka.partition.topic.name`*::
+*`kafka.partition.offset.oldest`*::
 +
 --
-
-deprecated:[6.5]
-
-Topic name
-
-
-type: keyword
-
---
-
-*`kafka.partition.broker.id`*::
-+
---
-
-deprecated:[6.5]
-
-Broker id
+Oldest offset of the partition.
 
 
 type: long
-
---
-
-*`kafka.partition.broker.address`*::
-+
---
-
-deprecated:[6.5]
-
-Broker address
-
-
-type: keyword
 
 --
 
 [float]
-=== producer
+==== producer
 
 Producer metrics from Kafka Producer JMX
 
@@ -23327,7 +23372,7 @@ Kibana module
 
 
 [float]
-=== stats
+==== stats
 
 Kibana stats and run-time metrics.
 
@@ -23430,7 +23475,7 @@ type: long
 --
 
 [float]
-=== process
+===== process
 
 Process metrics
 
@@ -23447,7 +23492,7 @@ type: scaled_float
 --
 
 [float]
-=== memory.heap
+====== memory.heap
 
 Process heap metrics
 
@@ -23500,7 +23545,7 @@ type: long
 --
 
 [float]
-=== request
+===== request
 
 Request count metrics
 
@@ -23527,7 +23572,7 @@ type: long
 --
 
 [float]
-=== response_time
+===== response_time
 
 Response times metrics
 
@@ -23554,7 +23599,7 @@ type: long
 --
 
 [float]
-=== status
+==== status
 
 Status fields
 
@@ -23605,7 +23650,7 @@ type: keyword
 --
 
 [float]
-=== metrics
+===== metrics
 
 Metrics fields
 
@@ -23622,7 +23667,7 @@ type: long
 --
 
 [float]
-=== requests
+====== requests
 
 Request statistics.
 
@@ -23781,7 +23826,7 @@ Information and statistics of pods managed by kubernetes.
 
 
 [float]
-=== apiserver
+==== apiserver
 
 Kubernetes API server metrics
 
@@ -24201,7 +24246,7 @@ type: long
 --
 
 [float]
-=== container
+==== container
 
 kubernetes container metrics
 
@@ -24218,7 +24263,7 @@ type: date
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU usage metrics
 
@@ -24271,7 +24316,7 @@ format: percent
 --
 
 [float]
-=== logs
+===== logs
 
 Logs info
 
@@ -24496,7 +24541,7 @@ type: long
 --
 
 [float]
-=== controllermanager
+==== controllermanager
 
 Controller manager metrics
 
@@ -24811,7 +24856,7 @@ type: boolean
 --
 
 [float]
-=== event
+==== event
 
 The Kubernetes events metricset collects events that are generated by objects running inside of Kubernetes
 
@@ -24879,7 +24924,7 @@ type: keyword
 --
 
 [float]
-=== source
+===== source
 
 The component reporting this event
 
@@ -24906,7 +24951,7 @@ type: keyword
 --
 
 [float]
-=== metadata
+===== metadata
 
 Metadata associated with the given event
 
@@ -24984,7 +25029,7 @@ type: keyword
 --
 
 [float]
-=== involved_object
+===== involved_object
 
 Metadata associated with the given involved object
 
@@ -25041,7 +25086,7 @@ type: keyword
 --
 
 [float]
-=== node
+==== node
 
 kubernetes node metrics
 
@@ -25058,7 +25103,7 @@ type: date
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU usage metrics
 
@@ -25319,7 +25364,7 @@ format: bytes
 --
 
 [float]
-=== pod
+==== pod
 
 kubernetes pod metrics
 
@@ -25383,7 +25428,7 @@ type: long
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU usage metrics
 
@@ -25522,7 +25567,7 @@ type: long
 --
 
 [float]
-=== proxy
+==== proxy
 
 Kubernetes proxy server metrics
 
@@ -25724,7 +25769,7 @@ type: long
 --
 
 [float]
-=== sync
+===== sync
 
 kubeproxy proxy sync metrics
 
@@ -25785,7 +25830,7 @@ type: object
 --
 
 [float]
-=== scheduler
+==== scheduler
 
 Kubernetes scheduler metrics
 
@@ -26118,7 +26163,7 @@ type: long
 --
 
 [float]
-=== container
+==== container
 
 kubernetes container metrics
 
@@ -26247,7 +26292,7 @@ format: bytes
 --
 
 [float]
-=== cronjob
+==== cronjob
 
 kubernetes cronjob metrics
 
@@ -26335,7 +26380,7 @@ type: long
 --
 
 [float]
-=== deployment
+==== deployment
 
 kubernetes deployment metrics
 
@@ -26352,7 +26397,7 @@ type: boolean
 --
 
 [float]
-=== replicas
+===== replicas
 
 Kubernetes deployment replicas info
 
@@ -26399,7 +26444,7 @@ type: integer
 --
 
 [float]
-=== node
+==== node
 
 kubernetes node metrics
 
@@ -26494,7 +26539,7 @@ type: long
 --
 
 [float]
-=== persistentvolume
+==== persistentvolume
 
 kubernetes persistent volume metrics from kube-state-metrics
 
@@ -26537,7 +26582,7 @@ type: keyword
 --
 
 [float]
-=== persistentvolumeclaim
+==== persistentvolumeclaim
 
 kubernetes persistent volume clame metrics from kube-state-metrics
 
@@ -26598,7 +26643,7 @@ type: keyword
 --
 
 [float]
-=== pod
+==== pod
 
 kubernetes pod metrics
 
@@ -26625,7 +26670,7 @@ type: ip
 --
 
 [float]
-=== status
+===== status
 
 Kubernetes pod status metrics
 
@@ -26662,14 +26707,14 @@ type: keyword
 --
 
 [float]
-=== replicaset
+==== replicaset
 
 kubernetes replica set metrics
 
 
 
 [float]
-=== replicas
+===== replicas
 
 Kubernetes replica set paused status
 
@@ -26726,7 +26771,7 @@ type: long
 --
 
 [float]
-=== resourcequota
+==== resourcequota
 
 kubernetes resourcequota metrics
 
@@ -26778,7 +26823,7 @@ type: keyword
 --
 
 [float]
-=== service
+==== service
 
 kubernetes service metrics
 
@@ -26866,7 +26911,7 @@ type: date
 --
 
 [float]
-=== statefulset
+==== statefulset
 
 kubernetes stateful set metrics
 
@@ -26883,7 +26928,7 @@ type: long
 --
 
 [float]
-=== replicas
+===== replicas
 
 Kubernetes stateful set replicas status
 
@@ -26910,7 +26955,7 @@ type: long
 --
 
 [float]
-=== generation
+===== generation
 
 Kubernetes stateful set generation information
 
@@ -26937,7 +26982,7 @@ type: long
 --
 
 [float]
-=== storageclass
+==== storageclass
 
 kubernetes storage class metrics
 
@@ -26989,7 +27034,7 @@ type: date
 --
 
 [float]
-=== system
+==== system
 
 kubernetes system containers metrics
 
@@ -27016,7 +27061,7 @@ type: date
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU usage metrics
 
@@ -27105,7 +27150,7 @@ type: long
 --
 
 [float]
-=== volume
+==== volume
 
 kubernetes volume metrics
 
@@ -27226,14 +27271,14 @@ type: keyword
 
 
 [float]
-=== dommemstat
+==== dommemstat
 
 dommemstat
 
 
 
 [float]
-=== stat
+===== stat
 
 Memory stat
 
@@ -27280,7 +27325,7 @@ type: keyword
 --
 
 [float]
-=== status
+==== status
 
 status
 
@@ -27310,14 +27355,14 @@ linux module
 
 
 [float]
-=== conntrack
+==== conntrack
 
 conntrack
 
 
 
 [float]
-=== summary
+===== summary
 
 summary of nf_conntrack statistics, summed across CPU cores
 
@@ -27404,14 +27449,14 @@ type: long
 --
 
 [float]
-=== ksm
+==== ksm
 
 ksm
 
 
 
 [float]
-=== stats
+===== stats
 
 KSM statistics
 
@@ -27478,21 +27523,21 @@ type: long
 --
 
 [float]
-=== pageinfo
+==== pageinfo
 
 pageinfo
 
 
 
 [float]
-=== buddy_info
+===== buddy_info
 
 Data from /proc/buddyinfo grouping used pages by order
 
 
 
 [float]
-=== DMA
+====== DMA
 
 DMA page Data
 
@@ -27632,7 +27677,7 @@ Logstash module
 
 
 [float]
-=== node
+==== node
 
 node
 
@@ -27663,7 +27708,7 @@ alias to: service.version
 --
 
 [float]
-=== jvm
+===== jvm
 
 JVM Info
 
@@ -27692,14 +27737,14 @@ alias to: process.pid
 --
 
 [float]
-=== node.stats
+==== node.stats
 
 node_stats metrics.
 
 
 
 [float]
-=== events
+===== events
 
 Events stats
 
@@ -27749,7 +27794,7 @@ Memcached module
 
 
 [float]
-=== stats
+==== stats
 
 stats
 
@@ -27930,7 +27975,7 @@ MongoDB metrics.
 
 
 [float]
-=== collstats
+==== collstats
 
 MongoDB collection statistics metrics.
 
@@ -28148,7 +28193,7 @@ type: long
 --
 
 [float]
-=== dbstats
+==== dbstats
 
 dbstats provides an overview of a particular mongo database. This document is most concerned with data volumes of a database.
 
@@ -28274,14 +28319,14 @@ format: bytes
 --
 
 [float]
-=== metrics
+==== metrics
 
 Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
 
 
 
 [float]
-=== commands
+===== commands
 
 Reports on the use of database commands. The fields in metrics.commands are the names of database commands and each value is a document that reports the total number of commands executed as well as the number of failed executions.
 metrics.commands.<command>.failed shows the number of times <command> failed on this mongod. metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
@@ -28739,7 +28784,7 @@ type: long
 --
 
 [float]
-=== cursor
+===== cursor
 
 Contains data regarding cursor state and use.
 
@@ -28756,7 +28801,7 @@ type: long
 --
 
 [float]
-=== open
+====== open
 
 Contains data regarding open cursors.
 
@@ -28793,7 +28838,7 @@ type: long
 --
 
 [float]
-=== document
+===== document
 
 Reflects document access and modification patterns.
 
@@ -28840,7 +28885,7 @@ type: long
 --
 
 [float]
-=== get_last_error
+===== get_last_error
 
 Returns the error status of the preceding write operation on the current connection.
 
@@ -28877,7 +28922,7 @@ type: long
 --
 
 [float]
-=== operation
+===== operation
 
 Holds counters for several types of update and query operations that MongoDB handles using special operation types.
 
@@ -28904,7 +28949,7 @@ type: long
 --
 
 [float]
-=== query_executor
+===== query_executor
 
 Reports data from the query execution system.
 
@@ -28931,14 +28976,14 @@ type: long
 --
 
 [float]
-=== replication
+===== replication
 
 Reports metrics related to the replication process. metrics.replication appears on all mongod instances, even those that aren't members of replica sets.
 
 
 
 [float]
-=== executor
+====== executor
 
 Reports on various statistics for the replication executor.
 
@@ -29089,7 +29134,7 @@ type: keyword
 --
 
 [float]
-=== apply
+====== apply
 
 Reports on the application of operations from the replication oplog.
 
@@ -29103,7 +29148,7 @@ type: long
 --
 
 [float]
-=== batches
+======= batches
 
 Reports on the oplog application process on secondaries members of replica sets.
 
@@ -29140,7 +29185,7 @@ type: long
 --
 
 [float]
-=== buffer
+====== buffer
 
 MongoDB buffers oplog operations from the replication sync source buffer before applying oplog entries in a batch. metrics.replication.buffer provides a way to track the oplog buffer.
 
@@ -29177,7 +29222,7 @@ type: long
 --
 
 [float]
-=== initial_sync
+====== initial_sync
 
 Report initial sync status
 
@@ -29205,7 +29250,7 @@ type: long
 --
 
 [float]
-=== network
+====== network
 
 Reports network use by the replication process.
 
@@ -29222,7 +29267,7 @@ type: long
 --
 
 [float]
-=== getmores
+======= getmores
 
 Reports on the getmore operations, which are requests for additional results from the oplog cursor as part of the oplog replication process.
 
@@ -29269,14 +29314,14 @@ type: long
 --
 
 [float]
-=== preload
+====== preload
 
 Reports on the `pre-fetch` stage, where MongoDB loads documents and indexes into RAM to improve replication throughput.
 
 
 
 [float]
-=== docs
+======= docs
 
 Reports on the documents loaded into memory during the pre-fetch stage.
 
@@ -29300,7 +29345,7 @@ type: long
 --
 
 [float]
-=== indexes
+======= indexes
 
 Reports on the index items loaded into memory during the pre-fetch stage of replication.
 
@@ -29358,7 +29403,7 @@ type: long
 --
 
 [float]
-=== ttl
+===== ttl
 
 Reports on the operation of the resource use of the ttl index process.
 
@@ -29385,14 +29430,14 @@ type: long
 --
 
 [float]
-=== replstatus
+==== replstatus
 
 replstatus provides an overview of replica set status.
 
 
 
 [float]
-=== oplog
+===== oplog
 
 oplog provides an overview of replication oplog status, which is retrieved from db.getReplicationInfo().
 
@@ -29504,7 +29549,7 @@ type: long
 --
 
 [float]
-=== lag
+===== lag
 
 Delay between a write operation on the primary and its copy to a secondary
 
@@ -29535,7 +29580,7 @@ format: duration
 --
 
 [float]
-=== headroom
+===== headroom
 
 Difference between the primary's oplog window and the replication lag of the secondary
 
@@ -29566,7 +29611,7 @@ format: duration
 --
 
 [float]
-=== members
+===== members
 
 Provides information about members of replica set grouped by their state
 
@@ -29760,7 +29805,7 @@ type: long
 --
 
 [float]
-=== status
+==== status
 
 MongoDB server status metrics.
 
@@ -29861,7 +29906,7 @@ type: long
 --
 
 [float]
-=== connections
+===== connections
 
 Data regarding the current status of incoming connections and availability of the database server.
 
@@ -29898,7 +29943,7 @@ type: long
 --
 
 [float]
-=== extra_info
+===== extra_info
 
 Platform specific data.
 
@@ -29927,7 +29972,7 @@ type: long
 --
 
 [float]
-=== global_lock
+===== global_lock
 
 Reports on lock state of the database.
 
@@ -29944,7 +29989,7 @@ type: long
 --
 
 [float]
-=== current_queue
+====== current_queue
 
 The number of operations queued because of a lock.
 
@@ -29981,7 +30026,7 @@ type: long
 --
 
 [float]
-=== active_clients
+====== active_clients
 
 The number of connected clients and the read and write operations performed by these clients.
 
@@ -30018,7 +30063,7 @@ type: long
 --
 
 [float]
-=== locks
+===== locks
 
 A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
 locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
@@ -30591,7 +30636,7 @@ type: long
 --
 
 [float]
-=== network
+===== network
 
 Platform specific data.
 
@@ -30632,7 +30677,7 @@ type: long
 --
 
 [float]
-=== ops.latencies
+===== ops.latencies
 
 Operation latencies for the database as a whole. Only mongod instances report this metric.
 
@@ -30699,7 +30744,7 @@ type: long
 --
 
 [float]
-=== ops.counters
+===== ops.counters
 
 An overview of database operations by type.
 
@@ -30766,7 +30811,7 @@ type: long
 --
 
 [float]
-=== ops.replicated
+===== ops.replicated
 
 An overview of database replication operations by type.
 
@@ -30833,7 +30878,7 @@ type: long
 --
 
 [float]
-=== memory
+===== memory
 
 Data about the current memory usage of the mongod server.
 
@@ -30910,14 +30955,14 @@ type: keyword
 --
 
 [float]
-=== wired_tiger
+===== wired_tiger
 
 Statistics about the WiredTiger storage engine.
 
 
 
 [float]
-=== concurrent_transactions
+====== concurrent_transactions
 
 Statistics about the transactions currently in progress.
 
@@ -30984,7 +31029,7 @@ type: long
 --
 
 [float]
-=== cache
+====== cache
 
 Statistics about the cache and page evictions from the cache.
 
@@ -31057,7 +31102,7 @@ type: long
 --
 
 [float]
-=== log
+====== log
 
 Statistics about the write ahead log used by WiredTiger.
 
@@ -31140,7 +31185,7 @@ type: long
 --
 
 [float]
-=== background_flushing
+===== background_flushing
 
 Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
 
@@ -31197,7 +31242,7 @@ type: date
 --
 
 [float]
-=== journaling
+===== journaling
 
 Data about the journaling-related operations and performance. Journaling information only appears for mongod instances that use the MMAPv1 storage engine and have journaling enabled.
 
@@ -31264,7 +31309,7 @@ type: long
 --
 
 [float]
-=== times
+====== times
 
 Information about the performance of the mongod instance during the various phases of journaling in the last journal group commit interval.
 
@@ -31353,7 +31398,7 @@ The root field containing all MSSQL fields
 
 
 [float]
-=== database
+==== database
 
 The database that the metrics is being referred to
 
@@ -31377,7 +31422,7 @@ type: keyword
 --
 
 [float]
-=== performance
+==== performance
 
 performance metricset fetches information about the Performance Counters
 
@@ -31483,7 +31528,7 @@ type: long
 
 
 [float]
-=== cache_hit
+====== cache_hit
 
 Indicates the percentage of pages found in the buffer cache without having to read from disk.
 
@@ -31498,7 +31543,7 @@ type: double
 --
 
 [float]
-=== page_life_expectancy
+====== page_life_expectancy
 
 Indicates the number of seconds a page will stay in the buffer pool without references.
 
@@ -31540,19 +31585,19 @@ type: long
 --
 
 [float]
-=== transaction_log
+==== transaction_log
 
 transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
 
 
 [float]
-=== space_usage
+===== space_usage
 
 Space usage information for the transaction log
 
 
 [float]
-=== since_last_backup
+====== since_last_backup
 
 The amount of space used since the last log backup
 
@@ -31567,7 +31612,7 @@ type: long
 --
 
 [float]
-=== total
+====== total
 
 The size of the log
 
@@ -31582,7 +31627,7 @@ type: long
 --
 
 [float]
-=== used
+====== used
 
 The occupied size of the log
 
@@ -31606,13 +31651,13 @@ type: float
 --
 
 [float]
-=== stats
+===== stats
 
 Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
 
 
 [float]
-=== active_size
+====== active_size
 
 Total active transaction log size.
 
@@ -31636,7 +31681,7 @@ type: date
 --
 
 [float]
-=== recovery_size
+====== recovery_size
 
 Log size since log recovery log sequence number (LSN).
 
@@ -31651,7 +31696,7 @@ type: long
 --
 
 [float]
-=== since_last_checkpoint
+====== since_last_checkpoint
 
 Log size since last checkpoint log sequence number (LSN).
 
@@ -31666,7 +31711,7 @@ type: long
 --
 
 [float]
-=== total_size
+====== total_size
 
 Total transaction log size.
 
@@ -31723,14 +31768,14 @@ MySQL server status metrics collected from MySQL.
 
 
 [float]
-=== galera_status
+==== galera_status
 
 `galera_status` contains the metrics that were obtained by the status SQL query on Galera.
 
 
 
 [float]
-=== apply
+===== apply
 
 Apply status fields.
 
@@ -31767,7 +31812,7 @@ type: double
 --
 
 [float]
-=== cert
+===== cert
 
 Certification status fields.
 
@@ -31804,7 +31849,7 @@ type: double
 --
 
 [float]
-=== cluster
+===== cluster
 
 Cluster status fields.
 
@@ -31841,7 +31886,7 @@ type: keyword
 --
 
 [float]
-=== commit
+===== commit
 
 Commit status fields.
 
@@ -31878,7 +31923,7 @@ type: keyword
 --
 
 [float]
-=== evs
+===== evs
 
 Evs Fields.
 
@@ -31905,7 +31950,7 @@ type: keyword
 --
 
 [float]
-=== flow_ctl
+===== flow_ctl
 
 Flow Control fields.
 
@@ -31962,7 +32007,7 @@ type: long
 --
 
 [float]
-=== local
+===== local
 
 Node specific Cluster status fields.
 
@@ -31999,7 +32044,7 @@ type: long
 --
 
 [float]
-=== recv
+====== recv
 
 Node specific recv fields.
 
@@ -32056,7 +32101,7 @@ type: long
 --
 
 [float]
-=== send
+====== send
 
 Node specific sent fields.
 
@@ -32123,7 +32168,7 @@ type: keyword
 --
 
 [float]
-=== received
+===== received
 
 Write-Set receive status fields.
 
@@ -32150,7 +32195,7 @@ type: long
 --
 
 [float]
-=== repl
+===== repl
 
 Replication status fields.
 
@@ -32217,14 +32262,14 @@ type: long
 --
 
 [float]
-=== performance
+==== performance
 
 `performance` contains metrics related to the performance of a MySQL instance
 
 
 
 [float]
-=== events_statements
+===== events_statements
 
 Records statement events summarized by schema and digest
 
@@ -32284,7 +32329,7 @@ type: long
 --
 
 [float]
-=== table_io_waits
+===== table_io_waits
 
 Records table I/O waits by index
 
@@ -32328,20 +32373,20 @@ type: long
 --
 
 [float]
-=== query
+==== query
 
 `query` metricset fetches custom queries from the user to a MySQL instance.
 
 
 [float]
-=== status
+==== status
 
 `status` contains the metrics that were obtained by the status SQL query.
 
 
 
 [float]
-=== aborted
+===== aborted
 
 Aborted status fields.
 
@@ -32368,13 +32413,13 @@ type: long
 --
 
 [float]
-=== connection
+===== connection
 
 
 
 
 [float]
-=== errors
+====== errors
 
 
 
@@ -32436,13 +32481,13 @@ type: long
 --
 
 [float]
-=== cache
+===== cache
 
 
 
 
 [float]
-=== ssl
+====== ssl
 
 SSL session cache hits and misses.
 
@@ -32475,13 +32520,13 @@ type: long
 --
 
 [float]
-=== table
+====== table
 
 
 
 
 [float]
-=== open_cache
+======= open_cache
 
 
 
@@ -32515,7 +32560,7 @@ type: long
 --
 
 [float]
-=== binlog
+===== binlog
 
 
 
@@ -32539,7 +32584,7 @@ type: long
 --
 
 [float]
-=== bytes
+===== bytes
 
 Bytes stats.
 
@@ -32570,7 +32615,7 @@ format: bytes
 --
 
 [float]
-=== threads
+===== threads
 
 Threads stats.
 
@@ -32626,7 +32671,7 @@ type: long
 --
 
 [float]
-=== created
+===== created
 
 
 
@@ -32659,7 +32704,7 @@ type: long
 --
 
 [float]
-=== delayed
+===== delayed
 
 
 
@@ -32710,7 +32755,7 @@ type: long
 --
 
 [float]
-=== open
+===== open
 
 
 
@@ -32752,7 +32797,7 @@ type: long
 --
 
 [float]
-=== command
+===== command
 
 
 
@@ -32818,7 +32863,7 @@ type: long
 --
 
 [float]
-=== handler
+===== handler
 
 
 
@@ -32874,7 +32919,7 @@ type: long
 --
 
 [float]
-=== read
+====== read
 
 
 
@@ -33000,13 +33045,13 @@ type: long
 --
 
 [float]
-=== innodb
+===== innodb
 
 
 
 
 [float]
-=== rows
+====== rows
 
 
 
@@ -33048,7 +33093,7 @@ type: long
 --
 
 [float]
-=== buffer_pool
+====== buffer_pool
 
 
 
@@ -33074,7 +33119,7 @@ type: long
 --
 
 [float]
-=== bytes
+======= bytes
 
 
 
@@ -33100,7 +33145,7 @@ type: long
 --
 
 [float]
-=== pages
+======= pages
 
 
 
@@ -33176,7 +33221,7 @@ type: long
 --
 
 [float]
-=== read
+======= read
 
 
 
@@ -33222,7 +33267,7 @@ type: long
 --
 
 [float]
-=== pool
+======= pool
 
 
 
@@ -33302,7 +33347,7 @@ type: date
 --
 
 [float]
-=== connections
+==== connections
 
 Contains nats connection related metrics
 
@@ -33319,7 +33364,7 @@ type: integer
 --
 
 [float]
-=== routes
+==== routes
 
 Contains nats route related metrics
 
@@ -33336,7 +33381,7 @@ type: integer
 --
 
 [float]
-=== stats
+==== stats
 
 Contains nats var related metrics
 
@@ -33409,7 +33454,7 @@ type: integer
 --
 
 [float]
-=== in
+===== in
 
 The amount of incoming data
 
@@ -33438,7 +33483,7 @@ format: bytes
 --
 
 [float]
-=== out
+===== out
 
 The amount of outgoing data
 
@@ -33477,21 +33522,21 @@ type: long
 --
 
 [float]
-=== http
+===== http
 
 The http metrics of NATS server
 
 
 
 [float]
-=== req_stats
+====== req_stats
 
 The requests statistics
 
 
 
 [float]
-=== uri
+======= uri
 
 The request distribution on monitoring URIS
 
@@ -33548,7 +33593,7 @@ type: long
 --
 
 [float]
-=== subscriptions
+==== subscriptions
 
 Contains nats subscriptions related metrics
 
@@ -33651,7 +33696,7 @@ Nginx server status metrics collected from various modules.
 
 
 [float]
-=== stubstatus
+==== stubstatus
 
 `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
 
@@ -33804,7 +33849,7 @@ Oracle module
 
 
 [float]
-=== performance
+==== performance
 
 Performance related metrics on a single database instance
 
@@ -33864,7 +33909,7 @@ type: double
 --
 
 [float]
-=== cache
+===== cache
 
 Statistics about all buffer pools available for the instance
 
@@ -33888,7 +33933,7 @@ type: long
 --
 
 [float]
-=== get
+====== get
 
 Buffer pool 'get' statistics
 
@@ -33912,7 +33957,7 @@ type: long
 --
 
 [float]
-=== cursors
+===== cursors
 
 Cursors information
 
@@ -33945,7 +33990,7 @@ type: double
 --
 
 [float]
-=== opened
+====== opened
 
 Opened cursors statistic
 
@@ -33969,7 +34014,7 @@ type: long
 --
 
 [float]
-=== parse
+====== parse
 
 Parses statistic information that occured in the current session
 
@@ -34011,7 +34056,7 @@ type: double
 --
 
 [float]
-=== tablespace
+==== tablespace
 
 tablespace
 
@@ -34026,7 +34071,7 @@ type: keyword
 --
 
 [float]
-=== data_file
+===== data_file
 
 Database files information
 
@@ -34050,7 +34095,7 @@ type: keyword
 --
 
 [float]
-=== size
+====== size
 
 Size information about the file
 
@@ -34109,7 +34154,7 @@ type: keyword
 --
 
 [float]
-=== space
+===== space
 
 Tablespace space usage information
 
@@ -34162,7 +34207,7 @@ PHP-FPM server status metrics collected from PHP-FPM.
 
 
 [float]
-=== pool
+==== pool
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
 
@@ -34179,7 +34224,7 @@ type: keyword
 --
 
 [float]
-=== pool
+==== pool
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
 
@@ -34196,7 +34241,7 @@ type: keyword
 --
 
 [float]
-=== connections
+===== connections
 
 Connection state specific statistics.
 
@@ -34243,7 +34288,7 @@ type: long
 --
 
 [float]
-=== processes
+===== processes
 
 Process state specific statistics.
 
@@ -34330,7 +34375,7 @@ type: date
 --
 
 [float]
-=== process
+==== process
 
 process contains the metrics that were obtained from the PHP-FPM process.
 
@@ -34491,7 +34536,7 @@ PostgreSQL metrics.
 
 
 [float]
-=== activity
+==== activity
 
 One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
 
@@ -34656,7 +34701,7 @@ Text of this backend's most recent query. If state is active this field shows th
 --
 
 [float]
-=== bgwriter
+==== bgwriter
 
 Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
 
@@ -34773,7 +34818,7 @@ type: date
 --
 
 [float]
-=== database
+==== database
 
 One row per database, showing database-wide statistics. Collected by querying pg_stat_database
 
@@ -34970,7 +35015,7 @@ type: date
 --
 
 [float]
-=== statement
+==== statement
 
 One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
 
@@ -35240,13 +35285,13 @@ type: object
 --
 
 [float]
-=== query
+==== query
 
 query metricset
 
 
 [float]
-=== remote_write
+==== remote_write
 
 remote write metrics from Prometheus server
 
@@ -35322,7 +35367,7 @@ type: keyword
 --
 
 [float]
-=== connection
+==== connection
 
 connection
 
@@ -35527,7 +35572,7 @@ type: keyword
 --
 
 [float]
-=== exchange
+==== exchange
 
 exchange
 
@@ -35638,7 +35683,7 @@ type: float
 --
 
 [float]
-=== node
+==== node
 
 node
 
@@ -36026,7 +36071,7 @@ type: long
 --
 
 [float]
-=== queue
+==== queue
 
 queue
 
@@ -36255,14 +36300,14 @@ Redis metrics collected from Redis.
 
 
 [float]
-=== info
+==== info
 
 `info` contains the information and statistics returned by the `INFO` command.
 
 
 
 [float]
-=== clients
+===== clients
 
 Redis client stats.
 
@@ -36335,7 +36380,7 @@ type: long
 --
 
 [float]
-=== cluster
+===== cluster
 
 Redis cluster information.
 
@@ -36352,7 +36397,7 @@ type: boolean
 --
 
 [float]
-=== cpu
+===== cpu
 
 Redis CPU stats
 
@@ -36399,7 +36444,7 @@ type: scaled_float
 --
 
 [float]
-=== memory
+===== memory
 
 Redis memory stats.
 
@@ -36611,7 +36656,7 @@ format: bytes
 --
 
 [float]
-=== persistence
+===== persistence
 
 Redis CPU stats.
 
@@ -36628,7 +36673,7 @@ type: boolean
 --
 
 [float]
-=== rdb
+====== rdb
 
 Provides information about RDB persistence
 
@@ -36711,7 +36756,7 @@ format: bytes
 --
 
 [float]
-=== aof
+====== aof
 
 Provides information about AOF persitence
 
@@ -36872,7 +36917,7 @@ type: long
 --
 
 [float]
-=== replication
+===== replication
 
 Replication
 
@@ -37060,7 +37105,7 @@ type: boolean
 --
 
 [float]
-=== server
+===== server
 
 Server info
 
@@ -37217,7 +37262,7 @@ type: keyword
 --
 
 [float]
-=== stats
+===== stats
 
 Redis stats.
 
@@ -37469,7 +37514,7 @@ type: long
 --
 
 [float]
-=== key
+==== key
 
 `key` contains information about keys.
 
@@ -37526,7 +37571,7 @@ type: long
 --
 
 [float]
-=== keyspace
+==== keyspace
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.
 
@@ -37678,7 +37723,7 @@ type: keyword
 --
 
 [float]
-=== channels
+==== channels
 
 Contains stan / nats streaming/serverz endpoint metrics
 
@@ -37745,7 +37790,7 @@ type: long
 --
 
 [float]
-=== stats
+==== stats
 
 Contains only high-level stan / nats streaming server related metrics
 
@@ -37822,7 +37867,7 @@ type: long
 --
 
 [float]
-=== subscriptions
+==== subscriptions
 
 Contains stan / nats streaming/serverz endpoint subscription metrics
 
@@ -37941,7 +37986,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 [float]
-=== core
+==== core
 
 `system-core` contains CPU metrics for a single core of a multi-core system.
 
@@ -38134,7 +38179,7 @@ type: long
 --
 
 [float]
-=== cpu
+==== cpu
 
 `cpu` contains local CPU stats.
 
@@ -38447,7 +38492,7 @@ type: long
 --
 
 [float]
-=== diskio
+==== diskio
 
 `disk` contains disk IO metrics collected from the operating system.
 
@@ -38684,7 +38729,7 @@ type: float
 --
 
 [float]
-=== entropy
+==== entropy
 
 Available system entropy
 
@@ -38713,7 +38758,7 @@ format: percent
 --
 
 [float]
-=== filesystem
+==== filesystem
 
 `filesystem` contains local filesystem stats.
 
@@ -38830,7 +38875,7 @@ format: percent
 --
 
 [float]
-=== fsstat
+==== fsstat
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
@@ -38855,7 +38900,7 @@ type: long
 --
 
 [float]
-=== total_size
+===== total_size
 
 Nested file system docs.
 
@@ -38897,7 +38942,7 @@ format: bytes
 --
 
 [float]
-=== load
+==== load
 
 CPU load averages.
 
@@ -38974,7 +39019,7 @@ type: long
 --
 
 [float]
-=== memory
+==== memory
 
 `memory` contains local memory stats.
 
@@ -39029,7 +39074,7 @@ format: percent
 --
 
 [float]
-=== actual
+===== actual
 
 Actual memory used and free.
 
@@ -39072,7 +39117,7 @@ format: percent
 --
 
 [float]
-=== swap
+===== swap
 
 This group contains statistics related to the swap memory usage on the system.
 
@@ -39162,7 +39207,7 @@ format: percent
 --
 
 [float]
-=== page_stats
+===== page_stats
 
 memory page statistics
 
@@ -39245,7 +39290,7 @@ format: percent
 --
 
 [float]
-=== hugepages
+===== hugepages
 
 This group contains statistics related to huge pages usage on the system.
 
@@ -39335,7 +39380,7 @@ format: bytes
 --
 
 [float]
-=== swap.out
+====== swap.out
 
 huge pages swapped out
 
@@ -39359,7 +39404,7 @@ type: long
 --
 
 [float]
-=== network
+==== network
 
 `network` contains network IO metrics for a single network interface.
 
@@ -39462,7 +39507,7 @@ type: long
 --
 
 [float]
-=== network_summary
+==== network_summary
 
 Metrics relating to global network activity
 
@@ -39519,7 +39564,7 @@ type: object
 --
 
 [float]
-=== process
+==== process
 
 `process` contains process metadata, CPU metrics, and memory metrics.
 
@@ -39610,7 +39655,7 @@ type: object
 --
 
 [float]
-=== cpu
+===== cpu
 
 CPU-specific statistics per process.
 
@@ -39690,7 +39735,7 @@ type: date
 --
 
 [float]
-=== memory
+===== memory
 
 Memory-specific statistics per process.
 
@@ -39744,7 +39789,7 @@ format: bytes
 --
 
 [float]
-=== fd
+===== fd
 
 File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
 
@@ -39780,7 +39825,7 @@ type: long
 --
 
 [float]
-=== cgroup
+===== cgroup
 
 Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
 
@@ -39807,7 +39852,7 @@ type: keyword
 --
 
 [float]
-=== cpu
+====== cpu
 
 The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
 
@@ -39913,7 +39958,7 @@ type: long
 --
 
 [float]
-=== cpuacct
+====== cpuacct
 
 CPU accounting metrics.
 
@@ -39976,7 +40021,7 @@ type: object
 --
 
 [float]
-=== memory
+====== memory
 
 Memory limits and metrics.
 
@@ -40367,7 +40412,7 @@ format: bytes
 --
 
 [float]
-=== blkio
+====== blkio
 
 Block IO metrics.
 
@@ -40414,7 +40459,7 @@ type: long
 --
 
 [float]
-=== process.summary
+==== process.summary
 
 Summary metrics for the processes running on the host.
 
@@ -40501,7 +40546,7 @@ type: long
 --
 
 [float]
-=== raid
+==== raid
 
 raid
 
@@ -40618,7 +40663,7 @@ type: long
 --
 
 [float]
-=== service
+==== service
 
 metrics for system services
 
@@ -40679,7 +40724,7 @@ type: keyword
 --
 
 [float]
-=== resources
+===== resources
 
 system metrics associated with the service
 
@@ -40712,7 +40757,7 @@ type: long
 --
 
 [float]
-=== network
+====== network
 
 network resource usage
 
@@ -40758,7 +40803,7 @@ type: long
 --
 
 [float]
-=== socket
+==== socket
 
 TCP sockets that are active.
 
@@ -40920,14 +40965,14 @@ alias to: user.full_name
 --
 
 [float]
-=== socket.summary
+==== socket.summary
 
 Summary metrics of open sockets in the host system
 
 
 
 [float]
-=== all
+===== all
 
 All connections
 
@@ -40954,7 +40999,7 @@ type: integer
 --
 
 [float]
-=== tcp
+===== tcp
 
 All TCP connections
 
@@ -40973,7 +41018,7 @@ format: bytes
 --
 
 [float]
-=== all
+====== all
 
 All TCP connections
 
@@ -41100,7 +41145,7 @@ type: integer
 --
 
 [float]
-=== udp
+===== udp
 
 All UDP connections
 
@@ -41119,7 +41164,7 @@ format: bytes
 --
 
 [float]
-=== all
+====== all
 
 All UDP connections
 
@@ -41136,7 +41181,7 @@ type: integer
 --
 
 [float]
-=== uptime
+==== uptime
 
 `uptime` contains the operating system uptime metric.
 
@@ -41155,7 +41200,7 @@ format: duration
 --
 
 [float]
-=== users
+==== users
 
 Logged-in user session data
 
@@ -41270,7 +41315,7 @@ Tomcat module
 
 
 [float]
-=== cache
+==== cache
 
 Catalina Cache metrics from the WebResourceRoot
 
@@ -41330,7 +41375,7 @@ type: long
 --
 
 [float]
-=== memory
+==== memory
 
 Memory metrics from java.lang JMX
 
@@ -41417,7 +41462,7 @@ type: long
 --
 
 [float]
-=== requests
+==== requests
 
 Requests processor metrics from GlobalRequestProcessor JMX
 
@@ -41477,7 +41522,7 @@ type: long
 --
 
 [float]
-=== threading
+==== threading
 
 Threading metrics from the Catalina's ThreadPool JMX
 
@@ -41587,7 +41632,7 @@ Traefik reverse proxy / load balancer metrics
 
 
 [float]
-=== health
+==== health
 
 Metrics obtained from Traefik's health API endpoint
 
@@ -41604,7 +41649,7 @@ type: long
 --
 
 [float]
-=== response
+===== response
 
 Response metrics
 
@@ -41654,7 +41699,7 @@ uwsgi module
 
 
 [float]
-=== status
+==== status
 
 uwsgi.status metricset fields
 
@@ -41964,7 +42009,7 @@ vSphere module
 
 
 [float]
-=== datastore
+==== datastore
 
 datastore
 
@@ -42039,7 +42084,7 @@ format: percent
 --
 
 [float]
-=== host
+==== host
 
 host
 
@@ -42132,7 +42177,7 @@ type: keyword
 --
 
 [float]
-=== virtualmachine
+==== virtualmachine
 
 virtualmachine
 
@@ -42270,7 +42315,7 @@ Module for Windows
 
 
 [float]
-=== perfmon
+==== perfmon
 
 perfmon
 
@@ -42297,7 +42342,7 @@ type: object
 --
 
 [float]
-=== service
+==== service
 
 `service` contains the status for Windows services.
 
@@ -42432,7 +42477,7 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 [float]
-=== connection
+==== connection
 
 connections
 
@@ -42479,7 +42524,7 @@ type: long
 --
 
 [float]
-=== mntr
+==== mntr
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.
 
@@ -42678,7 +42723,7 @@ type: long
 --
 
 [float]
-=== server
+==== server
 
 server contains the metrics reported by the four-letter `srvr` command.
 

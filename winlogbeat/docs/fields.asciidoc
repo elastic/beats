@@ -7974,7 +7974,7 @@ required: False
 --
 
 [float]
-=== event_data
+==== event_data
 
 This is a non-exhaustive list of parameters that are used in Windows events. By having these fields defined in the template they can be used in dashboards and machine-learning jobs.
 

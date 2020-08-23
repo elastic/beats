@@ -1,51 +1,49 @@
 - key: kafka
   title: "Kafka"
   description: >
-    Kafka module
+    The Kafka Metricbeat module has two types of metrics. Those who are related with the cluster and can be present
+    across all metricset which are usually called module level metrics. And those metrics that are only present using
+    a specific metricset for example, the `broker` metricset.
   short_config: false
   release: ga
   fields:
     - name: kafka
       type: group
       description: >
+        Kafka module level metrics. These metrics aren't related with a particular metricset and can be present in any
+        of them
       fields:
+        - name: topic.name
+          type: keyword
+          description: >
+            Topic name
+        - name: topic.error.code
+          type: long
+          description: >
+            Topic error code.
+        - name: partition.id
+          type: long
+          description: >
+            Partition id.
+        - name: partition.topic_id
+          type: keyword
+          description:
+            Unique id of the partition in the topic.
+        - name: partition.topic_broker_id
+          type: keyword
+          description:
+            Unique id of the partition in the topic and the broker.
         - name: broker
           type: group
           description: >
-            Broker Consumer Group Information have been read from (Broker handling
+            Module level Broker Consumer Group Information that have been read from (Broker handling
             the consumer group).
           fields:
             - name: id
               type: long
               description: >
                 Broker id
-
             - name: address
               type: keyword
               description: >
                 Broker advertised address
-
-        - name: topic.name
-          type: keyword
-          description: >
-            Topic name
-
-        - name: topic.error.code
-          type: long
-          description: >
-            Topic error code.
-
-        - name: partition.id
-          type: long
-          description: >
-            Partition id.
-
-        - name: partition.topic_id
-          type: keyword
-          description:
-            Unique id of the partition in the topic.
-
-        - name: partition.topic_broker_id
-          type: keyword
-          description:
-            Unique id of the partition in the topic and the broker.

@@ -539,13 +539,13 @@ type: boolean
 --
 
 [float]
-=== request
+==== request
 
 Cassandra request.
 
 
 [float]
-=== headers
+===== headers
 
 Cassandra request headers.
 
@@ -605,13 +605,13 @@ type: keyword
 --
 
 [float]
-=== response
+==== response
 
 Cassandra response.
 
 
 [float]
-=== headers
+===== headers
 
 Cassandra response headers, the structure is as same as request's header.
 
@@ -662,7 +662,7 @@ type: long
 --
 
 [float]
-=== result
+===== result
 
 Details about the returned result.
 
@@ -677,7 +677,7 @@ type: keyword
 --
 
 [float]
-=== rows
+====== rows
 
 Details about the rows.
 
@@ -692,7 +692,7 @@ type: long
 --
 
 [float]
-=== meta
+======= meta
 
 Composed of result metadata.
 
@@ -761,7 +761,7 @@ type: keyword
 --
 
 [float]
-=== schema_change
+====== schema_change
 
 The result to a schema_change message.
 
@@ -830,7 +830,7 @@ type: keyword
 --
 
 [float]
-=== prepared
+====== prepared
 
 The result to a PREPARE message.
 
@@ -845,7 +845,7 @@ type: keyword
 --
 
 [float]
-=== req_meta
+======= req_meta
 
 This describes the request metadata.
 
@@ -905,7 +905,7 @@ type: keyword
 --
 
 [float]
-=== resp_meta
+======= resp_meta
 
 This describes the metadata for the result set.
 
@@ -974,7 +974,7 @@ type: object
 --
 
 [float]
-=== authentication
+===== authentication
 
 Indicates that the server requires authentication, and which authentication mechanism to use.
 
@@ -998,7 +998,7 @@ type: keyword
 --
 
 [float]
-=== event
+===== event
 
 Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
 
@@ -1040,7 +1040,7 @@ type: long
 --
 
 [float]
-=== schema_change
+====== schema_change
 
 The events details related to schema change.
 
@@ -1109,7 +1109,7 @@ type: keyword
 --
 
 [float]
-=== error
+===== error
 
 Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
 
@@ -1142,7 +1142,7 @@ type: keyword
 --
 
 [float]
-=== details
+====== details
 
 The details of the error.
 
@@ -9113,7 +9113,7 @@ Information about the HTTP request and response.
 
 
 [float]
-=== request
+==== request
 
 HTTP request
 
@@ -9138,7 +9138,7 @@ alias to: url.query
 --
 
 [float]
-=== response
+==== response
 
 HTTP response
 
@@ -10953,7 +10953,7 @@ type: keyword
 --
 
 [float]
-=== extensions
+====== extensions
 
 The hello extensions provided by the client.
 
@@ -11069,7 +11069,7 @@ type: keyword
 --
 
 [float]
-=== extensions
+====== extensions
 
 The hello extensions provided by the server.
 
@@ -11124,7 +11124,7 @@ type: keyword
 --
 
 [float]
-=== client_certificate
+===== client_certificate
 
 Certificate provided by the client for authentication.
 
@@ -11215,7 +11215,7 @@ type: keyword
 --
 
 [float]
-=== subject
+====== subject
 
 Subject represented by this certificate.
 
@@ -11286,7 +11286,7 @@ example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.glob
 --
 
 [float]
-=== issuer
+====== issuer
 
 Entity that issued and signed this certificate.
 
@@ -11357,7 +11357,7 @@ example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.glob
 --
 
 [float]
-=== server_certificate
+===== server_certificate
 
 Certificate provided by the server for authentication.
 
@@ -11448,7 +11448,7 @@ type: keyword
 --
 
 [float]
-=== subject
+====== subject
 
 Subject represented by this certificate.
 
@@ -11528,7 +11528,7 @@ example: C=US, ST=California, L=San Francisco, O=Fastly, Inc., CN=r2.shared.glob
 --
 
 [float]
-=== issuer
+====== issuer
 
 Entity that issued and signed this certificate.
 
