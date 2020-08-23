@@ -1,19 +1,16 @@
 package script
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/synthexec"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"io"
 	"net/url"
-	"os/exec"
 	"os/user"
 )
 
@@ -39,63 +36,18 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	job := monitors.MakeSimpleCont(func(event *beat.Event) error {
 		logp.Info("Start script job")
 
-		var cmd *exec.Cmd
-		if config.SuiteFile != "" {
-			cmd = exec.Command(
-				"node",
-				config.SuiteFile,
-				"-e", "production",
-				"--json",
-				"--headless",
-				"--screenshots",
-			)
-		} else {
-			cmd = exec.Command(
-				"npx",
-				"elastic-synthetics",
-				"--stdin",
-				"--json",
-				"--headless",
-				"--screenshots",
-			)
-		}
-
-
-
-		stdout, err := cmd.StdoutPipe()
+		cmdRes, err := synthexec.RunScript(config.Script)
 		if err != nil {
-			return fmt.Errorf("could not attach stdout: %w", err)
+			return fmt.Errorf("error running script: %w", err)
 		}
 
-		stderr, err := cmd.StderrPipe()
-		if err != nil {
-			return fmt.Errorf("could not attach stderr: %w", err)
-		}
-
-		stdin, err := cmd.StdinPipe()
-		if err != nil {
-			return fmt.Errorf("could not attach stdin: %w", err)
-		}
-
-		if err = cmd.Start(); err != nil {
-			return fmt.Errorf("Could not start cmd: %w", err)
-		}
-
-		_, err = stdin.Write([]byte(config.Script))
-		if err != nil {
-			return fmt.Errorf("could not write to script stdin: %w", err)
-		}
-		stdin.Close()
-
-		stdoutLines, result := decodePipe(stdout)
-		stderrLines, _ := decodePipe(stderr)
-
+		result := cmdRes.Result
 		processResult(event, result)
 
 		eventext.MergeEventFields(event, common.MapStr{
 			"script": common.MapStr{
-				"stdout": stdoutLines,
-				"stderr": stderrLines,
+				"stdout": cmdRes.Stdout,
+				"stderr": cmdRes.Stderr,
 			},
 		})
 
@@ -107,23 +59,19 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			})
 		}
 
-		if err = cmd.Wait(); err != nil {
-			return fmt.Errorf("error running cmd: %w", err)
-		}
-
 		return nil
 	})
 
 	return []jobs.Job{job}, 1, nil
 }
 
-func processResult(event *beat.Event, result *result) {
+func processResult(event *beat.Event, result *synthexec.Result) {
 	if result == nil {
 		logp.Warn("no result received!")
 		return
 	}
 	if result.Journeys == nil || len(result.Journeys) == 0 {
-		logp.Warn("result received with no journies: %#v", result.raw)
+		logp.Warn("result received with no journies: %#v", result.Raw)
 		return
 	}
 
@@ -150,75 +98,3 @@ func processResult(event *beat.Event, result *result) {
 	})
 }
 
-func decodePipe(pipe io.ReadCloser) (lines []string, result *result) {
-	pipeBio := bufio.NewReader(pipe)
-	for {
-		line, err := pipeBio.ReadBytes([]byte("\n")[0])
-
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			logp.Warn("error reading line: %w", err)
-		}
-
-		res, ok := decodeResults(line)
-		if ok { // append the rich results if that's what this line is
-			result = res
-		} else { // otherwise just append
-			lines = append(lines, string(line))
-		}
-	}
-
-	return
-}
-
-func decodeResults(line []byte) (res *result, ok bool) {
-	// We need to yield both a map[string]interface{} version of "Journeys" to pass through to ES
-	// and a richer version that has accessible fields. Let's do both
-	var rawRes = &rawResult{}
-	res = &result{}
-
-	err := json.Unmarshal(line, rawRes)
-	// This must just be a plain line
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(line, res)
-	if err != nil {
-		logp.Warn("Raw result decoded successfully, but richer one did not: %s", line)
-		return
-	}
-
-	res.raw = rawRes
-	ok = true
-	for idx, j := range res.Journeys {
-		j.Raw = rawRes.Journeys[idx]
-	}
-
-	return
-}
-
-type result struct {
-	formatVersion string `json:"format_version"`
-	Journeys []*Journey `json:"journeys"`
-	raw *rawResult
-}
-
-type rawResult struct {
-	Journeys []map[string]interface{} `json:"journeys"`
-}
-
-type Journey struct {
-	Url      string      `json:"url"`
-	Steps    []Step      `json:"steps"`
-	DataType string      `json:"__type__"`
-	Error    interface{} `json:"error"`
-	Duration interface{} `json:"elapsedMs"`
-	Raw      map[string]interface{}
-	Status string `json:"status"`
-}
-
-type Step struct {
-	Screenshot string `json:"screenshot"`
-}
