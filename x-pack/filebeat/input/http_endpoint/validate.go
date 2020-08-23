@@ -15,6 +15,7 @@ import (
 )
 
 type validator interface {
+	Validate(*http.Request) (int, error)
 	// ValidateHeader checks the HTTP headers for compliance. The body must not
 	// be touched.
 	ValidateHeader(*http.Request) (int, error)
@@ -37,6 +38,18 @@ type apiValidator struct {
 var errIncorrectUserOrPass = errors.New("Incorrect username or password")
 var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
 var errIncorrectHmac = errors.New("The HMAC signature of the request body does not match with the configured secret")
+
+func (v *apiValidator) Validate(r *http.Request) (int, error) {
+	i, err := v.ValidateHeader(r)
+	if err != nil {
+		return i, err
+	}
+	h, err := v.ValidateHmac(r)
+	if err != nil {
+		return h, err
+	}
+	return 0, nil
+}
 
 func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	if v.basicAuth {

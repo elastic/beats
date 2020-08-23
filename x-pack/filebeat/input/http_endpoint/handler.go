@@ -63,7 +63,7 @@ func (h *httpHandler) publishEvent(obj common.MapStr) {
 
 func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if status, err := v.ValidateHeader(r); status != 0 && err != nil {
+		if status, err := v.Validate(r); status != 0 && err != nil {
 			sendErrorResponse(w, status, err)
 		} else {
 			handler(w, r)
