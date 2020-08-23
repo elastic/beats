@@ -40,12 +40,10 @@ var errIncorrectHeaderSecret = errors.New("Incorrect header or header secret")
 var errIncorrectHmac = errors.New("The HMAC signature of the request body does not match with the configured secret")
 
 func (v *apiValidator) Validate(r *http.Request) (int, error) {
-	i, err := v.ValidateHeader(r)
-	if err != nil {
+	if i, err := v.ValidateHeader(r); err != nil {
 		return i, err
 	}
-	h, err := v.ValidateHmac(r)
-	if err != nil {
+	if h, err := v.ValidateHmac(r); err != nil {
 		return h, err
 	}
 	return 0, nil
