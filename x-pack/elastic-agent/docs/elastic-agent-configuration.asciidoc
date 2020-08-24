@@ -6,14 +6,17 @@ beta[]
 
 By default {agent} runs in standalone mode to ingest system data and send it to
 a local {es} instance running on port 9200. It uses the demo credentials of the
-`elastic` user. It's also configured to monitor all {beats} managed by the Agent
+`elastic` user. It's also configured to monitor all {beats} managed by {agent}
 and send the {beats} logs and metrics to the same {es} instance.
 
 To alter this behavior, configure the output and other configuration settings:
 
 * <<elastic-agent-output-configuration>>
 * <<elastic-agent-monitoring-configuration>>
-* <<elastic-agent-datasource-configuration>>
+* <<elastic-agent-input-configuration>>
+
+TIP: To get started quickly, use {fleet} in {ingest-manager} to generate a
+standalone configuration. For more information, see <<agent-standalone-mode>>.
 
 [discrete]
 [[elastic-agent-output-configuration]]
@@ -82,8 +85,8 @@ collected. If neither setting is specified, monitoring is disabled. Set
 `use_output` to specify the output to which monitoring events are sent.
 
 [discrete]
-[[elastic-agent-datasource-configuration]]
-== Datasource settings
+[[elastic-agent-input-configuration]]
+== Input settings
 
 By default {agent} collects system metrics, such as cpu, memory, network, and
 filesystem metrics, and sends them to the default output. For example:
