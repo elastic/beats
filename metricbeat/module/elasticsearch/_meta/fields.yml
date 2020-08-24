@@ -276,42 +276,6 @@
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
                   type: alias
-    - name: elasticsearch
-      type: group
-      description: >
-      fields:
-        - name: cluster.name
-          type: keyword
-          description: >
-            Elasticsearch cluster name.
-        - name: cluster.id
-          type: keyword
-          description: >
-            Elasticsearch cluster id.
-        - name: cluster.state.id
-          type: keyword
-          description: >
-            Elasticsearch state id.
-        - name: node
-          type: group
-          fields:
-            - name: id
-              type: keyword
-              description: >
-                Node ID
-            - name: name
-              type: keyword
-              description: >
-                Node name.
-            - name: master
-              type: boolean
-              description: >
-                Is the node the master node?
-            - name: mlockall
-              type: boolean
-              description: >
-                Is mlockall enabled on the node?
-
     - name: indices_stats
       type: group
       fields:
@@ -348,3 +312,38 @@
                     - name: index_total
                       type: alias
                       path: elasticsearch.index.summary.total.indexing.index.count
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:
+        - name: cluster.name
+          type: keyword
+          description: >
+            Elasticsearch cluster name.
+        - name: cluster.id
+          type: keyword
+          description: >
+            Elasticsearch cluster id.
+        - name: cluster.state.id
+          type: keyword
+          description: >
+            Elasticsearch state id.
+        - name: node
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                Node ID
+            - name: name
+              type: keyword
+              description: >
+                Node name.
+            - name: master
+              type: boolean
+              description: >
+                Is the node the master node?
+            - name: mlockall
+              type: boolean
+              description: >
+                Is mlockall enabled on the node?
