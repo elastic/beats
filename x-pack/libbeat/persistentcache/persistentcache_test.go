@@ -6,12 +6,16 @@ package persistentcache
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -19,11 +23,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
-func init() {
-	logp.DevelopmentSetup()
-}
-
 func TestPutGet(t *testing.T) {
+	logp.TestingSetup()
 	t.Parallel()
 
 	registry := newTestRegistry(t)
@@ -52,6 +53,7 @@ func TestPutGet(t *testing.T) {
 }
 
 func TestPersist(t *testing.T) {
+	logp.TestingSetup()
 	t.Parallel()
 
 	registry := newTestRegistry(t)
@@ -81,6 +83,7 @@ func TestPersist(t *testing.T) {
 }
 
 func TestExpired(t *testing.T) {
+	logp.TestingSetup()
 	t.Parallel()
 
 	registry := newTestRegistry(t)
@@ -112,6 +115,7 @@ func TestExpired(t *testing.T) {
 }
 
 func TestCleanup(t *testing.T) {
+	logp.TestingSetup()
 	t.Parallel()
 
 	registry := newTestRegistry(t)
@@ -146,6 +150,7 @@ func TestCleanup(t *testing.T) {
 }
 
 func TestJanitor(t *testing.T) {
+	logp.TestingSetup()
 	defer resources.NewGoroutinesChecker().Check(t)
 
 	registry := newTestRegistry(t)
@@ -189,6 +194,7 @@ func TestJanitor(t *testing.T) {
 }
 
 func TestRefreshOnAccess(t *testing.T) {
+	logp.TestingSetup()
 	t.Parallel()
 
 	registry := newTestRegistry(t)
@@ -236,7 +242,320 @@ func TestRefreshOnAccess(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestRegistry(t *testing.T) *Registry {
+var benchmarkCacheSizes = []int{10, 100, 1000, 10000, 100000}
+
+func BenchmarkPut(b *testing.B) {
+	type cache interface {
+		Put(key string, value interface{}) error
+		Close() error
+	}
+
+	registry := newTestRegistry(b)
+	newStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(registry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := []struct {
+		name    string
+		factory func(t testing.TB, name string) cache
+	}{
+		{name: "statestore", factory: newStatestoreCache},
+	}
+
+	b.Run("random strings", func(b *testing.B) {
+		for _, c := range caches {
+			b.Run(c.name, func(b *testing.B) {
+				b.ReportAllocs()
+
+				cache := c.factory(b, b.Name())
+				defer cache.Close()
+
+				value := uuid.Must(uuid.NewV4()).String()
+
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := cache.Put(strconv.Itoa(i), value)
+					if err != nil {
+						b.Fatal(err)
+					}
+				}
+				b.StopTimer()
+			})
+		}
+	})
+
+	b.Run("objects", func(b *testing.B) {
+		for _, c := range caches {
+			type entry struct {
+				ID   string
+				Data [128]byte
+			}
+
+			b.Run(c.name, func(b *testing.B) {
+				b.ReportAllocs()
+
+				cache := c.factory(b, b.Name())
+				defer cache.Close()
+
+				value := entry{ID: uuid.Must(uuid.NewV4()).String()}
+
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := cache.Put(strconv.Itoa(i), value)
+					if err != nil {
+						b.Fatal(err)
+					}
+				}
+				b.StopTimer()
+			})
+		}
+	})
+
+	b.Run("maps", func(b *testing.B) {
+		for _, c := range caches {
+			b.Run(c.name, func(b *testing.B) {
+				b.ReportAllocs()
+
+				cache := c.factory(b, b.Name())
+				defer cache.Close()
+
+				value := map[string]string{
+					"id": uuid.Must(uuid.NewV4()).String(),
+				}
+
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := cache.Put(strconv.Itoa(i), value)
+					if err != nil {
+						b.Fatal(err)
+					}
+				}
+				b.StopTimer()
+			})
+		}
+	})
+
+	for _, size := range benchmarkCacheSizes {
+		b.Run(fmt.Sprintf("%d objects", size), func(b *testing.B) {
+			type entry struct {
+				ID   string
+				Data [128]byte
+			}
+			objects := make([]entry, size)
+			for i := 0; i < size; i++ {
+				objects[i] = entry{
+					ID: uuid.Must(uuid.NewV4()).String(),
+				}
+			}
+
+			for _, c := range caches {
+				b.Run(c.name, func(b *testing.B) {
+					b.ReportAllocs()
+
+					for i := 0; i < b.N; i++ {
+						cache := c.factory(b, b.Name())
+						for _, object := range objects {
+							cache.Put(object.ID, object)
+						}
+						cache.Close()
+					}
+				})
+			}
+		})
+	}
+}
+
+func BenchmarkOpen(b *testing.B) {
+	type cache interface {
+		Put(key string, value interface{}) error
+		Close() error
+	}
+
+	registry := newTestRegistry(b)
+	newStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(registry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := map[string]struct {
+		factory func(t testing.TB, name string) cache
+	}{
+		"statestore": {factory: newStatestoreCache},
+	}
+
+	for _, size := range benchmarkCacheSizes {
+		b.Run(fmt.Sprintf("%d objects", size), func(b *testing.B) {
+			type entry struct {
+				ID   string
+				Data [128]byte
+			}
+
+			for name, c := range caches {
+				cache := c.factory(b, name)
+				for i := 0; i < size; i++ {
+					e := entry{
+						ID: uuid.Must(uuid.NewV4()).String(),
+					}
+					err := cache.Put(e.ID, e)
+					require.NoError(b, err)
+				}
+				cache.Close()
+
+				b.Run(name, func(b *testing.B) {
+					b.ReportAllocs()
+
+					for i := 0; i < b.N; i++ {
+						cache := c.factory(b, name)
+						cache.Close()
+					}
+				})
+			}
+		})
+	}
+}
+
+func BenchmarkGet(b *testing.B) {
+	type cache interface {
+		Put(key string, value interface{}) error
+		Get(key string, value interface{}) error
+		Close() error
+	}
+
+	registry := newTestRegistry(b)
+	newStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(registry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := []struct {
+		name    string
+		factory func(t testing.TB, name string) cache
+	}{
+		{name: "statestore", factory: newStatestoreCache},
+	}
+
+	for _, size := range benchmarkCacheSizes {
+		b.Run(fmt.Sprintf("%d objects", size), func(b *testing.B) {
+			for _, c := range caches {
+				type entry struct {
+					ID   string
+					Data [128]byte
+				}
+
+				cacheName := b.Name()
+
+				objects := make([]entry, size)
+				cache := c.factory(b, cacheName)
+				for i := 0; i < size; i++ {
+					e := entry{
+						ID: uuid.Must(uuid.NewV4()).String(),
+					}
+					objects[i] = e
+					err := cache.Put(e.ID, e)
+					require.NoError(b, err)
+				}
+				cache.Close()
+
+				b.Run(c.name, func(b *testing.B) {
+					b.ReportAllocs()
+
+					cache := c.factory(b, cacheName)
+
+					var result entry
+
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						expected := objects[rand.Intn(size)]
+						cache.Get(expected.ID, &result)
+						if expected.ID != result.ID {
+							b.FailNow()
+						}
+					}
+					b.StopTimer()
+					cache.Close()
+				})
+			}
+		})
+	}
+}
+
+func BenchmarkCleanup(b *testing.B) {
+	type cache interface {
+		PutWithTimeout(key string, value interface{}, d time.Duration) error
+		CleanUp() int
+		Close() error
+	}
+
+	registry := newTestRegistry(b)
+	newStatestoreCache := func(tb testing.TB, name string, clock func() time.Time) cache {
+		cache, err := newCache(registry, name, Options{})
+		cache.clock = clock
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := map[string]struct {
+		factory func(t testing.TB, name string, clock func() time.Time) cache
+	}{
+		"statestore": {factory: newStatestoreCache},
+	}
+
+	for _, size := range benchmarkCacheSizes {
+		b.Run(fmt.Sprintf("%d objects", size), func(b *testing.B) {
+
+			type entry struct {
+				ID   string
+				Data [128]byte
+			}
+
+			for name, c := range caches {
+				b.Run(name, func(b *testing.B) {
+					b.ReportAllocs()
+
+					now := time.Now()
+					cache := c.factory(b, name, func() time.Time { return now })
+					defer cache.Close()
+
+					for i := 0; i < size/2; i++ {
+						e := entry{
+							ID: uuid.Must(uuid.NewV4()).String(),
+						}
+						err := cache.PutWithTimeout(e.ID, e, 10*time.Second)
+						require.NoError(b, err)
+					}
+					now = now.Add(10 * time.Second)
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						b.StopTimer()
+						for i := 0; i < size/2; i++ {
+							e := entry{
+								ID: uuid.Must(uuid.NewV4()).String(),
+							}
+							err := cache.PutWithTimeout(e.ID, e, 10*time.Second)
+							require.NoError(b, err)
+						}
+						b.StartTimer()
+
+						// At this point we should have ~size elements in the
+						// cache, and ~size/2 elements expired.
+						expired := cache.CleanUp()
+						if expired == 0 {
+							b.FailNow()
+						}
+						now = now.Add(10 * time.Second)
+					}
+				})
+
+			}
+		})
+	}
+}
+
+func newTestRegistry(t testing.TB) *Registry {
 	t.Helper()
 
 	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
@@ -247,4 +566,21 @@ func newTestRegistry(t *testing.T) *Registry {
 	return &Registry{
 		path: filepath.Join(tempDir, cacheFile),
 	}
+}
+
+func dirSize(tb testing.TB, path string) int64 {
+	var size int64
+
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return nil
+	})
+	require.NoError(tb, err)
+
+	return size
 }

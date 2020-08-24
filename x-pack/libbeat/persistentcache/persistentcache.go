@@ -5,7 +5,6 @@
 package persistentcache
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -116,10 +115,7 @@ func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.D
 	if err != nil {
 		return fmt.Errorf("encoding item to store in cache: %w", err)
 	}
-	entry.Item = base64.StdEncoding.EncodeToString(d)
-	if err != nil {
-		return fmt.Errorf("encoding item to store in cache: %w", err)
-	}
+	entry.Item = string(d)
 	c.refresh(&entry, timeout)
 	return c.store.Set(k, entry)
 }
@@ -138,11 +134,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 	if c.refreshOnAccess && c.refresh(&entry, 0) {
 		c.store.Set(k, entry)
 	}
-	d, err := base64.StdEncoding.DecodeString(entry.Item)
-	if err != nil {
-		return fmt.Errorf("decoding base64 string: %w", err)
-	}
-	err = json.Unmarshal(d, v)
+	err = json.Unmarshal([]byte(entry.Item), v)
 	if err != nil {
 		return fmt.Errorf("decoding item stored in cache: %w", err)
 	}
