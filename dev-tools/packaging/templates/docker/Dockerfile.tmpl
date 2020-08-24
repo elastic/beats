@@ -4,7 +4,7 @@
 
 # Prepare home in a different stage to avoid creating additional layers on
 # the final image because of permission changes.
-FROM {{ .from }} AS home
+FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
@@ -23,8 +23,13 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
 
 FROM {{ .from }}
 
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum clean all
+{{- if contains .from "ubi-minimal" }}
+RUN microdnf -y --setopt=tsflags=nodocs update && \
+    microdnf install shadow-utils && \
+    microdnf clean all
+{{- else }}
+RUN yum -y --setopt=tsflags=nodocs update && yum clean all
+{{- end }}
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \
@@ -36,6 +41,19 @@ LABEL \
   org.label-schema.url="{{ .BeatURL }}" \
   org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   org.label-schema.vcs-ref="{{ commit }}" \
+  io.k8s.description="{{ .BeatDescription }}" \
+  io.k8s.display-name="{{ .BeatName | title }} image" \
+  org.opencontainers.image.created="{{ date }}" \
+  org.opencontainers.image.licenses="{{ .License }}" \
+  org.opencontainers.image.title="{{ .BeatName | title }}" \
+  org.opencontainers.image.vendor="{{ .BeatVendor }}" \
+  name="{{ .BeatName }}" \
+  maintainer="infra@elastic.co" \
+  vendor="{{ .BeatVendor }}" \
+  version="{{ beat_version }}" \
+  release="1" \
+  url="{{ .BeatURL }}" \
+  summary="{{ .BeatName }}" \
   license="{{ .License }}" \
   description="{{ .BeatDescription }}"
 
@@ -46,6 +64,10 @@ COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 COPY --from=home {{ $beatHome }} {{ $beatHome }}
+
+RUN mkdir /licenses
+COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
+COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}

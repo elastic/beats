@@ -65,7 +65,7 @@ processors:
 - kv:
     field: zeek.ssl.issuer
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.server.issuer
     ignore_missing: true
 - rename:
@@ -104,7 +104,7 @@ processors:
 - kv:
     field: zeek.ssl.subject
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.server.subject
     ignore_missing: true
 - remove:
@@ -142,7 +142,7 @@ processors:
 - kv:
     field: zeek.ssl.client_issuer
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.client.issuer
     ignore_missing: true
 - rename:
@@ -181,7 +181,7 @@ processors:
 - kv:
     field: zeek.ssl.client_subject
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.client.subject
     ignore_missing: true
 - remove:
