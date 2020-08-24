@@ -38,8 +38,8 @@ func TestCheckBody(t *testing.T) {
 		description   string
 		body          string
 		patterns      []string
-		result        bool
 		positiveCheck bool
+		result        bool
 	}{
 		{
 			"Single regex that matches",
@@ -128,15 +128,15 @@ func TestCheckBody(t *testing.T) {
 			"Positive check on HTTP body when body check is not matched and positiveCheck is true",
 			"'status': 'red'",
 			[]string{"green"},
-			false,
 			true,
+			false,
 		},
 		{
 			"Negative check on HTTP body when body check is not matched and positiveCheck is false",
 			"'status': 'red'",
 			[]string{"green"},
-			true,
 			false,
+			true,
 		},
 	}
 
