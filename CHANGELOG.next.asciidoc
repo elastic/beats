@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Change network.direction values to ECS recommended values (inbound, outbound). {issue}12445[12445] {pull}20695[20695]
 
 *Filebeat*
 
@@ -268,6 +269,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
+- Fix event.outcome logic for azure/siginlogs fileset {pull}20254[20254]
 - Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
@@ -362,6 +364,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
+- Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
+- Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
 
 *Packetbeat*
 
@@ -371,8 +375,9 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Winlogbeat*
 
-- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436{18436}
-- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[20564]
+- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
+- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
+- Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 
 *Functionbeat*
 
@@ -448,6 +453,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
+- Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 
 *Auditbeat*
 
@@ -611,6 +617,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
 - Record HTTP response headers. {pull}18327[18327]
+- Add index and pipeline settings to monitor configurations. {pull}20610[20610]
 
 *Heartbeat*
 
@@ -718,7 +725,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 - Update MySQL dashboard with connection errors and cache metrics {pull}19913[19913] {issue}16955[16955]
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
+- Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 
 *Packetbeat*
 
@@ -743,10 +752,10 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
-- Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
+- Add support to change beat name, and support for Kibana Logs. {pull}20522[20522]
 
 ==== Deprecated
 

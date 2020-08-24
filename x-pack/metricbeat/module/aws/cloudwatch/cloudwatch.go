@@ -652,7 +652,7 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 		tags := resourceTagMap[v]
 		// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
 		if len(tags) == 0 && strings.HasPrefix(v, "arn:") {
-			resourceID, err := aws.FindIdentifierFromARN(v)
+			resourceID, err := aws.FindShortIdentifierFromARN(v)
 			if err == nil {
 				tags = resourceTagMap[resourceID]
 			}

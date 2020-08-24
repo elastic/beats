@@ -7,11 +7,12 @@ import unittest
 
 from metricbeat import BaseTest
 
+from beat import common_tests
 from beat.beat import INTEGRATION_TESTS
 from elasticsearch import Elasticsearch
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
