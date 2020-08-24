@@ -23,7 +23,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
-func TestHTTPJSONInput(t *testing.T) {
+func TestStatelessHTTPJSONInput(t *testing.T) {
 	testCases := []struct {
 		name        string
 		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -224,7 +224,7 @@ func TestHTTPJSONInput(t *testing.T) {
 
 			cfg := common.MustNewConfigFrom(tc.baseConfig)
 
-			input, err := configure(cfg)
+			input, err := statelessConfigure(cfg)
 
 			assert.NoError(t, err)
 			assert.Equal(t, "httpjson", input.Name())
