@@ -243,7 +243,6 @@ def clean_keys(obj):
         "infoblox.nios",
         "iptables.log",
         "netscout.sightline",
-        "rapid7.nexpose",
         "redis.log",
         "system.auth",
         "system.syslog",
