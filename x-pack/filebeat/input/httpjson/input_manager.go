@@ -1,8 +1,13 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package httpjson
 
 import (
-	"github.com/elastic/go-concert/unison"
 	"go.uber.org/multierr"
+
+	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
