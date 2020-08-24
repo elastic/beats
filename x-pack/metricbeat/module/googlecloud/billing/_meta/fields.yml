@@ -1,0 +1,5 @@
+- name: billing
+  release: beta
+  type: group
+  description: Google Cloud Billing metrics
+  fields:

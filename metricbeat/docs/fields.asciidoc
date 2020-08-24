@@ -18427,6 +18427,11 @@ type: object
 --
 
 [float]
+=== billing
+
+Google Cloud Billing metrics
+
+[float]
 === compute
 
 Google Cloud Compute metrics

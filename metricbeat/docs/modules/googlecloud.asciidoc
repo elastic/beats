@@ -281,6 +281,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-googlecloud-billing,billing>>
+
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
 * <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
@@ -290,6 +292,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
 * <<metricbeat-metricset-googlecloud-storage,storage>>
+
+include::googlecloud/billing.asciidoc[]
 
 include::googlecloud/compute.asciidoc[]
 

@@ -1,0 +1,23 @@
+`billing` metricset is designed for collecting billing metrics from Google Cloud
+BigQuery. BigQuery is a fully-managed, serverless data warehouse. Cloud Billing
+export to BigQuery enables you to export detailed Google Cloud billing data
+(such as usage, cost estimates, and pricing data) automatically throughout the
+day to a BigQuery dataset that you specify. Then you can access your Cloud
+Billing data from BigQuery for detailed analysis using Metricbeat. Please see
+https://cloud.google.com/billing/docs/how-to/export-data-bigquery[export cloud
+billing data to BigQuery] for more details on how to export billing data.
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - billing
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  billing:
+    dataset_name: master_gcp
+    table_pattern: gcp_billing_export_v1
+----

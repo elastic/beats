@@ -111,7 +111,8 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
 |<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-googlecloud-billing,billing>> beta[]  
+|<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-googlecloud-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
