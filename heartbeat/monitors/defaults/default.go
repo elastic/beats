@@ -24,5 +24,6 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/script"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/suitejourney"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 )

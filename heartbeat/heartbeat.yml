@@ -4,12 +4,12 @@ heartbeat.config.monitors:
   reload.enabled: false
   reload.period: 5s
 
-heartbeat.monitors:
-- type: script
-  id: my-suite
-  name: My Suite
-  suite_file: "/home/andrewvc/projects/synthetic-monitoring/examples/sample-app/journeys/dist"
+heartbeat.synthetic_suites:
+- name: My Suite
+  path: "/home/andrewvc/projects/synthetic-monitoring/examples/sample-app/journeys/dist"
   schedule: "@every 1m"
+
+heartbeat.monitors:
 #- type: script
 #  id: my-monitor
 #  name: My Monitor

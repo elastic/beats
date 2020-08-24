@@ -9,7 +9,7 @@ import (
 	"os/exec"
 )
 
-func RunSuite(suiteFile string) (out *SynthExecOut, err error) {
+func ListSuite(suiteFile string) (out *CmdOut, err error) {
 	cmd := exec.Command(
 		"node",
 		suiteFile,
@@ -17,12 +17,27 @@ func RunSuite(suiteFile string) (out *SynthExecOut, err error) {
 		"--json",
 		"--headless",
 		"--screenshots",
+		"--dry-run",
 	)
 
 	return runCmd(cmd, nil)
 }
 
-func RunScript(script string) (out *SynthExecOut, err error) {
+func RunSuite(suiteFile string, journeyName string) (out *CmdOut, err error) {
+	cmd := exec.Command(
+		"node",
+		suiteFile,
+		"-e", "production",
+		"--json",
+		"--headless",
+		"--screenshots",
+		"--journey-name", journeyName,
+	)
+
+	return runCmd(cmd, nil)
+}
+
+func RunScript(script string) (out *CmdOut, err error) {
 	cmd := exec.Command(
 		"npx",
 		"elastic-synthetics",
@@ -35,7 +50,9 @@ func RunScript(script string) (out *SynthExecOut, err error) {
 	return runCmd(cmd, &script)
 }
 
-func runCmd(cmd *exec.Cmd, stdinStr *string) (out *SynthExecOut, err error) {
+func runCmd(cmd *exec.Cmd, stdinStr *string) (out *CmdOut, err error) {
+	logp.Info("Running command: %s", cmd.String())
+
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not attach stdout: %w", err)
@@ -70,7 +87,7 @@ func runCmd(cmd *exec.Cmd, stdinStr *string) (out *SynthExecOut, err error) {
 		return nil, fmt.Errorf("error running cmd: %w", err)
 	}
 
-	return &SynthExecOut{
+	return &CmdOut{
 		Result: result,
 		Stdout: stdoutLines,
 		Stderr: stderrLines,
@@ -126,7 +143,7 @@ func decodeResults(line []byte) (res *Result, ok bool) {
 	return
 }
 
-type SynthExecOut struct {
+type CmdOut struct {
 	Result *Result
 	Stdout []string
 	Stderr []string
@@ -143,6 +160,7 @@ type RawResult struct {
 }
 
 type Journey struct {
+	Name string `json:"name"`
 	Url      string      `json:"url"`
 	Steps    []Step      `json:"steps"`
 	DataType string      `json:"__type__"`

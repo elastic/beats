@@ -19,6 +19,7 @@ package beater
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/synthexec"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
@@ -100,6 +101,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	if len(bt.config.SyntheticSuites) > 0 {
+		err := bt.RunSyntheticSuiteMonitors(b)
+		if err != nil {
+			return err
+		}
+	}
+
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
 		if err != nil {
@@ -151,6 +159,39 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Execute the monitor
 	go bt.monitorReloader.Run(bt.dynamicFactory)
 
+	return nil
+}
+
+func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
+	for _, suite := range bt.config.SyntheticSuites {
+		logp.Warn("Listing suite", suite.Path)
+		res, err := synthexec.ListSuite(suite.Path)
+		if err != nil {
+			return err
+		}
+
+		if res.Result != nil && len(res.Result.Journeys) > 0 {
+			factory := monitors.NewFactory(bt.scheduler, false)
+			for _, j := range res.Result.Journeys {
+				cfg, err := common.NewConfigFrom(map[string]interface{}{
+					"type": "suitejourney",
+					"path": suite.Path,
+					"schedule": suite.Schedule,
+					"suite_params": suite.Params,
+					"name": j.Name,
+					"id": j.Name,
+				})
+				if err != nil {
+					return err
+				}
+				created, err := factory.Create(b.Publisher, cfg)
+				if err != nil {
+					return errors.Wrap(err, "could not create monitor")
+				}
+				created.Start()
+			}
+		}
+	}
 	return nil
 }
 
