@@ -276,6 +276,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
+- Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 
 *Heartbeat*
 
