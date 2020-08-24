@@ -5,6 +5,7 @@ set -eo pipefail
 # Environment variables used
 # FLEET_ENROLLMENT_TOKEN - existing enrollment token to be used for enroll
 # FLEET_ENROLL - if set to 1 enroll will be performed
+# FLEET_ENROLL_INSECURE - if set to 1, agent will enroll with fleet using --insecure flag
 # FLEET_SETUP - if  set to 1 fleet setup will be performed
 # FLEET_TOKEN_NAME - token name for a token to be created
 # KIBANA_HOST - actual kibana host [http://localhost:5601]
@@ -53,7 +54,11 @@ function enroll(){
     fi
     echo $apikey
 
-    ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
+    if [[ -n "${FLEET_ENROLL_INSECURE}" ]] && [[ ${FLEET_ENROLL_INSECURE} == 1 ]]; then
+      insecure_flag="--insecure"
+    fi
+
+    ./{{ .BeatName }} enroll ${insecure_flag} ${KIBANA_HOST:-http://localhost:5601} $apikey -f
 }
 
 if [[ -n "${FLEET_SETUP}" ]] && [[ ${FLEET_SETUP} == 1 ]]; then setup; fi

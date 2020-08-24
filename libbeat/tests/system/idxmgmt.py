@@ -1,7 +1,7 @@
-from elasticsearch import NotFoundError
-from nose.tools import raises
 import datetime
 import unittest
+import pytest
+from elasticsearch import NotFoundError
 
 
 class IdxMgmt(unittest.TestCase):
@@ -52,9 +52,9 @@ class IdxMgmt(unittest.TestCase):
             except NotFoundError:
                 pass
 
-    @raises(NotFoundError)
     def assert_index_template_not_loaded(self, template):
-        self._client.transport.perform_request('GET', '/_template/' + template)
+        with pytest.raises(NotFoundError):
+            self._client.transport.perform_request('GET', '/_template/' + template)
 
     def assert_index_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_template/' + template)
@@ -86,9 +86,9 @@ class IdxMgmt(unittest.TestCase):
         assert name in resp
         assert resp[name]["aliases"][alias]["is_write_index"] == True
 
-    @raises(NotFoundError)
     def assert_policy_not_created(self, policy):
-        self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)
+        with pytest.raises(NotFoundError):
+            self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)
 
     def assert_policy_created(self, policy):
         resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)

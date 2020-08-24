@@ -258,13 +258,9 @@ processors:
       field: "message"
       pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port})%{}-> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port})%{}"
   - dissect:
-      if: "ctx._temp_.cisco.message_id == '106102'"
+      if: "ctx._temp_.cisco.message_id == '106102' || ctx._temp_.cisco.message_id == '106103'"
       field: "message"
-      pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} for user %{_temp_.cisco.username} %{_temp_.cisco.source_interface}/%{source.address} %{source.port} %{_temp_.cisco.destination_interface}/%{destination.address} %{destination.port} %{}"
-  - dissect:
-      if: "ctx._temp_.cisco.message_id == '106103'"
-      field: "message"
-      pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} for user %{_temp_.cisco.username} %{_temp_.cisco.source_interface}/%{source.address} %{source.port} %{_temp_.cisco.destination_interface}/%{destination.address} %{destination.port} %{}"
+      pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} for user %{user.name} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port})%{}-> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "message"

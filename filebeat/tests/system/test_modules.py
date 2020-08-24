@@ -165,8 +165,8 @@ class Test(BaseTest):
             # the event was ingested to Elasticsearch
             assert "ingested" in obj["event"], "missing event.ingested timestamp"
 
-            assert "error" not in obj, "not error expected but got: {}".format(
-                obj)
+            assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
@@ -239,7 +239,6 @@ def clean_keys(obj):
         "infoblox.nios",
         "iptables.log",
         "netscout.sightline",
-        "rapid7.nexpose",
         "redis.log",
         "system.auth",
         "system.syslog",
