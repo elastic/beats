@@ -13,7 +13,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cef>>
   * <<filebeat-module-checkpoint>>
   * <<filebeat-module-cisco>>
-  * <<filebeat-module-citrix>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cylance>>
@@ -32,7 +31,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-iptables>>
   * <<filebeat-module-juniper>>
   * <<filebeat-module-kafka>>
-  * <<filebeat-module-kaspersky>>
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
   * <<filebeat-module-microsoft>>
@@ -51,7 +49,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-rabbitmq>>
   * <<filebeat-module-radware>>
-  * <<filebeat-module-rapid7>>
   * <<filebeat-module-redis>>
   * <<filebeat-module-santa>>
   * <<filebeat-module-sonicwall>>
@@ -59,7 +56,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
-  * <<filebeat-module-tenable>>
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
@@ -79,7 +75,6 @@ include::modules/bluecoat.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
-include::modules/citrix.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cylance.asciidoc[]
@@ -98,7 +93,6 @@ include::modules/infoblox.asciidoc[]
 include::modules/iptables.asciidoc[]
 include::modules/juniper.asciidoc[]
 include::modules/kafka.asciidoc[]
-include::modules/kaspersky.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/microsoft.asciidoc[]
@@ -117,7 +111,6 @@ include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/radware.asciidoc[]
-include::modules/rapid7.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/santa.asciidoc[]
 include::modules/sonicwall.asciidoc[]
@@ -125,7 +118,6 @@ include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
-include::modules/tenable.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
