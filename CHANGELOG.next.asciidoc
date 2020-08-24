@@ -377,6 +377,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Winlogbeat*
 
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
+- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
 - Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 
 *Functionbeat*
