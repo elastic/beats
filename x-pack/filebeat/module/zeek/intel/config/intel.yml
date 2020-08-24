@@ -14,10 +14,6 @@ processors:
   - decode_json_fields:
       fields: [event.original]
       target: zeek.intel
-  - timestamp:
-      field: zeek.intel.ts
-      layouts: [UNIX]
-      test: "1573030980.989353"
   - convert:
       ignore_missing: true
       fields:
@@ -57,7 +53,6 @@ processors:
   - drop_fields:
       ignore_missing: true
       fields:
-        - zeek.intel.ts
         - zeek.intel.id.orig_h
         - zeek.intel.id.orig_p
         - zeek.intel.id.resp_h
