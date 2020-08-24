@@ -15,6 +15,7 @@ import (
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -64,6 +65,7 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
+type input struct {
 	config    config.Config
 	tlsConfig *tlscommon.TLSConfig
 }
@@ -77,34 +79,9 @@ func Plugin() v2.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (stateless.Input, error) {
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
+func (*input) Name() string { return inputName }
 
-	return newHTTPJSONInput(conf)
-}
-
-func newHTTPJSONInput(config config) (*httpJSONInput, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	return &httpJSONInput{
-		config:    config,
-		tlsConfig: tlsConfig,
-	}, nil
-}
-
-func (*httpJSONInput) Name() string { return inputName }
-
-func (in *httpJSONInput) Test(v2.TestContext) error {
+func (in *input) test() error {
 	port := func() string {
 		if in.config.URL.Port() != "" {
 			return in.config.URL.Port()
@@ -124,9 +101,11 @@ func (in *httpJSONInput) Test(v2.TestContext) error {
 	return nil
 }
 
-// Run starts the input and blocks until it ends the execution.
-// It will return on context cancellation, any other error will be retried.
-func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
+func (in *input) run(
+	ctx v2.Context,
+	publisher cursor.Publisher,
+	cursor *cursor.Cursor,
+) error {
 	log := ctx.Logger.With("url", in.config.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
@@ -151,6 +130,8 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 		log,
 	)
 
+	requester.loadCursor(cursor, log)
+
 	// TODO: disallow passing interval = 0 as a mean to run once.
 	if in.config.Interval == 0 {
 		return requester.processHTTPRequest(stdCtx, publisher)
@@ -169,7 +150,7 @@ func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) erro
 	return nil
 }
 
-func (in *httpJSONInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+func (in *input) newHTTPClient(ctx context.Context) (*http.Client, error) {
 	// Make retryable HTTP client
 	client := &retryablehttp.Client{
 		HTTPClient: &http.Client{
