@@ -79,6 +79,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Tracking session end reason in panw module. {pull}18705[18705]
+- Removed experimental modules `citrix`, `kaspersky`, `rapid7` and `tenable`. {pull}20706[20706]
 
 *Heartbeat*
 
