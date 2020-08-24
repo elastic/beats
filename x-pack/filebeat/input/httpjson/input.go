@@ -70,12 +70,21 @@ type input struct {
 	tlsConfig *tlscommon.TLSConfig
 }
 
-func Plugin() v2.Plugin {
+func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+	sim := stateless.NewInputManager(statelessConfigure)
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Beta,
 		Deprecated: false,
-		Manager:    stateless.NewInputManager(configure),
+		Manager: inputManager{
+			stateless: &sim,
+			cursor: &cursor.InputManager{
+				Logger:     log,
+				StateStore: store,
+				Type:       inputName,
+				Configure:  cursorConfigure,
+			},
+		},
 	}
 }
 
