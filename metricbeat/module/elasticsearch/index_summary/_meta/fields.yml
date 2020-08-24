@@ -114,7 +114,7 @@
             - name: is_throttled
               type: long
               description: TODO
-            - name: throttle_time
+            - name: throttle_time.ms
               type: long
               description: TODO
         - name: search
