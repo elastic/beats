@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package httpjson
+package config
 
 import (
 	"context"
@@ -67,7 +67,8 @@ func (o *OAuth2) IsEnabled() bool {
 
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
 func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client, error) {
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
+	// only required to let oauth2 library to find our custom client in the context
+	ctx = context.WithValue(context.Background(), oauth2.HTTPClient, client)
 
 	switch o.GetProvider() {
 	case OAuth2ProviderAzure, OAuth2ProviderDefault:

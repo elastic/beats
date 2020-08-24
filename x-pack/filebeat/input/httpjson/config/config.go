@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package httpjson
+package config
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ import (
 )
 
 // Config contains information about httpjson configuration
-type config struct {
+type Config struct {
 	OAuth2               *OAuth2           `config:"oauth2"`
 	APIKey               string            `config:"api_key"`
 	AuthenticationScheme string            `config:"authentication_scheme"`
@@ -132,7 +132,7 @@ func (dc *DateCursor) Validate() error {
 	return nil
 }
 
-func (c *config) Validate() error {
+func (c *Config) Validate() error {
 	switch strings.ToUpper(c.HTTPMethod) {
 	case "GET", "POST":
 		break
@@ -162,8 +162,8 @@ func (c *config) Validate() error {
 	return nil
 }
 
-func defaultConfig() config {
-	var c config
+func Default() Config {
+	var c Config
 	c.HTTPMethod = "GET"
 	c.HTTPClientTimeout = 60 * time.Second
 	c.RetryWaitMin = 1 * time.Second

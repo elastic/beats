@@ -7,10 +7,12 @@ package httpjson
 import (
 	"bytes"
 	"net/url"
+	"text/template"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 type dateCursor struct {
@@ -23,10 +25,10 @@ type dateCursor struct {
 	dateFormat      string
 
 	value    string
-	valueTpl *Template
+	valueTpl *template.Template
 }
 
-func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
+func newDateCursorFromConfig(config config.Config, log *logp.Logger) *dateCursor {
 	c := &dateCursor{
 		enabled: config.DateCursor.IsEnabled(),
 		url:     *config.URL.URL,
@@ -41,7 +43,7 @@ func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 	c.urlField = config.DateCursor.URLField
 	c.initialInterval = config.DateCursor.InitialInterval
 	c.dateFormat = config.DateCursor.GetDateFormat()
-	c.valueTpl = config.DateCursor.ValueTemplate
+	c.valueTpl = config.DateCursor.ValueTemplate.Template
 
 	return c
 }
@@ -66,7 +68,7 @@ func (c *dateCursor) getURL() string {
 		value = dateStr
 	} else {
 		buf := new(bytes.Buffer)
-		if err := c.valueTpl.Template.Execute(buf, dateStr); err != nil {
+		if err := c.valueTpl.Execute(buf, dateStr); err != nil {
 			return c.url.String()
 		}
 		value = buf.String()

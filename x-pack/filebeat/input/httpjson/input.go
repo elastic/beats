@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -63,8 +64,7 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
-type httpJSONInput struct {
-	config    config
+	config    config.Config
 	tlsConfig *tlscommon.TLSConfig
 }
 

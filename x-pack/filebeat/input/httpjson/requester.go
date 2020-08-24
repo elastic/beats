@@ -17,6 +17,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 type requestInfo struct {
@@ -43,7 +44,7 @@ type requester struct {
 }
 
 func newRequester(
-	config config,
+	config config.Config,
 	rateLimiter *rateLimiter,
 	dateCursor *dateCursor,
 	pagination *pagination,
