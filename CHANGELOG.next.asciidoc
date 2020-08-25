@@ -65,7 +65,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - Tracking session end reason in panw module. {pull}18705[18705]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
-- Adding fix to checkpoint module when logs contain time field. {pull}20567[20567]
 
 *Heartbeat*
 
@@ -242,6 +241,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
+- Adding fix to checkpoint module when logs contain time field. {pull}20567[20567]
 
 *Heartbeat*
 
