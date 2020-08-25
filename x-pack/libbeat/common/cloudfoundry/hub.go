@@ -67,7 +67,7 @@ func (h *Hub) Client() (Client, error) {
 	if h.cfg.UaaAddress != "" {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
-	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log), nil
+	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through
