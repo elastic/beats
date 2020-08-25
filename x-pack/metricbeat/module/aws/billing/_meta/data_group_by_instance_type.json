@@ -22,13 +22,15 @@
                 "amount": 144,
                 "unit": "N/A"
             },
-            "end_date": "2020-08-13",
-            "group_by_key": "db.r5.large",
+            "end_date": "2020-08-24",
+            "group_by": {
+                "INSTANCE_TYPE": "db.r5.large"
+            },
             "group_definition": {
                 "key": "INSTANCE_TYPE",
                 "type": "DIMENSION"
             },
-            "start_date": "2020-08-12"
+            "start_date": "2020-08-23"
         }
     },
     "cloud": {

@@ -60,3 +60,46 @@ func TestParseGroupKey(t *testing.T) {
 		})
 	}
 }
+
+func TestGetGroupBys(t *testing.T) {
+	cases := []struct {
+		title            string
+		groupByTags      []string
+		groupByDimKeys   []string
+		expectedGroupBys []groupBy
+	}{
+		{
+			"test with both tags and dimKeys",
+			[]string{"createdBy"},
+			[]string{"AZ", "INSTANCE_TYPE"},
+			[]groupBy{
+				{"createdBy", "AZ"},
+				{"createdBy", "INSTANCE_TYPE"},
+			},
+		},
+		{
+			"test with only dimKeys",
+			[]string{},
+			[]string{"AZ", "INSTANCE_TYPE"},
+			[]groupBy{
+				{"", "AZ"},
+				{"", "INSTANCE_TYPE"},
+			},
+		},
+		{
+			"test with only tags",
+			[]string{"createdBy"},
+			[]string{},
+			[]groupBy{
+				{"createdBy", ""},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			groupBys := getGroupBys(c.groupByTags, c.groupByDimKeys)
+			assert.Equal(t, c.expectedGroupBys, groupBys)
+		})
+	}
+}

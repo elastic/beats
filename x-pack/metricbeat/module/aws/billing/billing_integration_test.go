@@ -23,8 +23,8 @@ func TestData(t *testing.T) {
 		return func(e common.MapStr) bool {
 			v, err := e.GetValue("aws.billing.group_definition.key")
 			if err == nil {
-				// Check for Cost Explorer billing metrcs
-				k, _ := e.GetValue("aws.billing.group_by_key")
+				// Check for Cost Explorer billing metrics
+				k, _ := e.GetValue("aws.billing.group_by." + v.(string))
 				exists, _ := aws.StringInSlice(k.(string), []string{"NoAZ", "NoInstanceType"})
 				if !exists {
 					return v == resultType

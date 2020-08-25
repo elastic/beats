@@ -4,7 +4,7 @@
         "billing": {
             "Currency": "USD",
             "EstimatedCharges": 0,
-            "ServiceName": "AmazonSNS"
+            "ServiceName": "AmazonDynamoDB"
         }
     },
     "cloud": {

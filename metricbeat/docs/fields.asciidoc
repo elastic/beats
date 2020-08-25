@@ -1728,21 +1728,13 @@ type: keyword
 
 --
 
-*`aws.billing.resourceTags.aws:createdBy`*::
+*`aws.billing.group_by.*`*::
 +
 --
-aws:createdBy tag value
+Cost explorer group by key values
 
-type: keyword
 
---
-
-*`aws.billing.group_by_key`*::
-+
---
-Cost explorer group by key name
-
-type: keyword
+type: object
 
 --
 

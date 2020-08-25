@@ -134,17 +134,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	eventsCW := m.getCloudWatchBillingMetrics(svcCloudwatch, startTime, endTime)
 	events = append(events, eventsCW...)
 
-	// Get total cost from GetCostAndUsage with group by type "TAG"
-	for _, tagKey := range m.CostExplorerConfig.GroupByTagKeys {
-		eventsByTag := m.getCostGroupByTag(svcCostExplorer, tagKey, timePeriod, startDate, endDate)
-		events = append(events, eventsByTag...)
-	}
-
-	// Get total cost from GetCostAndUsage with group by type "DIMENSION"
-	for _, dimKey := range m.CostExplorerConfig.GroupByDimensionKeys {
-		eventsByDimKey := m.getCostGroupByDimension(svcCostExplorer, dimKey, timePeriod, startDate, endDate)
-		events = append(events, eventsByDimKey...)
-	}
+	// Get total cost from Cost Explorer GetCostAndUsage with group by type "DIMENSION" and "TAG"
+	eventsCE := m.getCostGroupBy(svcCostExplorer, m.CostExplorerConfig.GroupByDimensionKeys, m.CostExplorerConfig.GroupByTagKeys, timePeriod, startDate, endDate)
+	events = append(events, eventsCE...)
 
 	// report events
 	for _, event := range events {
@@ -203,78 +195,65 @@ func (m *MetricSet) getCloudWatchBillingMetrics(svcCloudwatch cloudwatchiface.Cl
 	return events
 }
 
-func (m *MetricSet) getCostGroupByTag(svcCostExplorer costexploreriface.ClientAPI, tagKey string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
-	var events []mb.Event
-	groupByTagCostInput := costexplorer.GetCostAndUsageInput{
-		Granularity: costexplorer.GranularityDaily,
-		// no permission for "NetAmortizedCost" and "NetUnblendedCost"
-		Metrics: []string{"AmortizedCost", "BlendedCost",
-			"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
-		TimePeriod: &timePeriod,
-		GroupBy: []costexplorer.GroupDefinition{
-			{
-				Key:  awssdk.String(tagKey),
-				Type: costexplorer.GroupDefinitionTypeTag,
-			},
-		},
-	}
-
-	groupByTagCostReq := svcCostExplorer.GetCostAndUsageRequest(&groupByTagCostInput)
-	groupByTagOutput, err := groupByTagCostReq.Send(context.Background())
-	if err != nil {
-		err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
-		m.Logger().Errorf(err.Error())
-		return nil
-	}
-
-	if len(groupByTagOutput.ResultsByTime) > 0 {
-		costResultGroups := groupByTagOutput.ResultsByTime[0].Groups
-		for _, group := range costResultGroups {
-			event := m.addCostMetrics(group.Metrics, groupByTagOutput.GroupDefinitions[0], startDate, endDate)
-			for _, key := range group.Keys {
-				tagKey, tagValue := parseGroupKey(key)
-				if tagValue != "" {
-					event.MetricSetFields.Put("resourceTags."+tagKey, tagValue)
-				}
-			}
-
-			events = append(events, event)
-		}
-	}
-	return events
-}
-
-func (m *MetricSet) getCostGroupByDimension(svcCostExplorer costexploreriface.ClientAPI, dimensionKey string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
+func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, groupByDimKeys []string, groupByTags []string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
-	groupByCostInput := costexplorer.GetCostAndUsageInput{
-		Granularity: costexplorer.GranularityDaily,
-		// no permission for "NetAmortizedCost" and "NetUnblendedCost"
-		Metrics: []string{"AmortizedCost", "BlendedCost",
-			"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
-		TimePeriod: &timePeriod,
-		GroupBy: []costexplorer.GroupDefinition{
-			{
-				Key:  awssdk.String(dimensionKey),
+	groupBys := getGroupBys(groupByTags, groupByDimKeys)
+	for _, groupBy := range groupBys {
+		var groupDefs []costexplorer.GroupDefinition
+
+		if groupBy.dimension != "" {
+			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+				Key:  awssdk.String(groupBy.dimension),
 				Type: costexplorer.GroupDefinitionTypeDimension,
-			},
-		},
-	}
+			})
+		}
 
-	groupByCostReq := svcCostExplorer.GetCostAndUsageRequest(&groupByCostInput)
-	groupByOutput, err := groupByCostReq.Send(context.Background())
-	if err != nil {
-		err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
-		m.Logger().Errorf(err.Error())
-		return nil
-	}
+		if groupBy.tag != "" {
+			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+				Key:  awssdk.String(groupBy.tag),
+				Type: costexplorer.GroupDefinitionTypeTag,
+			})
+		}
 
-	if len(groupByOutput.ResultsByTime) > 0 {
-		costResultGroups := groupByOutput.ResultsByTime[0].Groups
-		for _, group := range costResultGroups {
-			event := m.addCostMetrics(group.Metrics, groupByOutput.GroupDefinitions[0], startDate, endDate)
-			event.MetricSetFields.Put("group_by_key", group.Keys[0])
-			events = append(events, event)
+		groupByCostInput := costexplorer.GetCostAndUsageInput{
+			Granularity: costexplorer.GranularityDaily,
+			// no permission for "NetAmortizedCost" and "NetUnblendedCost"
+			Metrics: []string{"AmortizedCost", "BlendedCost",
+				"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
+			TimePeriod: &timePeriod,
+			// Only two values for GroupBy are allowed
+			GroupBy: groupDefs,
+		}
+
+		groupByCostReq := svcCostExplorer.GetCostAndUsageRequest(&groupByCostInput)
+		groupByOutput, err := groupByCostReq.Send(context.Background())
+		if err != nil {
+			err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
+			m.Logger().Errorf(err.Error())
+			return nil
+		}
+
+		if len(groupByOutput.ResultsByTime) > 0 {
+			costResultGroups := groupByOutput.ResultsByTime[0].Groups
+			for _, group := range costResultGroups {
+				event := m.addCostMetrics(group.Metrics, groupByOutput.GroupDefinitions[0], startDate, endDate)
+				for _, key := range group.Keys {
+					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
+					if !strings.Contains(key, "$") {
+						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
+						continue
+					}
+
+					// tag key value is separated by $
+					tagKey, tagValue := parseGroupKey(key)
+					if tagValue != "" {
+						event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+					}
+				}
+
+				events = append(events, event)
+			}
 		}
 	}
 	return events
@@ -371,4 +350,31 @@ func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
 		tagValue = ""
 	}
 	return
+}
+
+type groupBy struct {
+	tag       string
+	dimension string
+}
+
+func getGroupBys(groupByTags []string, groupByDimKeys []string) []groupBy {
+	var groupBys []groupBy
+
+	if len(groupByTags) == 0 {
+		groupByTags = []string{""}
+	}
+	if len(groupByDimKeys) == 0 {
+		groupByDimKeys = []string{""}
+	}
+
+	for _, tagKey := range groupByTags {
+		for _, dimKey := range groupByDimKeys {
+			groupBy := groupBy{
+				tag:       tagKey,
+				dimension: dimKey,
+			}
+			groupBys = append(groupBys, groupBy)
+		}
+	}
+	return groupBys
 }

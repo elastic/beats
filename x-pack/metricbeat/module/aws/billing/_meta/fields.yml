@@ -73,9 +73,9 @@
         - name: type
           type: keyword
           description: The string that represents the type of group
-    - name: resourceTags.aws:createdBy
-      type: keyword
-      description: aws:createdBy tag value
-    - name: group_by_key
-      type: keyword
-      description: Cost explorer group by key name
+    - name: group_by.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
+      description: >
+        Cost explorer group by key values

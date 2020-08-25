@@ -6,7 +6,30 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [],
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "controlledBy": "1549397251041",
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "cloud.account.name",
+                  "negate": false,
+                  "params": {
+                    "query": "elastic-beats"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "cloud.account.name": "elastic-beats"
+                  }
+                }
+              }
+            ],
             "query": {
               "language": "kuery",
               "query": ""
@@ -25,46 +48,94 @@
             "gridData": {
               "h": 5,
               "i": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
-              "w": 16,
+              "w": 9,
               "x": 0,
               "y": 0
             },
             "panelIndex": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
             "panelRefName": "panel_0",
             "title": "AWS Account Filter",
-            "version": "7.4.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
-              "title": "Estimated Billing Chart"
+              "title": "Current Total Unblended Cost"
             },
             "gridData": {
-              "h": 16,
-              "i": "26670498-b079-4447-bbc8-e4ca8215898c",
-              "w": 32,
-              "x": 16,
+              "h": 18,
+              "i": "f1db16b5-ce0a-4f21-885f-434c16346c26",
+              "w": 8,
+              "x": 9,
               "y": 0
             },
-            "panelIndex": "26670498-b079-4447-bbc8-e4ca8215898c",
+            "panelIndex": "f1db16b5-ce0a-4f21-885f-434c16346c26",
             "panelRefName": "panel_1",
-            "title": "Estimated Billing Chart",
-            "version": "7.4.0"
+            "title": "Current Total Unblended Cost",
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
-              "title": "Total Estimated Charges"
+              "title": "Availability Zone Utilization"
             },
             "gridData": {
-              "h": 11,
+              "h": 18,
+              "i": "57912f48-42ec-4d3e-ba54-bf94757d1eec",
+              "w": 31,
+              "x": 17,
+              "y": 0
+            },
+            "panelIndex": "57912f48-42ec-4d3e-ba54-bf94757d1eec",
+            "panelRefName": "panel_2",
+            "title": "Availability Zone Utilization",
+            "version": "7.9.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Total Estimated Charges For This Month"
+            },
+            "gridData": {
+              "h": 13,
               "i": "221aab02-2747-4d84-9dde-028ccd51bdce",
-              "w": 16,
+              "w": 9,
               "x": 0,
               "y": 5
             },
             "panelIndex": "221aab02-2747-4d84-9dde-028ccd51bdce",
-            "panelRefName": "panel_2",
-            "title": "Total Estimated Charges",
-            "version": "7.4.0"
+            "panelRefName": "panel_3",
+            "title": "Total Estimated Charges For This Month",
+            "version": "7.9.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Cost Per Service Per User"
+            },
+            "gridData": {
+              "h": 28,
+              "i": "941c459d-ad66-4557-b08e-0a1665a8e74f",
+              "w": 48,
+              "x": 0,
+              "y": 18
+            },
+            "panelIndex": "941c459d-ad66-4557-b08e-0a1665a8e74f",
+            "panelRefName": "panel_4",
+            "title": "Cost Per Service Per User",
+            "version": "7.9.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "High Spenders"
+            },
+            "gridData": {
+              "h": 23,
+              "i": "a60875e3-5f0a-4343-a0fd-48235078ef84",
+              "w": 48,
+              "x": 0,
+              "y": 46
+            },
+            "panelIndex": "a60875e3-5f0a-4343-a0fd-48235078ef84",
+            "panelRefName": "panel_5",
+            "title": "High Spenders",
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -75,12 +146,12 @@
               "i": "21e91e6b-0ff0-42ba-9132-6f30c5c6bbb7",
               "w": 48,
               "x": 0,
-              "y": 16
+              "y": 69
             },
             "panelIndex": "21e91e6b-0ff0-42ba-9132-6f30c5c6bbb7",
-            "panelRefName": "panel_3",
+            "panelRefName": "panel_6",
             "title": "Top 10 Estimated Billing Per Service Name",
-            "version": "7.4.0"
+            "version": "7.9.0"
           }
         ],
         "timeRestore": false,
@@ -91,31 +162,54 @@
       "migrationVersion": {
         "dashboard": "7.3.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
+        {
+          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
         {
           "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "749cd470-1530-11ea-841c-01bf20a6c8ba",
+          "id": "1731c440-e649-11ea-a838-3f4a45f85600",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
+          "id": "a5670a20-e65a-11ea-a838-3f4a45f85600",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "31a4ea90-152b-11ea-841c-01bf20a6c8ba",
+          "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
           "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "74eb1c90-e657-11ea-a838-3f4a45f85600",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "15cc5820-e65a-11ea-a838-3f4a45f85600",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "31a4ea90-152b-11ea-841c-01bf20a6c8ba",
+          "name": "panel_6",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-02-04T15:57:47.353Z",
-      "version": "WzY3NjQsMV0="
+      "updated_at": "2020-08-25T02:24:01.498Z",
+      "version": "WzE4ODksNF0="
     },
     {
       "attributes": {
@@ -143,7 +237,7 @@
                 "label": "account name",
                 "options": {
                   "dynamicOptions": true,
-                  "multiselect": true,
+                  "multiselect": false,
                   "order": "desc",
                   "size": 5,
                   "type": "terms"
@@ -162,18 +256,105 @@
       },
       "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
-          "id": "metricbeat-*",
+          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T21:33:20.219Z",
-      "version": "WzQ2OTAsMV0="
+      "updated_at": "2020-08-24T22:19:51.786Z",
+      "version": "WzE2NTYsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Total Unblended Cost [Metricbeat ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "cf04e620-e648-11ea-bdad-df8839db1393"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=24h",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "filter": {
+                  "language": "kuery",
+                  "query": "aws.billing.group_definition.key : \"AZ\""
+                },
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Total Unblended Cost",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.billing.UnblendedCost.amount",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "kibana",
+                "split_mode": "everything",
+                "stacked": "none",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "tooltip_mode": "show_all",
+            "type": "metric"
+          },
+          "title": "Total Unblended Cost [Metricbeat ]",
+          "type": "metrics"
+        }
+      },
+      "id": "1731c440-e649-11ea-a838-3f4a45f85600",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-08-24T20:33:38.436Z",
+      "version": "WzE0MDIsNF0="
     },
     {
       "attributes": {
@@ -188,54 +369,31 @@
             }
           }
         },
-        "title": "Estimated Billing Pie Chart [Metricbeat AWS]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "16": "#629E51",
-              "272": "#DEDAF7",
-              "80": "#E24D42",
-              "running": "#7EB26D",
-              "stopped": "#E24D42"
-            },
-            "legendOpen": true
-          }
-        },
+        "title": "Availability Zone Utilization [Metricbeat AWS]",
+        "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [
             {
               "enabled": true,
               "id": "1",
-              "params": {
-                "customLabel": "",
-                "field": "aws.billing.metrics.EstimatedCharges.max"
-              },
+              "params": {},
               "schema": "metric",
-              "type": "sum"
+              "type": "count"
             },
             {
               "enabled": true,
               "id": "2",
               "params": {
-                "customLabel": "",
-                "field": "aws.dimensions.ServiceName",
+                "exclude": "NoAZ",
+                "field": "aws.billing.group_by.AZ",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
-                "orderAgg": {
-                  "enabled": true,
-                  "id": "2-orderAgg",
-                  "params": {
-                    "field": "aws.billing.metrics.EstimatedCharges.max"
-                  },
-                  "schema": "orderAgg",
-                  "type": "avg"
-                },
-                "orderBy": "custom",
-                "otherBucket": true,
+                "orderBy": "1",
+                "otherBucket": false,
                 "otherBucketLabel": "Other",
-                "size": 10
+                "size": 20
               },
               "schema": "segment",
               "type": "terms"
@@ -244,32 +402,7 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
-            "dimensions": {
-              "buckets": [
-                {
-                  "accessor": 0,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                }
-              ],
-              "metric": {
-                "accessor": 1,
-                "aggType": "sum",
-                "format": {
-                  "id": "number"
-                },
-                "params": {}
-              }
-            },
-            "isDonut": false,
+            "isDonut": true,
             "labels": {
               "last_level": true,
               "show": true,
@@ -279,24 +412,27 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Estimated Billing Pie Chart [Metricbeat AWS]",
+          "title": "Availability Zone Utilization [Metricbeat AWS]",
           "type": "pie"
         }
       },
-      "id": "749cd470-1530-11ea-841c-01bf20a6c8ba",
+      "id": "a5670a20-e65a-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
-          "id": "metricbeat-*",
+          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-01-27T21:33:08.924Z",
-      "version": "WzQ1ODAsMV0="
+      "updated_at": "2020-08-25T02:23:26.472Z",
+      "version": "WzE4ODEsNF0="
     },
     {
       "attributes": {
@@ -342,7 +478,7 @@
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "12h",
+            "interval": "\u003e=1d",
             "isModelInvalid": false,
             "series": [
               {
@@ -360,7 +496,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.billing.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.EstimatedCharges",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -370,6 +506,7 @@
                 "separate_axis": 0,
                 "series_drop_last_bucket": 0,
                 "series_interval": "12h",
+                "split_color_mode": "gradient",
                 "split_mode": "filter",
                 "stacked": "none",
                 "time_range_mode": "last_value",
@@ -379,6 +516,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "metric"
           },
           "title": "Total Estimated Charges [Metricbeat AWS]",
@@ -387,12 +525,326 @@
       },
       "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-03T23:52:07.805Z",
-      "version": "WzY3NDUsMV0="
+      "updated_at": "2020-08-24T22:21:30.754Z",
+      "version": "WzE2NjYsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Cost Per Service Per User [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Unblended Cost",
+                "field": "aws.billing.UnblendedCost.amount"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Service Name",
+                "field": "aws.billing.group_by.SERVICE",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "aws.billing.group_by.aws:createdBy",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {
+              "show": false
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Total Unblended Cost"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Total Unblended Cost"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Cost Per Service Per User [Metricbeat AWS]",
+          "type": "histogram"
+        }
+      },
+      "id": "74eb1c90-e657-11ea-a838-3f4a45f85600",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-08-25T02:25:29.795Z",
+      "version": "WzE5MDEsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "High Spenders [Metricbeat AWS]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Total Unblended Cost": "#64B0C8"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Unblended Cost",
+                "field": "aws.billing.UnblendedCost.amount"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "exclude": "NoAZ",
+                "field": "aws.billing.group_by.aws:createdBy",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 15
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": false,
+                  "truncate": 200
+                },
+                "position": "left",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Total Unblended Cost"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": true,
+                  "rotate": 75,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "bottom",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Total Unblended Cost"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "High Spenders [Metricbeat AWS]",
+          "type": "histogram"
+        }
+      },
+      "id": "15cc5820-e65a-11ea-a838-3f4a45f85600",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-08-24T22:52:48.164Z",
+      "version": "WzE4MzksNF0="
     },
     {
       "attributes": {
@@ -425,7 +877,7 @@
             },
             "id": "729af8b0-152a-11ea-ae8f-79fec1a0d4d3",
             "index_pattern": "metricbeat-*",
-            "interval": "12h",
+            "interval": "\u003e=24h",
             "isModelInvalid": false,
             "series": [
               {
@@ -443,7 +895,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.billing.metrics.EstimatedCharges.max",
+                    "field": "aws.billing.EstimatedCharges",
                     "id": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                     "type": "sum"
                   }
@@ -456,7 +908,7 @@
                 "split_mode": "terms",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "aws.dimensions.ServiceName",
+                "terms_field": "aws.billing.ServiceName",
                 "terms_include": "",
                 "terms_order_by": "729b1fc1-152a-11ea-ae8f-79fec1a0d4d3",
                 "terms_size": "10",
@@ -467,6 +919,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Top 10 Billing per Service Name [Metricbeat AWS]",
@@ -475,13 +928,16 @@
       },
       "id": "31a4ea90-152b-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-04T13:56:47.812Z",
-      "version": "WzY3NjMsMV0="
+      "updated_at": "2020-08-24T22:47:45.491Z",
+      "version": "WzE4MDYsNF0="
     }
   ],
-  "version": "7.4.0"
+  "version": "7.9.0"
 }

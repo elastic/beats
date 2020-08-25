@@ -34,11 +34,12 @@
   metricsets:
     - billing
   cost_explorer_config:
-    - group_by_dimension_keys:
-        - "AZ"
-        - "INSTANCE_TYPE"
-    #- group_by_tag_keys:
-    #    - "aws:createdBy"
+    group_by_dimension_keys:
+      - "AZ"
+      - "INSTANCE_TYPE"
+      - "SERVICE"
+#    group_by_tag_keys:
+#      - "aws:createdBy"
 - module: aws
   period: 24h
   metricsets:
