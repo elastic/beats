@@ -173,10 +173,13 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 	event.RootFields.Put("cloud.provider", "azure")
 	event.RootFields.Put("cloud.region", metric.Resource.Location)
 	event.RootFields.Put("cloud.instance.name", metric.Resource.Name)
+	event.RootFields.Put("host.name", metric.Resource.Name)
 	if metric.Resource.SubId != "" {
 		event.RootFields.Put("cloud.instance.id", metric.Resource.SubId)
+		event.RootFields.Put("host.id", metric.Resource.SubId)
 	} else {
 		event.RootFields.Put("cloud.instance.id", metric.Resource.Id)
+		event.RootFields.Put("host.id", metric.Resource.Id)
 	}
 	if metric.Resource.Size != "" {
 		event.RootFields.Put("cloud.machine.type", metric.Resource.Size)
@@ -200,6 +203,7 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), *value.count)
 		}
 	}
+	event = addHostFields(event, metricList)
 	return event, metricList
 }
 
@@ -228,4 +232,31 @@ func returnAllDimensions(dimensions []Dimension) (bool, []Dimension) {
 		return false, nil
 	}
 	return true, dims
+}
+
+func addHostFields(event mb.Event, metricList common.MapStr) mb.Event {
+	hostFieldTable := map[string]string{
+		"percentage_cpu.avg":      "host.cpu.pct",
+		"network_in_total.total":  "host.network.in.bytes",
+		"network_in.total":        "host.network.in.packets",
+		"network_out_total.total": "host.network.out.bytes",
+		"network_out.total":       "host.network.out.packets",
+		"disk_read_bytes.total":   "host.disk.read.bytes",
+		"disk_write_bytes.total":  "host.disk.write.bytes",
+	}
+
+	for metricName, hostName := range hostFieldTable {
+		metricValue, err := metricList.GetValue(metricName)
+		if err != nil {
+			continue
+		}
+
+		if value, ok := metricValue.(float64); ok {
+			if metricName == "percentage_cpu.avg" {
+				value = value / 100
+			}
+			event.RootFields.Put(hostName, value)
+		}
+	}
+	return event
 }
