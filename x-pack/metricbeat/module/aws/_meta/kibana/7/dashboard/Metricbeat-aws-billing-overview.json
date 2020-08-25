@@ -167,7 +167,7 @@
       ],
       "references": [
         {
-          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "id": "metricbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
           "type": "index-pattern"
         },
@@ -263,7 +263,7 @@
       ],
       "references": [
         {
-          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         }
@@ -284,7 +284,7 @@
             }
           }
         },
-        "title": "Total Unblended Cost [Metricbeat ]",
+        "title": "Total Unblended Cost [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -340,7 +340,7 @@
             "tooltip_mode": "show_all",
             "type": "metric"
           },
-          "title": "Total Unblended Cost [Metricbeat ]",
+          "title": "Total Unblended Cost [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -425,7 +425,7 @@
       ],
       "references": [
         {
-          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "id": "metricbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -687,7 +687,7 @@
       ],
       "references": [
         {
-          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "id": "metricbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -837,7 +837,7 @@
       ],
       "references": [
         {
-          "id": "ddf6b800-e64f-11ea-a838-3f4a45f85600",
+          "id": "metricbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }

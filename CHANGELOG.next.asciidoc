@@ -653,6 +653,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
+- Add billing data collection from Cost Explorer into aws billing metricset. {pull}20527[20527] {issue}20103[20103]
 
 *Packetbeat*
 
