@@ -18767,7 +18767,7 @@ type: long
 
 --
 
-*`elasticsearch.index.summary.primaries.indexing.throttle_time`*::
+*`elasticsearch.index.summary.primaries.indexing.throttle_time.ms`*::
 +
 --
 TODO
