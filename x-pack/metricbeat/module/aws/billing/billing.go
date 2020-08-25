@@ -38,6 +38,8 @@ var (
 		"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "BILLING_ENTITY",
 		"RESERVATION_ID",
 	}
+
+	dateLayout = "2006-01-02"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -186,7 +188,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(svcCloudwatch cloudwatchiface.Cl
 						event.MetricSetFields.Put(labels[i], labels[i+1])
 						i += 2
 					}
-
+					event.Timestamp = endTime
 					events = append(events, event)
 				}
 			}
@@ -250,6 +252,11 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					if tagValue != "" {
 						event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 					}
+				}
+
+				t, err := time.Parse(dateLayout, endDate)
+				if err == nil {
+					event.Timestamp = t
 				}
 
 				events = append(events, event)
@@ -329,8 +336,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {
 	currentTime := time.Now()
 	startTime := currentTime.Add(period * -1)
-	startDate = startTime.Format("2006-01-02")
-	endDate = currentTime.Format("2006-01-02")
+	startDate = startTime.Format(dateLayout)
+	endDate = currentTime.Format(dateLayout)
 	return
 }
 

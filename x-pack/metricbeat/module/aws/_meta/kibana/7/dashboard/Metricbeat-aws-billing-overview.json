@@ -198,8 +198,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-08-25T17:20:09.296Z",
-      "version": "WzMzOTEsNV0="
+      "updated_at": "2020-08-25T21:11:29.920Z",
+      "version": "WzQ1MDUsNV0="
     },
     {
       "attributes": {
@@ -259,8 +259,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-08-25T02:51:31.526Z",
-      "version": "WzIxMTEsNF0="
+      "updated_at": "2020-08-25T20:26:22.105Z",
+      "version": "WzM3MjcsNV0="
     },
     {
       "attributes": {
@@ -291,9 +291,13 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
+            "filter": {
+              "language": "kuery",
+              "query": "aws.billing.group_definition.key : \"AZ\""
+            },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=24h",
+            "interval": "\u003e=2d",
             "isModelInvalid": false,
             "series": [
               {
@@ -316,10 +320,15 @@
                     "type": "sum"
                   }
                 ],
+                "override_index_pattern": 1,
                 "point_size": 1,
                 "separate_axis": 0,
+                "series_drop_last_bucket": 0,
+                "series_index_pattern": "metricbeat-*",
+                "series_interval": "\u003e=2d",
+                "series_time_field": "@timestamp",
                 "split_color_mode": "kibana",
-                "split_mode": "everything",
+                "split_mode": "filter",
                 "stacked": "none",
                 "type": "timeseries"
               }
@@ -327,7 +336,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "time_range_mode": "entire_time_range",
+            "time_range_mode": "last_value",
             "tooltip_mode": "show_all",
             "type": "metric"
           },
@@ -344,8 +353,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-08-25T16:17:22.754Z",
-      "version": "WzI2NzUsNV0="
+      "updated_at": "2020-08-25T20:46:45.905Z",
+      "version": "WzQ0NDQsNV0="
     },
     {
       "attributes": {
@@ -422,8 +431,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-08-25T02:51:18.193Z",
-      "version": "WzE5NzYsNF0="
+      "updated_at": "2020-08-25T20:26:08.834Z",
+      "version": "WzM1OTEsNV0="
     },
     {
       "attributes": {
@@ -459,6 +468,10 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
+            "filter": {
+              "language": "kuery",
+              "query": "aws.billing.EstimatedCharges : * and not (aws.billing.ServiceName : * )"
+            },
             "gauge_color_rules": [
               {
                 "id": "e8a045e0-1531-11ea-961e-c1db9cc6166e"
@@ -479,7 +492,7 @@
                 "fill": 0.5,
                 "filter": {
                   "language": "kuery",
-                  "query": "not aws.dimensions.ServiceName : * "
+                  "query": "aws.billing.EstimatedCharges : * and not (aws.billing.ServiceName : * )"
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -492,11 +505,13 @@
                     "type": "sum"
                   }
                 ],
-                "override_index_pattern": 0,
+                "override_index_pattern": 1,
                 "point_size": 1,
                 "separate_axis": 0,
                 "series_drop_last_bucket": 0,
-                "series_interval": "12h",
+                "series_index_pattern": "metricbeat-*",
+                "series_interval": "\u003e=1d",
+                "series_time_field": "@timestamp",
                 "split_color_mode": "gradient",
                 "split_mode": "filter",
                 "stacked": "none",
@@ -507,7 +522,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "time_range_mode": "entire_time_range",
+            "time_range_mode": "last_value",
             "tooltip_mode": "show_all",
             "type": "metric"
           },
@@ -524,8 +539,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-08-25T16:18:28.484Z",
-      "version": "WzI2OTcsNV0="
+      "updated_at": "2020-08-25T21:11:14.083Z",
+      "version": "WzQ1MDAsNV0="
     },
     {
       "attributes": {
@@ -637,8 +652,8 @@
       ],
       "references": [],
       "type": "lens",
-      "updated_at": "2020-08-25T16:44:36.145Z",
-      "version": "WzMwNzIsNV0="
+      "updated_at": "2020-08-25T20:26:08.834Z",
+      "version": "WzM1OTMsNV0="
     },
     {
       "attributes": {
@@ -732,8 +747,8 @@
       ],
       "references": [],
       "type": "lens",
-      "updated_at": "2020-08-25T16:43:51.734Z",
-      "version": "WzMwMzEsNV0="
+      "updated_at": "2020-08-25T20:26:08.834Z",
+      "version": "WzM1OTQsNV0="
     },
     {
       "attributes": {
@@ -842,8 +857,8 @@
       ],
       "references": [],
       "type": "lens",
-      "updated_at": "2020-08-25T17:07:52.893Z",
-      "version": "WzMzNjUsNV0="
+      "updated_at": "2020-08-25T20:26:08.834Z",
+      "version": "WzM1OTUsNV0="
     },
     {
       "attributes": {
@@ -869,9 +884,13 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
+            "filter": {
+              "language": "kuery",
+              "query": "aws.billing.group_definition.key : \"AZ\""
+            },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "\u003e=24h",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=1d",
             "isModelInvalid": false,
             "series": [
               {
@@ -898,14 +917,14 @@
                 "point_size": 1,
                 "separate_axis": 0,
                 "split_color_mode": "kibana",
-                "split_mode": "everything",
+                "split_mode": "filter",
                 "stacked": "none",
                 "type": "timeseries"
               }
             ],
             "show_grid": 0,
             "show_legend": 1,
-            "time_field": "",
+            "time_field": "@timestamp",
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
@@ -922,8 +941,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-08-25T17:19:52.494Z",
-      "version": "WzMzODUsNV0="
+      "updated_at": "2020-08-25T20:49:15.530Z",
+      "version": "WzQ0NjIsNV0="
     }
   ],
   "version": "7.9.0"
