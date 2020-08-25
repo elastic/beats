@@ -34,8 +34,8 @@ func TestManagedModeRouting(t *testing.T) {
 	assert.NoError(t, err)
 
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{
 			log:     log,
 			emitter: emit,
 		},
@@ -95,9 +95,9 @@ const fleetResponse = `
 	"success": true,
 	"actions": [{
 		"agent_id": "17e93530-7f42-11ea-9330-71e968b29fa4",
-		"type": "CONFIG_CHANGE",
+		"type": "POLICY_CHANGE",
 		"data": {
-			"config": {
+			"policy": {
 				"id": "86561d50-7f3b-11ea-9fab-3db3bdb4efa4",
 				"outputs": {
 					"default": {

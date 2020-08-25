@@ -56,10 +56,10 @@ func TestCheckin(t *testing.T) {
 			raw := `
 	{
 		"actions": [{
-			"type": "CONFIG_CHANGE",
+			"type": "POLICY_CHANGE",
 			"id": "id1",
 			"data": {
-				"config": {
+				"policy": {
 					"id": "policy-id",
 					"outputs": {
 						"default": {
@@ -104,7 +104,7 @@ func TestCheckin(t *testing.T) {
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 		},
 	))
 
@@ -114,10 +114,10 @@ func TestCheckin(t *testing.T) {
 	{
 	    "actions": [
 	        {
-	            "type": "CONFIG_CHANGE",
+	            "type": "POLICY_CHANGE",
 	            "id": "id1",
 	            "data": {
-	                "config": {
+	                "policy": {
 	                    "id": "policy-id",
 	                    "outputs": {
 	                        "default": {
@@ -167,7 +167,7 @@ func TestCheckin(t *testing.T) {
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 
 			// UnknownAction
 			require.Equal(t, "id2", r.Actions[1].ID())

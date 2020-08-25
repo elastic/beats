@@ -3,9 +3,9 @@
   "success": true,
   "actions": [
     {
-      "type": "CONFIG_CHANGE",
+      "type": "POLICY_CHANGE",
       "data": {
-        "config": {
+        "policy": {
           "id": "default",
           "outputs": {
             "default": {
