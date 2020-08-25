@@ -82,17 +82,23 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("address", e.addr)
 
-	validator := &apiValidator{
+	authValidator := &authValidator{
 		basicAuth:    e.config.BasicAuth,
 		username:     e.config.Username,
 		password:     e.config.Password,
-		method:       http.MethodPost,
-		contentType:  e.config.ContentType,
 		secretHeader: e.config.SecretHeader,
 		secretValue:  e.config.SecretValue,
-		hmacHeader:   e.config.HmacHeader,
-		hmacPrefix:   e.config.HmacPrefix,
-		hmacToken:    e.config.HmacToken,
+	}
+
+	hmacValidator := &hmacValidator{
+		hmacHeader: e.config.HmacHeader,
+		hmacPrefix: e.config.HmacPrefix,
+		hmacToken:  e.config.HmacToken,
+	}
+
+	headerValidator := &headerValidator{
+		method:      http.MethodPost,
+		contentType: e.config.ContentType,
 	}
 
 	handler := &httpHandler{
@@ -103,8 +109,10 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		responseBody: e.config.ResponseBody,
 	}
 
+	validateHandler := withValidators(handler.apiResponse, headerValidator, hmacValidator, authValidator)
+
 	mux := http.NewServeMux()
-	mux.HandleFunc(e.config.URL, withValidator(validator, handler.apiResponse))
+	mux.HandleFunc(e.config.URL, validateHandler)
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
 	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
 		server.Close()

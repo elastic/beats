@@ -61,13 +61,15 @@ func (h *httpHandler) publishEvent(obj common.MapStr) {
 	h.publisher.Publish(event)
 }
 
-func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
+func withValidators(handler http.HandlerFunc, vs ...validator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if status, err := v.Validate(r); status != 0 && err != nil {
-			sendErrorResponse(w, status, err)
-		} else {
-			handler(w, r)
+		for _, v := range vs {
+			if status, err := v.Validate(r); status != 0 && err != nil {
+				sendErrorResponse(w, status, err)
+				return
+			}
 		}
+		handler(w, r)
 	}
 }
 
