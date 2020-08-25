@@ -18763,7 +18763,7 @@ type: long
 --
 TODO
 
-type: long
+type: boolean
 
 --
 
@@ -18922,7 +18922,7 @@ type: long
 --
 TODO
 
-type: long
+type: boolean
 
 --
 

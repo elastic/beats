@@ -39,7 +39,7 @@
               description: TODO
               type: long
             - name: is_throttled
-              type: long
+              type: boolean
               description: TODO
             - name: throttle_time.ms
               type: long
@@ -112,7 +112,7 @@
               description: TODO
               type: long
             - name: is_throttled
-              type: long
+              type: boolean
               description: TODO
             - name: throttle_time.ms
               type: long
