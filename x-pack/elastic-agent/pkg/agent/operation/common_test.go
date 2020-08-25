@@ -58,7 +58,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
