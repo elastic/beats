@@ -148,8 +148,8 @@ func testKinesisConfig(t *testing.T) {
 				"description": "mylong description",
 				"triggers": []map[string]interface{}{
 					map[string]interface{}{
-						"event_source_arn":             "abc123",
-						"parallelization_factor":       13,
+						"event_source_arn":       "abc123",
+						"parallelization_factor": 13,
 					},
 				},
 			},
@@ -161,8 +161,8 @@ func testKinesisConfig(t *testing.T) {
 				"description": "mylong description",
 				"triggers": []map[string]interface{}{
 					map[string]interface{}{
-						"event_source_arn":             "abc123",
-						"parallelization_factor":       0,
+						"event_source_arn":       "abc123",
+						"parallelization_factor": 0,
 					},
 				},
 			},

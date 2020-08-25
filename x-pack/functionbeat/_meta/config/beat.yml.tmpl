@@ -170,7 +170,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -237,7 +237,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.

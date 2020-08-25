@@ -103,8 +103,8 @@ type KinesisTriggerConfig struct {
 func (c *KinesisTriggerConfig) Unpack(cfg *common.Config) error {
 	type tmpConfig KinesisTriggerConfig
 	config := tmpConfig{
-		BatchSize:        100,
-		StartingPosition: trimHorizonPos,
+		BatchSize:             100,
+		StartingPosition:      trimHorizonPos,
 		ParallelizationFactor: 1,
 	}
 	if err := cfg.Unpack(&config); err != nil {
@@ -178,11 +178,11 @@ func (k *Kinesis) Template() *cloudformation.Template {
 	for _, trigger := range k.config.Triggers {
 		resourceName := prefix(k.Name() + trigger.EventSourceArn)
 		template.Resources[resourceName] = &lambda.EventSourceMapping{
-			BatchSize:                    trigger.BatchSize,
-			ParallelizationFactor:        trigger.ParallelizationFactor,
-			EventSourceArn:               trigger.EventSourceArn,
-			FunctionName:                 cloudformation.GetAtt(prefix(""), "Arn"),
-			StartingPosition:             trigger.StartingPosition.String(),
+			BatchSize:             trigger.BatchSize,
+			ParallelizationFactor: trigger.ParallelizationFactor,
+			EventSourceArn:        trigger.EventSourceArn,
+			FunctionName:          cloudformation.GetAtt(prefix(""), "Arn"),
+			StartingPosition:      trigger.StartingPosition.String(),
 		}
 	}
 
