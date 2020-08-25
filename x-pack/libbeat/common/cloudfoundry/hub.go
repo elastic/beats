@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
@@ -20,10 +19,9 @@ import (
 type Client interface {
 	// GetAppByGuid returns the application from cloudfoundry.
 	GetAppByGuid(guid string) (*cfclient.App, error)
-	// StartJanitor keeps the cache of applications clean.
-	StartJanitor(interval time.Duration)
-	// StopJanitor stops the running janitor.
-	StopJanitor()
+
+	// Close releases resources associated with this client.
+	Close() error
 }
 
 // Hub is central place to get all the required clients to communicate with cloudfoundry.
@@ -67,7 +65,7 @@ func (h *Hub) Client() (Client, error) {
 	if h.cfg.UaaAddress != "" {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
-	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
+	return newClientCacheWrap(cf, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through

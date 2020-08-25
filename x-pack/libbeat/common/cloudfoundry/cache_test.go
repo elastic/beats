@@ -19,14 +19,18 @@ import (
 )
 
 func TestClientCacheWrap(t *testing.T) {
-	ttl := 500 * time.Millisecond
+	if testing.Short() {
+		t.Skip("skipping in short mode")
+	}
+
+	ttl := 2 * time.Second
 	guid := mustCreateFakeGuid()
 	app := cfclient.App{
 		Guid:   guid,
 		Memory: 1, // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
-	cache, err := newClientCacheWrap(fakeClient, ttl, ttl, logp.NewLogger("cloudfoundry"))
+	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logp.NewLogger("cloudfoundry"))
 	require.NoError(t, err)
 
 	missingAppGuid := mustCreateFakeGuid()

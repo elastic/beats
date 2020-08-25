@@ -5,11 +5,13 @@
 package cloudfoundry
 
 import (
-	"errors"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
@@ -30,13 +32,17 @@ type clientCacheWrap struct {
 }
 
 // newClientCacheWrap creates a new cache for application data.
-func newClientCacheWrap(client cfClient, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
+func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
 	options := persistentcache.Options{
 		Timeout: ttl,
 	}
 
-	// TODO: Use an unique name per API endpoint
-	cache, err := persistentcache.New("cloudfoundry", options)
+	name := "cloudfoundry"
+	if cacheName != "" {
+		name = name + "-" + sanitizeCacheName(cacheName)
+	}
+
+	cache, err := persistentcache.New(name, options)
 	if err != nil {
 		return nil, fmt.Errorf("creating metadata cache: %w", err)
 	}
@@ -58,26 +64,24 @@ type appResponse struct {
 
 func (r *appResponse) fromStructs(app cfclient.App, err error) {
 	if err != nil {
-		switch e := err.(type) {
-		case cfclient.CloudFoundryError:
-			// Store native CF errors as they are. They are serializable and
-			// contain relevant information.
-			r.Error = e
-		default:
-			r.ErrorMessage = e.Error()
+		cause := errors.Cause(err)
+		if cferr, ok := cause.(cfclient.CloudFoundryError); ok {
+			r.Error = cferr
 		}
+		r.ErrorMessage = err.Error()
 		return
 	}
 	r.App = app
 }
 
-func (r *appResponse) toStructs() (*cfclient.App, error) {
-	if len(r.ErrorMessage) > 0 {
-		return nil, errors.New(r.ErrorMessage)
-	}
+func (r *appResponse) toStructs() (*AppMeta, error) {
 	var empty cfclient.CloudFoundryError
 	if r.Error != empty {
-		return nil, r.Error
+		// Wrapping the error so cfclient.IsAppNotFoundError can identify it
+		return nil, errors.Wrap(r.Error, r.ErrorMessage)
+	}
+	if len(r.ErrorMessage) > 0 {
+		return nil, errors.New(r.ErrorMessage)
 	}
 	return &r.App, nil
 }
@@ -111,12 +115,17 @@ func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
 	return resp.toStructs()
 }
 
-// StartJanitor starts a goroutine that will periodically clean the applications cache.
-func (c *clientCacheWrap) StartJanitor(interval time.Duration) {
-	c.cache.StartJanitor(interval)
+// Close release resources associated with this client
+func (c *clientCacheWrap) Close() error {
+	err := c.cache.Close()
+	if err != nil {
+		return fmt.Errorf("closing cache: %w", err)
+	}
+	return nil
 }
 
-// StopJanitor stops the goroutine that periodically clean the applications cache.
-func (c *clientCacheWrap) StopJanitor() {
-	c.cache.StopJanitor()
+// sanitizeCacheName returns a unique string that can be used safely as part of a file name
+func sanitizeCacheName(name string) string {
+	hash := sha1.Sum([]byte(name))
+	return base64.RawURLEncoding.EncodeToString(hash[:])
 }

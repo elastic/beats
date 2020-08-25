@@ -6,7 +6,6 @@ package add_cloudfoundry_metadata
 
 import (
 	"testing"
-	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/gofrs/uuid"
@@ -152,10 +151,8 @@ func (c *fakeClient) GetAppByGuid(guid string) (*cfclient.App, error) {
 	return &c.app, nil
 }
 
-func (c *fakeClient) StartJanitor(_ time.Duration) {
-}
-
-func (c *fakeClient) StopJanitor() {
+func (c *fakeClient) Close() error {
+	return nil
 }
 
 func mustCreateFakeGuid() string {

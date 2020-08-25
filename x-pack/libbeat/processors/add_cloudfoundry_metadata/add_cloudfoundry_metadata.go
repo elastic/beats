@@ -5,8 +5,6 @@
 package add_cloudfoundry_metadata
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -44,9 +42,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if err != nil {
 		log.Debugf("%s: failed to created cloudfoundry client: %+v", processorName, err)
 	}
-
-	// Janitor run every 5 minutes to clean up the client cache.
-	client.StartJanitor(5 * time.Minute)
 
 	return &addCloudFoundryMetadata{
 		log:    log,
@@ -91,6 +86,16 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+// String returns this processor name.
 func (d *addCloudFoundryMetadata) String() string {
 	return processorName
+}
+
+// Close closes the underlying client and releases its resources.
+func (d *addCloudFoundryMetadata) Close() error {
+	err := d.client.Close()
+	if err != nil {
+		return errors.Wrap(err, "closing client")
+	}
+	return nil
 }

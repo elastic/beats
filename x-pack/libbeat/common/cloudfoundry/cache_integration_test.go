@@ -56,7 +56,8 @@ func TestGetApps(t *testing.T) {
 		testNotExists := func(t *testing.T) {
 			app, err := client.GetAppByGuid("notexists")
 			assert.Nil(t, app)
-			assert.True(t, cfclient.IsAppNotFoundError(err))
+			assert.Error(t, err)
+			assert.True(t, cfclient.IsAppNotFoundError(err), "Error found: %v", err)
 		}
 
 		var firstTimeDuration time.Duration
