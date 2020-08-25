@@ -122,7 +122,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
