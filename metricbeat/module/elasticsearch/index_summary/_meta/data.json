@@ -1,47 +1,103 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2020-08-25T13:05:46.460Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "event": {
+        "dataset": "elasticsearch.index.summary",
+        "module": "elasticsearch",
+        "duration": 9796336
     },
     "elasticsearch": {
         "cluster": {
-            "id": "UziYVLPkTTmCzccc6102Bg",
-            "name": "elasticsearch"
+            "id": "3TvloZ79QPudNglW61_FKw",
+            "name": "docker-cluster"
         },
         "index": {
             "summary": {
                 "primaries": {
                     "docs": {
-                        "count": 231,
-                        "deleted": 56
+                        "count": 232,
+                        "deleted": 33
                     },
                     "segments": {
-                        "count": 16,
+                        "count": 28,
                         "memory": {
-                            "bytes": 105245
+                            "bytes": 180032
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 444882
+                            "bytes": 11817747
+                        }
+                    },
+                    "bulk": {
+                        "time": {
+                            "count": {},
+                            "avg": {}
+                        },
+                        "size": {},
+                        "operations": {}
+                    },
+                    "search": {
+                        "query": {
+                            "time": {}
+                        }
+                    },
+                    "indexing": {
+                        "is_throttled": false,
+                        "throttle_time": {
+                            "ms": 0
+                        },
+                        "index": {
+                            "count": 265,
+                            "time": {
+                                "ms": 816
+                            }
                         }
                     }
                 },
                 "total": {
                     "docs": {
-                        "count": 231,
-                        "deleted": 56
+                        "count": 232,
+                        "deleted": 33
                     },
                     "segments": {
-                        "count": 16,
+                        "count": 28,
                         "memory": {
-                            "bytes": 105245
+                            "bytes": 180032
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 444882
+                            "bytes": 11817747
+                        }
+                    },
+                    "indexing": {
+                        "index": {
+                            "time": {
+                                "ms": 816
+                            },
+                            "count": 265
+                        },
+                        "is_throttled": false,
+                        "throttle_time": {
+                            "ms": 0
+                        }
+                    },
+                    "bulk": {
+                        "operations": {},
+                        "time": {
+                            "avg": {},
+                            "count": {}
+                        },
+                        "size": {}
+                    },
+                    "search": {
+                        "query": {
+                            "time": {}
                         }
                     }
                 }
@@ -49,13 +105,25 @@
         }
     },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "index_summary",
-        "namespace": "elasticsearch.index.summary",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "name": "elasticsearch",
+        "address": "localhost:9200",
+        "type": "elasticsearch"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "fd75c555-fae2-4a64-87e1-e24fcf7939d5",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro"
+    },
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
     }
 }
