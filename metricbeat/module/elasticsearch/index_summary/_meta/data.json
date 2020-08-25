@@ -1,124 +1,148 @@
 {
-    "@timestamp": "2020-08-25T13:05:46.460Z",
+    "@timestamp": "2020-08-25T20:31:16.873Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
+    "metricset": {
+        "period": 10000,
+        "name": "index_summary"
+    },
     "event": {
         "dataset": "elasticsearch.index.summary",
         "module": "elasticsearch",
-        "duration": 9796336
+        "duration": 24752955
     },
     "elasticsearch": {
         "cluster": {
-            "id": "3TvloZ79QPudNglW61_FKw",
-            "name": "docker-cluster"
+            "name": "docker-cluster",
+            "id": "3TvloZ79QPudNglW61_FKw"
         },
         "index": {
             "summary": {
                 "primaries": {
-                    "docs": {
-                        "count": 232,
-                        "deleted": 33
-                    },
-                    "segments": {
-                        "count": 28,
-                        "memory": {
-                            "bytes": 180032
+                    "search": {
+                        "query": {
+                            "count": 384,
+                            "time": {
+                                "ms": 1363
+                            }
                         }
+                    },
+                    "docs": {
+                        "count": 242,
+                        "deleted": 39
                     },
                     "store": {
                         "size": {
-                            "bytes": 11817747
+                            "bytes": 12515663
                         }
                     },
-                    "bulk": {
-                        "time": {
-                            "count": {},
-                            "avg": {}
-                        },
-                        "size": {},
-                        "operations": {}
-                    },
-                    "search": {
-                        "query": {
-                            "time": {}
+                    "segments": {
+                        "count": 31,
+                        "memory": {
+                            "bytes": 181292
                         }
                     },
                     "indexing": {
+                        "index": {
+                            "count": 50,
+                            "time": {
+                                "ms": 249
+                            }
+                        },
                         "is_throttled": false,
                         "throttle_time": {
                             "ms": 0
+                        }
+                    },
+                    "bulk": {
+                        "size": {
+                            "bytes": 26854
                         },
-                        "index": {
-                            "count": 265,
-                            "time": {
-                                "ms": 816
+                        "operations": {
+                            "count": 59
+                        },
+                        "time": {
+                            "avg": {
+                                "ms": 3,
+                                "bytes": 383
+                            },
+                            "count": {
+                                "ms": 303
                             }
                         }
                     }
                 },
                 "total": {
-                    "docs": {
-                        "count": 232,
-                        "deleted": 33
-                    },
-                    "segments": {
-                        "count": 28,
-                        "memory": {
-                            "bytes": 180032
+                    "bulk": {
+                        "time": {
+                            "avg": {
+                                "ms": 3,
+                                "bytes": 383
+                            },
+                            "count": {
+                                "ms": 303
+                            }
+                        },
+                        "size": {
+                            "bytes": 26854
+                        },
+                        "operations": {
+                            "count": 59
                         }
+                    },
+                    "search": {
+                        "query": {
+                            "count": 384,
+                            "time": {
+                                "ms": 1363
+                            }
+                        }
+                    },
+                    "docs": {
+                        "deleted": 39,
+                        "count": 242
                     },
                     "store": {
                         "size": {
-                            "bytes": 11817747
+                            "bytes": 12515663
+                        }
+                    },
+                    "segments": {
+                        "count": 31,
+                        "memory": {
+                            "bytes": 181292
                         }
                     },
                     "indexing": {
                         "index": {
                             "time": {
-                                "ms": 816
+                                "ms": 249
                             },
-                            "count": 265
+                            "count": 50
                         },
                         "is_throttled": false,
                         "throttle_time": {
                             "ms": 0
-                        }
-                    },
-                    "bulk": {
-                        "operations": {},
-                        "time": {
-                            "avg": {},
-                            "count": {}
-                        },
-                        "size": {}
-                    },
-                    "search": {
-                        "query": {
-                            "time": {}
                         }
                     }
                 }
             }
         }
     },
-    "metricset": {
-        "name": "index_summary",
-        "period": 10000
-    },
     "service": {
-        "name": "elasticsearch",
         "address": "localhost:9200",
-        "type": "elasticsearch"
+        "type": "elasticsearch",
+        "name": "elasticsearch"
     },
     "agent": {
-        "type": "metricbeat",
-        "version": "8.0.0",
-        "ephemeral_id": "fd75c555-fae2-4a64-87e1-e24fcf7939d5",
+        "ephemeral_id": "b4272a9a-3d41-4cb6-ad8e-4e8eec254f4a",
         "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro"
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0"
     },
     "ecs": {
         "version": "1.5.0"

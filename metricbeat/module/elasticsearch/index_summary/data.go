@@ -31,124 +31,54 @@ import (
 
 var (
 	schema = s.Schema{
-		"primaries": c.Dict("primaries", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count":   c.Int("count"),
-				"deleted": c.Int("deleted"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size": s.Object{
-					"bytes": c.Int("size_in_bytes"),
-				},
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"count": c.Int("count"),
-				"memory": s.Object{
-					"bytes": c.Int("memory_in_bytes"),
-				},
-			}),
-			"indexing": c.Dict("indexing", s.Schema{
-				"index": s.Object{
-					"count": c.Int("index_total"),
-					"time": s.Object{
-						"ms": c.Int("index_time_in_millis"),
-					},
-				},
-				// following field is not included in the Stack Monitoring UI mapping
-				"is_throttled": c.Bool("is_throttled"),
-				// following field is not included in the Stack Monitoring UI mapping
-				"throttle_time": s.Object{
-					"ms": c.Int("throttle_time_in_millis"),
-				},
-			}),
-			// following field is not included in the Stack Monitoring UI mapping
-			"bulk": s.Object{
-				"operations": s.Object{
-					"count": c.Int("total_operations"),
-				},
-				"time": s.Object{
-					"count": s.Object{
-						"ms": c.Int("total_time_in_millis"),
-					},
-					"avg": s.Object{
-						"ms":    c.Int("avg_time_in_millis"),
-						"bytes": c.Int("avg_size_in_bytes"),
-					},
-				},
-				"size": s.Object{
-					"bytes": c.Int("total_size_in_bytes"),
-				},
-			},
-			// following field is not included in the Stack Monitoring UI mapping
-			"search": s.Object{
-				"query": s.Object{
-					"count": c.Int("query_total"),
-					"time": s.Object{
-						"ms": c.Int("query_time_in_millis"),
-					},
-				},
-			},
-		}),
-		"total": c.Dict("total", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count":   c.Int("count"),
-				"deleted": c.Int("deleted"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size": s.Object{
-					"bytes": c.Int("size_in_bytes"),
-				},
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"count": c.Int("count"),
-				"memory": s.Object{
-					"bytes": c.Int("memory_in_bytes"),
-				},
-			}),
-			"indexing": c.Dict("indexing", s.Schema{
-				"index": s.Object{
-					"count": c.Int("index_total"),
-					// following field is not included in the Stack Monitoring UI mapping
-					"time": s.Object{
-						"ms": c.Int("index_time_in_millis"),
-					},
-				},
-				// following field is not included in the Stack Monitoring UI mapping
-				"is_throttled": c.Bool("is_throttled"),
-				// following field is not included in the Stack Monitoring UI mapping
-				"throttle_time": s.Object{
-					"ms": c.Int("throttle_time_in_millis"),
-				},
-			}),
-			// following field is not included in the Stack Monitoring UI mapping
-			"bulk": s.Object{
-				"operations": s.Object{
-					"count": c.Int("total_operations"),
-				},
-				"time": s.Object{
-					"count": s.Object{
-						"ms": c.Int("total_time_in_millis"),
-					},
-					"avg": s.Object{
-						"ms":    c.Int("avg_time_in_millis"),
-						"bytes": c.Int("avg_size_in_bytes"),
-					},
-				},
-				"size": s.Object{
-					"bytes": c.Int("total_size_in_bytes"),
-				},
-			},
-			"search": s.Object{
-				"query": s.Object{
-					"count": c.Int("query_total"),
-					"time": s.Object{
-						"ms": c.Int("query_time_in_millis"),
-					},
-				},
-			},
-		}),
+		"primaries": c.Dict("primaries", indexSummaryDict),
+		"total":     c.Dict("total", indexSummaryDict),
 	}
 )
+
+var indexSummaryDict = s.Schema{
+	"docs": c.Dict("docs", s.Schema{
+		"count":   c.Int("count"),
+		"deleted": c.Int("deleted"),
+	}),
+	"store": c.Dict("store", s.Schema{
+		"size": s.Object{
+			"bytes": c.Int("size_in_bytes"),
+		},
+	}),
+	"segments": c.Dict("segments", s.Schema{
+		"count": c.Int("count"),
+		"memory": s.Object{
+			"bytes": c.Int("memory_in_bytes"),
+		},
+	}),
+	"indexing": indexingDict,
+	// following field is not included in the Stack Monitoring UI mapping
+	"bulk":   elasticsearch.BulkStatsDictMetricbeatCompatible,
+	"search": searchDict,
+}
+
+var indexingDict = c.Dict("indexing", s.Schema{
+	"index": s.Object{
+		"count": c.Int("index_total"),
+		"time": s.Object{
+			"ms": c.Int("index_time_in_millis"),
+		},
+	},
+	"is_throttled": c.Bool("is_throttled"),
+	"throttle_time": s.Object{
+		"ms": c.Int("throttle_time_in_millis"),
+	},
+})
+
+var searchDict = c.Dict("search", s.Schema{
+	"query": s.Object{
+		"count": c.Int("query_total"),
+		"time": s.Object{
+			"ms": c.Int("query_time_in_millis"),
+		},
+	},
+})
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var all struct {

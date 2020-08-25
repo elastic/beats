@@ -127,6 +127,24 @@ var BulkStatsDict = c.Dict("bulk", s.Schema{
 	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
 }, c.DictOptional)
 
+var BulkStatsDictMetricbeatCompatible = c.Dict("bulk", s.Schema{
+	"operations": s.Object{
+		"count": c.Int("total_operations"),
+	},
+	"time": s.Object{
+		"count": s.Object{
+			"ms": c.Int("total_time_in_millis"),
+		},
+		"avg": s.Object{
+			"ms":    c.Int("avg_time_in_millis"),
+			"bytes": c.Int("avg_size_in_bytes"),
+		},
+	},
+	"size": s.Object{
+		"bytes": c.Int("total_size_in_bytes"),
+	},
+}, c.DictOptional)
+
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
 	// Check if cluster id already cached. If yes, return it.
