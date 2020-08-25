@@ -58,6 +58,7 @@ type MetricSet struct {
 	statsHTTP            *helper.HTTP
 	settingsHTTP         *helper.HTTP
 	usageLastCollectedOn time.Time
+	usageNextCollectOn   time.Time
 	isUsageExcludable    bool
 }
 
@@ -168,7 +169,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 		if err != nil {
 			if shouldCollectUsage {
 				// When errored in collecting the usage stats it may be counterproductive to try again on the next poll, try to collect the stats again after usageCollectionBackoff
-				m.usageLastCollectedOn = now.Add(usageCollectionBackoff - usageCollectionPeriod)
+				m.usageNextCollectOn = now.Add(usageCollectionBackoff)
 			}
 			return err
 		}
@@ -220,5 +221,5 @@ func (m *MetricSet) calculateIntervalMs() int64 {
 }
 
 func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod
+	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
 }
