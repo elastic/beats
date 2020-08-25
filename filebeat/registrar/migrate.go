@@ -31,7 +31,6 @@ import (
 	helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 )
 
@@ -214,17 +213,15 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 	registryBackend, err := memlog.New(logp.NewLogger("migration"), memlog.Settings{
 		Root:               m.dataPath,
 		FileMode:           m.permissions,
-		Checkpoint:         func(_ uint64) bool { return true },
+		Checkpoint:         func(sz uint64) bool { return false },
 		IgnoreVersionCheck: true,
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to create new registry backend")
 	}
+	defer registryBackend.Close()
 
-	reg := statestore.NewRegistry(registryBackend)
-	defer reg.Close()
-
-	store, err := reg.Get("filebeat")
+	store, err := registryBackend.Access("filebeat")
 	if err != nil {
 		return errors.Wrap(err, "failed to open filebeat registry store")
 	}
@@ -232,6 +229,13 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 
 	if err := writeStates(store, states); err != nil {
 		return errors.Wrap(err, "failed to migrate registry states")
+	}
+
+	if checkpointer, ok := store.(interface{ Checkpoint() error }); ok {
+		err := checkpointer.Checkpoint()
+		if err != nil {
+			return fmt.Errorf("failed to fsync filebeat storage state: %w", err)
+		}
 	}
 
 	if err := os.Remove(origDataFile); err != nil {
