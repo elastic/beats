@@ -76,6 +76,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -175,6 +181,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -272,6 +284,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -371,6 +389,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -469,6 +493,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -566,6 +596,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -666,6 +702,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -763,6 +805,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -861,6 +909,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -960,6 +1014,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1060,6 +1120,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "205.251.196.144"
@@ -1153,6 +1219,12 @@
         "network.iana_number": 6,
         "network.protocol": "dns",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1251,6 +1323,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1348,6 +1426,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1446,6 +1530,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1545,6 +1635,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1642,6 +1738,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1739,6 +1841,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1836,6 +1944,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1931,6 +2045,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -2030,6 +2150,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
