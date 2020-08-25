@@ -242,7 +242,7 @@ func TestRefreshOnAccess(t *testing.T) {
 	assert.Error(t, err)
 }
 
-var benchmarkCacheSizes = []int{10, 100, 1000, 10000, 100000}
+var benchmarkCacheSizes = []int{10, 100, 1000, 10000} //, 100000}
 
 func BenchmarkPut(b *testing.B) {
 	type cache interface {
@@ -257,11 +257,20 @@ func BenchmarkPut(b *testing.B) {
 		return cache
 	}
 
+	boltregistry := newTestRegistry(b)
+	boltregistry.backend = "bolt"
+	newBoltStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(boltregistry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
 	caches := []struct {
 		name    string
 		factory func(t testing.TB, name string) cache
 	}{
-		{name: "statestore", factory: newStatestoreCache},
+		{name: "memlog", factory: newStatestoreCache},
+		{name: "bolt", factory: newBoltStatestoreCache},
 	}
 
 	b.Run("random strings", func(b *testing.B) {
@@ -380,10 +389,20 @@ func BenchmarkOpen(b *testing.B) {
 		return cache
 	}
 
-	caches := map[string]struct {
+	boltregistry := newTestRegistry(b)
+	boltregistry.backend = "bolt"
+	newBoltStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(boltregistry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := []struct {
+		name    string
 		factory func(t testing.TB, name string) cache
 	}{
-		"statestore": {factory: newStatestoreCache},
+		{name: "memlog", factory: newStatestoreCache},
+		{name: "bolt", factory: newBoltStatestoreCache},
 	}
 
 	for _, size := range benchmarkCacheSizes {
@@ -393,8 +412,9 @@ func BenchmarkOpen(b *testing.B) {
 				Data [128]byte
 			}
 
-			for name, c := range caches {
-				cache := c.factory(b, name)
+			for _, c := range caches {
+				cacheName := b.Name()
+				cache := c.factory(b, cacheName)
 				for i := 0; i < size; i++ {
 					e := entry{
 						ID: uuid.Must(uuid.NewV4()).String(),
@@ -404,11 +424,11 @@ func BenchmarkOpen(b *testing.B) {
 				}
 				cache.Close()
 
-				b.Run(name, func(b *testing.B) {
+				b.Run(c.name, func(b *testing.B) {
 					b.ReportAllocs()
 
 					for i := 0; i < b.N; i++ {
-						cache := c.factory(b, name)
+						cache := c.factory(b, cacheName)
 						cache.Close()
 					}
 				})
@@ -431,11 +451,20 @@ func BenchmarkGet(b *testing.B) {
 		return cache
 	}
 
+	boltregistry := newTestRegistry(b)
+	boltregistry.backend = "bolt"
+	newBoltStatestoreCache := func(tb testing.TB, name string) cache {
+		cache, err := newCache(boltregistry, name, Options{})
+		require.NoError(tb, err)
+		return cache
+	}
+
 	caches := []struct {
 		name    string
 		factory func(t testing.TB, name string) cache
 	}{
-		{name: "statestore", factory: newStatestoreCache},
+		{name: "memlog", factory: newStatestoreCache},
+		{name: "bolt", factory: newBoltStatestoreCache},
 	}
 
 	for _, size := range benchmarkCacheSizes {
@@ -498,10 +527,21 @@ func BenchmarkCleanup(b *testing.B) {
 		return cache
 	}
 
-	caches := map[string]struct {
+	boltregistry := newTestRegistry(b)
+	boltregistry.backend = "bolt"
+	newBoltStatestoreCache := func(tb testing.TB, name string, clock func() time.Time) cache {
+		cache, err := newCache(boltregistry, name, Options{})
+		cache.clock = clock
+		require.NoError(tb, err)
+		return cache
+	}
+
+	caches := []struct {
+		name    string
 		factory func(t testing.TB, name string, clock func() time.Time) cache
 	}{
-		"statestore": {factory: newStatestoreCache},
+		{name: "memlog", factory: newStatestoreCache},
+		{name: "bolt", factory: newBoltStatestoreCache},
 	}
 
 	for _, size := range benchmarkCacheSizes {
@@ -512,12 +552,12 @@ func BenchmarkCleanup(b *testing.B) {
 				Data [128]byte
 			}
 
-			for name, c := range caches {
-				b.Run(name, func(b *testing.B) {
+			for _, c := range caches {
+				b.Run(c.name, func(b *testing.B) {
 					b.ReportAllocs()
 
 					now := time.Now()
-					cache := c.factory(b, name, func() time.Time { return now })
+					cache := c.factory(b, c.name, func() time.Time { return now })
 					defer cache.Close()
 
 					for i := 0; i < size/2; i++ {

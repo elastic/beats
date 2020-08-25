@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 )
 
@@ -213,6 +214,7 @@ func (c *PersistentCache) now() time.Time {
 type Registry struct {
 	mutex    sync.Mutex
 	path     string
+	backend  string
 	registry *statestore.Registry
 }
 
@@ -221,10 +223,23 @@ func (r *Registry) OpenStore(logger *logp.Logger, name string) (*statestore.Stor
 	defer r.mutex.Unlock()
 
 	if r.registry == nil {
-		rootPath := r.path
-		if rootPath == "" {
-			rootPath = paths.Resolve(paths.Data, cacheFile)
+		registry, err := r.initRegistry(logger)
+		if err != nil {
+			return nil, err
 		}
+		r.registry = registry
+	}
+
+	return r.registry.Get(name)
+}
+
+func (r *Registry) initRegistry(logger *logp.Logger) (*statestore.Registry, error) {
+	rootPath := r.path
+	if rootPath == "" {
+		rootPath = paths.Resolve(paths.Data, cacheFile)
+	}
+	switch r.backend {
+	case "memlog":
 		backend, err := memlog.New(logger, memlog.Settings{
 			Root:     rootPath,
 			FileMode: cacheFileMode,
@@ -232,8 +247,17 @@ func (r *Registry) OpenStore(logger *logp.Logger, name string) (*statestore.Stor
 		if err != nil {
 			return nil, fmt.Errorf("opening store for persistent cache: %w", err)
 		}
-		r.registry = statestore.NewRegistry(backend)
+		return statestore.NewRegistry(backend), nil
+	case "bolt", "":
+		backend, err := bolt.New(logger, bolt.Settings{
+			Root:     rootPath,
+			FileMode: cacheFileMode,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("opening store for persistent cache: %w", err)
+		}
+		return statestore.NewRegistry(backend), nil
+	default:
+		return nil, fmt.Errorf("backend not supported: %s", r.backend)
 	}
-
-	return r.registry.Get(name)
 }
