@@ -48,12 +48,12 @@ func TestFetchUsage(t *testing.T) {
 				w.WriteHeader(503)
 
 			case 1: // second call
-				// Make sure exclude_usage is still false since first call failed
-				require.Equal(t, "false", excludeUsage)
+				// Make sure exclude_usage is true since first call failed and it should not try again until usageCollectionBackoff time has passed
+				require.Equal(t, "true", excludeUsage)
 				w.WriteHeader(200)
 
 			case 2: // third call
-				// Make sure exclude_usage is now true since second call succeeded
+				// Make sure exclude_usage is still true
 				require.Equal(t, "true", excludeUsage)
 				w.WriteHeader(200)
 			}

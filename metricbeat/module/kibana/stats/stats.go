@@ -38,9 +38,10 @@ func init() {
 }
 
 const (
-	statsPath             = "api/stats"
-	settingsPath          = "api/settings"
-	usageCollectionPeriod = 24 * time.Hour
+	statsPath              = "api/stats"
+	settingsPath           = "api/settings"
+	usageCollectionPeriod  = 24 * time.Hour
+	usageCollectionBackoff = 1 * time.Hour
 )
 
 var (
@@ -165,6 +166,10 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 
 		content, err = m.statsHTTP.FetchContent()
 		if err != nil {
+			if shouldCollectUsage {
+				// When errored in collecting the usage stats it may be counterproductive to try again on the next poll, try to collect the stats again after usageCollectionBackoff
+				m.usageLastCollectedOn = now.Add(usageCollectionBackoff - usageCollectionPeriod)
+			}
 			return err
 		}
 
