@@ -80,7 +80,7 @@ func (v *apiValidator) ValidateHmac(r *http.Request) (int, error) {
 	}
 
 	if v.hmacToken != "" && v.hmacHeader != "" {
-		if len(r.Header.Get(v.hmacHeader)) != 0 {
+		if len(r.Header.Get(v.hmacHeader)) == 0 {
 			return http.StatusInternalServerError, fmt.Errorf("The HMAC signature in the configured request header is empty")
 		}
 		s := hmac.New(sha1.New, []byte(v.hmacToken))
