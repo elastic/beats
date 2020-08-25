@@ -57,6 +57,7 @@
 - Prevent closing closed reader {pull}20214[20214]
 - Fix Windows service installation script {pull}20203[20203]
 - Fix timeout issue stopping service applications {pull}20256[20256]
+- Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
 
 ==== New features
 
