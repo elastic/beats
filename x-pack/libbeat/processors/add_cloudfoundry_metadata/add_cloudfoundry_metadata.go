@@ -74,12 +74,12 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 				"name": app.Name,
 			},
 			"space": common.MapStr{
-				"id":   app.SpaceData.Meta.Guid,
-				"name": app.SpaceData.Entity.Name,
+				"id":   app.SpaceGuid,
+				"name": app.SpaceName,
 			},
 			"org": common.MapStr{
-				"id":   app.SpaceData.Entity.OrgData.Meta.Guid,
-				"name": app.SpaceData.Entity.OrgData.Entity.Name,
+				"id":   app.OrgGuid,
+				"name": app.OrgName,
 			},
 		},
 	})

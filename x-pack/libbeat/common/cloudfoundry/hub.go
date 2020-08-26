@@ -18,10 +18,20 @@ import (
 // Client interface exposed by Hub.Client.
 type Client interface {
 	// GetAppByGuid returns the application from cloudfoundry.
-	GetAppByGuid(guid string) (*cfclient.App, error)
+	GetAppByGuid(guid string) (*AppMeta, error)
 
 	// Close releases resources associated with this client.
 	Close() error
+}
+
+// AppMeta is the metadata associated with a cloudfoundry application
+type AppMeta struct {
+	Guid      string `json:"guid"`
+	Name      string `json:"name"`
+	SpaceGuid string `json:"space_guid"`
+	SpaceName string `json:"space_name"`
+	OrgGuid   string `json:"org_guid"`
+	OrgName   string `json:"org_name"`
 }
 
 // Hub is central place to get all the required clients to communicate with cloudfoundry.

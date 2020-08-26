@@ -56,8 +56,7 @@ func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, er
 }
 
 type appResponse struct {
-	// TODO: Store only the fields we need from the App.
-	App          cfclient.App               `json:"a"`
+	App          AppMeta                    `json:"a"`
 	Error        cfclient.CloudFoundryError `json:"e,omitempty"`
 	ErrorMessage string                     `json:"em,omitempty"`
 }
@@ -71,7 +70,14 @@ func (r *appResponse) fromStructs(app cfclient.App, err error) {
 		r.ErrorMessage = err.Error()
 		return
 	}
-	r.App = app
+	r.App = AppMeta{
+		Name:      app.Name,
+		Guid:      app.Guid,
+		SpaceName: app.SpaceData.Entity.Name,
+		SpaceGuid: app.SpaceData.Meta.Guid,
+		OrgName:   app.SpaceData.Entity.OrgData.Entity.Name,
+		OrgGuid:   app.SpaceData.Entity.OrgData.Meta.Guid,
+	}
 }
 
 func (r *appResponse) toStructs() (*AppMeta, error) {
@@ -88,7 +94,7 @@ func (r *appResponse) toStructs() (*AppMeta, error) {
 
 // fetchApp uses the cfClient to retrieve an App entity and
 // stores it in the internal cache
-func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
+func (c *clientCacheWrap) fetchAppByGuid(guid string) (*AppMeta, error) {
 	app, err := c.client.GetAppByGuid(guid)
 	var resp appResponse
 	resp.fromStructs(app, err)
@@ -106,7 +112,7 @@ func (c *clientCacheWrap) fetchAppByGuid(guid string) (*cfclient.App, error) {
 
 // GetApp returns CF Application info, either from the cache or
 // using the CF client.
-func (c *clientCacheWrap) GetAppByGuid(guid string) (*cfclient.App, error) {
+func (c *clientCacheWrap) GetAppByGuid(guid string) (*AppMeta, error) {
 	var resp appResponse
 	err := c.cache.Get(guid, &resp)
 	if err != nil {

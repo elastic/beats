@@ -26,8 +26,8 @@ func TestClientCacheWrap(t *testing.T) {
 	ttl := 2 * time.Second
 	guid := mustCreateFakeGuid()
 	app := cfclient.App{
-		Guid:   guid,
-		Memory: 1, // use this field to track if from cache or from client
+		Guid: guid,
+		Name: "Foo", // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
 	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logp.NewLogger("cloudfoundry"))
@@ -50,25 +50,28 @@ func TestClientCacheWrap(t *testing.T) {
 	// fetched from client for the first time
 	one, err = cache.GetAppByGuid(guid)
 	assert.NoError(t, err)
-	assert.Equal(t, app, *one)
+	assert.Equal(t, app.Guid, one.Guid)
+	assert.Equal(t, app.Name, one.Name)
 	assert.Equal(t, 2, fakeClient.callCount)
 
 	// updated app in fake client, new fetch should not have updated app
 	updatedApp := cfclient.App{
-		Guid:   guid,
-		Memory: 2,
+		Guid: guid,
+		Name: "Bar",
 	}
 	fakeClient.app = updatedApp
 	two, err := cache.GetAppByGuid(guid)
 	assert.NoError(t, err)
-	assert.Equal(t, app, *two)
+	assert.Equal(t, app.Guid, two.Guid)
+	assert.Equal(t, app.Name, two.Name)
 	assert.Equal(t, 2, fakeClient.callCount)
 
 	// wait the ttl, then it should have updated app
 	time.Sleep(ttl)
 	three, err := cache.GetAppByGuid(guid)
 	assert.NoError(t, err)
-	assert.Equal(t, updatedApp, *three)
+	assert.Equal(t, updatedApp.Guid, three.Guid)
+	assert.Equal(t, updatedApp.Name, three.Name)
 	assert.Equal(t, 3, fakeClient.callCount)
 }
 
