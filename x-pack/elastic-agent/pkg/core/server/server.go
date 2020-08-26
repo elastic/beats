@@ -894,11 +894,12 @@ func (s *Server) getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, err
 
 // getListenAddr returns the listening address of the server.
 func (s *Server) getListenAddr() string {
-	if s.listenAddr != ":0" {
-		return s.listenAddr
+	addr := strings.SplitN(s.listenAddr, ":", 2)
+	if len(addr) == 2 && addr[1] == "0" {
+		port := s.listener.Addr().(*net.TCPAddr).Port
+		return fmt.Sprintf("%s:%d", addr[0], port)
 	}
-	port := s.listener.Addr().(*net.TCPAddr).Port
-	return fmt.Sprintf(":%d", port)
+	return s.listenAddr
 }
 
 type pendingAction struct {
