@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -53,8 +54,8 @@ func TestFetchUsage(t *testing.T) {
 				w.WriteHeader(200)
 
 			case 2: // third call
-				// Make sure exclude_usage is still true
-				require.Equal(t, "true", excludeUsage)
+				// Make sure exclude_usage is false because we've forced the usageNextCollectOn to be expired
+				require.Equal(t, "false", excludeUsage)
 				w.WriteHeader(200)
 			}
 
@@ -67,12 +68,36 @@ func TestFetchUsage(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
+	ms, err := mtest.NewMetricSet(f)
+	require.Nil(t, err)
+
+	// At the begining usageLastCollectedOn and usageNextCollectOn should be nil
+	require.Nil(t, mtest.GetUsageLastCollectedOn(ms))
+	require.Nil(t, mtest.GetUsageNextCollectOn(ms))
+
 	// First fetch
 	mbtest.ReportingFetchV2Error(f)
+
+	// Now usageLastCollectedOn should be nil but usageNextCollectOn shouldn't
+	require.Nil(t, mtest.GetUsageLastCollectedOn(ms))
+	usageNextCollectOn := mtest.GetUsageNextCollectOn(ms)
+	require.NotNil(t, usageNextCollectOn)
 
 	// Second fetch
 	mbtest.ReportingFetchV2Error(f)
 
+	// It collected metrics only, so usageLastCollectedOn should still be nil and usageNextCollectOn shouldn't have changed
+	require.Nil(t, mtest.GetUsageLastCollectedOn(ms))
+	require.Equal(t, usageNextCollectOn, mtest.GetUsageNextCollectOn(ms))
+
+	// Force the next usage collection
+	now := time.Now()
+	mtest.SetUsageNextCollectOn(ms, now)
+
 	// Third fetch
 	mbtest.ReportingFetchV2Error(f)
+
+	// It should have successfully collected the usage so usageLastCollectedOn should have a value and usageNextCollectOn shouldn't be updated
+	require.NotNil(t, mtest.GetUsageLastCollectedOn(ms))
+	require.Equal(t, now, mtest.GetUsageNextCollectOn(ms))
 }
