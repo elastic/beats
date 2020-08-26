@@ -77275,18 +77275,6 @@ Contains log file lines.
 
 
 
-*`log.file.path`*::
-+
---
-The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
-
-
-type: keyword
-
-required: False
-
---
-
 *`log.source.address`*::
 +
 --
