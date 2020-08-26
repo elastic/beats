@@ -64,7 +64,7 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	}
 
 	http.SetHeaderDefault("Accept", acceptHeader)
-	http.SetHeader("Accept-Encoding", "gzip")
+	http.SetHeaderDefault("Accept-Encoding", "gzip")
 	return &prometheus{http, base.Logger()}, nil
 }
 
@@ -79,10 +79,12 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	defer resp.Body.Close()
 
 	if resp.Header.Get("Content-Encoding") == "gzip" {
-		reader, err = gzip.NewReader(resp.Body)
+		greader, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			return nil, err
 		}
+		defer greader.Close()
+		reader = greader
 	} else {
 		reader = resp.Body
 	}
