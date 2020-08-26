@@ -122,6 +122,29 @@ func TestCopyFields(t *testing.T) {
 				"message":          42,
 			},
 		},
+		"copy map from nested key message.original to top level field message_copied": {
+			FromTo: fromTo{
+				From: "message.original",
+				To:   "message_copied",
+			},
+			Input: common.MapStr{
+				"message": common.MapStr{
+					"original": common.MapStr{
+						"original": "original",
+					},
+				},
+			},
+			Expected: common.MapStr{
+				"message": common.MapStr{
+					"original": common.MapStr{
+						"original": "original",
+					},
+				},
+				"message_copied": common.MapStr{
+					"original": "original",
+				},
+			},
+		},
 	}
 
 	for name, test := range tests {

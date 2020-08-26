@@ -5,14 +5,7 @@
 package reexec
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-)
-
-var (
-	execSingleton     ExecManager
-	execSingletonOnce sync.Once
 )
 
 // ExecManager is the interface that the global reexec manager implements.
@@ -30,14 +23,6 @@ type ExecManager interface {
 	ShutdownComplete()
 }
 
-// Manager returns the global reexec manager.
-func Manager(log *logger.Logger, exec string) ExecManager {
-	execSingletonOnce.Do(func() {
-		execSingleton = newManager(log, exec)
-	})
-	return execSingleton
-}
-
 type manager struct {
 	logger   *logger.Logger
 	exec     string
@@ -46,7 +31,8 @@ type manager struct {
 	complete chan bool
 }
 
-func newManager(log *logger.Logger, exec string) *manager {
+// NewManager returns the reexec manager.
+func NewManager(log *logger.Logger, exec string) ExecManager {
 	return &manager{
 		logger:   log,
 		exec:     exec,

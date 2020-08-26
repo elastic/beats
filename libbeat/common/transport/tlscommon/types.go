@@ -117,27 +117,23 @@ var tlsClientAuthTypes = map[string]tlsClientAuth{
 	"required": tlsClientAuthRequired,
 }
 
-// TLSVerificationMode represents the type of verification to do on the remote host,
-// `none` or `full` and we default to `full`, internally this option is transformed into the
-// `insecure` field in the `tls.Config` struct.
+// TLSVerificationMode represents the type of verification to do on the remote host:
+// `none`, `certificate`, and `full` and we default to `full`.
+// Internally this option is transformed into the `insecure` field in the `tls.Config` struct.
 type TLSVerificationMode uint8
 
 // Constants of the supported verification mode.
 const (
 	VerifyFull TLSVerificationMode = iota
 	VerifyNone
-
-	// TODO: add VerifyCertificate support. Due to checks being run
-	//       during handshake being limited, verify certificates in
-	//       postVerifyTLSConnection
-	// VerifyCertificate
+	VerifyCertificate
 )
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
-	"":     VerifyFull,
-	"full": VerifyFull,
-	"none": VerifyNone,
-	// "certificate": verifyCertificate,
+	"":            VerifyFull,
+	"full":        VerifyFull,
+	"none":        VerifyNone,
+	"certificate": VerifyCertificate,
 }
 
 func (m TLSVerificationMode) String() string {

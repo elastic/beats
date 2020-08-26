@@ -5,7 +5,6 @@ from heartbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
-import nose.tools
 
 
 class Test(BaseTest, common_tests.TestExportsMixin):
@@ -181,7 +180,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             heartbeat_proc.check_kill_and_wait()
 
         for output in self.read_output():
-            nose.tools.assert_equal(
+            self.assertEqual(
                 output["event.dataset"],
                 "uptime",
                 "Check for event.dataset in {} failed".format(output)

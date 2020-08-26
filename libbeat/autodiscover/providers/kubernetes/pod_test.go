@@ -1013,7 +1013,7 @@ func TestEmitEvent(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.pod"),
 			}
 
-			p.eventer = pod
+			p.eventManager = NewMockPodEventerManager(pod)
 
 			listener := p.bus.Subscribe()
 
@@ -1032,6 +1032,12 @@ func TestEmitEvent(t *testing.T) {
 
 		})
 	}
+}
+
+func NewMockPodEventerManager(pod *pod) EventManager {
+	em := &eventerManager{}
+	em.eventer = pod
+	return em
 }
 
 func getNestedAnnotations(in common.MapStr) common.MapStr {

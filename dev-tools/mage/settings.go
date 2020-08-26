@@ -92,6 +92,7 @@ var (
 		"repo":              GetProjectRepoInfo,
 		"title":             strings.Title,
 		"tolower":           strings.ToLower,
+		"contains":          strings.Contains,
 	}
 )
 

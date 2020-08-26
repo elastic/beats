@@ -59,8 +59,8 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
-	github.com/elastic/go-concert v0.0.3
-	github.com/elastic/go-libaudit/v2 v2.0.1
+	github.com/elastic/go-concert v0.0.4
+	github.com/elastic/go-libaudit/v2 v2.0.2
 	github.com/elastic/go-licenser v0.3.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
@@ -123,7 +123,7 @@ require (
 	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
-	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
+	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
@@ -167,7 +167,7 @@ require (
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20200701041122-1837592efa10
+	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.29.1
@@ -190,6 +190,7 @@ replace (
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
+	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
 	github.com/google/gopacket => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41

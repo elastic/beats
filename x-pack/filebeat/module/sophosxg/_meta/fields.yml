@@ -1,9 +1,0 @@
-- key: sophosxg
-  title: "sophosxg"
-  description: >
-    sophosxg Module
-  fields:
-    - name: sophosxg
-      type: group
-      description: >
-      fields:
