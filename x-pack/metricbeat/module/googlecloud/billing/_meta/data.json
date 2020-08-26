@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.billing",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "billing": {
+            "cost_type": "regular",
+            "invoice_month": "202008",
+            "project_id": "elastic-fin-bi",
+            "total": 144.35474299999996,
+            "total_exact": 144.354743
+        }
+    },
+    "metricset": {
+        "name": "billing",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}
