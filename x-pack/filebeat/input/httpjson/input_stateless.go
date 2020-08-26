@@ -9,7 +9,6 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
@@ -22,37 +21,26 @@ func statelessConfigure(cfg *common.Config) (stateless.Input, error) {
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
-
 	return newStatelessInput(conf)
 }
 
 func newStatelessInput(config config.Config) (*statelessInput, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	input, err := newInput(config)
 	if err != nil {
 		return nil, err
 	}
-
-	return &statelessInput{
-		input: &input{
-			config:    config,
-			tlsConfig: tlsConfig,
-		},
-	}, nil
+	return &statelessInput{input: input}, nil
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
 	return in.test()
 }
 
-type statlessPublisher struct {
+type statelessPublisher struct {
 	wrapped stateless.Publisher
 }
 
-func (pub statlessPublisher) Publish(event beat.Event, _ interface{}) error {
+func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 	pub.wrapped.Publish(event)
 	return nil
 }
@@ -60,6 +48,6 @@ func (pub statlessPublisher) Publish(event beat.Event, _ interface{}) error {
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
 func (in *statelessInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
-	pub := statlessPublisher{wrapped: publisher}
+	pub := statelessPublisher{wrapped: publisher}
 	return in.run(ctx, pub, nil)
 }

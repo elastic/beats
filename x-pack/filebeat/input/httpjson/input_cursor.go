@@ -8,7 +8,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
@@ -21,27 +20,15 @@ func cursorConfigure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) 
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
 	}
-
 	return newCursorInput(conf)
 }
 
 func newCursorInput(config config.Config) ([]cursor.Source, cursor.Input, error) {
-	if err := config.Validate(); err != nil {
-		return nil, nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	input, err := newInput(config)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	return nil,
-		&cursorInput{
-			input: &input{
-				config:    config,
-				tlsConfig: tlsConfig,
-			},
-		}, nil
+	return nil, &cursorInput{input: input}, nil
 }
 
 func (in *cursorInput) Test(cursor.Source, v2.TestContext) error {

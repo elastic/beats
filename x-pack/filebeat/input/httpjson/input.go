@@ -88,6 +88,22 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	}
 }
 
+func newInput(config config.Config) (*input, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	return &input{
+		config:    config,
+		tlsConfig: tlsConfig,
+	}, nil
+}
+
 func (*input) Name() string { return inputName }
 
 func (in *input) test() error {
