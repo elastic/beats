@@ -14,7 +14,7 @@ import (
 func TestVars_Replace(t *testing.T) {
 	vars := &Vars{
 		Mapping: map[string]interface{}{
-			"testing": map[string]interface{}{
+			"un-der_score": map[string]interface{}{
 				"key1": "data1",
 				"key2": "data2",
 			},
@@ -30,37 +30,37 @@ func TestVars_Replace(t *testing.T) {
 		NoMatch bool
 	}{
 		{
-			"{{testing.key1}}",
+			"{{un-der_score.key1}}",
 			"data1",
 			false,
 			false,
 		},
 		{
-			"{{testing.missing}}",
+			"{{un-der_score.missing}}",
 			"",
 			false,
 			true,
 		},
 		{
-			"{{testing.missing|testing.key2}}",
+			"{{un-der_score.missing|un-der_score.key2}}",
 			"data2",
 			false,
 			false,
 		},
 		{
-			"{{testing.missing|testing.missing2|other.data}}",
+			"{{un-der_score.missing|un-der_score.missing2|other.data}}",
 			"info",
 			false,
 			false,
 		},
 		{
-			"{{testing.missing|'fallback'}}",
+			"{{un-der_score.missing|'fallback'}}",
 			"fallback",
 			false,
 			false,
 		},
 		{
-			`{{testing.missing|||||||||"fallback"}}`,
+			`{{un-der_score.missing|||||||||"fallback"}}`,
 			"fallback",
 			false,
 			false,
@@ -72,13 +72,13 @@ func TestVars_Replace(t *testing.T) {
 			false,
 		},
 		{
-			`{{testing.}}`,
+			`{{un-der_score.}}`,
 			"",
 			true,
 			false,
 		},
 		{
-			`{{testing.missing|"oth}}`,
+			`{{un-der_score.missing|"oth}}`,
 			"",
 			true,
 			false,
@@ -90,31 +90,31 @@ func TestVars_Replace(t *testing.T) {
 			false,
 		},
 		{
-			"around {{testing.key1}} the var",
+			"around {{un-der_score.key1}} the var",
 			"around data1 the var",
 			false,
 			false,
 		},
 		{
-			"multi {{testing.key1}} var {{ testing.missing |     testing.key2      }} around",
+			"multi {{un-der_score.key1}} var {{ un-der_score.missing |     un-der_score.key2      }} around",
 			"multi data1 var data2 around",
 			false,
 			false,
 		},
 		{
-			`multi {{testing.key1}} var {{  testing.missing|  'other"s with space'  }} around`,
+			`multi {{un-der_score.key1}} var {{  un-der_score.missing|  'other"s with space'  }} around`,
 			`multi data1 var other"s with space around`,
 			false,
 			false,
 		},
 		{
-			`start {{  testing.missing|  'others | with space'  }} end`,
+			`start {{  un-der_score.missing|  'others | with space'  }} end`,
 			`start others | with space end`,
 			false,
 			false,
 		},
 		{
-			`start {{  testing.missing|  'other\'s with space'  }} end`,
+			`start {{  un-der_score.missing|  'other\'s with space'  }} end`,
 			`start other's with space end`,
 			false,
 			false,

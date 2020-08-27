@@ -176,11 +176,17 @@ func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[
 func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][]program.Program, error) {
 	monitor := noop.NewMonitor()
 	router := &inmemRouter{}
-	composableCtrl := &nilController{}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	composableCtrl, err := composable.New(cfg)
+	if err != nil {
+		return nil, err
+	}
+	composableWaiter := newWaitForCompose(composableCtrl)
 	emit, err := emitter(
-		context.Background(),
+		ctx,
 		log,
-		composableCtrl,
+		composableWaiter,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -195,6 +201,7 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 	if err := emit(cfg); err != nil {
 		return nil, err
 	}
+	composableWaiter.Wait()
 	return router.programs, nil
 }
 
@@ -211,8 +218,26 @@ func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }
 
-type nilController struct{}
+type waitForCompose struct {
+	controller composable.Controller
+	done       chan bool
+}
 
-func (*nilController) Run(_ context.Context, _ composable.VarsCallback) error {
-	return nil
+func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
+	return &waitForCompose{
+		controller: wrapped,
+		done:       make(chan bool),
+	}
+}
+
+func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
+	err := w.controller.Run(ctx, func(vars []composable.Vars) {
+		cb(vars)
+		w.done <- true
+	})
+	return err
+}
+
+func (w *waitForCompose) Wait() {
+	<-w.done
 }

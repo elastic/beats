@@ -216,14 +216,14 @@ func NewList(nodes []Node) *List {
 
 func (l *List) String() string {
 	var sb strings.Builder
+	sb.WriteString("[")
 	for i := 0; i < len(l.value); i++ {
-		sb.WriteString("[")
 		sb.WriteString(l.value[i].String())
-		sb.WriteString("]")
 		if i < len(l.value)-1 {
 			sb.WriteString(",")
 		}
 	}
+	sb.WriteString("]")
 	return sb.String()
 }
 

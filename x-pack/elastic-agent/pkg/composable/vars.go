@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
-var varsRegex = regexp.MustCompile(`{{([\p{L}\d\s\\\-|.'"]*)}}`)
+var varsRegex = regexp.MustCompile(`{{([\p{L}\d\s\\\-_|.'"]*)}}`)
 
 // ErrNoMatch is return when the replace didn't fail, just that no vars match to perform the replace.
 var ErrNoMatch = fmt.Errorf("no matching vars")

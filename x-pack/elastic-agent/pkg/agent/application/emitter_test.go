@@ -5,7 +5,6 @@
 package application
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -221,6 +220,200 @@ func TestRenderInputs(t *testing.T) {
 				},
 			},
 		},
+		"nested in streams": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/{{var1.name}}.log"),
+							})),
+						}),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value2.log"),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value3.log"),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value4.log"),
+							})),
+						}),
+					})),
+				}),
+			}),
+			varsArray: []composable.Vars{
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value1",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value2",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value2",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value3",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value4",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"missing": "other",
+						},
+					},
+				},
+			},
+		},
+		"vars with processors": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/{{var1.name}}.log"),
+							})),
+						}),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("custom", transpiler.NewStrVal("value1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value2.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("custom", transpiler.NewStrVal("value2")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+					})),
+				}),
+			}),
+			varsArray: []composable.Vars{
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value1",
+						},
+					},
+					ProcessorsKey: "var1",
+					Processors: []map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value1",
+								},
+								"to": "dynamic",
+							},
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value2",
+						},
+					},
+					ProcessorsKey: "var1",
+					Processors: []map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value2",
+								},
+								"to": "dynamic",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {
@@ -230,11 +423,7 @@ func TestRenderInputs(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				if !assert.True(t, reflect.DeepEqual(test.expected, v)) {
-					t.Logf(
-						`received: %+v
-					 	 expected: %+v`, v, test.expected)
-				}
+				assert.Equal(t, test.expected.String(), v.String())
 			}
 		})
 	}

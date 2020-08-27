@@ -225,6 +225,7 @@ func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpil
 				// another error that needs to be reported
 				return nil, err
 			}
+			dict = promoteProcessors(dict)
 			hash := string(dict.Hash())
 			_, exists := nodesMap[hash]
 			if !exists {
@@ -234,4 +235,46 @@ func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpil
 		}
 	}
 	return transpiler.NewList(nodes), nil
+}
+
+func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
+	found := findProcessors(dict)
+	if found == nil {
+		return dict
+	}
+	ast, _ := transpiler.NewAST(map[string]interface{}{
+		"processors": found,
+	})
+	node, _ := transpiler.Lookup(ast, "processors")
+	return transpiler.NewDict(append(dict.Value().([]transpiler.Node), node))
+}
+
+func findProcessors(node transpiler.Node) []map[string]interface{} {
+	switch t := node.(type) {
+	case *transpiler.Dict, *transpiler.List:
+		val := t.Value()
+		if val != nil {
+			for _, key := range t.Value().([]transpiler.Node) {
+				if found := findProcessors(key); found != nil {
+					return found
+				}
+			}
+		}
+	case *transpiler.Key:
+		val := t.Value()
+		if val != nil {
+			if found := findProcessors(t.Value().(transpiler.Node)); found != nil {
+				return found
+			}
+		}
+	case *transpiler.StrVal:
+		if t != nil {
+			if found := t.Processors(); found != nil {
+				return found
+			}
+		}
+	default:
+		return nil
+	}
+	return nil
 }
