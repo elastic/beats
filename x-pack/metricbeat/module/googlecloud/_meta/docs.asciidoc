@@ -143,6 +143,17 @@ Currently, we have `compute`, `loadbalancing`, `pubsub`, `metrics` and
 `storage` metricset in `googlecloud` module.
 
 [float]
+=== `billing`
+This metricset fetches billing metrics from https://cloud.google.com/bigquery[GCP BigQuery]
+Cloud Billing allows users to export billing data into BigQuery automatically
+throughout the day. This metricset gets access to the daily cost detail table
+periodically to export billing metrics for further analysis.
+
+The `billing` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-billing-overview.png[]
+
+[float]
 === `compute`
 This metricset fetches metrics from https://cloud.google.com/compute/[Compute Engine]
 Virtual Machines in Google Cloud Platform. The `compute` metricset contains some
