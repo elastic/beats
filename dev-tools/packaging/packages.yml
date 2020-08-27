@@ -45,6 +45,10 @@ shared:
         source: 'elastic-agent.yml'
         mode: 0600
         config: true
+      /etc/{{.BeatName}}/.elastic-agent.active.commit:
+        content: >
+          {{ commit }}
+        mode: 0644
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
         source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
         mode: 0755
@@ -143,6 +147,10 @@ shared:
         source: 'elastic-agent.yml'
         mode: 0600
         config: true
+      /etc/{{.BeatName}}/.elastic-agent.active.commit:
+        content: >
+          {{ commit }}
+        mode: 0644
       /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
         mode: 0755
@@ -218,6 +226,10 @@ shared:
       source: 'elastic-agent.yml'
       mode: 0600
       config: true
+    '.elastic-agent.active.commit':
+      content: >
+        {{ commit }}
+      mode: 0644
 
   # Binary package spec (tar.gz for linux/darwin) for community beats.
   - &agent_binary_spec
@@ -335,6 +347,10 @@ shared:
         source: 'elastic-agent.docker.yml'
         mode: 0600
         config: true
+      '.elastic-agent.active.commit':
+        content: >
+          {{ commit }}
+        mode: 0644
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
