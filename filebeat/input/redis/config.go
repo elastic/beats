@@ -39,4 +39,5 @@ type config struct {
 	Network                   string        `config:"network"`
 	MaxConn                   int           `config:"maxconn" validate:"min=1"`
 	Password                  string        `config:"password"`
+	Name                      string        `config:"name"`
 }

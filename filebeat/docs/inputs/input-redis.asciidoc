@@ -9,7 +9,7 @@
 
 experimental[]
 
-Use the `redis` input to read entries from Redis slowlogs.
+Use the `redis` input to read entries from Redis slowlogs and acl_logs.
 
 Example configuration:
 
@@ -17,6 +17,12 @@ Example configuration:
 ----
 {beatname_lc}.inputs:
 - type: redis
+  name: slowlog
+  hosts: ["localhost:6379"]
+  password: "${redis_pwd}"
+
+- type: redis
+  name: acl_log
   hosts: ["localhost:6379"]
   password: "${redis_pwd}"
 ----
@@ -26,6 +32,12 @@ Example configuration:
 
 The `redis` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[redis-name]]
+===== `name`
+
+The slowlog or acl_log value.
 
 [float]
 [[redis-hosts]]
@@ -43,13 +55,13 @@ The password to use when connecting to Redis.
 [[redis-scan_frequency]]
 ===== `scan_frequency`
 
-How often {beatname_uc} reads entries from Redis slowlogs. Specify `1s` to scan
+How often {beatname_uc} reads entries from Redis slowlogs and acl_logs. Specify `1s` to scan
 Redis as frequently as possible without causing {beatname_uc} to scan too
 frequently. Do not set this value to less than `1s`.
 
 The default is `10s`.
 
-IMPORTANT: Redis slowlogs are not permanent. To ensure that all slowlog entries
+IMPORTANT: Redis slowlogs and acl_logs are not permanent. To ensure that all slowlog and acl_logs entries
 are collected, set `scan_frequency` to a value that allows {beatname_uc}
 sufficient time to connect to Redis, query the logs, and buffer them to the
 output within the specified interval.

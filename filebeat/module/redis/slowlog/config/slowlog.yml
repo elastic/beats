@@ -1,4 +1,5 @@
 type: redis
+name: slowlog
 hosts:
 {{ range $i, $host := .hosts }}
  - {{$host}}

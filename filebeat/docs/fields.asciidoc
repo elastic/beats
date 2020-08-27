@@ -100252,6 +100252,53 @@ Redis Module
 
 
 [float]
+=== acl_log
+
+Acl logs are retrieved from Redis via a network connection.
+
+
+
+*`redis.acl_log.count`*::
++
+--
+Number of similar acl logs
+
+
+type: integer
+
+--
+
+*`redis.acl_log.reason`*::
++
+--
+The reason of acl log event
+
+
+type: keyword
+
+--
+
+*`redis.acl_log.object`*::
++
+--
+Usually the command that was executed by user
+
+
+type: keyword
+
+--
+
+*`redis.acl_log.username`*::
++
+--
+Username of Redis user that triggered ACL rule
+
+
+type: keyword
+
+--
+
+[float]
 === log
 
 Redis log files

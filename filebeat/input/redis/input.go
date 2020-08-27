@@ -32,6 +32,7 @@ import (
 )
 
 func init() {
+
 	err := input.Register("redis", NewInput)
 	if err != nil {
 		panic(err)
@@ -49,7 +50,6 @@ type Input struct {
 
 // NewInput creates a new redis input
 func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
-	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
 
@@ -57,6 +57,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	if err != nil {
 		return nil, err
 	}
+
+	cfgwarn.Experimental("Redis %s input is enabled.", config.Name)
 
 	out, err := connector.Connect(cfg)
 	if err != nil {
@@ -85,6 +87,12 @@ func (p *Input) LoadStates(states []file.State) error {
 // by the value of the `scan_frequency` setting.
 // Also see https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-redis.html#redis-scan_frequency.
 func (p *Input) Run() {
+
+	if len(p.config.Name) == 0 {
+		logp.Err("No redis submodule name configured")
+		return
+	}
+
 	logp.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
 
 	if len(p.config.Hosts) == 0 {
@@ -97,7 +105,7 @@ func (p *Input) Run() {
 		pool := CreatePool(host, p.config.Password, p.config.Network,
 			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
 
-		h, err := NewHarvester(pool.Get())
+		h, err := NewHarvester(pool.Get(), p.config.Name)
 		if err != nil {
 			logp.Err("Failed to create harvester: %v", err)
 			continue

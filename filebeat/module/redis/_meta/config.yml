@@ -11,6 +11,22 @@
   slowlog:
     enabled: true
 
+    # The Redis submodule Name
+    # var.name: "slowlog"
+
+    # The Redis hosts to connect to.
+    #var.hosts: ["localhost:6379"]
+
+    # Optional, the password to use when connecting to Redis.
+    #var.password:
+
+  # ACL logs, retrieved via the Redis API (ACL LOG)
+  acl_log:
+    enabled: true
+
+    # The Redis submodule Name
+    # var.name: "acl_log"
+
     # The Redis hosts to connect to.
     #var.hosts: ["localhost:6379"]
 
