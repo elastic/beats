@@ -5,7 +5,6 @@ import unittest
 import getpass
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 

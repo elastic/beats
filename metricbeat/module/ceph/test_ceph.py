@@ -5,7 +5,6 @@ import time
 import unittest
 from parameterized import parameterized
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 

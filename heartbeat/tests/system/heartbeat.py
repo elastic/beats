@@ -3,9 +3,6 @@ import sys
 import http.server
 import threading
 
-sys.path.append(os.path.join(os.path.dirname(
-    __file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 from time import sleep
 

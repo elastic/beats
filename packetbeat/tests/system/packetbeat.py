@@ -3,7 +3,6 @@ import sys
 import subprocess
 import json
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase
 from beat.beat import Proc

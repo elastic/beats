@@ -8,7 +8,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 

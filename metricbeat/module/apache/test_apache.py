@@ -8,7 +8,6 @@ import time
 import semver
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
