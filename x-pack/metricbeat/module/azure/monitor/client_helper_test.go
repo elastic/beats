@@ -7,6 +7,8 @@ package monitor
 import (
 	"testing"
 
+	az "github.com/elastic/beats/v7/x-pack/libbeat/common/azure"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
@@ -59,11 +61,11 @@ func TestMapMetric(t *testing.T) {
 	metricDefinitions := insights.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
 	}
-	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
-	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	metricConfig := az.MetricConfig{Namespace: "namespace", Dimensions: []az.DimensionConfig{{Name: "location", Value: "West Europe"}}}
+	resourceConfig := az.ResourceConfig{Metrics: []az.MetricConfig{metricConfig}}
 	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
-		m := &azure.MockService{}
+		m := &az.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
@@ -72,11 +74,11 @@ func TestMapMetric(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when all metric names and aggregations were configured", func(t *testing.T) {
-		m := &azure.MockService{}
+		m := &az.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"*"}
-		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		resourceConfig.Metrics = []az.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, metrics[0].Resource.Id, "123")
@@ -90,12 +92,12 @@ func TestMapMetric(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
-		m := &azure.MockService{}
+		m := &az.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"TotalRequests", "Capacity"}
 		metricConfig.Aggregations = []string{"Average"}
-		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
+		resourceConfig.Metrics = []az.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NoError(t, err)
 
@@ -144,7 +146,6 @@ func TestIntersections(t *testing.T) {
 	intersection, difference = intersections(firstStr, sercondStr)
 	assert.Equal(t, len(intersection), 0)
 	assert.Equal(t, difference, []string{"test4", "test5"})
-
 }
 
 func TestGetMetricDefinitionsByNames(t *testing.T) {

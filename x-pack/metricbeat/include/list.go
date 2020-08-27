@@ -21,7 +21,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/app_insights"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/compute_vm"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/compute_vm_scaleset"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/storage"

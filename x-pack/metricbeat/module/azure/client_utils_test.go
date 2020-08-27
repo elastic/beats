@@ -111,18 +111,6 @@ func TestGetResourceGroupFromID(t *testing.T) {
 	assert.Equal(t, group, "obs-infrastructure")
 }
 
-func TestGetResourceTypeFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	rType := getResourceTypeFromId(path)
-	assert.Equal(t, rType, "Microsoft.Compute/virtualMachines")
-}
-
-func TestGetResourceNameFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	name := getResourceNameFromId(path)
-	assert.Equal(t, name, "obstestmemleak")
-}
-
 func TestExpired(t *testing.T) {
 	resConfig := ResourceConfiguration{}
 	result := resConfig.Expired()
