@@ -56,7 +56,7 @@ func TestVars_Replace(t *testing.T) {
 			false,
 		},
 		{
-			`{{testing.missing|"fallback"}}`,
+			`{{testing.missing|||||||||"fallback"}}`,
 			"fallback",
 			false,
 			false,
@@ -69,12 +69,6 @@ func TestVars_Replace(t *testing.T) {
 		},
 		{
 			`{{testing.}}`,
-			"",
-			true,
-			false,
-		},
-		{
-			`{{testing. key1}}`,
 			"",
 			true,
 			false,
@@ -98,14 +92,26 @@ func TestVars_Replace(t *testing.T) {
 			false,
 		},
 		{
-			"multi {{testing.key1}} var {{testing.missing|testing.key2}} around",
+			"multi {{testing.key1}} var {{ testing.missing |     testing.key2      }} around",
 			"multi data1 var data2 around",
 			false,
 			false,
 		},
 		{
-			"multi {{testing.key1}} var {{testing.missing|'other with space'}} around",
-			"multi data1 var other with space around",
+			`multi {{testing.key1}} var {{  testing.missing|  'other"s with space'  }} around`,
+			`multi data1 var other"s with space around`,
+			false,
+			false,
+		},
+		{
+			`start {{  testing.missing|  'others | with space'  }} end`,
+			`start others | with space end`,
+			false,
+			false,
+		},
+		{
+			`start {{  testing.missing|  'other\'s with space'  }} end`,
+			`start other's with space end`,
 			false,
 			false,
 		},
@@ -152,6 +158,11 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 	assert.Equal(t, "data1", res)
 
 	res, resProcessors, err = vars.Replace("{{dynamic.key1}}")
+	require.NoError(t, err)
+	assert.Equal(t, processers, resProcessors)
+	assert.Equal(t, "dynamic1", res)
+
+	res, resProcessors, err = vars.Replace("{{other.key1|dynamic.key1}}")
 	require.NoError(t, err)
 	assert.Equal(t, processers, resProcessors)
 	assert.Equal(t, "dynamic1", res)
