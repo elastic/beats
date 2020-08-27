@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
@@ -23,7 +24,9 @@ type dynamicProvider struct {
 // Run runs the environment context provider.
 func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	for i, mapping := range c.Mappings {
-		comm.AddOrUpdate(strconv.Itoa(i), mapping, nil)
+		if err := comm.AddOrUpdate(strconv.Itoa(i), mapping, nil); err != nil {
+			return errors.New(err, fmt.Sprintf("failed to add mapping for index %d", i), errors.TypeUnexpected)
+		}
 	}
 	return nil
 }

@@ -6,6 +6,7 @@ package agent
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
@@ -23,7 +24,7 @@ func (*contextProvider) Run(comm composable.ContextProviderComm) error {
 	if err != nil {
 		return err
 	}
-	comm.Set(map[string]interface{}{
+	err = comm.Set(map[string]interface{}{
 		"id": a.AgentID(),
 		"version": map[string]interface{}{
 			"version":    release.Version(),
@@ -32,6 +33,9 @@ func (*contextProvider) Run(comm composable.ContextProviderComm) error {
 			"snapshot":   release.Snapshot(),
 		},
 	})
+	if err != nil {
+		return errors.New(err, "failed to set mapping", errors.TypeUnexpected)
+	}
 	return nil
 }
 

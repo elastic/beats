@@ -34,7 +34,17 @@ func NewDynamicComm(ctx context.Context) *DynamicComm {
 }
 
 // AddOrUpdate adds or updates a current mapping.
-func (t *DynamicComm) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) {
+func (t *DynamicComm) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error {
+	var err error
+	mapping, err = CloneMap(mapping)
+	if err != nil {
+		return err
+	}
+	processors, err = CloneMapArray(processors)
+	if err != nil {
+		return err
+	}
+
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
@@ -46,6 +56,7 @@ func (t *DynamicComm) AddOrUpdate(id string, mapping map[string]interface{}, pro
 		Mapping:    mapping,
 		Processors: processors,
 	}
+	return nil
 }
 
 // Remove removes the a mapping.

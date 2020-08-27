@@ -5,20 +5,22 @@
 package host
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"runtime"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/go-sysinfo"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-// DefaultCheckTimeout is the default timeout used to check if any host information has changed.
-const DefaultCheckTimeout = 5 * time.Minute
+// DefaultCheckInterval is the default timeout used to check if any host information has changed.
+const DefaultCheckInterval = 5 * time.Minute
 
 func init() {
 	composable.Providers.AddContextProvider("host", ContextProviderBuilder)
@@ -29,9 +31,10 @@ type infoFetcher func() (map[string]interface{}, error)
 type contextProvider struct {
 	logger *logger.Logger
 
+	CheckInterval time.Duration `config:"check_interval"`
+
 	// used by testing
-	checkTimeout time.Duration
-	fetcher      infoFetcher
+	fetcher infoFetcher
 }
 
 // Run runs the environment context provider.
@@ -40,7 +43,10 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 	if err != nil {
 		return err
 	}
-	comm.Set(current)
+	err = comm.Set(current)
+	if err != nil {
+		return errors.New(err, "failed to set mapping", errors.TypeUnexpected)
+	}
 
 	// Update context when any host information changes.
 	go func() {
@@ -48,7 +54,7 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 			select {
 			case <-comm.Done():
 				return
-			case <-time.After(c.checkTimeout):
+			case <-time.After(c.CheckInterval):
 				break
 			}
 
@@ -62,7 +68,10 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 				continue
 			}
 			current = updated
-			comm.Set(updated)
+			err = comm.Set(updated)
+			if err != nil {
+				c.logger.Errorf("Failed updating mapping to latest host information: %s", err)
+			}
 		}
 	}()
 
@@ -71,11 +80,24 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 
 // ContextProviderBuilder builds the context provider.
 func ContextProviderBuilder(c *config.Config) (composable.ContextProvider, error) {
-	logger, err := logger.New("dynamic.providers.host")
+	logger, err := logger.New("composable.providers.host")
 	if err != nil {
 		return nil, err
 	}
-	return &contextProvider{logger, DefaultCheckTimeout, getHostInfo}, nil
+	p := &contextProvider{
+		logger:  logger,
+		fetcher: getHostInfo,
+	}
+	if c != nil {
+		err := c.Unpack(p)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unpack config: %s", err)
+		}
+	}
+	if p.CheckInterval <= 0 {
+		p.CheckInterval = DefaultCheckInterval
+	}
+	return p, nil
 }
 
 func getHostInfo() (map[string]interface{}, error) {

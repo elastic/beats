@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
@@ -20,7 +21,10 @@ type contextProvider struct{}
 
 // Run runs the environment context provider.
 func (*contextProvider) Run(comm composable.ContextProviderComm) error {
-	comm.Set(getEnvMapping())
+	err := comm.Set(getEnvMapping())
+	if err != nil {
+		return errors.New(err, "failed to set mapping", errors.TypeUnexpected)
+	}
 	return nil
 }
 

@@ -17,7 +17,7 @@ type DynamicProviderComm interface {
 	context.Context
 
 	// AddOrUpdate updates a mapping with given ID with latest mapping and processors.
-	AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{})
+	AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error
 	// Remove removes a mapping by given ID.
 	Remove(id string)
 }
@@ -36,9 +36,11 @@ func (r *providerRegistry) AddDynamicProvider(name string, builder DynamicProvid
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
-	name = strings.ToLower(name)
 	if name == "" {
 		return fmt.Errorf("provider name is required")
+	}
+	if strings.ToLower(name) != name {
+		return fmt.Errorf("provider name must be lowercase")
 	}
 	_, contextExists := r.contextProviders[name]
 	_, dynamicExists := r.dynamicProviders[name]
@@ -55,10 +57,10 @@ func (r *providerRegistry) AddDynamicProvider(name string, builder DynamicProvid
 }
 
 // GetDynamicProvider returns the dynamic provider with the giving name, nil if it doesn't exist
-func (r *providerRegistry) GetDynamicProvider(name string) DynamicProviderBuilder {
+func (r *providerRegistry) GetDynamicProvider(name string) (DynamicProviderBuilder, bool) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	name = strings.ToLower(name)
-	return r.dynamicProviders[name]
+	b, ok := r.dynamicProviders[name]
+	return b, ok
 }

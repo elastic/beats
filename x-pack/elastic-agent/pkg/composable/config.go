@@ -6,12 +6,7 @@ package composable
 
 import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 
-// Config is config for multiple provides.
+// Config is config for multiple providers.
 type Config struct {
 	Providers map[string]*config.Config `config:"providers"`
-}
-
-// ProviderConfig is config for single provides.
-type ProviderConfig struct {
-	Enabled *bool `config:"enabled"`
 }

@@ -30,7 +30,7 @@ func TestContextProvider(t *testing.T) {
 		"vars": mapping,
 	})
 	require.NoError(t, err)
-	builder := composable.Providers.GetDynamicProvider("local_dynamic")
+	builder, _ := composable.Providers.GetDynamicProvider("local_dynamic")
 	provider, err := builder(cfg)
 	require.NoError(t, err)
 

@@ -7,6 +7,8 @@ package host
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+
 	"sync"
 	"testing"
 	"time"
@@ -24,17 +26,23 @@ func TestContextProvider(t *testing.T) {
 	starting["idx"] = 0
 	require.NoError(t, err)
 
-	builder := composable.Providers.GetContextProvider("host")
-	provider, err := builder(nil)
+	c, err := config.NewConfigFrom(map[string]interface{}{
+		"check_interval": 100 * time.Millisecond,
+	})
+	require.NoError(t, err)
+	builder, _ := composable.Providers.GetContextProvider("host")
+	provider, err := builder(c)
 	require.NoError(t, err)
 
 	hostProvider := provider.(*contextProvider)
-	hostProvider.checkTimeout = 100 * time.Millisecond
 	hostProvider.fetcher = returnHostMapping()
+	require.Equal(t, 100*time.Millisecond, hostProvider.CheckInterval)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	comm := ctesting.NewContextComm(ctx)
 	err = provider.Run(comm)
+	require.NoError(t, err)
+	starting, err = ctesting.CloneMap(starting)
 	require.NoError(t, err)
 	require.Equal(t, starting, comm.Current())
 
@@ -52,6 +60,8 @@ func TestContextProvider(t *testing.T) {
 	next, err := getHostInfo()
 	require.NoError(t, err)
 	next["idx"] = 1
+	next, err = ctesting.CloneMap(next)
+	require.NoError(t, err)
 	assert.Equal(t, next, comm.Current())
 }
 

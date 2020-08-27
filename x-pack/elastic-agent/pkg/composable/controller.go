@@ -6,6 +6,7 @@ package composable
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -45,16 +46,9 @@ func New(c *config.Config) (*Controller, error) {
 	contextProviders := map[string]*contextProviderState{}
 	for name, builder := range Providers.contextProviders {
 		pCfg, ok := providersCfg.Providers[name]
-		if ok {
-			var providerCfg ProviderConfig
-			err := pCfg.Unpack(&providerCfg)
-			if err != nil {
-				return nil, errors.New(err, fmt.Sprintf("failed to unpack provider '%s' config", name), errors.TypeConfig, errors.M("provider", name))
-			}
-			if providerCfg.Enabled != nil && !*providerCfg.Enabled {
-				// explicitly disabled; skipping
-				continue
-			}
+		if ok && !pCfg.Enabled() {
+			// explicitly disabled; skipping
+			continue
 		}
 		provider, err := builder(pCfg)
 		if err != nil {
@@ -69,16 +63,9 @@ func New(c *config.Config) (*Controller, error) {
 	dynamicProviders := map[string]*dynamicProviderState{}
 	for name, builder := range Providers.dynamicProviders {
 		pCfg, ok := providersCfg.Providers[name]
-		if ok {
-			var providerCfg ProviderConfig
-			err := pCfg.Unpack(&providerCfg)
-			if err != nil {
-				return nil, errors.New(err, fmt.Sprintf("failed to unpack provider '%s' config", name), errors.TypeConfig, errors.M("provider", name))
-			}
-			if providerCfg.Enabled != nil && !*providerCfg.Enabled {
-				// explicitly disabled; skipping
-				continue
-			}
+		if ok && !pCfg.Enabled() {
+			// explicitly disabled; skipping
+			continue
 		}
 		provider, err := builder(pCfg)
 		if err != nil {
@@ -98,6 +85,7 @@ func New(c *config.Config) (*Controller, error) {
 
 // Run runs the controller.
 func (c *Controller) Run(ctx context.Context, cb VarsCallback) error {
+	// large number not to block performing Run on the provided providers
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
@@ -160,7 +148,7 @@ func (c *Controller) Run(ctx context.Context, cb VarsCallback) error {
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
 				for _, mappings := range state.Mappings() {
-					local := copy(mapping)
+					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.Mapping
 					vars = append(vars, Vars{
 						Mapping:       local,
@@ -188,16 +176,23 @@ type contextProviderState struct {
 }
 
 // Set sets the current mapping.
-func (c *contextProviderState) Set(mapping map[string]interface{}) {
+func (c *contextProviderState) Set(mapping map[string]interface{}) error {
+	var err error
+	mapping, err = cloneMap(mapping)
+	if err != nil {
+		return err
+	}
+
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
 	if reflect.DeepEqual(c.mapping, mapping) {
 		// same mapping; no need to update and signal
-		return
+		return nil
 	}
 	c.mapping = mapping
 	c.signal <- true
+	return nil
 }
 
 // Current returns the current mapping.
@@ -217,19 +212,30 @@ type dynamicProviderState struct {
 }
 
 // AddOrUpdate adds or updates the current mapping for the dynamic provider.
-func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) {
+func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error {
+	var err error
+	mapping, err = cloneMap(mapping)
+	if err != nil {
+		return err
+	}
+	processors, err = cloneMapArray(processors)
+	if err != nil {
+		return err
+	}
+
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	curr, ok := c.mappings[id]
 	if ok && reflect.DeepEqual(curr.Mapping, mapping) && reflect.DeepEqual(curr.Processors, processors) {
 		// same mapping; no need to update and signal
-		return
+		return nil
 	}
 	c.mappings[id] = Vars{
 		Mapping:    mapping,
 		Processors: processors,
 	}
 	c.signal <- true
+	return nil
 }
 
 // Remove removes the current mapping for the dynamic provider.
@@ -261,10 +267,34 @@ func (c *dynamicProviderState) Mappings() []Vars {
 	return mappings
 }
 
-func copy(d map[string]interface{}) map[string]interface{} {
-	c := map[string]interface{}{}
-	for k, v := range d {
-		c[k] = v
+func cloneMap(source map[string]interface{}) (map[string]interface{}, error) {
+	if source == nil {
+		return nil, nil
 	}
-	return c
+	bytes, err := json.Marshal(source)
+	if err != nil {
+		return nil, fmt.Errorf("failed to clone: %s", err)
+	}
+	var dest map[string]interface{}
+	err = json.Unmarshal(bytes, &dest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to clone: %s", err)
+	}
+	return dest, nil
+}
+
+func cloneMapArray(source []map[string]interface{}) ([]map[string]interface{}, error) {
+	if source == nil {
+		return nil, nil
+	}
+	bytes, err := json.Marshal(source)
+	if err != nil {
+		return nil, fmt.Errorf("failed to clone: %s", err)
+	}
+	var dest []map[string]interface{}
+	err = json.Unmarshal(bytes, &dest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to clone: %s", err)
+	}
+	return dest, nil
 }

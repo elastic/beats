@@ -17,7 +17,7 @@ type ContextProviderComm interface {
 	context.Context
 
 	// Set sets the current mapping for this context.
-	Set(map[string]interface{})
+	Set(map[string]interface{}) error
 }
 
 // ContextProvider is the interface that a context provider must implement.
@@ -34,9 +34,11 @@ func (r *providerRegistry) AddContextProvider(name string, builder ContextProvid
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
-	name = strings.ToLower(name)
 	if name == "" {
 		return fmt.Errorf("provider name is required")
+	}
+	if strings.ToLower(name) != name {
+		return fmt.Errorf("provider name must be lowercase")
 	}
 	_, contextExists := r.contextProviders[name]
 	_, dynamicExists := r.dynamicProviders[name]
@@ -53,10 +55,10 @@ func (r *providerRegistry) AddContextProvider(name string, builder ContextProvid
 }
 
 // GetContextProvider returns the context provider with the giving name, nil if it doesn't exist
-func (r *providerRegistry) GetContextProvider(name string) ContextProviderBuilder {
+func (r *providerRegistry) GetContextProvider(name string) (ContextProviderBuilder, bool) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	name = strings.ToLower(name)
-	return r.contextProviders[name]
+	b, ok := r.contextProviders[name]
+	return b, ok
 }

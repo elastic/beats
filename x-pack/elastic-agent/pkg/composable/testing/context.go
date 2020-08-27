@@ -27,7 +27,13 @@ func NewContextComm(ctx context.Context) *ContextComm {
 }
 
 // Set sets the current mapping for the context.
-func (t *ContextComm) Set(mapping map[string]interface{}) {
+func (t *ContextComm) Set(mapping map[string]interface{}) error {
+	var err error
+	mapping, err = CloneMap(mapping)
+	if err != nil {
+		return err
+	}
+
 	t.lock.Lock()
 	t.previous = t.current
 	t.current = mapping
@@ -37,6 +43,7 @@ func (t *ContextComm) Set(mapping map[string]interface{}) {
 	if onSet != nil {
 		onSet()
 	}
+	return nil
 }
 
 // Previous returns the previous set mapping.

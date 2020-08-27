@@ -25,7 +25,7 @@ func TestContextProvider(t *testing.T) {
 		"vars": mapping,
 	})
 	require.NoError(t, err)
-	builder := composable.Providers.GetContextProvider("local")
+	builder, _ := composable.Providers.GetContextProvider("local")
 	provider, err := builder(cfg)
 	require.NoError(t, err)
 
