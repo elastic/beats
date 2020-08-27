@@ -279,6 +279,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
+- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
 
 *Heartbeat*
 
