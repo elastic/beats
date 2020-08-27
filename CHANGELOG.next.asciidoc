@@ -672,6 +672,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
+- Add support for parallelization factor for kinesis. {pull}20727[20727]
 
 *Winlogbeat*
 
