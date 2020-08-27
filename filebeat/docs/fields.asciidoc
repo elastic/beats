@@ -129200,13 +129200,7 @@ sophos Module
 
 
 
-[float]
-=== sophos
-
-
-
-
-*`sophos.network.interface.name`*::
+*`network.interface.name`*::
 +
 --
 Name of the network interface where the traffic has been observed.
@@ -129218,7 +129212,7 @@ type: keyword
 
 
 
-*`sophos.rsa.internal.msg`*::
+*`rsa.internal.msg`*::
 +
 --
 This key is used to capture the raw message that comes into the Log Decoder
@@ -129227,21 +129221,21 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.messageid`*::
+*`rsa.internal.messageid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.internal.event_desc`*::
+*`rsa.internal.event_desc`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.internal.message`*::
+*`rsa.internal.message`*::
 +
 --
 This key captures the contents of instant messages
@@ -129250,7 +129244,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.time`*::
+*`rsa.internal.time`*::
 +
 --
 This is the time at which a session hits a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness.
@@ -129259,7 +129253,7 @@ type: date
 
 --
 
-*`sophos.rsa.internal.level`*::
+*`rsa.internal.level`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129268,7 +129262,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.msg_id`*::
+*`rsa.internal.msg_id`*::
 +
 --
 This is the Message ID1 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129277,7 +129271,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.msg_vid`*::
+*`rsa.internal.msg_vid`*::
 +
 --
 This is the Message ID2 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129286,7 +129280,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.data`*::
+*`rsa.internal.data`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129295,7 +129289,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.obj_server`*::
+*`rsa.internal.obj_server`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129304,7 +129298,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.obj_val`*::
+*`rsa.internal.obj_val`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129313,7 +129307,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.resource`*::
+*`rsa.internal.resource`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129322,7 +129316,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.obj_id`*::
+*`rsa.internal.obj_id`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129331,7 +129325,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.statement`*::
+*`rsa.internal.statement`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129340,7 +129334,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.audit_class`*::
+*`rsa.internal.audit_class`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129349,7 +129343,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.entry`*::
+*`rsa.internal.entry`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129358,7 +129352,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.hcode`*::
+*`rsa.internal.hcode`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129367,7 +129361,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.inode`*::
+*`rsa.internal.inode`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129376,7 +129370,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.resource_class`*::
+*`rsa.internal.resource_class`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129385,7 +129379,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.dead`*::
+*`rsa.internal.dead`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129394,7 +129388,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.feed_desc`*::
+*`rsa.internal.feed_desc`*::
 +
 --
 This is used to capture the description of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129403,7 +129397,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.feed_name`*::
+*`rsa.internal.feed_name`*::
 +
 --
 This is used to capture the name of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129412,7 +129406,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.cid`*::
+*`rsa.internal.cid`*::
 +
 --
 This is the unique identifier used to identify a NetWitness Concentrator. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129421,7 +129415,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.device_class`*::
+*`rsa.internal.device_class`*::
 +
 --
 This is the Classification of the Log Event Source under a predefined fixed set of Event Source Classifications. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129430,7 +129424,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.device_group`*::
+*`rsa.internal.device_group`*::
 +
 --
 This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129439,7 +129433,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.device_host`*::
+*`rsa.internal.device_host`*::
 +
 --
 This is the Hostname of the log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129448,7 +129442,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.device_ip`*::
+*`rsa.internal.device_ip`*::
 +
 --
 This is the IPv4 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129457,7 +129451,7 @@ type: ip
 
 --
 
-*`sophos.rsa.internal.device_ipv6`*::
+*`rsa.internal.device_ipv6`*::
 +
 --
 This is the IPv6 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129466,7 +129460,7 @@ type: ip
 
 --
 
-*`sophos.rsa.internal.device_type`*::
+*`rsa.internal.device_type`*::
 +
 --
 This is the name of the log parser which parsed a given session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129475,7 +129469,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.device_type_id`*::
+*`rsa.internal.device_type_id`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129484,7 +129478,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.did`*::
+*`rsa.internal.did`*::
 +
 --
 This is the unique identifier used to identify a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129493,7 +129487,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.entropy_req`*::
+*`rsa.internal.entropy_req`*::
 +
 --
 This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration
@@ -129502,7 +129496,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.entropy_res`*::
+*`rsa.internal.entropy_res`*::
 +
 --
 This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration
@@ -129511,7 +129505,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.event_name`*::
+*`rsa.internal.event_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129520,7 +129514,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.feed_category`*::
+*`rsa.internal.feed_category`*::
 +
 --
 This is used to capture the category of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129529,7 +129523,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.forward_ip`*::
+*`rsa.internal.forward_ip`*::
 +
 --
 This key should be used to capture the IPV4 address of a relay system which forwarded the events from the original system to NetWitness.
@@ -129538,7 +129532,7 @@ type: ip
 
 --
 
-*`sophos.rsa.internal.forward_ipv6`*::
+*`rsa.internal.forward_ipv6`*::
 +
 --
 This key is used to capture the IPV6 address of a relay system which forwarded the events from the original system to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129547,7 +129541,7 @@ type: ip
 
 --
 
-*`sophos.rsa.internal.header_id`*::
+*`rsa.internal.header_id`*::
 +
 --
 This is the Header ID value that identifies the exact log parser header definition that parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129556,7 +129550,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.lc_cid`*::
+*`rsa.internal.lc_cid`*::
 +
 --
 This is a unique Identifier of a Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129565,7 +129559,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.lc_ctime`*::
+*`rsa.internal.lc_ctime`*::
 +
 --
 This is the time at which a log is collected in a NetWitness Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129574,7 +129568,7 @@ type: date
 
 --
 
-*`sophos.rsa.internal.mcb_req`*::
+*`rsa.internal.mcb_req`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte request is simply which byte for each side (0 thru 255) was seen the most
@@ -129583,7 +129577,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.mcb_res`*::
+*`rsa.internal.mcb_res`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte response is simply which byte for each side (0 thru 255) was seen the most
@@ -129592,7 +129586,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.mcbc_req`*::
+*`rsa.internal.mcbc_req`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams
@@ -129601,7 +129595,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.mcbc_res`*::
+*`rsa.internal.mcbc_res`*::
 +
 --
 This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams
@@ -129610,7 +129604,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.medium`*::
+*`rsa.internal.medium`*::
 +
 --
 This key is used to identify if it’s a log/packet session or Layer 2 Encapsulation Type. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness. 32 = log, 33 = correlation session, &lt; 32 is packet session
@@ -129619,7 +129613,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.node_name`*::
+*`rsa.internal.node_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129628,7 +129622,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.nwe_callback_id`*::
+*`rsa.internal.nwe_callback_id`*::
 +
 --
 This key denotes that event is endpoint related
@@ -129637,7 +129631,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.parse_error`*::
+*`rsa.internal.parse_error`*::
 +
 --
 This is a special key that stores any Meta key validation error found while parsing a log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129646,7 +129640,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.payload_req`*::
+*`rsa.internal.payload_req`*::
 +
 --
 This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep
@@ -129655,7 +129649,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.payload_res`*::
+*`rsa.internal.payload_res`*::
 +
 --
 This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep
@@ -129664,7 +129658,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.process_vid_dst`*::
+*`rsa.internal.process_vid_dst`*::
 +
 --
 Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the target process.
@@ -129673,7 +129667,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.process_vid_src`*::
+*`rsa.internal.process_vid_src`*::
 +
 --
 Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the source process.
@@ -129682,7 +129676,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.rid`*::
+*`rsa.internal.rid`*::
 +
 --
 This is a special ID of the Remote Session created by NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129691,7 +129685,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.session_split`*::
+*`rsa.internal.session_split`*::
 +
 --
 This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129700,7 +129694,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.site`*::
+*`rsa.internal.site`*::
 +
 --
 Deprecated key defined only in table map.
@@ -129709,7 +129703,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.size`*::
+*`rsa.internal.size`*::
 +
 --
 This is the size of the session as seen by the NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129718,7 +129712,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.sourcefile`*::
+*`rsa.internal.sourcefile`*::
 +
 --
 This is the name of the log file or PCAPs that can be imported into NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -129727,7 +129721,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.internal.ubc_req`*::
+*`rsa.internal.ubc_req`*::
 +
 --
 This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once
@@ -129736,7 +129730,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.ubc_res`*::
+*`rsa.internal.ubc_res`*::
 +
 --
 This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once
@@ -129745,7 +129739,7 @@ type: long
 
 --
 
-*`sophos.rsa.internal.word`*::
+*`rsa.internal.word`*::
 +
 --
 This is used by the Word Parsing technology to capture the first 5 character of every word in an unparsed log
@@ -129755,7 +129749,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.time.event_time`*::
+*`rsa.time.event_time`*::
 +
 --
 This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form
@@ -129764,7 +129758,7 @@ type: date
 
 --
 
-*`sophos.rsa.time.duration_time`*::
+*`rsa.time.duration_time`*::
 +
 --
 This key is used to capture the normalized duration/lifetime in seconds.
@@ -129773,7 +129767,7 @@ type: double
 
 --
 
-*`sophos.rsa.time.event_time_str`*::
+*`rsa.time.event_time_str`*::
 +
 --
 This key is used to capture the incomplete time mentioned in a session as a string
@@ -129782,7 +129776,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.time.starttime`*::
+*`rsa.time.starttime`*::
 +
 --
 This key is used to capture the Start time mentioned in a session in a standard form
@@ -129791,21 +129785,21 @@ type: date
 
 --
 
-*`sophos.rsa.time.month`*::
+*`rsa.time.month`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.day`*::
+*`rsa.time.day`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.endtime`*::
+*`rsa.time.endtime`*::
 +
 --
 This key is used to capture the End time mentioned in a session in a standard form
@@ -129814,7 +129808,7 @@ type: date
 
 --
 
-*`sophos.rsa.time.timezone`*::
+*`rsa.time.timezone`*::
 +
 --
 This key is used to capture the timezone of the Event Time
@@ -129823,7 +129817,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.time.duration_str`*::
+*`rsa.time.duration_str`*::
 +
 --
 A text string version of the duration
@@ -129832,21 +129826,21 @@ type: keyword
 
 --
 
-*`sophos.rsa.time.date`*::
+*`rsa.time.date`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.year`*::
+*`rsa.time.year`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.recorded_time`*::
+*`rsa.time.recorded_time`*::
 +
 --
 The event time as recorded by the system the event is collected from. The usage scenario is a multi-tier application where the management layer of the system records it's own timestamp at the time of collection from its child nodes. Must be in timestamp format.
@@ -129855,14 +129849,14 @@ type: date
 
 --
 
-*`sophos.rsa.time.datetime`*::
+*`rsa.time.datetime`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.effective_time`*::
+*`rsa.time.effective_time`*::
 +
 --
 This key is the effective time referenced by an individual event in a Standard Timestamp format
@@ -129871,7 +129865,7 @@ type: date
 
 --
 
-*`sophos.rsa.time.expire_time`*::
+*`rsa.time.expire_time`*::
 +
 --
 This key is the timestamp that explicitly refers to an expiration.
@@ -129880,7 +129874,7 @@ type: date
 
 --
 
-*`sophos.rsa.time.process_time`*::
+*`rsa.time.process_time`*::
 +
 --
 Deprecated, use duration.time
@@ -129889,28 +129883,28 @@ type: keyword
 
 --
 
-*`sophos.rsa.time.hour`*::
+*`rsa.time.hour`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.min`*::
+*`rsa.time.min`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.timestamp`*::
+*`rsa.time.timestamp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.event_queue_time`*::
+*`rsa.time.event_queue_time`*::
 +
 --
 This key is the Time that the event was queued.
@@ -129919,77 +129913,77 @@ type: date
 
 --
 
-*`sophos.rsa.time.p_time1`*::
+*`rsa.time.p_time1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.tzone`*::
+*`rsa.time.tzone`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.eventtime`*::
+*`rsa.time.eventtime`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.gmtdate`*::
+*`rsa.time.gmtdate`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.gmttime`*::
+*`rsa.time.gmttime`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.p_date`*::
+*`rsa.time.p_date`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.p_month`*::
+*`rsa.time.p_month`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.p_time`*::
+*`rsa.time.p_time`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.p_time2`*::
+*`rsa.time.p_time2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.p_year`*::
+*`rsa.time.p_year`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.time.expire_time_str`*::
+*`rsa.time.expire_time_str`*::
 +
 --
 This key is used to capture incomplete timestamp that explicitly refers to an expiration.
@@ -129998,7 +129992,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.time.stamp`*::
+*`rsa.time.stamp`*::
 +
 --
 Deprecated key defined only in table map.
@@ -130008,14 +130002,14 @@ type: date
 --
 
 
-*`sophos.rsa.misc.action`*::
+*`rsa.misc.action`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.result`*::
+*`rsa.misc.result`*::
 +
 --
 This key is used to capture the outcome/result string value of an action in a session.
@@ -130024,7 +130018,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.severity`*::
+*`rsa.misc.severity`*::
 +
 --
 This key is used to capture the severity given the session
@@ -130033,7 +130027,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_type`*::
+*`rsa.misc.event_type`*::
 +
 --
 This key captures the event category type as specified by the event source.
@@ -130042,7 +130036,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.reference_id`*::
+*`rsa.misc.reference_id`*::
 +
 --
 This key is used to capture an event id from the session directly
@@ -130051,7 +130045,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.version`*::
+*`rsa.misc.version`*::
 +
 --
 This key captures Version of the application or OS which is generating the event.
@@ -130060,7 +130054,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.disposition`*::
+*`rsa.misc.disposition`*::
 +
 --
 This key captures the The end state of an action.
@@ -130069,7 +130063,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.result_code`*::
+*`rsa.misc.result_code`*::
 +
 --
 This key is used to capture the outcome/result numeric value of an action in a session
@@ -130078,7 +130072,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.category`*::
+*`rsa.misc.category`*::
 +
 --
 This key is used to capture the category of an event given by the vendor in the session
@@ -130087,7 +130081,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.obj_name`*::
+*`rsa.misc.obj_name`*::
 +
 --
 This is used to capture name of object
@@ -130096,7 +130090,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.obj_type`*::
+*`rsa.misc.obj_type`*::
 +
 --
 This is used to capture type of object
@@ -130105,7 +130099,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_source`*::
+*`rsa.misc.event_source`*::
 +
 --
 This key captures Source of the event that’s not a hostname
@@ -130114,7 +130108,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.log_session_id`*::
+*`rsa.misc.log_session_id`*::
 +
 --
 This key is used to capture a sessionid from the session directly
@@ -130123,7 +130117,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.group`*::
+*`rsa.misc.group`*::
 +
 --
 This key captures the Group Name value
@@ -130132,7 +130126,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.policy_name`*::
+*`rsa.misc.policy_name`*::
 +
 --
 This key is used to capture the Policy Name only.
@@ -130141,7 +130135,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.rule_name`*::
+*`rsa.misc.rule_name`*::
 +
 --
 This key captures the Rule Name
@@ -130150,7 +130144,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.context`*::
+*`rsa.misc.context`*::
 +
 --
 This key captures Information which adds additional context to the event.
@@ -130159,7 +130153,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.change_new`*::
+*`rsa.misc.change_new`*::
 +
 --
 This key is used to capture the new values of the attribute that’s changing in a session
@@ -130168,14 +130162,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.space`*::
+*`rsa.misc.space`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.client`*::
+*`rsa.misc.client`*::
 +
 --
 This key is used to capture only the name of the client application requesting resources of the server. See the user.agent meta key for capture of the specific user agent identifier or browser identification string.
@@ -130184,21 +130178,21 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.msgIdPart1`*::
+*`rsa.misc.msgIdPart1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.msgIdPart2`*::
+*`rsa.misc.msgIdPart2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.change_old`*::
+*`rsa.misc.change_old`*::
 +
 --
 This key is used to capture the old value of the attribute that’s changing in a session
@@ -130207,7 +130201,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.operation_id`*::
+*`rsa.misc.operation_id`*::
 +
 --
 An alert number or operation number. The values should be unique and non-repeating.
@@ -130216,7 +130210,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_state`*::
+*`rsa.misc.event_state`*::
 +
 --
 This key captures the current state of the object/item referenced within the event. Describing an on-going event.
@@ -130225,7 +130219,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.group_object`*::
+*`rsa.misc.group_object`*::
 +
 --
 This key captures a collection/grouping of entities. Specific usage
@@ -130234,7 +130228,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.node`*::
+*`rsa.misc.node`*::
 +
 --
 Common use case is the node name within a cluster. The cluster name is reflected by the host name.
@@ -130243,7 +130237,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.rule`*::
+*`rsa.misc.rule`*::
 +
 --
 This key captures the Rule number
@@ -130252,7 +130246,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.device_name`*::
+*`rsa.misc.device_name`*::
 +
 --
 This is used to capture name of the Device associated with the node Like: a physical disk, printer, etc
@@ -130261,7 +130255,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.param`*::
+*`rsa.misc.param`*::
 +
 --
 This key is the parameters passed as part of a command or application, etc.
@@ -130270,7 +130264,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.change_attrib`*::
+*`rsa.misc.change_attrib`*::
 +
 --
 This key is used to capture the name of the attribute that’s changing in a session
@@ -130279,7 +130273,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_computer`*::
+*`rsa.misc.event_computer`*::
 +
 --
 This key is a windows only concept, where this key is used to capture fully qualified domain name in a windows log.
@@ -130288,7 +130282,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.reference_id1`*::
+*`rsa.misc.reference_id1`*::
 +
 --
 This key is for Linked ID to be used as an addition to "reference.id"
@@ -130297,7 +130291,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_log`*::
+*`rsa.misc.event_log`*::
 +
 --
 This key captures the Name of the event log
@@ -130306,7 +130300,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.OS`*::
+*`rsa.misc.OS`*::
 +
 --
 This key captures the Name of the Operating System
@@ -130315,7 +130309,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.terminal`*::
+*`rsa.misc.terminal`*::
 +
 --
 This key captures the Terminal Names only
@@ -130324,14 +130318,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.msgIdPart3`*::
+*`rsa.misc.msgIdPart3`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.filter`*::
+*`rsa.misc.filter`*::
 +
 --
 This key captures Filter used to reduce result set
@@ -130340,7 +130334,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.serial_number`*::
+*`rsa.misc.serial_number`*::
 +
 --
 This key is the Serial number associated with a physical asset.
@@ -130349,7 +130343,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.checksum`*::
+*`rsa.misc.checksum`*::
 +
 --
 This key is used to capture the checksum or hash of the entity such as a file or process. Checksum should be used over checksum.src or checksum.dst when it is unclear whether the entity is a source or target of an action.
@@ -130358,7 +130352,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_user`*::
+*`rsa.misc.event_user`*::
 +
 --
 This key is a windows only concept, where this key is used to capture combination of domain name and username in a windows log.
@@ -130367,7 +130361,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.virusname`*::
+*`rsa.misc.virusname`*::
 +
 --
 This key captures the name of the virus
@@ -130376,7 +130370,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.content_type`*::
+*`rsa.misc.content_type`*::
 +
 --
 This key is used to capture Content Type only.
@@ -130385,7 +130379,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.group_id`*::
+*`rsa.misc.group_id`*::
 +
 --
 This key captures Group ID Number (related to the group name)
@@ -130394,7 +130388,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.policy_id`*::
+*`rsa.misc.policy_id`*::
 +
 --
 This key is used to capture the Policy ID only, this should be a numeric value, use policy.name otherwise
@@ -130403,7 +130397,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.vsys`*::
+*`rsa.misc.vsys`*::
 +
 --
 This key captures Virtual System Name
@@ -130412,7 +130406,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.connection_id`*::
+*`rsa.misc.connection_id`*::
 +
 --
 This key captures the Connection ID
@@ -130421,7 +130415,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.reference_id2`*::
+*`rsa.misc.reference_id2`*::
 +
 --
 This key is for the 2nd Linked ID. Can be either linked to "reference.id" or "reference.id1" value but should not be used unless the other two variables are in play.
@@ -130430,7 +130424,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.sensor`*::
+*`rsa.misc.sensor`*::
 +
 --
 This key captures Name of the sensor. Typically used in IDS/IPS based devices
@@ -130439,7 +130433,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.sig_id`*::
+*`rsa.misc.sig_id`*::
 +
 --
 This key captures IDS/IPS Int Signature ID
@@ -130448,7 +130442,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.port_name`*::
+*`rsa.misc.port_name`*::
 +
 --
 This key is used for Physical or logical port connection but does NOT include a network port. (Example: Printer port name).
@@ -130457,7 +130451,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.rule_group`*::
+*`rsa.misc.rule_group`*::
 +
 --
 This key captures the Rule group name
@@ -130466,7 +130460,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.risk_num`*::
+*`rsa.misc.risk_num`*::
 +
 --
 This key captures a Numeric Risk value
@@ -130475,7 +130469,7 @@ type: double
 
 --
 
-*`sophos.rsa.misc.trigger_val`*::
+*`rsa.misc.trigger_val`*::
 +
 --
 This key captures the Value of the trigger or threshold condition.
@@ -130484,7 +130478,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.log_session_id1`*::
+*`rsa.misc.log_session_id1`*::
 +
 --
 This key is used to capture a Linked (Related) Session ID from the session directly
@@ -130493,7 +130487,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.comp_version`*::
+*`rsa.misc.comp_version`*::
 +
 --
 This key captures the Version level of a sub-component of a product.
@@ -130502,7 +130496,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.content_version`*::
+*`rsa.misc.content_version`*::
 +
 --
 This key captures Version level of a signature or database content.
@@ -130511,7 +130505,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.hardware_id`*::
+*`rsa.misc.hardware_id`*::
 +
 --
 This key is used to capture unique identifier for a device or system (NOT a Mac address)
@@ -130520,7 +130514,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.risk`*::
+*`rsa.misc.risk`*::
 +
 --
 This key captures the non-numeric risk value
@@ -130529,28 +130523,28 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.event_id`*::
+*`rsa.misc.event_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.reason`*::
+*`rsa.misc.reason`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.status`*::
+*`rsa.misc.status`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.mail_id`*::
+*`rsa.misc.mail_id`*::
 +
 --
 This key is used to capture the mailbox id/name
@@ -130559,7 +130553,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.rule_uid`*::
+*`rsa.misc.rule_uid`*::
 +
 --
 This key is the Unique Identifier for a rule.
@@ -130568,7 +130562,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.trigger_desc`*::
+*`rsa.misc.trigger_desc`*::
 +
 --
 This key captures the Description of the trigger or threshold condition.
@@ -130577,35 +130571,35 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.inout`*::
+*`rsa.misc.inout`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_msgid`*::
+*`rsa.misc.p_msgid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.data_type`*::
+*`rsa.misc.data_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.msgIdPart4`*::
+*`rsa.misc.msgIdPart4`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.error`*::
+*`rsa.misc.error`*::
 +
 --
 This key captures All non successful Error codes or responses
@@ -130614,14 +130608,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.index`*::
+*`rsa.misc.index`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.listnum`*::
+*`rsa.misc.listnum`*::
 +
 --
 This key is used to capture listname or listnumber, primarily for collecting access-list
@@ -130630,14 +130624,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.ntype`*::
+*`rsa.misc.ntype`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.observed_val`*::
+*`rsa.misc.observed_val`*::
 +
 --
 This key captures the Value observed (from the perspective of the device generating the log).
@@ -130646,7 +130640,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.policy_value`*::
+*`rsa.misc.policy_value`*::
 +
 --
 This key captures the contents of the policy. This contains details about the policy
@@ -130655,7 +130649,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.pool_name`*::
+*`rsa.misc.pool_name`*::
 +
 --
 This key captures the name of a resource pool
@@ -130664,7 +130658,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.rule_template`*::
+*`rsa.misc.rule_template`*::
 +
 --
 A default set of parameters which are overlayed onto a rule (or rulename) which efffectively constitutes a template
@@ -130673,35 +130667,35 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.count`*::
+*`rsa.misc.count`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.number`*::
+*`rsa.misc.number`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sigcat`*::
+*`rsa.misc.sigcat`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.type`*::
+*`rsa.misc.type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.comments`*::
+*`rsa.misc.comments`*::
 +
 --
 Comment information provided in the log message
@@ -130710,7 +130704,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.doc_number`*::
+*`rsa.misc.doc_number`*::
 +
 --
 This key captures File Identification number
@@ -130719,7 +130713,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.expected_val`*::
+*`rsa.misc.expected_val`*::
 +
 --
 This key captures the Value expected (from the perspective of the device generating the log).
@@ -130728,7 +130722,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.job_num`*::
+*`rsa.misc.job_num`*::
 +
 --
 This key captures the Job Number
@@ -130737,7 +130731,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.spi_dst`*::
+*`rsa.misc.spi_dst`*::
 +
 --
 Destination SPI Index
@@ -130746,7 +130740,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.spi_src`*::
+*`rsa.misc.spi_src`*::
 +
 --
 Source SPI Index
@@ -130755,14 +130749,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.code`*::
+*`rsa.misc.code`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.agent_id`*::
+*`rsa.misc.agent_id`*::
 +
 --
 This key is used to capture agent id
@@ -130771,7 +130765,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.message_body`*::
+*`rsa.misc.message_body`*::
 +
 --
 This key captures the The contents of the message body.
@@ -130780,14 +130774,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.phone`*::
+*`rsa.misc.phone`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sig_id_str`*::
+*`rsa.misc.sig_id_str`*::
 +
 --
 This key captures a string object of the sigid variable.
@@ -130796,28 +130790,28 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.cmd`*::
+*`rsa.misc.cmd`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.misc`*::
+*`rsa.misc.misc`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.name`*::
+*`rsa.misc.name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cpu`*::
+*`rsa.misc.cpu`*::
 +
 --
 This key is the CPU time used in the execution of the event being recorded.
@@ -130826,7 +130820,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.event_desc`*::
+*`rsa.misc.event_desc`*::
 +
 --
 This key is used to capture a description of an event available directly or inferred
@@ -130835,7 +130829,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.sig_id1`*::
+*`rsa.misc.sig_id1`*::
 +
 --
 This key captures IDS/IPS Int Signature ID. This must be linked to the sig.id
@@ -130844,42 +130838,42 @@ type: long
 
 --
 
-*`sophos.rsa.misc.im_buddyid`*::
+*`rsa.misc.im_buddyid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_client`*::
+*`rsa.misc.im_client`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_userid`*::
+*`rsa.misc.im_userid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.pid`*::
+*`rsa.misc.pid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.priority`*::
+*`rsa.misc.priority`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.context_subject`*::
+*`rsa.misc.context_subject`*::
 +
 --
 This key is to be used in an audit context where the subject is the object being identified
@@ -130888,14 +130882,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.context_target`*::
+*`rsa.misc.context_target`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cve`*::
+*`rsa.misc.cve`*::
 +
 --
 This key captures CVE (Common Vulnerabilities and Exposures) - an identifier for known information security vulnerabilities.
@@ -130904,7 +130898,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.fcatnum`*::
+*`rsa.misc.fcatnum`*::
 +
 --
 This key captures Filter Category Number. Legacy Usage
@@ -130913,7 +130907,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.library`*::
+*`rsa.misc.library`*::
 +
 --
 This key is used to capture library information in mainframe devices
@@ -130922,7 +130916,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.parent_node`*::
+*`rsa.misc.parent_node`*::
 +
 --
 This key captures the Parent Node Name. Must be related to node variable.
@@ -130931,7 +130925,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.risk_info`*::
+*`rsa.misc.risk_info`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -130940,7 +130934,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.tcp_flags`*::
+*`rsa.misc.tcp_flags`*::
 +
 --
 This key is captures the TCP flags set in any packet of session
@@ -130949,7 +130943,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.tos`*::
+*`rsa.misc.tos`*::
 +
 --
 This key describes the type of service
@@ -130958,7 +130952,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.vm_target`*::
+*`rsa.misc.vm_target`*::
 +
 --
 VMWare Target **VMWARE** only varaible.
@@ -130967,7 +130961,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.workspace`*::
+*`rsa.misc.workspace`*::
 +
 --
 This key captures Workspace Description
@@ -130976,91 +130970,91 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.command`*::
+*`rsa.misc.command`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.event_category`*::
+*`rsa.misc.event_category`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.facilityname`*::
+*`rsa.misc.facilityname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.forensic_info`*::
+*`rsa.misc.forensic_info`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.jobname`*::
+*`rsa.misc.jobname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.mode`*::
+*`rsa.misc.mode`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.policy`*::
+*`rsa.misc.policy`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.policy_waiver`*::
+*`rsa.misc.policy_waiver`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.second`*::
+*`rsa.misc.second`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.space1`*::
+*`rsa.misc.space1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.subcategory`*::
+*`rsa.misc.subcategory`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.tbdstr2`*::
+*`rsa.misc.tbdstr2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.alert_id`*::
+*`rsa.misc.alert_id`*::
 +
 --
 Deprecated, New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -131069,7 +131063,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.checksum_dst`*::
+*`rsa.misc.checksum_dst`*::
 +
 --
 This key is used to capture the checksum or hash of the the target entity such as a process or file.
@@ -131078,7 +131072,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.checksum_src`*::
+*`rsa.misc.checksum_src`*::
 +
 --
 This key is used to capture the checksum or hash of the source entity such as a file or process.
@@ -131087,7 +131081,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.fresult`*::
+*`rsa.misc.fresult`*::
 +
 --
 This key captures the Filter Result
@@ -131096,7 +131090,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.payload_dst`*::
+*`rsa.misc.payload_dst`*::
 +
 --
 This key is used to capture destination payload
@@ -131105,7 +131099,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.payload_src`*::
+*`rsa.misc.payload_src`*::
 +
 --
 This key is used to capture source payload
@@ -131114,7 +131108,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.pool_id`*::
+*`rsa.misc.pool_id`*::
 +
 --
 This key captures the identifier (typically numeric field) of a resource pool
@@ -131123,7 +131117,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.process_id_val`*::
+*`rsa.misc.process_id_val`*::
 +
 --
 This key is a failure key for Process ID when it is not an integer value
@@ -131132,7 +131126,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.risk_num_comm`*::
+*`rsa.misc.risk_num_comm`*::
 +
 --
 This key captures Risk Number Community
@@ -131141,7 +131135,7 @@ type: double
 
 --
 
-*`sophos.rsa.misc.risk_num_next`*::
+*`rsa.misc.risk_num_next`*::
 +
 --
 This key captures Risk Number NextGen
@@ -131150,7 +131144,7 @@ type: double
 
 --
 
-*`sophos.rsa.misc.risk_num_sand`*::
+*`rsa.misc.risk_num_sand`*::
 +
 --
 This key captures Risk Number SandBox
@@ -131159,7 +131153,7 @@ type: double
 
 --
 
-*`sophos.rsa.misc.risk_num_static`*::
+*`rsa.misc.risk_num_static`*::
 +
 --
 This key captures Risk Number Static
@@ -131168,7 +131162,7 @@ type: double
 
 --
 
-*`sophos.rsa.misc.risk_suspicious`*::
+*`rsa.misc.risk_suspicious`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -131177,7 +131171,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.risk_warning`*::
+*`rsa.misc.risk_warning`*::
 +
 --
 Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)
@@ -131186,7 +131180,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.snmp_oid`*::
+*`rsa.misc.snmp_oid`*::
 +
 --
 SNMP Object Identifier
@@ -131195,7 +131189,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.sql`*::
+*`rsa.misc.sql`*::
 +
 --
 This key captures the SQL query
@@ -131204,7 +131198,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.vuln_ref`*::
+*`rsa.misc.vuln_ref`*::
 +
 --
 This key captures the Vulnerability Reference details
@@ -131213,1547 +131207,1547 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.acl_id`*::
+*`rsa.misc.acl_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.acl_op`*::
+*`rsa.misc.acl_op`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.acl_pos`*::
+*`rsa.misc.acl_pos`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.acl_table`*::
+*`rsa.misc.acl_table`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.admin`*::
+*`rsa.misc.admin`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.alarm_id`*::
+*`rsa.misc.alarm_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.alarmname`*::
+*`rsa.misc.alarmname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.app_id`*::
+*`rsa.misc.app_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.audit`*::
+*`rsa.misc.audit`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.audit_object`*::
+*`rsa.misc.audit_object`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.auditdata`*::
+*`rsa.misc.auditdata`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.benchmark`*::
+*`rsa.misc.benchmark`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.bypass`*::
+*`rsa.misc.bypass`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cache`*::
+*`rsa.misc.cache`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cache_hit`*::
+*`rsa.misc.cache_hit`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cefversion`*::
+*`rsa.misc.cefversion`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cfg_attr`*::
+*`rsa.misc.cfg_attr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cfg_obj`*::
+*`rsa.misc.cfg_obj`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cfg_path`*::
+*`rsa.misc.cfg_path`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.changes`*::
+*`rsa.misc.changes`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.client_ip`*::
+*`rsa.misc.client_ip`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.clustermembers`*::
+*`rsa.misc.clustermembers`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_acttimeout`*::
+*`rsa.misc.cn_acttimeout`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_asn_src`*::
+*`rsa.misc.cn_asn_src`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_bgpv4nxthop`*::
+*`rsa.misc.cn_bgpv4nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_ctr_dst_code`*::
+*`rsa.misc.cn_ctr_dst_code`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_dst_tos`*::
+*`rsa.misc.cn_dst_tos`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_dst_vlan`*::
+*`rsa.misc.cn_dst_vlan`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_engine_id`*::
+*`rsa.misc.cn_engine_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_engine_type`*::
+*`rsa.misc.cn_engine_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_f_switch`*::
+*`rsa.misc.cn_f_switch`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_flowsampid`*::
+*`rsa.misc.cn_flowsampid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_flowsampintv`*::
+*`rsa.misc.cn_flowsampintv`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_flowsampmode`*::
+*`rsa.misc.cn_flowsampmode`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_inacttimeout`*::
+*`rsa.misc.cn_inacttimeout`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_inpermbyts`*::
+*`rsa.misc.cn_inpermbyts`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_inpermpckts`*::
+*`rsa.misc.cn_inpermpckts`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_invalid`*::
+*`rsa.misc.cn_invalid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_ip_proto_ver`*::
+*`rsa.misc.cn_ip_proto_ver`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_ipv4_ident`*::
+*`rsa.misc.cn_ipv4_ident`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_l_switch`*::
+*`rsa.misc.cn_l_switch`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_log_did`*::
+*`rsa.misc.cn_log_did`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_log_rid`*::
+*`rsa.misc.cn_log_rid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_max_ttl`*::
+*`rsa.misc.cn_max_ttl`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_maxpcktlen`*::
+*`rsa.misc.cn_maxpcktlen`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_min_ttl`*::
+*`rsa.misc.cn_min_ttl`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_minpcktlen`*::
+*`rsa.misc.cn_minpcktlen`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_1`*::
+*`rsa.misc.cn_mpls_lbl_1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_10`*::
+*`rsa.misc.cn_mpls_lbl_10`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_2`*::
+*`rsa.misc.cn_mpls_lbl_2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_3`*::
+*`rsa.misc.cn_mpls_lbl_3`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_4`*::
+*`rsa.misc.cn_mpls_lbl_4`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_5`*::
+*`rsa.misc.cn_mpls_lbl_5`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_6`*::
+*`rsa.misc.cn_mpls_lbl_6`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_7`*::
+*`rsa.misc.cn_mpls_lbl_7`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_8`*::
+*`rsa.misc.cn_mpls_lbl_8`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mpls_lbl_9`*::
+*`rsa.misc.cn_mpls_lbl_9`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mplstoplabel`*::
+*`rsa.misc.cn_mplstoplabel`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mplstoplabip`*::
+*`rsa.misc.cn_mplstoplabip`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mul_dst_byt`*::
+*`rsa.misc.cn_mul_dst_byt`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_mul_dst_pks`*::
+*`rsa.misc.cn_mul_dst_pks`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_muligmptype`*::
+*`rsa.misc.cn_muligmptype`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_sampalgo`*::
+*`rsa.misc.cn_sampalgo`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_sampint`*::
+*`rsa.misc.cn_sampint`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_seqctr`*::
+*`rsa.misc.cn_seqctr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_spackets`*::
+*`rsa.misc.cn_spackets`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_src_tos`*::
+*`rsa.misc.cn_src_tos`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_src_vlan`*::
+*`rsa.misc.cn_src_vlan`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_sysuptime`*::
+*`rsa.misc.cn_sysuptime`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_template_id`*::
+*`rsa.misc.cn_template_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_totbytsexp`*::
+*`rsa.misc.cn_totbytsexp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_totflowexp`*::
+*`rsa.misc.cn_totflowexp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_totpcktsexp`*::
+*`rsa.misc.cn_totpcktsexp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_unixnanosecs`*::
+*`rsa.misc.cn_unixnanosecs`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_v6flowlabel`*::
+*`rsa.misc.cn_v6flowlabel`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cn_v6optheaders`*::
+*`rsa.misc.cn_v6optheaders`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.comp_class`*::
+*`rsa.misc.comp_class`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.comp_name`*::
+*`rsa.misc.comp_name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.comp_rbytes`*::
+*`rsa.misc.comp_rbytes`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.comp_sbytes`*::
+*`rsa.misc.comp_sbytes`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cpu_data`*::
+*`rsa.misc.cpu_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.criticality`*::
+*`rsa.misc.criticality`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_agency_dst`*::
+*`rsa.misc.cs_agency_dst`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_analyzedby`*::
+*`rsa.misc.cs_analyzedby`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_av_other`*::
+*`rsa.misc.cs_av_other`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_av_primary`*::
+*`rsa.misc.cs_av_primary`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_av_secondary`*::
+*`rsa.misc.cs_av_secondary`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_bgpv6nxthop`*::
+*`rsa.misc.cs_bgpv6nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_bit9status`*::
+*`rsa.misc.cs_bit9status`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_context`*::
+*`rsa.misc.cs_context`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_control`*::
+*`rsa.misc.cs_control`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_data`*::
+*`rsa.misc.cs_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_datecret`*::
+*`rsa.misc.cs_datecret`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_dst_tld`*::
+*`rsa.misc.cs_dst_tld`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_eth_dst_ven`*::
+*`rsa.misc.cs_eth_dst_ven`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_eth_src_ven`*::
+*`rsa.misc.cs_eth_src_ven`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_event_uuid`*::
+*`rsa.misc.cs_event_uuid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_filetype`*::
+*`rsa.misc.cs_filetype`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_fld`*::
+*`rsa.misc.cs_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_if_desc`*::
+*`rsa.misc.cs_if_desc`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_if_name`*::
+*`rsa.misc.cs_if_name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_ip_next_hop`*::
+*`rsa.misc.cs_ip_next_hop`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_ipv4dstpre`*::
+*`rsa.misc.cs_ipv4dstpre`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_ipv4srcpre`*::
+*`rsa.misc.cs_ipv4srcpre`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_lifetime`*::
+*`rsa.misc.cs_lifetime`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_log_medium`*::
+*`rsa.misc.cs_log_medium`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_loginname`*::
+*`rsa.misc.cs_loginname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_modulescore`*::
+*`rsa.misc.cs_modulescore`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_modulesign`*::
+*`rsa.misc.cs_modulesign`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_opswatresult`*::
+*`rsa.misc.cs_opswatresult`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_payload`*::
+*`rsa.misc.cs_payload`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_registrant`*::
+*`rsa.misc.cs_registrant`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_registrar`*::
+*`rsa.misc.cs_registrar`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_represult`*::
+*`rsa.misc.cs_represult`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_rpayload`*::
+*`rsa.misc.cs_rpayload`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_sampler_name`*::
+*`rsa.misc.cs_sampler_name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_sourcemodule`*::
+*`rsa.misc.cs_sourcemodule`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_streams`*::
+*`rsa.misc.cs_streams`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_targetmodule`*::
+*`rsa.misc.cs_targetmodule`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_v6nxthop`*::
+*`rsa.misc.cs_v6nxthop`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_whois_server`*::
+*`rsa.misc.cs_whois_server`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.cs_yararesult`*::
+*`rsa.misc.cs_yararesult`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.description`*::
+*`rsa.misc.description`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.devvendor`*::
+*`rsa.misc.devvendor`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.distance`*::
+*`rsa.misc.distance`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.dstburb`*::
+*`rsa.misc.dstburb`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.edomain`*::
+*`rsa.misc.edomain`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.edomaub`*::
+*`rsa.misc.edomaub`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.euid`*::
+*`rsa.misc.euid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.facility`*::
+*`rsa.misc.facility`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.finterface`*::
+*`rsa.misc.finterface`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.flags`*::
+*`rsa.misc.flags`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.gaddr`*::
+*`rsa.misc.gaddr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.id3`*::
+*`rsa.misc.id3`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_buddyname`*::
+*`rsa.misc.im_buddyname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_croomid`*::
+*`rsa.misc.im_croomid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_croomtype`*::
+*`rsa.misc.im_croomtype`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_members`*::
+*`rsa.misc.im_members`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.im_username`*::
+*`rsa.misc.im_username`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.ipkt`*::
+*`rsa.misc.ipkt`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.ipscat`*::
+*`rsa.misc.ipscat`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.ipspri`*::
+*`rsa.misc.ipspri`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.latitude`*::
+*`rsa.misc.latitude`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.linenum`*::
+*`rsa.misc.linenum`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.list_name`*::
+*`rsa.misc.list_name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.load_data`*::
+*`rsa.misc.load_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.location_floor`*::
+*`rsa.misc.location_floor`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.location_mark`*::
+*`rsa.misc.location_mark`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.log_id`*::
+*`rsa.misc.log_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.log_type`*::
+*`rsa.misc.log_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.logid`*::
+*`rsa.misc.logid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.logip`*::
+*`rsa.misc.logip`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.logname`*::
+*`rsa.misc.logname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.longitude`*::
+*`rsa.misc.longitude`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.lport`*::
+*`rsa.misc.lport`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.mbug_data`*::
+*`rsa.misc.mbug_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.misc_name`*::
+*`rsa.misc.misc_name`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.msg_type`*::
+*`rsa.misc.msg_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.msgid`*::
+*`rsa.misc.msgid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.netsessid`*::
+*`rsa.misc.netsessid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.num`*::
+*`rsa.misc.num`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.number1`*::
+*`rsa.misc.number1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.number2`*::
+*`rsa.misc.number2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.nwwn`*::
+*`rsa.misc.nwwn`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.object`*::
+*`rsa.misc.object`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.operation`*::
+*`rsa.misc.operation`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.opkt`*::
+*`rsa.misc.opkt`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.orig_from`*::
+*`rsa.misc.orig_from`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.owner_id`*::
+*`rsa.misc.owner_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_action`*::
+*`rsa.misc.p_action`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_filter`*::
+*`rsa.misc.p_filter`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_group_object`*::
+*`rsa.misc.p_group_object`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_id`*::
+*`rsa.misc.p_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_msgid1`*::
+*`rsa.misc.p_msgid1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_msgid2`*::
+*`rsa.misc.p_msgid2`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.p_result1`*::
+*`rsa.misc.p_result1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.password_chg`*::
+*`rsa.misc.password_chg`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.password_expire`*::
+*`rsa.misc.password_expire`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.permgranted`*::
+*`rsa.misc.permgranted`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.permwanted`*::
+*`rsa.misc.permwanted`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.pgid`*::
+*`rsa.misc.pgid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.policyUUID`*::
+*`rsa.misc.policyUUID`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.prog_asp_num`*::
+*`rsa.misc.prog_asp_num`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.program`*::
+*`rsa.misc.program`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.real_data`*::
+*`rsa.misc.real_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.rec_asp_device`*::
+*`rsa.misc.rec_asp_device`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.rec_asp_num`*::
+*`rsa.misc.rec_asp_num`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.rec_library`*::
+*`rsa.misc.rec_library`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.recordnum`*::
+*`rsa.misc.recordnum`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.ruid`*::
+*`rsa.misc.ruid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sburb`*::
+*`rsa.misc.sburb`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sdomain_fld`*::
+*`rsa.misc.sdomain_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sec`*::
+*`rsa.misc.sec`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sensorname`*::
+*`rsa.misc.sensorname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.seqnum`*::
+*`rsa.misc.seqnum`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.session`*::
+*`rsa.misc.session`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sessiontype`*::
+*`rsa.misc.sessiontype`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.sigUUID`*::
+*`rsa.misc.sigUUID`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.spi`*::
+*`rsa.misc.spi`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.srcburb`*::
+*`rsa.misc.srcburb`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.srcdom`*::
+*`rsa.misc.srcdom`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.srcservice`*::
+*`rsa.misc.srcservice`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.state`*::
+*`rsa.misc.state`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.status1`*::
+*`rsa.misc.status1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.svcno`*::
+*`rsa.misc.svcno`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.system`*::
+*`rsa.misc.system`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.tbdstr1`*::
+*`rsa.misc.tbdstr1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.tgtdom`*::
+*`rsa.misc.tgtdom`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.tgtdomain`*::
+*`rsa.misc.tgtdomain`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.threshold`*::
+*`rsa.misc.threshold`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.type1`*::
+*`rsa.misc.type1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.udb_class`*::
+*`rsa.misc.udb_class`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.url_fld`*::
+*`rsa.misc.url_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.user_div`*::
+*`rsa.misc.user_div`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.userid`*::
+*`rsa.misc.userid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.username_fld`*::
+*`rsa.misc.username_fld`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.utcstamp`*::
+*`rsa.misc.utcstamp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.v_instafname`*::
+*`rsa.misc.v_instafname`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.virt_data`*::
+*`rsa.misc.virt_data`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.vpnid`*::
+*`rsa.misc.vpnid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.misc.autorun_type`*::
+*`rsa.misc.autorun_type`*::
 +
 --
 This is used to capture Auto Run type
@@ -132762,7 +132756,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.cc_number`*::
+*`rsa.misc.cc_number`*::
 +
 --
 Valid Credit Card Numbers only
@@ -132771,7 +132765,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.content`*::
+*`rsa.misc.content`*::
 +
 --
 This key captures the content type from protocol headers
@@ -132780,7 +132774,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.ein_number`*::
+*`rsa.misc.ein_number`*::
 +
 --
 Employee Identification Numbers only
@@ -132789,7 +132783,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.found`*::
+*`rsa.misc.found`*::
 +
 --
 This is used to capture the results of regex match
@@ -132798,7 +132792,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.language`*::
+*`rsa.misc.language`*::
 +
 --
 This is used to capture list of languages the client support and what it prefers
@@ -132807,7 +132801,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.lifetime`*::
+*`rsa.misc.lifetime`*::
 +
 --
 This key is used to capture the session lifetime in seconds.
@@ -132816,7 +132810,7 @@ type: long
 
 --
 
-*`sophos.rsa.misc.link`*::
+*`rsa.misc.link`*::
 +
 --
 This key is used to link the sessions together. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness
@@ -132825,7 +132819,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.match`*::
+*`rsa.misc.match`*::
 +
 --
 This key is for regex match name from search.ini
@@ -132834,7 +132828,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.param_dst`*::
+*`rsa.misc.param_dst`*::
 +
 --
 This key captures the command line/launch argument of the target process or file
@@ -132843,7 +132837,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.param_src`*::
+*`rsa.misc.param_src`*::
 +
 --
 This key captures source parameter
@@ -132852,7 +132846,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.search_text`*::
+*`rsa.misc.search_text`*::
 +
 --
 This key captures the Search Text used
@@ -132861,7 +132855,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.sig_name`*::
+*`rsa.misc.sig_name`*::
 +
 --
 This key is used to capture the Signature Name only.
@@ -132870,7 +132864,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.snmp_value`*::
+*`rsa.misc.snmp_value`*::
 +
 --
 SNMP set request value
@@ -132879,7 +132873,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.misc.streams`*::
+*`rsa.misc.streams`*::
 +
 --
 This key captures number of streams in session
@@ -132889,7 +132883,7 @@ type: long
 --
 
 
-*`sophos.rsa.db.index`*::
+*`rsa.db.index`*::
 +
 --
 This key captures IndexID of the index.
@@ -132898,7 +132892,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.instance`*::
+*`rsa.db.instance`*::
 +
 --
 This key is used to capture the database server instance name
@@ -132907,7 +132901,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.database`*::
+*`rsa.db.database`*::
 +
 --
 This key is used to capture the name of a database or an instance as seen in a session
@@ -132916,7 +132910,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.transact_id`*::
+*`rsa.db.transact_id`*::
 +
 --
 This key captures the SQL transantion ID of the current session
@@ -132925,7 +132919,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.permissions`*::
+*`rsa.db.permissions`*::
 +
 --
 This key captures permission or privilege level assigned to a resource.
@@ -132934,7 +132928,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.table_name`*::
+*`rsa.db.table_name`*::
 +
 --
 This key is used to capture the table name
@@ -132943,7 +132937,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.db_id`*::
+*`rsa.db.db_id`*::
 +
 --
 This key is used to capture the unique identifier for a database
@@ -132952,7 +132946,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.db.db_pid`*::
+*`rsa.db.db_pid`*::
 +
 --
 This key captures the process id of a connection with database server
@@ -132961,7 +132955,7 @@ type: long
 
 --
 
-*`sophos.rsa.db.lread`*::
+*`rsa.db.lread`*::
 +
 --
 This key is used for the number of logical reads
@@ -132970,7 +132964,7 @@ type: long
 
 --
 
-*`sophos.rsa.db.lwrite`*::
+*`rsa.db.lwrite`*::
 +
 --
 This key is used for the number of logical writes
@@ -132979,7 +132973,7 @@ type: long
 
 --
 
-*`sophos.rsa.db.pread`*::
+*`rsa.db.pread`*::
 +
 --
 This key is used for the number of physical writes
@@ -132989,7 +132983,7 @@ type: long
 --
 
 
-*`sophos.rsa.network.alias_host`*::
+*`rsa.network.alias_host`*::
 +
 --
 This key should be used when the source or destination context of a hostname is not clear.Also it captures the Device Hostname. Any Hostname that isnt ad.computer.
@@ -132998,14 +132992,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.domain`*::
+*`rsa.network.domain`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.host_dst`*::
+*`rsa.network.host_dst`*::
 +
 --
 This key should only be used when it’s a Destination Hostname
@@ -133014,7 +133008,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.network_service`*::
+*`rsa.network.network_service`*::
 +
 --
 This is used to capture layer 7 protocols/service names
@@ -133023,7 +133017,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.interface`*::
+*`rsa.network.interface`*::
 +
 --
 This key should be used when the source or destination context of an interface is not clear
@@ -133032,7 +133026,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.network_port`*::
+*`rsa.network.network_port`*::
 +
 --
 Deprecated, use port. NOTE: There is a type discrepancy as currently used, TM: Int32, INDEX: UInt64 (why neither chose the correct UInt16?!)
@@ -133041,7 +133035,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.eth_host`*::
+*`rsa.network.eth_host`*::
 +
 --
 Deprecated, use alias.mac
@@ -133050,7 +133044,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.sinterface`*::
+*`rsa.network.sinterface`*::
 +
 --
 This key should only be used when it’s a Source Interface
@@ -133059,7 +133053,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.dinterface`*::
+*`rsa.network.dinterface`*::
 +
 --
 This key should only be used when it’s a Destination Interface
@@ -133068,7 +133062,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.vlan`*::
+*`rsa.network.vlan`*::
 +
 --
 This key should only be used to capture the ID of the Virtual LAN
@@ -133077,7 +133071,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.zone_src`*::
+*`rsa.network.zone_src`*::
 +
 --
 This key should only be used when it’s a Source Zone.
@@ -133086,7 +133080,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.zone`*::
+*`rsa.network.zone`*::
 +
 --
 This key should be used when the source or destination context of a Zone is not clear
@@ -133095,7 +133089,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.zone_dst`*::
+*`rsa.network.zone_dst`*::
 +
 --
 This key should only be used when it’s a Destination Zone.
@@ -133104,7 +133098,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.gateway`*::
+*`rsa.network.gateway`*::
 +
 --
 This key is used to capture the IP Address of the gateway
@@ -133113,7 +133107,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.icmp_type`*::
+*`rsa.network.icmp_type`*::
 +
 --
 This key is used to capture the ICMP type only
@@ -133122,7 +133116,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.mask`*::
+*`rsa.network.mask`*::
 +
 --
 This key is used to capture the device network IPmask.
@@ -133131,7 +133125,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.icmp_code`*::
+*`rsa.network.icmp_code`*::
 +
 --
 This key is used to capture the ICMP code only
@@ -133140,7 +133134,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.protocol_detail`*::
+*`rsa.network.protocol_detail`*::
 +
 --
 This key should be used to capture additional protocol information
@@ -133149,7 +133143,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.dmask`*::
+*`rsa.network.dmask`*::
 +
 --
 This key is used for Destionation Device network mask
@@ -133158,7 +133152,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.port`*::
+*`rsa.network.port`*::
 +
 --
 This key should only be used to capture a Network Port when the directionality is not clear
@@ -133167,7 +133161,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.smask`*::
+*`rsa.network.smask`*::
 +
 --
 This key is used for capturing source Network Mask
@@ -133176,7 +133170,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.netname`*::
+*`rsa.network.netname`*::
 +
 --
 This key is used to capture the network name associated with an IP range. This is configured by the end user.
@@ -133185,7 +133179,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.paddr`*::
+*`rsa.network.paddr`*::
 +
 --
 Deprecated
@@ -133194,91 +133188,91 @@ type: ip
 
 --
 
-*`sophos.rsa.network.faddr`*::
+*`rsa.network.faddr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.lhost`*::
+*`rsa.network.lhost`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.origin`*::
+*`rsa.network.origin`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.remote_domain_id`*::
+*`rsa.network.remote_domain_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.addr`*::
+*`rsa.network.addr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_a_record`*::
+*`rsa.network.dns_a_record`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_ptr_record`*::
+*`rsa.network.dns_ptr_record`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.fhost`*::
+*`rsa.network.fhost`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.fport`*::
+*`rsa.network.fport`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.laddr`*::
+*`rsa.network.laddr`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.linterface`*::
+*`rsa.network.linterface`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.phost`*::
+*`rsa.network.phost`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.ad_computer_dst`*::
+*`rsa.network.ad_computer_dst`*::
 +
 --
 Deprecated, use host.dst
@@ -133287,7 +133281,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.eth_type`*::
+*`rsa.network.eth_type`*::
 +
 --
 This key is used to capture Ethernet Type, Used for Layer 3 Protocols Only
@@ -133296,7 +133290,7 @@ type: long
 
 --
 
-*`sophos.rsa.network.ip_proto`*::
+*`rsa.network.ip_proto`*::
 +
 --
 This key should be used to capture the Protocol number, all the protocol nubers are converted into string in UI
@@ -133305,63 +133299,63 @@ type: long
 
 --
 
-*`sophos.rsa.network.dns_cname_record`*::
+*`rsa.network.dns_cname_record`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_id`*::
+*`rsa.network.dns_id`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_opcode`*::
+*`rsa.network.dns_opcode`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_resp`*::
+*`rsa.network.dns_resp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.dns_type`*::
+*`rsa.network.dns_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.domain1`*::
+*`rsa.network.domain1`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.host_type`*::
+*`rsa.network.host_type`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.packet_length`*::
+*`rsa.network.packet_length`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.network.host_orig`*::
+*`rsa.network.host_orig`*::
 +
 --
 This is used to capture the original hostname in case of a Forwarding Agent or a Proxy in between.
@@ -133370,7 +133364,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.rpayload`*::
+*`rsa.network.rpayload`*::
 +
 --
 This key is used to capture the total number of payload bytes seen in the retransmitted packets.
@@ -133379,7 +133373,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.network.vlan_name`*::
+*`rsa.network.vlan_name`*::
 +
 --
 This key should only be used to capture the name of the Virtual LAN
@@ -133389,7 +133383,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.investigations.ec_activity`*::
+*`rsa.investigations.ec_activity`*::
 +
 --
 This key captures the particular event activity(Ex:Logoff)
@@ -133398,7 +133392,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.ec_theme`*::
+*`rsa.investigations.ec_theme`*::
 +
 --
 This key captures the Theme of a particular Event(Ex:Authentication)
@@ -133407,7 +133401,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.ec_subject`*::
+*`rsa.investigations.ec_subject`*::
 +
 --
 This key captures the Subject of a particular Event(Ex:User)
@@ -133416,7 +133410,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.ec_outcome`*::
+*`rsa.investigations.ec_outcome`*::
 +
 --
 This key captures the outcome of a particular Event(Ex:Success)
@@ -133425,7 +133419,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.event_cat`*::
+*`rsa.investigations.event_cat`*::
 +
 --
 This key captures the Event category number
@@ -133434,7 +133428,7 @@ type: long
 
 --
 
-*`sophos.rsa.investigations.event_cat_name`*::
+*`rsa.investigations.event_cat_name`*::
 +
 --
 This key captures the event category name corresponding to the event cat code
@@ -133443,7 +133437,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.event_vcat`*::
+*`rsa.investigations.event_vcat`*::
 +
 --
 This is a vendor supplied category. This should be used in situations where the vendor has adopted their own event_category taxonomy.
@@ -133452,7 +133446,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.analysis_file`*::
+*`rsa.investigations.analysis_file`*::
 +
 --
 This is used to capture all indicators used in a File Analysis. This key should be used to capture an analysis of a file
@@ -133461,7 +133455,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.analysis_service`*::
+*`rsa.investigations.analysis_service`*::
 +
 --
 This is used to capture all indicators used in a Service Analysis. This key should be used to capture an analysis of a service
@@ -133470,7 +133464,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.analysis_session`*::
+*`rsa.investigations.analysis_session`*::
 +
 --
 This is used to capture all indicators used for a Session Analysis. This key should be used to capture an analysis of a session
@@ -133479,7 +133473,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.boc`*::
+*`rsa.investigations.boc`*::
 +
 --
 This is used to capture behaviour of compromise
@@ -133488,7 +133482,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.eoc`*::
+*`rsa.investigations.eoc`*::
 +
 --
 This is used to capture Enablers of Compromise
@@ -133497,7 +133491,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.inv_category`*::
+*`rsa.investigations.inv_category`*::
 +
 --
 This used to capture investigation category
@@ -133506,7 +133500,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.inv_context`*::
+*`rsa.investigations.inv_context`*::
 +
 --
 This used to capture investigation context
@@ -133515,7 +133509,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.investigations.ioc`*::
+*`rsa.investigations.ioc`*::
 +
 --
 This is key capture indicator of compromise
@@ -133525,7 +133519,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.counters.dclass_c1`*::
+*`rsa.counters.dclass_c1`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c1.str only
@@ -133534,7 +133528,7 @@ type: long
 
 --
 
-*`sophos.rsa.counters.dclass_c2`*::
+*`rsa.counters.dclass_c2`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c2.str only
@@ -133543,7 +133537,7 @@ type: long
 
 --
 
-*`sophos.rsa.counters.event_counter`*::
+*`rsa.counters.event_counter`*::
 +
 --
 This is used to capture the number of times an event repeated
@@ -133552,7 +133546,7 @@ type: long
 
 --
 
-*`sophos.rsa.counters.dclass_r1`*::
+*`rsa.counters.dclass_r1`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r1.str only
@@ -133561,7 +133555,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_c3`*::
+*`rsa.counters.dclass_c3`*::
 +
 --
 This is a generic counter key that should be used with the label dclass.c3.str only
@@ -133570,7 +133564,7 @@ type: long
 
 --
 
-*`sophos.rsa.counters.dclass_c1_str`*::
+*`rsa.counters.dclass_c1_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c1 only
@@ -133579,7 +133573,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_c2_str`*::
+*`rsa.counters.dclass_c2_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c2 only
@@ -133588,7 +133582,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_r1_str`*::
+*`rsa.counters.dclass_r1_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r1 only
@@ -133597,7 +133591,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_r2`*::
+*`rsa.counters.dclass_r2`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r2.str only
@@ -133606,7 +133600,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_c3_str`*::
+*`rsa.counters.dclass_c3_str`*::
 +
 --
 This is a generic counter string key that should be used with the label dclass.c3 only
@@ -133615,7 +133609,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_r3`*::
+*`rsa.counters.dclass_r3`*::
 +
 --
 This is a generic ratio key that should be used with the label dclass.r3.str only
@@ -133624,7 +133618,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_r2_str`*::
+*`rsa.counters.dclass_r2_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r2 only
@@ -133633,7 +133627,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.counters.dclass_r3_str`*::
+*`rsa.counters.dclass_r3_str`*::
 +
 --
 This is a generic ratio string key that should be used with the label dclass.r3 only
@@ -133643,7 +133637,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.identity.auth_method`*::
+*`rsa.identity.auth_method`*::
 +
 --
 This key is used to capture authentication methods used only
@@ -133652,7 +133646,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.user_role`*::
+*`rsa.identity.user_role`*::
 +
 --
 This key is used to capture the Role of a user only
@@ -133661,7 +133655,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.dn`*::
+*`rsa.identity.dn`*::
 +
 --
 X.500 (LDAP) Distinguished Name
@@ -133670,7 +133664,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.logon_type`*::
+*`rsa.identity.logon_type`*::
 +
 --
 This key is used to capture the type of logon method used.
@@ -133679,7 +133673,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.profile`*::
+*`rsa.identity.profile`*::
 +
 --
 This key is used to capture the user profile
@@ -133688,7 +133682,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.accesses`*::
+*`rsa.identity.accesses`*::
 +
 --
 This key is used to capture actual privileges used in accessing an object
@@ -133697,7 +133691,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.realm`*::
+*`rsa.identity.realm`*::
 +
 --
 Radius realm or similar grouping of accounts
@@ -133706,7 +133700,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.user_sid_dst`*::
+*`rsa.identity.user_sid_dst`*::
 +
 --
 This key captures Destination User Session ID
@@ -133715,7 +133709,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.dn_src`*::
+*`rsa.identity.dn_src`*::
 +
 --
 An X.500 (LDAP) Distinguished name that is used in a context that indicates a Source dn
@@ -133724,7 +133718,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.org`*::
+*`rsa.identity.org`*::
 +
 --
 This key captures the User organization
@@ -133733,7 +133727,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.dn_dst`*::
+*`rsa.identity.dn_dst`*::
 +
 --
 An X.500 (LDAP) Distinguished name that used in a context that indicates a Destination dn
@@ -133742,7 +133736,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.firstname`*::
+*`rsa.identity.firstname`*::
 +
 --
 This key is for First Names only, this is used for Healthcare predominantly to capture Patients information
@@ -133751,7 +133745,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.lastname`*::
+*`rsa.identity.lastname`*::
 +
 --
 This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information
@@ -133760,7 +133754,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.user_dept`*::
+*`rsa.identity.user_dept`*::
 +
 --
 User's Department Names only
@@ -133769,7 +133763,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.user_sid_src`*::
+*`rsa.identity.user_sid_src`*::
 +
 --
 This key captures Source User Session ID
@@ -133778,7 +133772,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.federated_sp`*::
+*`rsa.identity.federated_sp`*::
 +
 --
 This key is the Federated Service Provider. This is the application requesting authentication.
@@ -133787,7 +133781,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.federated_idp`*::
+*`rsa.identity.federated_idp`*::
 +
 --
 This key is the federated Identity Provider. This is the server providing the authentication.
@@ -133796,7 +133790,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.logon_type_desc`*::
+*`rsa.identity.logon_type_desc`*::
 +
 --
 This key is used to capture the textual description of an integer logon type as stored in the meta key 'logon.type'.
@@ -133805,7 +133799,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.middlename`*::
+*`rsa.identity.middlename`*::
 +
 --
 This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information
@@ -133814,7 +133808,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.password`*::
+*`rsa.identity.password`*::
 +
 --
 This key is for Passwords seen in any session, plain text or encrypted
@@ -133823,7 +133817,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.host_role`*::
+*`rsa.identity.host_role`*::
 +
 --
 This key should only be used to capture the role of a Host Machine
@@ -133832,7 +133826,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.ldap`*::
+*`rsa.identity.ldap`*::
 +
 --
 This key is for Uninterpreted LDAP values. Ldap Values that don’t have a clear query or response context
@@ -133841,7 +133835,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.ldap_query`*::
+*`rsa.identity.ldap_query`*::
 +
 --
 This key is the Search criteria from an LDAP search
@@ -133850,7 +133844,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.ldap_response`*::
+*`rsa.identity.ldap_response`*::
 +
 --
 This key is to capture Results from an LDAP search
@@ -133859,7 +133853,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.owner`*::
+*`rsa.identity.owner`*::
 +
 --
 This is used to capture username the process or service is running as, the author of the task
@@ -133868,7 +133862,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.identity.service_account`*::
+*`rsa.identity.service_account`*::
 +
 --
 This key is a windows specific key, used for capturing name of the account a service (referenced in the event) is running under. Legacy Usage
@@ -133878,7 +133872,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.email.email_dst`*::
+*`rsa.email.email_dst`*::
 +
 --
 This key is used to capture the Destination email address only, when the destination context is not clear use email
@@ -133887,7 +133881,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.email.email_src`*::
+*`rsa.email.email_src`*::
 +
 --
 This key is used to capture the source email address only, when the source context is not clear use email
@@ -133896,7 +133890,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.email.subject`*::
+*`rsa.email.subject`*::
 +
 --
 This key is used to capture the subject string from an Email only.
@@ -133905,7 +133899,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.email.email`*::
+*`rsa.email.email`*::
 +
 --
 This key is used to capture a generic email address where the source or destination context is not clear
@@ -133914,7 +133908,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.email.trans_from`*::
+*`rsa.email.trans_from`*::
 +
 --
 Deprecated key defined only in table map.
@@ -133923,7 +133917,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.email.trans_to`*::
+*`rsa.email.trans_to`*::
 +
 --
 Deprecated key defined only in table map.
@@ -133933,7 +133927,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.file.privilege`*::
+*`rsa.file.privilege`*::
 +
 --
 Deprecated, use permissions
@@ -133942,7 +133936,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.attachment`*::
+*`rsa.file.attachment`*::
 +
 --
 This key captures the attachment file name
@@ -133951,14 +133945,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.filesystem`*::
+*`rsa.file.filesystem`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.file.binary`*::
+*`rsa.file.binary`*::
 +
 --
 Deprecated key defined only in table map.
@@ -133967,7 +133961,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.filename_dst`*::
+*`rsa.file.filename_dst`*::
 +
 --
 This is used to capture name of the file targeted by the action
@@ -133976,7 +133970,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.filename_src`*::
+*`rsa.file.filename_src`*::
 +
 --
 This is used to capture name of the parent filename, the file which performed the action
@@ -133985,14 +133979,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.filename_tmp`*::
+*`rsa.file.filename_tmp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.file.directory_dst`*::
+*`rsa.file.directory_dst`*::
 +
 --
 <span>This key is used to capture the directory of the target process or file</span>
@@ -134001,7 +133995,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.directory_src`*::
+*`rsa.file.directory_src`*::
 +
 --
 This key is used to capture the directory of the source process or file
@@ -134010,7 +134004,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.file_entropy`*::
+*`rsa.file.file_entropy`*::
 +
 --
 This is used to capture entropy vale of a file
@@ -134019,7 +134013,7 @@ type: double
 
 --
 
-*`sophos.rsa.file.file_vendor`*::
+*`rsa.file.file_vendor`*::
 +
 --
 This is used to capture Company name of file located in version_info
@@ -134028,7 +134022,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.file.task_name`*::
+*`rsa.file.task_name`*::
 +
 --
 This is used to capture name of the task
@@ -134038,7 +134032,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.web.fqdn`*::
+*`rsa.web.fqdn`*::
 +
 --
 Fully Qualified Domain Names
@@ -134047,7 +134041,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.web_cookie`*::
+*`rsa.web.web_cookie`*::
 +
 --
 This key is used to capture the Web cookies specifically.
@@ -134056,14 +134050,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.alias_host`*::
+*`rsa.web.alias_host`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.reputation_num`*::
+*`rsa.web.reputation_num`*::
 +
 --
 Reputation Number of an entity. Typically used for Web Domains
@@ -134072,7 +134066,7 @@ type: double
 
 --
 
-*`sophos.rsa.web.web_ref_domain`*::
+*`rsa.web.web_ref_domain`*::
 +
 --
 Web referer's domain
@@ -134081,7 +134075,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.web_ref_query`*::
+*`rsa.web.web_ref_query`*::
 +
 --
 This key captures Web referer's query portion of the URL
@@ -134090,14 +134084,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.remote_domain`*::
+*`rsa.web.remote_domain`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.web_ref_page`*::
+*`rsa.web.web_ref_page`*::
 +
 --
 This key captures Web referer's page information
@@ -134106,7 +134100,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.web_ref_root`*::
+*`rsa.web.web_ref_root`*::
 +
 --
 Web referer's root URL path
@@ -134115,77 +134109,77 @@ type: keyword
 
 --
 
-*`sophos.rsa.web.cn_asn_dst`*::
+*`rsa.web.cn_asn_dst`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.cn_rpackets`*::
+*`rsa.web.cn_rpackets`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.urlpage`*::
+*`rsa.web.urlpage`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.urlroot`*::
+*`rsa.web.urlroot`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.p_url`*::
+*`rsa.web.p_url`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.p_user_agent`*::
+*`rsa.web.p_user_agent`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.p_web_cookie`*::
+*`rsa.web.p_web_cookie`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.p_web_method`*::
+*`rsa.web.p_web_method`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.p_web_referer`*::
+*`rsa.web.p_web_referer`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.web_extension_tmp`*::
+*`rsa.web.web_extension_tmp`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.web.web_page`*::
+*`rsa.web.web_page`*::
 +
 --
 type: keyword
@@ -134193,7 +134187,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.threat.threat_category`*::
+*`rsa.threat.threat_category`*::
 +
 --
 This key captures Threat Name/Threat Category/Categorization of alert
@@ -134202,7 +134196,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.threat.threat_desc`*::
+*`rsa.threat.threat_desc`*::
 +
 --
 This key is used to capture the threat description from the session directly or inferred
@@ -134211,7 +134205,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.threat.alert`*::
+*`rsa.threat.alert`*::
 +
 --
 This key is used to capture name of the alert
@@ -134220,7 +134214,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.threat.threat_source`*::
+*`rsa.threat.threat_source`*::
 +
 --
 This key is used to capture source of the threat
@@ -134230,7 +134224,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.crypto.crypto`*::
+*`rsa.crypto.crypto`*::
 +
 --
 This key is used to capture the Encryption Type or Encryption Key only
@@ -134239,7 +134233,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cipher_src`*::
+*`rsa.crypto.cipher_src`*::
 +
 --
 This key is for Source (Client) Cipher
@@ -134248,7 +134242,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_subject`*::
+*`rsa.crypto.cert_subject`*::
 +
 --
 This key is used to capture the Certificate organization only
@@ -134257,7 +134251,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.peer`*::
+*`rsa.crypto.peer`*::
 +
 --
 This key is for Encryption peer's IP Address
@@ -134266,7 +134260,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cipher_size_src`*::
+*`rsa.crypto.cipher_size_src`*::
 +
 --
 This key captures Source (Client) Cipher Size
@@ -134275,7 +134269,7 @@ type: long
 
 --
 
-*`sophos.rsa.crypto.ike`*::
+*`rsa.crypto.ike`*::
 +
 --
 IKE negotiation phase.
@@ -134284,7 +134278,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.scheme`*::
+*`rsa.crypto.scheme`*::
 +
 --
 This key captures the Encryption scheme used
@@ -134293,7 +134287,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.peer_id`*::
+*`rsa.crypto.peer_id`*::
 +
 --
 This key is for Encryption peer’s identity
@@ -134302,7 +134296,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.sig_type`*::
+*`rsa.crypto.sig_type`*::
 +
 --
 This key captures the Signature Type
@@ -134311,14 +134305,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_issuer`*::
+*`rsa.crypto.cert_issuer`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_host_name`*::
+*`rsa.crypto.cert_host_name`*::
 +
 --
 Deprecated key defined only in table map.
@@ -134327,7 +134321,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_error`*::
+*`rsa.crypto.cert_error`*::
 +
 --
 This key captures the Certificate Error String
@@ -134336,7 +134330,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cipher_dst`*::
+*`rsa.crypto.cipher_dst`*::
 +
 --
 This key is for Destination (Server) Cipher
@@ -134345,7 +134339,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cipher_size_dst`*::
+*`rsa.crypto.cipher_size_dst`*::
 +
 --
 This key captures Destination (Server) Cipher Size
@@ -134354,7 +134348,7 @@ type: long
 
 --
 
-*`sophos.rsa.crypto.ssl_ver_src`*::
+*`rsa.crypto.ssl_ver_src`*::
 +
 --
 Deprecated, use version
@@ -134363,21 +134357,21 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.d_certauth`*::
+*`rsa.crypto.d_certauth`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.s_certauth`*::
+*`rsa.crypto.s_certauth`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.ike_cookie1`*::
+*`rsa.crypto.ike_cookie1`*::
 +
 --
 ID of the negotiation — sent for ISAKMP Phase One
@@ -134386,7 +134380,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.ike_cookie2`*::
+*`rsa.crypto.ike_cookie2`*::
 +
 --
 ID of the negotiation — sent for ISAKMP Phase Two
@@ -134395,14 +134389,14 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_checksum`*::
+*`rsa.crypto.cert_checksum`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_host_cat`*::
+*`rsa.crypto.cert_host_cat`*::
 +
 --
 This key is used for the hostname category value of a certificate
@@ -134411,7 +134405,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_serial`*::
+*`rsa.crypto.cert_serial`*::
 +
 --
 This key is used to capture the Certificate serial number only
@@ -134420,7 +134414,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_status`*::
+*`rsa.crypto.cert_status`*::
 +
 --
 This key captures Certificate validation status
@@ -134429,7 +134423,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.ssl_ver_dst`*::
+*`rsa.crypto.ssl_ver_dst`*::
 +
 --
 Deprecated, use version
@@ -134438,35 +134432,35 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_keysize`*::
+*`rsa.crypto.cert_keysize`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_username`*::
+*`rsa.crypto.cert_username`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.https_insact`*::
+*`rsa.crypto.https_insact`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.https_valid`*::
+*`rsa.crypto.https_valid`*::
 +
 --
 type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_ca`*::
+*`rsa.crypto.cert_ca`*::
 +
 --
 This key is used to capture the Certificate signing authority only
@@ -134475,7 +134469,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.crypto.cert_common`*::
+*`rsa.crypto.cert_common`*::
 +
 --
 This key is used to capture the Certificate common name only
@@ -134485,7 +134479,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.wireless.wlan_ssid`*::
+*`rsa.wireless.wlan_ssid`*::
 +
 --
 This key is used to capture the ssid of a Wireless Session
@@ -134494,7 +134488,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.wireless.access_point`*::
+*`rsa.wireless.access_point`*::
 +
 --
 This key is used to capture the access point name.
@@ -134503,7 +134497,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.wireless.wlan_channel`*::
+*`rsa.wireless.wlan_channel`*::
 +
 --
 This is used to capture the channel names
@@ -134512,7 +134506,7 @@ type: long
 
 --
 
-*`sophos.rsa.wireless.wlan_name`*::
+*`rsa.wireless.wlan_name`*::
 +
 --
 This key captures either WLAN number/name
@@ -134522,7 +134516,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.storage.disk_volume`*::
+*`rsa.storage.disk_volume`*::
 +
 --
 A unique name assigned to logical units (volumes) within a physical disk
@@ -134531,7 +134525,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.storage.lun`*::
+*`rsa.storage.lun`*::
 +
 --
 Logical Unit Number.This key is a very useful concept in Storage.
@@ -134540,7 +134534,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.storage.pwwn`*::
+*`rsa.storage.pwwn`*::
 +
 --
 This uniquely identifies a port on a HBA.
@@ -134550,7 +134544,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.physical.org_dst`*::
+*`rsa.physical.org_dst`*::
 +
 --
 This is used to capture the destination organization based on the GEOPIP Maxmind database.
@@ -134559,7 +134553,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.physical.org_src`*::
+*`rsa.physical.org_src`*::
 +
 --
 This is used to capture the source organization based on the GEOPIP Maxmind database.
@@ -134569,7 +134563,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.healthcare.patient_fname`*::
+*`rsa.healthcare.patient_fname`*::
 +
 --
 This key is for First Names only, this is used for Healthcare predominantly to capture Patients information
@@ -134578,7 +134572,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.healthcare.patient_id`*::
+*`rsa.healthcare.patient_id`*::
 +
 --
 This key captures the unique ID for a patient
@@ -134587,7 +134581,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.healthcare.patient_lname`*::
+*`rsa.healthcare.patient_lname`*::
 +
 --
 This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information
@@ -134596,7 +134590,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.healthcare.patient_mname`*::
+*`rsa.healthcare.patient_mname`*::
 +
 --
 This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information
@@ -134606,7 +134600,7 @@ type: keyword
 --
 
 
-*`sophos.rsa.endpoint.host_state`*::
+*`rsa.endpoint.host_state`*::
 +
 --
 This key is used to capture the current state of the machine, such as <strong>blacklisted</strong>, <strong>infected</strong>, <strong>firewall disabled</strong> and so on
@@ -134615,7 +134609,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.endpoint.registry_key`*::
+*`rsa.endpoint.registry_key`*::
 +
 --
 This key captures the path to the registry key
@@ -134624,7 +134618,7 @@ type: keyword
 
 --
 
-*`sophos.rsa.endpoint.registry_value`*::
+*`rsa.endpoint.registry_value`*::
 +
 --
 This key captures values or decorators used within a registry entry
@@ -134632,6 +134626,12 @@ This key captures values or decorators used within a registry entry
 type: keyword
 
 --
+
+[float]
+=== sophos
+
+
+
 
 [float]
 === xg
