@@ -54,7 +54,7 @@ var indexSummaryDict = s.Schema{
 	}),
 	"indexing": indexingDict,
 	// following field is not included in the Stack Monitoring UI mapping
-	"bulk":   elasticsearch.BulkStatsDictMetricbeatCompatible,
+	"bulk":   bulkStatsDict,
 	"search": searchDict,
 }
 
@@ -79,6 +79,24 @@ var searchDict = c.Dict("search", s.Schema{
 		},
 	},
 })
+
+var bulkStatsDict = c.Dict("bulk", s.Schema{
+	"operations": s.Object{
+		"count": c.Int("total_operations"),
+	},
+	"time": s.Object{
+		"count": s.Object{
+			"ms": c.Int("total_time_in_millis"),
+		},
+		"avg": s.Object{
+			"ms":    c.Int("avg_time_in_millis"),
+			"bytes": c.Int("avg_size_in_bytes"),
+		},
+	},
+	"size": s.Object{
+		"bytes": c.Int("total_size_in_bytes"),
+	},
+}, c.DictOptional)
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var all struct {

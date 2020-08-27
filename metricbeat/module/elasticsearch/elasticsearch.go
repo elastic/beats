@@ -29,8 +29,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -118,32 +116,6 @@ type License struct {
 type licenseWrapper struct {
 	License License `json:"license"`
 }
-
-var BulkStatsDict = c.Dict("bulk", s.Schema{
-	"total_operations":     c.Int("total_operations"),
-	"total_time_in_millis": c.Int("total_time_in_millis"),
-	"total_size_in_bytes":  c.Int("total_size_in_bytes"),
-	"avg_time_in_millis":   c.Int("avg_time_in_millis"),
-	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
-}, c.DictOptional)
-
-var BulkStatsDictMetricbeatCompatible = c.Dict("bulk", s.Schema{
-	"operations": s.Object{
-		"count": c.Int("total_operations"),
-	},
-	"time": s.Object{
-		"count": s.Object{
-			"ms": c.Int("total_time_in_millis"),
-		},
-		"avg": s.Object{
-			"ms":    c.Int("avg_time_in_millis"),
-			"bytes": c.Int("avg_size_in_bytes"),
-		},
-	},
-	"size": s.Object{
-		"bytes": c.Int("total_size_in_bytes"),
-	},
-}, c.DictOptional)
 
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
