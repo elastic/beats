@@ -740,6 +740,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
+- Request prometheus endpoints to be gzipped by default {pull}20766[20766]
 
 *Packetbeat*
 
