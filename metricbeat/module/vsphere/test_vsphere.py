@@ -1,8 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-import metricbeat
 
 
 VSPHERE_FIELDS = metricbeat.COMMON_FIELDS + ["vsphere"]

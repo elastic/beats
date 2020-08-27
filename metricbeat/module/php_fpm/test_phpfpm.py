@@ -1,9 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-import metricbeat
-
 
 PHPFPM_FIELDS = metricbeat.COMMON_FIELDS + ["php_fpm"]
 

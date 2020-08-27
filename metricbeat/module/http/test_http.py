@@ -1,10 +1,9 @@
+import metricbeat
 import os
 import requests
 import sys
 import time
 import unittest
-
-import metricbeat
 
 
 HTTP_FIELDS = metricbeat.COMMON_FIELDS + ["http"]

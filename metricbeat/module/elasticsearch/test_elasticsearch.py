@@ -1,17 +1,15 @@
-import re
-import sys
+import json
+import metricbeat
 import os
+import re
+import semver
+import sys
 import unittest
-import urllib.request
 import urllib.error
 import urllib.parse
-import json
-import semver
+import urllib.request
 from elasticsearch import Elasticsearch, TransportError, client
 from parameterized import parameterized
-
-
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):

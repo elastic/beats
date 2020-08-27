@@ -1,6 +1,5 @@
 import os
 import sys
-
 from beat.beat import TestCase
 
 

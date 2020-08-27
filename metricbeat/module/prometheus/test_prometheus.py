@@ -1,9 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-
-import metricbeat
 
 
 PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]

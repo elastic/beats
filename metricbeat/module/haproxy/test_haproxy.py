@@ -1,8 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-import metricbeat
 
 
 HAPROXY_FIELDS = metricbeat.COMMON_FIELDS + ["haproxy"]

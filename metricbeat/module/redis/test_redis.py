@@ -1,10 +1,9 @@
+import metricbeat
 import os
 import pytest
 import redis
 import sys
 import unittest
-
-import metricbeat
 
 
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]

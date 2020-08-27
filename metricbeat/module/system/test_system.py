@@ -1,11 +1,10 @@
+import getpass
+import metricbeat
+import os
 import re
 import six
 import sys
 import unittest
-import getpass
-import os
-
-import metricbeat
 
 
 SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",

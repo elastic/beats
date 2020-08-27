@@ -2,8 +2,6 @@ import os
 import re
 import sys
 import yaml
-
-
 from beat.beat import TestCase
 from beat.tags import tag
 from parameterized import parameterized_class

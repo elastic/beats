@@ -1,4 +1,5 @@
 import json
+import metricbeat
 import os
 import semver
 import sys
@@ -7,8 +8,6 @@ import unittest
 import urllib.error
 import urllib.parse
 import urllib.request
-
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):

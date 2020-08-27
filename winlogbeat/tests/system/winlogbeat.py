@@ -11,7 +11,6 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-
 from beat.beat import TestCase
 
 PROVIDER = "WinlogbeatTestPython"

@@ -1,9 +1,8 @@
+import metricbeat
 import os
 import sys
 import unittest
 from parameterized import parameterized
-
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):

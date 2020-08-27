@@ -1,11 +1,9 @@
+import metricbeat
 import os
 import sys
-import unittest
 import time
+import unittest
 from parameterized import parameterized
-
-
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):

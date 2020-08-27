@@ -1,9 +1,8 @@
 import os
-from parameterized import parameterized
 import redis
 import sys
 import unittest
-
+from parameterized import parameterized
 from xpack_metricbeat import XPackTest, metricbeat
 
 

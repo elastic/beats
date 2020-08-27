@@ -1,8 +1,6 @@
 import jinja2
 import os
 import sys
-
-
 from metricbeat import BaseTest as MetricbeatTest
 
 

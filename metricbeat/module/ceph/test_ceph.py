@@ -1,3 +1,4 @@
+import metricbeat
 import os
 import requests
 import sys
@@ -5,7 +6,6 @@ import time
 import unittest
 from parameterized import parameterized
 
-import metricbeat
 
 
 @metricbeat.parameterized_with_supported_versions

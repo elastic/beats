@@ -1,10 +1,8 @@
 import jinja2
 import os
 import sys
-
-
-from filebeat import BaseTest as FilebeatTest
 from beat import common_tests
+from filebeat import BaseTest as FilebeatTest
 
 
 class FilebeatXPackTest(FilebeatTest, common_tests.TestExportsMixin):

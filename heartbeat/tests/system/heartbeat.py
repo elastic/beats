@@ -2,7 +2,6 @@ import os
 import sys
 import http.server
 import threading
-
 from beat.beat import TestCase
 from time import sleep
 

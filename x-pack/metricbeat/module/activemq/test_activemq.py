@@ -4,7 +4,6 @@ import stomp
 import string
 import sys
 import unittest
-
 from xpack_metricbeat import XPackTest, metricbeat
 
 

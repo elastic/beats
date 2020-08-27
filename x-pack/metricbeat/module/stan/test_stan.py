@@ -2,7 +2,6 @@ import os
 import sys
 import unittest
 from parameterized import parameterized
-
 from xpack_metricbeat import XPackTest, metricbeat
 
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]

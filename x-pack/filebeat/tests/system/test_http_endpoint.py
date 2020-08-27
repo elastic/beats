@@ -3,10 +3,8 @@ import requests
 import sys
 import os
 import json
-from requests.auth import HTTPBasicAuth
-
-
 from filebeat import BaseTest
+from requests.auth import HTTPBasicAuth
 
 
 class Test(BaseTest):

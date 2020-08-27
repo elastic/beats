@@ -1,7 +1,6 @@
 import os
 import socket
 import sys
-
 from xpack_metricbeat import XPackTest, metricbeat
 
 STATSD_HOST = '127.0.0.1'

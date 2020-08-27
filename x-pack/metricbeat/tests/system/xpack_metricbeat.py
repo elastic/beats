@@ -1,8 +1,6 @@
+import metricbeat
 import os
 import sys
-
-
-import metricbeat
 
 
 class XPackTest(metricbeat.BaseTest):

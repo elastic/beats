@@ -2,8 +2,6 @@ import os
 import sys
 import subprocess
 import json
-
-
 from beat.beat import TestCase
 from beat.beat import Proc
 

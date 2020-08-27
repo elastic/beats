@@ -1,11 +1,10 @@
 import logging
+import metricbeat
 import os
 import pytest
 import sys
 import unittest
 from parameterized import parameterized
-
-import metricbeat
 
 
 logger = logging.getLogger(__name__)

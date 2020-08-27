@@ -2,7 +2,6 @@ import os
 import pytest
 import sys
 import unittest
-
 from xpack_metricbeat import XPackTest, metricbeat
 
 
