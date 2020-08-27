@@ -12,6 +12,7 @@ This file is generated! See scripts/docs_collector.py
 
 This is a module for Fortinet logs sent in the syslog format. It supports the
 following devices:
+
 - `firewall` fileset: Supports FortiOS Firewall logs.
 - `clientendpoint` fileset: Supports FortiClient Endpoint Protection logs.
 - `fortimail` fileset: Supports FortiMail logs.
