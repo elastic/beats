@@ -1,4 +1,10 @@
-{{ if eq .input "syslog" }}
+{{ if .ssl }}
+
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
+
+{{ else if eq .input "syslog" }}
 
 type: syslog
 protocol.udp:
@@ -6,19 +12,6 @@ protocol.udp:
   {{ if ne .pipeline "" }}
   pipeline: "{{.pipeline}}"
   {{ end }}
-
-{{ else if eq .input "tls" }}
-type: tcp
-host: "{{.syslog_host}}:{{.syslog_port}}"
-ssl:
-  enabled: true
-  certificate_authorities: ["{{.cafile}}"]
-  certificate: "{{.certfile}}"
-  key: "{{.keyfile}}"
-  client_authentication: "required"
-{{ if ne .pipeline "" }}
-pipeline: "{{.pipeline}}"
-{{ end }}
 
 {{ else if eq .input "file" }}
 
@@ -29,6 +22,10 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
+{{ end }}
+
+{{ if ne .pipeline "" }}
+pipeline: "{{.pipeline}}"
 {{ end }}
 
 tags: {{.tags | tojson}}

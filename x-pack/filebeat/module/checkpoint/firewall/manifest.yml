@@ -9,12 +9,7 @@ var:
     default: 9001
   - name: input
     default: syslog
-  - name: certfile
-    default: ""
-  - name: keyfile
-    default: ""
-  - name: cafile
-    default: ""
+  - name: ssl
   - name: pipeline
     default: ""
 
