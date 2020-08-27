@@ -7,7 +7,6 @@ import unittest
 from parameterized import parameterized
 
 
-
 @metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
