@@ -182,6 +182,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
+- Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
 
 *Auditbeat*
 
