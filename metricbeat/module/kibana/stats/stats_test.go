@@ -101,3 +101,40 @@ func TestFetchUsage(t *testing.T) {
 	require.NotNil(t, mtest.GetUsageLastCollectedOn(ms))
 	require.Equal(t, now, mtest.GetUsageNextCollectOn(ms))
 }
+
+func TestShouldCollectUsage(t *testing.T) {
+	now := time.Now()
+
+	cases := map[string]struct{
+		usageLastCollectedOn time.Time
+		usageNextCollectOn time.Time
+		expectedResult bool
+	}{
+		"within_usage_collection_period": {
+			usageLastCollectedOn: now.Add(-1 * usageCollectionPeriod),
+			expectedResult: false,
+		},
+		"after_usage_collection_period_but_before_next_scheduled_collection": {
+			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
+			usageNextCollectOn: now.Add(3 * time.Hour),
+			expectedResult: false,
+		},
+		"after_usage_collection_period_and_after_next_scheduled_collection": {
+			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
+			usageNextCollectOn: now.Add(-1 * time.Hour),
+			expectedResult: true,
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			m := MetricSet{
+				usageLastCollectedOn: test.usageLastCollectedOn,
+				usageNextCollectOn: test.usageNextCollectOn,
+			}
+
+			actualResult := m.shouldCollectUsage(now)
+			require.Equal(t, test.expectedResult, actualResult)
+		})
+	}
+}
