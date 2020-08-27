@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"reflect"
 	"sort"
 	"strconv"
@@ -44,6 +45,9 @@ type Node interface {
 
 	// Hash compute a sha256 hash of the current node and recursively call any children.
 	Hash() []byte
+
+	// Apply apply the current vars.
+	Apply(composable.Vars) error
 }
 
 // AST represents a raw configuration which is purely data, only primitives are currently supported,
@@ -115,6 +119,16 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// Apply applies the vars to all the nodes in the dictionary.
+func (d *Dict) Apply(vars composable.Vars) error {
+	for _, v := range d.value {
+		if err := v.Apply(vars); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // sort sorts the keys in the dictionary
 func (d *Dict) sort() {
 	sort.Slice(d.value, func(i, j int) bool {
@@ -181,6 +195,11 @@ func (k *Key) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// Apply applies the vars to the value.
+func (k *Key) Apply(vars composable.Vars) error {
+	return k.value.Apply(vars)
+}
+
 // List represents a slice in our Tree.
 type List struct {
 	value []Node
@@ -244,14 +263,25 @@ func (l *List) Clone() Node {
 	return &List{value: nodes}
 }
 
+// Apply applies the vars to all nodes in the list.
+func (l *List) Apply(vars composable.Vars) error {
+	for _, v := range l.value {
+		if err := v.Apply(vars); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // StrVal represents a string.
 type StrVal struct {
 	value string
+	processors []map[string]interface{}
 }
 
 // NewStrVal creates a new string value node with provided value.
 func NewStrVal(val string) *StrVal {
-	return &StrVal{val}
+	return &StrVal{val, nil}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -277,6 +307,23 @@ func (s *StrVal) Clone() Node {
 // Hash we return the byte slice of the string.
 func (s *StrVal) Hash() []byte {
 	return []byte(s.value)
+}
+
+// Apply applies the vars to the string value.
+func (s *StrVal) Apply(vars composable.Vars) error {
+	val, processors, err := vars.Replace(s.value)
+	if err != nil {
+		return err
+	}
+	s.value = val
+	s.processors = processors
+	return nil
+}
+
+// Processors returns any linked processors that are now connected to this string
+// because of Apply.
+func (s *StrVal) Processors() []map[string]interface{} {
+	return s.processors
 }
 
 // IntVal represents an int.
@@ -307,6 +354,11 @@ func (s *IntVal) Value() interface{} {
 func (s *IntVal) Clone() Node {
 	k := *s
 	return &k
+}
+
+// Apply does nothing.
+func (s *IntVal) Apply(_ composable.Vars) error {
+	return nil
 }
 
 // Hash we convert the value into a string and return the byte slice.
@@ -349,6 +401,11 @@ func (s *UIntVal) Hash() []byte {
 	return []byte(s.String())
 }
 
+// Apply does nothing.
+func (s *UIntVal) Apply(_ composable.Vars) error {
+	return nil
+}
+
 // FloatVal represents a float.
 // NOTE: We will convert float32 to a float64.
 type FloatVal struct {
@@ -383,6 +440,11 @@ func (s *FloatVal) Clone() Node {
 // Hash return a string representation of the value, we try to return the minimal precision we can.
 func (s *FloatVal) Hash() []byte {
 	return []byte(strconv.FormatFloat(s.value, 'f', -1, 64))
+}
+
+// Apply does nothing.
+func (s *FloatVal) Apply(_ composable.Vars) error {
+	return nil
 }
 
 // BoolVal represents a boolean in our Tree.
@@ -424,6 +486,11 @@ func (s *BoolVal) Hash() []byte {
 		return trueVal
 	}
 	return falseVal
+}
+
+// Apply does nothing.
+func (s *BoolVal) Apply(_ composable.Vars) error {
+	return nil
 }
 
 // NewAST takes a map and convert it to an internal Tree, allowing us to executes rules on the
@@ -555,6 +622,11 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 	}
 
 	return b, nil
+}
+
+// Apply applies the variables to the replacement in the AST.
+func (a *AST) Apply(vars composable.Vars) error {
+	return a.root.Apply(vars)
 }
 
 func splitPath(s Selector) []string {

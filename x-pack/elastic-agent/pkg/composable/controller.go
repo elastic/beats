@@ -17,17 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
-// Vars is a context of variables that also contain a list of processors that go with the mapping.
-type Vars struct {
-	Mapping map[string]interface{}
-
-	ProcessorsKey string
-	Processors    []map[string]interface{}
-}
-
-// VarsCallback is callback called when the current vars state changes.
-type VarsCallback func([]Vars)
-
 // Controller manages the state of the providers current context.
 type Controller struct {
 	contextProviders map[string]*contextProviderState
