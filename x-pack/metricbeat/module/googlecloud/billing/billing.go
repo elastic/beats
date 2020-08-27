@@ -12,18 +12,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"cloud.google.com/go/bigquery"
-	"google.golang.org/api/iterator"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/pkg/errors"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
@@ -65,16 +61,19 @@ type config struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The gcp '%s' metricset is beta.", metricsetName)
 
-	m := &MetricSet{BaseMetricSet: base}
+	m := &MetricSet{
+		BaseMetricSet: base,
+		logger:        logp.NewLogger(metricsetName),
+	}
+
 	if err := base.Module().UnpackConfig(&m.config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unpack billing config failed: %w", err)
 	}
 
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
-
-	m.logger = logp.NewLogger(metricsetName)
+	m.Logger().Debugf("metricset config: %v", m.config)
 	return m, nil
 }
 
@@ -82,25 +81,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	m.Logger().Debugf("billing config: %v", m.config)
-
 	// find current month
 	month := getCurrentMonth()
 
 	opt := []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	client, err := bigquery.NewClient(ctx, m.config.ProjectID, opt...)
 	if err != nil {
-		return errors.Wrap(err, "error creating bigquery client")
+		return fmt.Errorf("gerror creating bigquery client: %w", err)
 	}
 
 	defer client.Close()
 
+	var events []mb.Event
 	tableMetas, err := getTables(ctx, client, m.config.DatasetID, m.config.TablePattern)
 	if err != nil {
-		return errors.Wrap(err, "getTables failed")
+		return fmt.Errorf("getTables failed: %w", err)
 	}
-
-	var events []mb.Event
 
 	// default cost_type for query is "regular"
 	costType := m.config.CostType
@@ -110,70 +106,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	}
 
 	for _, tableMeta := range tableMetas {
-		m.logger.Debug("table meta info = ", tableMeta)
-		query := fmt.Sprintf(`
-			SELECT
-				invoice.month,
-				project.id,
-				cost_type,
-			  SUM(cost)
-				+ SUM(IFNULL((SELECT SUM(c.amount) FROM UNNEST(credits) c), 0))
-				AS total,
-			  (SUM(CAST(cost * 1000000 AS int64))
-				+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
-				AS total_exact
-			FROM %s
-			WHERE project.id IS NOT NULL
-			AND invoice.month = '%s'
-			AND cost_type = '%s'
-			GROUP BY 1, 2, 3
-			ORDER BY 1 ASC, 2 ASC, 3 ASC;`, tableMeta.tableFullID, month, costType)
-
-		q := client.Query(query)
-		m.logger.Debug("bigquery query = ", query)
-
-		// Location must match that of the dataset(s) referenced in the query.
-		q.Location = tableMeta.location
-
-		// Run the query and print results when the query job is completed.
-		job, err := q.Run(ctx)
+		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, costType)
 		if err != nil {
-			err = fmt.Errorf("bigquery Run failed: %w", err)
-			m.logger.Error(err)
-			return err
+			return fmt.Errorf("queryBigQuery failed: %w", err)
 		}
 
-		status, err := job.Wait(ctx)
-		if err != nil {
-			err = fmt.Errorf("bigquery Wait failed: %w", err)
-			m.logger.Error(err)
-			return err
-		}
-
-		if err := status.Err(); err != nil {
-			err = fmt.Errorf("bigquery status error: %w", err)
-			m.logger.Error(err)
-			return err
-		}
-
-		it, err := job.Read(ctx)
-		for {
-			var row []bigquery.Value
-			err := it.Next(&row)
-			if err == iterator.Done {
-				break
-			}
-
-			if err != nil {
-				err = fmt.Errorf("bigquery RowIterator Next failed: %w", err)
-				m.logger.Error(err)
-				return err
-			}
-
-			if len(row) == 5 {
-				events = append(events, createEvents(row))
-			}
-		}
+		events = append(events, eventsPerQuery...)
 	}
 
 	m.Logger().Debugf("Total %d of events are created for billing", len(events))
@@ -196,6 +134,7 @@ type tableMeta struct {
 func getTables(ctx context.Context, client *bigquery.Client, datasetID string, tablePattern string) ([]tableMeta, error) {
 	dit := client.Datasets(ctx)
 	var tables []tableMeta
+
 	for {
 		dataset, err := dit.Next()
 		if err == iterator.Done {
@@ -237,18 +176,83 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 	return tables, nil
 }
 
-func createEvents(rowItems []bigquery.Value) mb.Event {
+func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
+	var events []mb.Event
+	query := fmt.Sprintf(`
+			SELECT
+				invoice.month,
+				project.id,
+				cost_type,
+			  (SUM(CAST(cost * 1000000 AS int64))
+				+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
+				AS total_exact
+			FROM %s
+			WHERE project.id IS NOT NULL
+			AND invoice.month = '%s'
+			AND cost_type = '%s'
+			GROUP BY 1, 2, 3
+			ORDER BY 1 ASC, 2 ASC, 3 ASC;`, tableMeta.tableFullID, month, costType)
+
+	q := client.Query(query)
+	m.logger.Debug("bigquery query = ", query)
+
+	// Location must match that of the dataset(s) referenced in the query.
+	q.Location = tableMeta.location
+
+	// Run the query and print results when the query job is completed.
+	job, err := q.Run(ctx)
+	if err != nil {
+		err = fmt.Errorf("bigquery Run failed: %w", err)
+		m.logger.Error(err)
+		return events, err
+	}
+
+	status, err := job.Wait(ctx)
+	if err != nil {
+		err = fmt.Errorf("bigquery Wait failed: %w", err)
+		m.logger.Error(err)
+		return events, err
+	}
+
+	if err := status.Err(); err != nil {
+		err = fmt.Errorf("bigquery status error: %w", err)
+		m.logger.Error(err)
+		return events, err
+	}
+
+	it, err := job.Read(ctx)
+	for {
+		var row []bigquery.Value
+		err := it.Next(&row)
+		if err == iterator.Done {
+			break
+		}
+
+		if err != nil {
+			err = fmt.Errorf("bigquery RowIterator Next failed: %w", err)
+			m.logger.Error(err)
+			return events, err
+		}
+
+		if len(row) == 4 {
+			events = append(events, createEvents(row, m.config.ProjectID))
+		}
+	}
+	return events, nil
+}
+
+func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 	event := mb.Event{}
 	event.MetricSetFields = common.MapStr{}
 	event.RootFields = common.MapStr{}
 
 	event.RootFields.Put("cloud.provider", "googlecloud")
+	event.RootFields.Put("cloud.account.id", accountID)
 
 	event.MetricSetFields.Put("invoice_month", rowItems[0])
 	event.MetricSetFields.Put("project_id", rowItems[1])
 	event.MetricSetFields.Put("cost_type", rowItems[2])
 	event.MetricSetFields.Put("total", rowItems[3])
-	event.MetricSetFields.Put("total_exact", rowItems[4])
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type
 	currentDate := getCurrentDate()

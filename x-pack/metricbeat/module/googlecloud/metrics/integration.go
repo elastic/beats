@@ -44,12 +44,6 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 				},
 			}
 		}
-
-		if metricSetName == "billing" {
-			config["dataset_id"] = "master_gcp"
-			config["table_pattern"] = "gcp_billing_export_v1"
-			config["period"] = "24h"
-		}
 	}
 	return config
 }

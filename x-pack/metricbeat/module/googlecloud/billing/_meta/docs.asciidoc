@@ -17,7 +17,7 @@ billing data to BigQuery] for more details on how to export billing data.
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
-  billing:
-    dataset_name: master_gcp
-    table_pattern: gcp_billing_export_v1
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"
+  cost_type: "regular"
 ----

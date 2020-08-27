@@ -13,8 +13,5 @@
       type: keyword
       description: Project ID of the billing report belongs to.
     - name: total
-      type: long
+      type: float
       description: Total billing amount.
-    - name: total_exact
-      type: long
-      description: Exact total billing amount.

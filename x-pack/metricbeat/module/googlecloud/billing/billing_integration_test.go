@@ -16,6 +16,10 @@ import (
 
 func TestData(t *testing.T) {
 	config := metrics.GetConfigForTest(t, "billing")
+	config["period"] = "24h"
+	config["dataset_id"] = "master_gcp"
+	config["table_pattern"] = "gcp_billing_export_v1"
+	config["cost_type"] = "regular"
 
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")

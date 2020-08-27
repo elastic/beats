@@ -18464,16 +18464,7 @@ type: keyword
 --
 Total billing amount.
 
-type: long
-
---
-
-*`googlecloud.billing.total_exact`*::
-+
---
-Exact total billing amount.
-
-type: long
+type: float
 
 --
 

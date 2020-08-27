@@ -1,6 +1,9 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
+        "account": {
+            "id": "elastic-bi"
+        },
         "provider": "googlecloud"
     },
     "event": {
@@ -13,8 +16,7 @@
             "cost_type": "regular",
             "invoice_month": "202008",
             "project_id": "elastic-fin-bi",
-            "total": 144.35474299999996,
-            "total_exact": 144.354743
+            "total": 148.532479
         }
     },
     "metricset": {
