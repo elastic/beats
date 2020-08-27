@@ -879,7 +879,12 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 			baseDir = ""
 		}
 
-		header.Name = filepath.Join(baseDir, pkgFile.Target)
+		relPath, err := filepath.Rel(pkgFile.Source, path)
+		if err != nil {
+			return err
+		}
+
+		header.Name = filepath.Join(baseDir, pkgFile.Target, relPath)
 		if info.IsDir() {
 			header.Name += string(filepath.Separator)
 		}
@@ -941,6 +946,10 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 		}
 
 		header.Name = filepath.Join(baseDir, pkgFile.Target)
+		if filepath.IsAbs(pkgFile.Target) {
+			header.Name = pkgFile.Target
+		}
+
 		header.Linkname = pkgFile.Source
 		header.Typeflag = tar.TypeSymlink
 
