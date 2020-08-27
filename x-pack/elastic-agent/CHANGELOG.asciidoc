@@ -3,10 +3,8 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-
-[[release-notes-8.0.0]]
-=== Agent version 8.0.0
-
+[[release-notes-7.8.0]]
+=== Elastic Agent version 7.8.0
 
 ==== Breaking changes
 - Rename agent to elastic-agent {pull}17391[17391]
@@ -66,3 +64,4 @@
 - Pick up version from libbeat {pull}18350[18350]
 - More clear output of inspect command {pull}18405[18405]
 - When not port are specified and the https is used fallback to 443 {pull}18844[18844]
+
