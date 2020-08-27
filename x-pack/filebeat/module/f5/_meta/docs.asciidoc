@@ -7,7 +7,11 @@
 
 experimental[]
 
-This is a module for receiving Big-IP Access Policy Manager logs over Syslog or a file.
+This is a module for F5 network device's logs. It includes the following
+filesets for receiving logs over syslog or read from a file:
+
+- `bigipapm` fileset: supports F5 Big-IP Access Policy Manager.
+- `bigipafm` fileset: supports F5 Big-IP Advanced Firewall Manager.
 
 include::../include/gs-link.asciidoc[]
 

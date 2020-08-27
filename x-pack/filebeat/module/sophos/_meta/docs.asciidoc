@@ -5,7 +5,11 @@
 
 == Sophos module
 
-This is a module for Sophos Products, currently it supports XG SFOS logs sent in the syslog format.
+This is a module for Sophos Products, currently it accepts
+logs in syslog format or from a file for the following devices:
+
+- `xg` fileset: supports Sophos XG SFOS logs.
+- `utm` fileset: supports Sophos UTM logs.
 
 To configure a remote syslog destination, please reference the https://community.sophos.com/kb/en-us/123184[SophosXG/SFOS Documentation].
 

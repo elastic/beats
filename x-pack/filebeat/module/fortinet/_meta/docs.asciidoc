@@ -5,7 +5,12 @@
 
 == Fortinet module
 
-This is a module for Fortinet FortiOS logs sent in the syslog format.
+This is a module for Fortinet logs sent in the syslog format. It supports the
+following devices:
+- `firewall` fileset: Supports FortiOS Firewall logs.
+- `clientendpoint` fileset: Supports FortiClient Endpoint Protection logs.
+- `fortimail` fileset: Supports FortiMail logs.
+- `fortimanager` fileset: Supports FortiManager logs.
 
 To configure a remote syslog destination, please reference the https://docs.fortinet.com/document/fortigate/6.0.0/cli-reference/260508/log-syslogd-syslogd2-syslogd3-syslogd4-setting[Fortigate/FortiOS Documentation].
 
