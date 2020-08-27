@@ -417,7 +417,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added experimental `cyberark` module. {pull}20820[20820]
 - Added experimental `proofpoint` module. {pull}20820[20820]
 - Added experimental `snort` module. {pull}20820[20820]
-- Added experimental `proofpoint` module. {pull}20820[20820]
+- Added experimental `symantec` module. {pull}20820[20820]
 - Added experimental dataset `barracuda/spamfirewall`. {pull}20820[20820]
 - Added experimental dataset `cisco/meraki`. {pull}20820[20820]
 - Added experimental dataset `f5/bigipafm`. {pull}20820[20820]
