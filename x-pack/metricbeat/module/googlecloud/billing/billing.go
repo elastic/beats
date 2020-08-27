@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
@@ -53,7 +52,7 @@ type config struct {
 	DatasetID           string `config:"dataset_id" validate:"required"`
 	TablePattern        string `config:"table_pattern" validate:"required"`
 	CostType            string `config:"cost_type"`
-	period              *duration.Duration
+	period              time.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -70,9 +69,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("unpack billing config failed: %w", err)
 	}
 
-	m.config.period = &duration.Duration{
-		Seconds: int64(m.Module().Config().Period.Seconds()),
-	}
 	m.Logger().Debugf("metricset config: %v", m.config)
 	return m, nil
 }
